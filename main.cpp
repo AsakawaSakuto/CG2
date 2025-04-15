@@ -1,6 +1,9 @@
 #include <Windows.h> // 00_01
 #include <string>    // 00_01
 #include <cstdint>   // 00_03
+#include <filesystem>// 00_04 EX ファイルやディレクトリに関する操作を行うライブラリ
+#include <fstream>   // 00_04 EX ファイルに書いたり読んだりするライブラリ
+#include <chrono>    // 00_04 EX 時間を扱うライブラリ
 
 #pragma region 配布
 
@@ -48,6 +51,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	}
 	// 標準のメッセージ処理を行う
 	return DefWindowProc(hwnd, msg, wparam, lparam);
+}
+
+#pragma endregion
+
+#pragma region ログをファイルに書き出す 00_04
+
+void Log(const std::string& message) {
+	OutputDebugStringA(message.c_str());
 }
 
 #pragma endregion
@@ -104,6 +115,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ウィンドウを表示する
 	ShowWindow(hwnd, SW_SHOW);
+
+#pragma endregion
+
+#pragma region ディレクトリを掘る 00_04 EX
+
+	// ログのディレクトリを用意
+	std::filesystem::create_directory("logs");
+
+#pragma endregion
+
+#pragma region 現在時刻でログファイルを生成 00_04 EX
+
+	// 現在時刻を取得（UTC時刻）
+	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+	// ログファイルの名前にコロンマが使えないので、削って秒にする
+	std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>
+		nowSeconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+	// 日本時間（PCの設定時間）に変換
+	std::chrono::zoned_time localTime{ std::chrono::current_zone(), nowSeconds };
+	// formatを使って年月日_時分秒の文字列に変換
+	std::string dateString = std::format("{:%Y%m%d_%H%M%S}", localTime);
+	// 時刻を使ってファイル名を決定
+	std::string logFilePath = std::string("logs/") + dateString + ".log";
+	// ファイルを作って書き込む準備
+	std::ofstream logStream(logFilePath);
 
 #pragma endregion
 
