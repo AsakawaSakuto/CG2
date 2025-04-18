@@ -1,14 +1,18 @@
-#include <Windows.h> // 00_01
-#include <string>    // 00_01
-#include <cstdint>   // 00_03
-#include <filesystem>// 00_04 EX ファイルやディレクトリに関する操作を行うライブラリ
-#include <fstream>   // 00_04 EX ファイルに書いたり読んだりするライブラリ
-#include <chrono>    // 00_04 EX 時間を扱うライブラリ
-#include <d3d12.h>   // 00_05
-#include <dxgi1_6.h> // 00_05
-#include <cassert>   // 00_05
-#pragma comment(lib,"d3d12.lib")  // 00_05
-#pragma comment(lib,"dxgi.lib")   // 00_05
+#include <Windows.h>  // 00_01
+#include <string>     // 00_01
+
+#include <cstdint>    // 00_03
+
+#include <filesystem> // 00_04 EX ファイルやディレクトリに関する操作を行うライブラリ
+#include <fstream>    // 00_04 EX ファイルに書いたり読んだりするライブラリ
+#include <chrono>     // 00_04 EX 時間を扱うライブラリ
+
+#include <d3d12.h>               // 00_05
+#include <dxgi1_6.h>             // 00_05
+#include <cassert>               // 00_05
+#pragma comment(lib,"d3d12.lib") // 00_05
+#pragma comment(lib,"dxgi.lib")  // 00_05
+
 #include <dxgidebug.h>            // 01_03
 #pragma comment(lib,"dxguid.lib") // 01_03
 #include <dxcapi.h>                   // 02_00
@@ -18,6 +22,8 @@
 #include "externals/imgui/imgui_impl_dx12.h"  // 02_03
 #include "externals/imgui/imgui_impl_win32.h" // 02_03
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+#include "externals/DirectXTex/DirectXTex.h"
 
 #include "Vector3.h"
 #include "Vector4.h"
@@ -238,9 +244,36 @@ ID3D12DescriptorHeap* CreateDescriptorHeap(
 
 #pragma endregion
 
+#pragma region Textureデータを読み込むためのLoadtexture関数をつくる
+
+DirectX::ScratchImage LoadTexture(const std::string filePath)
+{
+	// テクスチャファイルを読んでプログラムで扱えるようにする
+	DirectX::ScratchImage image{};
+	std::wstring filePathW = ConvertString(filePath);
+	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	assert(SUCCEEDED(hr));
+
+	// ミップマップの作成
+	DirectX::ScratchImage mipImages{};
+	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	assert(SUCCEEDED(hr));
+
+	// ミップマップ付きのデータを返す
+	return mipImages;
+}
+
+#pragma endregion
+
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+
+#pragma region main関数の先頭でCOMを初期化 03_00
+
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
+#pragma endregion
 
 #pragma region ウィンドウクラスを登録 00_03
 
@@ -933,10 +966,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	} // メインループ外
 
+#pragma region ゲーム終了時にはCOMの終了処理を行っておく
+
+	CoUninitialize();
+
+#pragma endregion
+
+
 #pragma region Imguiの終了処理
 
 	// ImGuiの終了処理。詳細はさして重要ではないので解説は省略する。
-// こういうもんである。初期化と逆順に行う
+    // こういうもんである。初期化と逆順に行う
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
