@@ -11,10 +11,10 @@ struct Matrix4x4 {
 };
 
 // 単位行列
-Matrix4x4 MakeIdentity4x4();
+Matrix4x4 MakeIdentityMatrix();
 
 // 行列の積
-Matrix4x4 Multiply(const Matrix4x4& v1, const Matrix4x4& v2);
+Matrix4x4 MultiplyMatrix(const Matrix4x4& m1, const Matrix4x4& m2);
 
 // 移動行列
 Matrix4x4 MakeTranslateMatrix(const  Vector3& translate);
@@ -35,7 +35,7 @@ Matrix4x4 MakeRotateZMatrix(float rotate);
 Matrix4x4 MakeAffineMatrix(const  Vector3& scale, const  Vector3& rotate, const  Vector3& translate);
 
 // 逆行列
-Matrix4x4 Inverse(Matrix4x4 cameraMatrix);
+Matrix4x4 InverseMatrix(Matrix4x4 cameraMatrix);
 
 // 透視投影行列
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);

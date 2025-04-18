@@ -1,7 +1,7 @@
 #include"Matrix4x4.h"
 
 // 単位行列
-Matrix4x4 MakeIdentity4x4() {
+Matrix4x4 MakeIdentityMatrix() {
 	Matrix4x4 result{};
 
 	for (int i = 0; i < 4; i++) {
@@ -17,7 +17,7 @@ Matrix4x4 MakeIdentity4x4() {
 }
 
 // 行列の積
-Matrix4x4 Multiply(const Matrix4x4& v1, const Matrix4x4& v2) {
+Matrix4x4 MultiplyMatrix(const Matrix4x4& v1, const Matrix4x4& v2) {
 	Matrix4x4 result{};
 
 	for (int x = 0; x < 4; x++) {
@@ -162,7 +162,7 @@ Matrix4x4 MakeAffineMatrix(const  Vector3& scale, const  Vector3& rotate, const 
 	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
 	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
 	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-	Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+	Matrix4x4 rotateXYZMatrix = MultiplyMatrix(rotateXMatrix, MultiplyMatrix(rotateYMatrix, rotateZMatrix));
 
 	result.m[0][0] = scale.x * rotateXYZMatrix.m[0][0];
 	result.m[0][1] = scale.x * rotateXYZMatrix.m[0][1];
@@ -185,7 +185,7 @@ Matrix4x4 MakeAffineMatrix(const  Vector3& scale, const  Vector3& rotate, const 
 };
 
 // 逆行列
-Matrix4x4 Inverse(Matrix4x4 cameraMatrix)
+Matrix4x4 InverseMatrix(Matrix4x4 cameraMatrix)
 {
 	Matrix4x4 result{};
 
