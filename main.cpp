@@ -16,7 +16,7 @@
 
 #include "Vector3.h"
 #include "Vector4.h"
-#include "Matrix.h"
+#include "Matrix4x4.h"
 
 struct Transform {
 	Vector3 scale;
@@ -723,7 +723,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 単位行列を書き込む
 	*wvpData = MakeIdentity4x4();
 
-	Matrix4x4* transformationMatrixData = nullptr;
+	/*Matrix4x4* transformationMatrixData = nullptr;*/
 
 #pragma endregion
 
@@ -747,13 +747,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region 三角形の回転処理 02_02
 
 			transform.rotate.y += 0.03f;
+			// 行列の内容を更新して三角形を動かす
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-			/*Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
 			Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-			*transformationMatrixData = worldViewProjectionMatrix;*/
-			*wvpData = worldMatrix;
+			// シーン上で三角形を描画
+			*wvpData = worldViewProjectionMatrix;
 
 #pragma endregion
 
