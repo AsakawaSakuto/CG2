@@ -763,7 +763,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
-	materialData->position = { 1.0f, 0.0f, 0.0f, 1.0f }; // 赤 (RGBA)
+	materialData->position = { 1.0f, 1.0f, 1.0f, 1.0f }; // 赤 (RGBA)
 	materialData->texcoord = { 0.0f, 0.0f };             // ダミー（使わなければ 0.0f でOK）
 
 #pragma endregion
