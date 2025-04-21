@@ -280,11 +280,24 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip
 {
 	Matrix4x4 result{};
 
-	result.m[0][0] = (1 / aspectRatio) * 1 / std::tan(fovY / 2);
-	result.m[1][1] = 1 / std::tan(fovY / 2);
+	result.m[0][0] = (1.0f / aspectRatio) * 1.0f / std::tan(fovY / 2.0f);
+	result.m[1][1] = 1.0f / std::tan(fovY / 2.0f);
 	result.m[2][2] = farClip / (farClip - nearClip);
-	result.m[2][3] = 1;
+	result.m[2][3] = 1.0f;
 	result.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
 
+	return result;
+}
+
+// 平行投影行列
+Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
+	Matrix4x4 result{};
+	result.m[0][0] = 2.0f / (right - left);
+	result.m[1][1] = 2.0f / (top - bottom);
+	result.m[2][2] = 1.0f / (farClip - nearClip);
+	result.m[3][0] = (left + right) / (left - right);
+	result.m[3][1] = (top + bottom) / (bottom - top);
+	result.m[3][2] = nearClip / (nearClip - farClip);
+	result.m[3][3] = 1.0f;
 	return result;
 }
