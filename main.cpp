@@ -374,6 +374,66 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 
 #pragma endregion
 
+#pragma region 球体メッシュを作成する関数 05_00
+
+// 球体メッシュを作成する関数
+void CreateSphereMesh(std::vector<VertexData>& vertices, int subdivision) {
+	const float pi = 3.1415926535f;
+	const float lonEvery = 2.0f * pi / subdivision;
+	const float latEvery = pi / subdivision;
+
+	vertices.clear();
+	vertices.resize(subdivision * subdivision * 6);
+
+	for (int latIndex = 0; latIndex < subdivision; ++latIndex) {
+		float lat = -pi / 2.0f + latEvery * latIndex;
+		for (int lonIndex = 0; lonIndex < subdivision; ++lonIndex) {
+			float lon = lonEvery * lonIndex;
+			uint32_t start = (latIndex * subdivision + lonIndex) * 6;
+
+			// 4点計算
+			Vector3 a = { cosf(lat) * cosf(lon), sinf(lat), cosf(lat) * sinf(lon) };
+			Vector3 b = { cosf(lat) * cosf(lon + lonEvery), sinf(lat), cosf(lat) * sinf(lon + lonEvery) };
+			Vector3 c = { cosf(lat + latEvery) * cosf(lon), sinf(lat + latEvery), cosf(lat + latEvery) * sinf(lon) };
+			Vector3 d = { cosf(lat + latEvery) * cosf(lon + lonEvery), sinf(lat + latEvery), cosf(lat + latEvery) * sinf(lon + lonEvery) };
+
+			float u0 = float(lonIndex) / subdivision;
+			float v0 = 1.0f - float(latIndex) / subdivision;
+			float u1 = float(lonIndex + 1) / subdivision;
+			float v1 = 1.0f - float(latIndex + 1) / subdivision;
+
+			vertices[start + 0] = { {a.x, a.y, a.z, 1.0f}, {u0, v0} };
+			vertices[start + 1] = { {c.x, c.y, c.z, 1.0f}, {u0, v1} };
+			vertices[start + 2] = { {b.x, b.y, b.z, 1.0f}, {u1, v0} };
+
+			vertices[start + 3] = { {c.x, c.y, c.z, 1.0f}, {u0, v1} };
+			vertices[start + 4] = { {d.x, d.y, d.z, 1.0f}, {u1, v1} };
+			vertices[start + 5] = { {b.x, b.y, b.z, 1.0f}, {u1, v0} };
+
+		}
+	}
+}
+
+
+#pragma endregion
+
+#pragma region DiscriptorHandleを取得する関数 05_01
+
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (descriptorSize * index);
+	return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (descriptorSize * index);
+	return handleGPU;
+}
+
+#pragma endregion
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -631,10 +691,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region DescriptorHeapを生成する 01_00 関数化 RTVとSRV用のヒープを作成 02_03
 
 	// RTV用のヒープでディスクリプタの数は2 RTVはShader内で触るものではないのでShaderVisibleはfalse
-	ID3D12DescriptorHeap * rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SRVのヒープでディスクリプタの数は128 SRVはShader内で触るものなのでShaderVisibleはftrue
 	ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+
+#pragma endregion
+
+#pragma region DescriptorSizeの取得
+
+	// DescriptorsSizeを取得しておく
+	const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 #pragma endregion
 
@@ -904,6 +973,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
+#pragma region Sphereのリソースを作成 05_00
+
+	// Sphere用の頂点バッファリソースを生成
+	std::vector<VertexData> sphereVertices;
+	const int sphereSubdivision = 16; // 分割数（細かさ）
+	CreateSphereMesh(sphereVertices, sphereSubdivision);
+
+	ID3D12Resource* sphereVertexResource = CreateBufferResource(device, sizeof(VertexData) * UINT(sphereVertices.size()));
+
+	// 頂点データをアップロード
+	VertexData* sphereVertexData = nullptr;
+	sphereVertexResource->Map(0, nullptr, reinterpret_cast<void**>(&sphereVertexData));
+	memcpy(sphereVertexData, sphereVertices.data(), sizeof(VertexData)* sphereVertices.size());
+
+	// Sphere用のVBV作成
+	D3D12_VERTEX_BUFFER_VIEW sphereVertexBufferView{};
+	sphereVertexBufferView.BufferLocation = sphereVertexResource->GetGPUVirtualAddress();
+	sphereVertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * sphereVertices.size());
+	sphereVertexBufferView.StrideInBytes = sizeof(VertexData);
+
+#pragma endregion
+
 #pragma region VertexBufferViewを作成する VertexResourceにデータを書き込む 02_00 VertexBufferViewSpriteを作成する VertexResourceSpriteにデータを書き込む 04_00
 
 	// 頂点バッファビューを作成する
@@ -1081,6 +1172,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
+	
 	// メインループ 00_03
 	MSG msg{};
 	// ウィンドウのxボタンが押されるまでループ
@@ -1099,6 +1191,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::NewFrame();
 			// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 			ImGui::ShowDemoWindow();
+
+			// --- ImGuiカメラコントローラ ---
+			ImGui::Begin("Camera Control");
+
+			ImGui::Text("Move Camera:");
+			ImGui::DragFloat3("Position", &cameraTransform.translate.x, 0.1f);
+
+			ImGui::Text("Rotate Camera:");
+			ImGui::DragFloat3("Rotation", &cameraTransform.rotate.x, 0.1f);
+
+			ImGui::End();
+
 			// Imguiの内部コマンドを生成する
 			ImGui::Render();
 
@@ -1196,6 +1300,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 			// 描画！ (DrawCall/ドローコール)
 			commandList->DrawInstanced(6, 1, 0, 0);
+
+#pragma endregion
+
+#pragma region Sphere描画 05_00
+
+			// --- Sphere描画 ---
+            // 頂点バッファをSphereに切り替える
+			commandList->IASetVertexBuffers(0, 1, &sphereVertexBufferView);
+			// PrimitiveTopology設定
+			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			// wvp用CBuffer設定（そのまま使い回し）
+			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+			// Sphereを描画
+			commandList->DrawInstanced(UINT(sphereVertices.size()), 1, 0, -10);
+
 
 #pragma endregion
 
@@ -1311,6 +1430,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexShaderBlob->Release();
 
 	materialResource->Release();
+
+	sphereVertexResource->Release();
 
 	CloseWindow(hwnd);
 
