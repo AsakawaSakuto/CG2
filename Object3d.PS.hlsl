@@ -40,9 +40,12 @@ PixelShaderOutput main(VertexShaderOutput input)
 
     float4 texColor = gTexture.Sample(gSampler, input.texcoord);
 
+    // HarfLambert
+    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+    
     if (gMaterial.enableLighting != 0)
     {
-        output.color = gMaterial.color * texColor * gDirectionalLight.color * NdotL * gDirectionalLight.intensity;
+        output.color = gMaterial.color * texColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
     }
     else
     {
