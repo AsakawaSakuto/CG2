@@ -44,7 +44,6 @@ struct VertexData {
 	float _pad2;        // 4 bytes (align to 16 again)
 };
 
-
 struct Material {
 	Vector4 color;
 	int32_t enableLighting;
