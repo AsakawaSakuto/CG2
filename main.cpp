@@ -449,6 +449,57 @@ void CreateSphereMesh(std::vector<VertexData>& vertices, int subdivision) {
 	}
 }
 
+// 球体メッシュをインデックス付きで作成する関数
+void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision) {
+	const float pi = 3.1415926535f;
+	const float lonEvery = 2.0f * pi / subdivision;
+	const float latEvery = pi / subdivision;
+
+	vertices.clear();
+	indices.clear();
+
+	auto Normalize = [](const Vector3& v) -> Vector3 {
+		float len = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+		if (len > 0.0f) return { v.x / len, v.y / len, v.z / len };
+		else return { 0.0f, 1.0f, 0.0f };
+		};
+
+	for (int lat = 0; lat <= subdivision; ++lat) {
+		float theta = -pi / 2.0f + latEvery * lat;
+		float v = 1.0f - float(lat) / subdivision;
+
+		for (int lon = 0; lon <= subdivision; ++lon) {
+			float phi = lonEvery * lon;
+			float u = float(lon) / subdivision;
+
+			Vector3 pos = {
+				cosf(theta) * cosf(phi),
+				sinf(theta),
+				cosf(theta) * sinf(phi)
+			};
+			Vector3 normal = Normalize(pos);
+			vertices.push_back({ { pos.x, pos.y, pos.z, 1.0f }, { u, v }, {}, normal });
+		}
+	}
+
+	for (int lat = 0; lat < subdivision; ++lat) {
+		for (int lon = 0; lon < subdivision; ++lon) {
+			int i0 = lat * (subdivision + 1) + lon;
+			int i1 = i0 + 1;
+			int i2 = i0 + (subdivision + 1);
+			int i3 = i2 + 1;
+
+			indices.push_back(i0);
+			indices.push_back(i2);
+			indices.push_back(i1);
+
+			indices.push_back(i1);
+			indices.push_back(i2);
+			indices.push_back(i3);
+		}
+	}
+}
+
 
 #pragma endregion
 
@@ -1053,70 +1104,85 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// Sphere用の頂点バッファリソースを生成
 	std::vector<VertexData> sphereVertices;
-	const int sphereSubdivision = 16; // 分割数（細かさ）
-	CreateSphereMesh(sphereVertices, sphereSubdivision);
+	std::vector<uint32_t> sphereIndices; // Index
+	const int sphereSubdivision = 32; // 分割数（細かさ）
 
+	CreateIndexedSphereMesh(sphereVertices, sphereIndices, sphereSubdivision);
+
+	// 頂点リソース
 	ID3D12Resource* sphereVertexResource = CreateBufferResource(device, sizeof(VertexData) * UINT(sphereVertices.size()));
-
-	// 頂点データをアップロード
 	VertexData* sphereVertexData = nullptr;
 	sphereVertexResource->Map(0, nullptr, reinterpret_cast<void**>(&sphereVertexData));
 	memcpy(sphereVertexData, sphereVertices.data(), sizeof(VertexData)* sphereVertices.size());
+	sphereVertexResource->Unmap(0, nullptr);
 
-	// Sphere用のVBV作成
+	// インデックスリソース
+	ID3D12Resource* sphereIndexResource = CreateBufferResource(device, sizeof(uint32_t) * sphereIndices.size());
+	uint32_t* indexData = nullptr;
+	sphereIndexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	memcpy(indexData, sphereIndices.data(), sizeof(uint32_t)* sphereIndices.size());
+	sphereIndexResource->Unmap(0, nullptr);
+
+	// VBV作成(VertexBufferView)
 	D3D12_VERTEX_BUFFER_VIEW sphereVertexBufferView{};
 	sphereVertexBufferView.BufferLocation = sphereVertexResource->GetGPUVirtualAddress();
 	sphereVertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * sphereVertices.size());
 	sphereVertexBufferView.StrideInBytes = sizeof(VertexData);
 
+	// IBV作成(IndexBufferView)
+	D3D12_INDEX_BUFFER_VIEW sphereIBV{};
+	sphereIBV.BufferLocation = sphereIndexResource->GetGPUVirtualAddress();
+	sphereIBV.SizeInBytes = UINT(sizeof(uint32_t) * sphereIndices.size());
+	sphereIBV.Format = DXGI_FORMAT_R32_UINT;
+
 #pragma endregion
 
 #pragma region VertexBufferViewを作成する VertexResourceにデータを書き込む 02_00 VertexBufferViewSpriteを作成する VertexResourceSpriteにデータを書き込む 04_00 ライティング 05_03
 
-	// 頂点バッファビューを作成する
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	// リソースの先頭のアドレスから使う
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	// 使用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
-	// 頂点あたりのサイズ
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+	//// 頂点バッファビューを作成する
+	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	//// リソースの先頭のアドレスから使う
+	//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	//// 使用するリソースのサイズは頂点3つ分のサイズ
+	//vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+	//// 頂点あたりのサイズ
+	//vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	// 頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
-	// 書き込むためのアドレスを取得
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	// 左下
-	vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
-	vertexData[0].texcoord = { 0.0f,1.0f };
-	vertexData[0].normal = { 0.0f,0.0f,-1.0f };
-	// 上
-	vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
-	vertexData[1].texcoord = { 0.5f,0.0f };
-	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
-	// 右下
-	vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
-	vertexData[2].texcoord = { 1.0f,1.0f };
-	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
+	//// 頂点リソースにデータを書き込む
+	//VertexData* vertexData = nullptr;
+	//// 書き込むためのアドレスを取得
+	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//// 左下
+	//vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+	//vertexData[0].texcoord = { 0.0f,1.0f };
+	//vertexData[0].normal = { 0.0f,0.0f,-1.0f };
+	//// 上
+	//vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
+	//vertexData[1].texcoord = { 0.5f,0.0f };
+	//vertexData[1].normal = { 0.0f,0.0f,-1.0f };
+	//// 右下
+	//vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+	//vertexData[2].texcoord = { 1.0f,1.0f };
+	//vertexData[2].normal = { 0.0f,0.0f,-1.0f };
 
-	// 左下2
-	vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
-	vertexData[3].texcoord = { 0.0f,1.0f };
-	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
-	// 上2
-	vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-	vertexData[4].texcoord = { 0.5f,0.0f };
-	vertexData[4].normal = { 0.0f,0.0f,-1.0f };
-	// 右下2
-	vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
-	vertexData[5].texcoord = { 1.0f,1.0f };
-	vertexData[5].normal = { 0.0f,0.0f,-1.0f };
+	//// 左下2
+	//vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+	//vertexData[3].texcoord = { 0.0f,1.0f };
+	//vertexData[3].normal = { 0.0f,0.0f,-1.0f };
+	//// 上2
+	//vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	//vertexData[4].texcoord = { 0.5f,0.0f };
+	//vertexData[4].normal = { 0.0f,0.0f,-1.0f };
+	//// 右下2
+	//vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+	//vertexData[5].texcoord = { 1.0f,1.0f };
+	//vertexData[5].normal = { 0.0f,0.0f,-1.0f };
 
-	for (int i = 0; i < 6; i++)
-	{
-		Vector3 pos = { vertexData[i].position.x, vertexData[i].position.y, vertexData[i].position.z };
-		vertexData[i].normal = pos.Normalize();
-	}
+	//for (int i = 0; i < 6; i++)
+	//{
+	//	Vector3 pos = { vertexData[i].position.x, vertexData[i].position.y, vertexData[i].position.z };
+	//	vertexData[i].normal = pos.Normalize();
+	//}
 
 	/*----------
 	   Sprite
@@ -1444,39 +1510,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 			commandList->SetGraphicsRootSignature(rootSignature);
 			commandList->SetPipelineState(graphicsPipelineState);    // PSOを設定
-			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);    // VBVを設定
-			// 形状を設定。PSOに設定しているものとは独立。同じものを設定すると考えておけば良い
-			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			// マテリアルCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-			// wvp用のBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-			// SRVのDescriptorTableの戦闘を設定、2はrootParameter[2] 03_00
-			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
 
-			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-			// 描画！(DrawCall「ドローコール」)。頂点元で2つのインスタンス。インスタンスについては今後
-			commandList->DrawInstanced(6, 1, 0, 0);
+
+			/*-----三角形描画-----*/ 
+
+			//commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);    // VBVを設定
+			//// 形状を設定。PSOに設定しているものとは独立。同じものを設定すると考えておけば良い
+			//commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			//// マテリアルCBufferの場所を設定
+			//commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+			//// wvp用のBufferの場所を設定
+			//commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+			//// SRVのDescriptorTableの戦闘を設定、2はrootParameter[2] 03_00
+			//commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+
+			//commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+			//// 描画！(DrawCall「ドローコール」)。頂点元で2つのインスタンス。インスタンスについては今後
+			//commandList->DrawInstanced(6, 1, 0, 0);
 
 #pragma endregion
 
 #pragma region Sphere描画 05_00
 
 			// --- Sphere描画 ---
-            // 頂点バッファをSphereに切り替える
 			commandList->IASetVertexBuffers(0, 1, &sphereVertexBufferView);
-			// PrimitiveTopology設定
+			commandList->IASetIndexBuffer(&sphereIBV);
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			// RootParam[0] マテリアル
+
+			// RootParams 設定（そのままでOK）
 			commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-			// RootParam[1] WVP
 			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-			// RootParam[2] テクスチャ
 			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-			// RootParam[3] ライト
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-			// Sphereを描画
-			commandList->DrawInstanced(UINT(sphereVertices.size()), 1, 0, 0);
+
+			// インデックス描画
+			commandList->DrawIndexedInstanced(
+				static_cast<UINT>(sphereIndices.size()),
+				1, 0, 0, 0);
+
 
 
 #pragma endregion
