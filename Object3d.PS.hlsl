@@ -33,6 +33,10 @@ SamplerState gSampler : register(s0);
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
+    
+    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+    float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
+    
     float3 N = normalize(input.normal);
     float3 L = normalize(-gDirectionalLight.direction);
 
@@ -45,11 +49,11 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     if (gMaterial.enableLighting != 0)
     {
-        output.color = gMaterial.color * texColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+        output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
     }
     else
     {
-        output.color = gMaterial.color * texColor;
+        output.color = gMaterial.color * textureColor;
     }
     
     return output;

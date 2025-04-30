@@ -917,6 +917,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	descriptionRootSignature.pParameters = rootParameters;              // ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);  // 配列の長さ
 
+	// UVTransform用の変数
+	Transform uvTransformSprite{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
+
 	// マテリアル用のリソースを作る。今回は VertexData 1つ分のサイズを用意する
 	ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Material));
 
@@ -928,6 +935,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 赤 (RGBA)
 	materialData->enableLighting = true;
+	materialData->uvTransform = MakeIdentityMatrix();
 
 	// マテリアル用のリソースを作る。今回は VertexData 1つ分のサイズを用意する
 	ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material));
@@ -940,6 +948,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialDataSprite->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 赤 (RGBA)
 	materialDataSprite->enableLighting = false;
+	materialDataSprite->uvTransform = MakeIdentityMatrix();
 
 #pragma endregion
 
@@ -1417,11 +1426,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 			
-			ImGui::End();
-
-			// ImGuiでDirectionalLightを操作
-			ImGui::Begin("Light Control");
-
 			// カラー（Vector4）の操作（RGBA）
 			ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&directionalLightData->color));
 
@@ -1430,6 +1434,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			// 光の強さ（intensity）操作
 			ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 10.0f);
+
+			ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 
 			ImGui::End();
 
@@ -1451,6 +1459,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			wvpData->WVP = worldViewProjectionMatrix;
 			wvpData->World = worldViewProjectionMatrix;
 
+			// UVトランスフォーム行列の作成と書き込み
+			Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+			uvTransformMatrix = MultiplyMatrix(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
+			uvTransformMatrix = MultiplyMatrix(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+			materialDataSprite->uvTransform = uvTransformMatrix;
+
 			// Sprite用のWorldViewProjectionMatrixを作る
 			Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
 			Matrix4x4 viewMatrixSprite = MakeIdentityMatrix();
@@ -1459,7 +1473,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
 			transformationMatrixDataSprite->World = worldViewProjectionMatrixSprite;
 
-
+			
 #pragma endregion
 
 #pragma region コマンドを積み込んで確定させる 01_00
@@ -1564,9 +1578,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//
 			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
 			// 描画！ (DrawCall/ドローコール)
-			//commandList->DrawInstanced(6, 1, 0, 0);
 			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
+			
 
 #pragma endregion
 
