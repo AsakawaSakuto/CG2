@@ -1824,10 +1824,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	rootSignature->Release();
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
-
 	materialResource->Release();
-
 	sphereVertexResource->Release();
+	directionalLightResource->Release();
 
 	CloseWindow(hwnd);
 
