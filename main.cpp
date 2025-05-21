@@ -30,6 +30,9 @@
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
+#include <xaudio2.h>
+#pragma comment(lib,"xaudio2.h")
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #include "externals/DirectXTex/DirectXTex.h"
@@ -80,6 +83,9 @@ struct ModelData {
 	std::vector<VertexData> vertices;
 	MaterialData material;
 };
+
+ComPtr<IXAudio2> xAudio2;
+IXAudio2MasteringVoice* masterVoice;
 
 #pragma region 配布
 
@@ -802,7 +808,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Log("Complete create D3D12Device!!!\n"); // 初期化完了ログを出す
 
 #pragma endregion
-
+	hr = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
+	assert(SUCCEEDED(hr));
 #pragma region エラー・警告で停止 *この対応はdeviceに対して行うので上のLog(初期化完了ログ)の直後に記述する 01_01
 
 #ifdef _DEBUG
