@@ -31,7 +31,7 @@
 using Microsoft::WRL::ComPtr;
 
 #include <xaudio2.h>
-#pragma comment(lib,"xaudio2.h")
+#pragma comment(lib, "xaudio2.lib")
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -84,8 +84,122 @@ struct ModelData {
 	MaterialData material;
 };
 
-ComPtr<IXAudio2> xAudio2;
-IXAudio2MasteringVoice* masterVoice;
+// 07-00 xAudio関係
+struct ChunkHeader {
+	char id[4]; // チャンク毎のID
+	int32_t size;	// チャンクサイズ
+};
+
+struct RiffHeader {
+	ChunkHeader chunk; // RIFF
+	char type[4]; // WAVE
+};
+
+struct FormatChunk {
+	ChunkHeader chunk; // fmt
+	WAVEFORMATEX fmt; // WAVEフォーマット
+};
+
+struct SoundData {
+	WAVEFORMATEX wfex; // WAVEフォーマット
+	BYTE* pBuffer = nullptr; // 音声データ
+	uint32_t bufferSize = 0; // バッファサイズ
+	std::string name; // ファイル名
+};
+
+SoundData SoundLoadWave(const char* filePath) {
+
+#pragma region ファイルオープン
+	//ファイル入力ストリームのインスタンス
+	std::ifstream file;
+	//wavファイルをバイナリモードで開く
+	file.open(filePath, std::ios_base::binary);
+	//ファイルオープン失敗を検出する
+	assert(file.is_open());
+#pragma endregion
+
+#pragma region wavデータ読み込み
+	//RIFFヘッダーの読み込み
+	RiffHeader riff;
+	file.read((char*)&riff, sizeof(riff));
+	//RIFFヘッダーのチェック
+	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
+		assert(0);
+	}
+	//タイプがWAVEかチェック
+	if (strncmp(riff.type, "WAVE", 4) != 0) {
+		assert(0);
+	}
+	//フォーマットチャンクの読み込み
+	FormatChunk format = {};
+	//チャンクヘッダーの確認
+	file.read((char*)&format, sizeof(ChunkHeader));
+	if (strncmp(format.chunk.id, "fmt ", 4) != 0) {
+		assert(0);
+	}
+	//チャンク本体の読み込み
+	assert(format.chunk.size <= sizeof(format.fmt));
+	file.read((char*)&format.fmt, format.chunk.size);
+
+	//Dataチャンクの読み込み
+	ChunkHeader data;
+	file.read((char*)&data, sizeof(data));
+	//JUNKチャンクを検出した場合
+	if (strncmp(data.id, "JUNK ", 4) == 0) {
+		//読み取り位置をJUNKチャンクの終わりまで進める
+		file.seekg(data.size, std::ios_base::cur);
+		//再読み込み
+		file.read((char*)&data, sizeof(data));
+	}
+	if (strncmp(data.id, "data ", 4) != 0) {
+		assert(0);
+	}
+	//Dataチャンクのデータ部（波形データ）の読み込み
+	char* pBuffer = new char[data.size];
+	file.read(pBuffer, data.size);
+
+	//Waveファイルを閉じる
+	file.close();
+
+#pragma endregion
+
+#pragma region 読み込んだ音声データをreturn
+	//returnする音声データ
+	SoundData soundData = {};
+
+	soundData.wfex = format.fmt;
+	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
+	soundData.bufferSize = data.size;
+
+	return soundData;
+#pragma endregion
+}
+
+void SoundUnload(SoundData* soundData)
+{
+	// バッファのメモリを解放
+	delete[] soundData->pBuffer;
+
+	soundData->pBuffer = 0;
+	soundData->bufferSize = 0;
+	soundData->wfex = {};
+}
+
+void SoundPlayWave(IXAudio2* xAudio2,const SoundData&soundData) {
+	HRESULT result;
+	//波形フォーマットを元にSourceVoiceの生成
+	IXAudio2SourceVoice* pSourceVoice = nullptr;
+	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+	assert(SUCCEEDED(result));
+	//再生する波形データの設定
+	XAUDIO2_BUFFER buf{};
+	buf.pAudioData = soundData.pBuffer;
+	buf.AudioBytes = soundData.bufferSize;
+	buf.Flags = XAUDIO2_END_OF_STREAM;
+	//波形データの再生
+	result = pSourceVoice->SubmitSourceBuffer(&buf);
+	result = pSourceVoice->Start();
+}
 
 #pragma region 配布
 
@@ -808,8 +922,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Log("Complete create D3D12Device!!!\n"); // 初期化完了ログを出す
 
 #pragma endregion
-	hr = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
-	assert(SUCCEEDED(hr));
+	
 #pragma region エラー・警告で停止 *この対応はdeviceに対して行うので上のLog(初期化完了ログ)の直後に記述する 01_01
 
 #ifdef _DEBUG
@@ -981,6 +1094,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	assert(SUCCEEDED(hr));
 
 #pragma endregion
+
+	// 07-00 xAudio関係
+
+	Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
+	IXAudio2MasteringVoice* masterVoice = nullptr;
+
+	hr = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
+	assert(SUCCEEDED(hr));
+
+	hr = xAudio2->CreateMasteringVoice(&masterVoice);
+	assert(SUCCEEDED(hr));
+
+	SoundData soundData1 = SoundLoadWave("Resources/fanfare.wav");
+
+	SoundPlayWave(xAudio2.Get(), soundData1);
 
 #pragma region RootSignatureを生成する 02_00
 
@@ -1806,6 +1934,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui::DestroyContext();
 
 #pragma endregion
+
+	xAudio2.Reset();
+	SoundUnload(&soundData1);
 
 #pragma region 解放処理(リソースチェックの前) 01_03
 
