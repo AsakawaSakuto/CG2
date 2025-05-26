@@ -33,6 +33,11 @@ using Microsoft::WRL::ComPtr;
 #include <xaudio2.h>
 #pragma comment(lib, "xaudio2.lib")
 
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #include "externals/DirectXTex/DirectXTex.h"
@@ -1095,6 +1100,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
+	// 07-01 Input
+	IDirectInput8* directInput = nullptr;
+	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	assert(SUCCEEDED(hr));
+
+	IDirectInputDevice8* keyboard = nullptr;
+	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+	assert(SUCCEEDED(hr));
+
+	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
+	assert(SUCCEEDED(hr));
+
+	hr = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	assert(SUCCEEDED(hr));
+
 	// 07-00 xAudio関係
 
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
@@ -1108,7 +1128,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	SoundData soundData1 = SoundLoadWave("Resources/fanfare.wav");
 
-	SoundPlayWave(xAudio2.Get(), soundData1);
+	/*SoundPlayWave(xAudio2.Get(), soundData1);*/
 
 #pragma region RootSignatureを生成する 02_00
 
@@ -1660,6 +1680,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	device->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
 
 #pragma endregion
+	// メインループ外で定義（前フレームのキー状態を保存）
+	BYTE preKey[256] = {};
 
 	// メインループ 00_03
 	MSG msg{};
@@ -1671,6 +1693,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(&msg);
 		} else { // ゲームの処理
 
+			keyboard->Acquire();
+			BYTE key[256] = {};
+			keyboard->GetDeviceState(sizeof(key), key);
+
+			// スペースキーがトリガー（今回押されていて、前回押されていない）なら再生
+			if (key[DIK_SPACE] && !preKey[DIK_SPACE])
+			{
+				SoundPlayWave(xAudio2.Get(), soundData1);
+			}
+
+			// 現在のキー状態を保存して次フレームに備える
+			memcpy(preKey, key, sizeof(key));
 #pragma region Imguiを使う
 
 			// フレームの先頭でImguiにここからフレームが始まる旨を告げる
