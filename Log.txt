@@ -1,0 +1,41 @@
+[Log] === Logger Initialized ===
+[Log] エンジン起動成功
+[Error] 致命的エラーが発生しました
+[Log] Use Adapter:NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Log] FearureLevel:12.1
+
+[Log] Complete create D3D12Device!!!
+
+[Log] Use Adapter:NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Log] FearureLevel:12.1
+
+[Log] Complete create D3D12Device!!!
+
+[Log] Use Adapter:NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Log] FearureLevel:12.1
+
+[Log] Complete create D3D12Device!!!
+
+[Log] Use Adapter:NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Log] FearureLevel:12.1
+
+[Log] Complete create D3D12Device!!!
+
+[Log] Use Adapter:NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Log] FearureLevel:12.1
+
+[Log] Complete create D3D12Device!!!
+
+[Log] Use Adapter:NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Log] FearureLevel:12.1
+
+[Log] Complete create D3D12Device!!!
+
+[Log] Begin CompileShader, path:Object3d.VS.hlsl, profile:vs_6_0
+
