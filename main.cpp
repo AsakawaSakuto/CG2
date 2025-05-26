@@ -42,16 +42,14 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 #include "externals/DirectXTex/DirectXTex.h"
 
+#include"Camera.h"
+#include"DebugCamera.h"
+
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
-
-struct Transform {
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
-};
+#include "Transform.h"
 
 struct VertexData {
 	Vector4 position;   // 16 bytes
@@ -1599,11 +1597,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region メインループ開始前にtransform変数を作る 02_02 04_00
 
-	Transform transform{ {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
-	Transform cameraTransform{ {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,-5.0f} };
-
+	Transform transform{ {1.0f,1.0f,1.0f}, {0.0f,3.1f,0.0f}, {0.0f,0.0f,0.0f} };
 	Transform transformSprite{ {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 
+	Camera* camera = new Camera();
+	DebugCamera* debugCamera = new DebugCamera();
+	Camera* useCamera = new Camera();
+	bool isDebugCamera = false;
 #pragma endregion
 
 #pragma region Imguiの初期化 メインループ前に行う 02_03
@@ -1697,10 +1697,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			BYTE key[256] = {};
 			keyboard->GetDeviceState(sizeof(key), key);
 
-			// スペースキーがトリガー（今回押されていて、前回押されていない）なら再生
-			if (key[DIK_SPACE] && !preKey[DIK_SPACE])
-			{
+			// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
+			if (key[DIK_Z] && !preKey[DIK_Z]) {
 				SoundPlayWave(xAudio2.Get(), soundData1);
+			}
+
+			if (key[DIK_SPACE] && !preKey[DIK_SPACE]) {
+				if (isDebugCamera) {
+					isDebugCamera = false;
+				} else {
+					isDebugCamera = true;
+				}
+			}
+
+			if (isDebugCamera)
+			{
+				debugCamera->Update();
+				useCamera = debugCamera;
+			} else {
+				camera->Update();
+				useCamera = camera;
 			}
 
 			// 現在のキー状態を保存して次フレームに備える
@@ -1712,21 +1728,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 			// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-			ImGui::ShowDemoWindow();
+			/*ImGui::ShowDemoWindow();*/
 
 			// --- ImGuiカメラコントローラ ---
+
 			ImGui::Begin("Camera Control");
 
-			ImGui::Text("Move Camera:");
-			ImGui::DragFloat3("Position", &cameraTransform.translate.x, 0.1f);
+			ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
+			ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
 
-			ImGui::Text("Rotate Camera:");
-			ImGui::DragFloat3("Rotation", &cameraTransform.rotate.x, 0.1f);
+			ImGui::End();
 
-			ImGui::SliderAngle("SphereRotateX", &transform.rotate.x);
-			ImGui::SliderAngle("SphereRotateY", &transform.rotate.y);
-			ImGui::SliderAngle("SphereRotateZ", &transform.rotate.z);
+			ImGui::Begin("Model Control");
 
+			ImGui::Text("Model Scale");
+			ImGui::DragFloat3("ModelScale", &transform.scale.x, 0.1f);
+
+			ImGui::Text("Model Rotate");
+			ImGui::DragFloat3("ModelRotate", &transform.rotate.x, 0.1f);
+
+			ImGui::Text("Model Translate");
+			ImGui::DragFloat3("ModelTranslate", &transform.translate.x, 0.1f);
+
+			ImGui::Text("Model TextureChange");
 			ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 
             // カラー（Vector4）の操作（RGBA）
@@ -1754,7 +1778,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			/*transform.rotate.y += 0.03f;*/
 			// 行列の内容を更新して三角形を動かす
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+			Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera->GetTransform().scale, useCamera->GetTransform().rotate, useCamera->GetTransform().translate);
 			Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
 			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
 			Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
@@ -1968,10 +1992,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui::DestroyContext();
 
 #pragma endregion
-
+	
 	xAudio2.Reset();
 	SoundUnload(&soundData1);
-
+	
 #pragma region 解放処理(リソースチェックの前) 01_03
 
 	CloseHandle(fenceEvent);	
@@ -1980,6 +2004,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion
 
 #pragma region リソースリークチェック(最後の最後に残っているものがないか) *main関数のreturnの直前に行う 01_03
+
+	delete camera;
+	delete debugCamera;
+	delete useCamera;
 
 	// リソースリークチェック
 	ComPtr<IDXGIDebug1> debug;
