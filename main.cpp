@@ -1734,8 +1734,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::Begin("Camera Control");
 
-			ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
-			ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
+			if (isDebugCamera) {
+				ImGui::Text("Debug Camera");
+				ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
+				ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
+				ImGui::Checkbox("CameraModeChange", &isDebugCamera);
+			} else {
+				ImGui::Text("Normal Camera");
+				ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
+				ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
+				ImGui::Checkbox("CameraModeChange", &isDebugCamera);
+			}
 
 			ImGui::End();
 
@@ -2005,10 +2014,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region リソースリークチェック(最後の最後に残っているものがないか) *main関数のreturnの直前に行う 01_03
 
-	delete camera;
-	delete debugCamera;
-	delete useCamera;
-
 	// リソースリークチェック
 	ComPtr<IDXGIDebug1> debug;
 	if (SUCCEEDED(DXGIGetDebugInterface1(1, IID_PPV_ARGS(&debug)))) {
@@ -2018,6 +2023,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 #pragma endregion
+
+	delete camera;
+	delete debugCamera;
+	delete useCamera;
 
 	return 0;
 }
