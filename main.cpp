@@ -44,6 +44,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 #include"Camera.h"
 #include"DebugCamera.h"
+#include"Input.h"
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -842,19 +843,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region 現在時刻でログファイルを生成 00_04 EX
 
-	// 現在時刻を取得（UTC時刻）
-	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-	// ログファイルの名前にコロンマが使えないので、削って秒にする
-	std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>
-		nowSeconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
-	// 日本時間（PCの設定時間）に変換
-	std::chrono::zoned_time localTime{ std::chrono::current_zone(), nowSeconds };
-	// formatを使って年月日_時分秒の文字列に変換
-	std::string dateString = std::format("{:%Y%m%d_%H%M%S}", localTime);
-	// 時刻を使ってファイル名を決定
-	std::string logFilePath = std::string("logs/") + dateString + ".log";
-	// ファイルを作って書き込む準備
-	std::ofstream logStream(logFilePath);
+	//// 現在時刻を取得（UTC時刻）
+	//std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+	//// ログファイルの名前にコロンマが使えないので、削って秒にする
+	//std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>
+	//	nowSeconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+	//// 日本時間（PCの設定時間）に変換
+	//std::chrono::zoned_time localTime{ std::chrono::current_zone(), nowSeconds };
+	//// formatを使って年月日_時分秒の文字列に変換
+	//std::string dateString = std::format("{:%Y%m%d_%H%M%S}", localTime);
+	//// 時刻を使ってファイル名を決定
+	//std::string logFilePath = std::string("logs/") + dateString + ".log";
+	//// ファイルを作って書き込む準備
+	//std::ofstream logStream(logFilePath);
 
 #pragma endregion
 
@@ -1099,19 +1100,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion
 
 	// 07-01 Input
-	IDirectInput8* directInput = nullptr;
-	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
-	assert(SUCCEEDED(hr));
-
-	IDirectInputDevice8* keyboard = nullptr;
-	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
-	assert(SUCCEEDED(hr));
-
-	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
-	assert(SUCCEEDED(hr));
-
-	hr = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(hr));
+	Input* input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
 
 	// 07-00 xAudio関係
 
@@ -2024,9 +2014,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
-	//delete camera;
-	//delete debugCamera;
-	//delete useCamera;
+	delete camera;
+	delete debugCamera;
+	delete useCamera;
+	delete input;
 
 	return 0;
 }
