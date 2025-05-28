@@ -8,7 +8,6 @@
 #include <d3d12.h>
 //#include "d3dx12.h"
 #include <dxcapi.h>
-using namespace Microsoft::WRL;
 
 #include"WinApp.h"
 
@@ -24,6 +23,6 @@ private:
 	HRESULT result_;
 	BYTE key_[256] = {};
 	BYTE keyPre_[256] = {};
-	ComPtr<IDirectInput8> directInput_;
-	ComPtr<IDirectInputDevice8> keyboard_;
+	Microsoft::WRL::ComPtr<IDirectInput8> directInput_;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_;
 };

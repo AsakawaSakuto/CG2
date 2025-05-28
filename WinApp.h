@@ -37,13 +37,14 @@ public:
     //
     void Finalize();
 
+    int32_t GetWidth()const { return kClientWidth_; }
+    int32_t GetHeight()const { return kClientHeight_; }
 private:
     HWND hwnd_ = {};
     WNDCLASS wc_ = {};
     bool allowResize_ = true; // リサイズ許可フラグ
 
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
     static const int32_t kClientWidth_ = 1280;
     static const int32_t kClientHeight_ = 720;
 };

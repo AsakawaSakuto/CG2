@@ -46,6 +46,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include"DebugCamera.h"
 #include"Input.h"
 #include"WinApp.h"
+#include"ConvertString.h"
+#include"DirectXCommon.h"
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -204,36 +206,6 @@ void SoundPlayWave(IXAudio2* xAudio2,const SoundData&soundData) {
 	//波形データの再生
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
 	result = pSourceVoice->Start();
-}
-
-#pragma region 配布
-
-std::wstring ConvertString(const std::string& str) {
-	if (str.empty()) {
-		return std::wstring();
-	}
-
-	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
-	if (sizeNeeded == 0) {
-		return std::wstring();
-	}
-	std::wstring result(sizeNeeded, 0);
-	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
-	return result;
-}
-
-std::string ConvertString(const std::wstring& str) {
-	if (str.empty()) {
-		return std::string();
-	}
-
-	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-	if (sizeNeeded == 0) {
-		return std::string();
-	}
-	std::string result(sizeNeeded, 0);
-	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
-	return result;
 }
 
 #pragma endregion
@@ -772,22 +744,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	winApp->Initialize(L"CG2_Window");
 	winApp->EnableResize(true);
 
+	DirectXCommon* dxCommon = new DirectXCommon();
+	dxCommon->Initialize(winApp);
 
-#pragma region デバッグレイヤー(CreateWindowの直後) 01_01
-	
-#ifdef _DEBUG
-	ComPtr<ID3D12Debug1> debugController = nullptr;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
-	{
-		// デバッグレイヤーを有効化する
-		debugController->EnableDebugLayer();
-		// さらにGPU側でもチェックを行うようにする
-		debugController->SetEnableGPUBasedValidation(TRUE);
-	}
-#endif
-
-#pragma endregion
-
+	HRESULT hr;
+	Microsoft::WRL::ComPtr<ID3D12Device> device = dxCommon->GetDevice().Get();
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = dxCommon->GetCommandQueue().Get();
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = dxCommon->GetCommandAllocator();
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = dxCommon->GetSwapChain().Get();
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = dxCommon->GetSwapChainDesc();
 #pragma region ディレクトリを掘る 00_04 EX
 
 	// ログのディレクトリを用意
@@ -795,180 +761,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
-#pragma region 現在時刻でログファイルを生成 00_04 EX
-
-	//// 現在時刻を取得（UTC時刻）
-	//std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-	//// ログファイルの名前にコロンマが使えないので、削って秒にする
-	//std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>
-	//	nowSeconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
-	//// 日本時間（PCの設定時間）に変換
-	//std::chrono::zoned_time localTime{ std::chrono::current_zone(), nowSeconds };
-	//// formatを使って年月日_時分秒の文字列に変換
-	//std::string dateString = std::format("{:%Y%m%d_%H%M%S}", localTime);
-	//// 時刻を使ってファイル名を決定
-	//std::string logFilePath = std::string("logs/") + dateString + ".log";
-	//// ファイルを作って書き込む準備
-	//std::ofstream logStream(logFilePath);
-
-#pragma endregion
-
-#pragma region DXGIFactoryの生成 00_05
-
-	/*ウィンドウを作成した後、メインループが始まる前に記述する*/
-
-	// DXGIファクトリーの生成
-	ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
-
-	// HRESULTはWindows系のエラーコードであり、
-	// 関数が成功したかどうかをSUCCEEDEDマクロで判定できる
-	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
-
-	// 初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、
-	// どうにもできない場合が多いのでassertにしておく
-	assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region 使用するアダプタ(GPU)を決定 00_05
-
-	// 使用するアダプタ(GPU)用の変数。最初にnullptrを入れておく
-	ComPtr<IDXGIAdapter4> useAdapter = nullptr;
-
-	// 良い順にアダプタを頼む
-	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i,
-		DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; ++i) {
-		// アダプターの情報を取得する
-		DXGI_ADAPTER_DESC3 adapterDesc{};
-		hr = useAdapter->GetDesc3(&adapterDesc);
-		assert(SUCCEEDED(hr)); // 取得できないのは一大事 
-		// ソフトウェアアダプタ出なければ採用
-		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
-			// 採用したアダプタの情報をログに出力。wstringの方なので注意
-			Log(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
-			break;
-		}
-		useAdapter = nullptr; // ソフトウェアアダプタの場合は見なかったことにする
-	}
-	// 適切なアダプタが見つからなかったので起動できない
-	assert(useAdapter != nullptr);
-
-#pragma endregion
-
-#pragma region D3D12Deviceの生成 00_05
-
-	// D3D12Device
-	ComPtr<ID3D12Device> device = nullptr;
-	// 機能レベルとログ出力用の文字列
-	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0 };
-	const char* featureLevelStrings[] = { "12.2","12.1" ,"12.0" };
-	// 高い順に生成できるか試していく
-	for (size_t i = 0; i < _countof(featureLevels); i++)
-	{
-		// 採用したアダプターでデバイスを生成
-		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&device));
-		// 指定した機能レベルでデバイスが生成できたかを確認
-		if (SUCCEEDED(hr))
-		{
-			// 生成できたのでログ出力を行ってループを抜ける
-			Log(std::format("FearureLevel:{}\n", featureLevelStrings[i]));
-			break;
-		}
-	}
-	// デバイスの生成がうまくいかなかったので起動できない
-	assert(device != nullptr);
-	Log("Complete create D3D12Device!!!\n"); // 初期化完了ログを出す
-
-#pragma endregion
 	
-#pragma region エラー・警告で停止 *この対応はdeviceに対して行うので上のLog(初期化完了ログ)の直後に記述する 01_01
-
-#ifdef _DEBUG
-	ID3D12InfoQueue* infoQueue = nullptr;
-	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
-		// ヤバイエラー時に止まる
-		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-		// エラー時に止まる
-		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
-		// 警告時に止まる
-		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
-
-#pragma region 解除の直前 01_01
-
-		// 抑制するメッセージのID
-		D3D12_MESSAGE_ID denyIds[] = {
-			// Windows11でのDXGIデバッガレイヤーとDX12デバッガレイヤーの相互作用バグによるエラーメッセージ
-			// https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
-			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
-		};
-		// 抑制するレベル
-		D3D12_MESSAGE_SEVERITY severities[] = { D3D12_MESSAGE_SEVERITY_INFO };
-		D3D12_INFO_QUEUE_FILTER filter{};
-		filter.DenyList.NumIDs = _countof(denyIds);
-		filter.DenyList.pIDList = denyIds;
-		filter.DenyList.NumSeverities = _countof(severities);
-		filter.DenyList.pSeverityList = severities;
-		// 指定したメッセージの表示を抑制する
-		infoQueue->PushStorageFilter(&filter);
-
-#pragma endregion
-
-		// 解除
-		infoQueue->Release();
-	}
-#endif
-
-#pragma endregion
-
-#pragma region CommandQueueを生成する 01_00
-
-	// コマンドキューを生成する
-	ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
-	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-	hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
-	// コマンドキューの生成がうまくいかなかったら起動できない
-	assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region CommandListを生成する 01_00
-
-	// コマンドアロケータを生成する
-	ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
-	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
-	// コマンドアロケータの生成がうまくいかなかったので起動できない 
-	assert(SUCCEEDED(hr));
-
-	// コマンドリストを生成する
-	ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
-	// コマンドリストの生成がうまくいかなかったので起動できない
-	assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region SwapChainを生成する 01_00
-
-	// スワップチェーンを生成する
-	ComPtr<IDXGISwapChain4> swapChain = nullptr;
-	ComPtr<IDXGISwapChain1> tempSwapChain;
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	swapChainDesc.Width = 1280;                          // 画面の幅
-	swapChainDesc.Height = 720;                        // 画面の高さ
-	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;           // 色の形式
-	swapChainDesc.SampleDesc.Count = 1;                          // マルチサンプルしない
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // 描画のターゲットとして利用する
-	swapChainDesc.BufferCount = 2;                               // ダブルバッファ
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;    // モニタに写したら、中身を破棄
-	// コマンドキュー、ウィンドウハンドル、設定を渡して生成する
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHWND(), &swapChainDesc, nullptr, nullptr, tempSwapChain.GetAddressOf());
-	assert(SUCCEEDED(hr));
-
-	// SwapChain4にアップキャストする
-	hr = tempSwapChain.As(&swapChain);
-	assert(SUCCEEDED(hr));
-
-#pragma endregion
 
 #pragma region DescriptorHeapを生成する 01_00 関数化 RTVとSRV用のヒープを作成 02_03
 
