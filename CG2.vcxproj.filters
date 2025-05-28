@@ -31,6 +31,9 @@
     <Filter Include="ソース ファイル\System\Input">
       <UniqueIdentifier>{e3b83c87-0ad2-4e8e-bc7b-ed98b433b71d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\System\WinApp">
+      <UniqueIdentifier>{869d2eaf-80e9-4026-a961-91428796b70a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>ソース ファイル\System\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="WinApp.cpp">
+      <Filter>ソース ファイル\System\WinApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>ソース ファイル\System\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WinApp.h">
+      <Filter>ソース ファイル\System\WinApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,14 +10,17 @@
 #include <dxcapi.h>
 using namespace Microsoft::WRL;
 
+#include"WinApp.h"
+
 class Input
 {
 public:
-	void Initialize(HINSTANCE hInstance,HWND hwnd);
+	void Initialize(WinApp* winApp);
 	void Update();
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
 private:
+	WinApp* winApp_ = nullptr;
 	HRESULT result_;
 	BYTE key_[256] = {};
 	BYTE keyPre_[256] = {};

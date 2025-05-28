@@ -1,9 +1,11 @@
 #include "Input.h"
 #include <cassert> 
 
-void Input::Initialize(HINSTANCE hInstance, HWND hwnd) {
+void Input::Initialize(WinApp* winApp) {
 
-	result_ = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput_, nullptr);
+	this->winApp_ = winApp;
+
+	result_ = DirectInput8Create(winApp_->GetInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput_, nullptr);
 	assert(SUCCEEDED(result_));
 
 	result_ = directInput_->CreateDevice(GUID_SysKeyboard, &keyboard_, NULL);
@@ -12,7 +14,7 @@ void Input::Initialize(HINSTANCE hInstance, HWND hwnd) {
 	result_ = keyboard_->SetDataFormat(&c_dfDIKeyboard);
 	assert(SUCCEEDED(result_));
 
-	result_ = keyboard_->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	result_ = keyboard_->SetCooperativeLevel(winApp_->GetHWND(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result_));
 }
 
