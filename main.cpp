@@ -1683,16 +1683,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(&msg);
 		} else { // ゲームの処理
 
-			keyboard->Acquire();
-			BYTE key[256] = {};
-			keyboard->GetDeviceState(sizeof(key), key);
+			input->Update();
 
 			// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
-			if (key[DIK_Z] && !preKey[DIK_Z]) {
+			if (input->TriggerKey(DIK_Z)) {
 				SoundPlayWave(xAudio2.Get(), soundData1);
 			}
 
-			if (key[DIK_SPACE] && !preKey[DIK_SPACE]) {
+			if (input->TriggerKey(DIK_SPACE)) {
 				if (isDebugCamera) {
 					isDebugCamera = false;
 				} else {
@@ -1709,8 +1707,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				useCamera = camera;
 			}
 
-			// 現在のキー状態を保存して次フレームに備える
-			memcpy(preKey, key, sizeof(key));
 #pragma region Imguiを使う
 
 			// フレームの先頭でImguiにここからフレームが始まる旨を告げる
@@ -2004,6 +2000,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region リソースリークチェック(最後の最後に残っているものがないか) *main関数のreturnの直前に行う 01_03
 
+	delete camera;
+	delete debugCamera;
+	delete useCamera;
+	delete input;
+
 	// リソースリークチェック
 	ComPtr<IDXGIDebug1> debug;
 	if (SUCCEEDED(DXGIGetDebugInterface1(1, IID_PPV_ARGS(&debug)))) {
@@ -2013,11 +2014,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 #pragma endregion
-
-	delete camera;
-	delete debugCamera;
-	delete useCamera;
-	delete input;
 
 	return 0;
 }
