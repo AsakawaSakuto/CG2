@@ -14,6 +14,7 @@ void DirectXCommon::Initialize(WinApp* winApp) {
     CreateDevice();
     CreateCommand();
     CreateSwapChain();
+    CreateDescriptorHeaps();
 }
 
 void DirectXCommon::CreateDevice() {
@@ -160,4 +161,33 @@ void DirectXCommon::CreateSwapChain() {
     // SwapChain4にキャスト
     hr_ = tempSwapChain.As(&swapChain_);
     assert(SUCCEEDED(hr_));
+}
+
+void DirectXCommon::CreateDescriptorHeaps() {
+    // DescriptorsSizeを取得しておく
+    descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+    // RTV用のヒープでディスクリプタの数は2 RTVはShader内で触るものではないのでShaderVisibleはfalse
+    rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+
+    // SRVのヒープでディスクリプタの数は128 SRVはShader内で触るものなのでShaderVisibleはftrue
+    srvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+
+    // DSV用のヒープでディスクリプタの数は1、DSVはShader内で触るものではないので、ShaderVisibleはfalse 03_01
+    dsvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+}
+
+ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(
+    ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
+{
+    ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+    D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
+    descriptorHeapDesc.Type = heapType;
+    descriptorHeapDesc.NumDescriptors = numDescriptors;
+    descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+    assert(SUCCEEDED(hr));
+    return descriptorHeap;
 }

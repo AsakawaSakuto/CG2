@@ -44,4 +44,17 @@ private:
     void CreateSwapChain();
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc_ = {};
+
+    // 各種デスクリプターヒープの生成
+    void CreateDescriptorHeaps();
+
+    // DescriptorsSizeを取得しておく
+    uint32_t descriptorSizeSRV_;
+    uint32_t descriptorSizeRTV_;
+    uint32_t descriptorSizeDSV_;
+    
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_; // RTV用のヒープでディスクリプタ
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_; // SR用Vのヒープでディスクリプタ
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_; // DSV用のヒープでディスクリプタ
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 };
