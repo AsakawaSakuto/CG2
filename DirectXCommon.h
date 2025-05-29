@@ -19,6 +19,9 @@ public:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
     Microsoft::WRL::ComPtr<IDXGISwapChain4> GetSwapChain() { return swapChain_; }
     DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsv() { return dsvDescriptorHeap_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSrv() { return srvDescriptorHeap_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRtv() { return rtvDescriptorHeap_; }
 private:
     // 
     WinApp* winApp_ = nullptr;
@@ -45,6 +48,13 @@ private:
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc_ = {};
 
+    // 深度バッファの生成
+    void CreateDepthBuffer();
+    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+
+
     // 各種デスクリプターヒープの生成
     void CreateDescriptorHeaps();
 
@@ -56,5 +66,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_; // RTV用のヒープでディスクリプタ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_; // SR用Vのヒープでディスクリプタ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_; // DSV用のヒープでディスクリプタ
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 };
