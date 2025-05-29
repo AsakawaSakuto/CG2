@@ -13,6 +13,7 @@ public:
 
 	void Initialize(WinApp* winApp);
 
+    // mainCpp用のゲッター達(後で消す)
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator_; }
@@ -22,6 +23,13 @@ public:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsv() { return dsvDescriptorHeap_; }
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSrv() { return srvDescriptorHeap_; }
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRtv() { return rtvDescriptorHeap_; }
+    D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
+    D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle0() { return rtvHandles_[0]; }
+    D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle1() { return rtvHandles_[1]; }
+
+    D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle(uint32_t index);
+    D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle(uint32_t index);
+    D3D12_CPU_DESCRIPTOR_HANDLE GetDsvCPUHandle(uint32_t index);
 private:
     // 
     WinApp* winApp_ = nullptr;
@@ -54,7 +62,6 @@ private:
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
 
-
     // 各種デスクリプターヒープの生成
     void CreateDescriptorHeaps();
 
@@ -67,4 +74,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_; // SR用Vのヒープでディスクリプタ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_; // DSV用のヒープでディスクリプタ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+
+    // レンダーターゲットビューの生成
+    void CreateRenderTargetView();
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle_;
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2]; // RTVを2つ作るのでディスクリプタを2つ用意
+    Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
+    D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
+    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 };

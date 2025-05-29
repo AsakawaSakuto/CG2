@@ -16,6 +16,7 @@ void DirectXCommon::Initialize(WinApp* winApp) {
     CreateSwapChain();
     CreateDescriptorHeaps();
     CreateDepthBuffer();
+    CreateRenderTargetView();
 }
 
 void DirectXCommon::CreateDevice() {
@@ -164,6 +165,18 @@ void DirectXCommon::CreateSwapChain() {
     assert(SUCCEEDED(hr_));
 }
 
+void DirectXCommon::CreateDepthBuffer() {
+    // DepthStencilTextureをウィンドウのサイズで作成 03_01
+    depthStencilResource_ = CreateDepthStencilTextureResource(device_.Get(), winApp_->GetWidth(), winApp_->GetHeight());
+
+    // DSVの設定 Heap上にDSVを構築する 03_01
+    dsvDesc_.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // Format。基本的にResourceに合わせる
+    dsvDesc_.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D; // 2Dテクスチャ
+
+    // DSVHeapの配列にDSVを作る
+    device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc_, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
+}
+
 void DirectXCommon::CreateDescriptorHeaps() {
     // DescriptorsSizeを取得しておく
     descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -180,6 +193,25 @@ void DirectXCommon::CreateDescriptorHeaps() {
     dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 }
 
+void DirectXCommon::CreateRenderTargetView() {
+    hr_ = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
+    assert(SUCCEEDED(hr_));
+    hr_ = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
+    assert(SUCCEEDED(hr_));
+    // RTVの設定
+    rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 出力結果をsRGBに変換して書き込む
+    rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D; // 2dテクスチャとして書き込む
+    // ディスクリプタの先頭を取得する
+    rtvStartHandle_ = GetCPUDescriptorHandle(rtvDescriptorHeap_.Get(), descriptorSizeRTV_, 0);
+    // まず1つ目を作る。1つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
+    rtvHandles_[0] = rtvStartHandle_;
+    device_->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc_, rtvHandles_[0]);
+    // 2つ目のディスクリプタハンドルを得る（自力で）
+    rtvHandles_[1].ptr = rtvHandles_[0].ptr + descriptorSizeRTV_;
+    // 2つ目を作る
+    device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
+}
+
 ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
     ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
@@ -192,19 +224,7 @@ ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTO
     return descriptorHeap;
 }
 
-void DirectXCommon::CreateDepthBuffer() {
-    // DepthStencilTextureをウィンドウのサイズで作成 03_01
-    depthStencilResource_ = CreateDepthStencilTextureResource(device_.Get(), winApp_->GetWidth(), winApp_->GetHeight());
-
-    // DSVの設定 Heap上にDSVを構築する 03_01
-    dsvDesc_.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // Format。基本的にResourceに合わせる
-    dsvDesc_.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D; // 2Dテクスチャ
-
-    // DSVHeapの配列にDSVを作る
-    device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc_, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
-}
-
-ComPtr<ID3D12Resource>  DirectXCommon::CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+ComPtr<ID3D12Resource> DirectXCommon::CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
 
     // 生産するResourceの設定
     D3D12_RESOURCE_DESC resourceDesc{};
@@ -238,4 +258,30 @@ ComPtr<ID3D12Resource>  DirectXCommon::CreateDepthStencilTextureResource(ID3D12D
     assert(SUCCEEDED(hr));
 
     return resource;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    handleCPU.ptr += (descriptorSize * index);
+    return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+    handleGPU.ptr += (descriptorSize * index);
+    return handleGPU;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSrvCPUHandle(uint32_t index) {
+    return GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), descriptorSizeSRV_, index);
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSrvGPUHandle(uint32_t index) {
+    return GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), descriptorSizeSRV_, index);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetDsvCPUHandle(uint32_t index) {
+    return GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), descriptorSizeDSV_, index);
 }
