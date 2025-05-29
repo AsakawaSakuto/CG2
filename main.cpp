@@ -764,6 +764,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[2];
 	rtvHandle[0] = dxCommon->GetRtvHandle0();
 	rtvHandle[1] = dxCommon->GetRtvHandle1();
+	D3D12_VIEWPORT viewport = dxCommon->GetViewport();
+	D3D12_RECT scissorRect = dxCommon->GetScissor();
 #pragma region ディレクトリを掘る 00_04 EX
 
 	// ログのディレクトリを用意
@@ -1296,23 +1298,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region ビューポートとシザー 02_00
 
-	// ビューポート
-	D3D12_VIEWPORT viewport{};
-	// クライアント領域のサイズと一緒にして画面全体に表示
-	viewport.Width = 1280;
-	viewport.Height = 720;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-
-	// シザー矩形
-	D3D12_RECT scissorRect{};
-	// 基本的にビューポートと同じ矩形が構成されるようにする
-	scissorRect.left = 0;
-	scissorRect.right = 1280;
-	scissorRect.top = 0;
-	scissorRect.bottom = 720;
 
 #pragma endregion
 

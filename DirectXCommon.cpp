@@ -17,6 +17,8 @@ void DirectXCommon::Initialize(WinApp* winApp) {
     CreateDescriptorHeaps();
     CreateDepthBuffer();
     CreateRenderTargetView();
+    CreateViewportRect();
+    CreateScissorRect();
 }
 
 void DirectXCommon::CreateDevice() {
@@ -210,6 +212,24 @@ void DirectXCommon::CreateRenderTargetView() {
     rtvHandles_[1].ptr = rtvHandles_[0].ptr + descriptorSizeRTV_;
     // 2つ目を作る
     device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
+}
+
+void DirectXCommon::CreateViewportRect() {
+    // クライアント領域のサイズと一緒にして画面全体に表示
+    viewport_.Width = FLOAT(winApp_->GetWidth());
+    viewport_.Height = FLOAT(winApp_->GetHeight());
+    viewport_.TopLeftX = 0;
+    viewport_.TopLeftY = 0;
+    viewport_.MinDepth = 0.0f;
+    viewport_.MaxDepth = 1.0f;
+}
+
+void DirectXCommon::CreateScissorRect() {
+    // 基本的にビューポートと同じ矩形が構成されるようにする
+    scissorRect_.left = 0;
+    scissorRect_.right = winApp_->GetWidth();
+    scissorRect_.top = 0;
+    scissorRect_.bottom = winApp_->GetHeight();
 }
 
 ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)

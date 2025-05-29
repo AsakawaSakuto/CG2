@@ -26,7 +26,8 @@ public:
     D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
     D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle0() { return rtvHandles_[0]; }
     D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle1() { return rtvHandles_[1]; }
-
+    D3D12_VIEWPORT GetViewport() { return viewport_; }
+    D3D12_RECT GetScissor() { return scissorRect_; }
     D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle(uint32_t index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle(uint32_t index);
     D3D12_CPU_DESCRIPTOR_HANDLE GetDsvCPUHandle(uint32_t index);
@@ -83,4 +84,12 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
+
+    // ビューポート矩形の初期化
+    void CreateViewportRect();
+    D3D12_VIEWPORT viewport_{}; // ビューポート矩形
+    
+    // シーザー矩形の初期化
+    void CreateScissorRect();
+    D3D12_RECT scissorRect_{}; // シザー矩形
 };
