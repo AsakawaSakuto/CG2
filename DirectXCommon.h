@@ -9,6 +9,8 @@
 #pragma comment(lib,"dxguid.lib")
 #include <dxcapi.h>                  
 #pragma comment(lib,"dxcompiler.lib")
+#include <chrono>
+#include <thread>
 
 #include "externals/imgui/imgui.h"           
 #include "externals/imgui/imgui_impl_dx12.h" 
@@ -104,7 +106,7 @@ private:
     void CreateDepthBuffer();
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
-    Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(int32_t width, int32_t height);
 
     // 各種デスクリプターヒープの生成
     void CreateDescriptorHeaps();
@@ -149,4 +151,13 @@ private:
     UINT backBufferIndex_;
     D3D12_RESOURCE_BARRIER barrier_;
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
+
+    // FPS固定初期化
+    void InitializeFixFPS();
+
+    // FPS固定更新
+    void UpdateFixFPS();
+
+    // 記録時間(FPS固定用)
+    std::chrono::steady_clock::time_point reference_;
 };
