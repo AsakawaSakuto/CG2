@@ -2,6 +2,12 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
+#include <dxcapi.h>
+#pragma comment(lib, "dxcompiler.lib")
+
+#include "externals/imgui/imgui.h"           
+#include "externals/imgui/imgui_impl_dx12.h" 
+#include "externals/imgui/imgui_impl_win32.h"
 
 #include"WinApp.h"
 #include"Logger.h"
@@ -11,7 +17,17 @@ class DirectXCommon
 {
 public:
 
+    // DirectXの初期化
 	void Initialize(WinApp* winApp);
+
+    // DirectXの描画前処理
+    void PreDraw();
+
+    //
+    void PostDraw();
+
+    //
+    void ResetCommand();
 
     // mainCpp用のゲッター達(後で消す)
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
@@ -31,6 +47,10 @@ public:
     D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle(uint32_t index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle(uint32_t index);
     D3D12_CPU_DESCRIPTOR_HANDLE GetDsvCPUHandle(uint32_t index);
+    Microsoft::WRL::ComPtr<IDxcUtils> GetDxcUtils() {return dxcUtils_;}
+    Microsoft::WRL::ComPtr<IDxcCompiler3> GetDxcCompiler(){ return dxcCompiler_; }
+    Microsoft::WRL::ComPtr<IDxcIncludeHandler> GetDxcHandler(){ return includeHandler_; }
+    D3D12_RESOURCE_BARRIER GerBarrier() { return barrier_; }
 private:
     // 
     WinApp* winApp_ = nullptr;
@@ -92,4 +112,19 @@ private:
     // シーザー矩形の初期化
     void CreateScissorRect();
     D3D12_RECT scissorRect_{}; // シザー矩形
+
+    // DXCの初期化
+    void CreateShaderCompiler();
+    Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_;
+    Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
+    Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
+
+    // Imguiの初期化
+    void CreateImgui();
+
+    // DirectXの描画前処理
+    UINT backBufferIndex_;
+    D3D12_RESOURCE_BARRIER barrier_;
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
+
 };

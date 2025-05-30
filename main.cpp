@@ -766,6 +766,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	rtvHandle[1] = dxCommon->GetRtvHandle1();
 	D3D12_VIEWPORT viewport = dxCommon->GetViewport();
 	D3D12_RECT scissorRect = dxCommon->GetScissor();
+
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = dxCommon->GetDxcUtils();
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = dxCommon->GetDxcCompiler();
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = dxCommon->GetDxcHandler();
+
+	D3D12_RESOURCE_BARRIER barrier = dxCommon->GerBarrier();
 #pragma region ディレクトリを掘る 00_04 EX
 
 	// ログのディレクトリを用意
@@ -843,18 +849,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region DXCの初期化 02_00
 
-	// dxcCompilerを初期化
-	ComPtr<IDxcUtils> dxcUtils = nullptr;
-	ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-	assert(SUCCEEDED(hr));
+	//// dxcCompilerを初期化
+	//ComPtr<IDxcUtils> dxcUtils = nullptr;
+	//ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+	//hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	//assert(SUCCEEDED(hr));
+	//hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	//assert(SUCCEEDED(hr));
 
-	// 現時点でincludeはしないが、includeに対応するための設定を行っておく
-	ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
-	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-	assert(SUCCEEDED(hr));
+	//// 現時点でincludeはしないが、includeに対応するための設定を行っておく
+	//ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
+	//hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+	//assert(SUCCEEDED(hr));
 
 #pragma endregion
 
@@ -1366,18 +1372,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region Imguiの初期化 メインループ前に行う 02_03
 
-	// ImGuiの初期化。詳細はさして重要ではないので解説は省略する。
-	// こういうもんである
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp->GetHWND());
-	ImGui_ImplDX12_Init(device.Get(),
-		swapChainDesc.BufferCount,
-		dxCommon->GetRtvDesc().Format,
-		srvDescriptorHeap.Get(),
-		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+	//// ImGuiの初期化。詳細はさして重要ではないので解説は省略する。
+	//// こういうもんである
+	//IMGUI_CHECKVERSION();
+	//ImGui::CreateContext();
+	//ImGui::StyleColorsDark();
+	//ImGui_ImplWin32_Init(winApp->GetHWND());
+	//ImGui_ImplDX12_Init(device.Get(),
+	//	swapChainDesc.BufferCount,
+	//	dxCommon->GetRtvDesc().Format,
+	//	srvDescriptorHeap.Get(),
+	//	srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+	//	srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 #pragma endregion
 
@@ -1469,11 +1475,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			if (isDebugCamera)
 			{
-				debugCamera->Update();
-				useCamera = debugCamera;
+				if (debugCamera != nullptr)
+				{
+					debugCamera->Update();
+					useCamera = debugCamera;
+				}
 			} else {
-				camera->Update();
-				useCamera = camera;
+				if (camera != nullptr)
+				{
+					camera->Update();
+					useCamera = camera;
+				}
 			}
 
 			if (true)
@@ -1589,50 +1601,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region コマンドを積み込んで確定させる 01_00
 
 			// これから書き込むバックバッファのインデックスを取得
-			UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-			
-#pragma region TransitionBarrierを張るコード 01_02
+			//UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
 			// TransitionBarrierの設定 *backBufferIndexを取得した直後、RenderTargetを設定する前に行う
-			D3D12_RESOURCE_BARRIER barrier{};
+			//D3D12_RESOURCE_BARRIER barrier{};
 			// 今回のバリアはTransition
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 			// Noneにしておく
-			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 			// バリアを張る対象のリソース。現在のバックバッファに対して行う
-			barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+			//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
 			// 遷移前（現在）のResourceState
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+			//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 			// 遷移後のResourceState
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+			//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			// TransitionBarrierを指定
-			commandList->ResourceBarrier(1, &barrier);
+			//commandList->ResourceBarrier(1, &barrier);
 
-#pragma endregion
-			/*printf("RTV0: %llu\n", rtvHandle[0].ptr);
-			printf("RTV1: %llu\n", rtvHandle[1].ptr);*/
 			// 描画先のRTVとDSVを指定する 03_01
-			D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dxCommon->GetDsvCPUHandle(0);
+			//D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dxCommon->GetDsvCPUHandle(0);
 			// 描画先のRTVを設定する
-			commandList->OMSetRenderTargets(1, &rtvHandle[backBufferIndex], false, &dsvHandle);
+			//commandList->OMSetRenderTargets(1, &rtvHandle[backBufferIndex], false, &dsvHandle);
 
 			// 指定した色で画面全体をクリアする
-			float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f }; // 青っぽい色、RGBAの順
-			commandList->ClearRenderTargetView(rtvHandle[backBufferIndex], clearColor, 0, nullptr);
+			//float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f }; // 青っぽい色、RGBAの順
+			//commandList->ClearRenderTargetView(rtvHandle[backBufferIndex], clearColor, 0, nullptr);
 
 			// 描画用のDescriptorHeapの設定 02_03
-			ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
-			commandList->SetDescriptorHeaps(1, descriptorHeaps);
-
-
-#pragma region コマンドを積む(ClearRenderTargetViewで画面をクリアした後) 02_00
+			//ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
+			//commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 			// 指定した深度で画面全体をクリアする 03_01
-			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+			//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-			commandList->RSSetViewports(1, &viewport);    // Viewportを設定
-			commandList->RSSetScissorRects(1, &scissorRect);    // Scissorを設定
+			//commandList->RSSetViewports(1, &viewport);    // Viewportを設定
+			//commandList->RSSetScissorRects(1, &scissorRect);    // Scissorを設定
+			
+			/*dxCommon->ResetCommand();*/
+			dxCommon->PreDraw();
 			// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 			commandList->SetGraphicsRootSignature(rootSignature.Get());
 			commandList->SetPipelineState(graphicsPipelineState.Get());    // PSOを設定
@@ -1720,56 +1726,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
-#pragma region 画面表示できるようにする 01_02
-
-			// 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-			// 今回はRenderTargetからPresentにする
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-			// TransitionBarrierを張る
-			commandList->ResourceBarrier(1, &barrier);
-
-#pragma endregion
-
-			// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-			hr = commandList->Close();
-			assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region コマンドをキックする 01_00
-
-			// GPUにコマンドリストの実行を行わせる
-			ID3D12CommandList* commandLists[] = { commandList.Get() };
-			commandQueue->ExecuteCommandLists(1, commandLists);
-
-			// GPUとOSに画面の交換を行うよう通知する
-			swapChain->Present(1, 0);
-
-#pragma region GPUにSignalを送る 01_02
-
-			// Fenceの値を更新
-			fenceValue++;
-			// GPUがここまでたどり着いたときに、Fenceの値が指定した値に代入するようにSignalを送る
-			commandQueue->Signal(fence.Get(), fenceValue);
-
-			// Fenceの値が指定したSign値に達したかどうかを待機する
-			// GetCompletedValueの同期間にFenceが指定した値に達したか確認
-			if (fence->GetCompletedValue() < fenceValue)
-			{
-				// 指定したSign値にたどりついていないので、たどり着くまで待つようにイベントを設定する
-				fence->SetEventOnCompletion(fenceValue, fenceEvent);
-				// イベント待つ
-				WaitForSingleObject(fenceEvent, INFINITE);
-			}
-
-#pragma endregion
-
-			// 次のフレーム用のコマンドリストを準備
-			hr = commandAllocator->Reset();
-			assert(SUCCEEDED(hr));
-			hr = commandList->Reset(commandAllocator.Get(), nullptr);
-			assert(SUCCEEDED(hr));
+			dxCommon->PostDraw();
 
 #pragma endregion
 
@@ -1801,17 +1758,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CloseHandle(fenceEvent);
 	winApp->Finalize();
 
-	delete camera;
-	camera = nullptr;
-	delete debugCamera;
-	debugCamera = nullptr;
-	delete useCamera;
-	useCamera = nullptr;
-	delete input;
-	input = nullptr;
-	delete winApp;
-	winApp = nullptr;
-
+	
 #pragma endregion
 
 #pragma region リソースリークチェック(最後の最後に残っているものがないか) *main関数のreturnの直前に行う 01_03
@@ -1825,6 +1772,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 #pragma endregion
+
+
+	delete camera;
+	camera = nullptr;
+
+	delete debugCamera;
+	debugCamera = nullptr;
+
+	useCamera = nullptr;
+
+	delete input;
+	input = nullptr;
+
+	delete winApp;
+	winApp = nullptr;
 
 	return 0;
 }
