@@ -105,6 +105,9 @@
     <ClCompile Include="Sprite.cpp">
       <Filter>ソース ファイル\Sprite</Filter>
     </ClCompile>
+    <ClCompile Include="SpriteData.cpp">
+      <Filter>ソース ファイル\Sprite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix4x4.h">
@@ -171,6 +174,9 @@
       <Filter>ソース ファイル\System\DirectXCommon</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
+      <Filter>ソース ファイル\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteData.h">
       <Filter>ソース ファイル\Sprite</Filter>
     </ClInclude>
   </ItemGroup>
