@@ -2,8 +2,13 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
-#include <dxcapi.h>
+#include <wrl/client.h>
+#include "externals/DirectXTex/DirectXTex.h"
 #pragma comment(lib, "dxcompiler.lib")
+#include <dxgidebug.h>
+#pragma comment(lib,"dxguid.lib")
+#include <dxcapi.h>                  
+#pragma comment(lib,"dxcompiler.lib")
 
 #include "externals/imgui/imgui.h"           
 #include "externals/imgui/imgui_impl_dx12.h" 
@@ -29,6 +34,21 @@ public:
     //
     void ResetCommand();
 
+    //
+    Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+
+    //
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+    //
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+    //
+    void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+
+    //
+    DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
     // mainCpp用のゲッター達(後で消す)
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
@@ -52,10 +72,13 @@ public:
     Microsoft::WRL::ComPtr<IDxcIncludeHandler> GetDxcHandler(){ return includeHandler_; }
     D3D12_RESOURCE_BARRIER GerBarrier() { return barrier_; }
 private:
+
     // 
     WinApp* winApp_ = nullptr;
+
     //
     HRESULT hr_;
+
     // デバイス生成
     void CreateDevice();
     Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_; // デバッグコントローラー
@@ -126,5 +149,4 @@ private:
     UINT backBufferIndex_;
     D3D12_RESOURCE_BARRIER barrier_;
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
-
 };

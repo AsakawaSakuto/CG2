@@ -96,6 +96,9 @@
     <ClCompile Include="DirectXCommon.cpp">
       <Filter>ソース ファイル\System\DirectXCommon</Filter>
     </ClCompile>
+    <ClCompile Include="D3DResourceLeakChecker.cpp">
+      <Filter>ソース ファイル\System\DirectXCommon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix4x4.h">
@@ -156,6 +159,9 @@
       <Filter>ソース ファイル\System\Utility\ConvertString</Filter>
     </ClInclude>
     <ClInclude Include="DirectXCommon.h">
+      <Filter>ソース ファイル\System\DirectXCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DResourceLeakChecker.h">
       <Filter>ソース ファイル\System\DirectXCommon</Filter>
     </ClInclude>
   </ItemGroup>

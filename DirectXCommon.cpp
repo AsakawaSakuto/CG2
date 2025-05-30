@@ -414,3 +414,184 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSrvGPUHandle(uint32_t index) {
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetDsvCPUHandle(uint32_t index) {
     return GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), descriptorSizeDSV_, index);
 }
+
+ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
+
+#pragma region 1 hlslファイルを読む
+
+    // これからシェーダーをコンパイルする旨をログに出す
+    Logger::Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+    // hlslファイルを読む
+    ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
+    hr_ = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+    // 読めなかったら止める
+    assert(SUCCEEDED(hr_));
+    // 読み込んだファイルの内容を設定する
+    DxcBuffer shaderSourceBuffer;
+    shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+    shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+    shaderSourceBuffer.Encoding = DXC_CP_UTF8; // UTF8の文字コードであることを通知
+
+#pragma endregion
+
+#pragma region 2 Compileする
+
+    LPCWSTR arguments[] = {
+        filePath.c_str(),    // コンパイル対象のhlslファイル名
+        L"-E", L"main",      // エントリーポイントの指定。基本的にmain以外にはしない
+        L"-T", profile,      // ShaderProfileの設定
+        L"-Zi", L"-Qembed_debug", // デバッグ用の情報を埋め込む
+        L"-Od",              // 最適化を外しておく
+        L"-Zpr",             // メモリレイアウトは行優先
+    };
+
+    // 実際にShaderをコンパイルする
+    ComPtr<IDxcResult> shaderResult = nullptr;
+    hr_ = dxcCompiler_->Compile(
+        &shaderSourceBuffer, // 読み込んだファイル
+        arguments,           // コンパイルオプション
+        _countof(arguments), // コンパイルオプションの数
+        includeHandler_.Get(),      // includeが含まれた場合
+        IID_PPV_ARGS(&shaderResult) // コンパイル結果
+    );
+
+    // コンパイルエラーではなくdxcが起動できないなど致命的な状況
+    assert(SUCCEEDED(hr_));
+
+#pragma endregion
+
+#pragma region 3 警告・エラーが出ていないか確認する
+
+    // 署名：エラーが出てきたらログに出して止める
+    ComPtr<IDxcBlobUtf8> shaderError = nullptr;
+    shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+    if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+        Logger::Log(shaderError->GetStringPointer());
+        // 署名：エラーメッセタイ
+        assert(false);
+    }
+
+#pragma endregion
+
+#pragma region 4 Compile結果を受け取って返す
+
+    // コンパイル結果から実行用のバイナリ部分を取得
+    ComPtr<IDxcBlob> shaderBlob = nullptr;
+    hr_ = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+    assert(SUCCEEDED(hr_));
+    // 成功したらログを作成
+    Logger::Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+    // もう使わないリソースを解放
+    shaderSource->Release();
+    shaderResult->Release();
+    // 実行用のバイナリを返却
+    return shaderBlob;
+
+#pragma endregion
+
+}
+
+ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(const DirectX::TexMetadata& metadata) {
+    // metadataを基にResourceの設定 2-1
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Width = UINT(metadata.width); // Textureの幅
+    resourceDesc.Height = UINT(metadata.height); // Textureの高さ
+    resourceDesc.MipLevels = UINT16(metadata.mipLevels); // mipmapの数
+    resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize); // 奥行き or 配列Textureの配列数
+    resourceDesc.Format = metadata.format; // TextureのFormat
+    resourceDesc.SampleDesc.Count = 1; // サンプリングカウント。1固定。
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension); // Textureの次元数。昔使っているのは2次元
+
+    // 利用するHeapの設定 2-2
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM; // 細かい設定を行う
+    heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK; // WriteBackポリシーでCPUアクセス可能
+    heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0; // プロセッサの近くに配置
+
+    // Resourceの生成 2-3
+    ComPtr<ID3D12Resource> resource;
+    hr_ = device_->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&resource));
+    assert(SUCCEEDED(hr_));
+    return resource;
+}
+
+ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_t sizeInBytes)
+{
+    // アップロードヒープの設定
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+    heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    heapProperties.CreationNodeMask = 0;
+    heapProperties.VisibleNodeMask = 0;
+
+    // リソースの設定（バッファ用）
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    resourceDesc.Alignment = 0;
+    resourceDesc.Width = sizeInBytes;
+    resourceDesc.Height = 1;
+    resourceDesc.DepthOrArraySize = 1;
+    resourceDesc.MipLevels = 1;
+    resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+    resourceDesc.SampleDesc.Count = 1;
+    resourceDesc.SampleDesc.Quality = 0;
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    // リソースの作成
+    ComPtr<ID3D12Resource> bufferResource = nullptr;
+    hr_ = device_->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, // Upload Heap に必要な初期状態
+        nullptr,
+        IID_PPV_ARGS(&bufferResource)
+    );
+
+    assert(SUCCEEDED(hr_));
+    return bufferResource;
+}
+
+void DirectXCommon::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
+    // Meta情報を取得
+    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+    // 全MipMapについて
+    for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel) {
+        // MipMapLevelを指定して各Imageを取得
+        const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
+        // Textureに転送
+        hr_ = texture->WriteToSubresource(
+            UINT(mipLevel),
+            nullptr,                // 全領域へコピー
+            img->pixels,            // 元データアドレス
+            UINT(img->rowPitch),    // 1ラインサイズ
+            UINT(img->slicePitch)   // 1枚サイズ
+        );
+        assert(SUCCEEDED(hr_));
+    }
+}
+
+DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath) {
+
+    // テクスチャファイルを読んでプログラムで扱えるようにする
+    DirectX::ScratchImage image{};
+    std::wstring filePathW = ConvertString(filePath);
+    hr_ = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+    assert(SUCCEEDED(hr_));
+
+    // ミップマップの作成
+    DirectX::ScratchImage mipImages{};
+    hr_ = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+    assert(SUCCEEDED(hr_));
+
+    // ミップマップ付きのデータを返す
+    return mipImages;
+}
