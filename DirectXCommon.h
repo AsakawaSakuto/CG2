@@ -19,6 +19,7 @@
 #include"WinApp.h"
 #include"Logger.h"
 #include"ConvertString.h"
+#include"CreateResource.h"
 
 class DirectXCommon
 {
@@ -39,28 +40,26 @@ public:
     //
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
-    //
-    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+    static const uint32_t kMaxSRVCount_;
 
-    //
-    Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+    WinApp* GetWinApp() { return  winApp_; }
 
-    //
-    void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+    uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
+    uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
+    uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
 
-    //
-    DirectX::ScratchImage LoadTexture(const std::string& filePath);
-
-    // mainCpp用のゲッター達(後で消す)
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
+
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRV() { return srvDescriptorHeap_; }
+
+    // mainCpp用のゲッター達(後で消す)
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator_; }
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
     Microsoft::WRL::ComPtr<IDXGISwapChain4> GetSwapChain() { return swapChain_; }
     DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsv() { return dsvDescriptorHeap_; }
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSrv() { return srvDescriptorHeap_; }
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRtv() { return rtvDescriptorHeap_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDSV() { return dsvDescriptorHeap_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRTV() { return rtvDescriptorHeap_; }
     D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
     D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle0() { return rtvHandles_[0]; }
     D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle1() { return rtvHandles_[1]; }
@@ -106,7 +105,6 @@ private:
     void CreateDepthBuffer();
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
-    Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(int32_t width, int32_t height);
 
     // 各種デスクリプターヒープの生成
     void CreateDescriptorHeaps();
@@ -117,9 +115,8 @@ private:
     uint32_t descriptorSizeDSV_;
     
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_; // RTV用のヒープでディスクリプタ
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_; // SR用Vのヒープでディスクリプタ
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_; // SRV用のヒープでディスクリプタ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_; // DSV用のヒープでディスクリプタ
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
     // レンダーターゲットビューの生成
     void CreateRenderTargetView();
@@ -127,8 +124,6 @@ private:
     D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle_;
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2]; // RTVを2つ作るのでディスクリプタを2つ用意
     Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
-    D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
-    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
     // ビューポート矩形の初期化
     void CreateViewportRect();

@@ -17,6 +17,8 @@ public:
 
 	void Initialize(DirectXCommon* dxCommon);
 
+	void SpriteDataSet();
+
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
 
 private:

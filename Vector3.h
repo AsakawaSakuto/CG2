@@ -11,12 +11,25 @@ struct Vector3 {
 	float y;
 	float z;
 
-    float Length() const {
-        return sqrt(x * x + y * y + z * z);
-    }
+	Vector3& operator=(const Vector3& other) {
+		if (this != &other) {
+			x = other.x;
+			y = other.y;
+			z = other.z;
+		}
+		return *this;
+	}
+	Vector3& operator+=(const Vector3& num) {
+		this->x += num.x;
+		this->y += num.y;
+		this->z += num.z;
+		return *this;
+	}
 
-    Vector3 Normalize() const {
-        float len = Length();
-        return (len > 0) ? Vector3{ x / len, y / len, z / len } : Vector3{ 0, 0, 0 };
-    }
+	Vector3& operator-=(const Vector3& num) {
+		this->x -= num.x;
+		this->y -= num.y;
+		this->z -= num.z;
+		return *this;
+	}
 };

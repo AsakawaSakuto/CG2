@@ -49,6 +49,12 @@
     <Filter Include="ソース ファイル\Sprite">
       <UniqueIdentifier>{4d2e7da4-2506-4a42-a613-38d6a35d1d07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\System\Utility\CreateResource">
+      <UniqueIdentifier>{3148295b-f069-4803-984c-5f57bbdcc8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\TextureManager">
+      <UniqueIdentifier>{a9e68c56-772a-4ae6-a559-65f1d9223e19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -107,6 +113,12 @@
     </ClCompile>
     <ClCompile Include="SpriteData.cpp">
       <Filter>ソース ファイル\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateResource.cpp">
+      <Filter>ソース ファイル\System\Utility\CreateResource</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>ソース ファイル\System\TextureManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +190,21 @@
     </ClInclude>
     <ClInclude Include="SpriteData.h">
       <Filter>ソース ファイル\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexData.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="CreateResource.h">
+      <Filter>ソース ファイル\System\Utility\CreateResource</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformationMatrix.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>ソース ファイル\System\TextureManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
