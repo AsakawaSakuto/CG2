@@ -474,6 +474,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Sprite* sprite2 = new Sprite();
 	sprite2->Initialize(spriteData, "resources/monsterBall.png");
 
+	Sprite* sprite3 = new Sprite();
+	sprite3->Initialize(spriteData, "resources/star.png");
+
 	HRESULT hr;
 	Microsoft::WRL::ComPtr<ID3D12Device> device = dxCommon->GetDevice();
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = dxCommon->GetCommandQueue();
@@ -1316,11 +1319,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
 			//transformationMatrixDataSprite->World = worldViewProjectionMatrixSprite;
 
-			Vector2 pos = sprite->GetPosition();
-			pos += {1.f, 1.f};
-			sprite->SetPosition(pos);
+			sprite2->SetPosition({ 360.f, 0.f });
+			sprite3->SetPosition({ 720.f, 0.f });
+
 			sprite->Update();
 			sprite2->Update();
+			sprite3->Update();
 #pragma endregion
 
 #pragma region コマンドを積み込んで確定させる 01_00
@@ -1442,6 +1446,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			sprite->Draw();
 			sprite2->Draw();
+			sprite3->Draw();
 
 #pragma endregion
 

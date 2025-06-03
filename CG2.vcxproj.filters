@@ -55,6 +55,9 @@
     <Filter Include="ソース ファイル\System\TextureManager">
       <UniqueIdentifier>{a9e68c56-772a-4ae6-a559-65f1d9223e19}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Object3d">
+      <UniqueIdentifier>{0ccb1530-ad70-4a2e-bdcc-d0c8d28a1fb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -119,6 +122,12 @@
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
       <Filter>ソース ファイル\System\TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Object3dData.cpp">
+      <Filter>ソース ファイル\Object3d</Filter>
+    </ClCompile>
+    <ClCompile Include="Object3d.cpp">
+      <Filter>ソース ファイル\Object3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +214,12 @@
     </ClInclude>
     <ClInclude Include="TextureManager.h">
       <Filter>ソース ファイル\System\TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Object3dData.h">
+      <Filter>ソース ファイル\Object3d</Filter>
+    </ClInclude>
+    <ClInclude Include="Object3d.h">
+      <Filter>ソース ファイル\Object3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
