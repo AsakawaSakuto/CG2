@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "TransformationMatrix.h"
 #include "Transform.h"
+#include "DirectionalLight.h"
 #include "TextureManager.h"
 
 class SpirteData;
@@ -38,21 +39,24 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
 	// リソースデータ
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
 	TransformationMatrix* transformationData_ = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
 	Transform transform_;
 	Vector2 position_;
-	Vector2 size_ = { 360.f,360.f };
+	Vector2 size_;
 
 	void CreateVertexResource();
 	void CreateIndexResource();
 	void CreateMaterialResource();
 	void CreateTransformationResource();
+	void CreateDirectionalLightResource();
 };

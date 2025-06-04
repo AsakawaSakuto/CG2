@@ -9,6 +9,7 @@ void Sprite::Initialize(SpriteData* spriteData, const std::string& fileName) {
 	
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
 
+	size_ = { 300.f,300.f };
 	transform_.scale = { 1.f,1.f,1.f };
 	transform_.translate = { 0.f,0.f,0.f };
 
@@ -16,6 +17,7 @@ void Sprite::Initialize(SpriteData* spriteData, const std::string& fileName) {
 	CreateIndexResource();
 	CreateMaterialResource();
 	CreateTransformationResource();
+	CreateDirectionalLightResource();
 }
 
 void Sprite::Update() {
@@ -31,15 +33,21 @@ void Sprite::Update() {
 }
 
 void Sprite::Draw() {
+	Logger::Log("Draw - TextureIndex: " + std::to_string(textureIndex_));
+	Logger::Log("Material GPU Address: " + std::to_string(materialResource_->GetGPUVirtualAddress()));
+	Logger::Log("Transform GPU Address: " + std::to_string(transformationResource_->GetGPUVirtualAddress()));
+	Logger::Log("SRV GPU Handle: " + std::to_string(TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_).ptr));
 	// Spriteの描画。変更が必要なものだけ変更する
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);  // VBVを設定
 	commandList_->IASetIndexBuffer(&indexBufferView_);
+	//
+	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// TransformationMatrixCBufferの場所を設定
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
 	// Spriteを常にuvCheckerにする
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
 	//
-	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	// 描画！ (DrawCall/ドローコール)
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
@@ -99,6 +107,8 @@ void Sprite::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = false;
 	materialData_->uvTransform = MakeIdentityMatrix();
+
+	materialResource_->Unmap(0, nullptr);
 }
 
 void Sprite::CreateTransformationResource() {
@@ -109,4 +119,14 @@ void Sprite::CreateTransformationResource() {
 	//
 	transformationData_->WVP = MakeIdentityMatrix();
 	transformationData_->World = MakeIdentityMatrix();
+}
+
+void Sprite::CreateDirectionalLightResource() {
+	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
+	//
+	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+	// 初期化（資料に基づく）
+	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
+	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
+	directionalLightData_->intensity = 1.0f;                        // 光の強さ
 }

@@ -6,6 +6,7 @@ using namespace Microsoft::WRL;
 
 void SpriteData::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
+	commandList_ = dxCommon_->GetCommandList();
 	CreatePSO();
 }
 
@@ -41,11 +42,11 @@ void SpriteData::CreatePSO() {
 
 void SpriteData::SpriteDataSet() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	// PSOを設定
-	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
+	commandList_->SetPipelineState(graphicsPipelineState_.Get());
 	// プリミティブトポロジーを設定
-	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void SpriteData::CreateRootSignature() {

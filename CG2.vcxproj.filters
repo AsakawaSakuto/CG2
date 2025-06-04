@@ -221,6 +221,9 @@
     <ClInclude Include="Object3d.h">
       <Filter>ソース ファイル\Object3d</Filter>
     </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

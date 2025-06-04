@@ -38,6 +38,9 @@ public:
     void ResetCommand();
 
     //
+    void CloseFence();
+
+    //
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
     static const uint32_t kMaxSRVCount_;
@@ -95,7 +98,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_;                       // フェンス
     uint64_t fenceValue_ = 0;
     HANDLE fenceEvent_ = nullptr;
-    
+
     // スワップチェイン生成
     void CreateSwapChain();
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;

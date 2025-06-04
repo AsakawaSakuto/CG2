@@ -146,6 +146,10 @@ void DirectXCommon::CreateCommand() {
     assert(fenceEvent_ != nullptr);
 }
 
+void DirectXCommon::CloseFence() {
+    CloseHandle(fenceEvent_);
+}
+
 void DirectXCommon::ResetCommand() {
     hr_ = commandAllocator_->Reset();
     assert(SUCCEEDED(hr_));
@@ -274,8 +278,9 @@ void DirectXCommon::CreateImgui() {
 void DirectXCommon::PreDraw() {
     // これから書き込むバックバッファのインデックスを取得
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
-
     // TransitionBarrierの設定 *backBufferIndexを取得した直後、RenderTargetを設定する前に行う
+    // バックバッファの番号取得
+    backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
     // 今回のバリアはTransition
     barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     // Noneにしておく
@@ -310,13 +315,14 @@ void DirectXCommon::PreDraw() {
 }
 
 void DirectXCommon::PostDraw() {
-    // バックバッファの番号取得
-    backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+    //assert(commandList_ != nullptr);   
+
+    // 諸諸の処理が終わった後にコマンドを積む、GUIは画面の最前面に映すので最後の描画
+    // ただしResourceBarrierによってD3D12_RESOURCE_STATE_RENDER_TARGET→D3D12_RESOURCE_STATE_PRESENTへ遷移させる前
+    // 実際のcommandListのImGuiの描画コマンドを積む
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 
     // TransitionBarrierを貼ってPresent状態へ遷移
-    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
     barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
     commandList_->ResourceBarrier(1, &barrier_);
@@ -340,9 +346,11 @@ void DirectXCommon::PostDraw() {
         WaitForSingleObject(fenceEvent_, INFINITE);
     }
 
-    // コマンドリストとアロケーターをリセット
-    commandAllocator_->Reset();
-    commandList_->Reset(commandAllocator_.Get(), nullptr);
+    // 次のフレーム用のコマンドリストを準備
+    hr_ = commandAllocator_->Reset();
+    assert(SUCCEEDED(hr_));
+    hr_ = commandList_->Reset(commandAllocator_.Get(), nullptr);
+    assert(SUCCEEDED(hr_));
 
     // FPS固定
     UpdateFixFPS();

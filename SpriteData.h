@@ -24,6 +24,8 @@ public:
 private:
 	DirectXCommon* dxCommon_;
 	HRESULT hr_;
+	// コマンドリスト(まとまった命令群)
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
 
 	void CreateRootSignature();
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
