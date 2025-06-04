@@ -47,34 +47,21 @@ public:
 
     WinApp* GetWinApp() { return  winApp_; }
 
-    uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
-    uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
-    uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
-
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
+
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
+
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRV() { return srvDescriptorHeap_; }
-
-    // mainCpp用のゲッター達(後で消す)
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator_; }
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
-    Microsoft::WRL::ComPtr<IDXGISwapChain4> GetSwapChain() { return swapChain_; }
-    DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDSV() { return dsvDescriptorHeap_; }
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetRTV() { return rtvDescriptorHeap_; }
-    D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc_; }
-    D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle0() { return rtvHandles_[0]; }
-    D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle1() { return rtvHandles_[1]; }
-    D3D12_VIEWPORT GetViewport() { return viewport_; }
-    D3D12_RECT GetScissor() { return scissorRect_; }
+    
     D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle(uint32_t index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle(uint32_t index);
     D3D12_CPU_DESCRIPTOR_HANDLE GetDsvCPUHandle(uint32_t index);
-    Microsoft::WRL::ComPtr<IDxcUtils> GetDxcUtils() {return dxcUtils_;}
-    Microsoft::WRL::ComPtr<IDxcCompiler3> GetDxcCompiler(){ return dxcCompiler_; }
-    Microsoft::WRL::ComPtr<IDxcIncludeHandler> GetDxcHandler(){ return includeHandler_; }
-    D3D12_RESOURCE_BARRIER GerBarrier() { return barrier_; }
+
+    uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
+    uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
+    uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
 private:
 
     // 

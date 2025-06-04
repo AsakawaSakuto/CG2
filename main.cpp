@@ -459,23 +459,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	sprite3->Initialize(spriteData, "resources/star.png");
 
 	HRESULT hr;
-	Microsoft::WRL::ComPtr<ID3D12Device> device = dxCommon->GetDevice();
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = dxCommon->GetSwapChain();
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = dxCommon->GetSwapChainDesc();
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = dxCommon->GetDSV();
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = dxCommon->GetSRV();
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = dxCommon->GetRTV();
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[2];
-	rtvHandle[0] = dxCommon->GetRtvHandle0();
-	rtvHandle[1] = dxCommon->GetRtvHandle1();
-	D3D12_VIEWPORT viewport = dxCommon->GetViewport();
-	D3D12_RECT scissorRect = dxCommon->GetScissor();
-
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = dxCommon->GetDxcUtils();
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = dxCommon->GetDxcCompiler();
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = dxCommon->GetDxcHandler();
-
-	D3D12_RESOURCE_BARRIER barrier = dxCommon->GerBarrier();
 
 	// ログのディレクトリを用意
 	std::filesystem::create_directory("logs");
