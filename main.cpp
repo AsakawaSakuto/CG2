@@ -622,6 +622,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			sprite2->SetPosition({ 0.f, 0.f });
 			sprite3->SetPosition({ 300.f, 0.f });
 
+			sprite->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+
 			sprite->Update();
 			sprite2->Update();
 			sprite3->Update();

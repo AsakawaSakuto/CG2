@@ -9,7 +9,7 @@ void Sprite::Initialize(SpriteData* spriteData, const std::string& fileName) {
 	
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
 
-	size_ = { 300.f,300.f };
+	size_ = { 256.f,256.f };
 	transform_.scale = { 1.f,1.f,1.f };
 	transform_.translate = { 0.f,0.f,0.f };
 

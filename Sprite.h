@@ -25,6 +25,8 @@ public:
 
 	void SetSize(const Vector2& size) { size_ = size; }
 
+	void SetColor(const Vector4& Color) { materialData_->color = Color; }
+
 private:
 	SpriteData* spriteData_;
 
