@@ -66,17 +66,19 @@ void Sprite::CreateVertexResource() {
 	float width = size_.x;
 	float height = size_.y;
 
-	// 左下
-	vertexData_[0].position = { 0.0f,height,0.0f,1.0f };
+	float left = 0.0f - anchorPoint.x * size_.x;
+	float right = 1.0f - anchorPoint.x * size_.x;
+	float top = 0.0f - anchorPoint.y * size_.y;
+	float bottom = 1.0f - anchorPoint.y * size_.y;
+
+	vertexData_[0].position = { left,bottom + height,0.0f,1.0f };  // 左下
+	vertexData_[1].position = { left,top,0.0f,1.0f };     // 左上
+	vertexData_[2].position = { right + width,bottom + height,0.0f,1.0f }; // 右下
+	vertexData_[3].position = { right + width,top,0.0f,1.0f };    // 右上
+	
 	vertexData_[0].texcoord = { 0.f,1.0f };
-	// 左上
-	vertexData_[1].position = { 0.0f,0.0f,0.0f,1.0f };
 	vertexData_[1].texcoord = { 0.0f,0.0f };
-	// 右下
-	vertexData_[2].position = { width,height,0.0f,1.0f };
 	vertexData_[2].texcoord = { 1.f,1.f };
-	// 右上
-	vertexData_[3].position = { width,0.0f,0.0f,1.0f };
 	vertexData_[3].texcoord = { 1.f,0.0f };
 
 	for (uint32_t i = 0; i < 4; i++) {

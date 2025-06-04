@@ -30,10 +30,10 @@ private:
 
 	uint32_t textureIndex_ = 0;
 
-	// コマンドリスト(まとまった命令群)
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
 	// デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
+	// コマンドリスト(まとまった命令群)
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
 	// リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -53,6 +53,7 @@ private:
 	Transform transform_;
 	Vector2 position_;
 	Vector2 size_;
+	Vector2 anchorPoint = { 0.5f,0.5f };
 
 	void CreateVertexResource();
 	void CreateIndexResource();

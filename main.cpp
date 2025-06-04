@@ -618,9 +618,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion
 
 
-
-			sprite2->SetPosition({ 360.f, 0.f });
-			sprite3->SetPosition({ 720.f, 0.f });
+			sprite->SetPosition({ 640.f, 360.f });
+			sprite2->SetPosition({ 0.f, 0.f });
+			sprite3->SetPosition({ 300.f, 0.f });
 
 			sprite->Update();
 			sprite2->Update();
