@@ -1,4 +1,5 @@
 #include "TextureManager.h"
+#include <filesystem>
 
 TextureManager* TextureManager::instance = nullptr;
 
@@ -63,12 +64,14 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
 }
 
 void TextureManager::LoadTexture(const std::string& filePath) {
-    Logger::Log("=== LoadTexture START ===");
-    Logger::Log("FilePath: " + filePath);
-
     // ファイルから読み込み
     DirectX::ScratchImage image{};
     std::wstring filePathW = ConvertString(filePath);
+
+    if (!std::filesystem::exists(filePathW)) {
+        Logger::Log("File not found: " + filePath);
+    }
+
     HRESULT hr = DirectX::LoadFromWICFile(
         filePathW.c_str(),
         DirectX::WIC_FLAGS_FORCE_SRGB,
@@ -119,6 +122,4 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     srvDesc.Texture2D.MipLevels = UINT(textureData.matadata.mipLevels);
     device_->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-    Logger::Log("Successfully loaded texture: " + filePath);
-    Logger::Log("=== LoadTexture END ===");
 }

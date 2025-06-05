@@ -30,14 +30,6 @@
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
-#include <xaudio2.h>
-#pragma comment(lib, "xaudio2.lib")
-
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #include "externals/DirectXTex/DirectXTex.h"
@@ -45,6 +37,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include"Camera.h"
 #include"DebugCamera.h"
 #include"Input.h"
+#include"Audio.h"
 #include"WinApp.h"
 #include"ConvertString.h"
 #include"DirectXCommon.h"
@@ -65,123 +58,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include "TransformationMatrix.h"
 #include "MaterialData.h"
 #include "ModelData.h"
-
-// 07-00 xAudio関係
-struct ChunkHeader {
-	char id[4]; // チャンク毎のID
-	int32_t size;	// チャンクサイズ
-};
-
-struct RiffHeader {
-	ChunkHeader chunk; // RIFF
-	char type[4]; // WAVE
-};
-
-struct FormatChunk {
-	ChunkHeader chunk; // fmt
-	WAVEFORMATEX fmt; // WAVEフォーマット
-};
-
-struct SoundData {
-	WAVEFORMATEX wfex; // WAVEフォーマット
-	BYTE* pBuffer = nullptr; // 音声データ
-	uint32_t bufferSize = 0; // バッファサイズ
-	std::string name; // ファイル名
-};
-
-SoundData SoundLoadWave(const char* filePath) {
-
-#pragma region ファイルオープン
-	//ファイル入力ストリームのインスタンス
-	std::ifstream file;
-	//wavファイルをバイナリモードで開く
-	file.open(filePath, std::ios_base::binary);
-	//ファイルオープン失敗を検出する
-	assert(file.is_open());
-#pragma endregion
-
-#pragma region wavデータ読み込み
-	//RIFFヘッダーの読み込み
-	RiffHeader riff;
-	file.read((char*)&riff, sizeof(riff));
-	//RIFFヘッダーのチェック
-	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
-		assert(0);
-	}
-	//タイプがWAVEかチェック
-	if (strncmp(riff.type, "WAVE", 4) != 0) {
-		assert(0);
-	}
-	//フォーマットチャンクの読み込み
-	FormatChunk format = {};
-	//チャンクヘッダーの確認
-	file.read((char*)&format, sizeof(ChunkHeader));
-	if (strncmp(format.chunk.id, "fmt ", 4) != 0) {
-		assert(0);
-	}
-	//チャンク本体の読み込み
-	assert(format.chunk.size <= sizeof(format.fmt));
-	file.read((char*)&format.fmt, format.chunk.size);
-
-	//Dataチャンクの読み込み
-	ChunkHeader data;
-	file.read((char*)&data, sizeof(data));
-	//JUNKチャンクを検出した場合
-	if (strncmp(data.id, "JUNK ", 4) == 0) {
-		//読み取り位置をJUNKチャンクの終わりまで進める
-		file.seekg(data.size, std::ios_base::cur);
-		//再読み込み
-		file.read((char*)&data, sizeof(data));
-	}
-	if (strncmp(data.id, "data ", 4) != 0) {
-		assert(0);
-	}
-	//Dataチャンクのデータ部（波形データ）の読み込み
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
-
-	//Waveファイルを閉じる
-	file.close();
-
-#pragma endregion
-
-#pragma region 読み込んだ音声データをreturn
-	//returnする音声データ
-	SoundData soundData = {};
-
-	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
-	soundData.bufferSize = data.size;
-
-	return soundData;
-#pragma endregion
-}
-
-void SoundUnload(SoundData* soundData)
-{
-	// バッファのメモリを解放
-	delete[] soundData->pBuffer;
-
-	soundData->pBuffer = 0;
-	soundData->bufferSize = 0;
-	soundData->wfex = {};
-}
-
-void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData) {
-	HRESULT result;
-	//波形フォーマットを元にSourceVoiceの生成
-	IXAudio2SourceVoice* pSourceVoice = nullptr;
-	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
-	assert(SUCCEEDED(result));
-	//再生する波形データの設定
-	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
-	buf.AudioBytes = soundData.bufferSize;
-	buf.Flags = XAUDIO2_END_OF_STREAM;
-	//波形データの再生
-	result = pSourceVoice->SubmitSourceBuffer(&buf);
-	result = pSourceVoice->Start();
-}
 
 // ウィンドウプロシャージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
@@ -331,65 +207,40 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	TextureManager::GetInstance()->Initialize(dxCommon);
 
+	Input* input = new Input();
+	input->Initialize(winApp);
+
 	SpriteData* spriteData = new SpriteData();
 	spriteData->Initialize(dxCommon);
 
 	Sprite* sprite = new Sprite();
-	sprite->Initialize(spriteData, "resources/uvChecker.png");
+	sprite->Initialize(spriteData, "resources/image/uvChecker.png");
 
 	Sprite* sprite2 = new Sprite();
-	sprite2->Initialize(spriteData, "resources/monsterBall.png");
+	sprite2->Initialize(spriteData, "resources/image/monsterBall.png");
 
 	Sprite* sprite3 = new Sprite();
-	sprite3->Initialize(spriteData, "resources/star.png");
+	sprite3->Initialize(spriteData, "resources/image/star.png");
 
 	Object3dData* object3dData = new Object3dData();
 	object3dData->Initialize(dxCommon);
 
 	Object3d* model = new Object3d();
-	model->Initialize(object3dData, "resources", "plane.obj", "resources/monsterBall.png");
+	model->Initialize(object3dData, "resources/object3d", "plane.obj", "resources/image/monsterBall.png");
 
 	Object3d* model2 = new Object3d();
-	model2->Initialize(object3dData, "resources", "axis.obj", "resources/uvChecker.png");
+	model2->Initialize(object3dData, "resources/object3d", "axis.obj", "resources/image/uvChecker.png");
 
-	HRESULT hr;
+	Audio* audio = new Audio();
+	audio->Initialize("resources/sound/fanfare.wav");
 
 	// ログのディレクトリを用意
 	std::filesystem::create_directory("logs");
-
-	// 07-01 Input
-	Input* input = new Input();
-	input->Initialize(winApp);
-
-	// 07-00 xAudio関係
-
-	Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
-	IXAudio2MasteringVoice* masterVoice = nullptr;
-
-	hr = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
-	assert(SUCCEEDED(hr));
-
-	hr = xAudio2->CreateMasteringVoice(&masterVoice);
-	assert(SUCCEEDED(hr));
-
-	SoundData soundData1 = SoundLoadWave("Resources/fanfare.wav");
-
-	/*SoundPlayWave(xAudio2.Get(), soundData1);*/
-
-#pragma region メインループ開始前にtransform変数を作る 02_02 04_00
-
-	Transform transform{ {1.0f,1.0f,1.0f}, {0.0f,3.1f,0.0f}, {0.0f,0.0f,0.0f} };
-	Transform transform2{ {1.0f,1.0f,1.0f}, {0.0f,3.1f,0.0f}, {0.0f,0.0f,0.0f} };
-	Transform transformSprite{ {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 
 	Camera* camera = new Camera();
 	DebugCamera* debugCamera = new DebugCamera();
 	Camera* useCamera = new Camera();
 	bool isDebugCamera = false;
-#pragma endregion
-
-	// メインループ外で定義（前フレームのキー状態を保存）
-	BYTE preKey[256] = {};
 
 	// メインループ 00_03
 	MSG msg{};
@@ -402,11 +253,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		} else { // ゲームの処理
 
+			///
+		    /// ↓更新処理ここから
+		    ///
+
 			input->Update();
 
 			// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
 			if (input->TriggerKey(DIK_Z)) {
-				SoundPlayWave(xAudio2.Get(), soundData1);
+				audio->PlayAudio();
 			}
 
 			if (input->TriggerKey(DIK_SPACE)) {
@@ -432,7 +287,47 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 
-#pragma region Imguiを使う
+			sprite->SetPosition({ 640.f, 360.f });
+			sprite2->SetPosition({ 0.f, 0.f });
+			sprite3->SetPosition({ 300.f, 0.f });
+
+			sprite->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+
+			sprite->Update();
+			sprite2->Update();
+			sprite3->Update();
+
+			model->Update(*useCamera);
+			model2->Update(*useCamera);
+
+			///
+		    /// ↑更新処理ここまで
+		    ///
+
+			///
+		    /// ↓描画処理ここから
+		    ///
+
+			dxCommon->PreDraw(); // ここより上に描画処理を書かない
+
+			spriteData->SpriteDataSet();
+			object3dData->Object3dDataSet();
+
+
+			sprite->Draw();
+			sprite2->Draw();
+			sprite3->Draw();
+
+			model->Draw();
+			model2->Draw();
+
+			///
+			/// ↑描画処理ここまで
+			///
+
+			///
+			/// ↓ImGuiここから
+			///
 
 			// フレームの先頭でImguiにここからフレームが始まる旨を告げる
 			ImGui_ImplDX12_NewFrame();
@@ -450,8 +345,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
 				ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
 				ImGui::Checkbox("CameraModeChange", &isDebugCamera);
-			}
-			else {
+			} else {
 				ImGui::Text("Normal Camera");
 				ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
 				ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
@@ -460,108 +354,38 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::End();
 
-			ImGui::Begin("Model Control");
-
-			ImGui::Text("Model Scale");
-			ImGui::DragFloat3("ModelScale", &transform.scale.x, 0.1f);
-
-			ImGui::Text("Model Rotate");
-			ImGui::DragFloat3("ModelRotate", &transform.rotate.x, 0.1f);
-
-			ImGui::Text("Model Translate");
-			ImGui::DragFloat3("ModelTranslate", &transform.translate.x, 0.1f);
-
-			//ImGui::Text("Model TextureChange");
-			//ImGui::Checkbox("useMonsterBall", &useMonsterBall);
-
-			// カラー（Vector4）の操作（RGBA）
-			//ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&directionalLightData->color));
-
-			// 向き（Vector3）操作（XYZ方向）
-			//ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1.0f, 1.0f);
-
-			// 光の強さ（intensity）操作
-			//ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 10.0f);
-
-			//ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-			//ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-			//ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
-
-			ImGui::End();
-
 			// Imguiの内部コマンドを生成する
 			ImGui::Render();
 
-#pragma endregion
+			///
+			/// ↑ImGuiここまで
+			///
 
-
-			sprite->SetPosition({ 640.f, 360.f });
-			sprite2->SetPosition({ 0.f, 0.f });
-			sprite3->SetPosition({ 300.f, 0.f });
-
-			sprite->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
-
-			sprite->Update();
-			sprite2->Update();
-			sprite3->Update();
-
-			model->Update(*useCamera);
-			model2->Update(*useCamera);
-
-			dxCommon->PreDraw();
-
-			spriteData->SpriteDataSet();
-			object3dData->Object3dDataSet();
-
-
-			sprite->Draw();
-			sprite2->Draw();
-			sprite3->Draw();
-
-			model->Draw();
-			model2->Draw();
-
-			dxCommon->PostDraw();
-
-#pragma endregion
+			dxCommon->PostDraw(); // ここより下に描画処理を書かない
 
 		}
 	} // メインループ外
 
-#pragma region ゲーム終了時にはCOMの終了処理を行っておく
-
+    //ゲーム終了時にはCOMの終了処理を行っておく
 	CoUninitialize();
 
-#pragma endregion
-
-
-#pragma region Imguiの終了処理
-
+	// Imguiの終了処理
 	// ImGuiの終了処理。詳細はさして重要ではないので解説は省略する。
 	// こういうもんである。初期化と逆順に行う
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-#pragma endregion
+	audio->Reset();
 
-	xAudio2.Reset();
-	SoundUnload(&soundData1);
-
-#pragma region 解放処理(リソースチェックの前) 01_03
-
+    // 解放処理(リソースチェックの前) 01_03
 	dxCommon->CloseFence();
 	winApp->Finalize();
 	TextureManager::GetInstance()->Finalize();
-	
-#pragma endregion
 
-#pragma region リソースリークチェック(最後の最後に残っているものがないか) *main関数のreturnの直前に行う 01_03
-
-
-
-#pragma endregion
-
+	///
+	/// ↓開放処理ここから
+	///
 
 	delete camera;
 	camera = nullptr;
@@ -594,6 +418,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete object3dData;
 	object3dData = nullptr;
+
+	delete audio;
+	audio = nullptr;
+
+	///
+	/// ↑描画処理ここまで
+	///
 
 	return 0;
 }
