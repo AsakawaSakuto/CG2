@@ -1,4 +1,4 @@
-#include"Matrix4x4.h"
+#include"MatrixFunction.h"
 
 // 単位行列
 Matrix4x4 MakeIdentityMatrix() {

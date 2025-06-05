@@ -1,14 +1,8 @@
 #pragma once
-#include"Vector3.h"
+#include"Matrix4x4.h"
+#include "Vector3.h"
 #include <cmath>
 #include <iostream>
-
-/// <summary>
-/// 4x4配列
-/// </summary>
-struct Matrix4x4 {
-	float m[4][4];
-};
 
 // 単位行列
 Matrix4x4 MakeIdentityMatrix();

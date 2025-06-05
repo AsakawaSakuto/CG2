@@ -6,6 +6,9 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
+#include <fstream>
+#include <sstream>
+
 using namespace Microsoft::WRL;
 
 // HRESULT
@@ -175,4 +178,100 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
     handleGPU.ptr += (descriptorSize * index);
     return handleGPU;
+}
+
+MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+{
+    // 1.中で必要となる変数の宣言
+    MaterialData materialData;  // 構築するMaterialData
+
+    // 2.ファイルを開く
+    std::string line;                                   // ファイルから読んだ1行を格納するもの
+    std::ifstream file(directoryPath + "/" + filename); // ファイルを開く
+    assert(file.is_open());                             // とりあえず開けなかったら止める
+
+    // 3.実際にファイルを読み、MaterialDataを構築していく
+    while (std::getline(file, line)) {
+        std::string identifier;
+        std::istringstream s(line);
+        s >> identifier;
+
+        // identifierに応じた処理
+        if (identifier == "map_Kd") {
+            std::string textureFilename;
+            s >> textureFilename;
+            // 連結してファイルパスにする
+            materialData.textureFilePath = directoryPath + "/" + textureFilename;
+        }
+    }
+    // 4.MaterialData を返す
+    return materialData;
+}
+
+ModelData LoadObject3dFile(const std::string& directoryPath, const std::string& filename) {
+
+    ModelData modelData;
+    std::vector<Vector4> positions;
+    std::vector<Vector3> normals;
+    std::vector<Vector2> texcoords;
+    std::string line;
+
+    std::ifstream file(directoryPath + "/" + filename);
+    assert(file.is_open());
+
+    while (std::getline(file, line)) {
+        std::string identifier;
+        std::istringstream s(line);
+        s >> identifier;
+
+        if (identifier == "v") {
+            Vector4 position;
+            s >> position.x >> position.y >> position.z;
+            position.w = 1.0f;
+            position.x *= -1.0f; // X軸反転
+            positions.push_back(position);
+        }
+        else if (identifier == "vt") {
+            Vector2 texcoord;
+            s >> texcoord.x >> texcoord.y;
+            texcoords.push_back(texcoord);
+        }
+        else if (identifier == "vn") {
+            Vector3 normal;
+            s >> normal.x >> normal.y >> normal.z;
+            normal.x *= -1.0f; // 法線のX軸反転
+            normals.push_back(normal);
+        }
+        else if (identifier == "f") {
+            VertexData triangle[3];
+            for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+                std::string vertexDefinition;
+                s >> vertexDefinition;
+                std::istringstream v(vertexDefinition);
+                uint32_t elementIndices[3];
+                for (int32_t element = 0; element < 3; ++element) {
+                    std::string index;
+                    std::getline(v, index, '/');
+                    elementIndices[element] = std::stoi(index);
+                }
+                Vector4 position = positions[elementIndices[0] - 1];
+                Vector2 texcoord = texcoords[elementIndices[1] - 1];
+                texcoord.y = 1.0f - texcoord.y; // Y軸反転（UV原点の違いを補正）
+                Vector3 normal = normals[elementIndices[2] - 1];
+                triangle[faceVertex] = { position, texcoord, normal };
+            }
+            // 頂点の順番を逆に登録して回り順を反転
+            modelData.vertices.push_back(triangle[2]);
+            modelData.vertices.push_back(triangle[1]);
+            modelData.vertices.push_back(triangle[0]);
+        }
+        else if (identifier == "mtllib") {
+            // materialTemplateLibraryファイルの名前を取得する
+            std::string materialFilename;
+            s >> materialFilename;
+            // 基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
+            modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
+        }
+    }
+    return modelData;
 }

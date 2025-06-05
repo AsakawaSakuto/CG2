@@ -51,6 +51,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include"D3DResourceLeakChecker.h"
 #include"Sprite.h"
 #include"SpriteData.h"
+#include"Object3d.h"
+#include"Object3dData.h"
 #include"TextureManager.h"
 
 #include "Vector2.h"
@@ -61,17 +63,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include "Transform.h"
 #include "Material.h"
 #include "TransformationMatrix.h"
-
-
-
-struct MaterialData {
-	std::string textureFilePath;
-};
-
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-};
+#include "MaterialData.h"
+#include "ModelData.h"
 
 // 07-00 xAudio関係
 struct ChunkHeader {
@@ -189,10 +182,6 @@ void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData) {
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
 	result = pSourceVoice->Start();
 }
-
-#pragma endregion
-
-#pragma region ウィンドウプロシャージャ 00_03
 
 // ウィンドウプロシャージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
@@ -320,105 +309,12 @@ void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint
 
 #pragma region LoadMaterial関数 06_02
 
-MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
-{
-	// 1.中で必要となる変数の宣言
-	MaterialData materialData;  // 構築するMaterialData
 
-	// 2.ファイルを開く
-	std::string line;                                   // ファイルから読んだ1行を格納するもの
-	std::ifstream file(directoryPath + "/" + filename); // ファイルを開く
-	assert(file.is_open());                             // とりあえず開けなかったら止める
-
-	// 3.実際にファイルを読み、MaterialDataを構築していく
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		// identifierに応じた処理
-		if (identifier == "map_Kd") {
-			std::string textureFilename;
-			s >> textureFilename;
-			// 連結してファイルパスにする
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-		}
-	}
-	// 4.MaterialData を返す
-	return materialData;
-}
 
 #pragma endregion
 
 #pragma region Objファイルを読み込む関数 06_02
 
-ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename) {
-
-	ModelData modelData;
-	std::vector<Vector4> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector2> texcoords;
-	std::string line;
-
-	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());
-
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		if (identifier == "v") {
-			Vector4 position;
-			s >> position.x >> position.y >> position.z;
-			position.w = 1.0f;
-			position.x *= -1.0f; // X軸反転
-			positions.push_back(position);
-		}
-		else if (identifier == "vt") {
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
-			texcoords.push_back(texcoord);
-		}
-		else if (identifier == "vn") {
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
-			normal.x *= -1.0f; // 法線のX軸反転
-			normals.push_back(normal);
-		}
-		else if (identifier == "f") {
-			VertexData triangle[3];
-			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-				std::string vertexDefinition;
-				s >> vertexDefinition;
-				std::istringstream v(vertexDefinition);
-				uint32_t elementIndices[3];
-				for (int32_t element = 0; element < 3; ++element) {
-					std::string index;
-					std::getline(v, index, '/');
-					elementIndices[element] = std::stoi(index);
-				}
-				Vector4 position = positions[elementIndices[0] - 1];
-				Vector2 texcoord = texcoords[elementIndices[1] - 1];
-				texcoord.y = 1.0f - texcoord.y; // Y軸反転（UV原点の違いを補正）
-				Vector3 normal = normals[elementIndices[2] - 1];
-				triangle[faceVertex] = { position, texcoord, normal };
-			}
-			// 頂点の順番を逆に登録して回り順を反転
-			modelData.vertices.push_back(triangle[2]);
-			modelData.vertices.push_back(triangle[1]);
-			modelData.vertices.push_back(triangle[0]);
-		}
-		else if (identifier == "mtllib") {
-			// materialTemplateLibraryファイルの名前を取得する
-			std::string materialFilename;
-			s >> materialFilename;
-			// 基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
-			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
-		}
-	}
-	return modelData;
-}
 
 #pragma endregion
 
@@ -457,6 +353,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Sprite* sprite3 = new Sprite();
 	sprite3->Initialize(spriteData, "resources/star.png");
+
+	Object3dData* object3dData = new Object3dData();
+	object3dData->Initialize(dxCommon);
+
+	Object3d* model = new Object3d();
+	model->Initialize(object3dData, "resources", "plane.obj", "resources/monsterBall.png");
+
+	Object3d* model2 = new Object3d();
+	model2->Initialize(object3dData, "resources", "axis.obj", "resources/uvChecker.png");
 
 	HRESULT hr;
 
@@ -611,14 +516,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			sprite2->Update();
 			sprite3->Update();
 
+			model->Update(*useCamera);
+			model2->Update(*useCamera);
 
 			dxCommon->PreDraw();
 
 			spriteData->SpriteDataSet();
+			object3dData->Object3dDataSet();
+
 
 			sprite->Draw();
 			sprite2->Draw();
 			sprite3->Draw();
+
+			model->Draw();
+			model2->Draw();
 
 			dxCommon->PostDraw();
 
@@ -678,13 +590,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete sprite;
 	sprite = nullptr;
+
 	delete sprite2;
 	sprite2 = nullptr;
+
 	delete sprite3;
 	sprite3 = nullptr;
 
 	delete spriteData;
 	spriteData = nullptr;
+
+	delete model;
+	model = nullptr;
+
+	delete object3dData;
+	object3dData = nullptr;
 
 	return 0;
 }

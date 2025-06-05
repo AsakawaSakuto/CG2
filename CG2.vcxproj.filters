@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="ソース ファイル\Matrix4x4">
-      <UniqueIdentifier>{077112b5-b2b9-43e0-8742-a6b5d1ee0545}</UniqueIdentifier>
-    </Filter>
     <Filter Include="imgui">
       <UniqueIdentifier>{a833b09a-99a4-4271-89fd-db7076b02100}</UniqueIdentifier>
     </Filter>
@@ -46,16 +43,31 @@
     <Filter Include="ソース ファイル\System\DirectXCommon">
       <UniqueIdentifier>{c31d2cd5-c88f-44ac-b5b1-85d9878a4cca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Sprite">
-      <UniqueIdentifier>{4d2e7da4-2506-4a42-a613-38d6a35d1d07}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\System\Utility\CreateResource">
       <UniqueIdentifier>{3148295b-f069-4803-984c-5f57bbdcc8c0}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\System\TextureManager">
       <UniqueIdentifier>{a9e68c56-772a-4ae6-a559-65f1d9223e19}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Object3d">
+    <Filter Include="ソース ファイル\System\ResourceData">
+      <UniqueIdentifier>{4e3786ae-0b6c-425d-b0c9-4de5ee316654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Utility\Math">
+      <UniqueIdentifier>{2cfb454f-56c0-4eda-9a0c-73831766780c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\System\Utility\MatrixFunction">
+      <UniqueIdentifier>{077112b5-b2b9-43e0-8742-a6b5d1ee0545}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\2d">
+      <UniqueIdentifier>{13afaa86-0043-47d1-a789-92bfb1f71a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\3d">
+      <UniqueIdentifier>{97fae438-2a01-4489-8e15-b4066766d6b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\2d\Sprite">
+      <UniqueIdentifier>{4d2e7da4-2506-4a42-a613-38d6a35d1d07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\3d\Object3d">
       <UniqueIdentifier>{0ccb1530-ad70-4a2e-bdcc-d0c8d28a1fb4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -63,8 +75,8 @@
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Matrix4x4.cpp">
-      <Filter>ソース ファイル\Matrix4x4</Filter>
+    <ClCompile Include="Engine\System\Utility\MatrixFunction\MatrixFunction.cpp">
+      <Filter>ソース ファイル\System\Utility\MatrixFunction</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
@@ -87,58 +99,52 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="DebugCamera.cpp">
+    <ClCompile Include="Engine\Camera\DebugCamera.cpp">
       <Filter>ソース ファイル\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="Engine\Camera\Camera.cpp">
       <Filter>ソース ファイル\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
+    <ClCompile Include="Engine\System\Input\Input.cpp">
       <Filter>ソース ファイル\System\Input</Filter>
     </ClCompile>
-    <ClCompile Include="WinApp.cpp">
+    <ClCompile Include="Engine\System\WinApp\WinApp.cpp">
       <Filter>ソース ファイル\System\WinApp</Filter>
     </ClCompile>
-    <ClCompile Include="Logger.cpp">
+    <ClCompile Include="Engine\System\Utility\Logger\Logger.cpp">
       <Filter>ソース ファイル\System\Utility\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="ConvertString.cpp">
+    <ClCompile Include="Engine\System\Utility\ConvertString\ConvertString.cpp">
       <Filter>ソース ファイル\System\Utility\ConvertString</Filter>
     </ClCompile>
-    <ClCompile Include="DirectXCommon.cpp">
+    <ClCompile Include="Engine\System\DirectXCommon\DirectXCommon.cpp">
       <Filter>ソース ファイル\System\DirectXCommon</Filter>
     </ClCompile>
-    <ClCompile Include="D3DResourceLeakChecker.cpp">
+    <ClCompile Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.cpp">
       <Filter>ソース ファイル\System\DirectXCommon</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>ソース ファイル\Sprite</Filter>
+    <ClCompile Include="Engine\2d\Sprite\Sprite.cpp">
+      <Filter>ソース ファイル\2d\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteData.cpp">
-      <Filter>ソース ファイル\Sprite</Filter>
+    <ClCompile Include="Engine\2d\Sprite\SpriteData.cpp">
+      <Filter>ソース ファイル\2d\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="CreateResource.cpp">
+    <ClCompile Include="Engine\System\Utility\CreateResource\CreateResource.cpp">
       <Filter>ソース ファイル\System\Utility\CreateResource</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
+    <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp">
       <Filter>ソース ファイル\System\TextureManager</Filter>
     </ClCompile>
-    <ClCompile Include="Object3dData.cpp">
-      <Filter>ソース ファイル\Object3d</Filter>
+    <ClCompile Include="Engine\3d\Object3d\Object3dData.cpp">
+      <Filter>ソース ファイル\3d\Object3d</Filter>
     </ClCompile>
-    <ClCompile Include="Object3d.cpp">
-      <Filter>ソース ファイル\Object3d</Filter>
+    <ClCompile Include="Engine\3d\Object3d\Object3d.cpp">
+      <Filter>ソース ファイル\3d\Object3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Matrix4x4.h">
-      <Filter>ソース ファイル\Matrix4x4</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.h">
-      <Filter>ソース ファイル</Filter>
+    <ClInclude Include="Engine\System\Utility\MatrixFunction\MatrixFunction.h">
+      <Filter>ソース ファイル\System\Utility\MatrixFunction</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
@@ -164,65 +170,80 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugCamera.h">
+    <ClInclude Include="Engine\Camera\DebugCamera.h">
       <Filter>ソース ファイル\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="Engine\Camera\Camera.h">
       <Filter>ソース ファイル\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
+    <ClInclude Include="Engine\System\Input\Input.h">
       <Filter>ソース ファイル\System\Input</Filter>
     </ClInclude>
-    <ClInclude Include="WinApp.h">
+    <ClInclude Include="Engine\System\WinApp\WinApp.h">
       <Filter>ソース ファイル\System\WinApp</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.h">
+    <ClInclude Include="Engine\System\Utility\Logger\Logger.h">
       <Filter>ソース ファイル\System\Utility\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="ConvertString.h">
+    <ClInclude Include="Engine\System\Utility\ConvertString\ConvertString.h">
       <Filter>ソース ファイル\System\Utility\ConvertString</Filter>
     </ClInclude>
-    <ClInclude Include="DirectXCommon.h">
+    <ClInclude Include="Engine\System\DirectXCommon\DirectXCommon.h">
       <Filter>ソース ファイル\System\DirectXCommon</Filter>
     </ClInclude>
-    <ClInclude Include="D3DResourceLeakChecker.h">
+    <ClInclude Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.h">
       <Filter>ソース ファイル\System\DirectXCommon</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>ソース ファイル\Sprite</Filter>
+    <ClInclude Include="Engine\2d\Sprite\Sprite.h">
+      <Filter>ソース ファイル\2d\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteData.h">
-      <Filter>ソース ファイル\Sprite</Filter>
+    <ClInclude Include="Engine\2d\Sprite\SpriteData.h">
+      <Filter>ソース ファイル\2d\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="VertexData.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="CreateResource.h">
+    <ClInclude Include="Engine\System\Utility\CreateResource\CreateResource.h">
       <Filter>ソース ファイル\System\Utility\CreateResource</Filter>
     </ClInclude>
-    <ClInclude Include="TransformationMatrix.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureManager.h">
+    <ClInclude Include="Engine\System\TextureManager\TextureManager.h">
       <Filter>ソース ファイル\System\TextureManager</Filter>
     </ClInclude>
-    <ClInclude Include="Object3dData.h">
-      <Filter>ソース ファイル\Object3d</Filter>
+    <ClInclude Include="Engine\3d\Object3d\Object3dData.h">
+      <Filter>ソース ファイル\3d\Object3d</Filter>
     </ClInclude>
-    <ClInclude Include="Object3d.h">
-      <Filter>ソース ファイル\Object3d</Filter>
+    <ClInclude Include="Engine\3d\Object3d\Object3d.h">
+      <Filter>ソース ファイル\3d\Object3d</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>ソース ファイル</Filter>
+    <ClInclude Include="Engine\System\Utility\Math\Vector2.h">
+      <Filter>ソース ファイル\System\Utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\Utility\Math\Vector3.h">
+      <Filter>ソース ファイル\System\Utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\Utility\Math\Vector4.h">
+      <Filter>ソース ファイル\System\Utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\DirectionalLight.h">
+      <Filter>ソース ファイル\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\Material.h">
+      <Filter>ソース ファイル\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\MaterialData.h">
+      <Filter>ソース ファイル\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\ModelData.h">
+      <Filter>ソース ファイル\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\Transform.h">
+      <Filter>ソース ファイル\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\TransformationMatrix.h">
+      <Filter>ソース ファイル\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\VertexData.h">
+      <Filter>ソース ファイル\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h">
+      <Filter>ソース ファイル\System\Utility\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

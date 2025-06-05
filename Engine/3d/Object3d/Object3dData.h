@@ -1,23 +1,26 @@
 #pragma once
 #include"DirectXCommon.h"
+
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
 #include <wrl/client.h>
-#include "externals/DirectXTex/DirectXTex.h"
-#pragma comment(lib, "dxcompiler.lib")
 #include <dxgidebug.h>
+#include <dxcapi.h>
+
+#pragma comment(lib, "dxcompiler.lib")
 #pragma comment(lib,"dxguid.lib")
-#include <dxcapi.h>                  
 #pragma comment(lib,"dxcompiler.lib")
 
-class SpriteData
+#include "externals/DirectXTex/DirectXTex.h"
+
+class Object3dData
 {
 public:
 
 	void Initialize(DirectXCommon* dxCommon);
 
-	void SpriteDataSet();
+	void Object3dDataSet();
 
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
 
@@ -41,7 +44,7 @@ private:
 	void CompileShaders();
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-	
+
 	void BlendStateSet(); // BlendStateの設定
 	D3D12_BLEND_DESC blendDesc_{};
 
