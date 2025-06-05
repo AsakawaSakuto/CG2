@@ -307,17 +307,6 @@ void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint
 
 #pragma endregion
 
-#pragma region LoadMaterial関数 06_02
-
-
-
-#pragma endregion
-
-#pragma region Objファイルを読み込む関数 06_02
-
-
-#pragma endregion
-
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//AllocConsole();
