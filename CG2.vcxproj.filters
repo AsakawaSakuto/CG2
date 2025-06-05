@@ -153,10 +153,10 @@
     <ClCompile Include="Engine\System\Audio\AudioData.cpp">
       <Filter>ソース ファイル\System\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Sphere.cpp">
+    <ClCompile Include="Engine\3d\Sphere\Sphere.cpp">
       <Filter>ソース ファイル\3d\Sphere</Filter>
     </ClCompile>
-    <ClCompile Include="SphereData.cpp">
+    <ClCompile Include="Engine\3d\Sphere\SphereData.cpp">
       <Filter>ソース ファイル\3d\Sphere</Filter>
     </ClCompile>
   </ItemGroup>
@@ -269,10 +269,10 @@
     <ClInclude Include="Engine\System\Audio\AudioData.h">
       <Filter>ソース ファイル\System\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Sphere.h">
+    <ClInclude Include="Engine\3d\Sphere\Sphere.h">
       <Filter>ソース ファイル\3d\Sphere</Filter>
     </ClInclude>
-    <ClInclude Include="SphereData.h">
+    <ClInclude Include="Engine\3d\Sphere\SphereData.h">
       <Filter>ソース ファイル\3d\Sphere</Filter>
     </ClInclude>
   </ItemGroup>

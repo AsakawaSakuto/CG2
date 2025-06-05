@@ -10,7 +10,7 @@ void SphereData::Initialize(DirectXCommon* dxCommon) {
 	CreatePSO();
 }
 
-void SphereData::SpriteDataSet() {
+void SphereData::SphereDataSet() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	// PSOを設定

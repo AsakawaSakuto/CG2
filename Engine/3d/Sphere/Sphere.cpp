@@ -6,13 +6,11 @@ void Sphere::Initialize(SphereData* sphereData, const std::string& fileName) {
 
 	device_ = sphereData_->GetDxCommon()->GetDevice();
 	commandList_ = sphereData_->GetDxCommon()->GetCommandList();
-
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
 
 	transform_.scale = { 1.f,1.f,1.f };
+	transform_.rotate = { 0.f,0.f,0.f };
 	transform_.translate = { 0.f,0.f,0.f };
-
-	CreateIndexedSphereMesh(vertices_, indices_, subdivision_);
 
 	CreateVertexResource();
 	CreateIndexResource();
@@ -51,7 +49,9 @@ void Sphere::Draw() {
 }
 
 void Sphere::CreateVertexResource() {
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * indices_.size());
+	CreateIndexedSphereMesh(vertices_, indices_, subdivision_);
+
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices_.size());
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * vertices_.size());

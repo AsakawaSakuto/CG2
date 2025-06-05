@@ -20,7 +20,7 @@ public:
 
 	void Initialize(DirectXCommon* dxCommon);
 
-	void SpriteDataSet();
+	void SphereDataSet();
 
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
 

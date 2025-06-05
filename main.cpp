@@ -158,7 +158,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			spriteData->SpriteDataSet();
 			object3dData->Object3dDataSet();
-
+			sphereData->SphereDataSet();
 
 			sprite->Draw();
 			sprite2->Draw();
@@ -273,6 +273,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete audio2;
 	audio2 = nullptr;
+
+	delete sphere;
+	sphere = nullptr;
+
+	delete sphereData;
+	sphereData = nullptr;
 
 	///
 	/// ↑描画処理ここまで

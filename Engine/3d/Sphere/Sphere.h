@@ -20,7 +20,7 @@ public:
 	void Draw();
 
 private:
-	SphereData* sphereData_;
+	SphereData* sphereData_ = nullptr;
 
 	uint32_t textureIndex_ = 0;
 
