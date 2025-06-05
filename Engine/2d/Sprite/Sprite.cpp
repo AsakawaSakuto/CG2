@@ -49,7 +49,7 @@ void Sprite::Draw() {
 	//
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	// 描画！ (DrawCall/ドローコール)
-	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	commandList_->DrawIndexedInstanced(12, 1, 0, 0, 0);
 }
 
 void Sprite::CreateVertexResource() {
@@ -88,16 +88,20 @@ void Sprite::CreateVertexResource() {
 
 void Sprite::CreateIndexResource() {
 	// IndexResource
-	indexResource_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 6);
+	indexResource_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * 12);
 	// リソースの先頭のアドレスから使う
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズ
-	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 12;
 	// format
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
-	indexData_[0] = 0;	indexData_[1] = 1;	indexData_[2] = 2;
-	indexData_[3] = 1;	indexData_[4] = 3;	indexData_[5] = 2;
+	// 表面（三角形2枚）
+	indexData_[0] = 0; indexData_[1] = 1; indexData_[2] = 2;
+	indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
+	// 裏面（三角形2枚、巻き方向を逆に）
+	indexData_[6] = 2; indexData_[7] = 1; indexData_[8] = 0;
+	indexData_[9] = 2; indexData_[10] = 3; indexData_[11] = 1;
 }
 
 void Sprite::CreateMaterialResource() {

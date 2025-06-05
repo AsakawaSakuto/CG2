@@ -1,44 +1,8 @@
-#include <Windows.h>  // 00_01
-#include <string>     // 00_01
-
-#include <cstdint>    // 00_03
-
-#include <filesystem> // 00_04 EX ファイルやディレクトリに関する操作を行うライブラリ
-#include <fstream>    // 00_04 EX ファイルに書いたり読んだりするライブラリ
-#include <chrono>     // 00_04 EX 時間を扱うライブラリ
-
-#include <d3d12.h>               // 00_05
-#include <dxgi1_6.h>             // 00_05
-#include <cassert>               // 00_05
-#pragma comment(lib,"d3d12.lib") // 00_05
-#pragma comment(lib,"dxgi.lib")  // 00_05
-
-#include <dxgidebug.h>            // 01_03
-#pragma comment(lib,"dxguid.lib") // 01_03
-#include <dxcapi.h>                   // 02_00
-#pragma comment(lib,"dxcompiler.lib") // 02_00
-
-#include "externals/imgui/imgui.h"            // 02_03
-#include "externals/imgui/imgui_impl_dx12.h"  // 02_03
-#include "externals/imgui/imgui_impl_win32.h" // 02_03
-
-#include <fstream> // 06_02
-#include <sstream> // 06_02
-
-#include <wrl.h> // 06_03
-
-#include <wrl/client.h>
-using Microsoft::WRL::ComPtr;
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-#include "externals/DirectXTex/DirectXTex.h"
-
-#include"Camera.h"
-#include"DebugCamera.h"
-#include"Input.h"
-#include"Audio.h"
 #include"WinApp.h"
+#include"Input.h"
+#include"Camera.h"
+#include"Audio.h"
+#include"DebugCamera.h"
 #include"ConvertString.h"
 #include"DirectXCommon.h"
 #include"D3DResourceLeakChecker.h"
@@ -48,33 +12,15 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include"Object3dData.h"
 #include"TextureManager.h"
 
+#include <filesystem>
+#include "externals/DirectXTex/DirectXTex.h"
+
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "VertexData.h"
 #include "Matrix4x4.h"
-#include "Transform.h"
-#include "Material.h"
-#include "TransformationMatrix.h"
-#include "MaterialData.h"
-#include "ModelData.h"
 
-// ウィンドウプロシャージャ
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-		return true;
-	}
-	// メッセージに応じて固有の処理を行う
-	switch (msg) {
-		// ウィンドウが破壊された
-	case WM_DESTROY:
-		// OSに対してアプリの終了を伝える
-		PostQuitMessage(0);
-		return 0;
-	}
-	// 標準のメッセージ処理を行う
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
+using Microsoft::WRL::ComPtr;
 
 #pragma region 球体メッシュを作成する関数 05_00
 
@@ -180,25 +126,24 @@ void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint
 	}
 }
 
-
 #pragma endregion
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	//AllocConsole();
-	//FILE* fp;
-	//freopen_s(&fp, "CONOUT$", "w", stdout);
-#pragma region main関数の先頭でCOMを初期化 03_00
 
+    // main関数の先頭でCOMを初期化 03_00
 	CoInitializeEx(0, COINIT_MULTITHREADED);
-
-#pragma endregion
-
-	Logger::Initialize();
 
 	WinApp* winApp = new WinApp();
 	winApp->Initialize(L"CG2_Window");
 	winApp->EnableResize(true);
+
+	// ログのディレクトリを用意
+	Logger::Initialize();
+	std::filesystem::create_directory("logs");
+	//AllocConsole();
+	//FILE* fp;
+	//freopen_s(&fp, "CONOUT$", "w", stdout);
 
 	DirectXCommon* dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
@@ -234,8 +179,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* audio = new Audio();
 	audio->Initialize("resources/sound/fanfare.wav");
 
-	// ログのディレクトリを用意
-	std::filesystem::create_directory("logs");
+	Audio* audio2 = new Audio();
+	audio2->Initialize("resources/sound/start.wav");
 
 	Camera* camera = new Camera();
 	DebugCamera* debugCamera = new DebugCamera();
@@ -262,6 +207,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
 			if (input->TriggerKey(DIK_Z)) {
 				audio->PlayAudio();
+				audio2->PlayAudio();
 			}
 
 			if (input->TriggerKey(DIK_SPACE)) {
@@ -272,16 +218,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 
-			if (isDebugCamera)
-			{
-				if (debugCamera != nullptr)
-				{
+			if (isDebugCamera) {
+				if (debugCamera != nullptr) {
 					debugCamera->Update();
 					useCamera = debugCamera;
 				}
 			} else {
-				if (camera != nullptr)
-				{
+				if (camera != nullptr) {
 					camera->Update();
 					useCamera = camera;
 				}
@@ -314,11 +257,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			object3dData->Object3dDataSet();
 
 
-			sprite->Draw();
-			sprite2->Draw();
-			sprite3->Draw();
+			//sprite->Draw();
+			//sprite2->Draw();
+			//sprite3->Draw();
 
-			model->Draw();
+			//model->Draw();
 			model2->Draw();
 
 			///
@@ -377,6 +320,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui::DestroyContext();
 
 	audio->Reset();
+	audio2->Reset();
 
     // 解放処理(リソースチェックの前) 01_03
 	dxCommon->CloseFence();
@@ -421,6 +365,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete audio;
 	audio = nullptr;
+
+	delete audio2;
+	audio2 = nullptr;
 
 	///
 	/// ↑描画処理ここまで
