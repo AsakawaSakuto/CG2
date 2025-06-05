@@ -1,5 +1,5 @@
 #pragma once
-#include "SpriteData.h"
+#include "SphereData.h"
 #include "VertexData.h"
 #include "Material.h"
 #include "TransformationMatrix.h"
@@ -7,29 +7,20 @@
 #include "DirectionalLight.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
+#include "Camera.h"
 
-class SpirteData;
-
-class Sprite
+class Sphere
 {
 public:
 
-	void Initialize(SpriteData* spriteData, const std::string& fileName);
+	void Initialize(SphereData* sphereData, const std::string& fileName);
 
-	void Update();
+	void Update(Camera& useCamera);
 
 	void Draw();
 
-	const Vector2& GetPosition()const { return position_; }
-
-	void SetPosition(const Vector2& position) { position_ = position; }
-
-	void SetSize(const Vector2& size) { size_ = size; }
-
-	void SetColor(const Vector4& Color) { materialData_->color = Color; }
-
 private:
-	SpriteData* spriteData_;
+	SphereData* sphereData_;
 
 	uint32_t textureIndex_ = 0;
 
@@ -53,10 +44,12 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
+	std::vector<VertexData> vertices_;
+	std::vector<uint32_t> indices_;
+	const int subdivision_ = 32; // 分割数（細かさ）
+
 	Transform transform_;
-	Vector2 position_;
-	Vector2 size_;
-	Vector2 anchorPoint = { 0.5f,0.5f };
+	Vector3 position_;
 
 	void CreateVertexResource();
 	void CreateIndexResource();
@@ -64,3 +57,6 @@ private:
 	void CreateTransformationResource();
 	void CreateDirectionalLightResource();
 };
+
+// 球体メッシュをインデックス付きで作成する関数
+void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision);

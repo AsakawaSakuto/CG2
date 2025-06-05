@@ -73,6 +73,9 @@
     <Filter Include="ソース ファイル\System\Audio">
       <UniqueIdentifier>{8de1a442-c8a2-403f-addf-1be5ad236c48}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\3d\Sphere">
+      <UniqueIdentifier>{faf0d11d-e9b2-4b0e-b6b5-b1fff587a423}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -149,6 +152,12 @@
     </ClCompile>
     <ClCompile Include="Engine\System\Audio\AudioData.cpp">
       <Filter>ソース ファイル\System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>ソース ファイル\3d\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="SphereData.cpp">
+      <Filter>ソース ファイル\3d\Sphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +268,12 @@
     </ClInclude>
     <ClInclude Include="Engine\System\Audio\AudioData.h">
       <Filter>ソース ファイル\System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>ソース ファイル\3d\Sphere</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereData.h">
+      <Filter>ソース ファイル\3d\Sphere</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

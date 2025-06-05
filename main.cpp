@@ -11,6 +11,7 @@
 #include"Object3d.h"
 #include"Object3dData.h"
 #include"TextureManager.h"
+#include"Sphere.h"
 
 #include <filesystem>
 #include "externals/DirectXTex/DirectXTex.h"
@@ -21,112 +22,6 @@
 #include "Matrix4x4.h"
 
 using Microsoft::WRL::ComPtr;
-
-#pragma region 球体メッシュを作成する関数 05_00
-
-// 球体メッシュを作成する関数
-void CreateSphereMesh(std::vector<VertexData>& vertices, int subdivision) {
-	const float pi = 3.1415926535f;
-	const float lonEvery = 2.0f * pi / subdivision;
-	const float latEvery = pi / subdivision;
-
-	vertices.clear();
-	vertices.resize(subdivision * subdivision * 6);
-
-	auto Normalize = [](const Vector3& v) -> Vector3 {
-		float len = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-		if (len > 0.0f) return { v.x / len, v.y / len, v.z / len };
-		else return { 0.0f, 1.0f, 0.0f }; // fallback（ゼロベクトル回避）
-		};
-
-	for (int latIndex = 0; latIndex < subdivision; ++latIndex) {
-		float lat = -pi / 2.0f + latEvery * latIndex;
-		for (int lonIndex = 0; lonIndex < subdivision; ++lonIndex) {
-			float lon = lonEvery * lonIndex;
-			uint32_t start = (latIndex * subdivision + lonIndex) * 6;
-
-			// 頂点座標
-			Vector3 a = { cosf(lat) * cosf(lon), sinf(lat), cosf(lat) * sinf(lon) };
-			Vector3 b = { cosf(lat) * cosf(lon + lonEvery), sinf(lat), cosf(lat) * sinf(lon + lonEvery) };
-			Vector3 c = { cosf(lat + latEvery) * cosf(lon), sinf(lat + latEvery), cosf(lat + latEvery) * sinf(lon) };
-			Vector3 d = { cosf(lat + latEvery) * cosf(lon + lonEvery), sinf(lat + latEvery), cosf(lat + latEvery) * sinf(lon + lonEvery) };
-
-			// UV座標
-			float u0 = float(lonIndex) / subdivision;
-			float v0 = 1.0f - float(latIndex) / subdivision;
-			float u1 = float(lonIndex + 1) / subdivision;
-			float v1 = 1.0f - float(latIndex + 1) / subdivision;
-
-			// 法線
-			Vector3 na = Normalize(a);
-			Vector3 nb = Normalize(b);
-			Vector3 nc = Normalize(c);
-			Vector3 nd = Normalize(d);
-
-			// 頂点データ代入（paddingも構造体に含まれている前提）
-			vertices[start + 0] = { {a.x, a.y, a.z, 1.0f}, {u0, v0}, na };
-			vertices[start + 1] = { {c.x, c.y, c.z, 1.0f}, {u0, v1}, nc };
-			vertices[start + 2] = { {b.x, b.y, b.z, 1.0f}, {u1, v0}, nb };
-
-			vertices[start + 3] = { {c.x, c.y, c.z, 1.0f}, {u0, v1}, nc };
-			vertices[start + 4] = { {d.x, d.y, d.z, 1.0f}, {u1, v1}, nd };
-			vertices[start + 5] = { {b.x, b.y, b.z, 1.0f}, {u1, v0}, nb };
-		}
-	}
-}
-
-// 球体メッシュをインデックス付きで作成する関数
-void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision) {
-	const float pi = 3.1415926535f;
-	const float lonEvery = 2.0f * pi / subdivision;
-	const float latEvery = pi / subdivision;
-
-	vertices.clear();
-	indices.clear();
-
-	auto Normalize = [](const Vector3& v) -> Vector3 {
-		float len = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-		if (len > 0.0f) return { v.x / len, v.y / len, v.z / len };
-		else return { 0.0f, 1.0f, 0.0f };
-		};
-
-	for (int lat = 0; lat <= subdivision; ++lat) {
-		float theta = -pi / 2.0f + latEvery * lat;
-		float v = 1.0f - float(lat) / subdivision;
-
-		for (int lon = 0; lon <= subdivision; ++lon) {
-			float phi = lonEvery * lon;
-			float u = float(lon) / subdivision;
-
-			Vector3 pos = {
-				cosf(theta) * cosf(phi),
-				sinf(theta),
-				cosf(theta) * sinf(phi)
-			};
-			Vector3 normal = Normalize(pos);
-			vertices.push_back({ { pos.x, pos.y, pos.z, 1.0f }, { u, v }, normal });
-		}
-	}
-
-	for (int lat = 0; lat < subdivision; ++lat) {
-		for (int lon = 0; lon < subdivision; ++lon) {
-			int i0 = lat * (subdivision + 1) + lon;
-			int i1 = i0 + 1;
-			int i2 = i0 + (subdivision + 1);
-			int i3 = i2 + 1;
-
-			indices.push_back(i0);
-			indices.push_back(i2);
-			indices.push_back(i1);
-
-			indices.push_back(i1);
-			indices.push_back(i2);
-			indices.push_back(i3);
-		}
-	}
-}
-
-#pragma endregion
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -181,6 +76,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Audio* audio2 = new Audio();
 	audio2->Initialize("resources/sound/start.wav");
+
+	SphereData* sphereData = new SphereData();
+	sphereData->Initialize(dxCommon);
+
+	Sphere* sphere = new Sphere();
+	sphere->Initialize(sphereData, "resources/image/uvChecker.png");
 
 	Camera* camera = new Camera();
 	DebugCamera* debugCamera = new DebugCamera();
@@ -243,6 +144,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			model->Update(*useCamera);
 			model2->Update(*useCamera);
 
+			sphere->Update(*useCamera);
+
 			///
 		    /// ↑更新処理ここまで
 		    ///
@@ -257,12 +160,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			object3dData->Object3dDataSet();
 
 
-			//sprite->Draw();
-			//sprite2->Draw();
-			//sprite3->Draw();
+			sprite->Draw();
+			sprite2->Draw();
+			sprite3->Draw();
 
 			model->Draw();
 			model2->Draw();
+
+			sphere->Draw();
 
 			///
 			/// ↑描画処理ここまで

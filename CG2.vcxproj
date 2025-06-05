@@ -118,6 +118,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\2d\Sprite\SpriteData.cpp" />
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
+    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="SphereData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\System\Audio\Audio.h" />
@@ -156,6 +158,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\ResourceData\VertexData.h" />
     <ClInclude Include="Engine\System\WinApp\WinApp.h" />
     <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h" />
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="SphereData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

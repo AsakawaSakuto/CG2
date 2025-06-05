@@ -33,10 +33,6 @@ void Sprite::Update() {
 }
 
 void Sprite::Draw() {
-	Logger::Log("Draw - TextureIndex: " + std::to_string(textureIndex_));
-	Logger::Log("Material GPU Address: " + std::to_string(materialResource_->GetGPUVirtualAddress()));
-	Logger::Log("Transform GPU Address: " + std::to_string(transformationResource_->GetGPUVirtualAddress()));
-	Logger::Log("SRV GPU Handle: " + std::to_string(TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_).ptr));
 	// Spriteの描画。変更が必要なものだけ変更する
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);  // VBVを設定
 	commandList_->IASetIndexBuffer(&indexBufferView_);
