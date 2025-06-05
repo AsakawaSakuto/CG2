@@ -261,7 +261,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//sprite2->Draw();
 			//sprite3->Draw();
 
-			//model->Draw();
+			model->Draw();
 			model2->Draw();
 
 			///
