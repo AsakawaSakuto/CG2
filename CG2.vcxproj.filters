@@ -16,65 +16,68 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{a833b09a-99a4-4271-89fd-db7076b02100}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Camera">
-      <UniqueIdentifier>{d1c8fd17-8918-4337-b455-03cdcca1f062}</UniqueIdentifier>
-    </Filter>
     <Filter Include="シェーダーファイル">
       <UniqueIdentifier>{723369c9-a439-48b6-81d7-df9926c4b846}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\System">
-      <UniqueIdentifier>{bd0e6a5a-8457-492c-837d-09d2951e021c}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\Engine">
+      <UniqueIdentifier>{69a8db82-f612-4367-8edb-eb9416e7b4a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\System\Input">
-      <UniqueIdentifier>{e3b83c87-0ad2-4e8e-bc7b-ed98b433b71d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\WinApp">
-      <UniqueIdentifier>{869d2eaf-80e9-4026-a961-91428796b70a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\Utility">
-      <UniqueIdentifier>{5a3d3e2e-21c3-4787-a1a5-22348fdf7123}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\Utility\Logger">
-      <UniqueIdentifier>{33b5b5f0-2c86-4d0c-8484-c9ac7c44e4d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\Utility\ConvertString">
-      <UniqueIdentifier>{7ac9ac89-c8af-46e5-bd20-777fb559d21c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\DirectXCommon">
-      <UniqueIdentifier>{c31d2cd5-c88f-44ac-b5b1-85d9878a4cca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\Utility\CreateResource">
-      <UniqueIdentifier>{3148295b-f069-4803-984c-5f57bbdcc8c0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\TextureManager">
-      <UniqueIdentifier>{a9e68c56-772a-4ae6-a559-65f1d9223e19}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\ResourceData">
-      <UniqueIdentifier>{4e3786ae-0b6c-425d-b0c9-4de5ee316654}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\Utility\Math">
-      <UniqueIdentifier>{2cfb454f-56c0-4eda-9a0c-73831766780c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\System\Utility\MatrixFunction">
-      <UniqueIdentifier>{077112b5-b2b9-43e0-8742-a6b5d1ee0545}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\2d">
+    <Filter Include="ソース ファイル\Engine\2d">
       <UniqueIdentifier>{13afaa86-0043-47d1-a789-92bfb1f71a9e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\3d">
-      <UniqueIdentifier>{97fae438-2a01-4489-8e15-b4066766d6b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\2d\Sprite">
+    <Filter Include="ソース ファイル\Engine\2d\Sprite">
       <UniqueIdentifier>{4d2e7da4-2506-4a42-a613-38d6a35d1d07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\3d\Object3d">
+    <Filter Include="ソース ファイル\Engine\3d">
+      <UniqueIdentifier>{97fae438-2a01-4489-8e15-b4066766d6b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\3d\Object3d">
       <UniqueIdentifier>{0ccb1530-ad70-4a2e-bdcc-d0c8d28a1fb4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\System\Audio">
-      <UniqueIdentifier>{8de1a442-c8a2-403f-addf-1be5ad236c48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\3d\Sphere">
+    <Filter Include="ソース ファイル\Engine\3d\Sphere">
       <UniqueIdentifier>{faf0d11d-e9b2-4b0e-b6b5-b1fff587a423}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Camera">
+      <UniqueIdentifier>{d1c8fd17-8918-4337-b455-03cdcca1f062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System">
+      <UniqueIdentifier>{bd0e6a5a-8457-492c-837d-09d2951e021c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Input">
+      <UniqueIdentifier>{e3b83c87-0ad2-4e8e-bc7b-ed98b433b71d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\WinApp">
+      <UniqueIdentifier>{869d2eaf-80e9-4026-a961-91428796b70a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Utility">
+      <UniqueIdentifier>{5a3d3e2e-21c3-4787-a1a5-22348fdf7123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Utility\Logger">
+      <UniqueIdentifier>{33b5b5f0-2c86-4d0c-8484-c9ac7c44e4d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Utility\ConvertString">
+      <UniqueIdentifier>{7ac9ac89-c8af-46e5-bd20-777fb559d21c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Utility\CreateResource">
+      <UniqueIdentifier>{3148295b-f069-4803-984c-5f57bbdcc8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Utility\Math">
+      <UniqueIdentifier>{2cfb454f-56c0-4eda-9a0c-73831766780c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Utility\MatrixFunction">
+      <UniqueIdentifier>{077112b5-b2b9-43e0-8742-a6b5d1ee0545}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\DirectXCommon">
+      <UniqueIdentifier>{c31d2cd5-c88f-44ac-b5b1-85d9878a4cca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\TextureManager">
+      <UniqueIdentifier>{a9e68c56-772a-4ae6-a559-65f1d9223e19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\ResourceData">
+      <UniqueIdentifier>{4e3786ae-0b6c-425d-b0c9-4de5ee316654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\System\Audio">
+      <UniqueIdentifier>{8de1a442-c8a2-403f-addf-1be5ad236c48}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -82,7 +85,7 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\Utility\MatrixFunction\MatrixFunction.cpp">
-      <Filter>ソース ファイル\System\Utility\MatrixFunction</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\MatrixFunction</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
@@ -106,63 +109,63 @@
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Camera\DebugCamera.cpp">
-      <Filter>ソース ファイル\Camera</Filter>
+      <Filter>ソース ファイル\Engine\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Camera\Camera.cpp">
-      <Filter>ソース ファイル\Camera</Filter>
+      <Filter>ソース ファイル\Engine\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\Input\Input.cpp">
-      <Filter>ソース ファイル\System\Input</Filter>
+      <Filter>ソース ファイル\Engine\System\Input</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp">
-      <Filter>ソース ファイル\System\WinApp</Filter>
+      <Filter>ソース ファイル\Engine\System\WinApp</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\Utility\Logger\Logger.cpp">
-      <Filter>ソース ファイル\System\Utility\Logger</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\Logger</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\Utility\ConvertString\ConvertString.cpp">
-      <Filter>ソース ファイル\System\Utility\ConvertString</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\ConvertString</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\DirectXCommon\DirectXCommon.cpp">
-      <Filter>ソース ファイル\System\DirectXCommon</Filter>
+      <Filter>ソース ファイル\Engine\System\DirectXCommon</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.cpp">
-      <Filter>ソース ファイル\System\DirectXCommon</Filter>
+      <Filter>ソース ファイル\Engine\System\DirectXCommon</Filter>
     </ClCompile>
     <ClCompile Include="Engine\2d\Sprite\Sprite.cpp">
-      <Filter>ソース ファイル\2d\Sprite</Filter>
+      <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
     </ClCompile>
     <ClCompile Include="Engine\2d\Sprite\SpriteData.cpp">
-      <Filter>ソース ファイル\2d\Sprite</Filter>
+      <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\Utility\CreateResource\CreateResource.cpp">
-      <Filter>ソース ファイル\System\Utility\CreateResource</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\CreateResource</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp">
-      <Filter>ソース ファイル\System\TextureManager</Filter>
+      <Filter>ソース ファイル\Engine\System\TextureManager</Filter>
     </ClCompile>
     <ClCompile Include="Engine\3d\Object3d\Object3dData.cpp">
-      <Filter>ソース ファイル\3d\Object3d</Filter>
+      <Filter>ソース ファイル\Engine\3d\Object3d</Filter>
     </ClCompile>
     <ClCompile Include="Engine\3d\Object3d\Object3d.cpp">
-      <Filter>ソース ファイル\3d\Object3d</Filter>
+      <Filter>ソース ファイル\Engine\3d\Object3d</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\Audio\Audio.cpp">
-      <Filter>ソース ファイル\System\Audio</Filter>
+      <Filter>ソース ファイル\Engine\System\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Engine\System\Audio\AudioData.cpp">
-      <Filter>ソース ファイル\System\Audio</Filter>
+      <Filter>ソース ファイル\Engine\System\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Engine\3d\Sphere\Sphere.cpp">
-      <Filter>ソース ファイル\3d\Sphere</Filter>
+      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
     </ClCompile>
     <ClCompile Include="Engine\3d\Sphere\SphereData.cpp">
-      <Filter>ソース ファイル\3d\Sphere</Filter>
+      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\System\Utility\MatrixFunction\MatrixFunction.h">
-      <Filter>ソース ファイル\System\Utility\MatrixFunction</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\MatrixFunction</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
@@ -189,91 +192,91 @@
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Camera\DebugCamera.h">
-      <Filter>ソース ファイル\Camera</Filter>
+      <Filter>ソース ファイル\Engine\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Camera\Camera.h">
-      <Filter>ソース ファイル\Camera</Filter>
+      <Filter>ソース ファイル\Engine\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Input\Input.h">
-      <Filter>ソース ファイル\System\Input</Filter>
+      <Filter>ソース ファイル\Engine\System\Input</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\WinApp\WinApp.h">
-      <Filter>ソース ファイル\System\WinApp</Filter>
+      <Filter>ソース ファイル\Engine\System\WinApp</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\Logger\Logger.h">
-      <Filter>ソース ファイル\System\Utility\Logger</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\Logger</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\ConvertString\ConvertString.h">
-      <Filter>ソース ファイル\System\Utility\ConvertString</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\ConvertString</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\DirectXCommon\DirectXCommon.h">
-      <Filter>ソース ファイル\System\DirectXCommon</Filter>
+      <Filter>ソース ファイル\Engine\System\DirectXCommon</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.h">
-      <Filter>ソース ファイル\System\DirectXCommon</Filter>
+      <Filter>ソース ファイル\Engine\System\DirectXCommon</Filter>
     </ClInclude>
     <ClInclude Include="Engine\2d\Sprite\Sprite.h">
-      <Filter>ソース ファイル\2d\Sprite</Filter>
+      <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
     </ClInclude>
     <ClInclude Include="Engine\2d\Sprite\SpriteData.h">
-      <Filter>ソース ファイル\2d\Sprite</Filter>
+      <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\CreateResource\CreateResource.h">
-      <Filter>ソース ファイル\System\Utility\CreateResource</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\CreateResource</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\TextureManager\TextureManager.h">
-      <Filter>ソース ファイル\System\TextureManager</Filter>
+      <Filter>ソース ファイル\Engine\System\TextureManager</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3d\Object3d\Object3dData.h">
-      <Filter>ソース ファイル\3d\Object3d</Filter>
+      <Filter>ソース ファイル\Engine\3d\Object3d</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3d\Object3d\Object3d.h">
-      <Filter>ソース ファイル\3d\Object3d</Filter>
+      <Filter>ソース ファイル\Engine\3d\Object3d</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\Math\Vector2.h">
-      <Filter>ソース ファイル\System\Utility\Math</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\Math\Vector3.h">
-      <Filter>ソース ファイル\System\Utility\Math</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\Math\Vector4.h">
-      <Filter>ソース ファイル\System\Utility\Math</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\DirectionalLight.h">
-      <Filter>ソース ファイル\System\ResourceData</Filter>
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\Material.h">
-      <Filter>ソース ファイル\System\ResourceData</Filter>
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\MaterialData.h">
-      <Filter>ソース ファイル\System\ResourceData</Filter>
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\ModelData.h">
-      <Filter>ソース ファイル\System\ResourceData</Filter>
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\Transform.h">
-      <Filter>ソース ファイル\System\ResourceData</Filter>
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\TransformationMatrix.h">
-      <Filter>ソース ファイル\System\ResourceData</Filter>
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\VertexData.h">
-      <Filter>ソース ファイル\System\ResourceData</Filter>
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h">
-      <Filter>ソース ファイル\System\Utility\Math</Filter>
+      <Filter>ソース ファイル\Engine\System\Utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Audio\Audio.h">
-      <Filter>ソース ファイル\System\Audio</Filter>
+      <Filter>ソース ファイル\Engine\System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Audio\AudioData.h">
-      <Filter>ソース ファイル\System\Audio</Filter>
+      <Filter>ソース ファイル\Engine\System\Audio</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3d\Sphere\Sphere.h">
-      <Filter>ソース ファイル\3d\Sphere</Filter>
+      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3d\Sphere\SphereData.h">
-      <Filter>ソース ファイル\3d\Sphere</Filter>
+      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -67,7 +67,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	object3dData->Initialize(dxCommon);
 
 	Object3d* model = new Object3d();
-	model->Initialize(object3dData, "resources/object3d", "icoSphere.obj", "resources/image/uvChecker.png");
+	model->Initialize(object3dData, "resources/object3d", "monkey.obj", "resources/image/uvChecker.png");
 
 	Object3d* model2 = new Object3d();
 	model2->Initialize(object3dData, "resources/object3d", "icoSphere.obj", "resources/image/uvChecker.png");
