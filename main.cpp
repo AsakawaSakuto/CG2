@@ -61,13 +61,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	sprite2->Initialize(spriteData, "resources/image/monsterBall.png");
 
 	Sprite* sprite3 = new Sprite();
-	sprite3->Initialize(spriteData, "resources/image/star.png");
+	sprite3->Initialize(spriteData, "resources/image/white16x16.png");
 
 	Object3dData* object3dData = new Object3dData();
 	object3dData->Initialize(dxCommon);
 
 	Object3d* model = new Object3d();
-	model->Initialize(object3dData, "resources/object3d", "plane.obj", "resources/image/monsterBall.png");
+	model->Initialize(object3dData, "resources/object3d", "monkey.obj", "resources/image/white16x16.png");
 
 	Object3d* model2 = new Object3d();
 	model2->Initialize(object3dData, "resources/object3d", "axis.obj", "resources/image/uvChecker.png");
@@ -132,7 +132,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 			}
 
-			sprite->SetPosition({ 640.f, 360.f });
+			sprite->SetPosition({ 600.f, 0.f });
 			sprite2->SetPosition({ 0.f, 0.f });
 			sprite3->SetPosition({ 300.f, 0.f });
 
@@ -159,16 +159,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			spriteData->SpriteDataSet();
 			object3dData->Object3dDataSet();
-			sphereData->SphereDataSet();
+			//sphereData->SphereDataSet();
 
 			sprite->Draw();
 			sprite2->Draw();
 			sprite3->Draw();
 
 			model->Draw();
-			model2->Draw();
+			//model2->Draw();
 
-			sphere->Draw();
+			//sphere->Draw();
 
 			///
 			/// ↑描画処理ここまで

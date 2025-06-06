@@ -25,6 +25,7 @@ void Object3d::Initialize(Object3dData* object3dData,  const std::string& file ,
 
 void Object3d::Update(Camera& useCamera) {
 
+	//transform_.rotate.x += 0.03f;
 	transform_.rotate.y += 0.03f;
 	// 行列の内容を更新して三角形を動かす
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
