@@ -58,6 +58,9 @@ private:
 	Vector2 size_;
 	Vector2 anchorPoint = { 0.5f,0.5f };
 
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+
 	void CreateVertexResource();
 	void CreateIndexResource();
 	void CreateMaterialResource();

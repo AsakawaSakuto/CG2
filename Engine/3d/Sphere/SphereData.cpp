@@ -10,15 +10,6 @@ void SphereData::Initialize(DirectXCommon* dxCommon) {
 	CreatePSO();
 }
 
-void SphereData::SphereDataSet() {
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	// PSOを設定
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
-	// プリミティブトポロジーを設定
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
 void SphereData::CreatePSO() {
 
 	CreateRootSignature();
@@ -172,7 +163,7 @@ void SphereData::RasiterzerStateSet() {
 	// 裏面（時計回り）を表示しない
 	rasterizerDesc_.CullMode = D3D12_CULL_MODE_NONE;
 	// 三角形の中を塗りつぶす
-	rasterizerDesc_.FillMode = D3D12_FILL_MODE_SOLID;
+	rasterizerDesc_.FillMode = D3D12_FILL_MODE_WIREFRAME;
 }
 
 void SphereData::DepthStencilStateSet() {

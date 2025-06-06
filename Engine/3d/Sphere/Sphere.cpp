@@ -8,6 +8,10 @@ void Sphere::Initialize(SphereData* sphereData, const std::string& fileName) {
 	commandList_ = sphereData_->GetDxCommon()->GetCommandList();
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
 
+	rootSignature_ = sphereData_->GetRootsignature();
+
+	graphicsPipelineState_ = sphereData_->GetPipelineState();
+
 	transform_.scale = { 1.f,1.f,1.f };
 	transform_.rotate = { 0.f,0.f,0.f };
 	transform_.translate = { 0.f,0.f,0.f };
@@ -20,6 +24,10 @@ void Sphere::Initialize(SphereData* sphereData, const std::string& fileName) {
 }
 
 void Sphere::Update(Camera& useCamera) {
+	//transform_.rotate.x += 0.03f;
+	//transform_.rotate.y += 0.03f;
+	//transform_.rotate.z += 0.03f;
+
 	// 行列の内容を更新して三角形を動かす
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
@@ -32,6 +40,14 @@ void Sphere::Update(Camera& useCamera) {
 }
 
 void Sphere::Draw() {
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+	// PSOを設定
+	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+	// プリミティブトポロジーを設定
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetIndexBuffer(&indexBufferView_);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

@@ -10,15 +10,6 @@ void SpriteData::Initialize(DirectXCommon* dxCommon) {
 	CreatePSO();
 }
 
-void SpriteData::SpriteDataSet() {
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	// PSOを設定
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
-	// プリミティブトポロジーを設定
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
 void SpriteData::CreatePSO() {
 
 	CreateRootSignature();

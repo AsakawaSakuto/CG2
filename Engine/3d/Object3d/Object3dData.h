@@ -20,9 +20,13 @@ public:
 
 	void Initialize(DirectXCommon* dxCommon);
 
-	void Object3dDataSet();
-
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
+
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootsignature() { return rootSignature_; }
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> GetPipelineStateSolid() { return graphicsPipelineStateSolid_; }
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> GetPipelineStateWireframe() { return graphicsPipelineStateWireframe_; }
 
 private:
 	DirectXCommon* dxCommon_;
@@ -33,9 +37,13 @@ private:
 	void CreateRootSignature();
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 
-	void CreatePSO();
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_ = {};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+	void CreatePsoSolid();
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDescSolid_ = {};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateSolid_;
+
+	void CreatePsoWireframe();
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDescWireframe_ = {};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWireframe_;
 
 	void InputLayoutSet();
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {}; // InputLayout
@@ -49,7 +57,8 @@ private:
 	D3D12_BLEND_DESC blendDesc_{};
 
 	void RasiterzerStateSet();
-	D3D12_RASTERIZER_DESC rasterizerDesc_{};
+	D3D12_RASTERIZER_DESC rasterizerDescSolid_{};
+	D3D12_RASTERIZER_DESC rasterizerDescWireframe_{};
 
 	void DepthStencilStateSet();
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};

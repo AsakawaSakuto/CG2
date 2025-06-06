@@ -9,6 +9,10 @@ void Sprite::Initialize(SpriteData* spriteData, const std::string& fileName) {
 	
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
 
+	rootSignature_ = spriteData_->GetRootsignature();
+
+	graphicsPipelineState_ = spriteData_->GetPipelineState();
+
 	size_ = { 256.f,256.f };
 	transform_.scale = { 1.f,1.f,1.f };
 	transform_.translate = { 0.f,0.f,0.f };
@@ -33,6 +37,14 @@ void Sprite::Update() {
 }
 
 void Sprite::Draw() {
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+	// PSOを設定
+	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+	// プリミティブトポロジーを設定
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	// Spriteの描画。変更が必要なものだけ変更する
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);  // VBVを設定
 	commandList_->IASetIndexBuffer(&indexBufferView_);

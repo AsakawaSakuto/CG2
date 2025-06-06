@@ -51,6 +51,9 @@ private:
 	Transform transform_;
 	Vector3 position_;
 
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+
 	void CreateVertexResource();
 	void CreateIndexResource();
 	void CreateMaterialResource();

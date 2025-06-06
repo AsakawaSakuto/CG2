@@ -20,6 +20,9 @@ public:
 
 	void Draw();
 
+	void SetPostion(Vector3 position) { transform_.translate = position; }
+
+	void SetDrawMode(bool drawMode) { drawMode_ = drawMode; }
 
 private:
 
@@ -48,6 +51,12 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
+
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateSolid_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWireframe_;
+
+	bool drawMode_;
 
 	void CreateVertexResource();
 	void CreateMaterialResource();

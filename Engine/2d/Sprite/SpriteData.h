@@ -20,9 +20,11 @@ public:
 
 	void Initialize(DirectXCommon* dxCommon);
 
-	void SpriteDataSet();
-
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
+
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootsignature() { return rootSignature_; }
+
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> GetPipelineState() { return graphicsPipelineState_; }
 
 private:
 	DirectXCommon* dxCommon_;

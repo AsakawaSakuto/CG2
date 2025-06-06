@@ -67,10 +67,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	object3dData->Initialize(dxCommon);
 
 	Object3d* model = new Object3d();
-	model->Initialize(object3dData, "resources/object3d", "monkey.obj", "resources/image/white16x16.png");
+	model->Initialize(object3dData, "resources/object3d", "icoSphere.obj", "resources/image/uvChecker.png");
 
 	Object3d* model2 = new Object3d();
-	model2->Initialize(object3dData, "resources/object3d", "axis.obj", "resources/image/uvChecker.png");
+	model2->Initialize(object3dData, "resources/object3d", "icoSphere.obj", "resources/image/uvChecker.png");
 
 	Audio* audio = new Audio();
 	audio->Initialize("resources/sound/fanfare.wav");
@@ -88,6 +88,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DebugCamera* debugCamera = new DebugCamera();
 	Camera* useCamera = new Camera();
 	bool isDebugCamera = false;
+
+	bool drawMode = true;
+	bool drawMode2 = true;
 
 	// メインループ 00_03
 	MSG msg{};
@@ -143,7 +146,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			sprite3->Update();
 
 			model->Update(*useCamera);
+			model->SetDrawMode(drawMode);
+
 			model2->Update(*useCamera);
+			model2->SetPostion({ 2.f,0.f,0.f });
+			model2->SetDrawMode(drawMode2);
 
 			sphere->Update(*useCamera);
 
@@ -157,16 +164,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			dxCommon->PreDraw(); // ここより上に描画処理を書かない
 
-			spriteData->SpriteDataSet();
-			object3dData->Object3dDataSet();
-			//sphereData->SphereDataSet();
-
 			sprite->Draw();
 			sprite2->Draw();
 			sprite3->Draw();
 
 			model->Draw();
-			//model2->Draw();
+			model2->Draw();
 
 			//sphere->Draw();
 
@@ -194,6 +197,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
 				ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
 				ImGui::Checkbox("CameraModeChange", &isDebugCamera);
+
+				ImGui::Checkbox("DrawMode", &drawMode);
+				ImGui::Checkbox("DrawMode2", &drawMode2);
 			} else {
 				ImGui::Text("Normal Camera");
 				ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);

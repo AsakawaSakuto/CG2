@@ -7,19 +7,6 @@ using namespace Microsoft::WRL;
 void Object3dData::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	commandList_ = dxCommon_->GetCommandList();
-	CreatePSO();
-}
-
-void Object3dData::Object3dDataSet() {
-	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
-	// PSOを設定
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
-	// プリミティブトポロジーを設定
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void Object3dData::CreatePSO() {
 
 	CreateRootSignature();
 	InputLayoutSet();
@@ -28,24 +15,51 @@ void Object3dData::CreatePSO() {
 	RasiterzerStateSet();
 	DepthStencilStateSet();
 
+	CreatePsoSolid();
+	CreatePsoWireframe();
+}
+
+void Object3dData::CreatePsoSolid() {
 	// グラフィックスパイプラインステートの設定
-	graphicsPipelineStateDesc_.pRootSignature = rootSignature_.Get();
-	graphicsPipelineStateDesc_.InputLayout = inputLayoutDesc_;
-	graphicsPipelineStateDesc_.VS = { vertexShaderBlob_->GetBufferPointer(), vertexShaderBlob_->GetBufferSize() };
-	graphicsPipelineStateDesc_.PS = { pixelShaderBlob_->GetBufferPointer(), pixelShaderBlob_->GetBufferSize() };
-	graphicsPipelineStateDesc_.BlendState = blendDesc_;
-	graphicsPipelineStateDesc_.RasterizerState = rasterizerDesc_;
-	graphicsPipelineStateDesc_.NumRenderTargets = 1; // 書き込み先のRTVの情報
-	graphicsPipelineStateDesc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	graphicsPipelineStateDesc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 利用するプリミティブ（幾何）タイプ。三角形
-	graphicsPipelineStateDesc_.SampleDesc.Count = 1; // どのように画面に色を打ち込むかの設定（気にしなくて良い）
-	graphicsPipelineStateDesc_.SampleDesc.Quality = 0;
-	graphicsPipelineStateDesc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	graphicsPipelineStateDesc_.DepthStencilState = depthStencilDesc_;
-	graphicsPipelineStateDesc_.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	graphicsPipelineStateDescSolid_.pRootSignature = rootSignature_.Get();
+	graphicsPipelineStateDescSolid_.InputLayout = inputLayoutDesc_;
+	graphicsPipelineStateDescSolid_.VS = { vertexShaderBlob_->GetBufferPointer(), vertexShaderBlob_->GetBufferSize() };
+	graphicsPipelineStateDescSolid_.PS = { pixelShaderBlob_->GetBufferPointer(), pixelShaderBlob_->GetBufferSize() };
+	graphicsPipelineStateDescSolid_.BlendState = blendDesc_;
+	graphicsPipelineStateDescSolid_.RasterizerState = rasterizerDescSolid_;
+	graphicsPipelineStateDescSolid_.NumRenderTargets = 1; // 書き込み先のRTVの情報
+	graphicsPipelineStateDescSolid_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	graphicsPipelineStateDescSolid_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 利用するプリミティブ（幾何）タイプ。三角形
+	graphicsPipelineStateDescSolid_.SampleDesc.Count = 1; // どのように画面に色を打ち込むかの設定（気にしなくて良い）
+	graphicsPipelineStateDescSolid_.SampleDesc.Quality = 0;
+	graphicsPipelineStateDescSolid_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	graphicsPipelineStateDescSolid_.DepthStencilState = depthStencilDesc_;
+	graphicsPipelineStateDescSolid_.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	// 実際に生成
-	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineState_));
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDescSolid_, IID_PPV_ARGS(&graphicsPipelineStateSolid_));
+	assert(SUCCEEDED(hr_));
+}
+
+void Object3dData::CreatePsoWireframe() {
+	// グラフィックスパイプラインステートの設定
+	graphicsPipelineStateDescWireframe_.pRootSignature = rootSignature_.Get();
+	graphicsPipelineStateDescWireframe_.InputLayout = inputLayoutDesc_;
+	graphicsPipelineStateDescWireframe_.VS = { vertexShaderBlob_->GetBufferPointer(), vertexShaderBlob_->GetBufferSize() };
+	graphicsPipelineStateDescWireframe_.PS = { pixelShaderBlob_->GetBufferPointer(), pixelShaderBlob_->GetBufferSize() };
+	graphicsPipelineStateDescWireframe_.BlendState = blendDesc_;
+	graphicsPipelineStateDescWireframe_.RasterizerState = rasterizerDescWireframe_;
+	graphicsPipelineStateDescWireframe_.NumRenderTargets = 1; // 書き込み先のRTVの情報
+	graphicsPipelineStateDescWireframe_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	graphicsPipelineStateDescWireframe_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 利用するプリミティブ（幾何）タイプ。三角形
+	graphicsPipelineStateDescWireframe_.SampleDesc.Count = 1; // どのように画面に色を打ち込むかの設定（気にしなくて良い）
+	graphicsPipelineStateDescWireframe_.SampleDesc.Quality = 0;
+	graphicsPipelineStateDescWireframe_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	graphicsPipelineStateDescWireframe_.DepthStencilState = depthStencilDesc_;
+	graphicsPipelineStateDescWireframe_.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	// 実際に生成
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDescWireframe_, IID_PPV_ARGS(&graphicsPipelineStateWireframe_));
 	assert(SUCCEEDED(hr_));
 }
 
@@ -165,9 +179,14 @@ void Object3dData::BlendStateSet() {
 
 void Object3dData::RasiterzerStateSet() {
 	// 裏面（時計回り）を表示しない
-	rasterizerDesc_.CullMode = D3D12_CULL_MODE_NONE;
-	// 三角形の中を塗りつぶす
-	rasterizerDesc_.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	rasterizerDescSolid_.CullMode = D3D12_CULL_MODE_NONE;
+	// 三角形の中を塗りつぶす // WIREFRAME SOLID
+	rasterizerDescSolid_.FillMode = D3D12_FILL_MODE_SOLID;
+
+	// 裏面（時計回り）を表示しない
+	rasterizerDescWireframe_.CullMode = D3D12_CULL_MODE_NONE;
+	// 三角形の中を塗りつぶす // WIREFRAME SOLID
+	rasterizerDescWireframe_.FillMode = D3D12_FILL_MODE_WIREFRAME;
 }
 
 void Object3dData::DepthStencilStateSet() {

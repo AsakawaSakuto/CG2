@@ -8,14 +8,21 @@ void Object3d::Initialize(Object3dData* object3dData,  const std::string& file ,
 	device_ = object3dData_->GetDxCommon()->GetDevice();
 	commandList_ = object3dData_->GetDxCommon()->GetCommandList();
 
-	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
-
 	modelData_ = LoadObject3dFile(file,modelName);
+
+	rootSignature_ = object3dData_->GetRootsignature();
+
+	graphicsPipelineStateSolid_ = object3dData_->GetPipelineStateSolid();
+	graphicsPipelineStateWireframe_ = object3dData_->GetPipelineStateWireframe();
 
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(fileName);
 	// 読み込んだテクスチャの番号を取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
+
+	drawMode_ = true;
+
+	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 
 	CreateVertexResource();
 	CreateMaterialResource();
@@ -39,6 +46,14 @@ void Object3d::Update(Camera& useCamera) {
 }
 
 void Object3d::Draw() {
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+	// PSOを設定
+	commandList_->SetPipelineState(drawMode_ ? graphicsPipelineStateSolid_.Get() : graphicsPipelineStateWireframe_.Get());
+	// プリミティブトポロジーを設定
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetIndexBuffer(nullptr); // インデックス使っていないので設定しない
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
