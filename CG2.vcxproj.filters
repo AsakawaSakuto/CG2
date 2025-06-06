@@ -79,6 +79,9 @@
     <Filter Include="ソース ファイル\Engine\System\Audio">
       <UniqueIdentifier>{8de1a442-c8a2-403f-addf-1be5ad236c48}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Scene">
+      <UniqueIdentifier>{d4c209bb-1e95-4a4b-9ef0-5725df3ac9c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -161,6 +164,9 @@
     </ClCompile>
     <ClCompile Include="Engine\3d\Sphere\SphereData.cpp">
       <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\GameScene.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="Engine\3d\Sphere\SphereData.h">
       <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\GameScene.h">
+      <Filter>ソース ファイル\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
