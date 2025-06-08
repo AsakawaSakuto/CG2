@@ -82,6 +82,9 @@
     <Filter Include="ソース ファイル\Scene">
       <UniqueIdentifier>{d4c209bb-1e95-4a4b-9ef0-5725df3ac9c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Engine\2d\Triangle">
+      <UniqueIdentifier>{d140defe-9d38-4f7c-9933-24f8679477a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -167,6 +170,9 @@
     </ClCompile>
     <ClCompile Include="Scene\GameScene.cpp">
       <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\2d\Triangle\Triangle.cpp">
+      <Filter>ソース ファイル\Engine\2d\Triangle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -286,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="Scene\GameScene.h">
       <Filter>ソース ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\2d\Triangle\Triangle.h">
+      <Filter>ソース ファイル\Engine\2d\Triangle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

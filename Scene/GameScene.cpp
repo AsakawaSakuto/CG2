@@ -30,9 +30,9 @@ void GameScene::Initialize() {
 
 	object3dData->Initialize(dxCommon);
 
-	model->Initialize(object3dData, "resources/object3d", "monkey.obj", "resources/image/uvChecker.png");
+	model->Initialize(object3dData, "resources/object3d/monkey.obj");
 
-	model2->Initialize(object3dData, "resources/object3d", "icoSphere.obj", "resources/image/uvChecker.png");
+	model2->Initialize(object3dData, "resources/object3d/icoSphere.obj");
 
 	audio->Initialize("resources/sound/fanfare.wav");
 
@@ -41,6 +41,9 @@ void GameScene::Initialize() {
 	sphereData->Initialize(dxCommon);
 
 	sphere->Initialize(sphereData, "resources/image/uvChecker.png");
+
+	fenceModel->Initialize(object3dData, "resources/object3d/fence.obj");
+	fenceModel->SetTexture("resources/image/fence.png");
 }
 
 void GameScene::Update() {
@@ -53,6 +56,19 @@ void GameScene::Update() {
 	}
 
 	input->Update();
+
+	if (drawTexture) {
+		model->SetTexture("resources/engineResources/uvChecker.png");
+	} else {
+		model->SetTexture("resources/engineResources/white16x16.png");
+	}
+
+	if (drawTexture2) {
+		model2->SetTexture("resources/engineResources/uvChecker.png");
+	}
+	else {
+		model2->SetTexture("resources/engineResources/white16x16.png");
+	}
 
 	// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
 	if (input->TriggerKey(DIK_Z)) {
@@ -90,11 +106,13 @@ void GameScene::Update() {
 	sprite2->Update();
 	sprite3->Update();
 
+	fenceModel->Update(*useCamera);
+
 	model->Update(*useCamera);
 	model->SetDrawMode(drawMode);
 
 	model2->Update(*useCamera);
-	model2->SetPostion({ 2.f,0.f,0.f });
+	model2->SetPosition({ 2.f,0.f,0.f });
 	model2->SetDrawMode(drawMode2);
 
 	sphere->Update(*useCamera);
@@ -112,8 +130,10 @@ void GameScene::Draw() {
 	sprite2->Draw();
 	sprite3->Draw();
 
-	model->Draw();
-	model2->Draw();
+	//model->Draw();
+	//model2->Draw();
+
+	fenceModel->Draw();
 
 	//sphere->Draw();
 
@@ -142,10 +162,19 @@ void GameScene::Draw() {
 		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
 		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
 
-		ImGui::Checkbox("DrawMode", &drawMode);
-		ImGui::Checkbox("DrawMode2", &drawMode2);
-	}
-	else {
+		ImGui::DragFloat3("fencePos", &fenceModel->GetPosition().x, 0.1f);
+		ImGui::ColorEdit4("ModelColor", &fenceModel->GetColor().x);
+
+		//ImGui::Checkbox("DrawMode", &drawMode);
+		//ImGui::Checkbox("DrawMode2", &drawMode2);
+		//ImGui::Checkbox("DrawTexture", &drawTexture);
+		//ImGui::Checkbox("DrawTexture2", &drawTexture2);
+
+
+		ImGui::Text("Texture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
+		ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
+		ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
+	} else {
 		ImGui::Text("Normal Camera");
 		ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
 		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);

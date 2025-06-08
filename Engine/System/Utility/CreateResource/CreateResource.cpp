@@ -208,16 +208,19 @@ MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const st
     return materialData;
 }
 
-ModelData LoadObject3dFile(const std::string& directoryPath, const std::string& filename) {
-
+ModelData LoadObject3dFile(const std::string& filepath) {
     ModelData modelData;
     std::vector<Vector4> positions;
     std::vector<Vector3> normals;
     std::vector<Vector2> texcoords;
     std::string line;
 
-    std::ifstream file(directoryPath + "/" + filename);
+    std::ifstream file(filepath);
     assert(file.is_open());
+
+    // directoryPath 抽出
+    std::filesystem::path filePathObj(filepath);
+    std::string directoryPath = filePathObj.parent_path().string();
 
     while (std::getline(file, line)) {
         std::string identifier;
@@ -228,7 +231,7 @@ ModelData LoadObject3dFile(const std::string& directoryPath, const std::string& 
             Vector4 position;
             s >> position.x >> position.y >> position.z;
             position.w = 1.0f;
-            position.x *= -1.0f; // X軸反転
+            position.x *= -1.0f;
             positions.push_back(position);
         }
         else if (identifier == "vt") {
@@ -239,7 +242,7 @@ ModelData LoadObject3dFile(const std::string& directoryPath, const std::string& 
         else if (identifier == "vn") {
             Vector3 normal;
             s >> normal.x >> normal.y >> normal.z;
-            normal.x *= -1.0f; // 法線のX軸反転
+            normal.x *= -1.0f;
             normals.push_back(normal);
         }
         else if (identifier == "f") {
@@ -256,20 +259,17 @@ ModelData LoadObject3dFile(const std::string& directoryPath, const std::string& 
                 }
                 Vector4 position = positions[elementIndices[0] - 1];
                 Vector2 texcoord = texcoords[elementIndices[1] - 1];
-                texcoord.y = 1.0f - texcoord.y; // Y軸反転（UV原点の違いを補正）
+                texcoord.y = 1.0f - texcoord.y;
                 Vector3 normal = normals[elementIndices[2] - 1];
                 triangle[faceVertex] = { position, texcoord, normal };
             }
-            // 頂点の順番を逆に登録して回り順を反転
             modelData.vertices.push_back(triangle[2]);
             modelData.vertices.push_back(triangle[1]);
             modelData.vertices.push_back(triangle[0]);
         }
         else if (identifier == "mtllib") {
-            // materialTemplateLibraryファイルの名前を取得する
             std::string materialFilename;
             s >> materialFilename;
-            // 基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
             modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
         }
     }

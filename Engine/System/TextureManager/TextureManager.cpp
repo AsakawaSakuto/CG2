@@ -64,6 +64,11 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
 }
 
 void TextureManager::LoadTexture(const std::string& filePath) {
+    // 重複チェックは最初にやる
+    if (texturePathToIndex_.contains(filePath)) {
+        return; // すでに読み込み済み
+    }
+
     // ファイルから読み込み
     DirectX::ScratchImage image{};
     std::wstring filePathW = ConvertString(filePath);
@@ -122,4 +127,6 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     srvDesc.Texture2D.MipLevels = UINT(textureData.matadata.mipLevels);
     device_->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
+    // パス → インデックスの登録を忘れずに
+    texturePathToIndex_[filePath] = index;
 }

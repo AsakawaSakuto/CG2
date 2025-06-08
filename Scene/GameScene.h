@@ -67,6 +67,8 @@ private:
 
 	Object3d* model2 = new Object3d();
 
+	Object3d* fenceModel = new Object3d();
+
 	Audio* audio = new Audio();
 	
 	Audio* audio2 = new Audio();
@@ -78,8 +80,10 @@ private:
 	Camera* camera = new Camera();
 	DebugCamera* debugCamera = new DebugCamera();
 	Camera* useCamera = new Camera();
-	bool isDebugCamera = false;
+	bool isDebugCamera = true;
 
 	bool drawMode = true;
 	bool drawMode2 = true;
+	bool drawTexture = true;
+	bool drawTexture2 = true;
 };

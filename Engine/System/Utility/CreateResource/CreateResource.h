@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <format>
+#include <filesystem>
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -45,4 +46,4 @@ void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mip
 
 MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
-ModelData LoadObject3dFile(const std::string& directoryPath, const std::string& filename);
+ModelData LoadObject3dFile(const std::string& filepath);

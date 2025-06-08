@@ -49,11 +49,22 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     if (gMaterial.enableLighting != 0)
     {
-        output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+        //output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+        // ↓色にはライティングを行い、α値にはしない
+        output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+        output.color.a = gMaterial.color.a * textureColor.a;
     }
     else
     {
         output.color = gMaterial.color * textureColor;
+    }
+    
+    if (textureColor.a <= 0.5) {
+        discard;
+    }
+    if (output.color.a == 0.0)
+    {
+        discard;
     }
     
     return output;

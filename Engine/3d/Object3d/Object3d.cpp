@@ -3,22 +3,24 @@
 
 //"resources/uvChecker.png"
 
-void Object3d::Initialize(Object3dData* object3dData,  const std::string& file , const std::string&modelName, const std::string& fileName) {
+void Object3d::Initialize(Object3dData* object3dData,  const std::string& modelPath) {
 	object3dData_ = object3dData;
 	device_ = object3dData_->GetDxCommon()->GetDevice();
 	commandList_ = object3dData_->GetDxCommon()->GetCommandList();
 
-	modelData_ = LoadObject3dFile(file,modelName);
+	modelData_ = LoadObject3dFile(modelPath);
 
 	rootSignature_ = object3dData_->GetRootsignature();
 
 	graphicsPipelineStateSolid_ = object3dData_->GetPipelineStateSolid();
 	graphicsPipelineStateWireframe_ = object3dData_->GetPipelineStateWireframe();
 
+	textureName_ = "resources/engineResources/uvChecker.png";
+
 	// .objの参照しているテクスチャファイル読み込み
-	TextureManager::GetInstance()->LoadTexture(fileName);
+	TextureManager::GetInstance()->LoadTexture(textureName_);
 	// 読み込んだテクスチャの番号を取得
-	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 
 	drawMode_ = true;
 
@@ -33,7 +35,8 @@ void Object3d::Initialize(Object3dData* object3dData,  const std::string& file ,
 void Object3d::Update(Camera& useCamera) {
 
 	//transform_.rotate.x += 0.03f;
-	transform_.rotate.y += 0.03f;
+	//transform_.rotate.y += 0.03f;
+	
 	// 行列の内容を更新して三角形を動かす
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
@@ -68,6 +71,18 @@ void Object3d::Draw() {
 	commandList_->DrawInstanced(
 		static_cast<UINT>(modelData_.vertices.size()), // 頂点数ぶん描画
 		1, 0, 0);
+}
+
+void Object3d::SetTexture(const std::string& textureName) {
+	// すでに同じテクスチャなら処理をスキップ
+	if (textureName_ == textureName) {
+		return;
+	}
+	textureName_ = textureName;
+	// .objの参照しているテクスチャファイル読み込み
+	TextureManager::GetInstance()->LoadTexture(textureName_);
+	// 読み込んだテクスチャの番号を取得
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
 void Object3d::CreateVertexResource() {

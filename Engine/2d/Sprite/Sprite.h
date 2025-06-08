@@ -28,6 +28,12 @@ public:
 
 	void SetColor(const Vector4& Color) { materialData_->color = Color; }
 
+	Vector2& GetPosition() { return position_; }
+
+	Vector2& GetSize() { return size_; }
+
+	Vector4& GetColor() { return materialData_->color; }
+
 private:
 	SpriteData* spriteData_;
 

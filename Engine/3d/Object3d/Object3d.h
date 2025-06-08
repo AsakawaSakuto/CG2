@@ -1,28 +1,36 @@
 #pragma once
 #include"Object3dData.h"
 #include"ModelData.h"
-#include "VertexData.h"
-#include "Material.h"
-#include "TransformationMatrix.h"
-#include "Transform.h"
-#include "DirectionalLight.h"
-#include "TextureManager.h"
-#include "Camera.h"
+#include"VertexData.h"
+#include"Material.h"
+#include"TransformationMatrix.h"
+#include"Transform.h"
+#include"DirectionalLight.h"
+#include"TextureManager.h"
+#include"Camera.h"
 #include"MatrixFunction.h"
 
 class Object3d
 {
 public:
 	
-	void Initialize(Object3dData* object3dData, const std::string& file , const std::string& modelName, const std::string& fileName);
+	void Initialize(Object3dData* object3dData, const std::string& ModelPath);
 
 	void Update(Camera& useCamera);
 
 	void Draw();
 
-	void SetPostion(Vector3 position) { transform_.translate = position; }
+	void SetPosition(Vector3 position) { transform_.translate = position; }
+
+	void SetColor(Vector4 color) { materialData_->color = color; }
+
+	Vector3& GetPosition() { return transform_.translate; }
+
+	Vector4& GetColor() { return materialData_->color; }
 
 	void SetDrawMode(bool drawMode) { drawMode_ = drawMode; }
+
+	void SetTexture(const std::string& textureName);
 
 private:
 
@@ -31,6 +39,8 @@ private:
 	Object3dData* object3dData_;
 
 	ModelData modelData_;
+
+	std::string textureName_;
 
 	uint32_t textureIndex_ = 0;
 
