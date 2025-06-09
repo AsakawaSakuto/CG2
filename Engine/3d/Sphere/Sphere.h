@@ -19,6 +19,8 @@ public:
 
 	void Draw();
 
+	void DrawImGui(const char* objectName);
+
 private:
 	SphereData* sphereData_ = nullptr;
 

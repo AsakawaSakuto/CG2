@@ -18,6 +18,7 @@
 #include "Object3dData.h"
 #include "Sphere.h"
 #include "SphereData.h"
+#include "Triangle.h"
 // Math
 #include "Vector2.h"
 #include "Vector3.h"
@@ -77,13 +78,10 @@ private:
 	
 	Sphere* sphere = new Sphere();
 	
+	Triangle* triangle = new Triangle();
+
 	Camera* camera = new Camera();
 	DebugCamera* debugCamera = new DebugCamera();
 	Camera* useCamera = new Camera();
 	bool isDebugCamera = true;
-
-	bool drawMode = true;
-	bool drawMode2 = true;
-	bool drawTexture = true;
-	bool drawTexture2 = true;
 };

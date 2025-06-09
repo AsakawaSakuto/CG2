@@ -46,6 +46,8 @@ void GameScene::Initialize() {
 
 	fenceModel->Initialize(object3dData, "resources/object3d/fence.obj");
 	fenceModel->SetTexture("resources/image/fence.png");
+
+	triangle->Initialize(dxCommon);
 }
 
 void GameScene::Update() {
@@ -101,12 +103,12 @@ void GameScene::Update() {
 	fenceModel->Update(*useCamera);
 
 	model->Update(*useCamera);
-	model->SetDrawMode(drawMode);
 
 	model2->Update(*useCamera);
-	model2->SetDrawMode(drawMode2);
 
 	sphere->Update(*useCamera);
+
+	triangle->Update();
 
 	sprite->Update();
 	sprite2->Update();
@@ -123,6 +125,7 @@ void GameScene::Draw() {
 
 	fenceModel->Draw();
 
+	sphere->Draw();
 	//sprite3->Draw();
 
 	//sprite2->Draw();
@@ -130,6 +133,8 @@ void GameScene::Draw() {
 	//model->Draw();
 	//model2->Draw();
 
+
+	triangle->Draw();
 	sprite->Draw();
 
 	//sphere->Draw();
@@ -159,15 +164,12 @@ void GameScene::Draw() {
 		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.01f);
 		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
 
-		//ImGui::Checkbox("DrawMode", &drawMode);
-		//ImGui::Checkbox("DrawMode2", &drawMode2);
-		//ImGui::Checkbox("DrawTexture", &drawTexture);
-		//ImGui::Checkbox("DrawTexture2", &drawTexture2);
-
 		fenceModel->DrawImGui("fence");
-
+		sphere->DrawImGui("Sphere");
 		//model->DrawImGui("monkey");
 		//model2->DrawImGui("monkey2");
+
+		triangle->DrawImGui("triangle");
 
 		sprite->DrawImGui("sprite");
 		//sprite2->DrawImGui("sprite2");

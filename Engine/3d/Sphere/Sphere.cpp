@@ -64,6 +64,22 @@ void Sphere::Draw() {
 		1, 0, 0, 0);
 }
 
+void Sphere::DrawImGui(const char* objectName) {
+
+	ImGui::Begin(objectName);
+
+	ImGui::Text("Transform");
+	ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
+
+	ImGui::Text("ColorEdit");
+	ImGui::ColorEdit4("Color", &materialData_->color.x);
+
+	ImGui::End();
+
+}
+
 void Sphere::CreateVertexResource() {
 	CreateIndexedSphereMesh(vertices_, indices_, subdivision_);
 
