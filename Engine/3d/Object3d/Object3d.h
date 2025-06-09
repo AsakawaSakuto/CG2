@@ -20,6 +20,8 @@ public:
 
 	void Draw();
 
+	void DrawImGui(const char* objectName);
+
 	void SetPosition(Vector3 position) { transform_.translate = position; }
 
 	void SetColor(Vector4 color) { materialData_->color = color; }

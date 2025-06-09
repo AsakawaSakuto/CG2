@@ -20,6 +20,8 @@ public:
 
 	void Draw();
 
+	void DrawImGui(const char* objectName);
+
 	const Vector2& GetPosition()const { return position_; }
 
 	void SetPosition(const Vector2& position) { position_ = position; }

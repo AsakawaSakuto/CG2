@@ -85,6 +85,21 @@ void Object3d::SetTexture(const std::string& textureName) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
+void Object3d::DrawImGui(const char* objectName) {
+
+	ImGui::Begin(objectName);
+
+	ImGui::Text("Transform");
+	ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
+
+	ImGui::Text("ColorEdit");
+	ImGui::ColorEdit4("Color", &materialData_->color.x);
+
+	ImGui::End();
+}
+
 void Object3d::CreateVertexResource() {
 	// 頂点リソースをつくる
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData_.vertices.size());

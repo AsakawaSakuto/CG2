@@ -29,10 +29,12 @@ void GameScene::Initialize() {
 	sprite3->Initialize(spriteData, "resources/image/white16x16.png");
 
 	object3dData->Initialize(dxCommon);
-
+	
 	model->Initialize(object3dData, "resources/object3d/monkey.obj");
+	model->SetTexture("resources/engineResources/white16x16.png");
 
-	model2->Initialize(object3dData, "resources/object3d/icoSphere.obj");
+	model2->Initialize(object3dData, "resources/object3d/monkey.obj");
+	model2->SetTexture("resources/engineResources/white16x16.png");
 
 	audio->Initialize("resources/sound/fanfare.wav");
 
@@ -57,7 +59,7 @@ void GameScene::Update() {
 
 	input->Update();
 
-	if (drawTexture) {
+	/*if (drawTexture) {
 		model->SetTexture("resources/engineResources/uvChecker.png");
 	} else {
 		model->SetTexture("resources/engineResources/white16x16.png");
@@ -65,10 +67,9 @@ void GameScene::Update() {
 
 	if (drawTexture2) {
 		model2->SetTexture("resources/engineResources/uvChecker.png");
-	}
-	else {
+	} else {
 		model2->SetTexture("resources/engineResources/white16x16.png");
-	}
+	}*/
 
 	// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
 	if (input->TriggerKey(DIK_Z)) {
@@ -96,15 +97,6 @@ void GameScene::Update() {
 		}
 	}
 
-	sprite->SetPosition({ 600.f, 0.f });
-	sprite2->SetPosition({ 0.f, 0.f });
-	sprite3->SetPosition({ 300.f, 0.f });
-
-	sprite->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
-
-	sprite->Update();
-	sprite2->Update();
-	sprite3->Update();
 
 	fenceModel->Update(*useCamera);
 
@@ -112,28 +104,33 @@ void GameScene::Update() {
 	model->SetDrawMode(drawMode);
 
 	model2->Update(*useCamera);
-	model2->SetPosition({ 2.f,0.f,0.f });
 	model2->SetDrawMode(drawMode2);
 
 	sphere->Update(*useCamera);
+
+	sprite->Update();
+	sprite2->Update();
+	sprite3->Update();
 }
 
 void GameScene::Draw() {
+
+	dxCommon->PreDraw(); // ここより上に描画処理を書かない
 
 	///
 	/// ↓描画処理ここから
 	///
 
-	dxCommon->PreDraw(); // ここより上に描画処理を書かない
+	fenceModel->Draw();
 
-	sprite->Draw();
-	sprite2->Draw();
-	sprite3->Draw();
+	//sprite3->Draw();
+
+	//sprite2->Draw();
 
 	//model->Draw();
 	//model2->Draw();
 
-	fenceModel->Draw();
+	sprite->Draw();
 
 	//sphere->Draw();
 
@@ -158,18 +155,22 @@ void GameScene::Draw() {
 
 	if (isDebugCamera) {
 		ImGui::Text("Debug Camera");
-		ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
-		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
+		ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.01f);
+		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.01f);
 		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
-
-		ImGui::DragFloat3("fencePos", &fenceModel->GetPosition().x, 0.1f);
-		ImGui::ColorEdit4("ModelColor", &fenceModel->GetColor().x);
 
 		//ImGui::Checkbox("DrawMode", &drawMode);
 		//ImGui::Checkbox("DrawMode2", &drawMode2);
 		//ImGui::Checkbox("DrawTexture", &drawTexture);
 		//ImGui::Checkbox("DrawTexture2", &drawTexture2);
 
+		fenceModel->DrawImGui("fence");
+
+		//model->DrawImGui("monkey");
+		//model2->DrawImGui("monkey2");
+
+		sprite->DrawImGui("sprite");
+		//sprite2->DrawImGui("sprite2");
 
 		ImGui::Text("Texture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
 		ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
