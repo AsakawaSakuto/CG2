@@ -1,6 +1,7 @@
 #include"Particles.h"
 
 #include<cassert>
+
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
@@ -11,14 +12,19 @@ void Particles::Initialize(DirectXCommon* dxCommon) {
 
 	CreatePSO();
 
-	transform_.resize(num);
+	std::uniform_real_distribution<float> randVelocity(-0.01f, 0.01f);
+	
+	particles.resize(num);
 	transformationData_.resize(num);
 	transformationResource_.resize(num);
 
 	for (uint32_t i = 0; i < num; i++) {
-		transform_[i].scale = {1.f,1.f,1.f};
-		transform_[i].rotate = { 0.f,0.f,0.f };
-		transform_[i].translate = { i * 0.1f,i * 0.1f,i * 0.1f };
+		particles[i].transform.scale = {1.f,1.f,1.f};
+		particles[i].transform.rotate = { 0.f,0.f,0.f };
+		particles[i].transform.translate = { i * 0.1f,i * 0.1f,i * 0.1f };
+		// 位置と速度を[-1,1]でランダムに初期化
+		particles[i].transform.translate = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
+		particles[i].velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
 	}
 
 	textureName_ = "resources/engineResources/uvChecker.png";
@@ -37,9 +43,15 @@ void Particles::Initialize(DirectXCommon* dxCommon) {
 
 void Particles::Update(Camera& useCamera) {
 
+	if (isMove) {
+		for (uint32_t i = 0; i < num; i++) {
+			particles[i].transform.translate += particles[i].velocity;
+		}
+	}
+
 	for (uint32_t i = 0; i < num; i++) {
 	// 行列の内容を更新して三角形を動かす
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_[i].scale, transform_[i].rotate, transform_[i].translate);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(particles[i].transform.scale, particles[i].transform.rotate, particles[i].transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
 	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
@@ -92,10 +104,8 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
-	ImGui::Text("Transform");
-	//ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
-	//ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
-	//ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
+	ImGui::Text("ChecBox");
+	ImGui::Checkbox("isMove", &isMove);
 
 	ImGui::Text("ColorEdit");
 	ImGui::ColorEdit4("Color", &materialData_->color.x);

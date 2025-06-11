@@ -23,7 +23,9 @@
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "Camera.h"
+#include "ParticleData.h"
 
+#include <random>
 #pragma endregion
 
 class Particles
@@ -42,9 +44,12 @@ public:
 
 private:
 
+	bool isMove = false;
+	const float kDeltaTime = 1.0f / 60.0f;
+
 	uint32_t num = 10;
 
-	std::vector<Transform> transform_;
+	std::vector<ParticleData> particles;
 
 	std::string textureName_;
 
@@ -99,4 +104,12 @@ private:
 	void BlendStateSet();
 	void RasiterzerStateSet();
 	void DepthStencilStateSet();
+
+	std::mt19937 rand;
+
+public:
+	Particles() {
+		std::random_device seedGenerator;
+		rand = std::mt19937(seedGenerator());
+	}
 };
