@@ -30,8 +30,6 @@ public:
 
 	Vector4& GetColor() { return materialData_->color; }
 
-	void SetDrawMode(bool drawMode) { drawMode_ = drawMode; }
-
 	void SetTexture(const std::string& textureName);
 
 private:
@@ -45,6 +43,8 @@ private:
 	std::string textureName_;
 
 	uint32_t textureIndex_ = 0;
+
+	bool drawMode = true;
 
 	// デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
@@ -67,8 +67,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateSolid_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWireframe_;
-
-	bool drawMode_;
 
 	void CreateVertexResource();
 	void CreateMaterialResource();

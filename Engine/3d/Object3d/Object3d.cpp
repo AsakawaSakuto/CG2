@@ -22,8 +22,6 @@ void Object3d::Initialize(Object3dData* object3dData,  const std::string& modelP
 	// 読み込んだテクスチャの番号を取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 
-	drawMode_ = true;
-
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 
 	CreateVertexResource();
@@ -53,7 +51,7 @@ void Object3d::Draw() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	// PSOを設定
-	commandList_->SetPipelineState(drawMode_ ? graphicsPipelineStateSolid_.Get() : graphicsPipelineStateWireframe_.Get());
+	commandList_->SetPipelineState(drawMode ? graphicsPipelineStateSolid_.Get() : graphicsPipelineStateWireframe_.Get());
 	// プリミティブトポロジーを設定
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -96,6 +94,7 @@ void Object3d::DrawImGui(const char* objectName) {
 
 	ImGui::Text("ColorEdit");
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
+	ImGui::Checkbox("DrawMode", &drawMode);
 
 	ImGui::End();
 }

@@ -88,6 +88,9 @@
     <Filter Include="ソース ファイル\Engine\3d\Particles">
       <UniqueIdentifier>{ef9d163b-0e67-4ea7-80b2-87739be97e29}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Particles">
+      <UniqueIdentifier>{9eadd8fb-3781-4fdd-a182-eb6f3259470e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -174,11 +177,11 @@
     <ClCompile Include="Engine\2d\Triangle\Triangle.cpp">
       <Filter>ソース ファイル\Engine\2d\Triangle</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\GameScene.cpp">
-      <Filter>ソース ファイル\Engine\3d\Object3d</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\3d\Particles\Particles.cpp">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\GameScene.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -318,10 +321,19 @@
     <FxCompile Include="resources\shaders\Object3d.VS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
+    <FxCompile Include="resources\shaders\Particles\Particles.PS.hlsl">
+      <Filter>シェーダーファイル\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particles\Particles.VS.hlsl">
+      <Filter>シェーダーファイル\Particles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli">
       <Filter>シェーダーファイル</Filter>
+    </None>
+    <None Include="resources\shaders\Particles\Particles.hlsli">
+      <Filter>シェーダーファイル\Particles</Filter>
     </None>
   </ItemGroup>
 </Project>

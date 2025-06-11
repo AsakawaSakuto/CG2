@@ -19,6 +19,7 @@
 #include "Sphere.h"
 #include "SphereData.h"
 #include "Triangle.h"
+#include "Particles.h"
 // Math
 #include "Vector2.h"
 #include "Vector3.h"
@@ -79,6 +80,8 @@ private:
 	Sphere* sphere = new Sphere();
 	
 	Triangle* triangle = new Triangle();
+
+	Particles* particles = new Particles();
 
 	Camera* camera = new Camera();
 	DebugCamera* debugCamera = new DebugCamera();

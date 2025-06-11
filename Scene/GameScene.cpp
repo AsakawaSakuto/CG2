@@ -31,7 +31,7 @@ void GameScene::Initialize() {
 	object3dData->Initialize(dxCommon);
 	
 	model->Initialize(object3dData, "resources/object3d/monkey.obj");
-	model->SetTexture("resources/engineResources/white16x16.png");
+	//model->SetTexture("resources/engineResources/uvChecker.png");
 
 	model2->Initialize(object3dData, "resources/object3d/monkey.obj");
 	model2->SetTexture("resources/engineResources/white16x16.png");
@@ -48,6 +48,9 @@ void GameScene::Initialize() {
 	fenceModel->SetTexture("resources/image/fence.png");
 
 	triangle->Initialize(dxCommon);
+
+	particles->Initialize(dxCommon);
+	//particles->SetTexture("resources/engineResources/uvChecker.png");
 }
 
 void GameScene::Update() {
@@ -60,18 +63,6 @@ void GameScene::Update() {
 	}
 
 	input->Update();
-
-	/*if (drawTexture) {
-		model->SetTexture("resources/engineResources/uvChecker.png");
-	} else {
-		model->SetTexture("resources/engineResources/white16x16.png");
-	}
-
-	if (drawTexture2) {
-		model2->SetTexture("resources/engineResources/uvChecker.png");
-	} else {
-		model2->SetTexture("resources/engineResources/white16x16.png");
-	}*/
 
 	// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
 	if (input->TriggerKey(DIK_Z)) {
@@ -100,19 +91,15 @@ void GameScene::Update() {
 	}
 
 
-	fenceModel->Update(*useCamera);
-
+	//fenceModel->Update(*useCamera);
 	model->Update(*useCamera);
-
 	model2->Update(*useCamera);
-
-	sphere->Update(*useCamera);
-
-	triangle->Update();
-
-	sprite->Update();
-	sprite2->Update();
-	sprite3->Update();
+	particles->Update(*useCamera);
+	//sphere->Update(*useCamera);
+	//triangle->Update();
+	//sprite->Update();
+	//sprite2->Update();
+	//sprite3->Update();
 }
 
 void GameScene::Draw() {
@@ -123,19 +110,15 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	fenceModel->Draw();
-
-	sphere->Draw();
+	//fenceModel->Draw();
+	//sphere->Draw();
 	//sprite3->Draw();
-
 	//sprite2->Draw();
-
 	//model->Draw();
 	//model2->Draw();
-
-
-	triangle->Draw();
-	sprite->Draw();
+	particles->Draw();
+	//triangle->Draw();
+	//sprite->Draw();
 
 	//sphere->Draw();
 
@@ -164,17 +147,16 @@ void GameScene::Draw() {
 		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.01f);
 		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
 
-		fenceModel->DrawImGui("fence");
-		sphere->DrawImGui("Sphere");
+		//fenceModel->DrawImGui("fence");
+		//sphere->DrawImGui("Sphere");
 		//model->DrawImGui("monkey");
 		//model2->DrawImGui("monkey2");
-
-		triangle->DrawImGui("triangle");
-
-		sprite->DrawImGui("sprite");
+		particles->DrawImGui("particles");
+		//triangle->DrawImGui("triangle");
+		//sprite->DrawImGui("sprite");
 		//sprite2->DrawImGui("sprite2");
 
-		ImGui::Text("Texture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
+		ImGui::Text("LoadTexture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
 		ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
 		ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
 	} else {

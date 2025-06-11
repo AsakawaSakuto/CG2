@@ -38,6 +38,9 @@ public:
 	void DrawImGui(const char* objectName);
 
 private:
+	Transform transform_;
+	bool drawMode = true;
+
 	DirectXCommon* dxCommon_ = nullptr;
 	// デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
@@ -61,8 +64,6 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
-
-	Transform transform_;
 
 	void CreateVertexResource();
 	void CreateIndexResource();
