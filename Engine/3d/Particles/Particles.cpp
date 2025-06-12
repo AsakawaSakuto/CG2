@@ -49,12 +49,32 @@ void Particles::Initialize(DirectXCommon* dxCommon) {
 void Particles::Update(Camera& useCamera) {
 
 	for (uint32_t i = 0; i < kMaxNumInstance; i++) {
-	// 行列の内容を更新して三角形を動かす
-	Matrix4x4 worldMatrix = MakeAffineMatrix(particles[i].transform.scale, particles[i].transform.rotate, particles[i].transform.translate);
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
+		Matrix4x4 scaleMatrix = MakeScaleMatrix(particles[i].transform.scale);
+		Matrix4x4 translateMatrix = MakeTranslateMatrix(particles[i].transform.translate);
+
+		// カメラ → ビルボード行列作成
+		Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
+		Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+		Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
+		// 回転成分だけ使うように、平行移動を打ち消す
+		billboardMatrix.m[3][0] = 0.0f;
+		billboardMatrix.m[3][1] = 0.0f;
+		billboardMatrix.m[3][2] = 0.0f;
+
+		Matrix4x4 rotationMatrix;
+		if (useBillboard) {
+			rotationMatrix = billboardMatrix;
+		} else {
+			rotationMatrix = MakeRotateXYZMatrix(particles[i].transform.rotate); // 通常回転
+		}
+
+		// ワールド行列を構築
+		Matrix4x4 worldMatrix = MultiplyMatrix(MultiplyMatrix(scaleMatrix, rotationMatrix), translateMatrix);
+
 	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
+
 	// シーン上で三角形を描画
 		transformationData_[i]->WVP = worldViewProjectionMatrix;
 		transformationData_[i]->World = worldMatrix;
@@ -120,9 +140,9 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Text("ChecBox");
 	ImGui::Checkbox("isMove", &isMove);
+	ImGui::Checkbox("useBillboard", &useBillboard);
 
-	ImGui::Text("ColorEdit");
-	ImGui::ColorEdit4("Color", &materialData_->color.x);
+	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 
 	ImGui::End();
 

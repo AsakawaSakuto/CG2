@@ -31,6 +31,7 @@ void GameScene::Initialize() {
 	object3dData->Initialize(dxCommon);
 	
 	model->Initialize(object3dData, "resources/object3d/monkey.obj");
+	model->SetPosition({ -2.f,0.f,0.f });
 	//model->SetTexture("resources/engineResources/uvChecker.png");
 
 	model2->Initialize(object3dData, "resources/object3d/monkey.obj");
@@ -114,7 +115,7 @@ void GameScene::Draw() {
 	//sphere->Draw();
 	//sprite3->Draw();
 	//sprite2->Draw();
-	//model->Draw();
+	model->Draw();
 	//model2->Draw();
 	particles->Draw();
 	//triangle->Draw();
@@ -149,7 +150,7 @@ void GameScene::Draw() {
 
 		//fenceModel->DrawImGui("fence");
 		//sphere->DrawImGui("Sphere");
-		//model->DrawImGui("monkey");
+		model->DrawImGui("monkey");
 		//model2->DrawImGui("monkey2");
 		particles->DrawImGui("particles");
 		//triangle->DrawImGui("triangle");

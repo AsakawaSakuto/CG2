@@ -27,6 +27,7 @@
 #include "ParticleForGPU.h"
 
 #include <random>
+#include <numbers>
 #pragma endregion
 
 // パーティクルクラス
@@ -52,8 +53,8 @@ public:
 private:
 
 	// パーティクルが動くかどうかのフラグ
-	bool isMove = true;
-
+	bool isMove = false;
+	bool useBillboard = false;
 	// 1フレームの固定デルタタイム
 	const float kDeltaTime = 1.0f / 60.0f;
 

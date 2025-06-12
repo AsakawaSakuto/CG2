@@ -154,6 +154,16 @@ Matrix4x4 MakeRotateZMatrix(float rotate) {
 
 	return result;
 }
+// 回転行列XYZ
+Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate) {
+	// 各軸の回転行列を生成
+	Matrix4x4 rotX = MakeRotateXMatrix(rotate.x);
+	Matrix4x4 rotY = MakeRotateYMatrix(rotate.y);
+	Matrix4x4 rotZ = MakeRotateZMatrix(rotate.z);
+
+	// ローカル空間の回転順 Z → Y → X（右から適用される）
+	return MultiplyMatrix(MultiplyMatrix(rotZ, rotY), rotX);
+}
 
 // アフィン変換
 Matrix4x4 MakeAffineMatrix(const  Vector3& scale, const  Vector3& rotate, const  Vector3& translate) {

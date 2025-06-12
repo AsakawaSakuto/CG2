@@ -25,6 +25,9 @@ Matrix4x4 MakeRotateYMatrix(float rotate);
 // 回転行列Z
 Matrix4x4 MakeRotateZMatrix(float rotate);
 
+// 回転行列XYZ
+Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate);
+
 // アフィン変換
 Matrix4x4 MakeAffineMatrix(const  Vector3& scale, const  Vector3& rotate, const  Vector3& translate);
 
