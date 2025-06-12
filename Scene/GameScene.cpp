@@ -71,6 +71,8 @@ void GameScene::Update() {
 		audio2->PlayAudio();
 	}
 
+	particles->SetEmitter(model->GetPosition());
+
 	if (input->TriggerKey(DIK_SPACE)) {
 		if (isDebugCamera) {
 			isDebugCamera = false;

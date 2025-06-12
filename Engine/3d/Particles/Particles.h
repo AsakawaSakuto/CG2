@@ -25,10 +25,25 @@
 #include "Camera.h"
 #include "ParticleData.h"
 #include "ParticleForGPU.h"
+#include "Emitter.h"
+#include "BlendMode.h"
 
 #include <random>
 #include <numbers>
 #pragma endregion
+
+struct AABB
+{
+	Vector3 min; // 最小点
+	Vector3 max; // 最大点
+};
+
+struct AccelerationField {
+	Vector3 acceleration; //< 加速度
+	AABB area;            //< 範囲
+};
+
+bool IsCollision(const AABB& aabb, const Vector3& point);
 
 // パーティクルクラス
 class Particles
@@ -50,8 +65,9 @@ public:
 	// テクスチャの設定（描画用）
 	void SetTexture(const std::string& textureName);
 
+	void SetEmitter(const Vector3& translete) { emitter.transform.translate = translete; }
 private:
-
+	AccelerationField  accelerationField;
 	// パーティクルが動くかどうかのフラグ
 	bool isMove = false;
 	bool useBillboard = false;
@@ -60,17 +76,24 @@ private:
 
 	// パーティクルの数
 	uint32_t numInstance = 0;
-	uint32_t kMaxNumInstance = 10;
+	uint32_t kMaxNumInstance = 100;
 	
 	ParticleForGPU* instanceData = nullptr;
 
-	float alpha;
+
+	ParticleData MakeNewParticle(std::mt19937& rand, const Vector3& translate);
 
 	// パーティクル本体のデータ
-	std::vector<ParticleData> particles;
+	std::list<ParticleData> particles;
 
 	// 使用するテクスチャ名
 	std::string textureName_;
+
+	BlendMode blendMode;
+
+	std::list<ParticleData> Emit(const Emitter& emitter, std::mt19937& rand);
+
+	Emitter emitter;
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 
@@ -149,7 +172,7 @@ private:
 	void CreateRootSignature();
 	void InputLayoutSet();
 	void CompileShaders();
-	void BlendStateSet();
+	void BlendStateSet(BlendMode blendMode);
 	void RasiterzerStateSet();
 	void DepthStencilStateSet();
 

@@ -45,8 +45,6 @@ public:
 
     static const uint32_t kMaxSRVCount_;
 
-    WinApp* GetWinApp() { return  winApp_; }
-
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
 
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }

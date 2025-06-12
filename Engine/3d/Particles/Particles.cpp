@@ -5,32 +5,34 @@
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
+bool IsCollision(const AABB& aabb, const Vector3& point) {
+	return (point.x >= aabb.min.x && point.x <= aabb.max.x) &&
+		(point.y >= aabb.min.y && point.y <= aabb.max.y) &&
+		(point.z >= aabb.min.z && point.z <= aabb.max.z);
+}
+
 void Particles::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 
+	blendMode = kBlendModeAdd;
+
 	CreatePSO();
 
-	particles.resize(kMaxNumInstance);
-	transformationData_.resize(kMaxNumInstance);
+	emitter.transform.translate = { 0.0f,0.0f,0.0f };
+	emitter.transform.rotate = { 0.0f,0.0f,0.0f };
+	emitter.transform.scale = { 1.0f,1.0f,1.0f };
+	emitter.count = 5;
+	emitter.frequency = 0.5f;
+	emitter.frequencyTime = 0.0f;
+
+	accelerationField.acceleration = { 15.0f, 0.0f, 0.0f };
+	accelerationField.area.min = { -3.0f, -3.0f, -3.0f };
+	accelerationField.area.max = { 3.0f, 3.0f, 3.0f };
+
 	transformationResource_.resize(kMaxNumInstance);
-
-	std::uniform_real_distribution<float> randVelocity(-1.0f, 1.0f);
-	std::uniform_real_distribution<float> randColor(0.0f, 1.0f);
-	std::uniform_real_distribution<float> randTime(1.0f, 3.0f);
-
-	for (uint32_t i = 0; i < kMaxNumInstance; i++) {
-		particles[i].transform.scale = {1.f,1.f,1.f};
-		particles[i].transform.rotate = { 0.f,0.f,0.f };
-		particles[i].transform.translate = { 0.f,0.f,0.f };
-		// 位置と速度を[-1,1]でランダムに初期化
-		particles[i].transform.translate = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
-		particles[i].velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
-		particles[i].color = { randColor(rand),randColor(rand) ,randColor(rand) ,1.0f };
-		particles[i].lifeTime = randTime(rand);
-		particles[i].currentTime = 0;
-	}
+	transformationData_.resize(kMaxNumInstance);
 
 	textureName_ = "resources/engineResources/uvChecker.png";
 
@@ -48,63 +50,94 @@ void Particles::Initialize(DirectXCommon* dxCommon) {
 
 void Particles::Update(Camera& useCamera) {
 
-	for (uint32_t i = 0; i < kMaxNumInstance; i++) {
-		Matrix4x4 scaleMatrix = MakeScaleMatrix(particles[i].transform.scale);
-		Matrix4x4 translateMatrix = MakeTranslateMatrix(particles[i].transform.translate);
-
-		// カメラ → ビルボード行列作成
-		Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
-		Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
-		Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
-		// 回転成分だけ使うように、平行移動を打ち消す
-		billboardMatrix.m[3][0] = 0.0f;
-		billboardMatrix.m[3][1] = 0.0f;
-		billboardMatrix.m[3][2] = 0.0f;
-
-		Matrix4x4 rotationMatrix;
-		if (useBillboard) {
-			rotationMatrix = billboardMatrix;
-		} else {
-			rotationMatrix = MakeRotateXYZMatrix(particles[i].transform.rotate); // 通常回転
-		}
-
-		// ワールド行列を構築
-		Matrix4x4 worldMatrix = MultiplyMatrix(MultiplyMatrix(scaleMatrix, rotationMatrix), translateMatrix);
-
-	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
-
-	// シーン上で三角形を描画
-		transformationData_[i]->WVP = worldViewProjectionMatrix;
-		transformationData_[i]->World = worldMatrix;
+	// パーティクルを発生させる
+	emitter.frequencyTime += kDeltaTime;
+	if (emitter.frequency <= emitter.frequencyTime) {
+		particles.splice(particles.end(), Emit(emitter, rand));
+		emitter.frequencyTime -= emitter.frequency;
 	}
 
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData));
+	// カメラ行列とビルボード行列の作成
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
+	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
 
+	// 回転成分だけ使うように、平行移動を打ち消す
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+
+	// GPUバッファマップ
+	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData));
 	numInstance = 0;
 
-	for (uint32_t i = 0; i < kMaxNumInstance; ++i) {
-		if (particles[i].lifeTime <= particles[i].currentTime) { // 生存期間を過ぎていたら更新せず描画対象にしない
+	// パーティクルの更新・インスタンス登録
+	for (auto particleIterator = particles.begin(); particleIterator != particles.end(); ) {
+
+		// 寿命が尽きたパーティクルを削除
+		if (particleIterator->lifeTime <= particleIterator->currentTime) {
+			particleIterator = particles.erase(particleIterator);
 			continue;
 		}
-		alpha = 1.0f - (particles[i].currentTime / particles[i].lifeTime);
-		// …WorldMatrixを求めたりなんだり…
+
+		// World行列構築
+		Matrix4x4 scaleMatrix = MakeScaleMatrix(particleIterator->transform.scale);
+		Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->transform.translate);
+
+		Matrix4x4 rotationMatrix = useBillboard
+			? billboardMatrix
+			: MakeRotateXYZMatrix(particleIterator->transform.rotate);
+
+		Matrix4x4 worldMatrix = MultiplyMatrix(MultiplyMatrix(scaleMatrix, rotationMatrix), translateMatrix);
+
+		// WVP行列計算
+		Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(
+			0.45f,
+			static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_),
+			0.1f,
+			100.0f
+		);
+		Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
+
+		// パーティクルの更新処理
 		if (isMove) {
-			particles[i].transform.translate.x += particles[i].velocity.x * kDeltaTime;
-			particles[i].transform.translate.y += particles[i].velocity.y * kDeltaTime;
-			particles[i].transform.translate.z += particles[i].velocity.z * kDeltaTime;
-			particles[i].currentTime += kDeltaTime; // 経過時間を足す
+			// Fieldの範囲内のParticleには加速度を適用する
+			if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
+				(*particleIterator).velocity.x += accelerationField.acceleration.x * kDeltaTime;
+				(*particleIterator).velocity.y += accelerationField.acceleration.y * kDeltaTime;
+				(*particleIterator).velocity.z += accelerationField.acceleration.z * kDeltaTime;
+			}
+
+			particleIterator->transform.translate.x += particleIterator->velocity.x * kDeltaTime;
+			particleIterator->transform.translate.y += particleIterator->velocity.y * kDeltaTime;
+			particleIterator->transform.translate.z += particleIterator->velocity.z * kDeltaTime;
+			particleIterator->currentTime += kDeltaTime;
 		}
-		instanceData[numInstance].WVP = transformationData_[i]->WVP;
-		instanceData[numInstance].World = transformationData_[i]->World;
-		instanceData[numInstance].color = particles[i].color;
-		instanceData[numInstance].color.w = alpha;
-		++numInstance; // 生きているParticleの数を1つカウントする
+
+		float alpha = 0.0f;
+		float halfLife = particleIterator->lifeTime * 0.5f;
+
+		if (particleIterator->currentTime < halfLife) {
+			alpha = particleIterator->currentTime / halfLife;  // 0 → 1
+		} else {
+			alpha = 1.0f - ((particleIterator->currentTime - halfLife) / halfLife);  // 1 → 0
+		}
+
+		// 描画データに登録
+		if (numInstance < kMaxNumInstance) {
+			instanceData[numInstance].WVP = worldViewProjectionMatrix;
+			instanceData[numInstance].World = worldMatrix;
+			instanceData[numInstance].color = particleIterator->color;
+			instanceData[numInstance].color.w = alpha;
+			++numInstance;
+		}
+
+		++particleIterator;
 	}
 
+	// GPUバッファアンマップ
 	instancingResource_->Unmap(0, nullptr);
-
 }
 
 void Particles::Draw() {
@@ -145,8 +178,34 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 
+	ImGui::DragFloat3("Emitter", &emitter.transform.translate.x, 0.01f);
+
 	ImGui::End();
 
+}
+
+ParticleData Particles::MakeNewParticle(std::mt19937& rand, const Vector3& translate) {
+
+	std::uniform_real_distribution<float> randTranslateX(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> randTranslateY(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> randTranslateZ(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> randVelocity(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> randColor(0.0f, 1.0f);
+	std::uniform_real_distribution<float> randTime(1.0f, 2.0f);
+	ParticleData particle = {};
+
+	particle.transform.scale = { 1.f,1.f,1.f };
+	particle.transform.rotate = { 0.f,0.f,0.f };
+	particle.transform.translate.x = translate.x + randTranslateX(rand);
+	particle.transform.translate.y = translate.y + randTranslateY(rand);
+	particle.transform.translate.z = translate.z + randTranslateZ(rand);
+
+	particle.velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
+	particle.color = { randColor(rand),randColor(rand),randColor(rand),1.0f };
+	particle.lifeTime = randTime(rand);
+	particle.currentTime = 0;
+
+	return particle;
 }
 
 void Particles::SetTexture(const std::string& textureName) {
@@ -160,6 +219,16 @@ void Particles::SetTexture(const std::string& textureName) {
 	// 読み込んだテクスチャの番号を取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
+
+std::list<ParticleData> Particles::Emit(const Emitter& emitter, std::mt19937& rand) {
+	std::list<ParticleData> particles;
+	for (uint32_t count = 0; count < emitter.count; count++) {
+		particles.push_back(MakeNewParticle(rand, emitter.transform.translate));
+	}
+	return particles;
+}
+
+#pragma region 
 
 void Particles::CreateVertexResource() {
 	// 頂点リソース
@@ -260,7 +329,7 @@ void Particles::CreatePSO() {
 	CreateRootSignature();
 	InputLayoutSet();
 	CompileShaders();
-	BlendStateSet();
+	BlendStateSet(blendMode);
 	RasiterzerStateSet();
 	DepthStencilStateSet();
 
@@ -405,18 +474,56 @@ void Particles::CompileShaders() {
 	assert(pixelShaderBlob_ != nullptr);
 }
 
-void Particles::BlendStateSet() {
-	// すべての色要素を書き込む
+void Particles::BlendStateSet(BlendMode blendMode) {
+	// 全色成分を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	// CG3↓
 	blendDesc_.RenderTarget[0].BlendEnable = TRUE;
-	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-	//
+
+	switch (blendMode) {
+	case kBlendModeNone:
+		blendDesc_.RenderTarget[0].BlendEnable = FALSE;
+		break;
+
+	case kBlendModeNormal:
+		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		break;
+
+	case kBlendModeAdd:
+		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		break;
+
+	case kBlendModeSubtract:
+		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT; // 減算
+		break;
+
+	case kBlendModeMultily:
+		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		break;
+
+	case kBlendModeScreen:
+		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
+		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		break;
+
+	default:
+		// 無効なモードは無効化
+		blendDesc_.RenderTarget[0].BlendEnable = FALSE;
+		break;
+	}
+
+	// アルファブレンド設定（基本固定でOK）
 	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 }
 
 void Particles::RasiterzerStateSet() {
@@ -434,3 +541,5 @@ void Particles::DepthStencilStateSet() {
 	// 比較関数LessEqual、つまり、深ければ描画される
 	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 }
+
+#pragma endregion

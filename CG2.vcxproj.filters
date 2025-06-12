@@ -314,6 +314,12 @@
     <ClInclude Include="ParticleForGPU.h">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClInclude>
+    <ClInclude Include="BlendMode.h">
+      <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
+    </ClInclude>
+    <ClInclude Include="Emitter.h">
+      <Filter>ソース ファイル\Engine\3d\Particles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
