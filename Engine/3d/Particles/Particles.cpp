@@ -83,23 +83,24 @@ void Particles::Update(Camera& useCamera) {
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData));
 
 	numInstance = 0;
-	if (isMove) {
-		for (uint32_t i = 0; i < kMaxNumInstance; ++i) {
-			if (particles[i].lifeTime <= particles[i].currentTime) { // 生存期間を過ぎていたら更新せず描画対象にしない
-				continue;
-			}
-			alpha = 1.0f - (particles[i].currentTime / particles[i].lifeTime);
-			// …WorldMatrixを求めたりなんだり…
+
+	for (uint32_t i = 0; i < kMaxNumInstance; ++i) {
+		if (particles[i].lifeTime <= particles[i].currentTime) { // 生存期間を過ぎていたら更新せず描画対象にしない
+			continue;
+		}
+		alpha = 1.0f - (particles[i].currentTime / particles[i].lifeTime);
+		// …WorldMatrixを求めたりなんだり…
+		if (isMove) {
 			particles[i].transform.translate.x += particles[i].velocity.x * kDeltaTime;
 			particles[i].transform.translate.y += particles[i].velocity.y * kDeltaTime;
 			particles[i].transform.translate.z += particles[i].velocity.z * kDeltaTime;
 			particles[i].currentTime += kDeltaTime; // 経過時間を足す
-			instanceData[numInstance].WVP = transformationData_[i]->WVP;
-			instanceData[numInstance].World = transformationData_[i]->World;
-			instanceData[numInstance].color = particles[i].color;
-			instanceData[numInstance].color.w = alpha;
-			++numInstance; // 生きているParticleの数を1つカウントする
 		}
+		instanceData[numInstance].WVP = transformationData_[i]->WVP;
+		instanceData[numInstance].World = transformationData_[i]->World;
+		instanceData[numInstance].color = particles[i].color;
+		instanceData[numInstance].color.w = alpha;
+		++numInstance; // 生きているParticleの数を1つカウントする
 	}
 
 	instancingResource_->Unmap(0, nullptr);
