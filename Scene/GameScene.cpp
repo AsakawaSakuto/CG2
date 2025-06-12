@@ -50,7 +50,7 @@ void GameScene::Initialize() {
 	triangle->Initialize(dxCommon);
 
 	particles->Initialize(dxCommon);
-	//particles->SetTexture("resources/engineResources/uvChecker.png");
+	particles->SetTexture("resources/image/circle.png");
 }
 
 void GameScene::Update() {

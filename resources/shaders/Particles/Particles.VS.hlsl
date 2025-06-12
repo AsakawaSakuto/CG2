@@ -3,12 +3,13 @@
 // VertexShader
 // 与えられた座標を同次クリップ空間に変換する
 
-struct TransformationMatrix {
+struct ParticleForGPU {
     float4x4 WVP;
     float4x4 World;
+    float4 color;
 };
 
-StructuredBuffer<TransformationMatrix> gTransformationMatrices : register(t1);
+StructuredBuffer<ParticleForGPU> gParticles : register(t1);
 
 struct VertexShaderInput {
     float4 position : POSITION0;
@@ -18,8 +19,9 @@ struct VertexShaderInput {
 
 VertexShaderOutput main(VertexShaderInput input,uint instanceId : SV_InstanceId) {
     VertexShaderOutput output;
-    output.position = mul(input.position, gTransformationMatrices[instanceId].WVP);
+    output.position = mul(input.position, gParticles[instanceId].WVP);
     output.texcoord = input.texcord;
-    output.normal = normalize(mul(input.normal, (float3x3) gTransformationMatrices[instanceId].World));
+    output.normal = normalize(mul(input.normal, (float3x3) gParticles[instanceId].World));
+    output.color = gParticles[instanceId].color;
     return output;
 }

@@ -55,6 +55,8 @@ private:
 
 	Input* input = new Input();
 
+	/*---------------------------------------------*/
+
 	SpriteData* spriteData = new SpriteData();
 
 	Sprite* sprite = new Sprite();

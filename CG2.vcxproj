@@ -165,6 +165,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Sphere\Sphere.h" />
     <ClInclude Include="Engine\3d\Sphere\SphereData.h" />
     <ClInclude Include="Engine\3d\Particles\Particles.h" />
+    <ClInclude Include="ParticleForGPU.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Engine\2d\Triangle\Triangle.h" />
   </ItemGroup>

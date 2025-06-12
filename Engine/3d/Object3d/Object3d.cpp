@@ -43,7 +43,7 @@ void Object3d::Update(Camera& useCamera) {
 	Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
 	// シーン上で三角形を描画
 	transformationData_->WVP = worldViewProjectionMatrix;
-	transformationData_->World = worldViewProjectionMatrix;
+	transformationData_->World = worldMatrix;
 }
 
 void Object3d::Draw() {

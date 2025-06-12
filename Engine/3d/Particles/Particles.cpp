@@ -12,19 +12,24 @@ void Particles::Initialize(DirectXCommon* dxCommon) {
 
 	CreatePSO();
 
-	std::uniform_real_distribution<float> randVelocity(-0.01f, 0.01f);
-	
-	particles.resize(num);
-	transformationData_.resize(num);
-	transformationResource_.resize(num);
+	particles.resize(kMaxNumInstance);
+	transformationData_.resize(kMaxNumInstance);
+	transformationResource_.resize(kMaxNumInstance);
 
-	for (uint32_t i = 0; i < num; i++) {
+	std::uniform_real_distribution<float> randVelocity(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> randColor(0.0f, 1.0f);
+	std::uniform_real_distribution<float> randTime(1.0f, 3.0f);
+
+	for (uint32_t i = 0; i < kMaxNumInstance; i++) {
 		particles[i].transform.scale = {1.f,1.f,1.f};
 		particles[i].transform.rotate = { 0.f,0.f,0.f };
-		particles[i].transform.translate = { i * 0.1f,i * 0.1f,i * 0.1f };
+		particles[i].transform.translate = { 0.f,0.f,0.f };
 		// 位置と速度を[-1,1]でランダムに初期化
 		particles[i].transform.translate = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
 		particles[i].velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
+		particles[i].color = { randColor(rand),randColor(rand) ,randColor(rand) ,1.0f };
+		particles[i].lifeTime = randTime(rand);
+		particles[i].currentTime = 0;
 	}
 
 	textureName_ = "resources/engineResources/uvChecker.png";
@@ -43,13 +48,7 @@ void Particles::Initialize(DirectXCommon* dxCommon) {
 
 void Particles::Update(Camera& useCamera) {
 
-	if (isMove) {
-		for (uint32_t i = 0; i < num; i++) {
-			particles[i].transform.translate += particles[i].velocity;
-		}
-	}
-
-	for (uint32_t i = 0; i < num; i++) {
+	for (uint32_t i = 0; i < kMaxNumInstance; i++) {
 	// 行列の内容を更新して三角形を動かす
 	Matrix4x4 worldMatrix = MakeAffineMatrix(particles[i].transform.scale, particles[i].transform.rotate, particles[i].transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
@@ -58,15 +57,33 @@ void Particles::Update(Camera& useCamera) {
 	Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
 	// シーン上で三角形を描画
 		transformationData_[i]->WVP = worldViewProjectionMatrix;
-		transformationData_[i]->World = worldViewProjectionMatrix;
+		transformationData_[i]->World = worldMatrix;
 	}
-	TransformationMatrix* mappedData = nullptr;
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
-	for (uint32_t i = 0; i < num; i++) {
-		mappedData[i].WVP = transformationData_[i]->WVP;
-		mappedData[i].World = transformationData_[i]->World;
+
+	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData));
+
+	numInstance = 0;
+	if (isMove) {
+		for (uint32_t i = 0; i < kMaxNumInstance; ++i) {
+			if (particles[i].lifeTime <= particles[i].currentTime) { // 生存期間を過ぎていたら更新せず描画対象にしない
+				continue;
+			}
+			alpha = 1.0f - (particles[i].currentTime / particles[i].lifeTime);
+			// …WorldMatrixを求めたりなんだり…
+			particles[i].transform.translate.x += particles[i].velocity.x * kDeltaTime;
+			particles[i].transform.translate.y += particles[i].velocity.y * kDeltaTime;
+			particles[i].transform.translate.z += particles[i].velocity.z * kDeltaTime;
+			particles[i].currentTime += kDeltaTime; // 経過時間を足す
+			instanceData[numInstance].WVP = transformationData_[i]->WVP;
+			instanceData[numInstance].World = transformationData_[i]->World;
+			instanceData[numInstance].color = particles[i].color;
+			instanceData[numInstance].color.w = alpha;
+			++numInstance; // 生きているParticleの数を1つカウントする
+		}
 	}
+
 	instancingResource_->Unmap(0, nullptr);
+
 }
 
 void Particles::Draw() {
@@ -90,13 +107,10 @@ void Particles::Draw() {
 	//
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
-	// TransformationMatrixCBufferの場所を設定
-	//for (uint32_t i = 0; i < num; i++)
-	//{
-	//	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_[i]->GetGPUVirtualAddress());
-	//}
 	// 描画！ (DrawCall/ドローコール)
-	commandList_->DrawIndexedInstanced(6, num, 0, 0, 0);
+	if (numInstance > 0) {
+		commandList_->DrawIndexedInstanced(6, numInstance, 0, 0, 0);
+	}
 	
 }
 
@@ -181,24 +195,25 @@ void Particles::CreateMaterialResource() {
 }
 
 void Particles::CreateTransformationResource() {
-	for (uint32_t i = 0; i < num; i++) {
-		transformationResource_[i] = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	for (uint32_t i = 0; i < kMaxNumInstance; i++) {
+		transformationResource_[i] = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU));
 		transformationResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_[i]));
 		transformationData_[i]->WVP = MakeIdentityMatrix();
 		transformationData_[i]->World = MakeIdentityMatrix();
+		transformationData_[i]->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	//instancingResource_->Unmap(0, nullptr);
 	// --- Instancing用 StructuredBuffer をまとめて1つ作成 ---
-	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix) * num);
+	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxNumInstance);
 	// SRV設定（StructuredBufferとして使う）
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = num;
-	srvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+	srvDesc.Buffer.NumElements = kMaxNumInstance;
+	srvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 	// SRVハンドルの取得（Heap内の空いているスロット、ここでは例として3番）
@@ -376,7 +391,7 @@ void Particles::BlendStateSet() {
 	blendDesc_.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 	//
 	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
@@ -394,7 +409,7 @@ void Particles::DepthStencilStateSet() {
 	// Depthの機能を有効化する
 	depthStencilDesc_.DepthEnable = true;
 	// 書き込みします
-	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	// 比較関数LessEqual、つまり、深ければ描画される
 	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 }
