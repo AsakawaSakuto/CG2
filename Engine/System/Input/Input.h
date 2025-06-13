@@ -17,6 +17,15 @@ public:
 	void Update();
 	bool PushKey(BYTE keyNumber);
 	bool TriggerKey(BYTE keyNumber);
+	float GetWheelDelta() const { return wheelDelta_; }
+
+	// 左右押下状態（Push）
+	bool PushMouseButtonL() const { return isMouseL_; }
+	bool PushMouseButtonR() const { return isMouseR_; }
+
+	// 左右トリガー状態（Trigger）
+	bool TriggerMouseButtonL() const { return (isMouseL_ && !preMouseL_); }
+	bool TriggerMouseButtonR() const { return (isMouseR_ && !preMouseR_); }
 private:
 	WinApp* winApp_ = nullptr;
 	HRESULT result_;
@@ -24,4 +33,10 @@ private:
 	BYTE keyPre_[256] = {};
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput_;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_;
+	float wheelDelta_ = 0.0f;
+
+	bool isMouseL_ = false;
+	bool isMouseR_ = false;
+	bool preMouseL_ = false;
+	bool preMouseR_ = false;
 };

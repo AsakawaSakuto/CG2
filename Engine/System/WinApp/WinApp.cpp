@@ -39,6 +39,8 @@ void WinApp::Initialize(const wchar_t* title) {
 
     assert(hwnd_ != nullptr);
 
+    SetWindowLongPtr(hwnd_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+
     ShowWindow(hwnd_, SW_SHOW);
 
 #ifdef _DEBUG
@@ -124,9 +126,40 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
             info->ptMaxTrackSize.y = rect.bottom - rect.top;
             return 0;
         }
+        break;
+    }
+    case WM_MOUSEWHEEL:
+    {
+        WinApp* window = reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+        if (window) {
+            short delta = GET_WHEEL_DELTA_WPARAM(wparam);
+            window->AddWheelDelta(delta);
+        }
+        break;
+    }
+    case WM_LBUTTONDOWN:
+    {
+        reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA))->SetLButtonDown(true);
+        break;
+    }
+    case WM_LBUTTONUP:
+    {
+        reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA))->SetLButtonDown(false);
+        break;
+    }
+    case WM_RBUTTONDOWN:
+    {
+        reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA))->SetRButtonDown(true);
+        break;
+    }
+    case WM_RBUTTONUP:
+    {
+        reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA))->SetRButtonDown(false);
+        break;
     }
     break;
     }
+
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 

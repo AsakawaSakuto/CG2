@@ -42,10 +42,21 @@ public:
 
     int32_t GetWidth()const { return kClientWidth_; }
     int32_t GetHeight()const { return kClientHeight_; }
+
+    short GetWheelDelta() const { return wheelDelta_; }
+    void AddWheelDelta(short delta) { wheelDelta_ += delta; }
+    void ResetWheelDelta() { wheelDelta_ = 0; }
+
+    bool IsLButtonDown() const { return isLButtonDown_; }
+    bool IsRButtonDown() const { return isRButtonDown_; }
+    void SetLButtonDown(bool flag) { isLButtonDown_ = flag; }
+    void SetRButtonDown(bool flag) { isRButtonDown_ = flag; }
 private:
     HWND hwnd_ = {};
     WNDCLASS wc_ = {};
     bool allowResize_ = true; // リサイズ許可フラグ
-
+    short wheelDelta_ = 0;
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+    bool isLButtonDown_ = false;
+    bool isRButtonDown_ = false;
 };

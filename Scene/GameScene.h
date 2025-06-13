@@ -71,6 +71,8 @@ private:
 
 	Object3d* model2 = new Object3d();
 
+	Object3d* skydome = new Object3d();
+
 	Object3d* fenceModel = new Object3d();
 
 	Audio* audio = new Audio();

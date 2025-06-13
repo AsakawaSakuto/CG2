@@ -20,6 +20,8 @@ void GameScene::Initialize() {
 
 	input->Initialize(winApp);
 
+	debugCamera->SetInput(input);
+
 	spriteData->Initialize(dxCommon);
 
 	sprite->Initialize(spriteData, "resources/image/uvChecker.png");
@@ -36,6 +38,9 @@ void GameScene::Initialize() {
 
 	model2->Initialize(object3dData, "resources/object3d/monkey.obj");
 	model2->SetTexture("resources/engineResources/white16x16.png");
+
+	skydome->Initialize(object3dData, "resources/object3d/skydome.obj");
+	//skydome->SetTexture("resources/image/Skydome.png");
 
 	audio->Initialize("resources/sound/fanfare.wav");
 
@@ -97,6 +102,7 @@ void GameScene::Update() {
 	//fenceModel->Update(*useCamera);
 	model->Update(*useCamera);
 	model2->Update(*useCamera);
+	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
 	//sphere->Update(*useCamera);
 	//triangle->Update();
@@ -117,6 +123,7 @@ void GameScene::Draw() {
 	//sphere->Draw();
 	//sprite3->Draw();
 	//sprite2->Draw();
+	skydome->Draw();
 	model->Draw();
 	//model2->Draw();
 	particles->Draw();
@@ -146,9 +153,9 @@ void GameScene::Draw() {
 
 	if (isDebugCamera) {
 		ImGui::Text("Debug Camera");
-		ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.01f);
-		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.01f);
 		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
+
+		debugCamera->DrawImgui();
 
 		//fenceModel->DrawImGui("fence");
 		//sphere->DrawImGui("Sphere");
