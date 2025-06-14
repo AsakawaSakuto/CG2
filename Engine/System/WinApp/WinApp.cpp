@@ -157,6 +157,15 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
         reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA))->SetRButtonDown(false);
         break;
     }
+    case WM_MOUSEMOVE: {
+        WinApp* window = reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+        if (window) {
+            LONG x = GET_X_LPARAM(lparam);
+            LONG y = GET_Y_LPARAM(lparam);
+            window->SetMousePosition(x, y);
+        }
+        break;
+    }
     break;
     }
 

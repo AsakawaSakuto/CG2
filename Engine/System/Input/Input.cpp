@@ -26,13 +26,20 @@ void Input::Update() {
 	keyboard_->Acquire();
 	keyboard_->GetDeviceState(sizeof(key_), key_);
 
+	// マウス座標更新
+	previousMousePos_ = currentMousePos_;
+	currentMousePos_ = {
+		static_cast<float>(winApp_->GetMouseX()),
+		static_cast<float>(winApp_->GetMouseY())
+	};
+
 	// マウスボタンの前フレーム値保存
 	preMouseL_ = isMouseL_;
 	preMouseR_ = isMouseR_;
 
 	// WinAppから現在のボタン状態を取得
-	isMouseL_ = winApp_->IsLButtonDown();
-	isMouseR_ = winApp_->IsRButtonDown();
+	isMouseL_ = winApp_->MouseLButtonDown();
+	isMouseR_ = winApp_->MouseRButtonDown();
 
 	// ホイール入力取得
 	wheelDelta_ = static_cast<float>(winApp_->GetWheelDelta()) / WHEEL_DELTA;
@@ -53,4 +60,16 @@ bool Input::TriggerKey(BYTE keyNumber) {
 		return true;
 	}
 	return false;
+}
+
+void Input::SetMousePosition(LONG x, LONG y) {
+	previousMousePos_ = currentMousePos_;
+	currentMousePos_ = { static_cast<float>(x), static_cast<float>(y) };
+}
+
+Vector2 Input::GetMouseDelta() const {
+	return {
+		currentMousePos_.x - previousMousePos_.x,
+		currentMousePos_.y - previousMousePos_.y
+	};
 }

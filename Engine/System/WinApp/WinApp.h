@@ -8,6 +8,7 @@
 #include <dxgi1_6.h>
 #include <d3d12sdklayers.h>
 #include <wrl.h> 
+#include <windowsx.h>
 
 class WinApp {
 public:
@@ -47,10 +48,14 @@ public:
     void AddWheelDelta(short delta) { wheelDelta_ += delta; }
     void ResetWheelDelta() { wheelDelta_ = 0; }
 
-    bool IsLButtonDown() const { return isLButtonDown_; }
-    bool IsRButtonDown() const { return isRButtonDown_; }
+    bool MouseLButtonDown() const { return isLButtonDown_; }
+    bool MouseRButtonDown() const { return isRButtonDown_; }
     void SetLButtonDown(bool flag) { isLButtonDown_ = flag; }
     void SetRButtonDown(bool flag) { isRButtonDown_ = flag; }
+    
+    LONG GetMouseX() const { return mouseX_; }
+    LONG GetMouseY() const { return mouseY_; }
+    void SetMousePosition(LONG x, LONG y) { mouseX_ = x; mouseY_ = y; }
 private:
     HWND hwnd_ = {};
     WNDCLASS wc_ = {};
@@ -59,4 +64,6 @@ private:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
     bool isLButtonDown_ = false;
     bool isRButtonDown_ = false;
+    LONG mouseX_ = 0;
+    LONG mouseY_ = 0;
 };

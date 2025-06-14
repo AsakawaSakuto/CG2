@@ -23,6 +23,24 @@ void DebugCamera::Update() {
 		}
 	}
 
+	if (!ImGui::GetIO().WantCaptureMouse && input_->PushMouseButtonL()) {
+		Vector2 delta = input_->GetMouseDelta();
+		float rotateSpeed = 0.001f;
+		transform_.rotate.y += delta.x * rotateSpeed;
+		transform_.rotate.x += delta.y * rotateSpeed;
+	}
+
+	if (input_->PushKey(DIK_R)) {
+		transform_.rotate.x = 0.0f;
+		transform_.rotate.y = 0.0f;
+		transform_.rotate.z = 0.0f;
+	}
+	if (input_->PushKey(DIK_T)) {
+		transform_.translate.x = 0.0f;
+		transform_.translate.y = 0.0f;
+		transform_.translate.z = -10.0f;
+	}
+
 	if (input_->PushKey(DIK_A)) {
 		transform_.translate.x -= 0.05f;
 	}

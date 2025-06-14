@@ -102,11 +102,14 @@ void Particles::Update(Camera& useCamera) {
 
 		// パーティクルの更新処理
 		if (isMove) {
-			// Fieldの範囲内のParticleには加速度を適用する
-			if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
-				(*particleIterator).velocity.x += accelerationField.acceleration.x * kDeltaTime;
-				(*particleIterator).velocity.y += accelerationField.acceleration.y * kDeltaTime;
-				(*particleIterator).velocity.z += accelerationField.acceleration.z * kDeltaTime;
+			if (useField)
+			{
+				// Fieldの範囲内のParticleには加速度を適用する
+				if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
+					(*particleIterator).velocity.x += accelerationField.acceleration.x * kDeltaTime;
+					(*particleIterator).velocity.y += accelerationField.acceleration.y * kDeltaTime;
+					(*particleIterator).velocity.z += accelerationField.acceleration.z * kDeltaTime;
+				}
 			}
 
 			particleIterator->transform.translate.x += particleIterator->velocity.x * kDeltaTime;
@@ -175,6 +178,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Text("ChecBox");
 	ImGui::Checkbox("isMove", &isMove);
 	ImGui::Checkbox("useBillboard", &useBillboard);
+	ImGui::Checkbox("useField", &useField);
 
 	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 

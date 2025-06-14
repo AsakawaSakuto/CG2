@@ -69,8 +69,9 @@ public:
 private:
 	AccelerationField  accelerationField;
 	// パーティクルが動くかどうかのフラグ
-	bool isMove = false;
+	bool isMove = true;
 	bool useBillboard = false;
+	bool useField = false;
 	// 1フレームの固定デルタタイム
 	const float kDeltaTime = 1.0f / 60.0f;
 

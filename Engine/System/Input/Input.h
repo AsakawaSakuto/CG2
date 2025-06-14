@@ -7,6 +7,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <dxcapi.h>
+#include"Vector2.h"
 
 #include"WinApp.h"
 
@@ -26,6 +27,9 @@ public:
 	// 左右トリガー状態（Trigger）
 	bool TriggerMouseButtonL() const { return (isMouseL_ && !preMouseL_); }
 	bool TriggerMouseButtonR() const { return (isMouseR_ && !preMouseR_); }
+
+	void SetMousePosition(LONG x, LONG y);
+	Vector2 GetMouseDelta() const;
 private:
 	WinApp* winApp_ = nullptr;
 	HRESULT result_;
@@ -39,4 +43,7 @@ private:
 	bool isMouseR_ = false;
 	bool preMouseL_ = false;
 	bool preMouseR_ = false;
+
+	Vector2 currentMousePos_ = {};
+	Vector2 previousMousePos_ = {};
 };
