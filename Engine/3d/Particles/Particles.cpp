@@ -11,30 +11,31 @@ bool IsCollision(const AABB& aabb, const Vector3& point) {
 		(point.z >= aabb.min.z && point.z <= aabb.max.z);
 }
 
-void Particles::Initialize(DirectXCommon* dxCommon) {
+void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureName) {
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 
-	blendMode = kBlendModeAdd;
+	blendMode_ = kBlendModeAdd;
 
 	CreatePSO();
 
-	emitter.transform.translate = { 0.0f,0.0f,0.0f };
-	emitter.transform.rotate = { 0.0f,0.0f,0.0f };
-	emitter.transform.scale = { 1.0f,1.0f,1.0f };
-	emitter.count = 5;
-	emitter.frequency = 0.5f;
-	emitter.frequencyTime = 0.0f;
+	spawnCount_ = 1;
+	emitter_.transform.translate = { 0.0f,0.0f,0.0f };
+	emitter_.transform.rotate = { 0.0f,0.0f,0.0f };
+	emitter_.transform.scale = { 1.0f,1.0f,1.0f };
+	emitter_.count = spawnCount_;
+	emitter_.frequency = 0.1f;
+	emitter_.frequencyTime = 0.0f;
 
-	accelerationField.acceleration = { 15.0f, 0.0f, 0.0f };
-	accelerationField.area.min = { -3.0f, -3.0f, -3.0f };
-	accelerationField.area.max = { 3.0f, 3.0f, 3.0f };
+	accelerationField_.acceleration = { 15.0f, 0.0f, 0.0f };
+	accelerationField_.area.min = { -3.0f, -3.0f, -3.0f };
+	accelerationField_.area.max = { 3.0f, 3.0f, 3.0f };
 
-	transformationResource_.resize(kMaxNumInstance);
-	transformationData_.resize(kMaxNumInstance);
+	transformationResource_.resize(kMaxNumInstance_);
+	transformationData_.resize(kMaxNumInstance_);
 
-	textureName_ = "resources/engineResources/uvChecker.png";
+	textureName_ = TextureName;
 
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
@@ -49,12 +50,13 @@ void Particles::Initialize(DirectXCommon* dxCommon) {
 }
 
 void Particles::Update(Camera& useCamera) {
+	emitter_.count = spawnCount_;
 
 	// パーティクルを発生させる
-	emitter.frequencyTime += kDeltaTime;
-	if (emitter.frequency <= emitter.frequencyTime) {
-		particles.splice(particles.end(), Emit(emitter, rand));
-		emitter.frequencyTime -= emitter.frequency;
+	emitter_.frequencyTime += kDeltaTime_;
+	if (emitter_.frequency <= emitter_.frequencyTime) {
+		particles_.splice(particles_.end(), Emit(emitter_, rand));
+		emitter_.frequencyTime -= emitter_.frequency;
 	}
 
 	// カメラ行列とビルボード行列の作成
@@ -68,15 +70,15 @@ void Particles::Update(Camera& useCamera) {
 	billboardMatrix.m[3][2] = 0.0f;
 
 	// GPUバッファマップ
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData));
-	numInstance = 0;
+	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData_));
+	numInstance_ = 0;
 
 	// パーティクルの更新・インスタンス登録
-	for (auto particleIterator = particles.begin(); particleIterator != particles.end(); ) {
+	for (auto particleIterator = particles_.begin(); particleIterator != particles_.end(); ) {
 
 		// 寿命が尽きたパーティクルを削除
 		if (particleIterator->lifeTime <= particleIterator->currentTime) {
-			particleIterator = particles.erase(particleIterator);
+			particleIterator = particles_.erase(particleIterator);
 			continue;
 		}
 
@@ -84,7 +86,7 @@ void Particles::Update(Camera& useCamera) {
 		Matrix4x4 scaleMatrix = MakeScaleMatrix(particleIterator->transform.scale);
 		Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->transform.translate);
 
-		Matrix4x4 rotationMatrix = useBillboard
+		Matrix4x4 rotationMatrix = useBillboard_
 			? billboardMatrix
 			: MakeRotateXYZMatrix(particleIterator->transform.rotate);
 
@@ -101,21 +103,21 @@ void Particles::Update(Camera& useCamera) {
 		Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
 
 		// パーティクルの更新処理
-		if (isMove) {
-			if (useField)
+		if (isMove_) {
+			if (useField_)
 			{
 				// Fieldの範囲内のParticleには加速度を適用する
-				if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
-					(*particleIterator).velocity.x += accelerationField.acceleration.x * kDeltaTime;
-					(*particleIterator).velocity.y += accelerationField.acceleration.y * kDeltaTime;
-					(*particleIterator).velocity.z += accelerationField.acceleration.z * kDeltaTime;
+				if (IsCollision(accelerationField_.area, (*particleIterator).transform.translate)) {
+					(*particleIterator).velocity.x += accelerationField_.acceleration.x * kDeltaTime_;
+					(*particleIterator).velocity.y += accelerationField_.acceleration.y * kDeltaTime_;
+					(*particleIterator).velocity.z += accelerationField_.acceleration.z * kDeltaTime_;
 				}
 			}
 
-			particleIterator->transform.translate.x += particleIterator->velocity.x * kDeltaTime;
-			particleIterator->transform.translate.y += particleIterator->velocity.y * kDeltaTime;
-			particleIterator->transform.translate.z += particleIterator->velocity.z * kDeltaTime;
-			particleIterator->currentTime += kDeltaTime;
+			particleIterator->transform.translate.x += particleIterator->velocity.x * kDeltaTime_;
+			particleIterator->transform.translate.y += particleIterator->velocity.y * kDeltaTime_;
+			particleIterator->transform.translate.z += particleIterator->velocity.z * kDeltaTime_;
+			particleIterator->currentTime += kDeltaTime_;
 		}
 
 		float alpha = 0.0f;
@@ -128,12 +130,12 @@ void Particles::Update(Camera& useCamera) {
 		}
 
 		// 描画データに登録
-		if (numInstance < kMaxNumInstance) {
-			instanceData[numInstance].WVP = worldViewProjectionMatrix;
-			instanceData[numInstance].World = worldMatrix;
-			instanceData[numInstance].color = particleIterator->color;
-			instanceData[numInstance].color.w = alpha;
-			++numInstance;
+		if (numInstance_ < kMaxNumInstance_) {
+			instanceData_[numInstance_].WVP = worldViewProjectionMatrix;
+			instanceData_[numInstance_].World = worldMatrix;
+			instanceData_[numInstance_].color = particleIterator->color;
+			instanceData_[numInstance_].color.w = alpha;
+			++numInstance_;
 		}
 
 		++particleIterator;
@@ -148,7 +150,27 @@ void Particles::Draw() {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	// PSOを設定
-	commandList_->SetPipelineState(graphicsPipelineState_.Get());
+	switch (blendMode_)
+	{
+	case kBlendModeNone:
+		commandList_->SetPipelineState(graphicsPipelineStateNone_.Get());
+		break;
+	case kBlendModeNormal:
+		commandList_->SetPipelineState(graphicsPipelineStateNormal_.Get());
+		break;
+	case kBlendModeAdd:
+		commandList_->SetPipelineState(graphicsPipelineStateAdd_.Get());
+		break;
+	case kBlendModeSubtract:
+		commandList_->SetPipelineState(graphicsPipelineStateSubtract_.Get());
+		break;
+	case kBlendModeMultily:
+		commandList_->SetPipelineState(graphicsPipelineStateMultily_.Get());
+		break;
+	case kBlendModeScreen:
+		commandList_->SetPipelineState(graphicsPipelineStateScreen_.Get());
+		break;
+	}
 	// プリミティブトポロジーを設定
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -165,8 +187,8 @@ void Particles::Draw() {
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
 	// 描画！ (DrawCall/ドローコール)
-	if (numInstance > 0) {
-		commandList_->DrawIndexedInstanced(6, numInstance, 0, 0, 0);
+	if (numInstance_ > 0) {
+		commandList_->DrawIndexedInstanced(6, numInstance_, 0, 0, 0);
 	}
 	
 }
@@ -176,13 +198,20 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Begin(objectName);
 
 	ImGui::Text("ChecBox");
-	ImGui::Checkbox("isMove", &isMove);
-	ImGui::Checkbox("useBillboard", &useBillboard);
-	ImGui::Checkbox("useField", &useField);
+	ImGui::Checkbox("isMove", &isMove_);
+	ImGui::Checkbox("useBillboard", &useBillboard_);
+	ImGui::Checkbox("useField", &useField_);
 
 	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 
-	ImGui::DragFloat3("Emitter", &emitter.transform.translate.x, 0.01f);
+	const char* directionLabels[] = { "None", "Normal", "Add","Subtract","Multily" ,"Screen" };
+	int current = static_cast<int>(blendMode_);
+	ImGui::Combo("BlendMode", &current, directionLabels, 6);
+	blendMode_ = static_cast<BlendMode>(current);
+
+	ImGui::DragFloat3("Emitter", &emitter_.transform.translate.x, 0.01f);
+	ImGui::DragInt("GenerateCount", &spawnCount_, 1.0f, 0, 100);
+	ImGui::DragFloat("GenerateInterval", &emitter_.frequency, 0.001f, 0.0f, 1.0f);
 
 	ImGui::End();
 
@@ -289,7 +318,7 @@ void Particles::CreateMaterialResource() {
 }
 
 void Particles::CreateTransformationResource() {
-	for (uint32_t i = 0; i < kMaxNumInstance; i++) {
+	for (uint32_t i = 0; i < kMaxNumInstance_; i++) {
 		transformationResource_[i] = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU));
 		transformationResource_[i]->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_[i]));
 		transformationData_[i]->WVP = MakeIdentityMatrix();
@@ -299,14 +328,14 @@ void Particles::CreateTransformationResource() {
 
 	//instancingResource_->Unmap(0, nullptr);
 	// --- Instancing用 StructuredBuffer をまとめて1つ作成 ---
-	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxNumInstance);
+	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxNumInstance_);
 	// SRV設定（StructuredBufferとして使う）
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = kMaxNumInstance;
+	srvDesc.Buffer.NumElements = kMaxNumInstance_;
 	srvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
@@ -333,7 +362,7 @@ void Particles::CreatePSO() {
 	CreateRootSignature();
 	InputLayoutSet();
 	CompileShaders();
-	BlendStateSet(blendMode);
+	BlendStateSet();
 	RasiterzerStateSet();
 	DepthStencilStateSet();
 
@@ -342,7 +371,7 @@ void Particles::CreatePSO() {
 	graphicsPipelineStateDesc_.InputLayout = inputLayoutDesc_;
 	graphicsPipelineStateDesc_.VS = { vertexShaderBlob_->GetBufferPointer(), vertexShaderBlob_->GetBufferSize() };
 	graphicsPipelineStateDesc_.PS = { pixelShaderBlob_->GetBufferPointer(), pixelShaderBlob_->GetBufferSize() };
-	graphicsPipelineStateDesc_.BlendState = blendDesc_;
+	graphicsPipelineStateDesc_.BlendState = blendDescNone_;
 	graphicsPipelineStateDesc_.RasterizerState = rasterizerDesc_;
 	graphicsPipelineStateDesc_.NumRenderTargets = 1; // 書き込み先のRTVの情報
 	graphicsPipelineStateDesc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -354,7 +383,27 @@ void Particles::CreatePSO() {
 	graphicsPipelineStateDesc_.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	// 実際に生成
-	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineState_));
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineStateNone_));
+	assert(SUCCEEDED(hr_));
+
+	graphicsPipelineStateDesc_.BlendState = blendDescNormal_;
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineStateNormal_));
+	assert(SUCCEEDED(hr_));
+
+	graphicsPipelineStateDesc_.BlendState = blendDescAdd_;
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineStateAdd_));
+	assert(SUCCEEDED(hr_));
+
+	graphicsPipelineStateDesc_.BlendState = blendDescSubtract_;
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineStateSubtract_));
+	assert(SUCCEEDED(hr_));
+
+	graphicsPipelineStateDesc_.BlendState = blendDescMultily_;
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineStateMultily_));
+	assert(SUCCEEDED(hr_));
+
+	graphicsPipelineStateDesc_.BlendState = blendDescScreen_;
+	hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineStateScreen_));
 	assert(SUCCEEDED(hr_));
 }
 
@@ -478,56 +527,63 @@ void Particles::CompileShaders() {
 	assert(pixelShaderBlob_ != nullptr);
 }
 
-void Particles::BlendStateSet(BlendMode blendMode) {
-	// 全色成分を書き込む
-	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	blendDesc_.RenderTarget[0].BlendEnable = TRUE;
+void Particles::BlendStateSet() {
+	// kBlendModeNone:
+	blendDescNone_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDescNone_.RenderTarget[0].BlendEnable = FALSE;
+	blendDescNone_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDescNone_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDescNone_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
-	switch (blendMode) {
-	case kBlendModeNone:
-		blendDesc_.RenderTarget[0].BlendEnable = FALSE;
-		break;
+	// kBlendModeNormal:
+	blendDescNormal_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDescNormal_.RenderTarget[0].BlendEnable = TRUE;
+	blendDescNormal_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDescNormal_.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDescNormal_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDescNormal_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDescNormal_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDescNormal_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
-	case kBlendModeNormal:
-		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		break;
+	// kBlendModeAdd:
+	blendDescAdd_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDescAdd_.RenderTarget[0].BlendEnable = TRUE;
+	blendDescAdd_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDescAdd_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDescAdd_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDescAdd_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDescAdd_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDescAdd_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
-	case kBlendModeAdd:
-		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		break;
+	// kBlendModeSubtract:
+	blendDescSubtract_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDescSubtract_.RenderTarget[0].BlendEnable = TRUE;
+	blendDescSubtract_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDescSubtract_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDescSubtract_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+	blendDescSubtract_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDescSubtract_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDescSubtract_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
-	case kBlendModeSubtract:
-		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT; // 減算
-		break;
+	// kBlendModeMultily:
+	blendDescMultily_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDescMultily_.RenderTarget[0].BlendEnable = TRUE;
+	blendDescMultily_.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+	blendDescMultily_.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+	blendDescMultily_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDescMultily_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDescMultily_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDescMultily_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
-	case kBlendModeMultily:
-		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		break;
-
-	case kBlendModeScreen:
-		blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
-		blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		break;
-
-	default:
-		// 無効なモードは無効化
-		blendDesc_.RenderTarget[0].BlendEnable = FALSE;
-		break;
-	}
-
-	// アルファブレンド設定（基本固定でOK）
-	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	// kBlendModeScreen:
+	blendDescScreen_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDescScreen_.RenderTarget[0].BlendEnable = TRUE;
+	blendDescScreen_.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
+	blendDescScreen_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDescScreen_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDescScreen_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDescScreen_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDescScreen_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 }
 
 void Particles::RasiterzerStateSet() {

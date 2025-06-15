@@ -25,9 +25,6 @@ void Sprite::Initialize(SpriteData* spriteData, const std::string& fileName) {
 }
 
 void Sprite::Update() {
-	//transform_.translate.x = position_.x;
-	//transform_.translate.y = position_.y;
-
 	//Sprite用のWorldViewProjectionMatrixを作る
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 viewMatrix = MakeIdentityMatrix();
@@ -66,8 +63,8 @@ void Sprite::DrawImGui(const char* objectName) {
 
 	ImGui::Text("Transform");
 	ImGui::DragFloat3("translate", &transform_.translate.x, 1.f);
-	ImGui::DragFloat3("rotate", &transform_.rotate.x, 1.f);
-	ImGui::DragFloat3("scale", &transform_.scale.x, 1.f);
+	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f, 0.0f, 10.0f);
 
 	ImGui::Text("ColorEdit");
 	ImGui::ColorEdit4("Color", &materialData_->color.x);

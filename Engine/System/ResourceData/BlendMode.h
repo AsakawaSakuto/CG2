@@ -13,6 +13,4 @@ enum BlendMode {
 	kBlendModeMultily,
 	// スクリーン
 	kBlendModeScreen,
-	// 利用してはいけない
-	kCountOfBlendMode,
 };

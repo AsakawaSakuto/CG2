@@ -24,4 +24,6 @@ private:
 	Input* input_ = nullptr;
 	float wheel;
 	float scrollSpeed;
+	float moveSpeedMultiplier;
+	float rotateSpeedMultiplier;
 };

@@ -1,6 +1,11 @@
 #include "GameScene.h"
 
 void GameScene::Initialize() {
+
+	char path[MAX_PATH];
+	GetCurrentDirectoryA(MAX_PATH, path);
+	OutputDebugStringA((std::string("CWD: ") + path + "\n").c_str());
+
 	// main関数の先頭でCOMを初期化 03_00
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
@@ -21,25 +26,19 @@ void GameScene::Initialize() {
 	input->Initialize(winApp);
 
 	debugCamera->SetInput(input);
-
+	
 	spriteData->Initialize(dxCommon);
 
-	sprite->Initialize(spriteData, "resources/image/uvChecker.png");
+	sprite->Initialize(spriteData, "resources/engineResources/uvChecker.png");
 
-	sprite2->Initialize(spriteData, "resources/image/monsterBall.png");
-
-	sprite3->Initialize(spriteData, "resources/image/white16x16.png");
-
-	object3dData->Initialize(dxCommon);
-	
-	model->Initialize(object3dData, "resources/object3d/monkey.obj");
+	model->Initialize(dxCommon, "resources/object3d/monkey.obj");
+	//model->SetTexture("resources/engineResources/white16x16.png");
 	model->SetPosition({ -2.f,0.f,0.f });
-	//model->SetTexture("resources/engineResources/uvChecker.png");
 
-	model2->Initialize(object3dData, "resources/object3d/monkey.obj");
+	model2->Initialize(dxCommon, "resources/object3d/monkey.obj");
 	model2->SetTexture("resources/engineResources/white16x16.png");
 
-	skydome->Initialize(object3dData, "resources/object3d/skydome.obj");
+	skydome->Initialize(dxCommon, "resources/object3d/skydome.obj");
 	//skydome->SetTexture("resources/image/Skydome.png");
 
 	audio->Initialize("resources/sound/fanfare.wav");
@@ -48,15 +47,14 @@ void GameScene::Initialize() {
 
 	sphereData->Initialize(dxCommon);
 
-	sphere->Initialize(sphereData, "resources/image/uvChecker.png");
+	sphere->Initialize(sphereData, "resources/engineResources/uvChecker.png");
 
-	fenceModel->Initialize(object3dData, "resources/object3d/fence.obj");
+	fenceModel->Initialize(dxCommon, "resources/object3d/fence.obj");
 	fenceModel->SetTexture("resources/image/fence.png");
 
 	triangle->Initialize(dxCommon);
 
-	particles->Initialize(dxCommon);
-	particles->SetTexture("resources/image/circle.png");
+	particles->Initialize(dxCommon, "resources/image/circle.png");
 }
 
 void GameScene::Update() {
@@ -98,17 +96,28 @@ void GameScene::Update() {
 		}
 	}
 
+	if (particlesTexture) {
+		particles->SetTexture("resources/image/circle.png");
+	} else {
+		particles->SetTexture("resources/engineResources/uvChecker.png");
+	}
+
+	if (modelTexture) {
+		model->SetTexture("resources/engineResources/white16x16.png");
+	} else {
+		model->SetTexture("resources/engineResources/uvChecker.png");
+	}
+
+	sprite->Update();
 
 	//fenceModel->Update(*useCamera);
+	//model2->Update(*useCamera);
 	model->Update(*useCamera);
-	model2->Update(*useCamera);
+	skydome->SetColor({ 1.0f,1.0f,1.0f,0.5f });
 	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
 	//sphere->Update(*useCamera);
 	//triangle->Update();
-	//sprite->Update();
-	//sprite2->Update();
-	//sprite3->Update();
 }
 
 void GameScene::Draw() {
@@ -121,16 +130,16 @@ void GameScene::Draw() {
 
 	//fenceModel->Draw();
 	//sphere->Draw();
-	//sprite3->Draw();
-	//sprite2->Draw();
+	//model2->Draw();
+	//triangle->Draw();
+
 	skydome->Draw();
 	model->Draw();
-	//model2->Draw();
 	particles->Draw();
-	//triangle->Draw();
-	//sprite->Draw();
 
 	//sphere->Draw();
+
+	sprite->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -149,34 +158,37 @@ void GameScene::Draw() {
 
 	// --- ImGuiカメラコントローラ ---
 
-	ImGui::Begin("Camera Control");
+	ImGui::Begin("GameScene Control");
 
 	if (isDebugCamera) {
+
 		ImGui::Text("Debug Camera");
 		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
 
-		debugCamera->DrawImgui();
-
-		//fenceModel->DrawImGui("fence");
-		//sphere->DrawImGui("Sphere");
-		model->DrawImGui("monkey");
-		//model2->DrawImGui("monkey2");
-		particles->DrawImGui("particles");
-		//triangle->DrawImGui("triangle");
-		//sprite->DrawImGui("sprite");
-		//sprite2->DrawImGui("sprite2");
+		ImGui::Checkbox("particleTexture", &particlesTexture);
+		ImGui::Checkbox("monkeyTexture", &modelTexture);
 
 		ImGui::Text("LoadTexture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
 		ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
 		ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
+
 	} else {
+
 		ImGui::Text("Normal Camera");
-		ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
-		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
 		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
+		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
+		ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
+
 	}
 
 	ImGui::End();
+
+	debugCamera->DrawImgui();
+	model->DrawImGui("monkey");
+	particles->DrawImGui("particles");
+	skydome->DrawImGui("Skydome");
+
+	sprite->DrawImGui("Sprite");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
@@ -225,23 +237,8 @@ void GameScene::Finalize() {
 	delete winApp;
 	winApp = nullptr;
 
-	delete sprite;
-	sprite = nullptr;
-
-	delete sprite2;
-	sprite2 = nullptr;
-
-	delete sprite3;
-	sprite3 = nullptr;
-
-	delete spriteData;
-	spriteData = nullptr;
-
 	delete model;
 	model = nullptr;
-
-	delete object3dData;
-	object3dData = nullptr;
 
 	delete audio;
 	audio = nullptr;
@@ -254,6 +251,9 @@ void GameScene::Finalize() {
 
 	delete sphereData;
 	sphereData = nullptr;
+
+	delete particles;
+	particles = nullptr;
 
 	///
 	/// ↑描画処理ここまで

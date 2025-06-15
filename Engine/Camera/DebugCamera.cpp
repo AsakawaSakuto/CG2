@@ -4,6 +4,8 @@
 #include "externals/imgui/imgui_impl_win32.h"
 
 DebugCamera::DebugCamera() {
+	moveSpeedMultiplier = 1.0f;
+	rotateSpeedMultiplier = 1.0f;
 	transform_ = { {1.f,1.f,1.f},{0.f,0.f,0.f},{0.f,0.f,-10.f} };
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = InverseMatrix(worldMatrix_);
@@ -26,8 +28,8 @@ void DebugCamera::Update() {
 	if (!ImGui::GetIO().WantCaptureMouse && input_->PushMouseButtonL()) {
 		Vector2 delta = input_->GetMouseDelta();
 		float rotateSpeed = 0.001f;
-		transform_.rotate.y += delta.x * rotateSpeed;
-		transform_.rotate.x += delta.y * rotateSpeed;
+		transform_.rotate.y += delta.x * rotateSpeed * rotateSpeedMultiplier;
+		transform_.rotate.x += delta.y * rotateSpeed * rotateSpeedMultiplier;
 	}
 
 	if (input_->PushKey(DIK_R)) {
@@ -42,31 +44,31 @@ void DebugCamera::Update() {
 	}
 
 	if (input_->PushKey(DIK_A)) {
-		transform_.translate.x -= 0.05f;
+		transform_.translate.x -= 0.05f * moveSpeedMultiplier;
 	}
 	if (input_->PushKey(DIK_D)) {
-		transform_.translate.x += 0.05f;
+		transform_.translate.x += 0.05f * moveSpeedMultiplier;
 	}
 	if (input_->PushKey(DIK_W)) {
-		transform_.translate.y += 0.05f;
+		transform_.translate.y += 0.05f * moveSpeedMultiplier;
 	}
 	if (input_->PushKey(DIK_S)) {
-		transform_.translate.y -= 0.05f;
+		transform_.translate.y -= 0.05f * moveSpeedMultiplier;
 	}
 
 	wheel = input_->GetWheelDelta();
-	scrollSpeed = 0.5f;
+	scrollSpeed = 0.5f * moveSpeedMultiplier;
 
 	switch (moveDirection)
 	{
 	case MOVE_X:
-		transform_.translate.x += wheel * scrollSpeed;
+		transform_.translate.x += wheel * scrollSpeed * moveSpeedMultiplier;
 		break;
 	case MODE_Y:
-		transform_.translate.y += wheel * scrollSpeed;
+		transform_.translate.y += wheel * scrollSpeed * moveSpeedMultiplier;
 		break;
 	case MOVE_Z:
-		transform_.translate.z += wheel * scrollSpeed;
+		transform_.translate.z += wheel * scrollSpeed * moveSpeedMultiplier;
 		break;
 	}
 
@@ -86,6 +88,9 @@ void DebugCamera::DrawImgui() {
     int current = static_cast<int>(moveDirection);
     ImGui::Combo("Move Axis", &current, directionLabels, 3);
     moveDirection = static_cast<MoveDirection>(current);
+
+	ImGui::DragFloat("MoveMultiplier", &moveSpeedMultiplier, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("RotateMultiplier", &rotateSpeedMultiplier, 0.01f, 0.0f, 10.0f);
 
 	ImGui::End();
 }

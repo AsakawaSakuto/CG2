@@ -15,7 +15,6 @@
 #include "Sprite.h"
 #include "SpriteData.h"
 #include "Object3d.h"
-#include "Object3dData.h"
 #include "Sphere.h"
 #include "SphereData.h"
 #include "Triangle.h"
@@ -45,6 +44,7 @@ public:
 
 private:
 	bool endRequst_ = false;
+
 	MSG msg{};
 
 	WinApp* winApp = new WinApp();
@@ -60,12 +60,6 @@ private:
 	SpriteData* spriteData = new SpriteData();
 
 	Sprite* sprite = new Sprite();
-
-	Sprite* sprite2 = new Sprite();
-
-	Sprite* sprite3 = new Sprite();
-
-	Object3dData* object3dData = new Object3dData();
 
 	Object3d* model = new Object3d();
 
@@ -89,6 +83,9 @@ private:
 
 	Camera* camera = new Camera();
 	DebugCamera* debugCamera = new DebugCamera();
-	Camera* useCamera = new Camera();
+	Camera* useCamera = nullptr;
 	bool isDebugCamera = true;
+
+	bool modelTexture = true;
+	bool particlesTexture = true;
 };

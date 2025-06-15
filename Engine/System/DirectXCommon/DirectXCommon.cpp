@@ -276,6 +276,10 @@ void DirectXCommon::CreateImgui() {
 }
 
 void DirectXCommon::PreDraw() {
+  
+    /*commandAllocator_->Reset();
+    commandList_->Reset(commandAllocator_.Get(), nullptr);*/
+
     // これから書き込むバックバッファのインデックスを取得
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
     // TransitionBarrierの設定 *backBufferIndexを取得した直後、RenderTargetを設定する前に行う
@@ -316,7 +320,11 @@ void DirectXCommon::PreDraw() {
 }
 
 void DirectXCommon::PostDraw() {
-    //assert(commandList_ != nullptr);   
+    if (!commandList_) {
+        OutputDebugStringA("commandList_ is null! PostDraw aborted.\n");
+        return; // これでクラッシュ防止（仮対応）
+    }
+    assert(commandList_ != nullptr);   
 
     // 諸諸の処理が終わった後にコマンドを積む、GUIは画面の最前面に映すので最後の描画
     // ただしResourceBarrierによってD3D12_RESOURCE_STATE_RENDER_TARGET→D3D12_RESOURCE_STATE_PRESENTへ遷移させる前
@@ -423,12 +431,12 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
 #pragma region 2 Compileする
 
     LPCWSTR arguments[] = {
-        filePath.c_str(),    // コンパイル対象のhlslファイル名
-        L"-E", L"main",      // エントリーポイントの指定。基本的にmain以外にはしない
-        L"-T", profile,      // ShaderProfileの設定
-        L"-Zi", L"-Qembed_debug", // デバッグ用の情報を埋め込む
-        L"-Od",              // 最適化を外しておく
-        L"-Zpr",             // メモリレイアウトは行優先
+     filePath.c_str(),             // コンパイル対象のhlslファイル名
+     L"-E", L"main",               // エントリーポイントの指定
+     L"-T", profile,               // ShaderProfileの設定
+     L"-Zi", L"-Qembed_debug",     // デバッグ用の情報を埋め込む
+     L"-Od",                       // 最適化を外しておく
+     L"-Zpr",                      // メモリレイアウトは行優先
     };
 
     // 実際にShaderをコンパイルする
@@ -452,6 +460,7 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
     ComPtr<IDxcBlobUtf8> shaderError = nullptr;
     shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
     if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+        OutputDebugStringA(shaderError->GetStringPointer()); // ←これ追加
         Logger::Log(shaderError->GetStringPointer());
         // 署名：エラーメッセタイ
         assert(false);

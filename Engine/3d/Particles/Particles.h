@@ -32,15 +32,14 @@
 #include <numbers>
 #pragma endregion
 
-struct AABB
-{
+struct AABB {
 	Vector3 min; // 最小点
 	Vector3 max; // 最大点
 };
 
 struct AccelerationField {
-	Vector3 acceleration; //< 加速度
-	AABB area;            //< 範囲
+	Vector3 acceleration; // 加速度
+	AABB area;            // 範囲
 };
 
 bool IsCollision(const AABB& aabb, const Vector3& point);
@@ -51,7 +50,7 @@ class Particles
 public:
 
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName);
 
 	// 更新 パーティクルの動きや行列更新
 	void Update(Camera& useCamera);
@@ -65,36 +64,40 @@ public:
 	// テクスチャの設定（描画用）
 	void SetTexture(const std::string& textureName);
 
-	void SetEmitter(const Vector3& translete) { emitter.transform.translate = translete; }
+	void SetBlendMode(BlendMode blendMode) { blendMode_ = blendMode; }
+
+	void SetEmitter(const Vector3& translete) { emitter_.transform.translate = translete; }
 private:
-	AccelerationField  accelerationField;
+	AccelerationField  accelerationField_;
 	// パーティクルが動くかどうかのフラグ
-	bool isMove = true;
-	bool useBillboard = false;
-	bool useField = false;
+	bool isMove_ = true;
+	bool useBillboard_ = false;
+	bool useField_ = false;
 	// 1フレームの固定デルタタイム
-	const float kDeltaTime = 1.0f / 60.0f;
+	const float kDeltaTime_ = 1.0f / 60.0f;
 
 	// パーティクルの数
-	uint32_t numInstance = 0;
-	uint32_t kMaxNumInstance = 100;
+	uint32_t numInstance_ = 0;
+	uint32_t kMaxNumInstance_ = 100;
 	
-	ParticleForGPU* instanceData = nullptr;
+	ParticleForGPU* instanceData_ = nullptr;
 
 
 	ParticleData MakeNewParticle(std::mt19937& rand, const Vector3& translate);
 
 	// パーティクル本体のデータ
-	std::list<ParticleData> particles;
+	std::list<ParticleData> particles_;
 
 	// 使用するテクスチャ名
 	std::string textureName_;
 
-	BlendMode blendMode;
+	BlendMode blendMode_;
 
 	std::list<ParticleData> Emit(const Emitter& emitter, std::mt19937& rand);
 
-	Emitter emitter;
+	Emitter emitter_;
+
+	int spawnCount_;
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 
@@ -153,7 +156,12 @@ private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_;
 
 	// 作成済みPSO
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateNone_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateNormal_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateAdd_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateSubtract_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateMultily_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateScreen_;
 
 	// 頂点入力レイアウト情報
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3];
@@ -164,7 +172,13 @@ private:
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
 
 	// 各種ステート設定
-	D3D12_BLEND_DESC blendDesc_;                 // ブレンドステート
+	D3D12_BLEND_DESC blendDescNone_;
+	D3D12_BLEND_DESC blendDescNormal_;
+	D3D12_BLEND_DESC blendDescAdd_;
+	D3D12_BLEND_DESC blendDescSubtract_;
+	D3D12_BLEND_DESC blendDescMultily_;
+	D3D12_BLEND_DESC blendDescScreen_;
+
 	D3D12_RASTERIZER_DESC rasterizerDesc_;       // ラスタライザステート
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_;  // 深度ステンシルステート
 
@@ -173,7 +187,7 @@ private:
 	void CreateRootSignature();
 	void InputLayoutSet();
 	void CompileShaders();
-	void BlendStateSet(BlendMode blendMode);
+	void BlendStateSet();
 	void RasiterzerStateSet();
 	void DepthStencilStateSet();
 
