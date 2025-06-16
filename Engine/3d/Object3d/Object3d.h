@@ -21,6 +21,7 @@
 #include"DirectionalLight.h"
 #include"TextureManager.h"
 #include"Camera.h"
+#include"CameraForGPU.h"
 #include"MatrixFunction.h"
 
 class Object3d {
@@ -77,6 +78,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;           // マテリアルリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;     // 行列リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;   // ライトリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 
 	// 各種リソースのCPU側ポインタ
 
@@ -84,6 +86,9 @@ private:
 	Material* materialData_ = nullptr;                   // マテリアルデータ
 	TransformationMatrix* transformationData_ = nullptr; // 行列データ
 	DirectionalLight* directionalLightData_ = nullptr;   // ライトデータ
+	CameraForGPU* cameraData_ = nullptr;
+
+	DirectionalLight directionalLight_ = {};
 
 	// 頂点バッファ・インデックスバッファのビュー設定
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
@@ -94,6 +99,7 @@ private:
 	void CreateMaterialResource();           // マテリアルバッファ生成
 	void CreateTransformationResource();     // 行列バッファ生成
 	void CreateDirectionalLightResource();   // ライトバッファ生成
+	void CreateCameraResource();
 
 	HRESULT hr_;  // エラー確認用変数
 

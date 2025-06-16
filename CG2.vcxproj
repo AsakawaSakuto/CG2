@@ -124,6 +124,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\2d\Triangle\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\System\ResourceData\BlendMode.h" />
     <ClInclude Include="Emitter.h" />
     <ClInclude Include="Engine\3d\Particles\ParticleData.h" />

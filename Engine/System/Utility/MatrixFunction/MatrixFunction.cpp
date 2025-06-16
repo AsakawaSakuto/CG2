@@ -311,3 +311,15 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	result.m[3][3] = 1.0f;
 	return result;
 }
+
+Matrix4x4 TransposeMatrix(const Matrix4x4& m) {
+	Matrix4x4 result;
+
+	for (int row = 0; row < 4; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			result.m[row][col] = m.m[col][row];
+		}
+	}
+
+	return result;
+}

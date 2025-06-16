@@ -27,25 +27,25 @@ void GameScene::Initialize() {
 
 	debugCamera->SetInput(input.get());
 	
-	spriteData->Initialize(dxCommon.get());
+	//spriteData->Initialize(dxCommon.get());
 
-	sprite->Initialize(spriteData.get(), "resources/engineResources/uvChecker.png");
+	//sprite->Initialize(spriteData.get(), "resources/engineResources/uvChecker.png");
 	//sprite->SetPosition({ 896.0f,128.0f });
-
-	sprite2->Initialize(spriteData.get(), "resources/image/skydome.png");
-	sprite2->SetPosition({ 128.0f,128.0f });
-
-	sprite3->Initialize(spriteData.get(), "resources/image/monsterBall.png");
-	sprite3->SetPosition({ 384.0f,128.0f });
-
-	sprite4->Initialize(spriteData.get(), "resources/image/star.png");
-	sprite4->SetPosition({ 640.0f,128.0f });
+	//
+	//sprite2->Initialize(spriteData.get(), "resources/image/skydome.png");
+	//sprite2->SetPosition({ 128.0f,128.0f });
+	//
+	//sprite3->Initialize(spriteData.get(), "resources/image/monsterBall.png");
+	//sprite3->SetPosition({ 384.0f,128.0f });
+	//
+	//sprite4->Initialize(spriteData.get(), "resources/image/star.png");
+	//sprite4->SetPosition({ 640.0f,128.0f });
 
 	model->Initialize(dxCommon.get(), "resources/object3d/monkey.obj");
 	model->SetPosition({ -2.f,0.f,0.f });
 
-	model2->Initialize(dxCommon.get(), "resources/object3d/monkey.obj");
-	model2->SetTexture("resources/engineResources/white16x16.png");
+	model2->Initialize(dxCommon.get(), "resources/object3d/sphere.obj");
+	model2->SetTexture("resources/image/monsterBall2.png");
 
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj");
 	//skydome->SetTexture("resources/image/Skydome.png");
@@ -54,14 +54,14 @@ void GameScene::Initialize() {
 
 	audio2->Initialize("resources/sound/start.wav");
 
-	sphereData->Initialize(dxCommon.get());
+	//sphereData->Initialize(dxCommon.get());
 
-	sphere->Initialize(sphereData.get(), "resources/engineResources/uvChecker.png");
+	//sphere->Initialize(sphereData.get(), "resources/engineResources/uvChecker.png");
 
 	fenceModel->Initialize(dxCommon.get(), "resources/object3d/fence.obj");
 	fenceModel->SetTexture("resources/image/fence.png");
 
-	triangle->Initialize(dxCommon.get());
+	//triangle->Initialize(dxCommon.get());
 
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
 }
@@ -117,17 +117,17 @@ void GameScene::Update() {
 		model->SetTexture("resources/engineResources/uvChecker.png");
 	}
 
-	sprite->Update();
-	sprite2->Update();
-	sprite3->Update();
-	sprite4->Update();
+	//sprite->Update();
+	//sprite2->Update();
+	//sprite3->Update();
+	//sprite4->Update();
 
 	model->Update(*useCamera);
+	model2->Update(*useCamera);
 	skydome->SetColor({ 1.0f,1.0f,1.0f,0.5f });
 	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
 	//fenceModel->Update(*useCamera);
-	//model2->Update(*useCamera);
 	//sphere->Update(*useCamera);
 	//triangle->Update();
 }
@@ -142,15 +142,15 @@ void GameScene::Draw() {
 
 	//fenceModel->Draw();
 	//sphere->Draw();
-	//model2->Draw();
 	//triangle->Draw();
 	//sphere->Draw();
 
 	skydome->Draw();
 	model->Draw();
+	model2->Draw();
 	particles->Draw();
 
-	sprite->Draw();
+	//sprite->Draw();
 	//sprite2->Draw();
 	//sprite3->Draw();
 	//sprite4->Draw();
@@ -198,10 +198,11 @@ void GameScene::Draw() {
 
 	debugCamera->DrawImgui();
 	model->DrawImGui("monkey");
+	model2->DrawImGui("sphere");
 	particles->DrawImGui("particles");
 	skydome->DrawImGui("Skydome");
 
-	sprite->DrawImGui("Sprite");
+	//sprite->DrawImGui("Sprite");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

@@ -50,11 +50,8 @@ private:
 	unique_ptr<Input> input = make_unique<Input>();
 
 	// Sprites
-	unique_ptr<SpriteData> spriteData = make_unique<SpriteData>();
-	unique_ptr<Sprite> sprite = make_unique<Sprite>();
-	unique_ptr<Sprite> sprite2 = make_unique<Sprite>();
-	unique_ptr<Sprite> sprite3 = make_unique<Sprite>();
-	unique_ptr<Sprite> sprite4 = make_unique<Sprite>();
+	//unique_ptr<SpriteData> spriteData = make_unique<SpriteData>();
+	//unique_ptr<Sprite> sprite = make_unique<Sprite>();
 
 	// 3D Objects
 	unique_ptr<Object3d> model = make_unique<Object3d>();
@@ -67,9 +64,9 @@ private:
 	unique_ptr<Audio> audio2 = make_unique<Audio>();
 
 	// Other render objects
-	unique_ptr<SphereData> sphereData = make_unique<SphereData>();
-	unique_ptr<Sphere> sphere = make_unique<Sphere>();
-	unique_ptr<Triangle> triangle = make_unique<Triangle>();
+	//unique_ptr<SphereData> sphereData = make_unique<SphereData>();
+	//unique_ptr<Sphere> sphere = make_unique<Sphere>();
+	//unique_ptr<Triangle> triangle = make_unique<Triangle>();
 	unique_ptr<Particles> particles = make_unique<Particles>();
 
 	// Cameras

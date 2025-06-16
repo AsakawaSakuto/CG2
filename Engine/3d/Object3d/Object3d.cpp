@@ -25,13 +25,22 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 
+	directionalLight_.direction = {1.0f,-1.0f,1.0f};
+
 	CreateVertexResource();
 	CreateMaterialResource();
 	CreateTransformationResource();
 	CreateDirectionalLightResource();
+	CreateCameraResource();
 }
 
 void Object3d::Update(Camera& useCamera) {
+
+	if (cameraData_) {
+		cameraData_->worldPosition = useCamera.GetTranslate(); // カメラの位置を渡す
+	}
+
+	directionalLightData_->direction = directionalLight_.direction;
 
 	// 行列の内容を更新して三角形を動かす
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
@@ -39,16 +48,32 @@ void Object3d::Update(Camera& useCamera) {
 	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
-	// シーン上で三角形を描画
+
+	// 追加処理：法線変換行列を計算
+	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
+	Matrix4x4 worldInverseTransposeMatrix = (worldInverseMatrix);
+
+	// 書き込み
 	transformationData_->WVP = worldViewProjectionMatrix;
 	transformationData_->World = worldMatrix;
+	transformationData_->WorldInverseTranspose = worldInverseTransposeMatrix;
 }
 
 void Object3d::Draw() {
 
+	OutputDebugStringA("Object3d::Draw() 開始\n");
+
+	commandList_ = dxCommon_->GetCommandList();
+	if (!commandList_) {
+		OutputDebugStringA("commandList_ is null!\n");
+		return;
+	}
+
+	OutputDebugStringA("RootSignature 設定\n");
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 	// PSOを設定
+	OutputDebugStringA("PSO 設定\n");
 	commandList_->SetPipelineState(drawMode ? graphicsPipelineStateSolid_.Get() : graphicsPipelineStateWireframe_.Get());
 	// プリミティブトポロジーを設定
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -62,6 +87,7 @@ void Object3d::Draw() {
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 	// 頂点描画（DrawIndexedではなくDrawInstanced）
 	commandList_->DrawInstanced(
@@ -93,11 +119,13 @@ void Object3d::DrawImGui(const char* objectName) {
 	ImGui::Text("ColorEdit");
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
 	ImGui::Checkbox("DrawMode", &drawMode);
-
+	
 	ImGui::Text("LightEdit");
+	ImGui::DragFloat3("Light Direction", &directionalLight_.direction.x, 0.01f, -1.0f, 1.0f);
+	directionalLight_.direction = directionalLight_.direction.Normalize();
 	ImGui::DragFloat("Intensity", &directionalLightData_->intensity, 0.01f, 0.0f, 5.0f);
-	ImGui::DragFloat3("Direction", &directionalLightData_->direction.x, 0.01f, -1.0f, 1.0f);
 	ImGui::ColorEdit4("LightColor", &directionalLightData_->color.x);
+	ImGui::DragFloat("Shininess", &materialData_->shininess, 0.1f, 0.0f, 100.0f);
 
 	ImGui::End();
 }
@@ -126,6 +154,7 @@ void Object3d::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = true;
 	materialData_->uvTransform = MakeIdentityMatrix();
+	materialData_->shininess =30.0f;
 }
 
 void Object3d::CreateTransformationResource() {
@@ -147,6 +176,13 @@ void Object3d::CreateDirectionalLightResource() {
 	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
 	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
 	directionalLightData_->intensity = 1.0f;                        // 光の強さ
+}
+
+void Object3d::CreateCameraResource() {
+	cameraResource_ = CreateBufferResource(device_.Get(), sizeof(CameraForGPU));
+	assert(cameraResource_ != nullptr);
+	HRESULT hr = cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	assert(SUCCEEDED(hr));
 }
 
 void Object3d::CreatePSO() {
@@ -212,7 +248,7 @@ void Object3d::CreateRootSignature() {
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	// RootParameter作成。複数設定できるので配列。今回は単1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	D3D12_ROOT_PARAMETER rootParameters[5] = {};
 
 	// RootParam[0] → b0: Material（PS）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -235,6 +271,10 @@ void Object3d::CreateRootSignature() {
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[3].Descriptor.ShaderRegister = 2;
 
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[4].Descriptor.ShaderRegister = 3; // Camera
+
 	// レジスタ番号0をバインド
 	descriptionRootSignature.pParameters = rootParameters;              // ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);  // 配列の長さ
@@ -249,6 +289,13 @@ void Object3d::CreateRootSignature() {
 	hr_ = dxCommon_->GetDevice()->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature_));
+
+	if (FAILED(hr_)) {
+		if (errorBlob) {
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+		}
+		assert(false); // またはエラーハンドリング
+	}
 }
 
 void Object3d::InputLayoutSet() {

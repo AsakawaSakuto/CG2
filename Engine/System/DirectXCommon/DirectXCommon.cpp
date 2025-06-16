@@ -276,9 +276,16 @@ void DirectXCommon::CreateImgui() {
 }
 
 void DirectXCommon::PreDraw() {
-  
-    /*commandAllocator_->Reset();
-    commandList_->Reset(commandAllocator_.Get(), nullptr);*/
+    //// 念のため前回使っていたコマンドリストを閉じる（Recording中対策）
+    //if (commandList_->GetType() == D3D12_COMMAND_LIST_TYPE_DIRECT) {
+    //    commandList_->Close(); // 失敗してもOK
+    //}
+
+    //hr_ = commandAllocator_->Reset();
+    //assert(SUCCEEDED(hr_));
+
+    //hr_ = commandList_->Reset(commandAllocator_.Get(), nullptr);
+    //assert(SUCCEEDED(hr_));
 
     // これから書き込むバックバッファのインデックスを取得
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();

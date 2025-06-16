@@ -320,6 +320,9 @@
     <ClInclude Include="Emitter.h">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Camera\CameraForGPU.h">
+      <Filter>ソース ファイル\Engine\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

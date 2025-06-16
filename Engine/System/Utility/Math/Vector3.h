@@ -11,6 +11,18 @@ struct Vector3 {
 	float y;
 	float z;
 
+	// 長さを返す関数
+	float Length() const {
+		return std::sqrt(x * x + y * y + z * z);
+	}
+
+	// 正規化されたVector3を返す
+	Vector3 Normalize() const {
+		float len = Length();
+		if (len == 0.0f) return { 0.0f, 0.0f, 0.0f }; // 0除算防止
+		return { x / len, y / len, z / len };
+	}
+
 	Vector3& operator=(const Vector3& other) {
 		if (this != &other) {
 			x = other.x;
