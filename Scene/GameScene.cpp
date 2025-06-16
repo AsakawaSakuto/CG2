@@ -19,51 +19,51 @@ void GameScene::Initialize() {
 	//FILE* fp;
 	//freopen_s(&fp, "CONOUT$", "w", stdout);
 
-	dxCommon->Initialize(winApp);
+	dxCommon->Initialize(winApp.get());
 
-	TextureManager::GetInstance()->Initialize(dxCommon);
+	TextureManager::GetInstance()->Initialize(dxCommon.get());
 
-	input->Initialize(winApp);
+	input->Initialize(winApp.get());
 
-	debugCamera->SetInput(input);
+	debugCamera->SetInput(input.get());
 	
-	spriteData->Initialize(dxCommon);
+	spriteData->Initialize(dxCommon.get());
 
-	sprite->Initialize(spriteData, "resources/image/fence.png");
+	sprite->Initialize(spriteData.get(), "resources/engineResources/uvChecker.png");
 	//sprite->SetPosition({ 896.0f,128.0f });
 
-	sprite2->Initialize(spriteData, "resources/image/skydome.png");
+	sprite2->Initialize(spriteData.get(), "resources/image/skydome.png");
 	sprite2->SetPosition({ 128.0f,128.0f });
 
-	sprite3->Initialize(spriteData, "resources/image/monsterBall.png");
+	sprite3->Initialize(spriteData.get(), "resources/image/monsterBall.png");
 	sprite3->SetPosition({ 384.0f,128.0f });
 
-	sprite4->Initialize(spriteData, "resources/image/star.png");
+	sprite4->Initialize(spriteData.get(), "resources/image/star.png");
 	sprite4->SetPosition({ 640.0f,128.0f });
 
-	model->Initialize(dxCommon, "resources/object3d/monkey.obj");
+	model->Initialize(dxCommon.get(), "resources/object3d/monkey.obj");
 	model->SetPosition({ -2.f,0.f,0.f });
 
-	model2->Initialize(dxCommon, "resources/object3d/monkey.obj");
+	model2->Initialize(dxCommon.get(), "resources/object3d/monkey.obj");
 	model2->SetTexture("resources/engineResources/white16x16.png");
 
-	skydome->Initialize(dxCommon, "resources/object3d/skydome.obj");
+	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj");
 	//skydome->SetTexture("resources/image/Skydome.png");
 
 	audio->Initialize("resources/sound/fanfare.wav");
 
 	audio2->Initialize("resources/sound/start.wav");
 
-	sphereData->Initialize(dxCommon);
+	sphereData->Initialize(dxCommon.get());
 
-	sphere->Initialize(sphereData, "resources/engineResources/uvChecker.png");
+	sphere->Initialize(sphereData.get(), "resources/engineResources/uvChecker.png");
 
-	fenceModel->Initialize(dxCommon, "resources/object3d/fence.obj");
+	fenceModel->Initialize(dxCommon.get(), "resources/object3d/fence.obj");
 	fenceModel->SetTexture("resources/image/fence.png");
 
-	triangle->Initialize(dxCommon);
+	triangle->Initialize(dxCommon.get());
 
-	particles->Initialize(dxCommon, "resources/image/circle.png");
+	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
 }
 
 void GameScene::Update() {
@@ -96,12 +96,12 @@ void GameScene::Update() {
 	if (isDebugCamera) {
 		if (debugCamera != nullptr) {
 			debugCamera->Update();
-			useCamera = debugCamera;
+			useCamera = debugCamera.get();
 		}
 	} else {
 		if (camera != nullptr) {
 			camera->Update();
-			useCamera = camera;
+			useCamera = camera.get();
 		}
 	}
 
@@ -151,9 +151,9 @@ void GameScene::Draw() {
 	particles->Draw();
 
 	sprite->Draw();
-	sprite2->Draw();
+	//sprite2->Draw();
 	//sprite3->Draw();
-	sprite4->Draw();
+	//sprite4->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -235,38 +235,6 @@ void GameScene::Finalize() {
 	///
 	/// ↓開放処理ここから
 	///
-
-	delete camera;
-	camera = nullptr;
-
-	delete debugCamera;
-	debugCamera = nullptr;
-
-	useCamera = nullptr;
-
-	delete input;
-	input = nullptr;
-
-	delete winApp;
-	winApp = nullptr;
-
-	delete model;
-	model = nullptr;
-
-	delete audio;
-	audio = nullptr;
-
-	delete audio2;
-	audio2 = nullptr;
-
-	delete sphere;
-	sphere = nullptr;
-
-	delete sphereData;
-	sphereData = nullptr;
-
-	delete particles;
-	particles = nullptr;
 
 	///
 	/// ↑描画処理ここまで
