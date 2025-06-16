@@ -8,8 +8,6 @@
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 
-class SpirteData;
-
 class Sprite
 {
 public:
@@ -37,7 +35,7 @@ public:
 	Vector4& GetColor() { return materialData_->color; }
 
 private:
-	SpriteData* spriteData_;
+	SpriteData* spriteData_ = nullptr;
 
 	uint32_t textureIndex_ = 0;
 
@@ -58,16 +56,16 @@ private:
 	TransformationMatrix* transformationData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_ = {};
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_ = {};
 
-	Transform transform_;
-	Vector2 position_;
-	Vector2 size_;
+	Transform transform_ = {};
+	Vector2 position_ = {};
+	Vector2 size_ = {};
 	Vector2 anchorPoint = { 0.5f,0.5f };
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = {};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = {};
 
 	void CreateVertexResource();
 	void CreateIndexResource();

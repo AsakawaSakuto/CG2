@@ -61,6 +61,12 @@ private:
 
 	Sprite* sprite = new Sprite();
 
+	Sprite* sprite2 = new Sprite();
+
+	Sprite* sprite3 = new Sprite();
+
+	Sprite* sprite4 = new Sprite();
+
 	Object3d* model = new Object3d();
 
 	Object3d* model2 = new Object3d();

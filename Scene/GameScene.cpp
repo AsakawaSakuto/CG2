@@ -29,10 +29,19 @@ void GameScene::Initialize() {
 	
 	spriteData->Initialize(dxCommon);
 
-	sprite->Initialize(spriteData, "resources/engineResources/uvChecker.png");
+	sprite->Initialize(spriteData, "resources/image/fence.png");
+	//sprite->SetPosition({ 896.0f,128.0f });
+
+	sprite2->Initialize(spriteData, "resources/image/skydome.png");
+	sprite2->SetPosition({ 128.0f,128.0f });
+
+	sprite3->Initialize(spriteData, "resources/image/monsterBall.png");
+	sprite3->SetPosition({ 384.0f,128.0f });
+
+	sprite4->Initialize(spriteData, "resources/image/star.png");
+	sprite4->SetPosition({ 640.0f,128.0f });
 
 	model->Initialize(dxCommon, "resources/object3d/monkey.obj");
-	//model->SetTexture("resources/engineResources/white16x16.png");
 	model->SetPosition({ -2.f,0.f,0.f });
 
 	model2->Initialize(dxCommon, "resources/object3d/monkey.obj");
@@ -109,13 +118,16 @@ void GameScene::Update() {
 	}
 
 	sprite->Update();
+	sprite2->Update();
+	sprite3->Update();
+	sprite4->Update();
 
-	//fenceModel->Update(*useCamera);
-	//model2->Update(*useCamera);
 	model->Update(*useCamera);
 	skydome->SetColor({ 1.0f,1.0f,1.0f,0.5f });
 	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
+	//fenceModel->Update(*useCamera);
+	//model2->Update(*useCamera);
 	//sphere->Update(*useCamera);
 	//triangle->Update();
 }
@@ -132,14 +144,16 @@ void GameScene::Draw() {
 	//sphere->Draw();
 	//model2->Draw();
 	//triangle->Draw();
+	//sphere->Draw();
 
 	skydome->Draw();
 	model->Draw();
 	particles->Draw();
 
-	//sphere->Draw();
-
 	sprite->Draw();
+	sprite2->Draw();
+	//sprite3->Draw();
+	sprite4->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -171,7 +185,6 @@ void GameScene::Draw() {
 		ImGui::Text("LoadTexture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
 		ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
 		ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
-
 	} else {
 
 		ImGui::Text("Normal Camera");
