@@ -27,7 +27,7 @@
 class Object3d {
 public:
 	// 初期化
-	void Initialize(DirectXCommon* dxCommon, const std::string& ModelPath);
+	void Initialize(DirectXCommon* dxCommon, const std::string& ModelPath, const std::string& TexrurePath);
 
 	// 更新
 	void Update(Camera& useCamera);

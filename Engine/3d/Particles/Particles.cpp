@@ -37,6 +37,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 
 	textureName_ = TextureName;
 
+	TextureManager::GetInstance()->Initialize(dxCommon_);
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	// 読み込んだテクスチャの番号を取得
@@ -340,8 +341,8 @@ void Particles::CreateTransformationResource() {
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 	// SRVハンドルの取得（Heap内の空いているスロット、ここでは例として3番）
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = GetCPUDescriptorHandle(dxCommon_->GetSRV().Get(), dxCommon_->GetDescriptorSizeSRV(), 3);
-	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRV().Get(), dxCommon_->GetDescriptorSizeSRV(), 3);
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = GetCPUDescriptorHandle(dxCommon_->GetSRV().Get(), dxCommon_->GetDescriptorSizeSRV(), 32);
+	instancingSrvHandleGPU_ = GetGPUDescriptorHandle(dxCommon_->GetSRV().Get(), dxCommon_->GetDescriptorSizeSRV(), 32);
 
 	// SRVをHeapに登録
 	device_->CreateShaderResourceView(instancingResource_.Get(), &srvDesc, handleCPU);

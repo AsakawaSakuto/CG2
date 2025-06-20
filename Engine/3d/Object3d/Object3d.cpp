@@ -7,7 +7,7 @@ using namespace Microsoft::WRL;
 
 //"resources/uvChecker.png"
 
-void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
+void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath , const std::string& TexrurePath) {
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
@@ -16,8 +16,9 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 
 	modelData_ = LoadObject3dFile(modelPath);
 
-	textureName_ = "resources/engineResources/uvChecker.png";
+	textureName_ = TexrurePath;
 
+	TextureManager::GetInstance()->Initialize(dxCommon_);
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	// 読み込んだテクスチャの番号を取得
