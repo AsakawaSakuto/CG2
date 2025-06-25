@@ -31,7 +31,7 @@ void GameScene::Initialize() {
 	ball->SetTexture("resources/image/monsterBall.png");
 	monkey->Initialize(dxCommon.get(), "resources/object3d/monkey.obj", "resources/engineResources/uvChecker.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/engineResources/uvChecker.png");
-	plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/image/GroundTexture.png");
+	plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/engineResources/uvChecker.png");
 
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
 }
@@ -156,6 +156,8 @@ void GameScene::Draw() {
 	ball->DrawImGui("ball");
 	monkey->DrawImGui("monkey");
 	skydome->DrawImGui("skydome");
+
+	plane->DrawImGui("Plane");
 
 	particles->DrawImGui("particle");
 

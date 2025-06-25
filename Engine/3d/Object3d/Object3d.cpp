@@ -33,6 +33,7 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 	CreateTransformationResource();
 	CreateDirectionalLightResource();
 	CreateCameraResource();
+	CreatePointLightResource();
 }
 
 void Object3d::Update(Camera& useCamera) {
@@ -89,6 +90,7 @@ void Object3d::Draw() {
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
 
 	// 頂点描画（DrawIndexedではなくDrawInstanced）
 	commandList_->DrawInstanced(
@@ -128,6 +130,12 @@ void Object3d::DrawImGui(const char* objectName) {
 	ImGui::ColorEdit4("LightColor", &directionalLightData_->color.x);
 	ImGui::DragFloat("Shininess", &materialData_->shininess, 0.1f, 0.0f, 100.0f);
 
+	ImGui::Text("PointLightEdit");
+	ImGui::DragFloat3("PointLightPos", &pointLightData_->position.x, 0.1f);
+	ImGui::DragFloat("PointIntensity", &pointLightData_->intensity, 0.01f, 0.0f, 5.0f);
+	ImGui::ColorEdit4("PointLightColor", &pointLightData_->color.x);
+	ImGui::DragFloat("PointLightRadius", &pointLightData_->radius, 0.01f);
+	ImGui::DragFloat("PointLightDecay", &pointLightData_->decay, 0.01f);
 	ImGui::End();
 }
 
@@ -184,6 +192,16 @@ void Object3d::CreateCameraResource() {
 	assert(cameraResource_ != nullptr);
 	HRESULT hr = cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 	assert(SUCCEEDED(hr));
+}
+
+void Object3d::CreatePointLightResource() {
+	pointLightResource_ = CreateBufferResource(device_.Get(), sizeof(PointLight));
+	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData_));
+	pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	pointLightData_->position = { 0.0f,5.0f,0.0f };
+	pointLightData_->intensity = 1.0f;
+	pointLightData_->radius = 20.0f;
+	pointLightData_->decay = 2.0f;
 }
 
 void Object3d::CreatePSO() {
@@ -249,7 +267,7 @@ void Object3d::CreateRootSignature() {
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	// RootParameter作成。複数設定できるので配列。今回は単1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[5] = {};
+	D3D12_ROOT_PARAMETER rootParameters[6] = {};
 
 	// RootParam[0] → b0: Material（PS）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -275,6 +293,10 @@ void Object3d::CreateRootSignature() {
 	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[4].Descriptor.ShaderRegister = 3; // Camera
+
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[5].Descriptor.ShaderRegister = 4; // Point
 
 	// レジスタ番号0をバインド
 	descriptionRootSignature.pParameters = rootParameters;              // ルートパラメータ配列へのポインタ

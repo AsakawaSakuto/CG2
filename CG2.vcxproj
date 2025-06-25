@@ -126,7 +126,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\System\ResourceData\BlendMode.h" />
-    <ClInclude Include="Emitter.h" />
+    <ClInclude Include="Engine\3d\Particles\Emitter.h" />
     <ClInclude Include="Engine\3d\Particles\ParticleData.h" />
     <ClInclude Include="Engine\System\Audio\Audio.h" />
     <ClInclude Include="Engine\System\Audio\AudioData.h" />
@@ -166,9 +166,11 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Sphere\Sphere.h" />
     <ClInclude Include="Engine\3d\Sphere\SphereData.h" />
     <ClInclude Include="Engine\3d\Particles\Particles.h" />
-    <ClInclude Include="ParticleForGPU.h" />
+    <ClInclude Include="Engine\3d\Particles\ParticleForGPU.h" />
+    <ClInclude Include="Engine\System\ResourceData\PointLight.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Engine\2d\Triangle\Triangle.h" />
+    <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

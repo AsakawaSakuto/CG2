@@ -23,6 +23,7 @@
 #include"Camera.h"
 #include"CameraForGPU.h"
 #include"MatrixFunction.h"
+#include"PointLight.h"
 
 class Object3d {
 public:
@@ -79,6 +80,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;     // 行列リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;   // ライトリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
 
 	// 各種リソースのCPU側ポインタ
 
@@ -87,6 +89,7 @@ private:
 	TransformationMatrix* transformationData_ = nullptr; // 行列データ
 	DirectionalLight* directionalLightData_ = nullptr;   // ライトデータ
 	CameraForGPU* cameraData_ = nullptr;
+	PointLight* pointLightData_ = nullptr;
 
 	DirectionalLight directionalLight_ = {};
 
@@ -100,6 +103,7 @@ private:
 	void CreateTransformationResource();     // 行列バッファ生成
 	void CreateDirectionalLightResource();   // ライトバッファ生成
 	void CreateCameraResource();
+	void CreatePointLightResource();
 
 	HRESULT hr_;  // エラー確認用変数
 

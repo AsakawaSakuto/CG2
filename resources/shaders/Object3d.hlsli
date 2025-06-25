@@ -43,3 +43,23 @@ struct Camera
     float3 worldPosition;
     float padding;
 };
+
+struct PointLight
+{
+    float4 color;
+    float3 position;
+    float intensity;
+    float radius;
+    float decay;
+};
+
+struct SpotLight
+{
+    float4 color; 
+    float3 position;
+    float intensity;
+    float3 direction;
+    float distance;
+    float decay;
+    float cosAngle;
+};
