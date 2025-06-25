@@ -34,6 +34,7 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 	CreateDirectionalLightResource();
 	CreateCameraResource();
 	CreatePointLightResource();
+	CreateSpotLightResource();
 }
 
 void Object3d::Update(Camera& useCamera) {
@@ -91,6 +92,7 @@ void Object3d::Draw() {
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 
 	// 頂点描画（DrawIndexedではなくDrawInstanced）
 	commandList_->DrawInstanced(
@@ -127,15 +129,35 @@ void Object3d::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("Light Direction", &directionalLight_.direction.x, 0.01f, -1.0f, 1.0f);
 	directionalLight_.direction = directionalLight_.direction.Normalize();
 	ImGui::DragFloat("Intensity", &directionalLightData_->intensity, 0.01f, 0.0f, 5.0f);
-	ImGui::ColorEdit4("LightColor", &directionalLightData_->color.x);
 	ImGui::DragFloat("Shininess", &materialData_->shininess, 0.1f, 0.0f, 100.0f);
+	ImGui::ColorEdit4("LightColor", &directionalLightData_->color.x);
 
 	ImGui::Text("PointLightEdit");
 	ImGui::DragFloat3("PointLightPos", &pointLightData_->position.x, 0.1f);
 	ImGui::DragFloat("PointIntensity", &pointLightData_->intensity, 0.01f, 0.0f, 5.0f);
-	ImGui::ColorEdit4("PointLightColor", &pointLightData_->color.x);
 	ImGui::DragFloat("PointLightRadius", &pointLightData_->radius, 0.01f);
 	ImGui::DragFloat("PointLightDecay", &pointLightData_->decay, 0.01f);
+	ImGui::ColorEdit4("PointLightColor", &pointLightData_->color.x);
+
+	ImGui::Text("SpotLightEdit");
+	ImGui::DragFloat3("SpotLightPos", &spotLightData_->position.x, 0.1f);
+	ImGui::DragFloat("SpotLightIntensity", &spotLightData_->intensity, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("SpotLightDistance", &spotLightData_->distance, 0.1f);
+	spotLightData_->direction = spotLightData_->direction.Normalize();
+	ImGui::DragFloat3("SpotLightDirection", &spotLightData_->direction.x, 0.01f);
+	ImGui::DragFloat("SpotLightDecay", &spotLightData_->decay, 0.01f);
+	float angleDeg = 60.0f;            // cosAngle用の角度（UI用、一時変数）
+	float falloffStartDeg = 30.0f;     // cosFalloffStart用の角度
+	// 現在のcos値から度に変換してUIに表示（必要なら）
+	angleDeg = std::acos(spotLightData_->cosAngle) * 180.0f / std::numbers::pi_v<float>;
+	falloffStartDeg = std::acos(spotLightData_->cosFalloffStart) * 180.0f / std::numbers::pi_v<float>;
+	// ImGuiスライダー（例：0〜90度まで）
+	ImGui::SliderFloat("Spot Angle (deg)", &angleDeg, 1.0f, 90.0f);
+	ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f); // 必ず angle より小さく
+	// 入力された角度からcos値に変換して反映
+	spotLightData_->cosAngle = std::cos(angleDeg * std::numbers::pi_v<float> / 180.0f);
+	spotLightData_->cosFalloffStart = std::cos(falloffStartDeg * std::numbers::pi_v<float> / 180.0f);
+
 	ImGui::End();
 }
 
@@ -204,6 +226,19 @@ void Object3d::CreatePointLightResource() {
 	pointLightData_->decay = 2.0f;
 }
 
+void Object3d::CreateSpotLightResource() {
+	spotLightResource_ = CreateBufferResource(device_.Get(), sizeof(SpotLight));
+	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
+	spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	spotLightData_->position = { 2.0f,1.25f,0.0f };
+	spotLightData_->distance = 7.0f;
+	spotLightData_->direction = { -1.0f,-1.0f,0.0f };
+	spotLightData_->intensity = 4.0f;
+	spotLightData_->decay = 2.0f;
+	spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 6.0f);
+	spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
+}
+
 void Object3d::CreatePSO() {
 
 	CreateRootSignature();
@@ -267,7 +302,7 @@ void Object3d::CreateRootSignature() {
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	// RootParameter作成。複数設定できるので配列。今回は単1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[6] = {};
+	D3D12_ROOT_PARAMETER rootParameters[7] = {};
 
 	// RootParam[0] → b0: Material（PS）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -297,6 +332,10 @@ void Object3d::CreateRootSignature() {
 	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[5].Descriptor.ShaderRegister = 4; // Point
+
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[6].Descriptor.ShaderRegister = 5; // Point
 
 	// レジスタ番号0をバインド
 	descriptionRootSignature.pParameters = rootParameters;              // ルートパラメータ配列へのポインタ

@@ -4,6 +4,7 @@ ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b2);
 ConstantBuffer<Camera> gCamera : register(b3);
 ConstantBuffer<PointLight> gPointLight : register(b4);
+ConstantBuffer<SpotLight> gSpotLight : register(b5);
 
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -36,15 +37,28 @@ PixelShaderOutput main(VertexShaderOutput input)
     // === Point Light ===
     float3 L2 = normalize(gPointLight.position - input.worldPosition);
     float distance = length(gPointLight.position - input.worldPosition);
-
-    // 減衰計算（画像の式を反映）
     float attenuation = pow(saturate(-distance / gPointLight.radius + 1.0), gPointLight.decay);
-
     float3 halfL2 = normalize(L2 + toEye);
     float NdotL2 = saturate(dot(N, L2));
     float NdotH2 = saturate(dot(N, halfL2));
     float diffuseFactor2 = pow(NdotL2 * 0.5f + 0.5f, 2.0f);
     float specularFactor2 = pow(NdotH2, gMaterial.shininess);
+
+    // === Spot Light ===
+    float3 spotDirOnSurface = normalize(input.worldPosition - gSpotLight.position); // 入射方向
+    float3 L3 = -spotDirOnSurface; // ライト→サーフェス（光の進行方向）
+
+    float spotDistance = length(gSpotLight.position - input.worldPosition);
+    float attenuation3 = pow(saturate(-spotDistance / gSpotLight.distance + 1.0), gSpotLight.decay);
+
+    float cosTheta = dot(spotDirOnSurface, normalize(gSpotLight.direction));
+    float falloffFactor = saturate((cosTheta - gSpotLight.cosFalloffStart) / (gSpotLight.cosAngle - gSpotLight.cosFalloffStart));
+
+    float3 halfL3 = normalize(L3 + toEye);
+    float NdotL3 = saturate(dot(N, L3));
+    float NdotH3 = saturate(dot(N, halfL3));
+    float diffuseFactor3 = pow(NdotL3 * 0.5f + 0.5f, 2.0f);
+    float specularFactor3 = pow(NdotH3, gMaterial.shininess);
 
     if (gMaterial.enableLighting != 0)
     {
@@ -54,7 +68,11 @@ PixelShaderOutput main(VertexShaderOutput input)
         float3 diffuse2 = gMaterial.color.rgb * textureColor.rgb * gPointLight.color.rgb * diffuseFactor2 * gPointLight.intensity * attenuation;
         float3 specular2 = gPointLight.color.rgb * gPointLight.intensity * specularFactor2 * attenuation;
 
-        output.color.rgb = diffuse1 + specular1 + diffuse2 + specular2;
+        float3 spotColor = gSpotLight.color.rgb * gSpotLight.intensity * attenuation3 * falloffFactor;
+        float3 diffuse3 = gMaterial.color.rgb * textureColor.rgb * spotColor * diffuseFactor3;
+        float3 specular3 = spotColor * specularFactor3;
+
+        output.color.rgb = diffuse1 + specular1 + diffuse2 + specular2 + diffuse3 + specular3;
         output.color.a = gMaterial.color.a * textureColor.a;
     }
     else

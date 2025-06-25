@@ -12,6 +12,9 @@
 
 #include "externals/DirectXTex/DirectXTex.h"
 
+#include <cmath>
+#include <numbers>
+
 #include"DirectXCommon.h"
 #include"ModelData.h"
 #include"VertexData.h"
@@ -24,6 +27,7 @@
 #include"CameraForGPU.h"
 #include"MatrixFunction.h"
 #include"PointLight.h"
+#include"SpotLight.h"
 
 class Object3d {
 public:
@@ -81,6 +85,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;   // ライトリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 
 	// 各種リソースのCPU側ポインタ
 
@@ -90,6 +95,7 @@ private:
 	DirectionalLight* directionalLightData_ = nullptr;   // ライトデータ
 	CameraForGPU* cameraData_ = nullptr;
 	PointLight* pointLightData_ = nullptr;
+	SpotLight* spotLightData_ = nullptr;
 
 	DirectionalLight directionalLight_ = {};
 
@@ -104,6 +110,7 @@ private:
 	void CreateDirectionalLightResource();   // ライトバッファ生成
 	void CreateCameraResource();
 	void CreatePointLightResource();
+	void CreateSpotLightResource();
 
 	HRESULT hr_;  // エラー確認用変数
 
