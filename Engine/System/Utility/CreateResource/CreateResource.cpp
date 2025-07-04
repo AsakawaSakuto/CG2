@@ -214,68 +214,52 @@ MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const st
 
 ModelData LoadObject3dFile(const std::string& filepath) {
     ModelData modelData;
-    std::vector<Vector4> positions;
-    std::vector<Vector3> normals;
-    std::vector<Vector2> texcoords;
-    std::string line;
+    std::filesystem::path path(filepath);
+    std::string directoryPath = path.parent_path().string();
 
-    std::ifstream file(filepath);
-    assert(file.is_open());
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(filepath.c_str(),
+        aiProcess_FlipWindingOrder |
+        aiProcess_FlipUVs |
+        aiProcess_Triangulate);
 
-    // directoryPath 抽出
-    std::filesystem::path filePathObj(filepath);
-    std::string directoryPath = filePathObj.parent_path().string();
+    assert(scene && scene->HasMeshes());
 
-    while (std::getline(file, line)) {
-        std::string identifier;
-        std::istringstream s(line);
-        s >> identifier;
+    for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+        aiMesh* mesh = scene->mMeshes[meshIndex];
+        assert(mesh->HasNormals());
+        assert(mesh->HasTextureCoords(0));
 
-        if (identifier == "v") {
-            Vector4 position;
-            s >> position.x >> position.y >> position.z;
-            position.w = 1.0f;
-            position.x *= -1.0f;
-            positions.push_back(position);
-        }
-        else if (identifier == "vt") {
-            Vector2 texcoord;
-            s >> texcoord.x >> texcoord.y;
-            texcoords.push_back(texcoord);
-        }
-        else if (identifier == "vn") {
-            Vector3 normal;
-            s >> normal.x >> normal.y >> normal.z;
-            normal.x *= -1.0f;
-            normals.push_back(normal);
-        }
-        else if (identifier == "f") {
-            VertexData triangle[3];
-            for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-                std::string vertexDefinition;
-                s >> vertexDefinition;
-                std::istringstream v(vertexDefinition);
-                uint32_t elementIndices[3];
-                for (int32_t element = 0; element < 3; ++element) {
-                    std::string index;
-                    std::getline(v, index, '/');
-                    elementIndices[element] = std::stoi(index);
-                }
-                Vector4 position = positions[elementIndices[0] - 1];
-                Vector2 texcoord = texcoords[elementIndices[1] - 1];
-                texcoord.y = 1.0f - texcoord.y;
-                Vector3 normal = normals[elementIndices[2] - 1];
-                triangle[faceVertex] = { position, texcoord, normal };
+        for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+            aiFace face = mesh->mFaces[faceIndex];
+            assert(face.mNumIndices >= 3); // triangle only
+
+            for (uint32_t i = 0; i < face.mNumIndices; ++i) {
+                uint32_t index = face.mIndices[i];
+
+                aiVector3D pos = mesh->mVertices[index];
+                aiVector3D normal = mesh->mNormals[index];
+                aiVector3D uv = mesh->mTextureCoords[0][index];
+
+                VertexData vtx{};
+                vtx.position = { -pos.x, pos.y, pos.z, 1.0f };  // 左右反転
+                vtx.normal = { -normal.x, normal.y, normal.z };  // 左右反転
+                vtx.texcoord = { uv.x, uv.y };
+
+                modelData.vertices.push_back(vtx);
             }
-            modelData.vertices.push_back(triangle[2]);
-            modelData.vertices.push_back(triangle[1]);
-            modelData.vertices.push_back(triangle[0]);
-        }
-        else if (identifier == "mtllib") {
-            std::string materialFilename;
-            s >> materialFilename;
-            modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
         }
     }
+
+    // --- マテリアル読み込み ---
+    for (uint32_t matIndex = 0; matIndex < scene->mNumMaterials; ++matIndex) {
+        aiMaterial* material = scene->mMaterials[matIndex];
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+            aiString texPath;
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
+            modelData.material.textureFilePath = directoryPath + "/" + texPath.C_Str();
+        }
+    }
+
     return modelData;
 }
