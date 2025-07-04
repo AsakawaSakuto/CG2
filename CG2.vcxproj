@@ -54,12 +54,14 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
@@ -78,15 +80,15 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
