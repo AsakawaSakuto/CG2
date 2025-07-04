@@ -57,8 +57,8 @@ void Object3d::Update(Camera& useCamera) {
 	Matrix4x4 worldInverseTransposeMatrix = (worldInverseMatrix);
 
 	// 書き込み
-	transformationData_->WVP = worldViewProjectionMatrix;
-	transformationData_->World = worldMatrix;
+	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, MultiplyMatrix(worldMatrix,worldViewProjectionMatrix));
+	transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
 	transformationData_->WorldInverseTranspose = worldInverseTransposeMatrix;
 }
 

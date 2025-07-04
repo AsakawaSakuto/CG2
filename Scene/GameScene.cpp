@@ -104,8 +104,8 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	ball->Draw();
-	monkey->Draw();
+	//ball->Draw();
+	//monkey->Draw();
 	skydome->Draw();
 	plane->Draw();
 	planeGltf->Draw();
