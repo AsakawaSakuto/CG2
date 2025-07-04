@@ -58,6 +58,7 @@ private:
 	unique_ptr<Object3d> ball = make_unique<Object3d>();
 	unique_ptr<Object3d> skydome = make_unique<Object3d>();
 	unique_ptr<Object3d> plane = make_unique<Object3d>();
+	unique_ptr<Object3d> planeGltf = make_unique<Object3d>();
 
 	// Audio
 	unique_ptr<Audio> audio = make_unique<Audio>();

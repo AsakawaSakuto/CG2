@@ -225,6 +225,8 @@ ModelData LoadObject3dFile(const std::string& filepath) {
 
     assert(scene && scene->HasMeshes());
 
+    modelData.rootNode = modelData.rootNode.ReadNode(scene->mRootNode);
+
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());
@@ -260,6 +262,6 @@ ModelData LoadObject3dFile(const std::string& filepath) {
             modelData.material.textureFilePath = directoryPath + "/" + texPath.C_Str();
         }
     }
-
+    
     return modelData;
 }

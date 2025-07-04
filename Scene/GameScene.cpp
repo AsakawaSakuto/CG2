@@ -32,6 +32,7 @@ void GameScene::Initialize() {
 	monkey->Initialize(dxCommon.get(), "resources/object3d/monkey.obj", "resources/engineResources/uvChecker.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/engineResources/uvChecker.png");
 	plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/engineResources/uvChecker.png");
+	planeGltf->Initialize(dxCommon.get(), "resources/object3d/plane.gltf", "resources/engineResources/uvChecker.png");
 
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
 }
@@ -91,7 +92,7 @@ void GameScene::Update() {
 	monkey->Update(*useCamera);
 	skydome->Update(*useCamera);
 	plane->Update(*useCamera);
-
+	planeGltf->Update(*useCamera);
 	particles->Update(*useCamera);
 }
 
@@ -107,6 +108,7 @@ void GameScene::Draw() {
 	monkey->Draw();
 	skydome->Draw();
 	plane->Draw();
+	planeGltf->Draw();
 
 	particles->Draw();
 
@@ -140,6 +142,7 @@ void GameScene::Draw() {
 		ImGui::Text("LoadTexture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
 		ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
 		ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
+
 	} else {
 
 		ImGui::Text("Normal Camera");
@@ -153,11 +156,12 @@ void GameScene::Draw() {
 
 	debugCamera->DrawImgui();
 
-	ball->DrawImGui("ball");
+	/*ball->DrawImGui("ball");
 	monkey->DrawImGui("monkey");
-	skydome->DrawImGui("skydome");
+	skydome->DrawImGui("skydome");*/
 
 	plane->DrawImGui("Plane");
+	planeGltf->DrawImGui("PlaneGltf");
 
 	particles->DrawImGui("particle");
 

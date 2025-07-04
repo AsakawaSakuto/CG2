@@ -329,6 +329,9 @@
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\System\ResourceData\Node.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
