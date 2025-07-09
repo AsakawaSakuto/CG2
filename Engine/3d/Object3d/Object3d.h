@@ -46,6 +46,9 @@ public:
 	// 座標を設定
 	void SetPosition(Vector3 position) { transform_.translate = position; }
 
+	// サイズを設定
+	void SetScale(Vector3 scale) { transform_.scale = scale; }
+
 	// 色を設定
 	void SetColor(Vector4 color) { materialData_->color = color; }
 
@@ -58,6 +61,8 @@ public:
 	// 使用するテクスチャを変更
 	void SetTexture(const std::string& textureName);
 
+	// 描画モードを変更 trueで通常 falseでワイヤーフレーム
+	void SetDrawMode(bool drawMode) { drawMode_ = drawMode; }
 private:
 
 	// ワールド変換行列情報
@@ -71,10 +76,10 @@ private:
 	uint32_t textureIndex_ = 0;
 
 	// 描画モード切り替え（ワイヤーフレームなど）
-	bool drawMode = true;
+	bool drawMode_ = true;
 
 	// DirectX共通機能へのポインタ
-	DirectXCommon* dxCommon_;
+	DirectXCommon* dxCommon_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;                       // GPUデバイス
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;     // GPUコマンドリスト
 
@@ -88,7 +93,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 
 	// 各種リソースのCPU側ポインタ
-
 	VertexData* vertexData_ = nullptr;                   // 頂点データ
 	Material* materialData_ = nullptr;                   // マテリアルデータ
 	TransformationMatrix* transformationData_ = nullptr; // 行列データ

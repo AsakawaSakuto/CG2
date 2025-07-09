@@ -30,19 +30,13 @@
 
 #include <random>
 #include <numbers>
+#include <memory>
 #pragma endregion
 
-struct AABB {
-	Vector3 min; // 最小点
-	Vector3 max; // 最大点
-};
+class Object3d;
 
-struct AccelerationField {
-	Vector3 acceleration; // 加速度
-	AABB area;            // 範囲
-};
-
-bool IsCollision(const AABB& aabb, const Vector3& point);
+using std::unique_ptr;
+using std::make_unique;
 
 // パーティクルクラス
 class Particles
@@ -68,13 +62,15 @@ public:
 
 	void SetEmitter(const Vector3& translete) { emitter_.transform.translate = translete; }
 private:
-	AccelerationField  accelerationField_;
+	unique_ptr<Object3d> drawEmitter_ = make_unique<Object3d>();
 	// パーティクルが動くかどうかのフラグ
 	bool isMove_ = true;
 	bool useBillboard_ = false;
-	bool useField_ = false;
 	// 1フレームの固定デルタタイム
 	const float kDeltaTime_ = 1.0f / 60.0f;
+
+	Matrix4x4 worldViewProjectionMatrix_ = {};
+	Matrix4x4 worldMatrix_ = {};
 
 	// パーティクルの数
 	uint32_t numInstance_ = 0;
@@ -82,8 +78,9 @@ private:
 	
 	ParticleForGPU* instanceData_ = nullptr;
 
+	ParticleData MakeNewParticle(std::mt19937& rand, const Emitter& emitter);
 
-	ParticleData MakeNewParticle(std::mt19937& rand, const Vector3& translate);
+	Matrix4x4 billboardMatrix = {};
 
 	// パーティクル本体のデータ
 	std::list<ParticleData> particles_;
@@ -129,18 +126,17 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
 
 	// リソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;                      // 頂点
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;                       // インデックス
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;                    // マテリアル
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;            // ライト
-	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> transformationResource_; // 行列用配列
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;           // 頂点
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;            // インデックス
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;         // マテリアル
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_; // ライト
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;   // 行列用配列
 
 	// リソースデータ
 	VertexData* vertexData_ = nullptr;                 // 頂点
 	uint32_t* indexData_ = nullptr;                    // インデックス
 	Material* materialData_ = nullptr;                 // マテリアル
 	DirectionalLight* directionalLightData_ = nullptr; // ライト
-	std::vector<ParticleForGPU*> transformationData_;  // 行列用配列
 
 	// リソース作成系の内部関数
 	void CreateVertexResource();           // 頂点

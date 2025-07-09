@@ -29,11 +29,8 @@ void GameScene::Initialize() {
 	
 	ball->Initialize(dxCommon.get(), "resources/object3d/uvSphere.obj", "resources/engineResources/uvChecker.png");
 	ball->SetTexture("resources/image/monsterBall.png");
-	monkey->Initialize(dxCommon.get(), "resources/object3d/monkey.obj", "resources/engineResources/uvChecker.png");
-	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/engineResources/uvChecker.png");
-	plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/engineResources/uvChecker.png");
-	planeGltf->Initialize(dxCommon.get(), "resources/object3d/plane.gltf", "resources/engineResources/uvChecker.png");
-
+	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
+	plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/image/GroundTexture.png");
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
 }
 
@@ -47,52 +44,13 @@ void GameScene::Update() {
 	}
 
 	input->Update();
+	CameraController();
 
-	// Zキーがトリガー（今回押されていて、前回押されていない）なら再生
-	if (input->TriggerKey(DIK_Z)) {
-		audio->PlayAudio();
-		audio2->PlayAudio();
-	}
-
-	//particles->SetEmitter(model->GetPosition());
-
-	if (input->TriggerKey(DIK_SPACE)) {
-		if (isDebugCamera) {
-			isDebugCamera = false;
-		} else {
-			isDebugCamera = true;
-		}
-	}
-
-	if (isDebugCamera) {
-		if (debugCamera != nullptr) {
-			debugCamera->Update();
-			useCamera = debugCamera.get();
-		}
-	} else {
-		if (camera != nullptr) {
-			camera->Update();
-			useCamera = camera.get();
-		}
-	}
-
-	if (particlesTexture) {
-		particles->SetTexture("resources/image/circle.png");
-	} else {
-		particles->SetTexture("resources/engineResources/uvChecker.png");
-	}
-
-	if (modelTexture) {
-		monkey->SetTexture("resources/engineResources/white16x16.png");
-	} else {
-		monkey->SetTexture("resources/engineResources/uvChecker.png");
-	}
+	/*particles->SetEmitter(ball->GetPosition());*/
 
 	ball->Update(*useCamera);
-	monkey->Update(*useCamera);
-	skydome->Update(*useCamera);
 	plane->Update(*useCamera);
-	planeGltf->Update(*useCamera);
+	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
 }
 
@@ -105,11 +63,8 @@ void GameScene::Draw() {
 	///
 
 	//ball->Draw();
-	//monkey->Draw();
+	//plane->Draw();
 	skydome->Draw();
-	plane->Draw();
-	planeGltf->Draw();
-
 	particles->Draw();
 
 	///
@@ -127,42 +82,12 @@ void GameScene::Draw() {
 	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 	/*ImGui::ShowDemoWindow();*/
 
-	// --- ImGuiカメラコントローラ ---
-
-	ImGui::Begin("GameScene Control");
-
-	if (isDebugCamera) {
-
-		ImGui::Text("Debug Camera");
-		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
-
-		ImGui::Checkbox("particleTexture", &particlesTexture);
-		ImGui::Checkbox("monkeyTexture", &modelTexture);
-
-		ImGui::Text("LoadTexture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
-		ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
-		ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
-
-	} else {
-
-		ImGui::Text("Normal Camera");
-		ImGui::Checkbox("CameraModeChange", &isDebugCamera);
-		ImGui::DragFloat3("CameraTranslate", &useCamera->GetTranslate().x, 0.1f);
-		ImGui::DragFloat3("CameraRotate", &useCamera->GetRotate().x, 0.1f);
-
-	}
-
-	ImGui::End();
+	DrawFPS_ImGui();
 
 	debugCamera->DrawImgui();
 
-	/*ball->DrawImGui("ball");
-	monkey->DrawImGui("monkey");
-	skydome->DrawImGui("skydome");*/
-
-	plane->DrawImGui("Plane");
-	planeGltf->DrawImGui("PlaneGltf");
-
+	//ball->DrawImGui("ball");
+	//plane->DrawImGui("Plane");
 	particles->DrawImGui("particle");
 
 	// Imguiの内部コマンドを生成する
@@ -201,4 +126,55 @@ void GameScene::Finalize() {
 	///
 	/// ↑描画処理ここまで
 	///
+}
+
+void GameScene::CameraController() {
+	if (input->TriggerKey(DIK_SPACE)) {
+		if (isDebugCamera) {
+			isDebugCamera = false;
+		}
+		else {
+			isDebugCamera = true;
+		}
+	}
+
+	if (isDebugCamera) {
+		if (debugCamera != nullptr) {
+			debugCamera->Update();
+			useCamera = debugCamera.get();
+		}
+	}
+	else {
+		if (camera != nullptr) {
+			camera->Update();
+			useCamera = camera.get();
+		}
+	}
+}
+
+void GameScene::DrawFPS_ImGui() {
+	static float fpsHistory[100] = {};
+	static int frameCount = 0;
+
+	float currentFPS = ImGui::GetIO().Framerate;
+	fpsHistory[frameCount % IM_ARRAYSIZE(fpsHistory)] = currentFPS;
+	frameCount++;
+
+	ImVec2 window_pos = ImVec2(ImGui::GetIO().DisplaySize.x - 20.0f, 20.0f); // 右上にオフセット付き
+	ImVec2 window_pos_pivot = ImVec2(1.0f, 0.0f); // 原点を右上にする
+	ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+	ImGui::SetNextWindowBgAlpha(0.35f); // 背景を少し透過
+
+	ImGui::Begin("Client FPS", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+
+	// FPSグラフと数値の描画
+	ImGui::PlotLines("##FPSGraph", fpsHistory, IM_ARRAYSIZE(fpsHistory), 0, nullptr, 0.0f, 175.0f, ImVec2(0, 80));
+	ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+	ImGui::Separator();
+	ImGui::Text("LoadTexture Count: %zu", TextureManager::GetInstance()->GetTextureCount());
+	ImGui::Text("Path-Index Map Size: %zu", TextureManager::GetInstance()->GetPathToIndexMapSize());
+	ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
+
+	ImGui::End();
 }

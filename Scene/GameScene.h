@@ -1,5 +1,4 @@
 #pragma once
-
 // Includes
 #include "WinApp.h"
 #include "Input.h"
@@ -11,7 +10,7 @@
 #include "D3DResourceLeakChecker.h"
 #include "TextureManager.h"
 #include <filesystem>
-#include <memory> // ← 追加
+#include <memory>
 // Object
 #include "Sprite.h"
 #include "SpriteData.h"
@@ -46,8 +45,8 @@ private:
 	// Core systems
 	unique_ptr<WinApp> winApp = make_unique<WinApp>();
 	unique_ptr<DirectXCommon> dxCommon = make_unique<DirectXCommon>();
-	D3ResourceLeakChecker d3ResourceLeakCheker;
 	unique_ptr<Input> input = make_unique<Input>();
+	D3ResourceLeakChecker d3ResourceLeakCheker;
 
 	// Sprites
 	//unique_ptr<SpriteData> spriteData = make_unique<SpriteData>();
@@ -76,4 +75,7 @@ private:
 	// Option flags
 	bool modelTexture = true;
 	bool particlesTexture = true;
+
+	void CameraController();
+	void DrawFPS_ImGui();
 };
