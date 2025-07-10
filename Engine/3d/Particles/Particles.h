@@ -16,7 +16,9 @@
 #include "externals/DirectXTex/DirectXTex.h"
 
 #include "VertexData.h"
+#include "ParticleVertexData.h"
 #include "Material.h"
+#include "ParticleMaterial.h"
 #include "TransformationMatrix.h"
 #include "Transform.h"
 #include "DirectionalLight.h"
@@ -133,9 +135,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;   // 行列用配列
 
 	// リソースデータ
-	VertexData* vertexData_ = nullptr;                 // 頂点
+	ParticleVertexData* vertexData_ = nullptr;                 // 頂点
 	uint32_t* indexData_ = nullptr;                    // インデックス
-	Material* materialData_ = nullptr;                 // マテリアル
+	ParticleMaterial* materialData_ = nullptr;                 // マテリアル
 	DirectionalLight* directionalLightData_ = nullptr; // ライト
 
 	// リソース作成系の内部関数

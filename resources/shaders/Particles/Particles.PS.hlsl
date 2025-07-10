@@ -4,14 +4,13 @@
 // 実際に画面に撃つPixelの色を決めるShader
 struct Material {
     float4 color;
-    int enableLighting;
     float4x4 uvTransform;
 };
 
 struct DirectionalLight {
-    float4 color; // ライトの色
+    float4 color;     // ライトの色
     float3 direction; // ライトの向き
-    float intensity; // 輝度
+    float intensity;  // 輝度
     float3 padding;
 };
 
@@ -42,15 +41,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
     // HarfLambert
     float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-    
-    if (gMaterial.enableLighting != 0) {
-        //output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
-        // ↓色にはライティングを行い、α値にはしない
-        output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-        output.color.a = gMaterial.color.a * textureColor.a;
-    } else {
-        output.color = gMaterial.color * textureColor * input.color;
-    }
+    output.color = gMaterial.color * textureColor * input.color;
     if (output.color.a == 0.0) {
         discard;
     }

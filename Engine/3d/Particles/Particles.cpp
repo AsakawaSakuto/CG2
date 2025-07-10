@@ -1,9 +1,6 @@
-#include"Particles.h"
-
-#include<cassert>
-
+#include "Particles.h"
 #include "Object3d.h"
-
+#include <cassert>
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
@@ -265,13 +262,13 @@ void Particles::SetTexture(const std::string& textureName) {
 
 void Particles::CreateVertexResource() {
 	// 頂点リソース
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 4);
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleVertexData) * 4);
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(ParticleVertexData) * 4;
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.StrideInBytes = sizeof(ParticleVertexData);
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	vertexData_[0].position = { -0.5f,-0.5f,0.0f,1.0f };
@@ -283,10 +280,6 @@ void Particles::CreateVertexResource() {
 	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[2].texcoord = { 1.0f,1.f };
 	vertexData_[3].texcoord = { 1.0f,0.0f };
-
-	for (uint32_t i = 0; i < 4; i++) {
-		vertexData_[i].normal = { 0.0f,0.0f,-1.0f };
-	}
 }
 
 void Particles::CreateIndexResource() {
@@ -306,12 +299,11 @@ void Particles::CreateIndexResource() {
 
 void Particles::CreateMaterialResource() {
 	// MaterialResource
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
-	materialData_->enableLighting = false;
 	materialData_->uvTransform = MakeIdentityMatrix();
 
 	materialResource_->Unmap(0, nullptr);
