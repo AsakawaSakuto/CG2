@@ -45,17 +45,17 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateDirectionalLightResource();   // ライト情報
 
 	// エミッターの可視化用オブジェクトの初期化
-	drawEmitter_->Initialize(dxCommon_, "resources/object3d/cube.obj", "resources/engineResources/white16x16.png");
-	drawEmitter_->SetDrawMode(false);   // 描画モードON/OFF設定
-	drawEmitter_->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f }); // 可視化用の色（黒）
+	emitterModel_->Initialize(dxCommon_, "resources/object3d/cube.obj", "resources/engineResources/white16x16.png");
+	emitterModel_->SetDrawMode(false);   // 描画モードON/OFF設定
+	emitterModel_->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f }); // 可視化用の色（黒）
 }
 
 
 void Particles::Update(Camera& useCamera) {
 	// 可視化用エミッター（箱）の位置とスケールを同期
-	drawEmitter_->SetScale(emitter_.transform.scale);
-	drawEmitter_->SetPosition(emitter_.transform.translate);
-	drawEmitter_->Update(useCamera); // 表示位置・行列をカメラに合わせて更新
+	emitterModel_->SetScale(emitter_.transform.scale);
+	emitterModel_->SetPosition(emitter_.transform.translate);
+	emitterModel_->Update(useCamera); // 表示位置・行列をカメラに合わせて更新
 
 	// GPUバッファをマップして、書き込み用ポインタを取得
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData_));
@@ -75,7 +75,7 @@ void Particles::Update(Camera& useCamera) {
 	// カメラのビュー行列とプロジェクション行列の作成
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
 	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>); // 反転（Z+→Z-）用
-	billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix); // ビルボード行列作成
+	Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix); // ビルボード行列作成
 
 	// ビルボード行列の平行移動成分を無効化（回転のみ利用）
 	billboardMatrix.m[3][0] = 0.0f;
@@ -97,9 +97,9 @@ void Particles::Update(Camera& useCamera) {
 		Matrix4x4 scaleMatrix = MakeScaleMatrix(particleIterator->transform.scale);
 		Matrix4x4 rotationMatrix = useBillboard_ ? billboardMatrix : MakeRotateXYZMatrix(particleIterator->transform.rotate);
 		Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->transform.translate);
-		worldMatrix_ = MultiplyMatrix(MultiplyMatrix(scaleMatrix, rotationMatrix), translateMatrix);
+		Matrix4x4 worldMatrix = MultiplyMatrix(MultiplyMatrix(scaleMatrix, rotationMatrix), translateMatrix);
 		// WVP行列（ワールド→ビュー→プロジェクション）
-		worldViewProjectionMatrix_ = MultiplyMatrix(worldMatrix_, MultiplyMatrix(viewMatrix, projectionMatrix));
+		Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
 
 		// パーティクルの位置更新（速度に応じて移動）
 		if (isMove_) {
@@ -123,8 +123,8 @@ void Particles::Update(Camera& useCamera) {
 		if (numInstance_ < kMaxNumInstance_) {
 			instanceData_[numInstance_].color = particleIterator->color;
 			instanceData_[numInstance_].color.w = alpha;
-			instanceData_[numInstance_].WVP = worldViewProjectionMatrix_;
-			instanceData_[numInstance_].World = worldMatrix_;
+			instanceData_[numInstance_].WVP = worldViewProjectionMatrix;
+			instanceData_[numInstance_].World = worldMatrix;
 			++numInstance_;
 		}
 		++particleIterator;
@@ -187,7 +187,9 @@ void Particles::Draw() {
 	}
 
 	// エミッターのワイヤーフレーム（Cubeモデル）の描画（デバッグ・可視化用）
-	drawEmitter_->Draw();
+	if (isDrawEmitter_) {
+		emitterModel_->Draw();
+	}
 }
 
 void Particles::DrawImGui(const char* objectName) {
@@ -196,7 +198,8 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Text("ChecBox");
 	ImGui::Checkbox("isMove", &isMove_);
-	ImGui::Checkbox("useBillboard", &useBillboard_);
+	ImGui::Checkbox("useBillboard", &useBillboard_); 
+	ImGui::Checkbox("isDrawEmitter", &isDrawEmitter_);
 
 	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 
@@ -207,7 +210,7 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::DragFloat3("Emitter", &emitter_.transform.translate.x, 0.01f);
 	ImGui::DragFloat3("EmitterRange", &emitter_.transform.scale.x, 0.01f);
-	ImGui::DragInt("GenerateCount", &spawnCount_, 1.0f, 0, 100);
+	ImGui::DragInt("GenerateCount", &spawnCount_, 1.0f, 0, 1000);
 	ImGui::DragFloat("GenerateInterval", &emitter_.frequency, 0.001f, 0.0f, 1.0f);
 
 	ImGui::Text("Particle Count: %d", static_cast<int>(particles_.size()));
@@ -218,6 +221,7 @@ void Particles::DrawImGui(const char* objectName) {
 std::list<ParticleData> Particles::Emit(const Emitter& emitter, std::mt19937& rand) {
 	std::list<ParticleData> particles;
 	for (uint32_t count = 0; count < emitter.count; count++) {
+		// エミッター設定に基づいて1つずつパーティクルを生成してリストに追加
 		particles.push_back(MakeNewParticle(rand, emitter));
 	}
 	return particles;
@@ -225,25 +229,29 @@ std::list<ParticleData> Particles::Emit(const Emitter& emitter, std::mt19937& ra
 
 ParticleData Particles::MakeNewParticle(std::mt19937& rand, const Emitter& emitter) {
 
+	// ランダムな位置生成用：スケールの範囲内でX, Y, Z座標をばらつかせる
 	std::uniform_real_distribution<float> randTranslateX(emitter.transform.translate.x - emitter.transform.scale.x, emitter.transform.translate.x + emitter.transform.scale.x);
 	std::uniform_real_distribution<float> randTranslateY(emitter.transform.translate.y - emitter.transform.scale.y, emitter.transform.translate.y + emitter.transform.scale.y);
 	std::uniform_real_distribution<float> randTranslateZ(emitter.transform.translate.z - emitter.transform.scale.z, emitter.transform.translate.z + emitter.transform.scale.z);
-	std::uniform_real_distribution<float> randVelocity(-1.0f, 1.0f);
-	std::uniform_real_distribution<float> randColor(0.0f, 1.0f);
-	std::uniform_real_distribution<float> randTime(1.0f, 2.0f);
 
-	ParticleData particle = {};
+	
+	std::uniform_real_distribution<float> randVelocity(-1.0f, 1.0f); // ランダムな速度（方向）
+	std::uniform_real_distribution<float> randColor(0.0f, 1.0f);     // ランダムなカラー（RGBのみ）
+	std::uniform_real_distribution<float> randTime(1.0f, 2.0f);      // 寿命（lifeTime）のランダム生成
 
-	particle.transform.scale = { 1.f,1.f,1.f };
-	particle.transform.rotate = { 0.f,0.f,0.f };
+	ParticleData particle = {}; // 新しいパーティクルデータ構造体を初期化
+
+	particle.transform.scale = { 1.f,1.f,1.f };  // スケールは固定（1,1,1）
+	particle.transform.rotate = { 0.f,0.f,0.f }; // 回転は初期値として0に設定
+	                                             // ↓生成位置をエミッターの位置を中心にランダムでばらつかせる
 	particle.transform.translate.x = randTranslateX(rand) + emitter.transform.translate.x;
 	particle.transform.translate.y = randTranslateY(rand) + emitter.transform.translate.y;
 	particle.transform.translate.z = randTranslateZ(rand) + emitter.transform.translate.z;
 
-	particle.velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) };
-	particle.color = { randColor(rand),randColor(rand),randColor(rand),1.0f };
-	particle.lifeTime = randTime(rand);
-	particle.currentTime = 0;
+	particle.velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) }; // 初速度をランダムに設定
+	particle.color = { randColor(rand),randColor(rand),randColor(rand),1.0f }; 	        // 色の設定：RGBはランダム
+	particle.lifeTime = randTime(rand); 	                                            // パーティクルの寿命（最大生存時間）
+	particle.currentTime = 0;                                                           // 現在の時間は初期化（誕生時は0）
 
 	return particle;
 }
@@ -399,77 +407,93 @@ void Particles::CreatePSO() {
 
 void Particles::CreateRootSignature() {
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	// Input Assembler の入力レイアウトを使用することを許可するフラグ
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	// --- Descriptor Ranges ---
+
+	// 2つのDescriptorRangeを用意（テクスチャSRV用とStructuredBuffer用）
 	D3D12_DESCRIPTOR_RANGE descriptorRanges[2] = {};
 
-	// t0 : テクスチャ用 SRV (Pixel Shader)
-	descriptorRanges[0].BaseShaderRegister = 0;
-	descriptorRanges[0].NumDescriptors = 1;
+	// t0 : ピクセルシェーダで使う通常テクスチャ用のSRV（gTexture）
+	descriptorRanges[0].BaseShaderRegister = 0; // t0
+	descriptorRanges[0].NumDescriptors = 1; // 1つだけ
 	descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	// t1 : StructuredBuffer用 SRV (Vertex Shader)
-	descriptorRanges[1].BaseShaderRegister = 1;
-	descriptorRanges[1].NumDescriptors = 1;
+	// t1 : 頂点シェーダで使う構造化バッファ（StructuredBuffer）用のSRV（gParticles）
+	descriptorRanges[1].BaseShaderRegister = 1; // t1
+	descriptorRanges[1].NumDescriptors = 1; // 1つだけ
 	descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	// --- Static Sampler ---
+
+	// サンプラーステートの定義（PixelShaderで使用）
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // 線形フィルタリング
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
-	staticSamplers[0].ShaderRegister = 0;
+	staticSamplers[0].ShaderRegister = 0; // s0 に対応
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	// --- Root Parameters ---
+
+	// ルートパラメータを4つ設定（CBV × 2、SRV × 2）
 	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 
-	// b0 : Material（Pixel Shader）
+	// b0 : マテリアル（Material）構造体（Pixel Shader）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
 
-	// t1 : StructuredBuffer用 SRV（Vertex Shader）
+	// t1 : パーティクル情報（構造化バッファ）用SRV（Vertex Shader）
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1]; // t1
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
 
-	// t0 : テクスチャ（Pixel Shader）
+	// t0 : テクスチャ情報用SRV（Pixel Shader）
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[0]; // t0
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
-	// b2 : DirectionalLight（Pixel Shader）
+	// b2 : ディレクショナルライト情報（DirectionalLight）（Pixel Shader）
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[3].Descriptor.ShaderRegister = 2;
 
+	// ルートパラメータ配列をルートシグネチャ記述に登録
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
 
-	// --- シリアライズして RootSignature を生成 ---
+	// --- シリアライズしてRootSignatureを生成 ---
 	ComPtr<ID3DBlob> signatureBlob = nullptr;
 	ComPtr<ID3DBlob> errorBlob = nullptr;
-	hr_ = D3D12SerializeRootSignature(&descriptionRootSignature,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+
+	// ルートシグネチャのシリアライズ
+	hr_ = D3D12SerializeRootSignature(
+		&descriptionRootSignature,
+		D3D_ROOT_SIGNATURE_VERSION_1,
+		&signatureBlob,
+		&errorBlob
+	);
 	assert(SUCCEEDED(hr_));
 
+	// 実際のルートシグネチャオブジェクトを作成
 	hr_ = device_->CreateRootSignature(
 		0,
 		signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&rootSignature_));
+		IID_PPV_ARGS(&rootSignature_)
+	);
 	assert(SUCCEEDED(hr_));
 }
 
@@ -494,7 +518,7 @@ void Particles::InputLayoutSet() {
 	inputElementDescs_[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
 	inputElementDescs_[1].InstanceDataStepRate = 0;
 
-	// NORMAL ← ここが大事！
+	// NORMAL
 	inputElementDescs_[2].SemanticName = "NORMAL";
 	inputElementDescs_[2].SemanticIndex = 0;
 	inputElementDescs_[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;

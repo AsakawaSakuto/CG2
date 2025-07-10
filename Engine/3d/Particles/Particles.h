@@ -60,43 +60,37 @@ public:
 	// テクスチャの設定（描画用）
 	void SetTexture(const std::string& textureName);
 
+	// ブレンドモードを変更
 	void SetBlendMode(BlendMode blendMode) { blendMode_ = blendMode; }
 
+	// エミッタの位置（Translate）をセット
 	void SetEmitter(const Vector3& translete) { emitter_.transform.translate = translete; }
 private:
-	unique_ptr<Object3d> drawEmitter_ = make_unique<Object3d>();
-	// パーティクルが動くかどうかのフラグ
-	bool isMove_ = true;
-	bool useBillboard_ = false;
-	// 1フレームの固定デルタタイム
-	const float kDeltaTime_ = 1.0f / 60.0f;
-
-	Matrix4x4 worldViewProjectionMatrix_ = {};
-	Matrix4x4 worldMatrix_ = {};
-
-	// パーティクルの数
-	uint32_t numInstance_ = 0;
-	uint32_t kMaxNumInstance_ = 100;
 	
-	ParticleForGPU* instanceData_ = nullptr;
+	unique_ptr<Object3d> emitterModel_ = make_unique<Object3d>(); // エミッターの可視化用3Dオブジェクト
 
-	ParticleData MakeNewParticle(std::mt19937& rand, const Emitter& emitter);
+	std::list<ParticleData> particles_; // パーティクルの本体情報
+	Emitter emitter_;                   // 使用するエミッター
 
-	Matrix4x4 billboardMatrix = {};
+	uint32_t numInstance_ = 0;               // 現在描画するインスタンスの数
+	uint32_t kMaxNumInstance_ = 10000;       // 描画可能な最大パーティクル数
+	ParticleForGPU* instanceData_ = nullptr; // GPU側に送るインスタンス情報
+	
+	std::string textureName_; // 使用するテクスチャの名前
+	BlendMode blendMode_;     // 現在のブレンドモード
+	
+	bool isMove_ = true;         // パーティクルが動くかどうかのフラグ
+	bool useBillboard_ = true;   // ビルボードを使用するかどうかのフラグ
+	bool isDrawEmitter_ = false; // エミッターを可視化するかのフラグ
 
-	// パーティクル本体のデータ
-	std::list<ParticleData> particles_;
+	const float kDeltaTime_ = 1.0f / 60.0f; // 1フレームあたりの固定デルタタイム
+	int spawnCount_;                        // 今フレームでスポーンするパーティクル数のカウント（Emit で使用される）
 
-	// 使用するテクスチャ名
-	std::string textureName_;
-
-	BlendMode blendMode_;
-
+	// エミッターの設定に従って複数のパーティクルを生成し、リストとして返す関数
 	std::list<ParticleData> Emit(const Emitter& emitter, std::mt19937& rand);
 
-	Emitter emitter_;
-
-	int spawnCount_;
+	// 1つのパーティクルを生成し、初期化された ParticleData を返す
+	ParticleData MakeNewParticle(std::mt19937& rand, const Emitter& emitter);
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 
@@ -135,9 +129,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;   // 行列用配列
 
 	// リソースデータ
-	ParticleVertexData* vertexData_ = nullptr;                 // 頂点
+	ParticleVertexData* vertexData_ = nullptr;         // 頂点
 	uint32_t* indexData_ = nullptr;                    // インデックス
-	ParticleMaterial* materialData_ = nullptr;                 // マテリアル
+	ParticleMaterial* materialData_ = nullptr;         // マテリアル
 	DirectionalLight* directionalLightData_ = nullptr; // ライト
 
 	// リソース作成系の内部関数
