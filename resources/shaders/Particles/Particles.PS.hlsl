@@ -1,31 +1,33 @@
 #include "Particles.hlsli"
 
-// PixelShader
-// 実際に画面に撃つPixelの色を決めるShader
+// マテリアル構造体 b0
 struct Material {
     float4 color;
     float4x4 uvTransform;
 };
 
+// 平行光源 b2
 struct DirectionalLight {
-    float4 color;     // ライトの色
-    float3 direction; // ライトの向き
-    float intensity;  // 輝度
+    float4 color;
+    float3 direction;
+    float intensity;
     float3 padding;
 };
 
+// 定数バッファ
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b2);
 
+// テクスチャとサンプラー
+Texture2D<float4> gTexture : register(t0);
+SamplerState gSampler : register(s0);
+
+// 出力構造体
 struct PixelShaderOutput {
     float4 color : SV_TARGET0;
 };
 
-//srvのレジスタ－はt
-Texture2D<float4> gTexture : register(t0);
-//サンプラーのレジスターはs
-SamplerState gSampler : register(s0);
-
+// main
 PixelShaderOutput main(VertexShaderOutput input) {
     PixelShaderOutput output;
     
@@ -34,10 +36,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
     
     float3 N = normalize(input.normal);
     float3 L = normalize(-gDirectionalLight.direction);
-
     float NdotL = saturate(dot(N, L));
-
-    float4 texColor = gTexture.Sample(gSampler, input.texcoord);
 
     // HarfLambert
     float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
@@ -45,6 +44,5 @@ PixelShaderOutput main(VertexShaderOutput input) {
     if (output.color.a == 0.0) {
         discard;
     }
-    
     return output;
 }

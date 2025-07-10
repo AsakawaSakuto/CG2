@@ -1,8 +1,6 @@
 #include "Particles.hlsli"
 
-// VertexShader
-// 与えられた座標を同次クリップ空間に変換する
-
+// インスタンシング用GPU構造体
 struct ParticleForGPU {
     float4x4 WVP;
     float4x4 World;
@@ -11,12 +9,14 @@ struct ParticleForGPU {
 
 StructuredBuffer<ParticleForGPU> gParticles : register(t1);
 
+// 頂点シェーダー出力構造体
 struct VertexShaderInput {
     float4 position : POSITION0;
     float2 texcord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
 
+// main
 VertexShaderOutput main(VertexShaderInput input,uint instanceId : SV_InstanceId) {
     VertexShaderOutput output;
     output.position = mul(input.position, gParticles[instanceId].WVP);
