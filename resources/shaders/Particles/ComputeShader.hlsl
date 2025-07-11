@@ -3,6 +3,7 @@
 static const uint kMaxParticles = 512;
 RWStructuredBuffer<Particle> gParticles : register(u0);
 
+// 768以下
 [numthreads(512, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID ) {
     uint particlesIndex = DTid.x;

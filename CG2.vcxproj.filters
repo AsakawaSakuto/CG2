@@ -338,6 +338,9 @@
     <ClInclude Include="Engine\3d\Particles\ParticleVertexData.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\3d\Particles\ParticleDataCS.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
