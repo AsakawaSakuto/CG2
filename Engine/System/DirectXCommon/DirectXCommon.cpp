@@ -157,6 +157,16 @@ void DirectXCommon::ResetCommand() {
     assert(SUCCEEDED(hr_));
 }
 
+void DirectXCommon::WaitForGPU() {
+    // Fenceを更新してGPUの処理終了を待つ
+    fenceValue_++;
+    commandQueue_->Signal(fence_.Get(), fenceValue_);
+    if (fence_->GetCompletedValue() < fenceValue_) {
+        fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+        WaitForSingleObject(fenceEvent_, INFINITE);
+    }
+}
+
 void DirectXCommon::CreateSwapChain() {
     // SwapChainの設定
     swapChainDesc_.Width = winApp_->GetWidth();                   // 画面の幅
@@ -276,17 +286,10 @@ void DirectXCommon::CreateImgui() {
 }
 
 void DirectXCommon::PreDraw() {
-    //// 念のため前回使っていたコマンドリストを閉じる（Recording中対策）
-    //if (commandList_->GetType() == D3D12_COMMAND_LIST_TYPE_DIRECT) {
-    //    commandList_->Close(); // 失敗してもOK
-    //}
-
-    //hr_ = commandAllocator_->Reset();
-    //assert(SUCCEEDED(hr_));
-
-    //hr_ = commandList_->Reset(commandAllocator_.Get(), nullptr);
-    //assert(SUCCEEDED(hr_));
-
+    if (!commandList_ || !swapChainResources_[backBufferIndex_]) {
+        OutputDebugStringA("commandList_ or swapChainResource is null!\n");
+        return;
+    }
     // これから書き込むバックバッファのインデックスを取得
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
     // TransitionBarrierの設定 *backBufferIndexを取得した直後、RenderTargetを設定する前に行う
@@ -323,7 +326,6 @@ void DirectXCommon::PreDraw() {
 
     commandList_->RSSetViewports(1, &viewport_);    // Viewportを設定
     commandList_->RSSetScissorRects(1, &scissorRect_);    // Scissorを設定
-
 }
 
 void DirectXCommon::PostDraw() {
@@ -354,13 +356,7 @@ void DirectXCommon::PostDraw() {
     // 画面に表示
     swapChain_->Present(1, 0);
 
-    // Fenceを更新してGPUの処理終了を待つ
-    fenceValue_++;
-    commandQueue_->Signal(fence_.Get(), fenceValue_);
-    if (fence_->GetCompletedValue() < fenceValue_) {
-        fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
-        WaitForSingleObject(fenceEvent_, INFINITE);
-    }
+    WaitForGPU();
 
     // 次のフレーム用のコマンドリストを準備
     hr_ = commandAllocator_->Reset();
@@ -447,7 +443,7 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
     };
 
     // 実際にShaderをコンパイルする
-    ComPtr<IDxcResult> shaderResult = nullptr;
+    ComPtr<IDxcResult> shaderResult;
     hr_ = dxcCompiler_->Compile(
         &shaderSourceBuffer, // 読み込んだファイル
         arguments,           // コンパイルオプション
@@ -464,7 +460,7 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
 #pragma region 3 警告・エラーが出ていないか確認する
 
     // 署名：エラーが出てきたらログに出して止める
-    ComPtr<IDxcBlobUtf8> shaderError = nullptr;
+    ComPtr<IDxcBlobUtf8> shaderError;
     shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
     if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
         OutputDebugStringA(shaderError->GetStringPointer()); // ←これ追加
@@ -484,8 +480,8 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
     // 成功したらログを作成
     Logger::Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
     // もう使わないリソースを解放
-    shaderSource->Release();
-    shaderResult->Release();
+    //shaderSource->Release();
+    //shaderResult->Release();
     // 実行用のバイナリを返却
     return shaderBlob;
 

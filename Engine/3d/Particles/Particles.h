@@ -26,6 +26,7 @@
 #include "MatrixFunction.h"
 #include "Camera.h"
 #include "ParticleData.h"
+#include "ParticleDataCS.h"
 #include "ParticleForGPU.h"
 #include "Emitter.h"
 #include "BlendMode.h"
@@ -73,7 +74,7 @@ private:
 	Emitter emitter_;                   // 使用するエミッター
 
 	uint32_t numInstance_ = 0;               // 現在描画するインスタンスの数
-	uint32_t kMaxNumInstance_ = 10000;       // 描画可能な最大パーティクル数
+	const uint32_t kMaxParticles_ = 512;     // 描画可能な最大パーティクル数
 	ParticleForGPU* instanceData_ = nullptr; // GPU側に送るインスタンス情報
 	
 	std::string textureName_; // 使用するテクスチャの名前
@@ -91,6 +92,20 @@ private:
 
 	// 1つのパーティクルを生成し、初期化された ParticleData を返す
 	ParticleData MakeNewParticle(std::mt19937& rand, const Emitter& emitter);
+
+	/*-----------GPUパーティクルに使用してる変数-----------*/
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleBuffer_;       // GPUに渡すStructuredBuffer用
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferUpload_; // 初期化用UploadHeap
+
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> computeAllocator_;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> computeQueue_;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> computeList_;
+
+	// パーティクル配列
+	std::vector<ParticleDataCS> particlesCS_;
+
+	void CreateParticleResource();
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 
@@ -143,11 +158,13 @@ private:
 
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_;
 
 	// PSO作成に使う設定構造体
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_;
 
 	// 作成済みPSO
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> useGraphicsPipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateNone_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateNormal_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateAdd_;

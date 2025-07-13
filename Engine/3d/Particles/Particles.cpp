@@ -44,12 +44,17 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateTransformationResource();     // インスタンシング用行列バッファ
 	CreateDirectionalLightResource();   // ライト情報
 
+	particlesCS_.resize(kMaxParticles_);
+	D3D12_COMMAND_QUEUE_DESC desc = {};
+	desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+	device_->CreateCommandQueue(&desc, IID_PPV_ARGS(&computeQueue_));
+	CreateParticleResource();
+
 	// エミッターの可視化用オブジェクトの初期化
 	emitterModel_->Initialize(dxCommon_, "resources/object3d/cube.obj", "resources/engineResources/white16x16.png");
 	emitterModel_->SetDrawMode(false);   // 描画モードON/OFF設定
 	emitterModel_->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f }); // 可視化用の色（黒）
 }
-
 
 void Particles::Update(Camera& useCamera) {
 	// 可視化用エミッター（箱）の位置とスケールを同期
@@ -120,7 +125,7 @@ void Particles::Update(Camera& useCamera) {
 		}
 
 		// インスタンスデータとして登録（最大数を超えないように）
-		if (numInstance_ < kMaxNumInstance_) {
+		if (numInstance_ < kMaxParticles_) {
 			instanceData_[numInstance_].color = particleIterator->color;
 			instanceData_[numInstance_].color.w = alpha;
 			instanceData_[numInstance_].WVP = worldViewProjectionMatrix;
@@ -142,24 +147,26 @@ void Particles::Draw() {
 	// 現在のブレンドモードに応じて、使用するパイプラインステートオブジェクト（PSO）を切り替え
 	switch (blendMode_) {
 	case kBlendModeNone:
-		commandList_->SetPipelineState(graphicsPipelineStateNone_.Get());
+		useGraphicsPipelineState_ = graphicsPipelineStateNone_.Get();
 		break;
 	case kBlendModeNormal:
-		commandList_->SetPipelineState(graphicsPipelineStateNormal_.Get());
+		useGraphicsPipelineState_ = graphicsPipelineStateNormal_.Get();
 		break;
 	case kBlendModeAdd:
-		commandList_->SetPipelineState(graphicsPipelineStateAdd_.Get());
+		useGraphicsPipelineState_ = graphicsPipelineStateAdd_.Get();
 		break;
 	case kBlendModeSubtract:
-		commandList_->SetPipelineState(graphicsPipelineStateSubtract_.Get());
+		useGraphicsPipelineState_ = graphicsPipelineStateSubtract_.Get();
 		break;
 	case kBlendModeMultily:
-		commandList_->SetPipelineState(graphicsPipelineStateMultily_.Get());
+		useGraphicsPipelineState_ = graphicsPipelineStateMultily_.Get();
 		break;
 	case kBlendModeScreen:
-		commandList_->SetPipelineState(graphicsPipelineStateScreen_.Get());
+		useGraphicsPipelineState_ = graphicsPipelineStateScreen_.Get();
 		break;
 	}
+
+	commandList_->SetPipelineState(useGraphicsPipelineState_.Get());
 
 	// 三角形リストで描画することを指定（パーティクルは四角形だが、インデックスで三角形×2として構成）
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -268,6 +275,197 @@ void Particles::SetTexture(const std::string& textureName) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
+void Particles::CreateParticleResource() {
+	HRESULT hr;
+
+	//----------------------------------------
+	// 1) リソースの作成
+	//----------------------------------------
+	// (a) UAV バッファ用の記述
+	D3D12_RESOURCE_DESC uavDesc = {};
+	uavDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	uavDesc.Width = sizeof(ParticleDataCS) * kMaxParticles_;
+	uavDesc.Height = 1;
+	uavDesc.DepthOrArraySize = 1;
+	uavDesc.MipLevels = 1;
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.SampleDesc.Count = 1;
+	uavDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	uavDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
+	// (b) アップロードバッファは同じサイズ、フラグなし
+	D3D12_RESOURCE_DESC uploadDesc = uavDesc;
+	uploadDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	// (c) GPU 側の UAV バッファ (Default Heap)
+	ComPtr<ID3D12Resource> gpuBuffer;
+	{
+		CD3DX12_HEAP_PROPERTIES heapProp(D3D12_HEAP_TYPE_DEFAULT);
+		hr = device_->CreateCommittedResource(
+			&heapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&uavDesc,
+			D3D12_RESOURCE_STATE_COMMON,
+			nullptr,
+			IID_PPV_ARGS(&gpuBuffer)
+		);
+		assert(SUCCEEDED(hr));
+	}
+
+	// (d) CPU 側アップロードバッファ (Upload Heap)
+	ComPtr<ID3D12Resource> uploadBuffer;
+	{
+		CD3DX12_HEAP_PROPERTIES heapProp(D3D12_HEAP_TYPE_UPLOAD);
+		hr = device_->CreateCommittedResource(
+			&heapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&uploadDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&uploadBuffer)
+		);
+		assert(SUCCEEDED(hr));
+	}
+
+	// (e) CPU から初期データを書き込む
+	{
+		ParticleDataCS* mapped = nullptr;
+		uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
+		memcpy(mapped,
+			particlesCS_.data(),
+			sizeof(ParticleDataCS) * kMaxParticles_);
+		uploadBuffer->Unmap(0, nullptr);
+	}
+
+	//----------------------------------------
+	// 2) COPY → UAV へのステート遷移＆コピー（DIRECT リスト）
+	//----------------------------------------
+	ComPtr<ID3D12CommandAllocator> copyAlloc;
+	ComPtr<ID3D12GraphicsCommandList> copyList;
+
+	// (a) コマンドアロケータ／リストの生成（DIRECT！）
+	hr = device_->CreateCommandAllocator(
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		IID_PPV_ARGS(&copyAlloc)
+	);
+	assert(SUCCEEDED(hr));
+
+	hr = device_->CreateCommandList(
+		0,
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		copyAlloc.Get(),
+		nullptr,
+		IID_PPV_ARGS(&copyList)
+	);
+	assert(SUCCEEDED(hr));
+	// （CreateCommandList 直後は“開いている”状態）
+
+	// (b) COMMON → COPY_DEST
+	{
+		auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			gpuBuffer.Get(),
+			D3D12_RESOURCE_STATE_COMMON,
+			D3D12_RESOURCE_STATE_COPY_DEST
+		);
+		copyList->ResourceBarrier(1, &barrier);
+	}
+
+	// (c) CopyResource
+	copyList->CopyResource(gpuBuffer.Get(), uploadBuffer.Get());
+
+	// (d) COPY_DEST → UNORDERED_ACCESS
+	{
+		auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			gpuBuffer.Get(),
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+		);
+		copyList->ResourceBarrier(1, &barrier);
+	}
+
+	// (e) クローズ＆実行＆GPU待機
+	hr = copyList->Close();
+	assert(SUCCEEDED(hr));
+	{
+		ID3D12CommandList* lists[] = { copyList.Get() };
+		dxCommon_->GetCommandQueue()->ExecuteCommandLists(_countof(lists), lists);
+		dxCommon_->WaitForGPU();
+	}
+
+	// 作成したバッファをメンバへ保存
+	particleBuffer_ = std::move(gpuBuffer);
+	particleBufferUpload_ = std::move(uploadBuffer);
+
+	//----------------------------------------
+	// 3) ComputeShader 実行（DIRECTリスト！）
+	//----------------------------------------
+	// (a) シェーダコンパイル
+	ComPtr<IDxcBlob> csBlob = dxCommon_->CompileShader(
+		L"resources/Shaders/Particles/ComputeShader.hlsl",
+		L"cs_6_0"
+	);
+
+	// (b) ルートシグネチャ（HLSL 内 [RootSignature] から取得）
+	ComPtr<ID3D12RootSignature> computeRootSig;
+	hr = device_->CreateRootSignature(
+		0,
+		csBlob->GetBufferPointer(),
+		csBlob->GetBufferSize(),
+		IID_PPV_ARGS(&computeRootSig)
+	);
+	assert(SUCCEEDED(hr));
+
+	// (c) PSO 作成
+	ComPtr<ID3D12PipelineState> computePSO;
+	{
+		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+		psoDesc.pRootSignature = computeRootSig.Get();
+		psoDesc.CS.pShaderBytecode = csBlob->GetBufferPointer();
+		psoDesc.CS.BytecodeLength = csBlob->GetBufferSize();
+		hr = device_->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&computePSO));
+		assert(SUCCEEDED(hr));
+	}
+
+	// (d) コマンドアロケータ／リストの生成（DIRECT！）
+	ComPtr<ID3D12CommandAllocator> compAlloc;
+	ComPtr<ID3D12GraphicsCommandList> compList;
+	hr = device_->CreateCommandAllocator(
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		IID_PPV_ARGS(&compAlloc)
+	);
+	assert(SUCCEEDED(hr));
+	hr = device_->CreateCommandList(
+		0,
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		compAlloc.Get(),
+		computePSO.Get(),  // 初期に PSO をセットしておいても OK
+		IID_PPV_ARGS(&compList)
+	);
+	assert(SUCCEEDED(hr));
+	// （CreateCommandList 直後は“開いている”状態）
+
+	// (e) Dispatch 前に UAV バインド
+	compList->SetComputeRootSignature(computeRootSig.Get());
+	compList->SetPipelineState(computePSO.Get());
+	compList->SetComputeRootUnorderedAccessView(
+		0,
+		particleBuffer_->GetGPUVirtualAddress()
+	);
+
+	// (f) 実行
+	UINT threadGroups = (kMaxParticles_ + 255) / 256;
+	compList->Dispatch(threadGroups, 1, 1);
+
+	// (g) クローズ＆実行＆GPU待機
+	hr = compList->Close();
+	assert(SUCCEEDED(hr));
+	{
+		ID3D12CommandList* compLists[] = { compList.Get() };
+		dxCommon_->GetCommandQueue()->ExecuteCommandLists(_countof(compLists), compLists);
+		dxCommon_->WaitForGPU();
+	}
+}
+
 void Particles::CreateVertexResource() {
 	// 頂点リソース
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleVertexData) * 4);
@@ -318,7 +516,7 @@ void Particles::CreateMaterialResource() {
 }
 
 void Particles::CreateTransformationResource() {
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxNumInstance_);
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxParticles_);
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData_));
 	instanceData_->WVP = MakeIdentityMatrix();
 	instanceData_->World = MakeIdentityMatrix();
@@ -326,14 +524,14 @@ void Particles::CreateTransformationResource() {
 
 	//instancingResource_->Unmap(0, nullptr);
 	// --- Instancing用 StructuredBuffer をまとめて1つ作成 ---
-	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxNumInstance_);
+	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxParticles_);
 	// SRV設定（StructuredBufferとして使う）
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = kMaxNumInstance_;
+	srvDesc.Buffer.NumElements = kMaxParticles_;
 	srvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 

@@ -37,6 +37,10 @@
 
 [Log] Compile Succeeded, path:resources/shaders/Particles/Particles.PS.hlsl, profile:ps_6_0
 
+[Log] Begin CompileShader, path:resources/Shaders/Particles/ComputeShader.hlsl, profile:cs_6_0
+
+[Log] Compile Succeeded, path:resources/Shaders/Particles/ComputeShader.hlsl, profile:cs_6_0
+
 [Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
 
 [Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0

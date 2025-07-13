@@ -40,6 +40,8 @@ public:
     //
     void CloseFence();
 
+    void WaitForGPU();
+
     //
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
@@ -48,6 +50,8 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
 
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
+
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator_; }
 
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
 

@@ -2,7 +2,7 @@
 #include"Vector3.h"
 #include"Vector4.h"
 
-struct ParticleCS {
+struct ParticleDataCS {
     Vector3 scale;       // 12 bytes
     float pad1;          //  4 bytes → 合計16バイト
 

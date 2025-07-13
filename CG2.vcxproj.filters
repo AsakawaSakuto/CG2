@@ -366,7 +366,6 @@
     <FxCompile Include="resources\shaders\Sprite\Sprite.VS.hlsl">
       <Filter>シェーダーファイル\Sprite</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Particles\ComputeShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Particles\Particles.hlsli">
