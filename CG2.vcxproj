@@ -128,6 +128,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Engine\3d\Particles\ParticleDataCS.h" />
     <ClInclude Include="Engine\3d\Particles\ParticleVertexData.h" />
+    <ClInclude Include="Engine\3d\Particles\PreView.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\System\ResourceData\BlendMode.h" />
     <ClInclude Include="Engine\3d\Particles\Emitter.h" />

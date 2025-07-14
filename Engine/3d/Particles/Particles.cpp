@@ -41,7 +41,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateVertexResource();             // 頂点バッファ
 	CreateIndexResource();              // インデックスバッファ
 	CreateMaterialResource();           // マテリアル
-	CreateTransformationResource();     // インスタンシング用行列バッファ
+	//CreateTransformationResource();     // インスタンシング用行列バッファ
 	CreateDirectionalLightResource();   // ライト情報
 
 	particlesCS_.resize(kMaxParticles_);
@@ -49,6 +49,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
 	device_->CreateCommandQueue(&desc, IID_PPV_ARGS(&computeQueue_));
 	CreateParticleResource();
+	CreatePreViewResource();
 
 	// エミッターの可視化用オブジェクトの初期化
 	emitterModel_->Initialize(dxCommon_, "resources/object3d/cube.obj", "resources/engineResources/white16x16.png");
@@ -57,86 +58,60 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 }
 
 void Particles::Update(Camera& useCamera) {
-	// 可視化用エミッター（箱）の位置とスケールを同期
+	// エミッター3Dモデルの更新（可視化用。不要なら消してOK）
 	emitterModel_->SetScale(emitter_.transform.scale);
 	emitterModel_->SetPosition(emitter_.transform.translate);
-	emitterModel_->Update(useCamera); // 表示位置・行列をカメラに合わせて更新
+	emitterModel_->Update(useCamera);
 
-	// GPUバッファをマップして、書き込み用ポインタを取得
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData_));
-	numInstance_ = 0; // インスタンス数を初期化
-
-	// エミッターの発生数を更新
-	emitter_.count = spawnCount_;
-
-	// パーティクルの発生処理（一定時間ごとにEmit）
-	emitter_.frequencyTime += kDeltaTime_;
-	if (emitter_.frequency <= emitter_.frequencyTime) {
-		// 新規パーティクル生成し、リスト末尾に追加
-		particles_.splice(particles_.end(), Emit(emitter_, rand));
-		emitter_.frequencyTime -= emitter_.frequency;
-	}
-
-	// カメラのビュー行列とプロジェクション行列の作成
+	// ---- カメラ関連の行列計算（PreView構造体に書き込む） ----
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
-	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>); // 反転（Z+→Z-）用
-	Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix); // ビルボード行列作成
+	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
 
-	// ビルボード行列の平行移動成分を無効化（回転のみ利用）
 	billboardMatrix.m[3][0] = 0.0f;
 	billboardMatrix.m[3][1] = 0.0f;
 	billboardMatrix.m[3][2] = 0.0f;
 
-	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix); // ビュー行列
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
+	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(
+		0.45f,
+		static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_),
+		0.1f, 100.0f);
 
-	// パーティクルの更新＆インスタンスデータ登録
-	for (auto particleIterator = particles_.begin(); particleIterator != particles_.end(); ) {
-		// 寿命切れのパーティクルを削除
-		if (particleIterator->lifeTime <= particleIterator->currentTime) {
-			particleIterator = particles_.erase(particleIterator);
-			continue;
-		}
+	// PreViewリソースに書き込み
+	PreView tempPreView;
+	tempPreView.viewProjection = MultiplyMatrix(viewMatrix, projectionMatrix);
+	tempPreView.billboardMatrix = billboardMatrix;
 
-		// パーティクル個別のワールド行列（SRT順で構築）
-		Matrix4x4 scaleMatrix = MakeScaleMatrix(particleIterator->transform.scale);
-		Matrix4x4 rotationMatrix = useBillboard_ ? billboardMatrix : MakeRotateXYZMatrix(particleIterator->transform.rotate);
-		Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->transform.translate);
-		Matrix4x4 worldMatrix = MultiplyMatrix(MultiplyMatrix(scaleMatrix, rotationMatrix), translateMatrix);
-		// WVP行列（ワールド→ビュー→プロジェクション）
-		Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
+	void* mappedPtr = nullptr;
+	preViewResource_->Map(0, nullptr, &mappedPtr);
+	memcpy(mappedPtr, &tempPreView, sizeof(PreView));
+	preViewResource_->Unmap(0, nullptr);
 
-		// パーティクルの位置更新（速度に応じて移動）
-		if (isMove_) {
-			particleIterator->transform.translate.x += particleIterator->velocity.x * kDeltaTime_;
-			particleIterator->transform.translate.y += particleIterator->velocity.y * kDeltaTime_;
-			particleIterator->transform.translate.z += particleIterator->velocity.z * kDeltaTime_;
-		}
-		particleIterator->currentTime += kDeltaTime_;
+	// 1. 必要な場合だけ「UAV」に遷移
+	D3D12_RESOURCE_BARRIER toUAV = CD3DX12_RESOURCE_BARRIER::Transition(
+		particleBufferResource_.Get(),
+		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, // ←前回の状態に応じて
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+	);
+	commandList_->ResourceBarrier(1, &toUAV);
 
-		// アルファ（透明度）計算（フェードイン → フェードアウト）
-		float alpha = 0.0f;
-		float halfLife = particleIterator->lifeTime * 0.5f;
-		if (particleIterator->currentTime < halfLife) {
-			alpha = particleIterator->currentTime / halfLife;  // 0 → 1
-		}
-		else {
-			alpha = 1.0f - ((particleIterator->currentTime - halfLife) / halfLife);  // 1 → 0
-		}
+	// 2. CSのRootSignature, PSOセット
+	commandList_->SetPipelineState(csPipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
+	commandList_->SetComputeRootSignature(csRootSignature_.Get());
+	commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress());
 
-		// インスタンスデータとして登録（最大数を超えないように）
-		if (numInstance_ < kMaxParticles_) {
-			instanceData_[numInstance_].color = particleIterator->color;
-			instanceData_[numInstance_].color.w = alpha;
-			instanceData_[numInstance_].WVP = worldViewProjectionMatrix;
-			instanceData_[numInstance_].World = worldMatrix;
-			++numInstance_;
-		}
-		++particleIterator;
-	}
+	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
+	UINT numGroups = (kMaxParticles_ + 255) / 256;
+	commandList_->Dispatch(numGroups, 1, 1);
 
-	// GPUバッファのアンマップ
-	instancingResource_->Unmap(0, nullptr);
+	// 4. SRV状態へバリア
+	D3D12_RESOURCE_BARRIER toSRV = CD3DX12_RESOURCE_BARRIER::Transition(
+		particleBufferResource_.Get(),
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE
+	);
+	commandList_->ResourceBarrier(1, &toSRV);
 }
 
 void Particles::Draw() {
@@ -175,23 +150,24 @@ void Particles::Draw() {
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetIndexBuffer(&indexBufferView_);
 
-	// インスタンシング用データ（StructuredBuffer）をSRVとしてルートパラメータ1番に設定
-	commandList_->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU_);
-
-	// マテリアル用定数バッファ（b0）をルートパラメータ0番に設定
+	// 0番：Material
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
-	// テクスチャのSRVをルートパラメータ2番に設定（ここではuvCheckerなどを使用）
-	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
+	// 1番：カメラ・ビルボード行列（PreViewなど）
+	commandList_->SetGraphicsRootConstantBufferView(1, preViewResource_->GetGPUVirtualAddress()); // ←ここ重要
 
-	// ライト情報（ディレクショナルライト）をルートパラメータ3番に設定
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	// 2番：パーティクルインスタンシングSRV（StructuredBufferなど）
+	commandList_->SetGraphicsRootDescriptorTable(2, dxCommon_->GetSrvGPUHandle(particleSrvIndex_)); // ←今まで1番だったやつ
+
+	// 3番：テクスチャSRV
+	commandList_->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
+
+	// 4番：ディレクショナルライト（DirectionalLight）
+	commandList_->SetGraphicsRootConstantBufferView(4, directionalLightResource_->GetGPUVirtualAddress());
 
 	// パーティクルのインスタンシング描画
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
-	if (numInstance_ > 0) {
-		commandList_->DrawIndexedInstanced(6, numInstance_, 0, 0, 0);
-	}
+	commandList_->DrawIndexedInstanced(6, kMaxParticles_, 0, 0, 0);
 
 	// エミッターのワイヤーフレーム（Cubeモデル）の描画（デバッグ・可視化用）
 	if (isDrawEmitter_) {
@@ -225,8 +201,8 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::End();
 }
 
-std::list<ParticleData> Particles::Emit(const Emitter& emitter, std::mt19937& rand) {
-	std::list<ParticleData> particles;
+std::list<ParticleDataCS> Particles::Emit(const Emitter& emitter, std::mt19937& rand) {
+	std::list<ParticleDataCS> particles;
 	for (uint32_t count = 0; count < emitter.count; count++) {
 		// エミッター設定に基づいて1つずつパーティクルを生成してリストに追加
 		particles.push_back(MakeNewParticle(rand, emitter));
@@ -234,7 +210,7 @@ std::list<ParticleData> Particles::Emit(const Emitter& emitter, std::mt19937& ra
 	return particles;
 }
 
-ParticleData Particles::MakeNewParticle(std::mt19937& rand, const Emitter& emitter) {
+ParticleDataCS Particles::MakeNewParticle(std::mt19937& rand, const Emitter& emitter) {
 
 	// ランダムな位置生成用：スケールの範囲内でX, Y, Z座標をばらつかせる
 	std::uniform_real_distribution<float> randTranslateX(emitter.transform.translate.x - emitter.transform.scale.x, emitter.transform.translate.x + emitter.transform.scale.x);
@@ -246,14 +222,14 @@ ParticleData Particles::MakeNewParticle(std::mt19937& rand, const Emitter& emitt
 	std::uniform_real_distribution<float> randColor(0.0f, 1.0f);     // ランダムなカラー（RGBのみ）
 	std::uniform_real_distribution<float> randTime(1.0f, 2.0f);      // 寿命（lifeTime）のランダム生成
 
-	ParticleData particle = {}; // 新しいパーティクルデータ構造体を初期化
+	ParticleDataCS particle = {}; // 新しいパーティクルデータ構造体を初期化
 
-	particle.transform.scale = { 1.f,1.f,1.f };  // スケールは固定（1,1,1）
-	particle.transform.rotate = { 0.f,0.f,0.f }; // 回転は初期値として0に設定
+	particle.scale = { 1.f,1.f,1.f };  // スケールは固定（1,1,1）
+	particle.rotate = { 0.f,0.f,0.f }; // 回転は初期値として0に設定
 	                                             // ↓生成位置をエミッターの位置を中心にランダムでばらつかせる
-	particle.transform.translate.x = randTranslateX(rand) + emitter.transform.translate.x;
-	particle.transform.translate.y = randTranslateY(rand) + emitter.transform.translate.y;
-	particle.transform.translate.z = randTranslateZ(rand) + emitter.transform.translate.z;
+	particle.translate.x = randTranslateX(rand) + emitter.transform.translate.x;
+	particle.translate.y = randTranslateY(rand) + emitter.transform.translate.y;
+	particle.translate.z = randTranslateZ(rand) + emitter.transform.translate.z;
 
 	particle.velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) }; // 初速度をランダムに設定
 	particle.color = { randColor(rand),randColor(rand),randColor(rand),1.0f }; 	        // 色の設定：RGBはランダム
@@ -276,194 +252,131 @@ void Particles::SetTexture(const std::string& textureName) {
 }
 
 void Particles::CreateParticleResource() {
-	HRESULT hr;
-
-	//----------------------------------------
-	// 1) リソースの作成
-	//----------------------------------------
-	// (a) UAV バッファ用の記述
-	D3D12_RESOURCE_DESC uavDesc = {};
-	uavDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	uavDesc.Width = sizeof(ParticleDataCS) * kMaxParticles_;
-	uavDesc.Height = 1;
-	uavDesc.DepthOrArraySize = 1;
-	uavDesc.MipLevels = 1;
-	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-	uavDesc.SampleDesc.Count = 1;
-	uavDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	uavDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-
-	// (b) アップロードバッファは同じサイズ、フラグなし
-	D3D12_RESOURCE_DESC uploadDesc = uavDesc;
-	uploadDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	// (c) GPU 側の UAV バッファ (Default Heap)
-	ComPtr<ID3D12Resource> gpuBuffer;
-	{
-		CD3DX12_HEAP_PROPERTIES heapProp(D3D12_HEAP_TYPE_DEFAULT);
-		hr = device_->CreateCommittedResource(
-			&heapProp,
-			D3D12_HEAP_FLAG_NONE,
-			&uavDesc,
-			D3D12_RESOURCE_STATE_COMMON,
-			nullptr,
-			IID_PPV_ARGS(&gpuBuffer)
-		);
-		assert(SUCCEEDED(hr));
-	}
-
-	// (d) CPU 側アップロードバッファ (Upload Heap)
-	ComPtr<ID3D12Resource> uploadBuffer;
-	{
-		CD3DX12_HEAP_PROPERTIES heapProp(D3D12_HEAP_TYPE_UPLOAD);
-		hr = device_->CreateCommittedResource(
-			&heapProp,
-			D3D12_HEAP_FLAG_NONE,
-			&uploadDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(&uploadBuffer)
-		);
-		assert(SUCCEEDED(hr));
-	}
-
-	// (e) CPU から初期データを書き込む
-	{
-		ParticleDataCS* mapped = nullptr;
-		uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
-		memcpy(mapped,
-			particlesCS_.data(),
-			sizeof(ParticleDataCS) * kMaxParticles_);
-		uploadBuffer->Unmap(0, nullptr);
-	}
-
-	//----------------------------------------
-	// 2) COPY → UAV へのステート遷移＆コピー（DIRECT リスト）
-	//----------------------------------------
-	ComPtr<ID3D12CommandAllocator> copyAlloc;
-	ComPtr<ID3D12GraphicsCommandList> copyList;
-
-	// (a) コマンドアロケータ／リストの生成（DIRECT！）
-	hr = device_->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		IID_PPV_ARGS(&copyAlloc)
+	// DefaultHeap上にパーティクル配列を作成（UAV/SRV兼用）
+	CD3DX12_HEAP_PROPERTIES heapProp(D3D12_HEAP_TYPE_DEFAULT);
+	CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(
+		sizeof(ParticleDataCS) * kMaxParticles_,
+		D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS // UAV必須
 	);
-	assert(SUCCEEDED(hr));
 
-	hr = device_->CreateCommandList(
-		0,
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		copyAlloc.Get(),
+	device_->CreateCommittedResource(
+		&heapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&bufferDesc,
+		D3D12_RESOURCE_STATE_COMMON, // 初期はCOMMONでOK
 		nullptr,
-		IID_PPV_ARGS(&copyList)
+		IID_PPV_ARGS(&particleBufferResource_)
 	);
-	assert(SUCCEEDED(hr));
-	// （CreateCommandList 直後は“開いている”状態）
+	// UAV: Unordered Access View
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = kMaxParticles_;
+	uavDesc.Buffer.StructureByteStride = sizeof(ParticleDataCS);
 
-	// (b) COMMON → COPY_DEST
-	{
-		auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			gpuBuffer.Get(),
-			D3D12_RESOURCE_STATE_COMMON,
-			D3D12_RESOURCE_STATE_COPY_DEST
-		);
-		copyList->ResourceBarrier(1, &barrier);
-	}
-
-	// (c) CopyResource
-	copyList->CopyResource(gpuBuffer.Get(), uploadBuffer.Get());
-
-	// (d) COPY_DEST → UNORDERED_ACCESS
-	{
-		auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			gpuBuffer.Get(),
-			D3D12_RESOURCE_STATE_COPY_DEST,
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS
-		);
-		copyList->ResourceBarrier(1, &barrier);
-	}
-
-	// (e) クローズ＆実行＆GPU待機
-	hr = copyList->Close();
-	assert(SUCCEEDED(hr));
-	{
-		ID3D12CommandList* lists[] = { copyList.Get() };
-		dxCommon_->GetCommandQueue()->ExecuteCommandLists(_countof(lists), lists);
-		dxCommon_->WaitForGPU();
-	}
-
-	// 作成したバッファをメンバへ保存
-	particleBuffer_ = std::move(gpuBuffer);
-	particleBufferUpload_ = std::move(uploadBuffer);
-
-	//----------------------------------------
-	// 3) ComputeShader 実行（DIRECTリスト！）
-	//----------------------------------------
-	// (a) シェーダコンパイル
-	ComPtr<IDxcBlob> csBlob = dxCommon_->CompileShader(
-		L"resources/Shaders/Particles/ComputeShader.hlsl",
-		L"cs_6_0"
+	device_->CreateUnorderedAccessView(
+		particleBufferResource_.Get(),
+		nullptr, // CounterResource: nullでOK
+		&uavDesc,
+		dxCommon_->GetSrvCPUHandle(particleSrvIndex_) // UAVヒープ上の任意のスロット
 	);
 
-	// (b) ルートシグネチャ（HLSL 内 [RootSignature] から取得）
-	ComPtr<ID3D12RootSignature> computeRootSig;
-	hr = device_->CreateRootSignature(
-		0,
-		csBlob->GetBufferPointer(),
-		csBlob->GetBufferSize(),
-		IID_PPV_ARGS(&computeRootSig)
-	);
-	assert(SUCCEEDED(hr));
+	// SRV: Shader Resource View
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = kMaxParticles_;
+	srvDesc.Buffer.StructureByteStride = sizeof(ParticleDataCS);
+	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
-	// (c) PSO 作成
-	ComPtr<ID3D12PipelineState> computePSO;
-	{
-		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
-		psoDesc.pRootSignature = computeRootSig.Get();
-		psoDesc.CS.pShaderBytecode = csBlob->GetBufferPointer();
-		psoDesc.CS.BytecodeLength = csBlob->GetBufferSize();
-		hr = device_->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&computePSO));
-		assert(SUCCEEDED(hr));
-	}
-
-	// (d) コマンドアロケータ／リストの生成（DIRECT！）
-	ComPtr<ID3D12CommandAllocator> compAlloc;
-	ComPtr<ID3D12GraphicsCommandList> compList;
-	hr = device_->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		IID_PPV_ARGS(&compAlloc)
-	);
-	assert(SUCCEEDED(hr));
-	hr = device_->CreateCommandList(
-		0,
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		compAlloc.Get(),
-		computePSO.Get(),  // 初期に PSO をセットしておいても OK
-		IID_PPV_ARGS(&compList)
-	);
-	assert(SUCCEEDED(hr));
-	// （CreateCommandList 直後は“開いている”状態）
-
-	// (e) Dispatch 前に UAV バインド
-	compList->SetComputeRootSignature(computeRootSig.Get());
-	compList->SetPipelineState(computePSO.Get());
-	compList->SetComputeRootUnorderedAccessView(
-		0,
-		particleBuffer_->GetGPUVirtualAddress()
+	device_->CreateShaderResourceView(
+		particleBufferResource_.Get(),
+		&srvDesc,
+		dxCommon_->GetSrvCPUHandle(particleSrvIndex_) // SRVヒープ上の任意のスロット
 	);
 
-	// (f) 実行
-	UINT threadGroups = (kMaxParticles_ + 255) / 256;
-	compList->Dispatch(threadGroups, 1, 1);
+	//----------------------------------------------------------------//
 
-	// (g) クローズ＆実行＆GPU待機
-	hr = compList->Close();
-	assert(SUCCEEDED(hr));
-	{
-		ID3D12CommandList* compLists[] = { compList.Get() };
-		dxCommon_->GetCommandQueue()->ExecuteCommandLists(_countof(compLists), compLists);
-		dxCommon_->WaitForGPU();
-	}
+	// 1. RootSignature作成
+	D3D12_ROOT_PARAMETER csRootParams[1] = {};
+	csRootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
+	csRootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	csRootParams[0].Descriptor.ShaderRegister = 0;
+
+	D3D12_ROOT_SIGNATURE_DESC csRootSigDesc = {};
+	csRootSigDesc.pParameters = csRootParams;
+	csRootSigDesc.NumParameters = _countof(csRootParams);
+	csRootSigDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+	ComPtr<ID3DBlob> csSignature, csError;
+	D3D12SerializeRootSignature(&csRootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &csSignature, &csError);
+
+	device_->CreateRootSignature(0, csSignature->GetBufferPointer(), csSignature->GetBufferSize(), IID_PPV_ARGS(&csRootSignature_));
+
+	// 2. ComputeShaderをコンパイル
+	ComPtr<IDxcBlob> csBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/Particles.CS.hlsl", L"cs_6_0");
+
+	// 3. Compute用PSO作成
+	D3D12_COMPUTE_PIPELINE_STATE_DESC csPsoDesc = {};
+	csPsoDesc.pRootSignature = csRootSignature_.Get();
+	csPsoDesc.CS.pShaderBytecode = csBlob->GetBufferPointer();
+	csPsoDesc.CS.BytecodeLength = csBlob->GetBufferSize();
+
+	device_->CreateComputePipelineState(&csPsoDesc, IID_PPV_ARGS(&csPipelineState_));
+
+	// 1. コマンドアロケータ/リスト作成（DIRECTでOK）
+	ComPtr<ID3D12CommandAllocator> alloc;
+	device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&alloc));
+	ComPtr<ID3D12GraphicsCommandList> list;
+	device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, alloc.Get(), csPipelineState_.Get(), IID_PPV_ARGS(&list));
+
+	// 2. 必要ならResourceBarrier（初期状態COMMON→UNORDERED_ACCESS）
+	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		particleBufferResource_.Get(),
+		D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+	);
+	list->ResourceBarrier(1, &barrier);
+
+	// 3. RootSignature/PSO/UAVセット
+	list->SetComputeRootSignature(csRootSignature_.Get());
+	list->SetPipelineState(csPipelineState_.Get());
+	list->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress());
+
+	// 4. Dispatch
+	UINT numGroups = (kMaxParticles_ + 255) / 256;
+	list->Dispatch(numGroups, 1, 1);
+
+	// 5. BarrierでSRVに戻す（必要なら）
+	auto barrier2 = CD3DX12_RESOURCE_BARRIER::Transition(
+		particleBufferResource_.Get(),
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE
+	);
+	list->ResourceBarrier(1, &barrier2);
+
+	// 6. コマンド実行＆同期
+	list->Close();
+	ID3D12CommandList* lists[] = { list.Get() };
+	dxCommon_->GetCommandQueue()->ExecuteCommandLists(_countof(lists), lists);
+	// 必要に応じてWaitForGPU()でGPU待ち
+	dxCommon_->WaitForGPU();
+}
+
+void Particles::CreatePreViewResource() {
+	preViewResource_ = CreateBufferResource(device_.Get(), sizeof(PreView));
+
+	// 書き込むためのアドレスを取得
+	preViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&preViewData_));
+
+	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
+	preViewData_->viewProjection = {};
+	preViewData_->billboardMatrix = {};
+
+	preViewResource_->Unmap(0, nullptr);
 }
 
 void Particles::CreateVertexResource() {
@@ -516,15 +429,13 @@ void Particles::CreateMaterialResource() {
 }
 
 void Particles::CreateTransformationResource() {
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxParticles_);
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleDataCS) * kMaxParticles_);
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&instanceData_));
-	instanceData_->WVP = MakeIdentityMatrix();
-	instanceData_->World = MakeIdentityMatrix();
+	instanceData_->scale = Vector3(1.0f, 1.0f, 1.0f);
 	instanceData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	//instancingResource_->Unmap(0, nullptr);
 	// --- Instancing用 StructuredBuffer をまとめて1つ作成 ---
-	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleForGPU) * kMaxParticles_);
+	instancingResource_ = CreateBufferResource(device_.Get(), sizeof(ParticleDataCS) * kMaxParticles_);
 	// SRV設定（StructuredBufferとして使う）
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -532,7 +443,7 @@ void Particles::CreateTransformationResource() {
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = kMaxParticles_;
-	srvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
+	srvDesc.Buffer.StructureByteStride = sizeof(ParticleDataCS);
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 	// SRVハンドルの取得（Heap内の空いているスロット、ここでは例として3番）
@@ -644,33 +555,45 @@ void Particles::CreateRootSignature() {
 	// --- Root Parameters ---
 
 	// ルートパラメータを4つ設定（CBV × 2、SRV × 2）
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	D3D12_ROOT_PARAMETER rootParameters[5] = {};
 
-	// b0 : マテリアル（Material）構造体（Pixel Shader）
+	// b0 : マテリアル（Pixel Shader）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
 
-	// t1 : パーティクル情報（構造化バッファ）用SRV（Vertex Shader）
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	// b1 : カメラ＆ビルボード行列（PreView/Vertex Shader用 CBV！★追加！）
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1]; // t1
-	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].Descriptor.ShaderRegister = 1;
 
-	// t0 : テクスチャ情報用SRV（Pixel Shader）
+	// t1 : パーティクル情報（構造化バッファ）（Vertex Shader用SRV）
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[0]; // t0
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[1]; // t1
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
-	// b2 : ディレクショナルライト情報（DirectionalLight）（Pixel Shader）
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	// t0 : テクスチャ（Pixel Shader用SRV）
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[3].Descriptor.ShaderRegister = 2;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRanges[0]; // t0
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
+
+	// b2 : ディレクショナルライト（Pixel Shader用CBV）
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[4].Descriptor.ShaderRegister = 2;
 
 	// ルートパラメータ配列をルートシグネチャ記述に登録
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
+
+	D3D12_ROOT_PARAMETER csRootParameters[1] = {};
+
+	// u0 : パーティクルUAV
+	csRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
+	csRootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; // or COMPUTE
+	csRootParameters[0].Descriptor.ShaderRegister = 0; // u0
 
 	// --- シリアライズしてRootSignatureを生成 ---
 	ComPtr<ID3DBlob> signatureBlob = nullptr;

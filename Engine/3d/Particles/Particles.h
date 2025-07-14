@@ -30,6 +30,7 @@
 #include "ParticleForGPU.h"
 #include "Emitter.h"
 #include "BlendMode.h"
+#include "PreView.h"
 
 #include <random>
 #include <numbers>
@@ -70,13 +71,17 @@ private:
 	
 	unique_ptr<Object3d> emitterModel_ = make_unique<Object3d>(); // エミッターの可視化用3Dオブジェクト
 
-	std::list<ParticleData> particles_; // パーティクルの本体情報
+	std::list<ParticleDataCS> particles_; // パーティクルの本体情報
 	Emitter emitter_;                   // 使用するエミッター
 
+	uint32_t particleSrvIndex_ = 64;
 	uint32_t numInstance_ = 0;               // 現在描画するインスタンスの数
 	const uint32_t kMaxParticles_ = 512;     // 描画可能な最大パーティクル数
-	ParticleForGPU* instanceData_ = nullptr; // GPU側に送るインスタンス情報
-	
+	ParticleDataCS* instanceData_ = nullptr; // GPU側に送るインスタンス情報
+
+	// StructuredBuffer用（インスタンシング）バッファ
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
+
 	std::string textureName_; // 使用するテクスチャの名前
 	BlendMode blendMode_;     // 現在のブレンドモード
 	
@@ -88,24 +93,33 @@ private:
 	int spawnCount_;                        // 今フレームでスポーンするパーティクル数のカウント（Emit で使用される）
 
 	// エミッターの設定に従って複数のパーティクルを生成し、リストとして返す関数
-	std::list<ParticleData> Emit(const Emitter& emitter, std::mt19937& rand);
+	std::list<ParticleDataCS> Emit(const Emitter& emitter, std::mt19937& rand);
 
 	// 1つのパーティクルを生成し、初期化された ParticleData を返す
-	ParticleData MakeNewParticle(std::mt19937& rand, const Emitter& emitter);
+	ParticleDataCS MakeNewParticle(std::mt19937& rand, const Emitter& emitter);
 
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> particleBuffer_;       // GPUに渡すStructuredBuffer用
-	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferUpload_; // 初期化用UploadHeap
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferResource_;       // GPUに渡すStructuredBuffer用
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferUploadResource_; // 初期化用UploadHeap
 
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> computeAllocator_;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> computeQueue_;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> computeList_;
 
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> csPipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> csRootSignature_;
+
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSig_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> computePSO_;
+
 	// パーティクル配列
 	std::vector<ParticleDataCS> particlesCS_;
-
 	void CreateParticleResource();
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> preViewResource_;
+	PreView* preViewData_ = nullptr;
+	void CreatePreViewResource();
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 
@@ -129,9 +143,6 @@ private:
 
 	// インデックスバッファビュー
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
-
-	// StructuredBuffer用（インスタンシング）バッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 
 	// StructuredBuffer用 SRV のGPUハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;

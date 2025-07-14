@@ -59,7 +59,11 @@ public:
     
     D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle(uint32_t index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle(uint32_t index);
+
     D3D12_CPU_DESCRIPTOR_HANDLE GetDsvCPUHandle(uint32_t index);
+
+    D3D12_CPU_DESCRIPTOR_HANDLE GetUavCPUHandle(uint32_t index);
+    D3D12_GPU_DESCRIPTOR_HANDLE GetUavGPUHandle(uint32_t index);
 
     uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
     uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
