@@ -12,7 +12,7 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
     if (particlesIndex < kMaxParticles) {
         gParticles[particlesIndex] = (Particle) 0;
         gParticles[particlesIndex].translate = float3(0.0f, 0.0f, 0.0f);
-        gParticles[particlesIndex].scale = float3(0.5f, 0.5f, 0.5f);
+        gParticles[particlesIndex].scale = float3(1.0f, 1.0f, 1.0f);
         gParticles[particlesIndex].color = float4(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }

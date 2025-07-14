@@ -252,6 +252,7 @@ void Particles::SetTexture(const std::string& textureName) {
 }
 
 void Particles::CreateParticleResource() {
+
 	// DefaultHeap上にパーティクル配列を作成（UAV/SRV兼用）
 	CD3DX12_HEAP_PROPERTIES heapProp(D3D12_HEAP_TYPE_DEFAULT);
 	CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(
@@ -267,6 +268,7 @@ void Particles::CreateParticleResource() {
 		nullptr,
 		IID_PPV_ARGS(&particleBufferResource_)
 	);
+
 	// UAV: Unordered Access View
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -317,7 +319,7 @@ void Particles::CreateParticleResource() {
 	device_->CreateRootSignature(0, csSignature->GetBufferPointer(), csSignature->GetBufferSize(), IID_PPV_ARGS(&csRootSignature_));
 
 	// 2. ComputeShaderをコンパイル
-	ComPtr<IDxcBlob> csBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/Particles.CS.hlsl", L"cs_6_0");
+	ComPtr<IDxcBlob> csBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/ParticlesInitialize.CS.hlsl", L"cs_6_0");
 
 	// 3. Compute用PSO作成
 	D3D12_COMPUTE_PIPELINE_STATE_DESC csPsoDesc = {};

@@ -1,11 +1,5 @@
 #include "Particles.hlsli"
 
-// StructuredBufferをt1でバインド（t0はPSのテクスチャ用なので競合回避！）
-StructuredBuffer<Particle> gParticles : register(t1);
-
-// カメラやビルボード行列用CB（必要に応じて）
-ConstantBuffer<PreView> gPreView : register(b1);
-
 // 頂点シェーダー出力
 struct VertexShaderInput
 {
@@ -13,6 +7,12 @@ struct VertexShaderInput
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
 };
+
+// StructuredBufferをt1でバインド（t0はPSのテクスチャ用なので競合回避！）
+StructuredBuffer<Particle> gParticles : register(t1);
+
+// カメラやビルボード行列用CB（必要に応じて）
+ConstantBuffer<PreView> gPreView : register(b1);
 
 // main
 VertexShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID)
