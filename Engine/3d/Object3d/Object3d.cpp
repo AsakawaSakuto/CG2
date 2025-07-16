@@ -183,7 +183,7 @@ void Object3d::CreateMaterialResource() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
-	materialData_->enableLighting = true;
+	materialData_->enableLighting = false;
 	materialData_->uvTransform = MakeIdentityMatrix();
 	materialData_->shininess =30.0f;
 }

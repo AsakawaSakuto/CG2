@@ -31,6 +31,7 @@
 #include "Emitter.h"
 #include "BlendMode.h"
 #include "PreView.h"
+#include "EmitterSpfere.h"
 
 #include <random>
 #include <numbers>
@@ -66,18 +67,17 @@ public:
 	void SetBlendMode(BlendMode blendMode) { blendMode_ = blendMode; }
 
 	// エミッタの位置（Translate）をセット
-	void SetEmitter(const Vector3& translete) { emitter_.transform.translate = translete; }
+	void SetEmitter(const Vector3& translete) { emitter_.translate = translete; }
 private:
 	
 	unique_ptr<Object3d> emitterModel_ = make_unique<Object3d>(); // エミッターの可視化用3Dオブジェクト
 
 	std::list<ParticleDataCS> particles_; // パーティクルの本体情報
-	Emitter emitter_;                   // 使用するエミッター
 
 	uint32_t particleSrvIndex_ = 64;
 	uint32_t numInstance_ = 0;               // 現在描画するインスタンスの数
 	const uint32_t kMaxParticles_ = 512;     // 描画可能な最大パーティクル数
-	ParticleDataCS* instanceData_ = nullptr; // GPU側に送るインスタンス情報
+	ParticleDataCS* particleDataCS_ = nullptr; // GPU側に送るインスタンス情報
 
 	// StructuredBuffer用（インスタンシング）バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
@@ -116,10 +116,16 @@ private:
 	// パーティクル配列
 	std::vector<ParticleDataCS> particlesCS_;
 	void CreateParticleResource();
+	void UpdateGPUParticle();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> preViewResource_;
 	PreView* preViewData_ = nullptr;
 	void CreatePreViewResource();
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> emitterBufferResource_;
+	EmitterSphere emitter_;
+	EmitterSphere* emitterData_ = nullptr;
+	void CreateEmitterResource();
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 

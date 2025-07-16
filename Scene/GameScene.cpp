@@ -27,10 +27,10 @@ void GameScene::Initialize() {
 
 	debugCamera->SetInput(input.get());
 	
-	ball->Initialize(dxCommon.get(), "resources/object3d/uvSphere.obj", "resources/engineResources/uvChecker.png");
-	ball->SetTexture("resources/image/monsterBall.png");
+	//ball->Initialize(dxCommon.get(), "resources/object3d/uvSphere.obj", "resources/engineResources/uvChecker.png");
+	//ball->SetTexture("resources/image/monsterBall.png");
+	//plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/image/GroundTexture.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
-	plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/image/GroundTexture.png");
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
 }
 
@@ -48,8 +48,8 @@ void GameScene::Update() {
 
 	/*particles->SetEmitter(ball->GetPosition());*/
 
-	ball->Update(*useCamera);
-	plane->Update(*useCamera);
+	//ball->Update(*useCamera);
+	//plane->Update(*useCamera);
 	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
 }
