@@ -36,3 +36,35 @@ struct PreView {
     float4x4 viewProjection;
     float4x4 billboardMatrix;
 };
+
+struct PreFrame {
+    float time;
+    float deltaTime;
+};
+
+class RandomGenerator {
+    float3 seed;
+
+    float3 rand3dTo3d(float3 s)
+    {
+        return frac(sin(s) * 43758.5453);
+    }
+
+    float rand3dTo1d(float3 s)
+    {
+        return frac(sin(dot(s, float3(12.9898, 78.233, 45.164))) * 43758.5453);
+    }
+
+    float3 Generate3d()
+    {
+        seed = rand3dTo3d(seed);
+        return seed;
+    }
+
+    float Generate1d()
+    {
+        float result = rand3dTo1d(seed);
+        seed.x = result;
+        return result;
+    }
+};
