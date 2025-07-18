@@ -113,7 +113,7 @@ private:
 	// パーティクル配列
 	std::vector<ParticleDataCS> particlesCS_;
 	void CreateParticleResource();
-	void UpdateGPUParticle();
+	void UpdateParticle();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> perViewResource_;
 	PerView* perViewData_ = nullptr;
@@ -125,6 +125,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	EmitterSphere emitter_ = {};
 	void CreateEmitterResource();
+	void UpdateEmitter();
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 

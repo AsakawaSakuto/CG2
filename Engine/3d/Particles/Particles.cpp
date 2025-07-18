@@ -75,22 +75,6 @@ void Particles::Update(Camera& useCamera) {
 	memcpy(mappedPtr, &tempPreView, sizeof(PerView));
 	perViewResource_->Unmap(0, nullptr);
 
-	// このemitterSphereをCBufferとしてGPUへ転送
-	emitter_.frequencyTime += kDeltaTime_;
-	emitter_.count = kMaxParticles_;
-	if (emitter_.frequency <= emitter_.frequencyTime) {
-		emitter_.frequencyTime -= emitter_.frequency;
-		emitter_.emit = 1;
-	} else {
-		emitter_.emit = 0;
-	}
-
-	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
-	EmitterSphere* mappedEmitter = nullptr;
-	emitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter));
-	// ここで値をコピーまたは書き換え
-	*mappedEmitter = emitter_; // 構造体ごとコピー
-
 	totalTime_ += kDeltaTime_;
 	// フレームごとに
 	PerFrame* mapped = nullptr;
@@ -98,7 +82,9 @@ void Particles::Update(Camera& useCamera) {
 	mapped->time = totalTime_;      // 例えば経過時間など
 	mapped->deltaTime = kDeltaTime_;  // フレームごとの経過時間
 
-	UpdateGPUParticle();
+	UpdateEmitter();
+
+	UpdateParticle();
 }
 
 void Particles::Draw() {
@@ -361,7 +347,7 @@ void Particles::CreateParticleResource() {
 	dxCommon_->WaitForGPU();
 }
 
-void Particles::UpdateGPUParticle() {
+void Particles::UpdateParticle() {
 	// 1. 必要な場合だけ「UAV」に遷移
 	D3D12_RESOURCE_BARRIER toUAV = CD3DX12_RESOURCE_BARRIER::Transition(
 		particleBufferResource_.Get(),
@@ -403,6 +389,24 @@ void Particles::CreateEmitterResource() {
 		nullptr,
 		IID_PPV_ARGS(&emitterResource_)
 	);
+}
+
+void Particles::UpdateEmitter() {
+	// このemitterSphereをCBufferとしてGPUへ転送
+	emitter_.frequencyTime += kDeltaTime_;
+	emitter_.count = kMaxParticles_;
+	if (emitter_.frequency <= emitter_.frequencyTime) {
+		emitter_.frequencyTime -= emitter_.frequency;
+		emitter_.emit = 1;
+	} else {
+		emitter_.emit = 0;
+	}
+
+	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
+	EmitterSphere* mappedEmitter = nullptr;
+	emitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter));
+	// ここで値をコピーまたは書き換え
+	*mappedEmitter = emitter_; // 構造体ごとコピー
 }
 
 void Particles::CreatePerFrameResource() {
