@@ -90,12 +90,6 @@ private:
 	const float kDeltaTime_ = 1.0f / 60.0f; // 1フレームあたりの固定デルタタイム
 	float totalTime_ = 0.0f;
 
-	// エミッターの設定に従って複数のパーティクルを生成し、リストとして返す関数
-	std::list<ParticleDataCS> Emit(const Emitter& emitter, std::mt19937& rand);
-
-	// 1つのパーティクルを生成し、初期化された ParticleData を返す
-	ParticleDataCS MakeNewParticle(std::mt19937& rand, const Emitter& emitter);
-
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferResource_;       // GPUに渡すStructuredBuffer用
@@ -111,7 +105,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> csUpdatePipelineState_;
 
 	// パーティクル配列
-	std::vector<ParticleDataCS> particlesCS_;
 	void CreateParticleResource();
 	void UpdateParticle();
 

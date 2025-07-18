@@ -30,7 +30,6 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateMaterialResource();           // マテリアル
 	CreateDirectionalLightResource();   // ライト情報
 
-	particlesCS_.resize(kMaxParticles_);
 	D3D12_COMMAND_QUEUE_DESC desc = {};
 	desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
 	device_->CreateCommandQueue(&desc, IID_PPV_ARGS(&computeQueue_));
@@ -40,7 +39,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePerFrameResource();
 	CreateEmitterResource();
 
-	emitter_.count = 10;
+	emitter_.count = kMaxParticles_;
 	emitter_.frequency = 0.5f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.translate = Vector3(0.0f, 0.0f, 0.0f);
@@ -168,44 +167,6 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Text("Particle Count: %d", static_cast<int>(particles_.size()));
 
 	ImGui::End();
-}
-
-std::list<ParticleDataCS> Particles::Emit(const Emitter& emitter, std::mt19937& rand) {
-	std::list<ParticleDataCS> particles;
-	for (uint32_t count = 0; count < emitter.count; count++) {
-		// エミッター設定に基づいて1つずつパーティクルを生成してリストに追加
-		particles.push_back(MakeNewParticle(rand, emitter));
-	}
-	return particles;
-}
-
-ParticleDataCS Particles::MakeNewParticle(std::mt19937& rand, const Emitter& emitter) {
-
-	// ランダムな位置生成用：スケールの範囲内でX, Y, Z座標をばらつかせる
-	std::uniform_real_distribution<float> randTranslateX(emitter.transform.translate.x - emitter.transform.scale.x, emitter.transform.translate.x + emitter.transform.scale.x);
-	std::uniform_real_distribution<float> randTranslateY(emitter.transform.translate.y - emitter.transform.scale.y, emitter.transform.translate.y + emitter.transform.scale.y);
-	std::uniform_real_distribution<float> randTranslateZ(emitter.transform.translate.z - emitter.transform.scale.z, emitter.transform.translate.z + emitter.transform.scale.z);
-
-	
-	std::uniform_real_distribution<float> randVelocity(-1.0f, 1.0f); // ランダムな速度（方向）
-	std::uniform_real_distribution<float> randColor(0.0f, 1.0f);     // ランダムなカラー（RGBのみ）
-	std::uniform_real_distribution<float> randTime(1.0f, 2.0f);      // 寿命（lifeTime）のランダム生成
-
-	ParticleDataCS particle = {}; // 新しいパーティクルデータ構造体を初期化
-
-	particle.scale = { 1.f,1.f,1.f };  // スケールは固定（1,1,1）
-	particle.rotate = { 0.f,0.f,0.f }; // 回転は初期値として0に設定
-	                                             // ↓生成位置をエミッターの位置を中心にランダムでばらつかせる
-	particle.translate.x = randTranslateX(rand) + emitter.transform.translate.x;
-	particle.translate.y = randTranslateY(rand) + emitter.transform.translate.y;
-	particle.translate.z = randTranslateZ(rand) + emitter.transform.translate.z;
-
-	particle.velocity = { randVelocity(rand), randVelocity(rand), randVelocity(rand) }; // 初速度をランダムに設定
-	particle.color = { randColor(rand),randColor(rand),randColor(rand),1.0f }; 	        // 色の設定：RGBはランダム
-	particle.lifeTime = randTime(rand); 	                                            // パーティクルの寿命（最大生存時間）
-	particle.currentTime = 0;                                                           // 現在の時間は初期化（誕生時は0）
-
-	return particle;
 }
 
 void Particles::SetTexture(const std::string& textureName) {
@@ -658,7 +619,6 @@ void Particles::CreateRootSignature() {
 	assert(SUCCEEDED(hr_));
 }
 
-
 void Particles::InputLayoutSet() {
 
 	// POSITION
@@ -776,5 +736,3 @@ void Particles::DepthStencilStateSet() {
 	// 比較関数LessEqual、つまり、深ければ描画される
 	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 }
-
-#pragma endregion
