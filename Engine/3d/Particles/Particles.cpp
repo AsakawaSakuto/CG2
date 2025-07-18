@@ -34,11 +34,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	D3D12_COMMAND_QUEUE_DESC desc = {};
 	desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
 	device_->CreateCommandQueue(&desc, IID_PPV_ARGS(&computeQueue_));
+
 	CreateParticleResource();
-
 	CreatePerViewResource();
-
+	CreatePerFrameResource();
 	CreateEmitterResource();
+
 	emitter_.count = 10;
 	emitter_.frequency = 0.5f;
 	emitter_.frequencyTime = 0.0f;
@@ -76,6 +77,7 @@ void Particles::Update(Camera& useCamera) {
 
 	// このemitterSphereをCBufferとしてGPUへ転送
 	emitter_.frequencyTime += kDeltaTime_;
+	emitter_.count = kMaxParticles_;
 	if (emitter_.frequency <= emitter_.frequencyTime) {
 		emitter_.frequencyTime -= emitter_.frequency;
 		emitter_.emit = 1;
@@ -85,9 +87,16 @@ void Particles::Update(Camera& useCamera) {
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
 	EmitterSphere* mappedEmitter = nullptr;
-	emitterBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter));
+	emitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter));
 	// ここで値をコピーまたは書き換え
 	*mappedEmitter = emitter_; // 構造体ごとコピー
+
+	totalTime_ += kDeltaTime_;
+	// フレームごとに
+	PerFrame* mapped = nullptr;
+	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
+	mapped->time = totalTime_;      // 例えば経過時間など
+	mapped->deltaTime = kDeltaTime_;  // フレームごとの経過時間
 
 	UpdateGPUParticle();
 }
@@ -144,7 +153,10 @@ void Particles::Draw() {
 	commandList_->SetGraphicsRootConstantBufferView(4, directionalLightResource_->GetGPUVirtualAddress());
 
 	//
-	commandList_->SetGraphicsRootConstantBufferView(5, emitterBufferResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(5, emitterResource_->GetGPUVirtualAddress());
+
+	//
+	commandList_->SetGraphicsRootConstantBufferView(6, perFrameResource_->GetGPUVirtualAddress());
 
 	// パーティクルのインスタンシング描画
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
@@ -166,8 +178,6 @@ void Particles::DrawImGui(const char* objectName) {
 	int current = static_cast<int>(blendMode_);
 	ImGui::Combo("BlendMode", &current, directionLabels, 6);
 	blendMode_ = static_cast<BlendMode>(current);
-
-	ImGui::DragInt("GenerateCount", &spawnCount_, 1.0f, 0, 1000);
 
 	ImGui::Text("Particle Count: %d", static_cast<int>(particles_.size()));
 
@@ -276,10 +286,18 @@ void Particles::CreateParticleResource() {
 	//----------------------------------------------------------------//
 
 	// 1. RootSignature作成
-	D3D12_ROOT_PARAMETER csRootParams[1] = {};
+	D3D12_ROOT_PARAMETER csRootParams[3] = {};
 	csRootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
 	csRootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	csRootParams[0].Descriptor.ShaderRegister = 0;
+
+	csRootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	csRootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	csRootParams[1].Descriptor.ShaderRegister = 5;
+
+	csRootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	csRootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	csRootParams[2].Descriptor.ShaderRegister = 6;
 
 	D3D12_ROOT_SIGNATURE_DESC csRootSigDesc = {};
 	csRootSigDesc.pParameters = csRootParams;
@@ -291,22 +309,25 @@ void Particles::CreateParticleResource() {
 
 	device_->CreateRootSignature(0, csSignature->GetBufferPointer(), csSignature->GetBufferSize(), IID_PPV_ARGS(&csRootSignature_));
 
-	// 2. ComputeShaderをコンパイル
-	ComPtr<IDxcBlob> csBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/ParticlesInitialize.CS.hlsl", L"cs_6_0");
+	// --- 初期化用CS（ParticlesInitialize.CS.hlsl） ---
+	ComPtr<IDxcBlob> csInitBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/ParticlesInitialize.CS.hlsl", L"cs_6_0");
+	D3D12_COMPUTE_PIPELINE_STATE_DESC csInitDesc = {};
+	csInitDesc.pRootSignature = csRootSignature_.Get();
+	csInitDesc.CS = { csInitBlob->GetBufferPointer(), csInitBlob->GetBufferSize() };
+	device_->CreateComputePipelineState(&csInitDesc, IID_PPV_ARGS(&csInitializePipelineState_));
 
-	// 3. Compute用PSO作成
-	D3D12_COMPUTE_PIPELINE_STATE_DESC csPsoDesc = {};
-	csPsoDesc.pRootSignature = csRootSignature_.Get();
-	csPsoDesc.CS.pShaderBytecode = csBlob->GetBufferPointer();
-	csPsoDesc.CS.BytecodeLength = csBlob->GetBufferSize();
-
-	device_->CreateComputePipelineState(&csPsoDesc, IID_PPV_ARGS(&csPipelineState_));
+	// --- 動作用CS（EmitterParticle.CS.hlsl） ---
+	ComPtr<IDxcBlob> csUpdateBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/EmitterParticle.CS.hlsl", L"cs_6_0");
+	D3D12_COMPUTE_PIPELINE_STATE_DESC csUpdateDesc = {};
+	csUpdateDesc.pRootSignature = csRootSignature_.Get();
+	csUpdateDesc.CS = { csUpdateBlob->GetBufferPointer(), csUpdateBlob->GetBufferSize() };
+	device_->CreateComputePipelineState(&csUpdateDesc, IID_PPV_ARGS(&csUpdatePipelineState_));
 
 	// 1. コマンドアロケータ/リスト作成（DIRECTでOK）
 	ComPtr<ID3D12CommandAllocator> alloc;
 	device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&alloc));
 	ComPtr<ID3D12GraphicsCommandList> list;
-	device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, alloc.Get(), csPipelineState_.Get(), IID_PPV_ARGS(&list));
+	device_->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, alloc.Get(), csInitializePipelineState_.Get(), IID_PPV_ARGS(&list));
 
 	// 2. 必要ならResourceBarrier（初期状態COMMON→UNORDERED_ACCESS）
 	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -318,12 +339,11 @@ void Particles::CreateParticleResource() {
 
 	// 3. RootSignature/PSO/UAVセット
 	list->SetComputeRootSignature(csRootSignature_.Get());
-	list->SetPipelineState(csPipelineState_.Get());
+	list->SetPipelineState(csInitializePipelineState_.Get());
 	list->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress());
 
 	// 4. Dispatch
-	UINT numGroups = (kMaxParticles_ + 255) / 256;
-	list->Dispatch(numGroups, 1, 1);
+	list->Dispatch(kMaxParticles_, 1, 1);
 
 	// 5. BarrierでSRVに戻す（必要なら）
 	auto barrier2 = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -351,13 +371,15 @@ void Particles::UpdateGPUParticle() {
 	commandList_->ResourceBarrier(1, &toUAV);
 
 	// 2. CSのRootSignature, PSOセット
-	commandList_->SetPipelineState(csPipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
+	commandList_->SetPipelineState(csUpdatePipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
 	commandList_->SetComputeRootSignature(csRootSignature_.Get());
 	commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress());
 
+	commandList_->SetComputeRootConstantBufferView(1, emitterResource_->GetGPUVirtualAddress());  // b5
+	commandList_->SetComputeRootConstantBufferView(2, perFrameResource_->GetGPUVirtualAddress()); // b6
+
 	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
-	UINT numGroups = (kMaxParticles_ + 255) / 256;
-	commandList_->Dispatch(numGroups, 1, 1);
+	commandList_->Dispatch(kMaxParticles_, 1, 1);
 
 	// 4. SRV状態へバリア
 	D3D12_RESOURCE_BARRIER toSRV = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -379,7 +401,20 @@ void Particles::CreateEmitterResource() {
 		&resourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&emitterBufferResource_)
+		IID_PPV_ARGS(&emitterResource_)
+	);
+}
+
+void Particles::CreatePerFrameResource() {
+	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_UPLOAD);
+	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(PerFrame));
+	device_->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&perFrameResource_)
 	);
 }
 
@@ -546,7 +581,7 @@ void Particles::CreateRootSignature() {
 	// --- Root Parameters ---
 
 	// ルートパラメータを4つ設定（CBV × 2、SRV × 2）
-	D3D12_ROOT_PARAMETER rootParameters[6] = {};
+	D3D12_ROOT_PARAMETER rootParameters[7] = {};
 
 	// b0 : マテリアル（Pixel Shader）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -579,6 +614,11 @@ void Particles::CreateRootSignature() {
 	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; // 必要に応じて
 	rootParameters[5].Descriptor.ShaderRegister = 5;
+
+	// b6 : PerFrame（Compute/Vertex/Pixel 用CBV）
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; // 必要に応じて
+	rootParameters[6].Descriptor.ShaderRegister = 6;
 
 	// ルートパラメータ配列をルートシグネチャ記述に登録
 	descriptionRootSignature.pParameters = rootParameters;

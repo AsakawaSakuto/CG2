@@ -31,6 +31,7 @@
 #include "Emitter.h"
 #include "BlendMode.h"
 #include "PreView.h"
+#include "PreFrame.h"
 #include "EmitterSpfere.h"
 
 #include <random>
@@ -76,11 +77,8 @@ private:
 
 	uint32_t particleSrvIndex_ = 64;
 	uint32_t numInstance_ = 0;               // 現在描画するインスタンスの数
-	const uint32_t kMaxParticles_ = 512;     // 描画可能な最大パーティクル数
+	const uint32_t kMaxParticles_ = 16;      // 描画可能な最大パーティクル数
 	ParticleDataCS* particleDataCS_ = nullptr; // GPU側に送るインスタンス情報
-
-	// StructuredBuffer用（インスタンシング）バッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 
 	std::string textureName_; // 使用するテクスチャの名前
 	BlendMode blendMode_;     // 現在のブレンドモード
@@ -90,7 +88,7 @@ private:
 	bool isDrawEmitter_ = false; // エミッターを可視化するかのフラグ
 
 	const float kDeltaTime_ = 1.0f / 60.0f; // 1フレームあたりの固定デルタタイム
-	int spawnCount_;                        // 今フレームでスポーンするパーティクル数のカウント（Emit で使用される）
+	float totalTime_ = 0.0f;
 
 	// エミッターの設定に従って複数のパーティクルを生成し、リストとして返す関数
 	std::list<ParticleDataCS> Emit(const Emitter& emitter, std::mt19937& rand);
@@ -107,11 +105,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> computeQueue_;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> computeList_;
 
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> csPipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> csRootSignature_;
-
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSig_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> computePSO_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> csPipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> csInitializePipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> csUpdatePipelineState_;
 
 	// パーティクル配列
 	std::vector<ParticleDataCS> particlesCS_;
@@ -122,9 +119,11 @@ private:
 	PerView* perViewData_ = nullptr;
 	void CreatePerViewResource();
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> emitterBufferResource_;
-	EmitterSphere emitter_;
-	EmitterSphere* emitterData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_;
+	void CreatePerFrameResource();
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
+	EmitterSphere emitter_ = {};
 	void CreateEmitterResource();
 
 	/*----------作成から描画までの様々な変数や関数----------*/
