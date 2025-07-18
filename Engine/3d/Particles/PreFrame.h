@@ -1,6 +1,6 @@
 #pragma once
 
-struct PreFrame {
+struct PerFrame {
     float time;
     float deltaTime;
 };

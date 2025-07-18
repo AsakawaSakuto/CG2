@@ -118,9 +118,9 @@ private:
 	void CreateParticleResource();
 	void UpdateGPUParticle();
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> preViewResource_;
-	PreView* preViewData_ = nullptr;
-	void CreatePreViewResource();
+	Microsoft::WRL::ComPtr<ID3D12Resource> perViewResource_;
+	PerView* perViewData_ = nullptr;
+	void CreatePerViewResource();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterBufferResource_;
 	EmitterSphere emitter_;

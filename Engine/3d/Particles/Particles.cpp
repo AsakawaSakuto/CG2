@@ -36,7 +36,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	device_->CreateCommandQueue(&desc, IID_PPV_ARGS(&computeQueue_));
 	CreateParticleResource();
 
-	CreatePreViewResource();
+	CreatePerViewResource();
 
 	CreateEmitterResource();
 	emitter_.count = 10;
@@ -65,14 +65,14 @@ void Particles::Update(Camera& useCamera) {
 		0.1f, 100.0f);
 
 	// PreViewリソースに書き込み
-	PreView tempPreView;
+	PerView tempPreView;
 	tempPreView.viewProjection = MultiplyMatrix(viewMatrix, projectionMatrix);
 	tempPreView.billboardMatrix = billboardMatrix;
 
 	void* mappedPtr = nullptr;
-	preViewResource_->Map(0, nullptr, &mappedPtr);
-	memcpy(mappedPtr, &tempPreView, sizeof(PreView));
-	preViewResource_->Unmap(0, nullptr);
+	perViewResource_->Map(0, nullptr, &mappedPtr);
+	memcpy(mappedPtr, &tempPreView, sizeof(PerView));
+	perViewResource_->Unmap(0, nullptr);
 
 	// このemitterSphereをCBufferとしてGPUへ転送
 	emitter_.frequencyTime += kDeltaTime_;
@@ -132,7 +132,7 @@ void Particles::Draw() {
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
 	// 1番：カメラ・ビルボード行列（PreViewなど）
-	commandList_->SetGraphicsRootConstantBufferView(1, preViewResource_->GetGPUVirtualAddress()); // ←ここ重要
+	commandList_->SetGraphicsRootConstantBufferView(1, perViewResource_->GetGPUVirtualAddress()); // ←ここ重要
 
 	// 2番：パーティクルインスタンシングSRV（StructuredBufferなど）
 	commandList_->SetGraphicsRootDescriptorTable(2, dxCommon_->GetSrvGPUHandle(particleSrvIndex_)); // ←今まで1番だったやつ
@@ -383,17 +383,17 @@ void Particles::CreateEmitterResource() {
 	);
 }
 
-void Particles::CreatePreViewResource() {
-	preViewResource_ = CreateBufferResource(device_.Get(), sizeof(PreView));
+void Particles::CreatePerViewResource() {
+	perViewResource_ = CreateBufferResource(device_.Get(), sizeof(PerView));
 
 	// 書き込むためのアドレスを取得
-	preViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&preViewData_));
+	perViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_));
 
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
-	preViewData_->viewProjection = {};
-	preViewData_->billboardMatrix = {};
+	perViewData_->viewProjection = {};
+	perViewData_->billboardMatrix = {};
 
-	preViewResource_->Unmap(0, nullptr);
+	perViewResource_->Unmap(0, nullptr);
 }
 
 void Particles::CreateVertexResource() {

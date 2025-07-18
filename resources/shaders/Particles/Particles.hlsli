@@ -32,12 +32,12 @@ struct EmitterSphere {
     float2 pad;
 };
 
-struct PreView {
+struct PerView {
     float4x4 viewProjection;
     float4x4 billboardMatrix;
 };
 
-struct PreFrame {
+struct PerFrame {
     float time;
     float deltaTime;
 };
