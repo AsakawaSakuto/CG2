@@ -39,7 +39,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePerFrameResource();
 	CreateEmitterResource();
 
-	emitter_.count = 2;
+	emitter_.count = 16;
 	emitter_.frequency = 1.0f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.translate = Vector3(0.0f, 0.0f, 0.0f);
@@ -281,18 +281,25 @@ void Particles::CreateParticleResource() {
 	device_->CreateRootSignature(0, csSignature->GetBufferPointer(), csSignature->GetBufferSize(), IID_PPV_ARGS(&csRootSignature_));
 
 	// --- 初期化用CS（ParticlesInitialize.CS.hlsl） ---
-	ComPtr<IDxcBlob> csInitBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/ParticlesInitialize.CS.hlsl", L"cs_6_0");
+	ComPtr<IDxcBlob> csInitBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/InitializeParticle.CS.hlsl", L"cs_6_0");
 	D3D12_COMPUTE_PIPELINE_STATE_DESC csInitDesc = {};
 	csInitDesc.pRootSignature = csRootSignature_.Get();
 	csInitDesc.CS = { csInitBlob->GetBufferPointer(), csInitBlob->GetBufferSize() };
 	device_->CreateComputePipelineState(&csInitDesc, IID_PPV_ARGS(&csInitializePipelineState_));
 
+	// --- エミッタ用CS（EmitterParticle.CS.hlsl） ---
+	ComPtr<IDxcBlob> csEmitterBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/EmitterParticle.CS.hlsl", L"cs_6_0");
+	D3D12_COMPUTE_PIPELINE_STATE_DESC csEmitterDesc = {};
+	csEmitterDesc.pRootSignature = csRootSignature_.Get();
+	csEmitterDesc.CS = { csEmitterBlob->GetBufferPointer(), csEmitterBlob->GetBufferSize() };
+	device_->CreateComputePipelineState(&csEmitterDesc, IID_PPV_ARGS(&csEmitterPipelineState_));
+
 	// --- 動作用CS（EmitterParticle.CS.hlsl） ---
-	ComPtr<IDxcBlob> csUpdateBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/EmitterParticle.CS.hlsl", L"cs_6_0");
+	ComPtr<IDxcBlob> csUpdateBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/UpdateParticle.CS.hlsl", L"cs_6_0");
 	D3D12_COMPUTE_PIPELINE_STATE_DESC csUpdateDesc = {};
 	csUpdateDesc.pRootSignature = csRootSignature_.Get();
 	csUpdateDesc.CS = { csUpdateBlob->GetBufferPointer(), csUpdateBlob->GetBufferSize() };
-	device_->CreateComputePipelineState(&csUpdateDesc, IID_PPV_ARGS(&csEmitterPipelineState_));
+	device_->CreateComputePipelineState(&csUpdateDesc, IID_PPV_ARGS(&csUpdatePipelineState_));
 
 	// 1. コマンドアロケータ/リスト作成（DIRECTでOK）
 	ComPtr<ID3D12CommandAllocator> alloc;
@@ -348,7 +355,16 @@ void Particles::UpdateParticle() {
 	commandList_->SetComputeRootUnorderedAccessView(1, freeCounterBufferResource_->GetGPUVirtualAddress()); // u1
 	commandList_->SetComputeRootConstantBufferView(2, emitterResource_->GetGPUVirtualAddress()); // b5
 	commandList_->SetComputeRootConstantBufferView(3, perFrameResource_->GetGPUVirtualAddress()); // b6
+	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
+	commandList_->Dispatch(1, 1, 1);
 
+	// 2. CSのRootSignature, PSOセット
+	commandList_->SetPipelineState(csUpdatePipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
+	commandList_->SetComputeRootSignature(csRootSignature_.Get());
+	commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress()); // u0
+	commandList_->SetComputeRootUnorderedAccessView(1, freeCounterBufferResource_->GetGPUVirtualAddress()); // u1
+	commandList_->SetComputeRootConstantBufferView(2, emitterResource_->GetGPUVirtualAddress()); // b5
+	commandList_->SetComputeRootConstantBufferView(3, perFrameResource_->GetGPUVirtualAddress()); // b6
 	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
 	commandList_->Dispatch(1, 1, 1);
 
