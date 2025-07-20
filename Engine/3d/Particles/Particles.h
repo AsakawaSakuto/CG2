@@ -77,7 +77,7 @@ private:
 
 	uint32_t particleSrvIndex_ = 64;
 	uint32_t numInstance_ = 0;               // 現在描画するインスタンスの数
-	const uint32_t kMaxParticles_ = 16;      // 描画可能な最大パーティクル数
+	const uint32_t kMaxParticles_ = 512;      // 描画可能な最大パーティクル数
 	ParticleDataCS* particleDataCS_ = nullptr; // GPU側に送るインスタンス情報
 
 	std::string textureName_; // 使用するテクスチャの名前
@@ -100,11 +100,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> computeList_;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> csRootSignature_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> csPipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> csInitializePipelineState_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> csEmitterPipelineState_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> csUpdatePipelineState_;
 
-	// パーティクル配列
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterBufferResource_;
+
 	void CreateParticleResource();
 	void UpdateParticle();
 
