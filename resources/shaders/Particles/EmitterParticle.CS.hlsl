@@ -10,23 +10,22 @@ ConstantBuffer<PerFrame> gPerFrame : register(b6);
 [numthreads(1, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    RandomGenerator generator;
-    generator.seed = (DTid + gPerFrame.time) * gPerFrame.time;
     if (gEmitter.emit != 0)
-    { // 射出許可が出たので射出
+    {
         for (uint countIndex = 0; countIndex < gEmitter.count; ++countIndex)
         {
             uint particleIndex;
             InterlockedAdd(gFreeCounter[0], 1, particleIndex);
             if (particleIndex < kMaxParticles)
             {
-                // カウント分Particleを射出する
+                uint baseSeed = particleIndex + countIndex * 12345 + gPerFrame.index * 6789;
+
                 gParticles[particleIndex].scale = float3(1.0f, 1.0f, 1.0f);
-                gParticles[particleIndex].translate = generator.Generate3d();
-                gParticles[particleIndex].color.rgb = generator.Generate3d();
+                gParticles[particleIndex].translate = GenerateSpherePosition(baseSeed);
+                gParticles[particleIndex].color.rgb = GenerateColor(baseSeed + 3000);
                 gParticles[particleIndex].color.a = 1.0f;
                 gParticles[particleIndex].rotate = float3(0.0f, 0.0f, 0.0f);
-                gParticles[particleIndex].velocity = float3(0.01f, 0.001f, 0.0f);
+                gParticles[particleIndex].velocity = GenerateSpherePosition(baseSeed + 1000) * RandomRange(baseSeed + 2000, 0.2f, 1.0f);
                 gParticles[particleIndex].lifeTime = 2.0f;
                 gParticles[particleIndex].currentTime = 0.0f;
             }

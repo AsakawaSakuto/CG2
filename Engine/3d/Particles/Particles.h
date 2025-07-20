@@ -114,6 +114,7 @@ private:
 	void CreatePerViewResource();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_;
+	uint32_t frameIndex = 0;
 	void CreatePerFrameResource();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;

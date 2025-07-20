@@ -40,6 +40,7 @@ struct PerView {
 struct PerFrame {
     float time;
     float deltaTime;
+    uint index;
 };
 
 class RandomGenerator {
@@ -68,3 +69,53 @@ class RandomGenerator {
         return result;
     }
 };
+
+uint Hash(uint x)
+{
+    x ^= x >> 17;
+    x *= 0xed5ad4bbU;
+    x ^= x >> 11;
+    x *= 0xac4c1b51U;
+    x ^= x >> 15;
+    x *= 0x31848babU;
+    x ^= x >> 14;
+    return x;
+}
+
+float RandomFloat(uint seed)
+{
+    return frac(Hash(seed) / 65536.0f);
+}
+
+float3 GenerateSpherePosition(uint baseSeed)
+{
+    float u = RandomFloat(baseSeed + 0);
+    float v = RandomFloat(baseSeed + 1);
+    float w = RandomFloat(baseSeed + 2);
+
+    float theta = 2.0f * 3.14159265f * u;
+    float phi = acos(2.0f * v - 1.0f);
+    float r = pow(w, 1.0f / 3.0f);
+
+    float sinPhi = sin(phi);
+
+    return float3(
+        r * sinPhi * cos(theta),
+        r * sinPhi * sin(theta),
+        r * cos(phi)
+    );
+}
+
+float RandomRange(uint seed, float minV, float maxV)
+{
+    return lerp(minV, maxV, RandomFloat(seed));
+}
+
+float3 GenerateColor(uint baseSeed)
+{
+    return float3(
+        RandomFloat(baseSeed + 10),
+        RandomFloat(baseSeed + 11),
+        RandomFloat(baseSeed + 12)
+    );
+}

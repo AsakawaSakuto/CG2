@@ -74,12 +74,14 @@ void Particles::Update(Camera& useCamera) {
 	memcpy(mappedPtr, &tempPreView, sizeof(PerView));
 	perViewResource_->Unmap(0, nullptr);
 
+	frameIndex++;
 	totalTime_ += kDeltaTime_;
 	// フレームごとに
 	PerFrame* mapped = nullptr;
 	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
 	mapped->time = totalTime_;      // 例えば経過時間など
 	mapped->deltaTime = kDeltaTime_;  // フレームごとの経過時間
+	mapped->index = frameIndex;
 
 	UpdateEmitter();
 
