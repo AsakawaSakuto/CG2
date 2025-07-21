@@ -10,7 +10,7 @@ ConstantBuffer<PerFrame> gPerFrame : register(b6);
 void main( uint3 DTid : SV_DispatchThreadID ) {
     uint particleIndex = DTid.x;
     if (particleIndex < kMaxParticles) {
-        if (gParticles[particleIndex].color.a != 0)
+        if (gParticles[particleIndex].color.a != 0.0f)
         {
             gParticles[particleIndex].translate += gParticles[particleIndex].velocity;
             gParticles[particleIndex].currentTime += gPerFrame.deltaTime;

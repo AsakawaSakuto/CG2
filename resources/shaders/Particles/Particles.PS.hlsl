@@ -41,7 +41,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
     // HarfLambert
     float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
     output.color = gMaterial.color * textureColor * input.color;
-    if (output.color.a == 0.0) {
+    if (output.color.a < 0.01) {
         discard;
     }
     return output;

@@ -116,6 +116,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_;
 	uint32_t frameIndex = 0;
 	void CreatePerFrameResource();
+	void UpdatePerFrame();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	EmitterSphere emitter_ = {};

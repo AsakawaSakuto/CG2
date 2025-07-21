@@ -39,8 +39,8 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePerFrameResource();
 	CreateEmitterResource();
 
-	emitter_.count = 16;
-	emitter_.frequency = 1.0f;
+	emitter_.count = 10;
+	emitter_.frequency = 0.1f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.translate = Vector3(0.0f, 0.0f, 0.0f);
 	emitter_.radius = 1.0f;
@@ -74,14 +74,7 @@ void Particles::Update(Camera& useCamera) {
 	memcpy(mappedPtr, &tempPreView, sizeof(PerView));
 	perViewResource_->Unmap(0, nullptr);
 
-	frameIndex++;
-	totalTime_ += kDeltaTime_;
-	// フレームごとに
-	PerFrame* mapped = nullptr;
-	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
-	mapped->time = totalTime_;      // 例えば経過時間など
-	mapped->deltaTime = kDeltaTime_;  // フレームごとの経過時間
-	mapped->index = frameIndex;
+	UpdatePerFrame();
 
 	UpdateEmitter();
 
@@ -424,6 +417,17 @@ void Particles::CreatePerFrameResource() {
 	);
 }
 
+void Particles::UpdatePerFrame() {
+	frameIndex++;
+	totalTime_ += kDeltaTime_;
+	// フレームごとに
+	PerFrame* mapped = nullptr;
+	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
+	mapped->time = totalTime_;      // 例えば経過時間など
+	mapped->deltaTime = kDeltaTime_;  // フレームごとの経過時間
+	mapped->index = frameIndex;
+}
+
 void Particles::CreatePerViewResource() {
 	perViewResource_ = CreateBufferResource(device_.Get(), sizeof(PerView));
 
@@ -493,7 +497,7 @@ void Particles::CreateDirectionalLightResource() {
 	// 初期化（資料に基づく）
 	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
 	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
-	directionalLightData_->intensity = 1.0f;                        // 光の強さ
+	directionalLightData_->intensity = 0.0f;                        // 光の強さ
 }
 
 void Particles::CreatePSO() {
