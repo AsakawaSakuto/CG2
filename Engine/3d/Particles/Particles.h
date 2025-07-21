@@ -21,7 +21,6 @@
 #include "ParticleMaterial.h"
 #include "TransformationMatrix.h"
 #include "Transform.h"
-#include "DirectionalLight.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "Camera.h"
@@ -142,19 +141,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;           // 頂点
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;            // インデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;         // マテリアル
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_; // ライト
 
 	// リソースデータ
 	ParticleVertexData* vertexData_ = nullptr;         // 頂点
 	uint32_t* indexData_ = nullptr;                    // インデックス
 	ParticleMaterial* materialData_ = nullptr;         // マテリアル
-	DirectionalLight* directionalLightData_ = nullptr; // ライト
 
 	// リソース作成系の内部関数
 	void CreateVertexResource();           // 頂点
 	void CreateIndexResource();            // インデックス
 	void CreateMaterialResource();         // マテリアル
-	void CreateDirectionalLightResource(); // ライト
 
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;

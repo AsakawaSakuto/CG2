@@ -28,7 +28,6 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateVertexResource();             // 頂点バッファ
 	CreateIndexResource();              // インデックスバッファ
 	CreateMaterialResource();           // マテリアル
-	CreateDirectionalLightResource();   // ライト情報
 
 	emitter_.count = 10;
 	emitter_.frequency = 0.1f;
@@ -125,9 +124,6 @@ void Particles::Draw() {
 
 	// 3番：テクスチャSRV
 	commandList_->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
-
-	// 4番：ディレクショナルライト（DirectionalLight）
-	commandList_->SetGraphicsRootConstantBufferView(4, directionalLightResource_->GetGPUVirtualAddress());
 
 	// パーティクルのインスタンシング描画
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
@@ -503,16 +499,6 @@ void Particles::CreateMaterialResource() {
 	materialData_->uvTransform = MakeIdentityMatrix();
 
 	materialResource_->Unmap(0, nullptr);
-}
-
-void Particles::CreateDirectionalLightResource() {
-	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	// 初期化（資料に基づく）
-	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
-	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
-	directionalLightData_->intensity = 0.0f;                        // 光の強さ
 }
 
 void Particles::CreatePSO() {
