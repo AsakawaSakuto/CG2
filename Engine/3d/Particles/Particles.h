@@ -37,12 +37,6 @@
 #include <numbers>
 #include <memory>
 #pragma endregion
-
-class Object3d;
-
-using std::unique_ptr;
-using std::make_unique;
-
 // パーティクルクラス
 class Particles
 {
@@ -66,13 +60,13 @@ public:
 	// ブレンドモードを変更
 	void SetBlendMode(BlendMode blendMode) { blendMode_ = blendMode; }
 
-	// エミッタの位置（Translate）をセット
-	void SetEmitter(const Vector3& translete) { emitter_.translate = translete; }
+	// エミッタの値をセット
+	void SetEmitter(const EmitterSphere& emitter) { emitter_ = emitter; }
 private:
 
 	uint32_t particleSrvIndex_ = 64;
 	const uint32_t kMaxParticles_ = 16384;   // 描画可能な最大パーティクル数 // 1048576*2048 // 16384*32
-	const uint32_t kDispatchCount = 32;   // Dispatchを実行する回数
+	uint32_t kDispatchCount;   // Dispatchを実行する回数
 	ParticleDataCS* particleDataCS_ = nullptr; // GPU側に送るインスタンス情報
 
 	std::string textureName_; // 使用するテクスチャの名前

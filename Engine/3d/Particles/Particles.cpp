@@ -25,14 +25,18 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 
 	// リソースの作成
-	CreateVertexResource();             // 頂点バッファ
-	CreateIndexResource();              // インデックスバッファ
-	CreateMaterialResource();           // マテリアル
+	CreateVertexResource();   // 頂点バッファ
+	CreateIndexResource();    // インデックスバッファ
+	CreateMaterialResource(); // マテリアル
 
+	uint32_t num = kMaxParticles_ / 512;
+	kDispatchCount = num;
+
+	// Emitterのデフォルト値
 	emitter_.count = 10;
 	emitter_.frequency = 0.1f;
 	emitter_.frequencyTime = 0.0f;
-	emitter_.translate = Vector3(0.0f, 0.0f, 0.0f);
+	emitter_.translate = { 0.0f, 0.0f, 0.0f };
 	emitter_.radius = 1.0f;
 	emitter_.emit = 0;
 	emitter_.kMaxParticle = kMaxParticles_;
@@ -113,19 +117,18 @@ void Particles::Draw() {
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	commandList_->IASetIndexBuffer(&indexBufferView_);
 
-	// 0番：Material
+	// Material
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
-	// 1番：カメラ・ビルボード行列（PreViewなど）
+	// カメラ・ビルボード行列（PreViewなど）
 	commandList_->SetGraphicsRootConstantBufferView(1, perViewResource_->GetGPUVirtualAddress()); // ←ここ重要
 
-	// 2番：パーティクルインスタンシングSRV（StructuredBufferなど）
+	// パーティクルインスタンシングSRV（StructuredBufferなど）
 	commandList_->SetGraphicsRootDescriptorTable(2, dxCommon_->GetSrvGPUHandle(particleSrvIndex_)); // ←今まで1番だったやつ
 
-	// 3番：テクスチャSRV
+	// テクスチャSRV
 	commandList_->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
 
-	// パーティクルのインスタンシング描画
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
 	commandList_->DrawIndexedInstanced(6, kMaxParticles_, 0, 0, 0);
 }
@@ -135,6 +138,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Begin(objectName);
 
 	ImGui::Text("kMaxParticle:%d", kMaxParticles_);
+	ImGui::Text("kDispatchCount:%d", kDispatchCount);
 	ImGui::DragInt("EmitterCount", &emitter_.count, 1);
 	ImGui::DragFloat("EmitterFrequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
 
