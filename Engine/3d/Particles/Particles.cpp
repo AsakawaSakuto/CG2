@@ -129,12 +129,6 @@ void Particles::Draw() {
 	// 4番：ディレクショナルライト（DirectionalLight）
 	commandList_->SetGraphicsRootConstantBufferView(4, directionalLightResource_->GetGPUVirtualAddress());
 
-	//
-	commandList_->SetGraphicsRootConstantBufferView(5, emitterResource_->GetGPUVirtualAddress());
-
-	//
-	commandList_->SetGraphicsRootConstantBufferView(6, perFrameResource_->GetGPUVirtualAddress());
-
 	// パーティクルのインスタンシング描画
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
 	commandList_->DrawIndexedInstanced(6, kMaxParticles_, 0, 0, 0);
