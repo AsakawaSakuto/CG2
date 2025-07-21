@@ -9,5 +9,6 @@ struct EmitterSphere
 	float frequency;
 	float frequencyTime;
 	uint32_t emit;
-	float pad[2];
+	uint32_t kMaxParticle;
+	float pad;
 };

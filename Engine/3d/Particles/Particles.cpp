@@ -30,21 +30,18 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateMaterialResource();           // マテリアル
 	CreateDirectionalLightResource();   // ライト情報
 
-	D3D12_COMMAND_QUEUE_DESC desc = {};
-	desc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-	device_->CreateCommandQueue(&desc, IID_PPV_ARGS(&computeQueue_));
-
-	CreateParticleResource();
-	CreatePerViewResource();
-	CreatePerFrameResource();
-	CreateEmitterResource();
-
 	emitter_.count = 10;
 	emitter_.frequency = 0.1f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.translate = Vector3(0.0f, 0.0f, 0.0f);
 	emitter_.radius = 1.0f;
 	emitter_.emit = 0;
+	emitter_.kMaxParticle = kMaxParticles_;
+
+	CreateEmitterResource();
+	CreateParticleResource();
+	CreatePerViewResource();
+	CreatePerFrameResource();
 }
 
 void Particles::Update(Camera& useCamera) {
@@ -335,6 +332,8 @@ void Particles::CreateParticleResource() {
 	list->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress());
 	list->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress());
 	list->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());
+	list->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress());
+
 	// 4. Dispatch
 	list->Dispatch(kDispatchCount, 1, 1);
 

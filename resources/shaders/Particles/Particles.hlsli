@@ -5,9 +5,6 @@ struct VertexShaderOutput {
     float4 color : COLOR0;
 };
 
-// 1048576 // 16384
-static const uint kMaxParticles = 16384;
-
 struct Particle {
     float3 scale;
     float pad1;
@@ -30,7 +27,8 @@ struct EmitterSphere {
     float frequency;
     float frequencyTime;
     uint emit;
-    float2 pad;
+    uint kMaxParticle;
+    float pad;
 };
 
 struct PerView {

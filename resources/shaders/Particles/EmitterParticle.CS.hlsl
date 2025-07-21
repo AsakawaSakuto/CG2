@@ -17,7 +17,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         {
             int freeLsitIndex;
             InterlockedAdd(gFreeListIndex[0], -1, freeLsitIndex);
-            if (0 <= freeLsitIndex && freeLsitIndex < kMaxParticles)
+            if (0 <= freeLsitIndex && freeLsitIndex < gEmitter.kMaxParticle)
             {
                 uint particleIndex = gFreeList[freeLsitIndex];
                 uint baseSeed = particleIndex + countIndex * 12345 + gPerFrame.index * 6789;
