@@ -105,6 +105,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> csUpdatePipelineState_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterBufferResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeListIndexResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeListResource_;
 
 	void CreateParticleResource();
 	void UpdateParticle();

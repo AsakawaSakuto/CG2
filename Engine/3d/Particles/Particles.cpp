@@ -39,7 +39,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePerFrameResource();
 	CreateEmitterResource();
 
-	emitter_.count = 10;
+	emitter_.count = 100;
 	emitter_.frequency = 0.1f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.translate = Vector3(0.0f, 0.0f, 0.0f);
@@ -227,12 +227,12 @@ void Particles::CreateParticleResource() {
 
 	//----------------------------------------------------------------//
 
-	// カウンター用バッファ（要素数1）
-	D3D12_RESOURCE_DESC counterDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(int32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	// freeListIndex u1
+    D3D12_RESOURCE_DESC counterDesc2 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(int32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
 	device_->CreateCommittedResource(
-		&heapProp, D3D12_HEAP_FLAG_NONE, &counterDesc,
-		D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&freeCounterBufferResource_));
+		&heapProp, D3D12_HEAP_FLAG_NONE, &counterDesc2,
+		D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&freeListIndexResource_));
 
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc2 = {};
 	uavDesc2.Format = DXGI_FORMAT_UNKNOWN;
@@ -242,28 +242,50 @@ void Particles::CreateParticleResource() {
 	uavDesc2.Buffer.StructureByteStride = sizeof(int32_t);
 
 	device_->CreateUnorderedAccessView(
-		freeCounterBufferResource_.Get(), nullptr, &uavDesc2,
+		freeListIndexResource_.Get(), nullptr, &uavDesc2,
 		dxCommon_->GetSrvCPUHandle(65));
+
+	// freeList u2
+	D3D12_RESOURCE_DESC counterDesc3 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(uint32_t) * kMaxParticles_, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+
+	device_->CreateCommittedResource(
+		&heapProp, D3D12_HEAP_FLAG_NONE, &counterDesc3,
+		D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&freeListResource_));
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc3 = {};
+	uavDesc3.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc3.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	uavDesc3.Buffer.FirstElement = 0;
+	uavDesc3.Buffer.NumElements = kMaxParticles_;
+	uavDesc3.Buffer.StructureByteStride = sizeof(uint32_t);
+
+	device_->CreateUnorderedAccessView(
+		freeListResource_.Get(), nullptr, &uavDesc3,
+		dxCommon_->GetSrvCPUHandle(66));
 
 	//----------------------------------------------------------------//
 
 	// 1. RootSignature作成
-	D3D12_ROOT_PARAMETER csRootParams[4] = {};
+	D3D12_ROOT_PARAMETER csRootParams[5] = {};
 	csRootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u0: Particleバッファ
 	csRootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	csRootParams[0].Descriptor.ShaderRegister = 0;
 
-	csRootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u1: カウンター
+	csRootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u1: ListIndex
 	csRootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	csRootParams[1].Descriptor.ShaderRegister = 1;
 
-	csRootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b5: Emitter
+	csRootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u2: List
 	csRootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	csRootParams[2].Descriptor.ShaderRegister = 5;
+	csRootParams[2].Descriptor.ShaderRegister = 2;
 
-	csRootParams[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b6: PerFrame
+	csRootParams[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b5: Emitter
 	csRootParams[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	csRootParams[3].Descriptor.ShaderRegister = 6;
+	csRootParams[3].Descriptor.ShaderRegister = 5;
+
+	csRootParams[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b6: PerFrame
+	csRootParams[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	csRootParams[4].Descriptor.ShaderRegister = 6;
 
 	D3D12_ROOT_SIGNATURE_DESC csRootSigDesc = {};
 	csRootSigDesc.pParameters = csRootParams;
@@ -314,7 +336,8 @@ void Particles::CreateParticleResource() {
 	list->SetComputeRootSignature(csRootSignature_.Get());
 	list->SetPipelineState(csInitializePipelineState_.Get());
 	list->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress());
-	list->SetComputeRootUnorderedAccessView(1, freeCounterBufferResource_->GetGPUVirtualAddress());
+	list->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress());
+	list->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());
 	// 4. Dispatch
 	list->Dispatch(kMaxParticles_, 1, 1);
 
@@ -344,22 +367,24 @@ void Particles::UpdateParticle() {
 	commandList_->ResourceBarrier(1, &toUAV);
 
 	// 2. CSのRootSignature, PSOセット
-	commandList_->SetPipelineState(csEmitterPipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
 	commandList_->SetComputeRootSignature(csRootSignature_.Get());
+	commandList_->SetPipelineState(csEmitterPipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
 	commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress()); // u0
-	commandList_->SetComputeRootUnorderedAccessView(1, freeCounterBufferResource_->GetGPUVirtualAddress()); // u1
-	commandList_->SetComputeRootConstantBufferView(2, emitterResource_->GetGPUVirtualAddress()); // b5
-	commandList_->SetComputeRootConstantBufferView(3, perFrameResource_->GetGPUVirtualAddress()); // b6
+	commandList_->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress()); // u1
+	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress()); // u2
+	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress()); // b5
+	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress()); // b6
 	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
 	commandList_->Dispatch(1, 1, 1);
 
 	// 2. CSのRootSignature, PSOセット
-	commandList_->SetPipelineState(csUpdatePipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
 	commandList_->SetComputeRootSignature(csRootSignature_.Get());
+	commandList_->SetPipelineState(csUpdatePipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
 	commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress()); // u0
-	commandList_->SetComputeRootUnorderedAccessView(1, freeCounterBufferResource_->GetGPUVirtualAddress()); // u1
-	commandList_->SetComputeRootConstantBufferView(2, emitterResource_->GetGPUVirtualAddress()); // b5
-	commandList_->SetComputeRootConstantBufferView(3, perFrameResource_->GetGPUVirtualAddress()); // b6
+	commandList_->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress()); // u1
+	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress()); // u2
+	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress()); // b5
+	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress()); // b6
 	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
 	commandList_->Dispatch(1, 1, 1);
 
