@@ -9,6 +9,7 @@ ConstantBuffer<PerFrame> gPerFrame : register(b6);
 
 // 768以下
 [numthreads(512, 1, 1)]
+
 void main( uint3 DTid : SV_DispatchThreadID ) {
     uint particleIndex = DTid.x;
     if (particleIndex < kMaxParticles) {

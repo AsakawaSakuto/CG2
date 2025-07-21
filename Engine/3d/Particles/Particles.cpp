@@ -39,7 +39,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePerFrameResource();
 	CreateEmitterResource();
 
-	emitter_.count = 100;
+	emitter_.count = 10;
 	emitter_.frequency = 0.1f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.translate = Vector3(0.0f, 0.0f, 0.0f);
@@ -147,10 +147,9 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
-	ImGui::Text("ChecBox");
-	ImGui::Checkbox("isMove", &isMove_);
-	ImGui::Checkbox("useBillboard", &useBillboard_); 
-	ImGui::Checkbox("isDrawEmitter", &isDrawEmitter_);
+	ImGui::Text("kMaxParticle:%d", kMaxParticles_);
+	ImGui::DragInt("EmitterCount", &emitter_.count, 1);
+	ImGui::DragFloat("EmitterFrequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
 
 	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 
@@ -158,8 +157,6 @@ void Particles::DrawImGui(const char* objectName) {
 	int current = static_cast<int>(blendMode_);
 	ImGui::Combo("BlendMode", &current, directionLabels, 6);
 	blendMode_ = static_cast<BlendMode>(current);
-
-	ImGui::Text("Particle Count: %d", static_cast<int>(particles_.size()));
 
 	ImGui::End();
 }
