@@ -339,7 +339,7 @@ void Particles::CreateParticleResource() {
 	list->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress());
 	list->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());
 	// 4. Dispatch
-	list->Dispatch(kMaxParticles_, 1, 1);
+	list->Dispatch(kDispatchCount, 1, 1);
 
 	// 5. BarrierでSRVに戻す（必要なら）
 	auto barrier2 = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -366,27 +366,27 @@ void Particles::UpdateParticle() {
 	);
 	commandList_->ResourceBarrier(1, &toUAV);
 
-	// 2. CSのRootSignature, PSOセット
+	// Emitterの更新、Particleの生成
 	commandList_->SetComputeRootSignature(csRootSignature_.Get());
-	commandList_->SetPipelineState(csEmitterPipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
+	commandList_->SetPipelineState(csEmitterPipelineState_.Get()); // CSをセット
 	commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress()); // u0
-	commandList_->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress()); // u1
-	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress()); // u2
-	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress()); // b5
-	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress()); // b6
-	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
+	commandList_->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress());  // u1
+	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());       // u2
+	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress());         // b5
+	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress());        // b6
+	// Emitterの処理を実行
 	commandList_->Dispatch(1, 1, 1);
 
-	// 2. CSのRootSignature, PSOセット
+	// Particleの更新
 	commandList_->SetComputeRootSignature(csRootSignature_.Get());
-	commandList_->SetPipelineState(csUpdatePipelineState_.Get()); // ←毎フレーム使う用をメンバ変数に持たせる
+	commandList_->SetPipelineState(csUpdatePipelineState_.Get()); // CSをセット
 	commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress()); // u0
-	commandList_->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress()); // u1
-	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress()); // u2
-	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress()); // b5
-	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress()); // b6
-	// 3. パーティクルロジック用CSをDispatch（例：移動、発生、寿命判定などをCSでやる）
-	commandList_->Dispatch(1, 1, 1);
+	commandList_->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress());  // u1
+	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());       // u2
+	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress());         // b5
+	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress());        // b6
+	// Particleの更新を「kDispatchCount」の数分実行
+	commandList_->Dispatch(kDispatchCount, 1, 1);
 
 	// 4. SRV状態へバリア
 	D3D12_RESOURCE_BARRIER toSRV = CD3DX12_RESOURCE_BARRIER::Transition(

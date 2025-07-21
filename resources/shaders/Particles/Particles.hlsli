@@ -5,7 +5,8 @@ struct VertexShaderOutput {
     float4 color : COLOR0;
 };
 
-static const uint kMaxParticles = 512;
+// 1048576 // 16384
+static const uint kMaxParticles = 16384;
 
 struct Particle {
     float3 scale;

@@ -7,7 +7,7 @@ RWStructuredBuffer<uint> gFreeList : register(u2);
 [RootSignature("UAV(u0), UAV(u1), UAV(u2)")]
 
 // 768以下
-[numthreads(kMaxParticles, 1, 1)]
+[numthreads(512, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID ) {
     uint particlesIndex = DTid.x;
     if (particlesIndex == 0) {

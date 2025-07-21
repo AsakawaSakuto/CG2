@@ -29,7 +29,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 gParticles[particleIndex].rotate = float3(0.0f, 0.0f, 0.0f);
                 gParticles[particleIndex].velocity = GenerateSpherePosition(baseSeed + 1000) * RandomRange(baseSeed + 2000, 0.2f, 1.0f);
                 gParticles[particleIndex].velocity.z = 0.0f;
-                gParticles[particleIndex].lifeTime = 2.0f;
+                gParticles[particleIndex].lifeTime = 1.0f;
                 gParticles[particleIndex].currentTime = 0.0f;
             } 
             else 
