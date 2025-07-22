@@ -23,7 +23,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 uint baseSeed = particleIndex + countIndex * 12345 + gPerFrame.index * 6789;
                 
                 gParticles[particleIndex].scale = float3(1.0f, 1.0f, 1.0f);
-                gParticles[particleIndex].translate = GenerateSpherePosition(baseSeed);
+                gParticles[particleIndex].translate = GenerateSpherePosition(baseSeed) + gEmitter.translate;
                 gParticles[particleIndex].color.rgb = GenerateColor(baseSeed + 3000);
                 gParticles[particleIndex].color.a = 1.0f;
                 gParticles[particleIndex].rotate = float3(0.0f, 0.0f, 0.0f);

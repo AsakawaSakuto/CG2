@@ -141,6 +141,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Text("kDispatchCount:%d", kDispatchCount);
 	ImGui::DragInt("EmitterCount", &emitter_.count, 1);
 	ImGui::DragFloat("EmitterFrequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat3("EmitterT", &emitter_.translate.x, 0.1f);
 
 	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 
