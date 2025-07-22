@@ -142,6 +142,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragInt("EmitterCount", &emitter_.count, 1);
 	ImGui::DragFloat("EmitterFrequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
 	ImGui::DragFloat3("EmitterT", &emitter_.translate.x, 0.1f);
+	ImGui::DragFloat("EmitterSpeed", &emitterSpeed_, 0.01f);
 
 	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
 
@@ -411,6 +412,18 @@ void Particles::UpdateEmitter() {
 		emitter_.emit = 1;
 	} else {
 		emitter_.emit = 0;
+	}
+
+	if (isMove_) {
+		emitter_.translate.x += emitterSpeed_;
+		if (emitter_.translate.x >= 50.0f) {
+			isMove_ = false;
+		}
+	} else {
+		emitter_.translate.x -= emitterSpeed_;
+		if (emitter_.translate.x <= -50.0f) {
+			isMove_ = true;
+		}
 	}
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK

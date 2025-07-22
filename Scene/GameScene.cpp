@@ -31,6 +31,7 @@ void GameScene::Initialize() {
 	//ball->SetTexture("resources/image/monsterBall.png");
 	//plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/image/GroundTexture.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
+	skydome->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
 }
 

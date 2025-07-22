@@ -75,6 +75,8 @@ private:
 
 	const float kDeltaTime_ = 1.0f / 60.0f; // 1フレームあたりの固定デルタタイム
 	float totalTime_ = 0.0f;
+	bool isMove_;
+	float emitterSpeed_ = 0.0f;
 
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 
