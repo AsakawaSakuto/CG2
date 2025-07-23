@@ -68,6 +68,7 @@ public:
     uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
     uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
     uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
+    uint32_t GetDescriptorSizeUAV() { return descriptorSizeUAV_; }
 private:
 
     // 
@@ -109,10 +110,12 @@ private:
     uint32_t descriptorSizeSRV_;
     uint32_t descriptorSizeRTV_;
     uint32_t descriptorSizeDSV_;
+    uint32_t descriptorSizeUAV_;
     
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_; // RTV用のヒープでディスクリプタ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_; // SRV用のヒープでディスクリプタ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_; // DSV用のヒープでディスクリプタ
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> uavDescriptorHeap_; // DSV用のヒープでディスクリプタ
 
     // レンダーターゲットビューの生成
     void CreateRenderTargetView();

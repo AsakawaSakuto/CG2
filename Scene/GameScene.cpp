@@ -32,6 +32,7 @@ void GameScene::Initialize() {
 	//->Initialize(dxCommon.get(), "resources/object3d/multi.obj", "resources/image/GroundTexture.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
 	particles->Initialize(dxCommon.get(), "resources/image/fire.png", 512 * 2);
+	particles2->Initialize(dxCommon.get(), "resources/image/fire.png", 512 * 2);
 }
 
 void GameScene::Update() {
@@ -52,12 +53,11 @@ void GameScene::Update() {
 		skydome->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 	}
 
-	//particles->SetEmitterRange(emitterRange_);
-
 	//ball->Update(*useCamera);
 	//plane->Update(*useCamera);
 	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
+	particles2->Update(*useCamera);
 }
 
 void GameScene::Draw() {
@@ -72,6 +72,7 @@ void GameScene::Draw() {
 	//plane->Draw();
 	skydome->Draw();
 	particles->Draw();
+	particles2->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -95,6 +96,7 @@ void GameScene::Draw() {
 	//ball->DrawImGui("ball");
 	//plane->DrawImGui("Plane");
 	particles->DrawImGui("particle");
+	particles2->DrawImGui("particle2");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

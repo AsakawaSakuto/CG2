@@ -412,6 +412,14 @@ D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetDsvCPUHandle(uint32_t index) {
     return GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), descriptorSizeDSV_, index);
 }
 
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetUavCPUHandle(uint32_t index) {
+    return GetCPUDescriptorHandle(uavDescriptorHeap_.Get(), descriptorSizeUAV_, index);
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetUavGPUHandle(uint32_t index) {
+    return GetGPUDescriptorHandle(uavDescriptorHeap_.Get(), descriptorSizeUAV_, index);
+}
+
 ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
 
 #pragma region 1 hlslファイルを読む

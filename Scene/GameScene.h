@@ -67,6 +67,7 @@ private:
 
 	// Other render objects
 	unique_ptr<Particles> particles = make_unique<Particles>();
+	unique_ptr<Particles> particles2 = make_unique<Particles>();
 	EmitterSphere emitter_ = {};
 	EmitterRange emitterRange_ = {};
 

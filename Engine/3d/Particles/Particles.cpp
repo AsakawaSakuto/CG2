@@ -162,7 +162,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Text("EmitterEdit");
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
 	ImGui::DragFloat("Size", &emitter_.radius, 0.01f, 0.1f, 10.0f);
-	ImGui::DragInt("SpawnCount", &emitter_.count, 1);
+	ImGui::DragInt("SpawnCount", &emitter_.count, 1, 0, static_cast<int>(kMaxParticles_));
 	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
 
 	ImGui::Text("RangeEdit");
