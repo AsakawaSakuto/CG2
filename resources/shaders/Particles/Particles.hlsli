@@ -31,6 +31,27 @@ struct EmitterSphere {
     float pad;
 };
 
+struct EmitterRange {
+    float3 minScale;
+    float pad1;
+    float3 maxScale;
+    float pad2;
+    
+    float3 minColor;
+    float pad3;
+    float3 maxColor;
+    float pad4;
+    
+    float3 minVelocity;
+    float pa5;
+    float3 maxVelocity;
+    float pad6;
+    
+    float minLifeTime;
+    float maxLifeTime;
+    float2 pad7;
+};
+
 struct PerView {
     float4x4 viewProjection;
     float4x4 billboardMatrix;
@@ -110,11 +131,23 @@ float RandomRange(uint seed, float minV, float maxV)
     return lerp(minV, maxV, RandomFloat(seed));
 }
 
-float3 GenerateColor(uint baseSeed)
+float GenerateColorR(uint baseSeed)
 {
-    return float3(
-        RandomFloat(baseSeed + 10),
-        RandomFloat(baseSeed + 11),
+    return float(
+        RandomFloat(baseSeed + 10)
+    );
+}
+
+float GenerateColorG(uint baseSeed)
+{
+    return float(
+        RandomFloat(baseSeed + 11)
+    );
+}
+
+float GenerateColorB(uint baseSeed)
+{
+    return float(
         RandomFloat(baseSeed + 12)
     );
 }

@@ -63,24 +63,37 @@ public:
 	// エミッタの値をセット
 	void SetEmitter(const EmitterSphere& emitter) { emitter_ = emitter; }
 private:
-
+	// ParticleのSRV番号
 	uint32_t particleSrvIndex_ = 64;
-	const uint32_t kMaxParticles_ = 16384;   // 描画可能な最大パーティクル数 // 1048576*2048 // 16384*32
-	uint32_t kDispatchCount;   // Dispatchを実行する回数
-	ParticleDataCS* particleDataCS_ = nullptr; // GPU側に送るインスタンス情報
-
-	std::string textureName_; // 使用するテクスチャの名前
-	BlendMode blendMode_;     // 現在のブレンドモード
 	
+	// 描画可能な最大パーティクル数 // 1048576*2048 // 16384*32
+	const uint32_t kMaxParticles_ = 16384;
+	
+	// Dispatchを実行する回数
+	uint32_t kDispatchCount;
+	
+	// GPU側に送るインスタンス情報
+	ParticleDataCS* particleDataCS_ = nullptr;
 
-	const float kDeltaTime_ = 1.0f / 60.0f; // 1フレームあたりの固定デルタタイム
+	// 使用するテクスチャの名前
+	std::string textureName_;
+
+	// 現在のブレンドモード
+	BlendMode blendMode_;
+	
+	// 1フレームあたりの固定デルタタイム
+	const float kDeltaTime_ = 1.0f / 60.0f;
+
+
 	float totalTime_ = 0.0f;
+
 	bool isMove_;
+
 	float emitterSpeed_ = 0.0f;
 
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferResource_;       // GPUに渡すStructuredBuffer用
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferResource_;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> csRootSignature_;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> csInitializePipelineState_;
