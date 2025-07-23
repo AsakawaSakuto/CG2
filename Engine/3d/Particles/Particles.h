@@ -24,10 +24,7 @@
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "Camera.h"
-#include "ParticleData.h"
 #include "ParticleDataCS.h"
-#include "ParticleForGPU.h"
-#include "Emitter.h"
 #include "BlendMode.h"
 #include "PreView.h"
 #include "PreFrame.h"
@@ -152,8 +149,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;         // マテリアル
 
 	// リソースデータ
-	ParticleVertexData* vertexData_ = nullptr;         // 頂点
 	uint32_t* indexData_ = nullptr;                    // インデックス
+	ParticleVertexData* vertexData_ = nullptr;         // 頂点
 	ParticleMaterial* materialData_ = nullptr;         // マテリアル
 
 	// リソース作成系の内部関数

@@ -308,17 +308,8 @@
     <ClInclude Include="Engine\3d\Particles\Particles.h">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\ParticleData.h">
-      <Filter>ソース ファイル\Engine\3d\Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\ParticleForGPU.h">
-      <Filter>ソース ファイル\Engine\3d\Particles</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\BlendMode.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\Emitter.h">
-      <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Camera\CameraForGPU.h">
       <Filter>ソース ファイル\Engine\Camera</Filter>

@@ -134,8 +134,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Particles\PreView.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\System\ResourceData\BlendMode.h" />
-    <ClInclude Include="Engine\3d\Particles\Emitter.h" />
-    <ClInclude Include="Engine\3d\Particles\ParticleData.h" />
     <ClInclude Include="Engine\System\Audio\Audio.h" />
     <ClInclude Include="Engine\System\Audio\AudioData.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
@@ -175,7 +173,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Sphere\Sphere.h" />
     <ClInclude Include="Engine\3d\Sphere\SphereData.h" />
     <ClInclude Include="Engine\3d\Particles\Particles.h" />
-    <ClInclude Include="Engine\3d\Particles\ParticleForGPU.h" />
     <ClInclude Include="Engine\System\ResourceData\PointLight.h" />
     <ClInclude Include="Engine\3d\Particles\ParticleMaterial.h" />
     <ClInclude Include="Scene\GameScene.h" />
