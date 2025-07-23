@@ -160,9 +160,10 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Text("kDispatchCount:%d", kDispatchCount);
 
 	ImGui::Text("EmitterEdit");
+	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
+	ImGui::DragFloat("Size", &emitter_.radius, 0.01f, 0.1f, 10.0f);
 	ImGui::DragInt("SpawnCount", &emitter_.count, 1);
 	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
 
 	ImGui::Text("RangeEdit");
 	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);

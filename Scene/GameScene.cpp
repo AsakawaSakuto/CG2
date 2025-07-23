@@ -29,9 +29,9 @@ void GameScene::Initialize() {
 	
 	//ball->Initialize(dxCommon.get(), "resources/object3d/uvSphere.obj", "resources/engineResources/uvChecker.png");
 	//ball->SetTexture("resources/image/monsterBall.png");
-	//plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/image/GroundTexture.png");
+	//->Initialize(dxCommon.get(), "resources/object3d/multi.obj", "resources/image/GroundTexture.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
-	particles->Initialize(dxCommon.get(), "resources/image/circle.png", 512 * 2);
+	particles->Initialize(dxCommon.get(), "resources/image/fire.png", 512 * 2);
 }
 
 void GameScene::Update() {

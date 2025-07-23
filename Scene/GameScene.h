@@ -20,6 +20,7 @@
 #include "Triangle.h"
 #include "Particles.h"
 #include "EmitterRange.h"
+#include "EmitterSpfere.h"
 // Math
 #include "Vector2.h"
 #include "Vector3.h"
@@ -66,6 +67,7 @@ private:
 
 	// Other render objects
 	unique_ptr<Particles> particles = make_unique<Particles>();
+	EmitterSphere emitter_ = {};
 	EmitterRange emitterRange_ = {};
 
 	// Cameras
