@@ -19,6 +19,7 @@
 #include "SphereData.h"
 #include "Triangle.h"
 #include "Particles.h"
+#include "EmitterRange.h"
 // Math
 #include "Vector2.h"
 #include "Vector3.h"
@@ -65,6 +66,7 @@ private:
 
 	// Other render objects
 	unique_ptr<Particles> particles = make_unique<Particles>();
+	EmitterRange emitterRange_ = {};
 
 	// Cameras
 	unique_ptr<Camera> camera = make_unique<Camera>();
@@ -75,6 +77,7 @@ private:
 	// Option flags
 	bool modelTexture = true;
 	bool particlesTexture = true;
+	bool skydomeColor = true;
 
 	void CameraController();
 	void DrawFPS_ImGui();

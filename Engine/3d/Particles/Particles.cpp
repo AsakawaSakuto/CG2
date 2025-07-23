@@ -4,7 +4,7 @@
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
-void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureName) {
+void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle) {
 	// DX共通クラスからデバイス・コマンドリストを取得
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
@@ -29,6 +29,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateIndexResource();    // インデックスバッファ
 	CreateMaterialResource(); // マテリアル
 
+	// 扱うパーティクルの数とDisPatchを実行する回数
+	if (maxParticle < 512) {
+		kMaxParticles_ = 512;
+	} else {
+		kMaxParticles_ = maxParticle;
+	}
 	uint32_t num = kMaxParticles_ / 512;
 	kDispatchCount = num;
 
@@ -40,6 +46,19 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.radius = 1.0f;
 	emitter_.emit = 0;
 	emitter_.kMaxParticle = kMaxParticles_;
+
+	// Emitterの範囲
+	emitterRange_.minScale = { 1.0f,1.0f,1.0f };
+	emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
+
+	emitterRange_.minColor = { 0.0f,0.0f,0.0f };
+	emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
+	
+	emitterRange_.minVelocity = { -1.0f,-1.0f,0.0f };
+	emitterRange_.maxVelocity = { 1.0f,1.0f,0.0f };
+
+	emitterRange_.minLifeTime = 0.1f;
+	emitterRange_.maxLifeTime = 0.5f;
 
 	CreateEmitterResource();
 	CreateParticleResource();
@@ -139,12 +158,21 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Text("kMaxParticle:%d", kMaxParticles_);
 	ImGui::Text("kDispatchCount:%d", kDispatchCount);
-	ImGui::DragInt("EmitterCount", &emitter_.count, 1);
-	ImGui::DragFloat("EmitterFrequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat3("EmitterT", &emitter_.translate.x, 0.1f);
-	ImGui::DragFloat("EmitterSpeed", &emitterSpeed_, 0.01f);
 
-	ImGui::ColorEdit4("ColorEdit", &materialData_->color.x);
+	ImGui::Text("EmitterEdit");
+	ImGui::DragInt("SpawnCount", &emitter_.count, 1);
+	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
+
+	ImGui::Text("RangeEdit");
+	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
+	ImGui::DragFloat3("maxScale", &emitterRange_.maxScale.x, 0.01f);
+	ImGui::DragFloat3("minVelocity", &emitterRange_.minVelocity.x, 0.01f);
+	ImGui::DragFloat3("maxVelocity", &emitterRange_.maxVelocity.x, 0.01f);
+	ImGui::DragFloat3("minColor", &emitterRange_.minColor.x, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat3("maxColor", &emitterRange_.maxColor.x, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("minLifeTime", &emitterRange_.minLifeTime, 0.01f);
+	ImGui::DragFloat("maxLifeTime", &emitterRange_.maxLifeTime, 0.01f);
 
 	const char* directionLabels[] = { "None", "Normal", "Add","Subtract","Multily" ,"Screen" };
 	int current = static_cast<int>(blendMode_);
@@ -256,7 +284,7 @@ void Particles::CreateParticleResource() {
 	//----------------------------------------------------------------//
 
 	// 1. RootSignature作成
-	D3D12_ROOT_PARAMETER csRootParams[5] = {};
+	D3D12_ROOT_PARAMETER csRootParams[6] = {};
 	csRootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u0: Particleバッファ
 	csRootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	csRootParams[0].Descriptor.ShaderRegister = 0;
@@ -276,6 +304,10 @@ void Particles::CreateParticleResource() {
 	csRootParams[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b6: PerFrame
 	csRootParams[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	csRootParams[4].Descriptor.ShaderRegister = 6;
+
+	csRootParams[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b7: EmitterRange
+	csRootParams[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	csRootParams[5].Descriptor.ShaderRegister = 7;
 
 	D3D12_ROOT_SIGNATURE_DESC csRootSigDesc = {};
 	csRootSigDesc.pParameters = csRootParams;
@@ -366,6 +398,7 @@ void Particles::UpdateParticle() {
 	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());       // u2
 	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress());         // b5
 	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress());        // b6
+	commandList_->SetComputeRootConstantBufferView(5, emitterRangeResource_->GetGPUVirtualAddress());    // b7
 	// Emitterの処理を実行
 	commandList_->Dispatch(1, 1, 1);
 
@@ -402,6 +435,18 @@ void Particles::CreateEmitterResource() {
 		nullptr,
 		IID_PPV_ARGS(&emitterResource_)
 	);
+    
+	CD3DX12_HEAP_PROPERTIES heapProps2(D3D12_HEAP_TYPE_UPLOAD);
+	CD3DX12_RESOURCE_DESC resourceDesc2 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(EmitterRange));
+
+	device_->CreateCommittedResource(
+		&heapProps2,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc2,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&emitterRangeResource_)
+	);
 }
 
 void Particles::UpdateEmitter() {
@@ -425,6 +470,12 @@ void Particles::UpdateEmitter() {
 			isMove_ = true;
 		}
 	}
+
+	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
+	EmitterRange* mappedRange = nullptr;
+	emitterRangeResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedRange));
+	// ここで値をコピーまたは書き換え
+	*mappedRange = emitterRange_; // 構造体ごとコピー
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
 	EmitterSphere* mappedEmitter = nullptr;

@@ -31,8 +31,7 @@ void GameScene::Initialize() {
 	//ball->SetTexture("resources/image/monsterBall.png");
 	//plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/image/GroundTexture.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
-	skydome->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-	particles->Initialize(dxCommon.get(), "resources/image/circle.png");
+	particles->Initialize(dxCommon.get(), "resources/image/circle.png", 512 * 2);
 }
 
 void GameScene::Update() {
@@ -47,7 +46,13 @@ void GameScene::Update() {
 	input->Update();
 	CameraController();
 
-	/*particles->SetEmitter(ball->GetPosition());*/
+	if (skydomeColor) {
+		skydome->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	} else {
+		skydome->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	}
+
+	//particles->SetEmitterRange(emitterRange_);
 
 	//ball->Update(*useCamera);
 	//plane->Update(*useCamera);
@@ -86,7 +91,7 @@ void GameScene::Draw() {
 	DrawFPS_ImGui();
 
 	debugCamera->DrawImgui();
-
+	ImGui::Checkbox("skydomeColor", &skydomeColor);
 	//ball->DrawImGui("ball");
 	//plane->DrawImGui("Plane");
 	particles->DrawImGui("particle");

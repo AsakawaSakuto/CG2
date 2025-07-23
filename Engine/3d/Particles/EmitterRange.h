@@ -14,11 +14,11 @@ struct EmitterRange {
     float pad4;
 
     Vector3 minVelocity;
-    float pa5;
+    float pad5;
     Vector3 maxVelocity;
     float pad6;
 
     float minLifeTime;
     float maxLifeTime;
-    Vector2 pad7;
+    float pad7[2];
 };

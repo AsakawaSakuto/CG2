@@ -15,11 +15,8 @@
 
 #include "externals/DirectXTex/DirectXTex.h"
 
-#include "VertexData.h"
 #include "ParticleVertexData.h"
-#include "Material.h"
 #include "ParticleMaterial.h"
-#include "TransformationMatrix.h"
 #include "Transform.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
@@ -29,6 +26,7 @@
 #include "PreView.h"
 #include "PreFrame.h"
 #include "EmitterSpfere.h"
+#include "EmitterRange.h"
 
 #include <random>
 #include <numbers>
@@ -39,8 +37,8 @@ class Particles
 {
 public:
 
-	// 初期化
-	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName);
+	// 初期化・maxParticleに扱えるパーティクルの最大数を入れる(512の倍数)
+	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle);
 
 	// 更新 パーティクルの動きや行列更新
 	void Update(Camera& useCamera);
@@ -59,12 +57,15 @@ public:
 
 	// エミッタの値をセット
 	void SetEmitter(const EmitterSphere& emitter) { emitter_ = emitter; }
+
+	// エミッタ範囲の値をセット
+	void SetEmitterRange(const EmitterRange& emitterRange) { emitterRange_ = emitterRange; }
 private:
 	// ParticleのSRV番号
 	uint32_t particleSrvIndex_ = 64;
 	
 	// 描画可能な最大パーティクル数 // 1048576*2048 // 16384*32
-	const uint32_t kMaxParticles_ = 16384;
+	uint32_t kMaxParticles_;
 	
 	// Dispatchを実行する回数
 	uint32_t kDispatchCount;
@@ -113,7 +114,9 @@ private:
 	void UpdatePerFrame();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> emitterRangeResource_;
 	EmitterSphere emitter_ = {};
+	EmitterRange emitterRange_ = {};
 	void CreateEmitterResource();
 	void UpdateEmitter();
 
