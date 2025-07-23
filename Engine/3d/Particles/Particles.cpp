@@ -225,7 +225,7 @@ void Particles::CreateParticleResource() {
 		particleBufferResource_.Get(),
 		nullptr, // CounterResource: nullでOK
 		&uavDesc,
-		dxCommon_->GetSrvCPUHandle(particleSrvIndex_) // UAVヒープ上の任意のスロット
+		dxCommon_->GetSrvCPUHandle(64) // UAVヒープ上の任意のスロット
 	);
 
 	// SRV: Shader Resource View
@@ -241,7 +241,7 @@ void Particles::CreateParticleResource() {
 	device_->CreateShaderResourceView(
 		particleBufferResource_.Get(),
 		&srvDesc,
-		dxCommon_->GetSrvCPUHandle(particleSrvIndex_) // SRVヒープ上の任意のスロット
+		dxCommon_->GetSrvCPUHandle(64) // SRVヒープ上の任意のスロット
 	);
 
 	//----------------------------------------------------------------//
