@@ -22,20 +22,28 @@ class TextureManager
 public:
 	//
 	static TextureManager* GetInstance();
+
 	//
 	void Finalize();
+
 	//
 	void Initialize(DirectXCommon* dxCommon);
+
 	//
 	void LoadTexture(const std::string& filePath);
+
 	//
 	uint32_t GetTextureIndexByFilePath(const std::string& filePath);
+
 	// テクスチャ番号からGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureIndex);
+
 	//
 	size_t GetTextureCount() const {return textureDatas_.size();}
+
 	//
 	size_t GetPathToIndexMapSize() const {return texturePathToIndex_.size();}
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
