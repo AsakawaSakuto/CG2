@@ -77,9 +77,9 @@ void GameScene::Update() {
 	//plane->Update(*useCamera);
 	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
-	particles2->Update(*useCamera);
-	particles3->Update(*useCamera);
-	particles4->Update(*useCamera);
+	//particles2->Update(*useCamera);
+	//particles3->Update(*useCamera);
+	//particles4->Update(*useCamera);
 }
 
 void GameScene::Draw() {
@@ -94,9 +94,9 @@ void GameScene::Draw() {
 	//plane->Draw();
 	skydome->Draw();
 	particles->Draw();
-	particles2->Draw();
-	particles3->Draw();
-	particles4->Draw();
+	//particles2->Draw();
+	//particles3->Draw();
+	//particles4->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -120,9 +120,9 @@ void GameScene::Draw() {
 	//ball->DrawImGui("ball");
 	//plane->DrawImGui("Plane");
 	particles->DrawImGui("particle");
-	particles2->DrawImGui("particle2");
-	particles3->DrawImGui("particle3");
-	particles4->DrawImGui("particle4");
+	//particles2->DrawImGui("particle2");
+	//particles3->DrawImGui("particle3");
+	//particles4->DrawImGui("particle4");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
