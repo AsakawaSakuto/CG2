@@ -4,11 +4,14 @@
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
-void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle) {
+void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle, const uint32_t srv, const uint32_t uav) {
 	// DX共通クラスからデバイス・コマンドリストを取得
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
+
+	srvIndex_ = srv;
+	uavIndex_ = uav;
 
 	// ブレンドモードを加算合成に初期化
 	blendMode_ = kBlendModeAdd;
@@ -50,6 +53,9 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	// Emitterの範囲
 	emitterRange_.minScale = { 1.0f,1.0f,1.0f };
 	emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
+
+	emitterRange_.minTranslate = { 1.0f, 1.0f, 1.0f };
+	emitterRange_.maxTranslate = { 1.0f, 1.0f, 1.0f };
 
 	emitterRange_.minColor = { 0.0f,0.0f,0.0f };
 	emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
@@ -143,7 +149,7 @@ void Particles::Draw() {
 	commandList_->SetGraphicsRootConstantBufferView(1, perViewResource_->GetGPUVirtualAddress()); // ←ここ重要
 
 	// パーティクルインスタンシングSRV（StructuredBufferなど）
-	commandList_->SetGraphicsRootDescriptorTable(2, dxCommon_->GetSrvGPUHandle(particleSrvIndex_)); // ←今まで1番だったやつ
+	commandList_->SetGraphicsRootDescriptorTable(2, dxCommon_->GetSrvGPUHandle(srvIndex_)); // ←今まで1番だったやつ
 
 	// テクスチャSRV
 	commandList_->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
@@ -168,6 +174,8 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Text("RangeEdit");
 	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
 	ImGui::DragFloat3("maxScale", &emitterRange_.maxScale.x, 0.01f);
+	ImGui::DragFloat3("minTranslate", &emitterRange_.minTranslate.x, 0.01f);
+	ImGui::DragFloat3("maxTranslate", &emitterRange_.maxTranslate.x, 0.01f);
 	ImGui::DragFloat3("minVelocity", &emitterRange_.minVelocity.x, 0.01f);
 	ImGui::DragFloat3("maxVelocity", &emitterRange_.maxVelocity.x, 0.01f);
 	ImGui::DragFloat3("minColor", &emitterRange_.minColor.x, 0.01f, 0.0f, 1.0f);
@@ -225,7 +233,7 @@ void Particles::CreateParticleResource() {
 		particleBufferResource_.Get(),
 		nullptr, // CounterResource: nullでOK
 		&uavDesc,
-		dxCommon_->GetSrvCPUHandle(64) // UAVヒープ上の任意のスロット
+		dxCommon_->GetSrvCPUHandle(srvIndex_) // UAVヒープ上の任意のスロット
 	);
 
 	// SRV: Shader Resource View
@@ -241,7 +249,7 @@ void Particles::CreateParticleResource() {
 	device_->CreateShaderResourceView(
 		particleBufferResource_.Get(),
 		&srvDesc,
-		dxCommon_->GetSrvCPUHandle(64) // SRVヒープ上の任意のスロット
+		dxCommon_->GetSrvCPUHandle(srvIndex_) // SRVヒープ上の任意のスロット
 	);
 
 	//----------------------------------------------------------------//
@@ -262,7 +270,7 @@ void Particles::CreateParticleResource() {
 
 	device_->CreateUnorderedAccessView(
 		freeListIndexResource_.Get(), nullptr, &uavDesc2,
-		dxCommon_->GetSrvCPUHandle(65));
+		dxCommon_->GetSrvCPUHandle(uavIndex_));
 
 	// freeList u2
 	D3D12_RESOURCE_DESC counterDesc3 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(uint32_t) * kMaxParticles_, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
@@ -280,7 +288,7 @@ void Particles::CreateParticleResource() {
 
 	device_->CreateUnorderedAccessView(
 		freeListResource_.Get(), nullptr, &uavDesc3,
-		dxCommon_->GetSrvCPUHandle(66));
+		dxCommon_->GetSrvCPUHandle(uavIndex_));
 
 	//----------------------------------------------------------------//
 

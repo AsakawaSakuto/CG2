@@ -8,17 +8,22 @@ struct EmitterRange {
     Vector3 maxScale;
     float pad2;
 
-    Vector3 minColor;
+    Vector3 minTranslate;
     float pad3;
-    Vector3 maxColor;
+    Vector3 maxTranslate;
     float pad4;
 
-    Vector3 minVelocity;
+    Vector3 minColor;
     float pad5;
-    Vector3 maxVelocity;
+    Vector3 maxColor;
     float pad6;
+
+    Vector3 minVelocity;
+    float pad7;
+    Vector3 maxVelocity;
+    float pad8;
 
     float minLifeTime;
     float maxLifeTime;
-    float pad7[2];
+    float pad9[2];
 };

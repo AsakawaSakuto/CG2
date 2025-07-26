@@ -37,19 +37,24 @@ struct EmitterRange {
     float3 maxScale;
     float pad2;
     
-    float3 minColor;
+    float3 minTranslate;
     float pad3;
-    float3 maxColor;
+    float3 maxTranslate;
     float pad4;
     
-    float3 minVelocity;
-    float pa5;
-    float3 maxVelocity;
+    float3 minColor;
+    float pad5;
+    float3 maxColor;
     float pad6;
+    
+    float3 minVelocity;
+    float pad7;
+    float3 maxVelocity;
+    float pad8;
     
     float minLifeTime;
     float maxLifeTime;
-    float2 pad7;
+    float2 pad9;
 };
 
 struct PerView {
