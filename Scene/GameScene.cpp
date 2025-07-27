@@ -27,31 +27,8 @@ void GameScene::Initialize() {
 
 	debugCamera->SetInput(input.get());
 	
-	ball->Initialize(dxCommon.get(), "resources/object3d/takibi.obj", "resources/engineResources/uvChecker.png");
-	ball->SetTexture("resources/image/takibi.png");
-	//->Initialize(dxCommon.get(), "resources/object3d/multi.obj", "resources/image/GroundTexture.png");
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
-	particles->Initialize(dxCommon.get(), "resources/image/fire.png", 512 * 2, 64, 65);
-	particles2->Initialize(dxCommon.get(), "resources/image/fire.png", 512 * 2, 66, 67);
-	particles3->Initialize(dxCommon.get(), "resources/image/fire.png", 512 * 2, 68, 69);
-	particles4->Initialize(dxCommon.get(), "resources/image/fire.png", 512 * 2, 70, 71);
-
-	EmitterRange range = {};
-	range.minScale = { 0.0f,0.0f,0.0f };
-	range.maxScale = { 3.0f,3.0f,3.0f };
-	range.minTranslate = { 1.0f,1.0f,1.0f };
-	range.maxTranslate = { 1.0f,1.0f,1.0f };
-	range.minVelocity = { -0.2f,0.1f,0.0f };
-	range.maxVelocity = { 0.2f,1.0f,0.0f };
-	range.minColor = { 0.0f,0.0f,0.0f };
-	range.maxColor = { 1.0f,1.0f,1.0f };
-	range.minLifeTime = 0.1f;
-	range.maxLifeTime = 0.5f;
-
-	particles->SetEmitterRange(range);
-	particles2->SetEmitterRange(range);
-	particles3->SetEmitterRange(range);
-	particles4->SetEmitterRange(range);
+	particles->Initialize(dxCommon.get(), "resources/image/circle.png", 512 * 2, 64, 65);
 }
 
 void GameScene::Update() {
@@ -73,13 +50,8 @@ void GameScene::Update() {
 		skydome->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 	}
 
-	ball->Update(*useCamera);
-	//plane->Update(*useCamera);
 	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
-	//particles2->Update(*useCamera);
-	//particles3->Update(*useCamera);
-	//particles4->Update(*useCamera);
 }
 
 void GameScene::Draw() {
@@ -90,13 +62,8 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	//ball->Draw();
-	//plane->Draw();
 	skydome->Draw();
 	particles->Draw();
-	//particles2->Draw();
-	//particles3->Draw();
-	//particles4->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -117,12 +84,7 @@ void GameScene::Draw() {
 
 	debugCamera->DrawImgui();
 	ImGui::Checkbox("skydomeColor", &skydomeColor);
-	//ball->DrawImGui("ball");
-	//plane->DrawImGui("Plane");
 	particles->DrawImGui("particle");
-	//particles2->DrawImGui("particle2");
-	//particles3->DrawImGui("particle3");
-	//particles4->DrawImGui("particle4");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

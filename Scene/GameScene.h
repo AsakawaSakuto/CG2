@@ -55,11 +55,7 @@ private:
 	//unique_ptr<Sprite> sprite = make_unique<Sprite>();
 
 	// 3D Objects
-	unique_ptr<Object3d> monkey = make_unique<Object3d>();
-	unique_ptr<Object3d> ball = make_unique<Object3d>();
 	unique_ptr<Object3d> skydome = make_unique<Object3d>();
-	unique_ptr<Object3d> plane = make_unique<Object3d>();
-	unique_ptr<Object3d> planeGltf = make_unique<Object3d>();
 
 	// Audio
 	unique_ptr<Audio> audio = make_unique<Audio>();
@@ -67,9 +63,6 @@ private:
 
 	// Other render objects
 	unique_ptr<Particles> particles = make_unique<Particles>();
-	unique_ptr<Particles> particles2 = make_unique<Particles>();
-	unique_ptr<Particles> particles3 = make_unique<Particles>();
-	unique_ptr<Particles> particles4 = make_unique<Particles>();
 	EmitterSphere emitter_ = {};
 	EmitterRange emitterRange_ = {};
 
@@ -82,7 +75,7 @@ private:
 	// Option flags
 	bool modelTexture = true;
 	bool particlesTexture = true;
-	bool skydomeColor = true;
+	bool skydomeColor = false;
 
 	void CameraController();
 	void DrawFPS_ImGui();
