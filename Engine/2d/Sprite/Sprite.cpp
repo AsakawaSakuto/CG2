@@ -23,6 +23,30 @@ void Sprite::Initialize(SpriteData* spriteData, const std::string& fileName) {
 	CreateMaterialResource();
 	CreateTransformationResource();
 	CreateDirectionalLightResource();
+
+	cameraResource_ = CreateBufferResource(device_.Get(), sizeof(CameraForGPU));
+	assert(cameraResource_ != nullptr);
+	HRESULT hr = cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	assert(SUCCEEDED(hr));
+
+	pointLightResource_ = CreateBufferResource(device_.Get(), sizeof(PointLight));
+	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData_));
+	pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	pointLightData_->position = { 0.0f,5.0f,0.0f };
+	pointLightData_->intensity = 1.0f;
+	pointLightData_->radius = 20.0f;
+	pointLightData_->decay = 2.0f;
+
+	spotLightResource_ = CreateBufferResource(device_.Get(), sizeof(SpotLight));
+	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
+	spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	spotLightData_->position = { 2.0f,1.25f,0.0f };
+	spotLightData_->distance = 7.0f;
+	spotLightData_->direction = { -1.0f,-1.0f,0.0f };
+	spotLightData_->intensity = 4.0f;
+	spotLightData_->decay = 2.0f;
+	spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 6.0f);
+	spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
 }
 
 void Sprite::Update() {
@@ -51,12 +75,12 @@ void Sprite::Draw() {
 	commandList_->IASetIndexBuffer(&indexBufferView_);
 	//
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	// TransformationMatrixCBufferの場所を設定
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
-	// Spriteを常にuvCheckerにする
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
-	//
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 	// 描画！ (DrawCall/ドローコール)
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }

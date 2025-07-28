@@ -6,7 +6,7 @@
 DebugCamera::DebugCamera() {
 	moveSpeedMultiplier = 1.0f;
 	rotateSpeedMultiplier = 1.0f;
-	transform_ = { {1.f,1.f,1.f},{0.f,0.f,0.f},{0.f,0.f,-100.f} };
+	transform_ = { {1.f,1.f,1.f},{0.f,0.f,0.f},{0.f,0.f,-10.f} };
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = InverseMatrix(worldMatrix_);
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, 1280.f / 720.f,0.1f, 100.f);

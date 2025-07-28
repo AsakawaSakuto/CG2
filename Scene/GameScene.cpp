@@ -27,7 +27,27 @@ void GameScene::Initialize() {
 
 	debugCamera->SetInput(input.get());
 	
+	spriteData->Initialize(dxCommon.get());
+	sprite->Initialize(spriteData.get(), "resources/engineResources/uvChecker.png");
+	sprite->SetPosition({ 128.0f,128.0f });
+
 	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
+
+	sphere->Initialize(dxCommon.get(), "resources/object3d/sphere.obj", "resources/engineResources/uvChecker.png");
+	sphere->SetPosition({ 0.0f,0.0f,0.0f });
+	plane->Initialize(dxCommon.get(), "resources/object3d/plane.obj", "resources/engineResources/uvChecker.png");
+	plane->SetPosition({ 2.0f,0.0f,0.0f });
+	teapot->Initialize(dxCommon.get(), "resources/object3d/teapot.obj", "resources/engineResources/uvChecker.png");
+	teapot->SetPosition({ -2.0f,0.0f,0.0f });
+	bunny->Initialize(dxCommon.get(), "resources/object3d/bunny.obj", "resources/engineResources/uvChecker.png");
+	bunny->SetPosition({ 4.0f,0.0f,0.0f });
+	suzanne->Initialize(dxCommon.get(), "resources/object3d/suzanne.obj", "resources/engineResources/uvChecker.png");
+	suzanne->SetPosition({ -4.0f,0.0f,0.0f });
+	multiMesh->Initialize(dxCommon.get(), "resources/object3d/multiMesh.obj", "resources/engineResources/uvChecker.png");
+	multiMesh->SetPosition({ 2.0f,2.0f,0.0f });
+	multiMaterial->Initialize(dxCommon.get(), "resources/object3d/multiMaterial.obj", "resources/engineResources/uvChecker.png");
+	multiMaterial->SetPosition({ -2.0f,2.0f,0.0f });
+
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png", 512 * 2, 64, 65);
 }
 
@@ -43,15 +63,16 @@ void GameScene::Update() {
 	input->Update();
 	CameraController();
 
-	if (skydomeColor) {
-		skydome->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-	}
-	else {
-		skydome->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-	}
-
-	skydome->Update(*useCamera);
 	particles->Update(*useCamera);
+	sphere->Update(*useCamera);
+	plane->Update(*useCamera);
+	teapot->Update(*useCamera);
+	bunny->Update(*useCamera);
+	suzanne->Update(*useCamera);
+	multiMesh->Update(*useCamera);
+	multiMaterial->Update(*useCamera);
+
+	sprite->Update();
 }
 
 void GameScene::Draw() {
@@ -62,8 +83,17 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	skydome->Draw();
+	sphere->Draw();
+	plane->Draw();
+	teapot->Draw();
+	bunny->Draw();
+	suzanne->Draw();
+	multiMesh->Draw();
+	multiMaterial->Draw();
+
 	particles->Draw();
+
+	sprite->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -82,9 +112,59 @@ void GameScene::Draw() {
 
 	DrawFPS_ImGui();
 
+	ImGui::Begin("ImGuiChecBox");
+
+	ImGui::Checkbox("Sprite", &drawSprite);
+	ImGui::Checkbox("Sphere", &drawSphere);
+	ImGui::Checkbox("Plane", &drawPlane);
+	ImGui::Checkbox("Teapot", &drawTeapot);
+	ImGui::Checkbox("Bunny", &drawBunny);
+	ImGui::Checkbox("Suzanne", &drawSuzanne);
+	ImGui::Checkbox("MultiMesh", &drawMultiMesh);
+	ImGui::Checkbox("MultiMaterial", &drawMultiMaterial);
+	ImGui::Checkbox("Particle", &drawParticle);
+
+	ImGui::End();
+
 	debugCamera->DrawImgui();
-	ImGui::Checkbox("skydomeColor", &skydomeColor);
-	particles->DrawImGui("particle");
+
+	if (drawSprite) {
+		sprite->DrawImGui("Sprite");
+	}
+
+	if (drawSphere) {
+		sphere->DrawImGui("sphere");
+	}
+
+	if (drawPlane) {
+		plane->DrawImGui("plane");
+	}
+
+	if (drawTeapot) {
+		teapot->DrawImGui("teapot");
+	}
+
+	if (drawBunny) {
+		bunny->DrawImGui("bunny");
+	}
+
+	if (drawSuzanne) {
+		suzanne->DrawImGui("suzanne");
+	}
+
+	if (drawMultiMesh){
+		multiMesh->DrawImGui("MultiMesh");
+	}
+
+	if (drawMultiMaterial) {
+		multiMaterial->DrawImGui("MultiMaterial");
+	}
+
+	if (drawParticle) {
+		particles->DrawImGui("particle");
+	}
+
+
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

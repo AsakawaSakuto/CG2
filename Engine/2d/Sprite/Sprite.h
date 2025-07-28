@@ -7,6 +7,12 @@
 #include "DirectionalLight.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
+#include "CameraForGPU.h"
+#include "SpotLight.h"
+#include "PointLight.h"
+
+#include <cmath>
+#include <numbers>
 
 class Sprite
 {
@@ -49,12 +55,19 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 	// リソースデータ
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
 	TransformationMatrix* transformationData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
+	CameraForGPU* cameraData_ = nullptr;
+	PointLight* pointLightData_ = nullptr;
+	SpotLight* spotLightData_ = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_ = {};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_ = {};

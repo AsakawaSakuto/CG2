@@ -72,10 +72,6 @@ void Sphere::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
-
-	ImGui::Text("ColorEdit");
-	ImGui::ColorEdit4("Color", &materialData_->color.x);
-
 	ImGui::End();
 
 }
@@ -140,7 +136,7 @@ void Sphere::CreateDirectionalLightResource() {
 }
 
 // 球体メッシュをインデックス付きで作成する関数
-void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision) {
+void Sphere::CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision) {
 	const float pi = 3.1415926535f;
 	const float lonEvery = 2.0f * pi / subdivision;
 	const float latEvery = pi / subdivision;

@@ -50,12 +50,19 @@ private:
 	unique_ptr<Input> input = make_unique<Input>();
 	D3ResourceLeakChecker d3ResourceLeakCheker;
 
-	// Sprites
-	//unique_ptr<SpriteData> spriteData = make_unique<SpriteData>();
-	//unique_ptr<Sprite> sprite = make_unique<Sprite>();
+	//Sprites
+	unique_ptr<SpriteData> spriteData = make_unique<SpriteData>();
+	unique_ptr<Sprite> sprite = make_unique<Sprite>();
 
 	// 3D Objects
 	unique_ptr<Object3d> skydome = make_unique<Object3d>();
+	unique_ptr<Object3d> sphere = make_unique<Object3d>();
+	unique_ptr<Object3d> plane = make_unique<Object3d>();
+	unique_ptr<Object3d> teapot = make_unique<Object3d>();
+	unique_ptr<Object3d> bunny = make_unique<Object3d>();
+	unique_ptr<Object3d> suzanne = make_unique<Object3d>();
+	unique_ptr<Object3d> multiMesh = make_unique<Object3d>();
+	unique_ptr<Object3d> multiMaterial = make_unique<Object3d>();
 
 	// Audio
 	unique_ptr<Audio> audio = make_unique<Audio>();
@@ -73,9 +80,15 @@ private:
 	bool isDebugCamera = true;
 
 	// Option flags
-	bool modelTexture = true;
-	bool particlesTexture = true;
-	bool skydomeColor = false;
+	bool drawSprite = false;
+	bool drawSphere = false;
+	bool drawPlane = false;
+	bool drawTeapot = false;
+	bool drawBunny = false;
+	bool drawSuzanne = false;
+	bool drawMultiMesh = false;
+	bool drawMultiMaterial = false;
+	bool drawParticle = false;
 
 	void CameraController();
 	void DrawFPS_ImGui();

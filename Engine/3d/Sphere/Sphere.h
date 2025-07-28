@@ -61,7 +61,7 @@ private:
 	void CreateMaterialResource();
 	void CreateTransformationResource();
 	void CreateDirectionalLightResource();
-};
 
-// 球体メッシュをインデックス付きで作成する関数
-void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision);
+	// 球体メッシュをインデックス付きで作成する関数
+	void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision);
+};
