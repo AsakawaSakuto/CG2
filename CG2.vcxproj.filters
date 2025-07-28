@@ -323,25 +323,25 @@
     <ClInclude Include="Engine\System\ResourceData\Node.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\ParticleMaterial.h">
+    <ClInclude Include="Engine\3d\Particles\Struct\ParticleMaterial.h">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\ParticleVertexData.h">
+    <ClInclude Include="Engine\3d\Particles\Struct\ParticleVertexData.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\ParticleDataCS.h">
+    <ClInclude Include="Engine\3d\Particles\Struct\ParticleDataCS.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\PreView.h">
+    <ClInclude Include="Engine\3d\Particles\Struct\PreView.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\EmitterSpfere.h">
+    <ClInclude Include="Engine\3d\Particles\Struct\EmitterSpfere.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\PreFrame.h">
+    <ClInclude Include="Engine\3d\Particles\Struct\PreFrame.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\EmitterRange.h">
+    <ClInclude Include="Engine\3d\Particles\Struct\EmitterRange.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

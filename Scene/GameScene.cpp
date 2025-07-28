@@ -25,6 +25,8 @@ void GameScene::Initialize() {
 
 	input->Initialize(winApp.get());
 
+	audio->Initialize("resources/sound/fanfare.wav");
+
 	debugCamera->SetInput(input.get());
 	
 	spriteData->Initialize(dxCommon.get());
@@ -35,20 +37,40 @@ void GameScene::Initialize() {
 
 	sphere->Initialize(dxCommon.get(), "resources/object3d/sphere.obj", "resources/engineResources/uvChecker.png");
 	sphere->SetPosition({ 0.0f,0.0f,0.0f });
+
 	plane->Initialize(dxCommon.get(), "resources/object3d/plane.obj", "resources/engineResources/uvChecker.png");
 	plane->SetPosition({ 2.0f,0.0f,0.0f });
+
 	teapot->Initialize(dxCommon.get(), "resources/object3d/teapot.obj", "resources/engineResources/uvChecker.png");
 	teapot->SetPosition({ -2.0f,0.0f,0.0f });
+
 	bunny->Initialize(dxCommon.get(), "resources/object3d/bunny.obj", "resources/engineResources/uvChecker.png");
 	bunny->SetPosition({ 4.0f,0.0f,0.0f });
+
 	suzanne->Initialize(dxCommon.get(), "resources/object3d/suzanne.obj", "resources/engineResources/uvChecker.png");
 	suzanne->SetPosition({ -4.0f,0.0f,0.0f });
+
 	multiMesh->Initialize(dxCommon.get(), "resources/object3d/multiMesh.obj", "resources/engineResources/uvChecker.png");
 	multiMesh->SetPosition({ 2.0f,2.0f,0.0f });
+
 	multiMaterial->Initialize(dxCommon.get(), "resources/object3d/multiMaterial.obj", "resources/engineResources/uvChecker.png");
 	multiMaterial->SetPosition({ -2.0f,2.0f,0.0f });
 
 	particles->Initialize(dxCommon.get(), "resources/image/circle.png", 512 * 2, 64, 65);
+
+	EmitterRange range = {};
+	range.minScale = { 1.0f,1.0f,1.0f };
+	range.maxScale = { 3.0f,3.0f,3.0f };
+	range.minTranslate = { 1.0f,1.0f,1.0f };
+	range.maxTranslate = { 1.0f,1.0f,1.0f };
+	range.minVelocity = { -0.1f,0.1f,0.0f };
+	range.maxVelocity = { 0.1f,1.0f,0.0f };
+	range.minColor = { 0.0f,0.0f,0.0f };
+	range.maxColor = { 1.0f,1.0f,1.0f };
+	range.minLifeTime = 0.1f;
+	range.maxLifeTime = 0.5f;
+
+	particles->SetEmitterRange(range);
 }
 
 void GameScene::Update() {
@@ -62,6 +84,10 @@ void GameScene::Update() {
 
 	input->Update();
 	CameraController();
+
+	if (input->TriggerKey(DIK_Z)) {
+		audio->PlayAudio();
+	}
 
 	particles->Update(*useCamera);
 	sphere->Update(*useCamera);
