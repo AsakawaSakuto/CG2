@@ -45,6 +45,12 @@ private:
 
 	uint32_t textureIndex_ = 0;
 
+	Vector2 uvScale_ = { 1.0f,1.0f };
+	Vector2 uvTranslate_ = { 0.0f,0.0f };
+	float uvRotate_ = 0.0f;
+
+	//----------------------------------------------//
+
 	// デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 	// コマンドリスト(まとまった命令群)

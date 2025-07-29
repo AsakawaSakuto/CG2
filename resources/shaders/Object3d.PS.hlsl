@@ -31,7 +31,15 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 halfL1 = normalize(L1 + toEye);
     float NdotL1 = saturate(dot(N, L1));
     float NdotH1 = saturate(dot(N, halfL1));
-    float diffuseFactor1 = pow(NdotL1 * 0.5f + 0.5f, 2.0f);
+    float diffuseFactor1 = pow(NdotL1 * 0.5f + 0.5f, 2.0f); 
+    if (gDirectionalLight.useHalfLambert != 0)
+    {
+        diffuseFactor1 = pow(NdotL1 * 0.5f + 0.5f, 2.0f);
+    }
+    else
+    {
+        diffuseFactor1 = max(dot(N, L1), 0);
+    }
     float specularFactor1 = pow(NdotH1, gMaterial.shininess);
 
     // === Point Light ===
@@ -72,6 +80,22 @@ PixelShaderOutput main(VertexShaderOutput input)
         float3 diffuse3 = gMaterial.color.rgb * textureColor.rgb * spotColor * diffuseFactor3;
         float3 specular3 = spotColor * specularFactor3;
 
+        if (gDirectionalLight.useLight == 0)
+        {
+            diffuse1 = 0.0f;
+            specular1 = 0.0f;
+        }
+        if (gPointLight.useLight == 0)
+        {
+            diffuse2 = 0.0f;
+            specular2 = 0.0f;
+        }
+        if (gSpotLight.useLight == 0)
+        {
+            diffuse3 = 0.0f;
+            specular3 = 0.0f;
+        }
+        
         output.color.rgb = diffuse1 + specular1 + diffuse2 + specular2 + diffuse3 + specular3;
         output.color.a = gMaterial.color.a * textureColor.a;
     }

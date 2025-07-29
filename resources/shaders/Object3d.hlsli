@@ -34,8 +34,11 @@ struct DirectionalLight
 {
     float4 color;
     float3 direction;
+    float pad1;
     float intensity;
-    float3 padding;
+    uint useLight;
+    uint useHalfLambert;
+    float pad2;
 };
 
 struct Camera
@@ -48,9 +51,11 @@ struct PointLight
 {
     float4 color;
     float3 position;
+    float pad1;
     float intensity;
     float radius;
     float decay;
+    uint useLight;
 };
 
 struct SpotLight
@@ -63,4 +68,5 @@ struct SpotLight
     float decay;
     float cosAngle;
     float cosFalloffStart;
+    uint useLight;
 };

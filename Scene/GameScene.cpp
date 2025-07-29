@@ -38,7 +38,7 @@ void GameScene::Initialize() {
 	sphere->Initialize(dxCommon.get(), "resources/object3d/sphere.obj", "resources/engineResources/uvChecker.png");
 	sphere->SetPosition({ 0.0f,0.0f,0.0f });
 
-	plane->Initialize(dxCommon.get(), "resources/object3d/plane.obj", "resources/engineResources/uvChecker.png");
+	plane->Initialize(dxCommon.get(), "resources/object3d/planeobj.obj", "resources/engineResources/uvChecker.png");
 	plane->SetPosition({ 2.0f,0.0f,0.0f });
 
 	teapot->Initialize(dxCommon.get(), "resources/object3d/teapot.obj", "resources/engineResources/uvChecker.png");
@@ -89,7 +89,6 @@ void GameScene::Update() {
 		audio->PlayAudio();
 	}
 
-	particles->Update(*useCamera);
 	sphere->Update(*useCamera);
 	plane->Update(*useCamera);
 	teapot->Update(*useCamera);
@@ -97,6 +96,8 @@ void GameScene::Update() {
 	suzanne->Update(*useCamera);
 	multiMesh->Update(*useCamera);
 	multiMaterial->Update(*useCamera);
+
+	particles->Update(*useCamera);
 
 	sprite->Update();
 }
@@ -110,7 +111,7 @@ void GameScene::Draw() {
 	///
 
 	sphere->Draw();
-	plane->Draw();
+	//plane->Draw();
 	teapot->Draw();
 	bunny->Draw();
 	suzanne->Draw();

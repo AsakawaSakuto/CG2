@@ -154,6 +154,7 @@ Matrix4x4 MakeRotateZMatrix(float rotate) {
 
 	return result;
 }
+
 // 回転行列XYZ
 Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate) {
 	// 各軸の回転行列を生成

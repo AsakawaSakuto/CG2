@@ -463,21 +463,9 @@ void Particles::UpdateEmitter() {
 	emitter_.frequencyTime += kDeltaTime_;
 	if (emitter_.frequency <= emitter_.frequencyTime) {
 		emitter_.frequencyTime -= emitter_.frequency;
-		emitter_.emit = 1;
+		emitter_.emit = true;
 	} else {
-		emitter_.emit = 0;
-	}
-
-	if (isMove_) {
-		emitter_.translate.x += emitterSpeed_;
-		if (emitter_.translate.x >= 50.0f) {
-			isMove_ = false;
-		}
-	} else {
-		emitter_.translate.x -= emitterSpeed_;
-		if (emitter_.translate.x <= -50.0f) {
-			isMove_ = true;
-		}
+		emitter_.emit = false;
 	}
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK

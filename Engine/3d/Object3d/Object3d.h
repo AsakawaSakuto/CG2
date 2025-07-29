@@ -78,6 +78,12 @@ private:
 	// 描画モード切り替え（ワイヤーフレームなど）
 	bool drawMode_ = true;
 
+	Vector2 uvScale_ = { 1.0f,1.0f };
+	Vector2 uvTranslate_ = { 0.0f,0.0f };
+	float uvRotate_ = 0.0f;
+
+	//-----------------------------------------------------------//
+
 	// DirectX共通機能へのポインタ
 	DirectXCommon* dxCommon_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;                       // GPUデバイス
@@ -101,7 +107,7 @@ private:
 	PointLight* pointLightData_ = nullptr;
 	SpotLight* spotLightData_ = nullptr;
 
-	DirectionalLight directionalLight_ = {};
+	Vector3 direction_ = {};
 
 	// 頂点バッファ・インデックスバッファのビュー設定
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;

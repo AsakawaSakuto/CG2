@@ -11,5 +11,5 @@ struct SpotLight {
     float decay;       // 減衰率
     float cosAngle;    // スポットライトの余弦
     float cosFalloffStart;
-    float padding[2];
+    uint32_t useLight;
 };

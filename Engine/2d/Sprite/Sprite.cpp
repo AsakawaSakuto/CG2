@@ -59,6 +59,23 @@ void Sprite::Update() {
 	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth_), static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrixSprite = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrixSprite));
 	transformationData_->WVP = worldViewProjectionMatrixSprite;
+
+	Matrix4x4 scale = MakeIdentityMatrix();
+	scale.m[0][0] = uvScale_.x;
+	scale.m[1][1] = uvScale_.y;
+
+	Matrix4x4 rot = MakeIdentityMatrix();
+	rot.m[0][0] = cos(uvRotate_);
+	rot.m[0][1] = -sin(uvRotate_);
+	rot.m[1][0] = sin(uvRotate_);
+	rot.m[1][1] = cos(uvRotate_);
+
+	Matrix4x4 trans = MakeIdentityMatrix();
+	trans.m[3][0] = uvTranslate_.x;
+	trans.m[3][1] = uvTranslate_.y;
+
+	// 最終変換行列
+	materialData_->uvTransform = scale * rot * trans;
 }
 
 void Sprite::Draw() {
@@ -94,7 +111,10 @@ void Sprite::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f, 0.0f, 10.0f);
 
-	ImGui::Text("ColorEdit");
+	ImGui::Text("MaterialEdit");
+	ImGui::DragFloat2("uvTranslate", &uvTranslate_.x, 0.01f);
+	ImGui::DragFloat2("uvScale", &uvScale_.x, 0.01f);
+	ImGui::DragFloat("uvRotate", &uvRotate_, 0.01f);
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
 
 	ImGui::End();
