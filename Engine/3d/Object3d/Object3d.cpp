@@ -39,9 +39,7 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 
 void Object3d::Update(Camera& useCamera) {
 
-	if (cameraData_) {
-		cameraData_->worldPosition = useCamera.GetTranslate(); // カメラの位置を渡す
-	}
+	cameraData_->worldPosition = useCamera.GetTranslate(); // カメラの位置を渡す
 
 	directionalLightData_->direction = direction_;
 
@@ -137,6 +135,10 @@ void Object3d::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
+
+	ImGui::Text("worldMatrix[3][0]=%.3f", transformationData_->World.m[3][0]);
+	ImGui::Text("worldMatrix[3][1]=%.3f", transformationData_->World.m[3][1]);
+	ImGui::Text("worldMatrix[3][2]=%.3f", transformationData_->World.m[3][2]);
 
 	ImGui::Separator();
 
@@ -265,6 +267,7 @@ void Object3d::CreateTransformationResource() {
 	// 単位行列を書き込む
 	transformationData_->WVP = MakeIdentityMatrix();
 	transformationData_->World = MakeIdentityMatrix();
+	transformationData_->WorldInverseTranspose;
 }
 
 void Object3d::CreateDirectionalLightResource() {
