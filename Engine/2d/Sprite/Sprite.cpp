@@ -107,15 +107,30 @@ void Sprite::DrawImGui(const char* objectName) {
 	ImGui::Begin(objectName);
 
 	ImGui::Text("Transform");
-	ImGui::DragFloat3("translate", &position_.x, 1.f);
-	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat2("translate", &position_.x, 1.f);
+	ImGui::DragFloat2("scale", &transform_.scale.x, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("rotate", &transform_.rotate.z, 0.01f);
+
+	if (ImGui::Button("tReset")) {
+		position_ = { 128.0f ,128.0f };
+		transform_.rotate = { 0.0f, 0.0f, 0.0f };
+		transform_.scale = { 1.0f, 1.0f, 1.0f };
+	}
+
+	ImGui::Separator();
 
 	ImGui::Text("MaterialEdit");
 	ImGui::DragFloat2("uvTranslate", &uvTranslate_.x, 0.01f);
 	ImGui::DragFloat2("uvScale", &uvScale_.x, 0.01f);
 	ImGui::DragFloat("uvRotate", &uvRotate_, 0.01f);
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
+	
+	if (ImGui::Button("mReset")) {
+		uvTranslate_ = { 0.0f,0.0f };
+		uvScale_ = { 1.0f,1.0f };
+		uvRotate_ = 0.0f;
+		materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	}
 
 	ImGui::End();
 
@@ -168,6 +183,7 @@ void Sprite::CreateIndexResource() {
 	// 表面（三角形2枚）
 	indexData_[0] = 0; indexData_[1] = 1; indexData_[2] = 2;
 	indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
+
 	// 裏面（三角形2枚、巻き方向を逆に）
 	/*indexData_[6] = 2; indexData_[7] = 1; indexData_[8] = 0;
 	indexData_[9] = 2; indexData_[10] = 3; indexData_[11] = 1;*/

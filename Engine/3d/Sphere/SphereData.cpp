@@ -68,7 +68,7 @@ void SphereData::CreateRootSignature() {
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	// RootParameter作成。複数設定できるので配列。今回は単1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	D3D12_ROOT_PARAMETER rootParameters[7] = {};
 
 	// RootParam[0] → b0: Material（PS）
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -90,6 +90,18 @@ void SphereData::CreateRootSignature() {
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[3].Descriptor.ShaderRegister = 2;
+
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[4].Descriptor.ShaderRegister = 3; // Camera
+
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[5].Descriptor.ShaderRegister = 4; // Point
+
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[6].Descriptor.ShaderRegister = 5; // Point
 
 	// レジスタ番号0をバインド
 	descriptionRootSignature.pParameters = rootParameters;              // ルートパラメータ配列へのポインタ

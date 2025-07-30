@@ -50,13 +50,15 @@ private:
 	unique_ptr<Input> input = make_unique<Input>();
 	D3ResourceLeakChecker d3ResourceLeakCheker;
 
+	unique_ptr<SphereData> sphereData = make_unique<SphereData>();
+	unique_ptr<Sphere> sphere = make_unique<Sphere>();
+
 	//Sprites
 	unique_ptr<SpriteData> spriteData = make_unique<SpriteData>();
 	unique_ptr<Sprite> sprite = make_unique<Sprite>();
 
 	// 3D Objects
 	unique_ptr<Object3d> skydome = make_unique<Object3d>();
-	unique_ptr<Object3d> sphere = make_unique<Object3d>();
 	unique_ptr<Object3d> plane = make_unique<Object3d>();
 	unique_ptr<Object3d> teapot = make_unique<Object3d>();
 	unique_ptr<Object3d> bunny = make_unique<Object3d>();

@@ -52,12 +52,12 @@ void Object3d::Update(Camera& useCamera) {
 
 	// 追加処理：法線変換行列を計算
 	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
-	Matrix4x4 worldInverseTransposeMatrix = (worldInverseMatrix);
 
 	// 書き込み
-	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, MultiplyMatrix(worldMatrix,worldViewProjectionMatrix));
+	//transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, MultiplyMatrix(worldMatrix,worldViewProjectionMatrix));
+	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
 	transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
-	transformationData_->WorldInverseTranspose = worldInverseTransposeMatrix;
+	transformationData_->WorldInverseTranspose = worldInverseMatrix;
 
 	Matrix4x4 scale = MakeIdentityMatrix();
 	scale.m[0][0] = uvScale_.x;
@@ -136,9 +136,11 @@ void Object3d::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
 
-	ImGui::Text("worldMatrix[3][0]=%.3f", transformationData_->World.m[3][0]);
-	ImGui::Text("worldMatrix[3][1]=%.3f", transformationData_->World.m[3][1]);
-	ImGui::Text("worldMatrix[3][2]=%.3f", transformationData_->World.m[3][2]);
+	if (ImGui::Button("tReset")) {
+		transform_.translate = { 0.0f, 0.0f, 0.0f };
+		transform_.rotate = { 0.0f, 0.0f, 0.0f };
+		transform_.scale = { 1.0f, 1.0f, 1.0f };
+	}
 
 	ImGui::Separator();
 
@@ -149,6 +151,13 @@ void Object3d::DrawImGui(const char* objectName) {
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
 	ImGui::Checkbox("DrawMode", &drawMode_);
 	
+	if (ImGui::Button("mReset")) {
+		uvTranslate_ = { 0.0f,0.0f };
+		uvScale_ = { 1.0f,1.0f };
+		uvRotate_ = 0.0f;
+		materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	}
+
 	ImGui::Separator();
 
 	ImGui::Text("LightEdit");
@@ -179,8 +188,15 @@ void Object3d::DrawImGui(const char* objectName) {
 			ImGui::DragFloat3("d.Direction", &direction_.x, 0.01f, -1.0f, 1.0f);
 			direction_ = direction_.Normalize();
 			ImGui::DragFloat("d.Intensity", &directionalLightData_->intensity, 0.01f, 0.0f, 5.0f);
-			ImGui::DragFloat("d.Shininess", &materialData_->shininess, 0.1f, 0.0f, 100.0f);
+			ImGui::DragFloat("d.Shininess", &materialData_->shininess, 0.01f, 0.0f, 100.0f);
 			ImGui::ColorEdit4("d.Color", &directionalLightData_->color.x);
+
+			if (ImGui::Button("dReset")) {
+				direction_ = { 1.0f,-1.0f,1.0f };
+				materialData_->shininess = 30.0f;
+				directionalLightData_->intensity = 1.0f;
+				directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+			}
 		}
 
 		ImGui::Separator();
@@ -192,11 +208,19 @@ void Object3d::DrawImGui(const char* objectName) {
 		}
 
 		if (pointLightData_->useLight != 0) {
-			ImGui::DragFloat3("p.Pos", &pointLightData_->position.x, 0.1f);
+			ImGui::DragFloat3("p.Pos", &pointLightData_->position.x, 0.01f);
 			ImGui::DragFloat("p.Intensity", &pointLightData_->intensity, 0.01f, 0.0f, 5.0f);
 			ImGui::DragFloat("p.Radius", &pointLightData_->radius, 0.01f);
 			ImGui::DragFloat("p.Decay", &pointLightData_->decay, 0.01f);
 			ImGui::ColorEdit4("p.Color", &pointLightData_->color.x);
+
+			if (ImGui::Button("pReset")) {
+				pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+				pointLightData_->position = { 0.0f,5.0f,0.0f };
+				pointLightData_->intensity = 1.0f;
+				pointLightData_->radius = 20.0f;
+				pointLightData_->decay = 2.0f;
+			}
 		}
 
 		ImGui::Separator();
@@ -208,9 +232,9 @@ void Object3d::DrawImGui(const char* objectName) {
 		}
 
 		if (spotLightData_->useLight != 0) {
-			ImGui::DragFloat3("s.Pos", &spotLightData_->position.x, 0.1f);
+			ImGui::DragFloat3("s.Pos", &spotLightData_->position.x, 0.01f);
 			ImGui::DragFloat("s.Intensity", &spotLightData_->intensity, 0.01f, 0.0f, 10.0f);
-			ImGui::DragFloat("s.Distance", &spotLightData_->distance, 0.1f);
+			ImGui::DragFloat("s.Distance", &spotLightData_->distance, 0.01f);
 			spotLightData_->direction = spotLightData_->direction.Normalize();
 			ImGui::DragFloat3("s.Direction", &spotLightData_->direction.x, 0.01f);
 			ImGui::DragFloat("s.Decay", &spotLightData_->decay, 0.01f);
@@ -226,6 +250,17 @@ void Object3d::DrawImGui(const char* objectName) {
 			spotLightData_->cosAngle = std::cos(angleDeg * std::numbers::pi_v<float> / 180.0f);
 			spotLightData_->cosFalloffStart = std::cos(falloffStartDeg * std::numbers::pi_v<float> / 180.0f);
 			ImGui::ColorEdit4("s.Color", &spotLightData_->color.x);
+
+			if (ImGui::Button("sReset")) {
+				spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+				spotLightData_->position = { 2.0f,1.25f,0.0f };
+				spotLightData_->distance = 7.0f;
+				spotLightData_->direction = { -1.0f,-1.0f,0.0f };
+				spotLightData_->intensity = 4.0f;
+				spotLightData_->decay = 2.0f;
+				spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 6.0f);
+				spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
+			}
 		}
 	}
 

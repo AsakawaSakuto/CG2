@@ -5,9 +5,15 @@
 #include "TransformationMatrix.h"
 #include "Transform.h"
 #include "DirectionalLight.h"
+#include "SpotLight.h"
+#include "PointLight.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "Camera.h"
+#include "CameraForGPU.h"
+
+#include <cmath>
+#include <numbers>
 
 class Sphere
 {
@@ -26,6 +32,12 @@ private:
 
 	uint32_t textureIndex_ = 0;
 
+	Vector2 uvScale_ = { 1.0f,1.0f };
+	Vector2 uvTranslate_ = { 0.0f,0.0f };
+	float uvRotate_ = 0.0f;
+
+	Vector3 direction_ = {};
+
 	// デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_;
 	// コマンドリスト(まとまった命令群)
@@ -36,12 +48,21 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
+
 	// リソースデータ
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
 	TransformationMatrix* transformationData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
+
+	CameraForGPU* cameraData_ = nullptr;
+	PointLight* pointLightData_ = nullptr;
+	SpotLight* spotLightData_ = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
