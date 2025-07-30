@@ -79,20 +79,14 @@ void Object3d::Update(Camera& useCamera) {
 
 void Object3d::Draw() {
 
-	OutputDebugStringA("Object3d::Draw() 開始\n");
-
 	commandList_ = dxCommon_->GetCommandList();
-	if (!commandList_) {
-		OutputDebugStringA("commandList_ is null!\n");
-		return;
-	}
-
-	OutputDebugStringA("RootSignature 設定\n");
+	
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+
 	// PSOを設定
-	OutputDebugStringA("PSO 設定\n");
 	commandList_->SetPipelineState(drawMode_ ? graphicsPipelineStateSolid_.Get() : graphicsPipelineStateWireframe_.Get());
+
 	// プリミティブトポロジーを設定
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

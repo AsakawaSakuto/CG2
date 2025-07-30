@@ -138,6 +138,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\Audio\AudioData.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\System\ResourceData\Node.h" />
+    <ClInclude Include="Engine\System\ResourceData\SubMesh.h" />
     <ClInclude Include="Engine\System\Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\System\Utility\CreateResource\CreateResource.h" />
     <ClInclude Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.h" />

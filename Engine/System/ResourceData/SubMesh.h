@@ -4,5 +4,5 @@
 struct SubMesh {
     uint32_t indexStart;
     uint32_t indexCount;
-    uint32_t materialIndex; // このサブメッシュが使うMaterialのインデックス
+    uint32_t materialIndex;
 };

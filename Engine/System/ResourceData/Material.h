@@ -6,8 +6,8 @@
 struct Material {
     Vector4 color;
     int32_t enableLighting;
-    Vector3 padding1;            // 12B
+    Vector3 padding1;
     Matrix4x4 uvTransform;
-    float shininess;           // ← 1つでOK
-    Vector3 padding2;           // ← float3にして16バイト単位に
+    float shininess;
+    Vector3 padding2;
 };
