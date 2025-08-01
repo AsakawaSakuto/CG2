@@ -42,16 +42,16 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	kDispatchCount = num;
 
 	// Emitterのデフォルト値
-	emitter_.count = 10;
-	emitter_.frequency = 0.1f;
+	emitter_.count = 1;
+	emitter_.frequency = 0.01f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.translate = { 0.0f, 0.0f, 0.0f };
-	emitter_.radius = 1.0f;
+	emitter_.radius = 0.01f;
 	emitter_.emit = 0;
 	emitter_.kMaxParticle = kMaxParticles_;
 
 	// Emitterの範囲
-	emitterRange_.minScale = { 1.0f,1.0f,1.0f };
+	emitterRange_.minScale = { 0.1f,0.1f,0.1f };
 	emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
 
 	emitterRange_.minTranslate = { 1.0f, 1.0f, 1.0f };
@@ -60,8 +60,8 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitterRange_.minColor = { 0.0f,0.0f,0.0f };
 	emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
 	
-	emitterRange_.minVelocity = { -1.0f,-1.0f,0.0f };
-	emitterRange_.maxVelocity = { 1.0f,1.0f,0.0f };
+	emitterRange_.minVelocity = { -0.1f,-0.1f,0.0f };
+	emitterRange_.maxVelocity = { 0.1f,0.1f,0.0f };
 
 	emitterRange_.minLifeTime = 0.1f;
 	emitterRange_.maxLifeTime = 0.5f;
@@ -162,17 +162,17 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Text("kMaxParticle:%d", kMaxParticles_);
 	ImGui::Text("kDispatchCount:%d", kDispatchCount);
 
+	ImGui::Separator();
+
 	ImGui::Text("EmitterEdit");
-	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
-	ImGui::DragFloat("Size", &emitter_.radius, 0.01f, 0.1f, 10.0f);
+	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
+	ImGui::DragFloat("SpawnSize", &emitter_.radius, 0.01f, 0.01f, 10.0f);
 	ImGui::DragInt("SpawnCount", &emitter_.count, 1, 0, static_cast<int>(kMaxParticles_));
-	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.01f, 10.0f);
 
 	ImGui::Text("RangeEdit");
 	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
 	ImGui::DragFloat3("maxScale", &emitterRange_.maxScale.x, 0.01f);
-	ImGui::DragFloat3("minTranslate", &emitterRange_.minTranslate.x, 0.01f);
-	ImGui::DragFloat3("maxTranslate", &emitterRange_.maxTranslate.x, 0.01f);
 	ImGui::DragFloat3("minVelocity", &emitterRange_.minVelocity.x, 0.01f);
 	ImGui::DragFloat3("maxVelocity", &emitterRange_.maxVelocity.x, 0.01f);
 	ImGui::DragFloat3("minColor", &emitterRange_.minColor.x, 0.01f, 0.0f, 1.0f);
@@ -184,6 +184,29 @@ void Particles::DrawImGui(const char* objectName) {
 	int current = static_cast<int>(blendMode_);
 	ImGui::Combo("BlendMode", &current, directionLabels, 6);
 	blendMode_ = static_cast<BlendMode>(current);
+
+	if (ImGui::Button("Reset"))
+	{
+		emitter_.translate = { 0.0f, 0.0f, 0.0f };
+		emitter_.radius = 0.01f;
+		emitter_.count = 1;
+		emitter_.frequency = 0.01f;
+
+		emitterRange_.minScale = { 0.1f,0.1f,0.1f };
+		emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
+
+		emitterRange_.minTranslate = { 1.0f, 1.0f, 1.0f };
+		emitterRange_.maxTranslate = { 1.0f, 1.0f, 1.0f };
+
+		emitterRange_.minColor = { 0.0f,0.0f,0.0f };
+		emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
+
+		emitterRange_.minVelocity = { -0.1f,-0.1f,0.0f };
+		emitterRange_.maxVelocity = { 0.1f,0.1f,0.0f };
+
+		emitterRange_.minLifeTime = 0.1f;
+		emitterRange_.maxLifeTime = 0.5f;
+	}
 
 	ImGui::End();
 }
