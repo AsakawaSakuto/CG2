@@ -6,7 +6,7 @@
 DebugCamera::DebugCamera() {
 	moveSpeedMultiplier = 1.0f;
 	rotateSpeedMultiplier = 1.0f;
-	transform_ = { {1.f,1.f,1.f},{0.f,0.f,0.f},{0.f,0.f,-10.f} };
+	transform_ = { {1.f,1.f,1.f},{0.f,0.f,0.f},{0.f,2.f,-30.f} };
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = InverseMatrix(worldMatrix_);
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, 1280.f / 720.f,0.1f, 100.f);
@@ -15,7 +15,7 @@ DebugCamera::DebugCamera() {
 
 void DebugCamera::Update() {
 
-	if (input_->TriggerMouseButtonR()) {
+	/*if (input_->TriggerMouseButtonR()) {
 		if (moveDirection == MOVE_X ) {
 			moveDirection = MODE_Y;
 		} else if(moveDirection == MODE_Y) {
@@ -23,7 +23,7 @@ void DebugCamera::Update() {
 		} else if (moveDirection == MOVE_Z) {
 			moveDirection = MOVE_X;
 		}
-	}
+	}*/
 
 	if (!ImGui::GetIO().WantCaptureMouse && input_->PushMouseButtonL()) {
 		Vector2 delta = input_->GetMouseDelta();
@@ -83,14 +83,14 @@ void DebugCamera::DrawImgui() {
 
 	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
-	
-	const char* directionLabels[] = { "X", "Y", "Z" };
-    int current = static_cast<int>(moveDirection);
-    ImGui::Combo("Move Axis", &current, directionLabels, 3);
-    moveDirection = static_cast<MoveDirection>(current);
 
 	ImGui::DragFloat("MoveMultiplier", &moveSpeedMultiplier, 0.01f, 0.0f, 10.0f);
 	ImGui::DragFloat("RotateMultiplier", &rotateSpeedMultiplier, 0.01f, 0.0f, 10.0f);
+
+	if (ImGui::Button("Reset")) {
+		transform_.translate = { 0.0f,0.0f,-10.0f };
+		transform_.rotate = { 0.0f,0.0f,0.0f };
+	}
 
 	ImGui::End();
 }

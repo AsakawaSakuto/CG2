@@ -44,6 +44,8 @@ private:
 	bool endRequst_ = false;
 	MSG msg{};
 
+	Vector2 padMotorRange = { 1.0f,1.0f };
+
 	// Core systems
 	unique_ptr<WinApp> winApp = make_unique<WinApp>();
 	unique_ptr<DirectXCommon> dxCommon = make_unique<DirectXCommon>();
@@ -94,4 +96,6 @@ private:
 
 	void CameraController();
 	void DrawFPS_ImGui();
+	void DrawCheckBox_ImGui();
+	void UpdateGamePad();
 };
