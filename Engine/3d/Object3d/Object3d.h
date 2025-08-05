@@ -105,10 +105,10 @@ private:
 	Object3dVertexData* vertexData_ = nullptr;                   // 頂点データ
 	Object3dMaterial* materialData_ = nullptr;                   // マテリアルデータ
 	Object3dTransformationMatrix* transformationData_ = nullptr; // 行列データ
-	DirectionalLight* directionalLightData_ = nullptr;   // ライトデータ
-	CameraForGPU* cameraData_ = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;           // ライトデータ
 	PointLight* pointLightData_ = nullptr;
 	SpotLight* spotLightData_ = nullptr;
+	CameraForGPU* cameraData_ = nullptr;
 
 	Vector3 direction_ = {};
 
