@@ -32,12 +32,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreateIndexResource();    // インデックスバッファ
 	CreateMaterialResource(); // マテリアル
 
-	// 扱うパーティクルの数とDisPatchを実行する回数
-	if (maxParticle < 512) {
-		kMaxParticles_ = 512;
-	} else {
-		kMaxParticles_ = maxParticle;
-	}
+	kMaxParticles_ = 512 * maxParticle;
 	uint32_t num = kMaxParticles_ / 512;
 	kDispatchCount = num;
 

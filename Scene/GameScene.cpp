@@ -62,7 +62,7 @@ void GameScene::Initialize() {
 	suzanne->Initialize(dxCommon.get(), "resources/object3d/suzanne.obj");
 	suzanne->SetPosition({ -6.0f,0.0f,0.0f });
 
-	particles->Initialize(dxCommon.get(), "resources/image/circle64.png", 512 * 2, 64, 65);
+	particles->Initialize(dxCommon.get(), "resources/image/particle/circle.png", 1, 64, 65);
 
 	//EmitterRange range = {};
 	//range.minScale = { 1.0f,1.0f,1.0f };
