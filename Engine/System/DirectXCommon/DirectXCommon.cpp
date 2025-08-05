@@ -292,24 +292,32 @@ void DirectXCommon::PreDraw() {
     }
     // これから書き込むバックバッファのインデックスを取得
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+
     // TransitionBarrierの設定 *backBufferIndexを取得した直後、RenderTargetを設定する前に行う
     // バックバッファの番号取得
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+
     // 今回のバリアはTransition
     barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+
     // Noneにしておく
     barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
     // バリアを張る対象のリソース。現在のバックバッファに対して行う
     barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+
     // 遷移前（現在）のResourceState
     barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+
     // 遷移後のResourceState
     barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
     // TransitionBarrierを指定
     commandList_->ResourceBarrier(1, &barrier_);
 
     // 描画先のRTVとDSVを指定する 03_01
     dsvHandle_ = GetDsvCPUHandle(0);
+
     // 描画先のRTVを設定する
     commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle_);
 
@@ -324,7 +332,7 @@ void DirectXCommon::PreDraw() {
     // 指定した深度で画面全体をクリアする 03_01
     commandList_->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-    commandList_->RSSetViewports(1, &viewport_);    // Viewportを設定
+    commandList_->RSSetViewports(1, &viewport_);          // Viewportを設定
     commandList_->RSSetScissorRects(1, &scissorRect_);    // Scissorを設定
 }
 
