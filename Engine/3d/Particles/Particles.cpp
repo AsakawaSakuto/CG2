@@ -79,10 +79,6 @@ void Particles::Update(Camera& useCamera) {
 	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
 	Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
 
-	billboardMatrix.m[3][0] = 0.0f;
-	billboardMatrix.m[3][1] = 0.0f;
-	billboardMatrix.m[3][2] = 0.0f;
-
 	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
 

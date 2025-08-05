@@ -114,6 +114,7 @@ void GameScene::Update() {
 	multiMaterial->Update(*useCamera);
 
 	particles->Update(*useCamera);
+	particles->SetEmitterPosition(bunny->GetPosition());
 
 	sprite->Update();
 

@@ -25,7 +25,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 
                 gParticles[particleIndex].scale = lerp(gRange.minScale, gRange.maxScale, RandomFloat(baseSeed + 500));
                 gParticles[particleIndex].translate = float3(RandomRange(baseSeed + 5001, gEmitter.translate.x - gEmitter.radius, gEmitter.translate.x + gEmitter.radius), RandomRange(baseSeed + 5002, gEmitter.translate.y - gEmitter.radius, gEmitter.translate.y + gEmitter.radius), RandomRange(baseSeed + 5003, gEmitter.translate.z - gEmitter.radius, gEmitter.translate.z + gEmitter.radius));
-                gParticles[particleIndex].translate = gParticles[particleIndex].translate + gEmitter.translate;
                 gParticles[particleIndex].color.r = lerp(gRange.minColor.r, gRange.maxColor.r, GenerateColorR(baseSeed + 3001));
                 gParticles[particleIndex].color.g = lerp(gRange.minColor.g, gRange.maxColor.g, GenerateColorG(baseSeed + 3002));
                 gParticles[particleIndex].color.b = lerp(gRange.minColor.b, gRange.maxColor.b, GenerateColorB(baseSeed + 3003));
