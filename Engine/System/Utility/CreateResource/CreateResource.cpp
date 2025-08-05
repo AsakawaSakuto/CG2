@@ -253,14 +253,22 @@ Object3dModelData LoadObject3dFile(const std::string& filepath) {
         }
     }
 
-    // --- マテリアル読み込み ---
+    bool hasTexture = false;
     for (uint32_t matIndex = 0; matIndex < scene->mNumMaterials; ++matIndex) {
         aiMaterial* material = scene->mMaterials[matIndex];
         if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
             aiString texPath;
-            material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
-            modelData.material.textureFilePath = directoryPath + "/" + texPath.C_Str();
+            if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+                modelData.material.textureFilePath = directoryPath + "/" + texPath.C_Str();
+                hasTexture = true;
+                break; // 今は1枚だけ読み込む
+            }
         }
+    }
+
+    // テクスチャが見つからなかった場合
+    if (!hasTexture) {
+        modelData.material.textureFilePath = "resources/engineResources/uvChecker.png";
     }
     
     return modelData;

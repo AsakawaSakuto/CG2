@@ -50,25 +50,17 @@ void GameScene::Initialize() {
 	sprite->Initialize(spriteData.get(), "resources/engineResources/uvChecker.png");
 	sprite->SetPosition({ 128.0f,128.0f });
 
-	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj", "resources/image/skydome.png");
+	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj");
+	skydome->SetTexture("resources/image/skydome.png");
 
-	plane->Initialize(dxCommon.get(), "resources/object3d/plane.obj", "resources/engineResources/uvChecker.png");
-	plane->SetPosition({ 3.0f,0.0f,0.0f });
-
-	teapot->Initialize(dxCommon.get(), "resources/object3d/teapot.obj", "resources/engineResources/uvChecker.png");
+	teapot->Initialize(dxCommon.get(), "resources/object3d/teapot.obj");
 	teapot->SetPosition({ -3.0f,0.0f,0.0f });
 
-	bunny->Initialize(dxCommon.get(), "resources/object3d/bunny.obj", "resources/engineResources/uvChecker.png");
-	bunny->SetPosition({ 6.0f,0.0f,0.0f });
+	bunny->Initialize(dxCommon.get(), "resources/object3d/bunny.obj");
+	bunny->SetPosition({ 3.0f,0.0f,0.0f });
 
-	suzanne->Initialize(dxCommon.get(), "resources/object3d/suzanne.obj", "resources/engineResources/uvChecker.png");
+	suzanne->Initialize(dxCommon.get(), "resources/object3d/suzanne.obj");
 	suzanne->SetPosition({ -6.0f,0.0f,0.0f });
-
-	multiMesh->Initialize(dxCommon.get(), "resources/object3d/multiMesh.obj", "resources/engineResources/uvChecker.png");
-	multiMesh->SetPosition({ 4.0f,4.0f,0.0f });
-
-	multiMaterial->Initialize(dxCommon.get(), "resources/object3d/multiMaterial.obj", "resources/engineResources/uvChecker.png");
-	multiMaterial->SetPosition({ -4.0f,4.0f,0.0f });
 
 	particles->Initialize(dxCommon.get(), "resources/image/circle64.png", 512 * 2, 64, 65);
 
@@ -106,12 +98,11 @@ void GameScene::Update() {
 
 	UpdateGamePad();
 
-	plane->Update(*useCamera);
 	teapot->Update(*useCamera);
 	bunny->Update(*useCamera);
 	suzanne->Update(*useCamera);
-	multiMesh->Update(*useCamera);
-	multiMaterial->Update(*useCamera);
+
+	skydome->Update(*useCamera);
 
 	particles->Update(*useCamera);
 	particles->SetEmitterPosition(bunny->GetPosition());
@@ -129,12 +120,11 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	plane->Draw();
 	teapot->Draw();
 	bunny->Draw();
 	suzanne->Draw();
-	multiMesh->Draw();
-	multiMaterial->Draw();
+
+	skydome->Draw();
 
 	particles->Draw();
 
