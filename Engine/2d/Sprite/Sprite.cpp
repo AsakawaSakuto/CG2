@@ -138,13 +138,13 @@ void Sprite::DrawImGui(const char* objectName) {
 
 void Sprite::CreateVertexResource() {
 	// 頂点リソース
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * 4);
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * 4);
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(Object3dVertexData) * 4;
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.StrideInBytes = sizeof(Object3dVertexData);
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	float width = size_.x;
@@ -191,7 +191,7 @@ void Sprite::CreateIndexResource() {
 
 void Sprite::CreateMaterialResource() {
 	// MaterialResource
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
@@ -204,7 +204,7 @@ void Sprite::CreateMaterialResource() {
 
 void Sprite::CreateTransformationResource() {
 	//
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dTransformationMatrix));
 	//
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_));
 	//

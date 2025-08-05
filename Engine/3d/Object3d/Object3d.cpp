@@ -263,22 +263,22 @@ void Object3d::DrawImGui(const char* objectName) {
 
 void Object3d::CreateVertexResource() {
 	// 頂点リソースをつくる
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * modelData_.vertices.size());
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * modelData_.vertices.size());
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズは頂点のサイズ
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size()); 
+	vertexBufferView_.SizeInBytes = UINT(sizeof(Object3dVertexData) * modelData_.vertices.size()); 
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.StrideInBytes = sizeof(Object3dVertexData);
 	// 頂点リソースにデータを書き込む、書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	// 頂点データをリソースにコピー
-	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size()); 
+	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(Object3dVertexData) * modelData_.vertices.size()); 
 }
 
 void Object3d::CreateMaterialResource() {
 	// MaterialResource
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
@@ -290,7 +290,7 @@ void Object3d::CreateMaterialResource() {
 
 void Object3d::CreateTransformationResource() {
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dTransformationMatrix));
 	// 書き込むためのアドレスを取得
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_));
 	// 単位行列を書き込む

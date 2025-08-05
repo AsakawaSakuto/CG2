@@ -184,10 +184,10 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     return handleGPU;
 }
 
-MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
+Object3dMaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
 {
     // 1.中で必要となる変数の宣言
-    MaterialData materialData;  // 構築するMaterialData
+    Object3dMaterialData materialData;  // 構築するMaterialData
 
     // 2.ファイルを開く
     std::string line;                                   // ファイルから読んだ1行を格納するもの
@@ -212,8 +212,8 @@ MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const st
     return materialData;
 }
 
-ModelData LoadObject3dFile(const std::string& filepath) {
-    ModelData modelData;
+Object3dModelData LoadObject3dFile(const std::string& filepath) {
+    Object3dModelData modelData;
     std::filesystem::path path(filepath);
     std::string directoryPath = path.parent_path().string();
 
@@ -243,7 +243,7 @@ ModelData LoadObject3dFile(const std::string& filepath) {
                 aiVector3D normal = mesh->mNormals[index];
                 aiVector3D uv = mesh->mTextureCoords[0][index];
 
-                VertexData vtx{};
+                Object3dVertexData vtx{};
                 vtx.position = { -pos.x, pos.y, pos.z, 1.0f };  // 左右反転
                 vtx.normal = { -normal.x, normal.y, normal.z };  // 左右反転
                 vtx.texcoord = { uv.x, uv.y };

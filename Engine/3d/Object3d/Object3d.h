@@ -16,18 +16,21 @@
 #include <numbers>
 
 #include"DirectXCommon.h"
-#include"ModelData.h"
-#include"VertexData.h"
-#include"Material.h"
-#include"TransformationMatrix.h"
+
+#include"Object3dModelData.h"
+#include"Object3dVertexData.h"
+#include"Object3dMaterial.h"
+#include"Object3dTransformationMatrix.h"
+
 #include"Transform.h"
 #include"DirectionalLight.h"
+#include"PointLight.h"
+#include"SpotLight.h"
+
 #include"TextureManager.h"
 #include"Camera.h"
 #include"CameraForGPU.h"
 #include"MatrixFunction.h"
-#include"PointLight.h"
-#include"SpotLight.h"
 
 class Object3d {
 public:
@@ -69,7 +72,7 @@ private:
 	Transform transform_;
 
 	// 頂点・インデックス・マテリアル情報など
-	ModelData modelData_;
+	Object3dModelData modelData_;
 
 	// 使用中のテクスチャ名と、そのインデックス
 	std::string textureName_;
@@ -99,9 +102,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 
 	// 各種リソースのCPU側ポインタ
-	VertexData* vertexData_ = nullptr;                   // 頂点データ
-	Material* materialData_ = nullptr;                   // マテリアルデータ
-	TransformationMatrix* transformationData_ = nullptr; // 行列データ
+	Object3dVertexData* vertexData_ = nullptr;                   // 頂点データ
+	Object3dMaterial* materialData_ = nullptr;                   // マテリアルデータ
+	Object3dTransformationMatrix* transformationData_ = nullptr; // 行列データ
 	DirectionalLight* directionalLightData_ = nullptr;   // ライトデータ
 	CameraForGPU* cameraData_ = nullptr;
 	PointLight* pointLightData_ = nullptr;

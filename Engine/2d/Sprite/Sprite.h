@@ -1,8 +1,8 @@
 #pragma once
 #include "SpriteData.h"
-#include "VertexData.h"
-#include "Material.h"
-#include "TransformationMatrix.h"
+#include "Object3dVertexData.h"
+#include "Object3dMaterial.h"
+#include "Object3dTransformationMatrix.h"
 #include "Transform.h"
 #include "DirectionalLight.h"
 #include "TextureManager.h"
@@ -66,10 +66,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 	// リソースデータ
-	VertexData* vertexData_ = nullptr;
+	Object3dVertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
-	Material* materialData_ = nullptr;
-	TransformationMatrix* transformationData_ = nullptr;
+	Object3dMaterial* materialData_ = nullptr;
+	Object3dTransformationMatrix* transformationData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	CameraForGPU* cameraData_ = nullptr;
 	PointLight* pointLightData_ = nullptr;

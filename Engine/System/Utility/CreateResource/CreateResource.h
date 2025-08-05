@@ -24,8 +24,8 @@
 #include "externals/imgui/imgui_impl_dx12.h" 
 #include "externals/imgui/imgui_impl_win32.h"
 
-#include"ModelData.h"
-#include"MaterialData.h"
+#include"Object3dModelData.h"
+#include"Object3dMaterialData.h"
 
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 	ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
@@ -44,6 +44,6 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
-MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+Object3dMaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
-ModelData LoadObject3dFile(const std::string& filepath);
+Object3dModelData LoadObject3dFile(const std::string& filepath);

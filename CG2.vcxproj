@@ -54,7 +54,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -80,7 +80,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,8 +137,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\Audio\Audio.h" />
     <ClInclude Include="Engine\System\Audio\AudioData.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
-    <ClInclude Include="Engine\System\ResourceData\Node.h" />
-    <ClInclude Include="Engine\System\ResourceData\SubMesh.h" />
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dNode.h" />
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dSubMesh.h" />
     <ClInclude Include="Engine\System\Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\System\Utility\CreateResource\CreateResource.h" />
     <ClInclude Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.h" />
@@ -155,20 +155,20 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Engine\System\Input\Input.h" />
     <ClInclude Include="Engine\System\Utility\Logger\Logger.h" />
-    <ClInclude Include="Engine\System\ResourceData\Material.h" />
-    <ClInclude Include="Engine\System\ResourceData\MaterialData.h" />
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dMaterial.h" />
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dMaterialData.h" />
     <ClInclude Include="Engine\System\Utility\MatrixFunction\MatrixFunction.h" />
-    <ClInclude Include="Engine\System\ResourceData\ModelData.h" />
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dModelData.h" />
     <ClInclude Include="Engine\3d\Object3d\Object3d.h" />
     <ClInclude Include="Engine\2d\Sprite\Sprite.h" />
     <ClInclude Include="Engine\2d\Sprite\SpriteData.h" />
     <ClInclude Include="Engine\System\TextureManager\TextureManager.h" />
     <ClInclude Include="Engine\System\ResourceData\Transform.h" />
-    <ClInclude Include="Engine\System\ResourceData\TransformationMatrix.h" />
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dTransformationMatrix.h" />
     <ClInclude Include="Engine\System\Utility\Math\Vector2.h" />
     <ClInclude Include="Engine\System\Utility\Math\Vector4.h" />
     <ClInclude Include="Engine\System\Utility\Math\Vector3.h" />
-    <ClInclude Include="Engine\System\ResourceData\VertexData.h" />
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dVertexData.h" />
     <ClInclude Include="Engine\System\WinApp\WinApp.h" />
     <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h" />
     <ClInclude Include="Engine\3d\Sphere\Sphere.h" />

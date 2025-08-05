@@ -3,11 +3,11 @@
 #include"Vector4.h"
 #include"Matrix4x4.h"
 
-struct Material {
+struct Object3dMaterial {
     Vector4 color;
     int32_t enableLighting;
-    Vector3 padding1;
+    float pad1[3];
     Matrix4x4 uvTransform;
     float shininess;
-    Vector3 padding2;
+    float pad2[3];
 };

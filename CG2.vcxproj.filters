@@ -266,22 +266,22 @@
     <ClInclude Include="Engine\System\ResourceData\DirectionalLight.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\System\ResourceData\Material.h">
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dMaterial.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\System\ResourceData\MaterialData.h">
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dMaterialData.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\System\ResourceData\ModelData.h">
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dModelData.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\ResourceData\Transform.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\System\ResourceData\TransformationMatrix.h">
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dTransformationMatrix.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\System\ResourceData\VertexData.h">
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dVertexData.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h">
@@ -320,7 +320,7 @@
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h">
       <Filter>ソース ファイル\Engine\System\ResourceData</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\System\ResourceData\Node.h">
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dNode.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleMaterial.h">
@@ -344,7 +344,7 @@
     <ClInclude Include="Engine\3d\Particles\Struct\EmitterRange.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\System\ResourceData\SubMesh.h">
+    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dSubMesh.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

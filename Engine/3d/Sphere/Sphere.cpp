@@ -261,14 +261,14 @@ void Sphere::DrawImGui(const char* objectName) {
 void Sphere::CreateVertexResource() {
 	CreateIndexedSphereMesh(vertices_, indices_, subdivision_);
 
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(VertexData) * vertices_.size());
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * vertices_.size());
 
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * vertices_.size());
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.SizeInBytes = UINT(sizeof(Object3dVertexData) * vertices_.size());
+	vertexBufferView_.StrideInBytes = sizeof(Object3dVertexData);
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	memcpy(vertexData_, vertices_.data(), sizeof(VertexData) * vertices_.size());
+	memcpy(vertexData_, vertices_.data(), sizeof(Object3dVertexData) * vertices_.size());
 	vertexResource_->Unmap(0, nullptr);
 }
 
@@ -286,7 +286,7 @@ void Sphere::CreateIndexResource() {
 
 void Sphere::CreateTransformationResource() {
 	// MaterialResource
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Material));
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
@@ -299,7 +299,7 @@ void Sphere::CreateTransformationResource() {
 
 void Sphere::CreateMaterialResource() {
 	//
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(TransformationMatrix));
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dTransformationMatrix));
 	//
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_));
 	//
@@ -320,7 +320,7 @@ void Sphere::CreateDirectionalLightResource() {
 }
 
 // 球体メッシュをインデックス付きで作成する関数
-void Sphere::CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision) {
+void Sphere::CreateIndexedSphereMesh(std::vector<Object3dVertexData>& vertices, std::vector<uint32_t>& indices, int subdivision) {
 	const float pi = 3.1415926535f;
 	const float lonEvery = 2.0f * pi / subdivision;
 	const float latEvery = pi / subdivision;
@@ -348,7 +348,7 @@ void Sphere::CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vec
 				cosf(theta) * sinf(phi)
 			};
 			Vector3 normal = Normalize(pos);
-			vertices.push_back({ { pos.x, pos.y, pos.z, 1.0f }, { u, v }, normal });
+			vertices.push_back({ { pos.x, pos.y, pos.z, 1.0f }, {u, v}, normal });
 		}
 	}
 

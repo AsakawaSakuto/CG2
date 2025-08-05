@@ -1,8 +1,10 @@
 #pragma once
 #include "SphereData.h"
-#include "VertexData.h"
-#include "Material.h"
-#include "TransformationMatrix.h"
+
+#include "Object3dVertexData.h"
+#include "Object3dMaterial.h"
+#include "Object3dTransformationMatrix.h"
+
 #include "Transform.h"
 #include "DirectionalLight.h"
 #include "SpotLight.h"
@@ -54,10 +56,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 
 	// リソースデータ
-	VertexData* vertexData_ = nullptr;
+	Object3dVertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
-	Material* materialData_ = nullptr;
-	TransformationMatrix* transformationData_ = nullptr;
+	Object3dMaterial* materialData_ = nullptr;
+	Object3dTransformationMatrix* transformationData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 
 	CameraForGPU* cameraData_ = nullptr;
@@ -67,7 +69,7 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
-	std::vector<VertexData> vertices_;
+	std::vector<Object3dVertexData> vertices_;
 	std::vector<uint32_t> indices_;
 	const int subdivision_ = 32; // 分割数（細かさ）
 
@@ -84,5 +86,5 @@ private:
 	void CreateDirectionalLightResource();
 
 	// 球体メッシュをインデックス付きで作成する関数
-	void CreateIndexedSphereMesh(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices, int subdivision);
+	void CreateIndexedSphereMesh(std::vector<Object3dVertexData>& vertices, std::vector<uint32_t>& indices, int subdivision);
 };
