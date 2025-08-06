@@ -118,7 +118,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\System\Utility\MatrixFunction\MatrixFunction.cpp" />
     <ClCompile Include="Engine\3d\Object3d\Object3d.cpp" />
     <ClCompile Include="Engine\2d\Sprite\Sprite.cpp" />
-    <ClCompile Include="Engine\2d\Sprite\SpriteData.cpp" />
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
     <ClCompile Include="Engine\3d\Sphere\Sphere.cpp" />
@@ -161,7 +160,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Object3d\Struct\Object3dModelData.h" />
     <ClInclude Include="Engine\3d\Object3d\Object3d.h" />
     <ClInclude Include="Engine\2d\Sprite\Sprite.h" />
-    <ClInclude Include="Engine\2d\Sprite\SpriteData.h" />
     <ClInclude Include="Engine\System\TextureManager\TextureManager.h" />
     <ClInclude Include="Engine\System\ResourceData\Transform.h" />
     <ClInclude Include="Engine\3d\Object3d\Struct\Object3dTransformationMatrix.h" />

@@ -1,5 +1,5 @@
 #pragma once
-#include "SpriteData.h"
+#include "DirectXCommon.h"
 #include "Object3dVertexData.h"
 #include "Object3dMaterial.h"
 #include "Object3dTransformationMatrix.h"
@@ -18,7 +18,7 @@ class Sprite
 {
 public:
 
-	void Initialize(SpriteData* spriteData, const std::string& fileName);
+	void Initialize(DirectXCommon* dxCommon, const std::string& fileName);
 
 	void Update();
 
@@ -41,7 +41,8 @@ public:
 	Vector4& GetColor() { return materialData_->color; }
 
 private:
-	SpriteData* spriteData_ = nullptr;
+	DirectXCommon* dxCommon_ = nullptr;
+	HRESULT hr_;
 
 	uint32_t textureIndex_ = 0;
 
@@ -83,8 +84,31 @@ private:
 	Vector2 size_ = {};
 	Vector2 anchorPoint = { 0.5f,0.5f };
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = {};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = {};
+	//----------------------------------------------//
+
+	void CreateRootSignature();
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+
+	void CreatePSO();
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_ = {};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+
+	void InputLayoutSet();
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {};
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_ = {};
+
+	void CompileShaders();
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
+
+	void BlendStateSet();
+	D3D12_BLEND_DESC blendDesc_{};
+
+	void RasiterzerStateSet();
+	D3D12_RASTERIZER_DESC rasterizerDesc_{};
+
+	void DepthStencilStateSet();
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
 	void CreateVertexResource();
 	void CreateIndexResource();

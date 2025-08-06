@@ -43,6 +43,8 @@ void GameScene::Initialize() {
 
 	debugCamera_->SetInput(input_.get());
 
+	sprite_->Initialize(dxCommon_.get(), "resources/image/Grid.png");
+
 	skydome_->Initialize(dxCommon_.get(), "resources/object3d/skydome.obj");
 	skydome_->SetTexture("resources/image/skydome.png");
 
@@ -76,6 +78,8 @@ void GameScene::Update() {
 
 	particle_->Update(*useCamera_);
 	particle_->SetEmitterPosition(player_->GetPosition());
+
+	sprite_->Update();
 }
 
 void GameScene::Draw() {
@@ -91,6 +95,8 @@ void GameScene::Draw() {
 	skydome_->Draw();
 
 	particle_->Draw();
+
+	sprite_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -114,6 +120,8 @@ void GameScene::Draw() {
 	player_->DrawImGui("player");
 
 	particle_->DrawImGui("particle");
+
+	sprite_->DrawImGui("sprite");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

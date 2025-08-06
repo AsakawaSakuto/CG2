@@ -153,9 +153,6 @@
     <ClCompile Include="Engine\2d\Sprite\Sprite.cpp">
       <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\2d\Sprite\SpriteData.cpp">
-      <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\System\Utility\CreateResource\CreateResource.cpp">
       <Filter>ソース ファイル\Engine\System\Utility\CreateResource</Filter>
     </ClCompile>
@@ -240,9 +237,6 @@
       <Filter>ソース ファイル\Engine\System\DirectXCommon</Filter>
     </ClInclude>
     <ClInclude Include="Engine\2d\Sprite\Sprite.h">
-      <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\2d\Sprite\SpriteData.h">
       <Filter>ソース ファイル\Engine\2d\Sprite</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\CreateResource\CreateResource.h">

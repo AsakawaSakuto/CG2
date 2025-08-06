@@ -13,7 +13,6 @@
 #include <memory>
 // Object
 #include "Sprite.h"
-#include "SpriteData.h"
 #include "Object3d.h"
 #include "Sphere.h"
 #include "SphereData.h"
@@ -53,7 +52,7 @@ private:
 	D3ResourceLeakChecker d3ResourceLeakCheker_;
 
 	//Sprite
-
+	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
 
 	// 3D Object
 	unique_ptr<Object3d> skydome_ = make_unique<Object3d>();
