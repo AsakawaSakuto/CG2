@@ -1,5 +1,5 @@
 #pragma once
-// Includes
+// Include
 #include "WinApp.h"
 #include "Input.h"
 #include "Camera.h"
@@ -9,8 +9,10 @@
 #include "DirectXCommon.h"
 #include "D3DResourceLeakChecker.h"
 #include "TextureManager.h"
+#include "GamePad.h"
 #include <filesystem>
 #include <memory>
+
 // Object
 #include "Sprite.h"
 #include "Object3d.h"
@@ -20,6 +22,7 @@
 #include "Particles.h"
 #include "EmitterRange.h"
 #include "EmitterSpfere.h"
+
 // Math
 #include "Vector2.h"
 #include "Vector3.h"
@@ -43,7 +46,7 @@ private:
 	bool endRequst_ = false;
 	MSG msg_{};
 
-	Vector2 padMotorRange = { 1.0f,1.0f };
+	GamePad gamePad_;
 
 	// Core systems
 	unique_ptr<WinApp> winApp_ = make_unique<WinApp>();
@@ -73,5 +76,4 @@ private:
 
 	void CameraController();
 	void DrawFPS_ImGui();
-	void UpdateGamePad();
 };
