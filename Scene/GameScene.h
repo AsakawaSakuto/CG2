@@ -42,60 +42,37 @@ public:
 
 private:
 	bool endRequst_ = false;
-	MSG msg{};
+	MSG msg_{};
 
 	Vector2 padMotorRange = { 1.0f,1.0f };
 
 	// Core systems
-	unique_ptr<WinApp> winApp = make_unique<WinApp>();
-	unique_ptr<DirectXCommon> dxCommon = make_unique<DirectXCommon>();
-	unique_ptr<Input> input = make_unique<Input>();
-	D3ResourceLeakChecker d3ResourceLeakCheker;
+	unique_ptr<WinApp> winApp_ = make_unique<WinApp>();
+	unique_ptr<DirectXCommon> dxCommon_ = make_unique<DirectXCommon>();
+	unique_ptr<Input> input_ = make_unique<Input>();
+	D3ResourceLeakChecker d3ResourceLeakCheker_;
 
-	unique_ptr<SphereData> sphereData = make_unique<SphereData>();
-	unique_ptr<Sphere> sphere = make_unique<Sphere>();
+	//Sprite
 
-	//Sprites
-	unique_ptr<SpriteData> spriteData = make_unique<SpriteData>();
-	unique_ptr<Sprite> sprite = make_unique<Sprite>();
 
-	// 3D Objects
-	unique_ptr<Object3d> skydome = make_unique<Object3d>();
-	unique_ptr<Object3d> plane = make_unique<Object3d>();
-	unique_ptr<Object3d> teapot = make_unique<Object3d>();
-	unique_ptr<Object3d> bunny = make_unique<Object3d>();
-	unique_ptr<Object3d> suzanne = make_unique<Object3d>();
-	unique_ptr<Object3d> multiMesh = make_unique<Object3d>();
-	unique_ptr<Object3d> multiMaterial = make_unique<Object3d>();
+	// 3D Object
+	unique_ptr<Object3d> skydome_ = make_unique<Object3d>();
+	unique_ptr<Object3d> player_ = make_unique<Object3d>();
 
 	// Audio
-	unique_ptr<Audio> audio = make_unique<Audio>();
-	unique_ptr<Audio> audio2 = make_unique<Audio>();
+	unique_ptr<Audio> audio_ = make_unique<Audio>();
+	unique_ptr<Audio> audio2_ = make_unique<Audio>();
 
 	// Other render objects
-	unique_ptr<Particles> particles = make_unique<Particles>();
-	EmitterSphere emitter_ = {};
-	EmitterRange emitterRange_ = {};
+	unique_ptr<Particles> particle_ = make_unique<Particles>();
 
 	// Cameras
-	unique_ptr<Camera> camera = make_unique<Camera>();
-	unique_ptr<DebugCamera> debugCamera = make_unique<DebugCamera>();
-	Camera* useCamera = nullptr;
-	bool isDebugCamera = true;
-
-	// Option flags
-	bool drawSprite = false;
-	bool drawSphere = false;
-	bool drawPlane = false;
-	bool drawTeapot = false;
-	bool drawBunny = false;
-	bool drawSuzanne = false;
-	bool drawMultiMesh = false;
-	bool drawMultiMaterial = false;
-	bool drawParticle = false;
+	unique_ptr<Camera> camera_ = make_unique<Camera>();
+	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>();
+	Camera* useCamera_ = nullptr;
+	bool isDebugCamera_ = true;
 
 	void CameraController();
 	void DrawFPS_ImGui();
-	void DrawCheckBox_ImGui();
 	void UpdateGamePad();
 };

@@ -23,8 +23,8 @@ void GameScene::Initialize() {
 	// main関数の先頭でCOMを初期化 03_00
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
-	winApp->Initialize(L"CG2_Window");
-	winApp->EnableResize(true);
+	winApp_->Initialize(L"CG2_Window");
+	winApp_->EnableResize(true);
 
 	// ログのディレクトリを用意
 	Logger::Initialize();
@@ -33,104 +33,64 @@ void GameScene::Initialize() {
 	//FILE* fp;
 	//freopen_s(&fp, "CONOUT$", "w", stdout);
 
-	dxCommon->Initialize(winApp.get());
+	dxCommon_->Initialize(winApp_.get());
 
-	TextureManager::GetInstance()->Initialize(dxCommon.get());
+	TextureManager::GetInstance()->Initialize(dxCommon_.get());
 
-	input->Initialize(winApp.get());
+	input_->Initialize(winApp_.get());
 
-	audio->Initialize("resources/sound/fanfare.wav");
+	audio_->Initialize("resources/sound/fanfare.wav");
 
-	debugCamera->SetInput(input.get());
-	
-	sphereData->Initialize(dxCommon.get());
-	sphere->Initialize(sphereData.get(), "resources/engineResources/uvChecker.png");
+	debugCamera_->SetInput(input_.get());
 
-	spriteData->Initialize(dxCommon.get());
-	sprite->Initialize(spriteData.get(), "resources/engineResources/uvChecker.png");
-	sprite->SetPosition({ 128.0f,128.0f });
+	skydome_->Initialize(dxCommon_.get(), "resources/object3d/skydome.obj");
+	skydome_->SetTexture("resources/image/skydome.png");
 
-	skydome->Initialize(dxCommon.get(), "resources/object3d/skydome.obj");
-	skydome->SetTexture("resources/image/skydome.png");
+	player_->Initialize(dxCommon_.get(), "resources/object3d/player/player.obj");
 
-	teapot->Initialize(dxCommon.get(), "resources/object3d/teapot.obj");
-	teapot->SetPosition({ -3.0f,0.0f,0.0f });
-
-	bunny->Initialize(dxCommon.get(), "resources/object3d/bunny.obj");
-	bunny->SetPosition({ 3.0f,0.0f,0.0f });
-
-	suzanne->Initialize(dxCommon.get(), "resources/object3d/suzanne.obj");
-	suzanne->SetPosition({ -6.0f,0.0f,0.0f });
-
-	particles->Initialize(dxCommon.get(), "resources/image/particle/circle.png", 1, 64, 65);
-
-	//EmitterRange range = {};
-	//range.minScale = { 1.0f,1.0f,1.0f };
-	//range.maxScale = { 3.0f,3.0f,3.0f };
-	//range.minTranslate = { 1.0f,1.0f,1.0f };
-	//range.maxTranslate = { 1.0f,1.0f,1.0f };
-	//range.minVelocity = { -0.1f,0.1f,0.0f };
-	//range.maxVelocity = { 0.1f,1.0f,0.0f };
-	//range.minColor = { 0.0f,0.0f,0.0f };
-	//range.maxColor = { 1.0f,1.0f,1.0f };
-	//range.minLifeTime = 0.1f;
-	//range.maxLifeTime = 0.5f;
-
-	//particles->SetEmitterRange(range);
+	particle_->Initialize(dxCommon_.get(), "resources/image/particle/circle.png", 1, 64, 65);
 }
 
 void GameScene::Update() {
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+	while (PeekMessage(&msg_, nullptr, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&msg_);
+		DispatchMessage(&msg_);
 	}
 
-	if (msg.message == WM_QUIT) {
+	if (msg_.message == WM_QUIT) {
 		endRequst_ = true;
 	}
 
-	input->Update();
+	input_->Update();
 	CameraController();
 
-	if (input->TriggerKey(DIK_Z)) {
-		audio->PlayAudio();
+	if (input_->TriggerKey(DIK_Z)) {
+		audio_->PlayAudio();
 	}
 
 	UpdateGamePad();
 
-	teapot->Update(*useCamera);
-	bunny->Update(*useCamera);
-	suzanne->Update(*useCamera);
+	player_->Update(*useCamera_);
 
-	skydome->Update(*useCamera);
+	skydome_->Update(*useCamera_);
 
-	particles->Update(*useCamera);
-	particles->SetEmitterPosition(bunny->GetPosition());
-
-	sprite->Update();
-
-	sphere->Update(*useCamera);
+	particle_->Update(*useCamera_);
+	particle_->SetEmitterPosition(player_->GetPosition());
 }
 
 void GameScene::Draw() {
 
-	dxCommon->PreDraw(); // ここより上に描画処理を書かない
+	dxCommon_->PreDraw(); // ここより上に描画処理を書かない
 
 	///
 	/// ↓描画処理ここから
 	///
 
-	teapot->Draw();
-	bunny->Draw();
-	suzanne->Draw();
+	player_->Draw();
 
-	skydome->Draw();
+	skydome_->Draw();
 
-	particles->Draw();
-
-	sprite->Draw();
-
-	sphere->Draw();
+	particle_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -149,45 +109,11 @@ void GameScene::Draw() {
 
 	DrawFPS_ImGui();
 
-	DrawCheckBox_ImGui();
+	debugCamera_->DrawImgui();
 
-	debugCamera->DrawImgui();
+	player_->DrawImGui("player");
 
-	if (drawSprite) {
-		sprite->DrawImGui("Sprite");
-	}
-
-	if (drawSphere) {
-		sphere->DrawImGui("sphere");
-	}
-
-	if (drawPlane) {
-		plane->DrawImGui("plane");
-	}
-
-	if (drawTeapot) {
-		teapot->DrawImGui("teapot");
-	}
-
-	if (drawBunny) {
-		bunny->DrawImGui("bunny");
-	}
-
-	if (drawSuzanne) {
-		suzanne->DrawImGui("suzanne");
-	}
-
-	if (drawMultiMesh){
-		multiMesh->DrawImGui("MultiMesh");
-	}
-
-	if (drawMultiMaterial) {
-		multiMaterial->DrawImGui("MultiMaterial");
-	}
-
-	if (drawParticle) {
-		particles->DrawImGui("particle");
-	}
+	particle_->DrawImGui("particle");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
@@ -196,7 +122,7 @@ void GameScene::Draw() {
 	/// ↑ImGuiここまで
 	///
 
-	dxCommon->PostDraw(); // ここより下に描画処理を書かない
+	dxCommon_->PostDraw(); // ここより下に描画処理を書かない
 }
 
 void GameScene::Finalize() {
@@ -210,12 +136,12 @@ void GameScene::Finalize() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	audio->Reset();
-	audio2->Reset();
+	audio_->Reset();
+	audio2_->Reset();
 
 	// 解放処理(リソースチェックの前) 01_03
-	dxCommon->CloseFence();
-	winApp->Finalize();
+	dxCommon_->CloseFence();
+	winApp_->Finalize();
 	TextureManager::GetInstance()->Finalize();
 
 	///
@@ -228,25 +154,25 @@ void GameScene::Finalize() {
 }
 
 void GameScene::CameraController() {
-	/*if (input->TriggerKey(DIK_SPACE)) {
-		if (isDebugCamera) {
-			isDebugCamera = false;
+	if (input_->TriggerKey(DIK_SPACE)) {
+		if (isDebugCamera_) {
+			isDebugCamera_ = false;
 		}
 		else {
-			isDebugCamera = true;
+			isDebugCamera_ = true;
 		}
-	}*/
+	}
 
-	if (isDebugCamera) {
-		if (debugCamera != nullptr) {
-			debugCamera->Update();
-			useCamera = debugCamera.get();
+	if (isDebugCamera_) {
+		if (debugCamera_ != nullptr) {
+			debugCamera_->Update();
+			useCamera_ = debugCamera_.get();
 		}
 	}
 	else {
-		if (camera != nullptr) {
-			camera->Update();
-			useCamera = camera.get();
+		if (camera_ != nullptr) {
+			camera_->Update();
+			useCamera_ = camera_.get();
 		}
 	}
 }
@@ -276,32 +202,6 @@ void GameScene::DrawFPS_ImGui() {
 	ImGui::Text("Max SRV Slots: %u", DirectXCommon::kMaxSRVCount_);
 
 	ImGui::End();
-}
-
-void GameScene::DrawCheckBox_ImGui() {
-
-	ImVec2 window_pos = ImVec2(ImGui::GetIO().DisplaySize.x - 20.0f, 220.0f); // 右上にオフセット付き
-	ImVec2 window_pos_pivot = ImVec2(1.0f, 0.0f); // 原点を右上にする
-	ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-	ImGui::SetNextWindowBgAlpha(0.8f); // 背景を少し透過
-
-	ImGui::Begin("ImGuiChecBox", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
-
-	ImGui::Checkbox("Sprite", &drawSprite);
-	ImGui::Checkbox("Sphere", &drawSphere);
-	ImGui::Checkbox("Plane", &drawPlane);
-	ImGui::Checkbox("Teapot", &drawTeapot);
-	ImGui::Checkbox("Bunny", &drawBunny);
-	ImGui::Checkbox("Suzanne", &drawSuzanne);
-	ImGui::Checkbox("MultiMesh", &drawMultiMesh);
-	ImGui::Checkbox("MultiMaterial", &drawMultiMaterial);
-	ImGui::Checkbox("Particle", &drawParticle);
-	ImGui::Text("PadMotorPower [L R]");
-	ImGui::DragFloat2("", &padMotorRange.x, 0.01f, 0.0f, 1.0f);
-
-	ImGui::End();
-
 }
 
 void GameScene::UpdateGamePad() {
