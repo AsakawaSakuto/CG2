@@ -244,7 +244,7 @@ void Particles::CreateParticleResource() {
 		particleBufferResource_.Get(),
 		nullptr, // CounterResource: nullでOK
 		&uavDesc,
-		dxCommon_->GetSrvCPUHandle(srvIndex_) // UAVヒープ上の任意のスロット
+		dxCommon_->GetSrvCPUHandle(uavIndex_) // UAVヒープ上の任意のスロット
 	);
 
 	// SRV: Shader Resource View
@@ -281,7 +281,7 @@ void Particles::CreateParticleResource() {
 
 	device_->CreateUnorderedAccessView(
 		freeListIndexResource_.Get(), nullptr, &uavDesc2,
-		dxCommon_->GetSrvCPUHandle(uavIndex_));
+		dxCommon_->GetSrvCPUHandle(uav2Index_));
 
 	// freeList u2
 	D3D12_RESOURCE_DESC counterDesc3 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(uint32_t) * kMaxParticles_, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
@@ -299,7 +299,7 @@ void Particles::CreateParticleResource() {
 
 	device_->CreateUnorderedAccessView(
 		freeListResource_.Get(), nullptr, &uavDesc3,
-		dxCommon_->GetSrvCPUHandle(uavIndex_));
+		dxCommon_->GetSrvCPUHandle(uav3Index_));
 
 	//----------------------------------------------------------------//
 

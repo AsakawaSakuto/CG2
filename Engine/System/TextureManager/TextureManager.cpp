@@ -107,7 +107,10 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     // SRV登録位置を計算
     uint32_t index = static_cast<uint32_t>(textureDatas_.size() - 1);
     uint32_t srvIndex = index + kSRVIndexTop_;
-    assert(srvIndex < DirectXCommon::kMaxSRVCount_);
+    
+    // // ★テクスチャ領域の上限を超えない保証（超えたら即落として原因を洗う）
+    assert(srvIndex >= DirectXCommon::kTextureSRVBegin);
+    assert(srvIndex <= DirectXCommon::kTextureSRVEnd && "Texture SRV range exceeded. Increase range or free slots.");
 
     textureData.srvHandleCPU = GetCPUDescriptorHandle(
         dxCommon_->GetSRV().Get(),

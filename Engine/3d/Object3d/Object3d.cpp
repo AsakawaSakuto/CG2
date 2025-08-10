@@ -19,8 +19,10 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 	textureName_ = modelData_.material.textureFilePath;
 
 	TextureManager::GetInstance()->Initialize(dxCommon_);
+
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
+
 	// 読み込んだテクスチャの番号を取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 

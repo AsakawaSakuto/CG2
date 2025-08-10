@@ -67,6 +67,8 @@ private:
 	// ParticleのSRV番号
 	uint32_t srvIndex_;
 	uint32_t uavIndex_;
+	uint32_t uav2Index_;
+	uint32_t uav3Index_;
 
 	// 描画可能な最大パーティクル数 // 1048576*2048 // 16384*32
 	uint32_t kMaxParticles_;
