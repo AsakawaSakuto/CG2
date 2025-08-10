@@ -28,9 +28,12 @@
 #include "EmitterSpfere.h"
 #include "EmitterRange.h"
 
+#include "ParticleDescriptorAllocator.h"
+
 #include <random>
 #include <numbers>
 #include <memory>
+
 #pragma endregion
 // パーティクルクラス
 class Particles
@@ -38,7 +41,7 @@ class Particles
 public:
 
 	// 初期化・maxParticleに扱えるパーティクルの最大数を入れる(512の倍数)
-	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle, const uint32_t srv, const uint32_t uav);
+	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle);
 
 	// 更新 パーティクルの動きや行列更新
 	void Update(Camera& useCamera);
@@ -65,10 +68,10 @@ public:
 	void SetEmitterRange(const EmitterRange& emitterRange) { emitterRange_ = emitterRange; }
 private:
 	// ParticleのSRV番号
-	uint32_t srvIndex_;
-	uint32_t uavIndex_;
-	uint32_t uav2Index_;
-	uint32_t uav3Index_;
+	uint32_t idxSrvParticles_;
+	uint32_t idxUavParticles_;
+	uint32_t idxUavFreeListIndex_;
+	uint32_t idxUavFreeList_;
 
 	// 描画可能な最大パーティクル数 // 1048576*2048 // 16384*32
 	uint32_t kMaxParticles_;

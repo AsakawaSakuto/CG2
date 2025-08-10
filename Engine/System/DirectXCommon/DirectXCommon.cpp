@@ -1,6 +1,8 @@
 #include"DirectXCommon.h"
 #include<cassert>
 
+#include "ParticleDescriptorAllocator.h" 
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"Winmm.lib")
@@ -501,4 +503,15 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
 
 #pragma endregion
 
+}
+
+ParticleDescriptorAllocator& DirectXCommon::GetParticleAlloc() {
+    if (!particleAlloc_) {
+        particleAlloc_ = std::make_unique<ParticleDescriptorAllocator>();
+    }
+    if (!particleAllocInitialized_) {
+        particleAlloc_->Initialize(this, kParticleSRVBegin, kParticleSRVEnd);
+        particleAllocInitialized_ = true;
+    }
+    return *particleAlloc_;
 }

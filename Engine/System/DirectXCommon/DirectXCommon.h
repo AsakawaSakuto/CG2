@@ -21,6 +21,8 @@
 #include"ConvertString.h"
 #include"CreateResource.h"
 
+class ParticleDescriptorAllocator;
+
 class DirectXCommon
 {
 public:
@@ -78,7 +80,12 @@ public:
     uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
     uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
     uint32_t GetDescriptorSizeUAV() { return descriptorSizeUAV_; }
+
+    ParticleDescriptorAllocator& GetParticleAlloc();
 private:
+
+    std::unique_ptr<ParticleDescriptorAllocator> particleAlloc_;
+    bool particleAllocInitialized_ = false;
 
     // 
     WinApp* winApp_ = nullptr;

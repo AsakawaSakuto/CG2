@@ -92,6 +92,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\3d\Particles\ParticleDescriptorAllocator.cpp" />
     <ClCompile Include="Engine\System\Audio\Audio.cpp" />
     <ClCompile Include="Engine\System\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
@@ -126,6 +127,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\2d\Triangle\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\3d\Particles\ParticleDescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\EmitterRange.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\EmitterSpfere.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleDataCS.h" />

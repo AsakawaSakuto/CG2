@@ -67,6 +67,7 @@ private:
 
 	// Other render objects
 	unique_ptr<Particles> particle_ = make_unique<Particles>();
+	unique_ptr<Particles> particle2_ = make_unique<Particles>();
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();

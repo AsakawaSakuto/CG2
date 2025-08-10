@@ -36,7 +36,8 @@ void GameScene::Initialize() {
 
 	player_->Initialize(dxCommon_.get(), "resources/object3d/player/player.obj");
 
-	particle_->Initialize(dxCommon_.get(), "resources/image/particle/circle.png", 1, 64, 65);
+	particle_->Initialize(dxCommon_.get(), "resources/image/particle/circle.png", 1);
+	particle2_->Initialize(dxCommon_.get(), "resources/image/particle/fire.png", 2);
 }
 
 void GameScene::Update() {
@@ -65,6 +66,8 @@ void GameScene::Update() {
 	particle_->Update(*useCamera_);
 	particle_->SetEmitterPosition(player_->GetPosition());
 
+	particle2_->Update(*useCamera_);
+
 	sprite_->Update();
 }
 
@@ -81,6 +84,8 @@ void GameScene::Draw() {
 	skydome_->Draw();
 
 	particle_->Draw();
+
+	particle2_->Draw();
 
 	sprite_->Draw();
 
@@ -106,6 +111,8 @@ void GameScene::Draw() {
 	player_->DrawImGui("player");
 
 	particle_->DrawImGui("particle");
+
+	particle2_->DrawImGui("particle2");
 
 	sprite_->DrawImGui("sprite");
 

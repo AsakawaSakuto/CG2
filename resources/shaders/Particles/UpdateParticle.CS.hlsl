@@ -23,7 +23,7 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             gParticles[particleIndex].color.a = saturate(alpha);
         }
         
-        if (gParticles[particleIndex].color.a == 0.0f)
+        if (gParticles[particleIndex].color.a <= 0.0f)
         {
             gParticles[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
             int freeListIndex;
