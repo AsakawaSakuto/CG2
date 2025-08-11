@@ -432,6 +432,13 @@ void Particles::UpdateParticle() {
 	// Emitterの処理を実行
 	commandList_->Dispatch(1, 1, 1);
 
+	D3D12_RESOURCE_BARRIER bs[] = {
+    CD3DX12_RESOURCE_BARRIER::UAV(particleBufferResource_.Get()),
+    CD3DX12_RESOURCE_BARRIER::UAV(freeListIndexResource_.Get()),
+    CD3DX12_RESOURCE_BARRIER::UAV(freeListResource_.Get()),
+	};
+	commandList_->ResourceBarrier(_countof(bs), bs);
+
 	// Particleの更新
 	commandList_->SetComputeRootSignature(csRootSignature_.Get());
 	commandList_->SetPipelineState(csUpdatePipelineState_.Get()); // CSをセット
