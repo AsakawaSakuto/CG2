@@ -25,19 +25,7 @@ void GameScene::Initialize() {
 
 	input_->Initialize(winApp_.get());
 
-	audio_->Initialize("resources/sound/fanfare.wav");
-
 	debugCamera_->SetInput(input_.get());
-
-	sprite_->Initialize(dxCommon_.get(), "resources/image/Grid.png");
-
-	skydome_->Initialize(dxCommon_.get(), "resources/object3d/skydome.obj");
-	skydome_->SetTexture("resources/image/skydome.png");
-
-	player_->Initialize(dxCommon_.get(), "resources/object3d/player/player.obj");
-
-	particle_->Initialize(dxCommon_.get(), "resources/image/particle/circle.png", 1);
-	particle2_->Initialize(dxCommon_.get(), "resources/image/particle/closs.png", 2);
 }
 
 void GameScene::Update() {
@@ -53,28 +41,7 @@ void GameScene::Update() {
 	input_->Update();
 	CameraController();
 
-	if (input_->TriggerKey(DIK_Z)) {
-		audio_->PlayAudio();
-	}
-	if (input_->TriggerKey(DIK_X)) {
-		particle2_->SetUseEmitter(true);
-	}
-	if (input_->TriggerKey(DIK_C)) {
-		particle2_->SetUseEmitter(false);
-	}
-
 	gamePad_.Update();
-
-	player_->Update(*useCamera_);
-
-	skydome_->Update(*useCamera_);
-
-	particle_->Update(*useCamera_);
-	particle_->SetEmitterPosition(player_->GetPosition());
-
-	particle2_->Update(*useCamera_);
-
-	sprite_->Update();
 }
 
 void GameScene::Draw() {
@@ -84,16 +51,6 @@ void GameScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
-
-	player_->Draw();
-
-	skydome_->Draw();
-
-	particle_->Draw();
-
-	particle2_->Draw();
-
-	sprite_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -113,14 +70,6 @@ void GameScene::Draw() {
 	DrawFPS_ImGui();
 
 	debugCamera_->DrawImgui();
-
-	player_->DrawImGui("player");
-
-	particle_->DrawImGui("particle");
-
-	particle2_->DrawImGui("particle2");
-
-	sprite_->DrawImGui("sprite");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
