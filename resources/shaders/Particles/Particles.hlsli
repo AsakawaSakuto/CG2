@@ -28,7 +28,7 @@ struct EmitterSphere {
     float frequencyTime;
     uint emit;
     uint kMaxParticle;
-    float pad;
+    uint isMove;
 };
 
 struct EmitterRange {
@@ -129,6 +129,25 @@ float3 GenerateSpherePosition(uint baseSeed)
         r * sinPhi * sin(theta),
         r * cos(phi)
     );
+}
+
+float3 GenerateSpherePositionCustom(uint baseSeed, float3 center, float radius)
+{
+    float u = RandomFloat(baseSeed + 0);
+    float v = RandomFloat(baseSeed + 1);
+    float w = RandomFloat(baseSeed + 2);
+
+    float theta = 2.0f * 3.14159265f * u;
+    float cosPhi = 1.0f - 2.0f * v;
+    float sinPhi = sqrt(max(0.0f, 1.0f - cosPhi * cosPhi));
+
+    float3 dir = float3(sinPhi * cos(theta),
+                        cosPhi,
+                        sinPhi * sin(theta));
+
+    float r = radius * pow(w, 1.0f / 3.0f);
+
+    return center + r * dir;
 }
 
 float RandomRange(uint seed, float minV, float maxV)

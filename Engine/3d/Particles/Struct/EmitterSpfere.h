@@ -10,5 +10,5 @@ struct EmitterSphere
 	float frequencyTime;
 	uint32_t emit;
 	uint32_t kMaxParticle;
-	float pad;
+	uint32_t isMove;
 };

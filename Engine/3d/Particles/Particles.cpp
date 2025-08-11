@@ -47,6 +47,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.radius = 0.01f;
 	emitter_.emit = 0;
 	emitter_.kMaxParticle = kMaxParticles_;
+	emitter_.isMove = 0;
 
 	// Emitterの範囲
 	emitterRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -163,6 +164,12 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat("SpawnSize", &emitter_.radius, 0.01f, 0.01f, 10.0f);
 	ImGui::DragInt("SpawnCount", &emitter_.count, 1, 0, static_cast<int>(kMaxParticles_));
 	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.01f, 10.0f);
+
+	bool isMoveFlag = (emitter_.isMove != 0); // uint32_t → bool に変換
+	// ImGui チェックボックス
+	if (ImGui::Checkbox("Move Particles", &isMoveFlag)) {
+		emitter_.isMove = isMoveFlag ? 1u : 0u; // bool → uint32_t に変換
+	}
 
 	ImGui::Text("RangeEdit");
 	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
