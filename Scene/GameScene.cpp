@@ -26,6 +26,8 @@ void GameScene::Initialize() {
 	input_->Initialize(winApp_.get());
 
 	debugCamera_->SetInput(input_.get());
+
+	player_->Initialize(dxCommon_.get());
 }
 
 void GameScene::Update() {
@@ -42,6 +44,8 @@ void GameScene::Update() {
 	CameraController();
 
 	gamePad_.Update();
+
+	player_->Update(useCamera_);
 }
 
 void GameScene::Draw() {
@@ -51,6 +55,8 @@ void GameScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	player_->Draw();
 
 	///
 	/// ↑描画処理ここまで

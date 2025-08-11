@@ -29,6 +29,8 @@
 #include "Vector4.h"
 #include "Matrix4x4.h"
 
+#include "Player.h"
+
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
 using std::make_unique;
@@ -54,12 +56,10 @@ private:
 	unique_ptr<Input> input_ = make_unique<Input>();
 	D3ResourceLeakChecker d3ResourceLeakCheker_;
 
+	unique_ptr<Player> player_ = make_unique<Player>();
+
 	//Sprite
 	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
-
-	// 3D Object
-	unique_ptr<Object3d> skydome_ = make_unique<Object3d>();
-	unique_ptr<Object3d> player_ = make_unique<Object3d>();
 
 	// Audio
 	unique_ptr<Audio> audio_ = make_unique<Audio>();
