@@ -171,6 +171,8 @@ void Particles::DrawImGui(const char* objectName) {
 		emitter_.isMove = isMoveFlag ? 1u : 0u; // bool → uint32_t に変換
 	}
 
+	ImGui::Checkbox("useEmitter", &useEmitter_);
+
 	ImGui::Text("RangeEdit");
 	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
 	ImGui::DragFloat3("maxScale", &emitterRange_.maxScale.x, 0.01f);
@@ -488,12 +490,18 @@ void Particles::CreateEmitterResource() {
 
 void Particles::UpdateEmitter() {
 	// このemitterSphereをCBufferとしてGPUへ転送
-	emitter_.frequencyTime += kDeltaTime_;
-	if (emitter_.frequency <= emitter_.frequencyTime) {
-		emitter_.frequencyTime -= emitter_.frequency;
-		emitter_.emit = true;
+	if (useEmitter_) {
+		emitter_.frequencyTime += kDeltaTime_;
+		if (emitter_.frequency <= emitter_.frequencyTime) {
+			emitter_.frequencyTime -= emitter_.frequency;
+			emitter_.emit = true;
+		}
+		else {
+			emitter_.emit = false;
+		}
 	} else {
 		emitter_.emit = false;
+		emitter_.frequencyTime = 0.0f;
 	}
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK

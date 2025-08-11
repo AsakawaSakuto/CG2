@@ -66,6 +66,9 @@ public:
 
 	// エミッタ範囲の値をセット
 	void SetEmitterRange(const EmitterRange& emitterRange) { emitterRange_ = emitterRange; }
+
+	//
+	void SetUseEmitter(bool useEmitter) { useEmitter_ = useEmitter; }
 private:
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;
@@ -91,6 +94,7 @@ private:
 	// 1フレームあたりの固定デルタタイム
 	const float kDeltaTime_ = 1.0f / 60.0f;
 
+	bool useEmitter_ = false;
 
 	float totalTime_ = 0.0f;
 

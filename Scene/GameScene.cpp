@@ -37,7 +37,7 @@ void GameScene::Initialize() {
 	player_->Initialize(dxCommon_.get(), "resources/object3d/player/player.obj");
 
 	particle_->Initialize(dxCommon_.get(), "resources/image/particle/circle.png", 1);
-	particle2_->Initialize(dxCommon_.get(), "resources/image/particle/triangle.png", 2);
+	particle2_->Initialize(dxCommon_.get(), "resources/image/particle/closs.png", 2);
 }
 
 void GameScene::Update() {
@@ -55,6 +55,12 @@ void GameScene::Update() {
 
 	if (input_->TriggerKey(DIK_Z)) {
 		audio_->PlayAudio();
+	}
+	if (input_->TriggerKey(DIK_X)) {
+		particle2_->SetUseEmitter(true);
+	}
+	if (input_->TriggerKey(DIK_C)) {
+		particle2_->SetUseEmitter(false);
 	}
 
 	gamePad_.Update();
