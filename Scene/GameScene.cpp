@@ -43,8 +43,6 @@ void GameScene::Update() {
 	input_->Update();
 	CameraController();
 
-	gamePad_.Update();
-
 	player_->Update(useCamera_);
 }
 
@@ -76,6 +74,8 @@ void GameScene::Draw() {
 	DrawFPS_ImGui();
 
 	debugCamera_->DrawImgui();
+
+	//player_->DrawImGui();
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

@@ -48,8 +48,6 @@ private:
 	bool endRequst_ = false;
 	MSG msg_{};
 
-	GamePad gamePad_;
-
 	// Core systems
 	unique_ptr<WinApp> winApp_ = make_unique<WinApp>();
 	unique_ptr<DirectXCommon> dxCommon_ = make_unique<DirectXCommon>();
