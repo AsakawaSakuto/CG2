@@ -5,19 +5,51 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	model_->Initialize(dxCommon_, "resources/object3d/player/player.obj");
 
 	gamePad_.Initialize();
+
+    for (int i = 0; i < 32; ++i) {
+        auto bullet = std::make_unique<PlayerBullet>();
+        bullet->Initialize(dxCommon_); // 重い処理はここで全部
+        bullet->SetIsAlive(false);
+        bullets_.push_back(std::move(bullet));
+    }
 }
 
 void Player::Update(Camera* camera) {
 
 	gamePad_.Update();
 	
+    if (gamePad_.PushButton(GamePad::A)) {
+        bulletSpawnTimer_ += deltaTime;
+        if (bulletSpawnTimer_ >= bulletSpawnTime_) {
+            for (auto& bullet : bullets_) {
+                if (!bullet->GetIsAlive()) {
+                    bullet->Spawn(model_->GetTranslate()); // 軽い処理
+                    bulletSpawnTimer_ = 0.0f;
+                    break;
+                }
+            }
+        }
+    }
+
 	Move();
+
+    for (auto& bullet : bullets_) {
+        if (bullet->GetIsAlive()) {
+            bullet->Update(camera);
+        }
+    }
 
 	model_->Update(*camera);
 }
 
 void Player::Draw() {
 	model_->Draw();
+    
+    for (auto& bullet : bullets_) {
+        if (bullet->GetIsAlive()) {
+            bullet->Draw();
+        }
+    }
 }
 
 void Player::DrawImGui() {
@@ -27,7 +59,7 @@ void Player::DrawImGui() {
 
 void Player::Move() {
 
-	Vector3 translate = model_->GetPosition();
+	Vector3 translate = model_->GetTranslate();
 
     // 左スティックの入力取得
     float lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
@@ -48,5 +80,5 @@ void Player::Move() {
     translate.x += move.x * speed_ * deltaTime;
     translate.y += move.y * speed_ * deltaTime;
 
-    model_->SetPosition(translate);
+    model_->SetTranslate(translate);
 }

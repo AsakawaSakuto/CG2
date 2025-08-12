@@ -13,3 +13,259 @@
 
 [Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
 
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+
+[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+

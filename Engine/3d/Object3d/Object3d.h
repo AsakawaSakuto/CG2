@@ -47,7 +47,10 @@ public:
 	void DrawImGui(const char* objectName);
 
 	// 座標を設定
-	void SetPosition(Vector3 position) { transform_.translate = position; }
+	void SetTranslate(Vector3 position) { transform_.translate = position; }
+
+    // 角度を設定
+	void SetRotate(Vector3 rotate) { transform_.rotate = rotate; }
 
 	// サイズを設定
 	void SetScale(Vector3 scale) { transform_.scale = scale; }
@@ -56,7 +59,7 @@ public:
 	void SetColor(Vector4 color) { materialData_->color = color; }
 
 	// 座標を取得（参照）
-	Vector3& GetPosition() { return transform_.translate; }
+	Vector3& GetTranslate() { return transform_.translate; }
 
 	// 色を取得（参照）
 	Vector4& GetColor() { return materialData_->color; }
