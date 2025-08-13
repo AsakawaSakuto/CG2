@@ -13,6 +13,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     engineFire_->Initialize(dxCommon, "resources/image/particle/circle.png", 1);
     engineFire_->SetUseEmitter(true);
 
+    heal_->Initialize(dxCommon, "resources/image/particle/closs.png", 1);
+
 	gamePad_.Initialize();
 
     for (int i = 0; i < 32; ++i) {
@@ -23,24 +25,6 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     }
 
     state_ = NORMAL;
-
-    engineFireEmitter_.count = 2;
-    engineFireEmitter_.radius = 0.05f;
-    engineFireEmitter_.frequency = 0.01f;
-    engineFireEmitter_.frequencyTime = 0.0f;
-    engineFireEmitter_.isMove = true;
-
-    engineFireEmitterRange_.minScale = { 0.1f,0.1f,0.1f };
-    engineFireEmitterRange_.maxScale = { 1.1f,1.1f,1.1f };
-    engineFireEmitterRange_.minVelocity = { 0.0f,0.0f,-0.3f };
-    engineFireEmitterRange_.maxVelocity = { 0.0f,0.0f,0.0f };
-    engineFireEmitterRange_.minColor = { 0.9f,0.0f,0.0f };
-    engineFireEmitterRange_.maxColor = { 1.0f,0.5f,0.0f };
-    engineFireEmitterRange_.minLifeTime = 0.1f;
-    engineFireEmitterRange_.maxLifeTime = 0.2f;
-
-    engineFire_->SetEmitterValue(engineFireEmitter_);
-    engineFire_->SetEmitterRange(engineFireEmitterRange_);
 }
 
 void Player::Update(Camera* camera) {
@@ -51,23 +35,27 @@ void Player::Update(Camera* camera) {
 
     Attack();
 
-    Action();
-
-    UpdateReticle(camera);
-
     for (auto& bullet : bullets_) {
         if (bullet->GetIsAlive()) {
             bullet->Update(camera);
         }
     }
 
-    engineFire_->SetEmitterValue(engineFireEmitter_);
-    engineFire_->SetEmitterRange(engineFireEmitterRange_);
-    Vector3 engineFirePos = model_->GetTranslate();
-    engineFire_->SetEmitterPosition(engineFirePos + engineFireOffset_);
+    Action();
+
+    UpdateReticle(camera);
+
+    UpdateParticle();
+
+    if (gamePad_.TriggerButton(GamePad::X)) {
+        Heal();
+    }
 
 	model_->Update(*camera);
+
     engineFire_->Update(*camera);
+    heal_->Update(*camera);
+
     reticle3D_->Update(*camera);
     reticle2D_->Update();
 }
@@ -82,59 +70,21 @@ void Player::Draw() {
     }
 
     engineFire_->Draw();
+    heal_->Draw();
+
     reticle2D_->Draw();
     //reticle3D_->Draw();
 }
 
 void Player::DrawImGui() {
-    /*ImGui::DragFloat("Speed", &moveSpeed_, 0.1f);
-    ImGui::DragFloat("BullerSpeed", &bulletSpeed_, 1.0f);
-    ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
-    ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
-    ImGui::DragFloat3("fireOffset", &engineFireOffset_.x, 0.01f);
-    model_->DrawImGui("player");*/
+    //ImGui::DragFloat("Speed", &moveSpeed_, 0.1f);
+    //ImGui::DragFloat("BullerSpeed", &bulletSpeed_, 1.0f);
+    //ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
+    //ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
+    //ImGui::DragFloat3("fireOffset", &engineFireOffset_.x, 0.01f);
+    //model_->DrawImGui("player");
     //engineFire_->DrawImGui("engineFire");
-}
-
-void Player::Move() {
-    if (state_ == NORMAL) {
-        Vector3 translate = model_->GetTranslate();
-
-        // 左スティックの入力取得
-        float lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
-        float ly = gamePad_.LeftStickY(); // -1.0 ~ +1.0
-
-        // 入力ベクトル
-        Vector2 move(lx, ly);
-
-        // 斜めで速くなりすぎないように長さをクランプ
-        float length = sqrt(move.x * move.x + move.y * move.y);
-        if (length > 1.0f)
-        {
-            move.x /= length;
-            move.y /= length;
-        }
-
-        // 位置を更新（倒し量＝速度）
-        translate.x += move.x * moveSpeed_ * deltaTime_;
-        translate.y += move.y * moveSpeed_ * deltaTime_;
-
-        translate.x = std::clamp(translate.x, -9.5f, 9.5f);
-        translate.y = std::clamp(translate.y, -1.0f, 9.0f);
-
-        // 実機の傾き
-        moveRotate_.y -= move.x * moveRotateSpeed_.x * deltaTime_;
-        moveRotate_.x += move.y * moveRotateSpeed_.y * deltaTime_;
-
-        moveRotate_.x = std::clamp(moveRotate_.x, -0.3f, 0.3f);
-        moveRotate_.y = std::clamp(moveRotate_.y, -0.3f, 0.3f);
-
-        engineFireOffset_.x = moveRotate_.y * -1.0f;;
-        engineFireOffset_.y = moveRotate_.x;
-
-        model_->SetRotate(moveRotate_);
-        model_->SetTranslate(translate);
-    }
+    //heal_->DrawImGui("h");
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -195,6 +145,47 @@ void Player::UpdateReticle(Camera* camera) {
     Vector3 playerPos = GetWorldPosition();
     bulletVelocity_ = reticleWorldPosition - playerPos;
     bulletVelocity_ = bulletVelocity_.Normalize() * bulletSpeed_;
+}
+
+void Player::Move() {
+    if (state_ == NORMAL) {
+        Vector3 translate = model_->GetTranslate();
+
+        // 左スティックの入力取得
+        float lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
+        float ly = gamePad_.LeftStickY(); // -1.0 ~ +1.0
+
+        // 入力ベクトル
+        Vector2 move(lx, ly);
+
+        // 斜めで速くなりすぎないように長さをクランプ
+        float length = sqrt(move.x * move.x + move.y * move.y);
+        if (length > 1.0f)
+        {
+            move.x /= length;
+            move.y /= length;
+        }
+
+        // 位置を更新（倒し量＝速度）
+        translate.x += move.x * moveSpeed_ * deltaTime_;
+        translate.y += move.y * moveSpeed_ * deltaTime_;
+
+        translate.x = std::clamp(translate.x, -9.5f, 9.5f);
+        translate.y = std::clamp(translate.y, -1.0f, 9.0f);
+
+        // 実機の傾き
+        moveRotate_.y -= move.x * moveRotateSpeed_.x * deltaTime_;
+        moveRotate_.x += move.y * moveRotateSpeed_.y * deltaTime_;
+
+        moveRotate_.x = std::clamp(moveRotate_.x, -0.3f, 0.3f);
+        moveRotate_.y = std::clamp(moveRotate_.y, -0.3f, 0.3f);
+
+        engineFireOffset_.x = moveRotate_.y * -1.0f;;
+        engineFireOffset_.y = moveRotate_.x;
+
+        model_->SetRotate(moveRotate_);
+        model_->SetTranslate(translate);
+    }
 }
 
 void Player::Attack() {
@@ -262,6 +253,68 @@ void Player::Action() {
             dashCoolTimer_ = 0.0f;
             isCanDash = true;
         }
+    }
+}
+
+void Player::UpdateParticle() {
+    engineFireEmitter_.count = 2;
+    engineFireEmitter_.radius = 0.05f;
+    engineFireEmitter_.frequency = 0.01f;
+    engineFireEmitter_.frequencyTime = 0.0f;
+    engineFireEmitter_.isMove = true;
+
+    engineFireRange_.minScale = { 0.1f,0.1f,0.1f };
+    engineFireRange_.maxScale = { 1.1f,1.1f,1.1f };
+    engineFireRange_.minVelocity = { 0.0f,0.0f,-0.3f };
+    engineFireRange_.maxVelocity = { 0.0f,0.0f,0.0f };
+    engineFireRange_.minColor = { 0.9f,0.0f,0.0f };
+    engineFireRange_.maxColor = { 1.0f,0.5f,0.0f };
+    engineFireRange_.minLifeTime = 0.1f;
+    engineFireRange_.maxLifeTime = 0.2f;
+
+    engineFire_->SetEmitterValue(engineFireEmitter_);
+    engineFire_->SetEmitterRange(engineFireRange_);
+    engineFire_->SetEmitterPosition(model_->GetTranslate());
+    engineFire_->SetOffSet(engineFireOffset_);
+    
+    //--------------------------------------------//
+
+    healEmitter_.count = 2;
+    healEmitter_.radius = 2.f;
+    healEmitter_.frequency = 0.01f;
+    healEmitter_.frequencyTime = 0.0f;
+    healEmitter_.isMove = true;
+
+    healRange_.minScale = { 0.1f,0.1f,0.1f };
+    healRange_.maxScale = { 1.0f,1.0f,1.0f };
+    healRange_.minVelocity = { 0.0f,0.05f,0.0f };
+    healRange_.maxVelocity = { 0.0f,0.2f,0.0f };
+    healRange_.minColor = { 0.0f,0.2f,0.0f };
+    healRange_.maxColor = { 0.0f,1.0f,0.0f };
+    healRange_.minLifeTime = 0.1f;
+    healRange_.maxLifeTime = 0.3f;
+
+    heal_->SetEmitterValue(healEmitter_);
+    heal_->SetEmitterRange(healRange_);
+    heal_->SetEmitterPosition(model_->GetTranslate());
+    heal_->SetOffSet({ 0.0f,0.5f,0.0f });
+
+    if (isHeal_) {
+        heal_->SetUseEmitter(true);
+        healTimer_ += deltaTime_;
+        if (healTimer_ >= healTime_) {
+            healTimer_ = 0.0f;
+            isHeal_ = false;
+        }
+    } else {
+        heal_->SetUseEmitter(false);
+    }
+}
+
+void Player::Heal() {
+    if (!isHeal_) {
+        isHeal_ = true;
+        life_++;
     }
 }
 

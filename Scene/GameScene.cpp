@@ -56,8 +56,8 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	player_->Draw();
 	skyBox_->Draw();
+	player_->Draw();
 
 	//ground_->Draw();
 

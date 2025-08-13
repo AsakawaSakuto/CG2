@@ -158,6 +158,7 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Text("EmitterEdit");
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
+	ImGui::DragFloat3("OffSet", &offset_.x, 0.01f);
 	ImGui::DragFloat("SpawnSize", &emitter_.radius, 0.01f, 0.01f, 10.0f);
 	ImGui::DragInt("SpawnCount", &emitter_.count, 1, 0, static_cast<int>(kMaxParticles_));
 	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.01f, 10.0f);
@@ -500,6 +501,7 @@ void Particles::UpdateEmitter() {
 		emitter_.frequencyTime = 0.0f;
 	}
 	emitter_.kMaxParticle = kMaxParticles_;
+	emitter_.translate += offset_;
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
 	EmitterRange* mappedRange = nullptr;
 	emitterRangeResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedRange));

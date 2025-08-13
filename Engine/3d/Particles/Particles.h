@@ -69,6 +69,9 @@ public:
 
 	//
 	void SetUseEmitter(bool useEmitter) { useEmitter_ = useEmitter; }
+
+	//
+	void SetOffSet(Vector3 offset) { offset_ = offset; }
 private:
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;
@@ -102,6 +105,7 @@ private:
 
 	float emitterSpeed_ = 0.0f;
 
+	Vector3 offset_ = {};
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferResource_;

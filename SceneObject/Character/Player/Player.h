@@ -26,15 +26,18 @@ public:
 	void DrawImGui();
 
 	Vector3 GetWorldPosition();
+
+	void Heal();
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
 	unique_ptr<Object3d> reticle3D_ = make_unique<Object3d>();
 	unique_ptr<Sprite> reticle2D_ = make_unique<Sprite>();
-	unique_ptr<Particles> engineFire_ = make_unique<Particles>();
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	GamePad gamePad_;
+
+	int life_ = 3;
 
 	float deltaTime_ = 1.0f / 60.0f;
 
@@ -62,16 +65,25 @@ private:
 	float dashCoolTimer_ = 0.0f;
 	bool isCanDash = true;
 
-	//--- engineFire ---//
+	//--- particle ---//
+	unique_ptr<Particles> engineFire_ = make_unique<Particles>();
 	EmitterSphere engineFireEmitter_ = {};
-	EmitterRange engineFireEmitterRange_ = {};
+	EmitterRange engineFireRange_ = {};
 	Vector3 engineFireOffset_ = { 0.0f,0.0f,-1.5f };
+
+	unique_ptr<Particles> heal_ = make_unique<Particles>();
+	EmitterSphere healEmitter_ = {};
+	EmitterRange healRange_ = {};
+	float healTime_ = 0.75f;
+	float healTimer_ = 0.0f;
+	bool isHeal_ = false;
 
 	//--- function ---//
 	void Move();
 	void Attack();
 	void Action();
 	void UpdateReticle(Camera* camera);
+	void UpdateParticle();
 
 	enum State {
 		NORMAL,
