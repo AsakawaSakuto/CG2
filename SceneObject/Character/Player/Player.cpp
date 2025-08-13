@@ -82,17 +82,17 @@ void Player::Draw() {
     }
 
     engineFire_->Draw();
-    reticle3D_->Draw();
     reticle2D_->Draw();
+    //reticle3D_->Draw();
 }
 
 void Player::DrawImGui() {
-    ImGui::DragFloat("Speed", &moveSpeed_, 0.1f);
+    /*ImGui::DragFloat("Speed", &moveSpeed_, 0.1f);
     ImGui::DragFloat("BullerSpeed", &bulletSpeed_, 1.0f);
     ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
     ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
     ImGui::DragFloat3("fireOffset", &engineFireOffset_.x, 0.01f);
-    //model_->DrawImGui("player");
+    model_->DrawImGui("player");*/
     //engineFire_->DrawImGui("engineFire");
 }
 
@@ -119,6 +119,10 @@ void Player::Move() {
         translate.x += move.x * moveSpeed_ * deltaTime_;
         translate.y += move.y * moveSpeed_ * deltaTime_;
 
+        translate.x = std::clamp(translate.x, -9.5f, 9.5f);
+        translate.y = std::clamp(translate.y, -1.0f, 9.0f);
+
+        // 実機の傾き
         moveRotate_.y -= move.x * moveRotateSpeed_.x * deltaTime_;
         moveRotate_.x += move.y * moveRotateSpeed_.y * deltaTime_;
 
@@ -236,6 +240,7 @@ void Player::Action() {
 
         Vector3 translate = model_->GetTranslate();
         translate.x += dashDirection_ * moveSpeed_ * deltaTime_;
+        translate.x = std::clamp(translate.x, -9.5f, 9.5f);
         model_->SetTranslate(translate);
 
         engineFireEmitter_.count = 10;
@@ -244,7 +249,7 @@ void Player::Action() {
         if (dashRotateTimer_ >= dashRotateTime_) {
             dashRotateTimer_ = 0.0f;
             dashRotate_ = { 0.0f ,0.0f ,0.0f };
-            moveRotate_ = { 0.0f ,0.0f ,0.0f };
+            //moveRotate_ = { 0.0f ,0.0f ,0.0f };
             model_->SetRotate(dashRotate_);
             state_ = NORMAL;
         }

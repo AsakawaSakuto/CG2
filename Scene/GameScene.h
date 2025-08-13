@@ -30,6 +30,7 @@
 #include "Matrix4x4.h"
 
 #include "Player.h"
+#include "SkyBox.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -55,6 +56,7 @@ private:
 	D3ResourceLeakChecker d3ResourceLeakCheker_;
 
 	unique_ptr<Player> player_ = make_unique<Player>();
+	unique_ptr<SkyBox> skyBox_ = make_unique<SkyBox>();
 
 	//Sprite
 	unique_ptr<Object3d> ground_ = make_unique<Object3d>();

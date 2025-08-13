@@ -28,8 +28,7 @@ void GameScene::Initialize() {
 	debugCamera_->SetInput(input_.get());
 
 	player_->Initialize(dxCommon_.get());
-
-	ground_->Initialize(dxCommon_.get(), "resources/object3d/ground.obj");
+	skyBox_->Initialize(dxCommon_.get());
 }
 
 void GameScene::Update() {
@@ -46,8 +45,7 @@ void GameScene::Update() {
 	CameraController();
 
 	player_->Update(useCamera_);
-
-	ground_->Update(*useCamera_);
+	skyBox_->Update(useCamera_);
 }
 
 void GameScene::Draw() {
@@ -59,6 +57,7 @@ void GameScene::Draw() {
 	///
 
 	player_->Draw();
+	skyBox_->Draw();
 
 	//ground_->Draw();
 
@@ -79,11 +78,11 @@ void GameScene::Draw() {
 
 	DrawFPS_ImGui();
 
-	//ground_->DrawImGui("g");
-
 	debugCamera_->DrawImgui();
 
 	player_->DrawImGui();
+
+	//skyBox_->DrawImGui();
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

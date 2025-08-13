@@ -71,6 +71,12 @@ public:
 	void SetDrawMode(bool drawMode) { drawMode_ = drawMode; }
 
 	Matrix4x4& GetWorldMatrix() { return worldMatrix; }
+
+	void SetUvTranslate(Vector2 uvT) { uvTranslate_ = uvT; }
+
+	void SetUvScale(Vector2 uvS) { uvScale_ = uvS; }
+
+	void SetUvRotate(float uvR) { uvRotate_ = uvR; }
 private:
 	Matrix4x4 worldMatrix;
 
