@@ -62,7 +62,7 @@ void Player::Draw() {
 }
 
 void Player::DrawImGui() {
-    ImGui::DragFloat("Speed", &speed_, 0.1f);
+    ImGui::DragFloat("Speed", &moveSpeed_, 0.1f);
     ImGui::DragFloat("BullerSpeed", &bulletSpeed_, 1.0f);
     ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
     ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
@@ -89,9 +89,16 @@ void Player::Move() {
         }
 
         // 位置を更新（倒し量＝速度）
-        translate.x += move.x * speed_ * deltaTime;
-        translate.y += move.y * speed_ * deltaTime;
+        translate.x += move.x * moveSpeed_ * deltaTime_;
+        translate.y += move.y * moveSpeed_ * deltaTime_;
 
+        moveRotate_.y -= move.x * moveRotateSpeed_.x * deltaTime_;
+        moveRotate_.x += move.y * moveRotateSpeed_.y * deltaTime_;
+
+        moveRotate_.x = std::clamp(moveRotate_.x, -0.3f, 0.3f);
+        moveRotate_.y = std::clamp(moveRotate_.y, -0.3f, 0.3f);
+
+        model_->SetRotate(moveRotate_);
         model_->SetTranslate(translate);
     }
 }
@@ -116,8 +123,8 @@ void Player::UpdateReticle(Camera* camera) {
     }
 
     // 位置を更新（倒し量＝速度）
-    position.x += move.x * reticleSpeed_ * deltaTime;
-    position.y -= move.y * reticleSpeed_ * deltaTime;
+    position.x += move.x * reticleSpeed_ * deltaTime_;
+    position.y -= move.y * reticleSpeed_ * deltaTime_;
 
     reticle2D_->SetPosition(position);
 
@@ -157,8 +164,9 @@ void Player::UpdateReticle(Camera* camera) {
 }
 
 void Player::Attack() {
+    // Rボタントリガーで弾を発射
     if (gamePad_.PushButton(GamePad::R) && state_== NORMAL) {
-        bulletSpawnTimer_ += deltaTime;
+        bulletSpawnTimer_ += deltaTime_;
         if (bulletSpawnTimer_ >= bulletSpawnTime_) {
             for (auto& bullet : bullets_) {
                 if (!bullet->GetIsAlive()) {
@@ -172,40 +180,44 @@ void Player::Attack() {
 }
 
 void Player::Action() {
+    // ZR ZL で左右にダッシュ
     if (state_ == NORMAL && isCanDash) {
         if (gamePad_.RightTrigger() >= 0.5f) {
             state_ = DASH;
             isCanDash = false;
-            rotateSpeed_ = -6.28f * 2.0f;
+            dashRotateSpeed_ = -6.28f * 2.0f;
             dashDirection_ = 1.0f;
         } else if (gamePad_.LeftTrigger() >= 0.5f) {
             state_ = DASH;
             isCanDash = false;
-            rotateSpeed_ = 6.28f * 2.0f;
+            dashRotateSpeed_ = 6.28f * 2.0f;
             dashDirection_ = -1.0f;
         }
     }
 
+    // ダッシュ中は実機のZ軸を回転＋動かす
     if (state_ == DASH) {
-        rotate_.z += rotateSpeed_ * deltaTime;
-        model_->SetRotate(rotate_);
+        dashRotate_.z += dashRotateSpeed_ * deltaTime_;
+        model_->SetRotate(dashRotate_);
 
         Vector3 translate = model_->GetTranslate();
-        translate.x += dashDirection_ * speed_ * deltaTime;
+        translate.x += dashDirection_ * moveSpeed_ * deltaTime_;
         model_->SetTranslate(translate);
 
-        rotateTimer_ += deltaTime;
-        if (rotateTimer_ >= rotateTime_) {
-            rotateTimer_ = 0.0f;
-            rotate_.z = 0.0f;
-            model_->SetRotate(rotate_);
+        dashRotateTimer_ += deltaTime_;
+        if (dashRotateTimer_ >= dashRotateTime_) {
+            dashRotateTimer_ = 0.0f;
+            dashRotate_ = { 0.0f ,0.0f ,0.0f };
+            moveRotate_ = { 0.0f ,0.0f ,0.0f };
+            model_->SetRotate(dashRotate_);
             state_ = NORMAL;
         }
     }
 
+    // ダッシュのクールタイムをカウント
     if (state_ == NORMAL && !isCanDash) {
-        dashCoolTimer_ += deltaTime;
-        if (dashCoolTimer_ >= dashCoolTime) {
+        dashCoolTimer_ += deltaTime_;
+        if (dashCoolTimer_ >= dashCoolTime_) {
             dashCoolTimer_ = 0.0f;
             isCanDash = true;
         }

@@ -34,31 +34,33 @@ private:
 
 	GamePad gamePad_;
 
-	float deltaTime = 1.0f / 60.0f;
+	float deltaTime_ = 1.0f / 60.0f;
 
-	float speed_ = 15.0f;
+	float moveSpeed_ = 15.0f;
+	Vector2 moveRotateSpeed_ = { 0.7f,0.5f };
+	Vector3 moveRotate_ = {};
 
-	// bullet
+	//--- bullet ---//
 	float bulletSpawnTimer_ = 0.0f;
 	float bulletSpawnTime_ = 0.25f;
 	Vector3 bulletVelocity_ = {};
-	float bulletSpeed_ = 50.0f;
+	float bulletSpeed_ = 100.0f;
 
-	// reticle
+	//--- reticle ---//
 	float reticleSpeed_ = 640.0f;
 	float kDistanceToReticle = 100.0f;
 	
-	// dash
-	Vector3 rotate_ = {};
-	float rotateSpeed_ = 0.0f;
-	float rotateTimer_ = 0.0f;
-	float rotateTime_ = 0.49f;
+	//--- dash ---//
+	Vector3 dashRotate_ = {};
+	float dashRotateSpeed_ = 0.0f;
+	float dashRotateTimer_ = 0.0f;
+	float dashRotateTime_ = 0.49f;
 	float dashDirection_ = 0.0f;
-	float dashCoolTime = 3.0f;
+	float dashCoolTime_ = 3.0f;
 	float dashCoolTimer_ = 0.0f;
 	bool isCanDash = true;
 
-	// function
+	//--- function ---//
 	void Move();
 	void Attack();
 	void Action();
@@ -68,6 +70,5 @@ private:
 		NORMAL,
 		DASH,
 	};
-
 	State state_ = NORMAL;
 };
