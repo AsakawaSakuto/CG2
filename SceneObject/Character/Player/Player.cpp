@@ -30,7 +30,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 void Player::Update(Camera* camera) {
 
 	gamePad_.Update();
-	
+
 	Move();
 
     Attack();
@@ -239,8 +239,7 @@ void Player::Action() {
         dashRotateTimer_ += deltaTime_;
         if (dashRotateTimer_ >= dashRotateTime_) {
             dashRotateTimer_ = 0.0f;
-            dashRotate_ = { 0.0f ,0.0f ,0.0f };
-            //moveRotate_ = { 0.0f ,0.0f ,0.0f };
+            dashRotate_.z = 0.0f;
             model_->SetRotate(dashRotate_);
             state_ = NORMAL;
         }

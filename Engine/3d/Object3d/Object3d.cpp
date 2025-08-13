@@ -45,6 +45,16 @@ void Object3d::Update(Camera& useCamera) {
 
 	directionalLightData_->direction = direction_;
 
+	if (transform_.scale.x <= 0.0f) {
+		transform_.scale.x = 0.0f;
+	}
+	if (transform_.scale.y <= 0.0f) {
+		transform_.scale.y = 0.0f;
+	}
+	if (transform_.scale.z <= 0.0f) {
+		transform_.scale.z = 0.0f;
+	}
+
 	// 行列の内容を更新して三角形を動かす
 	worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());

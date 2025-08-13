@@ -33,7 +33,7 @@ private:
 
 	float lifeTimer_ = 0.0f;
 
-	float lifeTime_ = 5.0f;
+	float lifeTime_ = 2.0f;
 
 	bool isAlive_ = false;
 

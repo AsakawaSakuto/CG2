@@ -3,6 +3,7 @@
 void PlayerBullet::Initialize(DirectXCommon* dxCommon) {
     dxCommon_ = dxCommon;
     model_->Initialize(dxCommon_, "resources/object3d/player/playerBullet.obj");
+    //model_->SetUseLight(false);
 }
 
 void PlayerBullet::Update(Camera* camera) {
@@ -12,11 +13,24 @@ void PlayerBullet::Update(Camera* camera) {
         isAlive_ = false;
     }
 
-    Vector3 translate = model_->GetTranslate();
-   
-    translate += velocity_ * deltaTime_;
+    if (isAlive_) {
+        Vector3 scale = model_->GetScale();
+        scale.x -= 0.5f * deltaTime_;
+        scale.y -= 0.5f * deltaTime_;
+        scale.z -= 0.5f * deltaTime_;
+        model_->SetScale(scale);
+    } else {
+        model_->SetScale({ 1.0f,1.0f,1.0f });
+    }
 
+    Vector3 translate = model_->GetTranslate();
+    translate += velocity_ * deltaTime_;
     model_->SetTranslate(translate);
+
+    Vector3 rotateValue = { 0.0f,0.0f,2.0f };
+    Vector3 rotate = model_->GetRotate();
+    rotate += rotateValue * deltaTime_;
+    model_->SetRotate(rotate);
 
     model_->Update(*camera);
 }

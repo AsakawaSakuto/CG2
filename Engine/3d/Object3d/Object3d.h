@@ -61,6 +61,10 @@ public:
 	// 座標を取得（参照）
 	Vector3& GetTranslate() { return transform_.translate; }
 
+	Vector3& GetRotate() { return transform_.rotate; }
+	
+	Vector3& GetScale() { return transform_.scale; }
+
 	// 色を取得（参照）
 	Vector4& GetColor() { return materialData_->color; }
 
@@ -77,6 +81,8 @@ public:
 	void SetUvScale(Vector2 uvS) { uvScale_ = uvS; }
 
 	void SetUvRotate(float uvR) { uvRotate_ = uvR; }
+
+	void SetUseLight(bool use) { materialData_->enableLighting = use; }
 private:
 	Matrix4x4 worldMatrix;
 
