@@ -20,6 +20,10 @@ public:
 	Vector3 GetWorldPosition();
 
 	Transform GetTransform() { return transform_; }
+
+	Matrix4x4 GetWorldMatrix() { return worldMatrix_; }
+	Matrix4x4 GetViewMatrix() { return viewMatrix_; }
+	Matrix4x4 GetProjectionMatrix() { return projectionMatrix_; }
 protected:
 	Matrix4x4 worldMatrix_;
 	Matrix4x4 viewProjectionMatrix_;

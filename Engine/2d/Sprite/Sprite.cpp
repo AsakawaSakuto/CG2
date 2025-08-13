@@ -5,7 +5,7 @@
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
-void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName) {
+void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 size) {
 	//
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
@@ -16,7 +16,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName) {
 
 	CreatePSO();
 
-	size_ = { 256.f,256.f };
+	size_ = size;
 	transform_.scale = { 1.f,1.f,1.f };
 	transform_.translate = { 0.f,0.f,0.f };
 

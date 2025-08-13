@@ -18,7 +18,7 @@ class Sprite
 {
 public:
 
-	void Initialize(DirectXCommon* dxCommon, const std::string& fileName);
+	void Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 size);
 
 	void Update();
 

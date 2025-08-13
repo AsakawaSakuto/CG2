@@ -57,7 +57,7 @@ private:
 	unique_ptr<Player> player_ = make_unique<Player>();
 
 	//Sprite
-	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
+	unique_ptr<Object3d> ground_ = make_unique<Object3d>();
 
 	// Audio
 	unique_ptr<Audio> audio_ = make_unique<Audio>();

@@ -18,7 +18,7 @@ public:
 
 	void DrawImGui();
 
-	void Spawn(Vector3 translate);
+	void Spawn(Vector3 translate, Vector3 velocity);
 
 	bool GetIsAlive() { return isAlive_; }
 
@@ -26,13 +26,14 @@ public:
 
 private:
 	DirectXCommon* dxCommon_ = nullptr;
+
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
 
 	float deltaTime_ = 1.0f / 60.0f;
 
 	float lifeTimer_ = 0.0f;
 
-	float lifeTime_ = 10.0f;
+	float lifeTime_ = 5.0f;
 
 	bool isAlive_ = false;
 

@@ -13,7 +13,9 @@ void PlayerBullet::Update(Camera* camera) {
     }
 
     Vector3 translate = model_->GetTranslate();
-    translate.z += 20.0f * deltaTime_;
+   
+    translate += velocity_ * deltaTime_;
+
     model_->SetTranslate(translate);
 
     model_->Update(*camera);
@@ -27,8 +29,15 @@ void PlayerBullet::DrawImGui() {
     model_->DrawImGui("player");
 }
 
-void PlayerBullet::Spawn(Vector3 translate) {
+void PlayerBullet::Spawn(Vector3 translate, Vector3 velocity) {
     model_->SetTranslate(translate);
     isAlive_ = true;
     lifeTimer_ = 0.0f;
+    velocity_ = velocity;
+
+    Vector3 rotate = {};
+    rotate.y = std::atan2(velocity_.x, velocity_.z);
+    float horizontalLength = std::sqrt(velocity_.x * velocity_.x + velocity_.z * velocity_.z);
+    rotate.x = std::atan2(-velocity_.y, horizontalLength);
+    model_->SetRotate(rotate);
 }

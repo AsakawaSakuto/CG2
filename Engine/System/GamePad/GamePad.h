@@ -36,7 +36,7 @@ public:
     // ボタンのインデックス定義（使いやすいように公開）
     enum Button {
         A = 0, B, X, Y,
-        LB, RB,
+        L, R,
         BACK, START,
         LS, RS,
         DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT,

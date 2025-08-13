@@ -48,8 +48,8 @@ void GamePad::Update() {
         buttons_[B] = (b & XINPUT_GAMEPAD_B) != 0;
         buttons_[X] = (b & XINPUT_GAMEPAD_X) != 0;
         buttons_[Y] = (b & XINPUT_GAMEPAD_Y) != 0;
-        buttons_[LB] = (b & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0;
-        buttons_[RB] = (b & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0;
+        buttons_[L] = (b & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0;
+        buttons_[R] = (b & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0;
         buttons_[BACK] = (b & XINPUT_GAMEPAD_BACK) != 0;
         buttons_[START] = (b & XINPUT_GAMEPAD_START) != 0;
         buttons_[LS] = (b & XINPUT_GAMEPAD_LEFT_THUMB) != 0;

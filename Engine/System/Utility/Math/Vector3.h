@@ -46,7 +46,40 @@ struct Vector3 {
 		return *this;
 	}
 
+	Vector3& operator*=(const Vector3& num) {
+		this->x *= num.x;
+		this->y *= num.y;
+		this->z *= num.z;
+		return *this;
+	}
+
+	Vector3 operator+(const Vector3& other) const {
+		Vector3 result = *this;
+		result += other;
+		return result;
+	}
+
+	Vector3 operator-(const Vector3& other) const {
+		Vector3 result = *this;
+		result -= other;
+		return result;
+	}
+
+	Vector3 operator*(const Vector3& other) const {
+		Vector3 result = *this;
+		result *= other;
+		return result;
+	}
+
 	Vector3 operator+(float scalar) const {
 		return Vector3{ x + scalar, y + scalar, z + scalar };
+	}
+
+	Vector3 operator-(float scalar) const {
+		return Vector3{ x - scalar, y - scalar, z - scalar };
+	}
+
+	Vector3 operator*(float scalar) const {
+		return Vector3{ x * scalar, y * scalar, z * scalar };
 	}
 };

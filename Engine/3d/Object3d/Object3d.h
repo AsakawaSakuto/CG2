@@ -69,7 +69,10 @@ public:
 
 	// 描画モードを変更 trueで通常 falseでワイヤーフレーム
 	void SetDrawMode(bool drawMode) { drawMode_ = drawMode; }
+
+	Matrix4x4& GetWorldMatrix() { return worldMatrix; }
 private:
+	Matrix4x4 worldMatrix;
 
 	// ワールド変換行列情報
 	Transform transform_;
