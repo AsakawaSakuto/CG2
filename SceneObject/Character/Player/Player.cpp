@@ -61,6 +61,8 @@ void Player::Update(Camera* camera) {
         }
     }
 
+    engineFire_->SetEmitterValue(engineFireEmitter_);
+    engineFire_->SetEmitterRange(engineFireEmitterRange_);
     Vector3 engineFirePos = model_->GetTranslate();
     engineFire_->SetEmitterPosition(engineFirePos + engineFireOffset_);
 
@@ -236,7 +238,7 @@ void Player::Action() {
         translate.x += dashDirection_ * moveSpeed_ * deltaTime_;
         model_->SetTranslate(translate);
 
-        engineFireEmitter_.count = 4;
+        engineFireEmitter_.count = 10;
 
         dashRotateTimer_ += deltaTime_;
         if (dashRotateTimer_ >= dashRotateTime_) {
