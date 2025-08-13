@@ -61,11 +61,11 @@ public:
 	// エミッタの値をセット
 	void SetEmitterValue(const EmitterSphere& emitter) { emitter_ = emitter; }
 
-	//
-	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
-
 	// エミッタ範囲の値をセット
 	void SetEmitterRange(const EmitterRange& emitterRange) { emitterRange_ = emitterRange; }
+
+	//
+	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
 
 	//
 	void SetUseEmitter(bool useEmitter) { useEmitter_ = useEmitter; }

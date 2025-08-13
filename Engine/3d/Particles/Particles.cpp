@@ -48,20 +48,17 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.emit = 0;
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.isMove = 0;
+	
 
 	// Emitterの範囲
 	emitterRange_.minScale = { 0.1f,0.1f,0.1f };
 	emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
-
 	emitterRange_.minTranslate = { 1.0f, 1.0f, 1.0f };
 	emitterRange_.maxTranslate = { 1.0f, 1.0f, 1.0f };
-
 	emitterRange_.minColor = { 0.0f,0.0f,0.0f };
 	emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
-	
 	emitterRange_.minVelocity = { -0.1f,-0.1f,0.0f };
 	emitterRange_.maxVelocity = { 0.1f,0.1f,0.0f };
-
 	emitterRange_.minLifeTime = 0.1f;
 	emitterRange_.maxLifeTime = 0.5f;
 
@@ -495,15 +492,14 @@ void Particles::UpdateEmitter() {
 		if (emitter_.frequency <= emitter_.frequencyTime) {
 			emitter_.frequencyTime -= emitter_.frequency;
 			emitter_.emit = true;
-		}
-		else {
+		} else {
 			emitter_.emit = false;
 		}
 	} else {
 		emitter_.emit = false;
 		emitter_.frequencyTime = 0.0f;
 	}
-
+	emitter_.kMaxParticle = kMaxParticles_;
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
 	EmitterRange* mappedRange = nullptr;
 	emitterRangeResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedRange));

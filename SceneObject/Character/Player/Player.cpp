@@ -10,6 +10,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     reticle2D_->Initialize(dxCommon_, "resources/image/reticle.png", {64.0f,64.0f});
     reticle2D_->SetPosition({ 640.0f,360.0f });
 
+    engineFire_->Initialize(dxCommon, "resources/image/particle/circle.png", 1);
+    engineFire_->SetUseEmitter(true);
+
 	gamePad_.Initialize();
 
     for (int i = 0; i < 32; ++i) {
@@ -20,6 +23,24 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     }
 
     state_ = NORMAL;
+
+    engineFireEmitter_.count = 2;
+    engineFireEmitter_.radius = 0.05f;
+    engineFireEmitter_.frequency = 0.01f;
+    engineFireEmitter_.frequencyTime = 0.0f;
+    engineFireEmitter_.isMove = true;
+
+    engineFireEmitterRange_.minScale = { 0.1f,0.1f,0.1f };
+    engineFireEmitterRange_.maxScale = { 1.1f,1.1f,1.1f };
+    engineFireEmitterRange_.minVelocity = { 0.0f,0.0f,-0.3f };
+    engineFireEmitterRange_.maxVelocity = { 0.0f,0.0f,0.0f };
+    engineFireEmitterRange_.minColor = { 0.9f,0.0f,0.0f };
+    engineFireEmitterRange_.maxColor = { 1.0f,0.5f,0.0f };
+    engineFireEmitterRange_.minLifeTime = 0.1f;
+    engineFireEmitterRange_.maxLifeTime = 0.2f;
+
+    engineFire_->SetEmitterValue(engineFireEmitter_);
+    engineFire_->SetEmitterRange(engineFireEmitterRange_);
 }
 
 void Player::Update(Camera* camera) {
@@ -40,10 +61,12 @@ void Player::Update(Camera* camera) {
         }
     }
 
+    Vector3 engineFirePos = model_->GetTranslate();
+    engineFire_->SetEmitterPosition(engineFirePos + engineFireOffset_);
+
 	model_->Update(*camera);
-
+    engineFire_->Update(*camera);
     reticle3D_->Update(*camera);
-
     reticle2D_->Update();
 }
 
@@ -56,8 +79,8 @@ void Player::Draw() {
         }
     }
 
+    engineFire_->Draw();
     reticle3D_->Draw();
-
     reticle2D_->Draw();
 }
 
@@ -66,7 +89,9 @@ void Player::DrawImGui() {
     ImGui::DragFloat("BullerSpeed", &bulletSpeed_, 1.0f);
     ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
     ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
-    model_->DrawImGui("player");
+    ImGui::DragFloat3("fireOffset", &engineFireOffset_.x, 0.01f);
+    //model_->DrawImGui("player");
+    //engineFire_->DrawImGui("engineFire");
 }
 
 void Player::Move() {
@@ -97,6 +122,9 @@ void Player::Move() {
 
         moveRotate_.x = std::clamp(moveRotate_.x, -0.3f, 0.3f);
         moveRotate_.y = std::clamp(moveRotate_.y, -0.3f, 0.3f);
+
+        engineFireOffset_.x = moveRotate_.y * -1.0f;;
+        engineFireOffset_.y = moveRotate_.x;
 
         model_->SetRotate(moveRotate_);
         model_->SetTranslate(translate);
@@ -195,6 +223,10 @@ void Player::Action() {
         }
     }
 
+    if (state_ == NORMAL) {
+        engineFireEmitter_.count = 2;
+    }
+
     // ダッシュ中は実機のZ軸を回転＋動かす
     if (state_ == DASH) {
         dashRotate_.z += dashRotateSpeed_ * deltaTime_;
@@ -203,6 +235,8 @@ void Player::Action() {
         Vector3 translate = model_->GetTranslate();
         translate.x += dashDirection_ * moveSpeed_ * deltaTime_;
         model_->SetTranslate(translate);
+
+        engineFireEmitter_.count = 4;
 
         dashRotateTimer_ += deltaTime_;
         if (dashRotateTimer_ >= dashRotateTime_) {

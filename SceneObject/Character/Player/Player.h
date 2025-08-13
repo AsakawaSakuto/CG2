@@ -6,6 +6,7 @@
 #include"Gamepad.h"
 #include"playerBullet.h"
 #include"MatrixFunction.h"
+#include"Particles.h"
 
 #include <list>
 
@@ -30,6 +31,7 @@ private:
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
 	unique_ptr<Object3d> reticle3D_ = make_unique<Object3d>();
 	unique_ptr<Sprite> reticle2D_ = make_unique<Sprite>();
+	unique_ptr<Particles> engineFire_ = make_unique<Particles>();
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	GamePad gamePad_;
@@ -59,6 +61,11 @@ private:
 	float dashCoolTime_ = 3.0f;
 	float dashCoolTimer_ = 0.0f;
 	bool isCanDash = true;
+
+	//--- engineFire ---//
+	EmitterSphere engineFireEmitter_ = {};
+	EmitterRange engineFireEmitterRange_ = {};
+	Vector3 engineFireOffset_ = { 0.0f,0.0f,-1.5f };
 
 	//--- function ---//
 	void Move();
