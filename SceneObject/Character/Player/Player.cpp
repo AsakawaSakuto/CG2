@@ -18,15 +18,19 @@ void Player::Initialize(DirectXCommon* dxCommon) {
         bullet->SetIsAlive(false);
         bullets_.push_back(std::move(bullet));
     }
+
+    state_ = NORMAL;
 }
 
 void Player::Update(Camera* camera) {
 
 	gamePad_.Update();
 	
+	Move();
+
     Attack();
 
-	Move();
+    Action();
 
     UpdateReticle(camera);
 
@@ -62,32 +66,34 @@ void Player::DrawImGui() {
     ImGui::DragFloat("BullerSpeed", &bulletSpeed_, 1.0f);
     ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
     ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
+    model_->DrawImGui("player");
 }
 
 void Player::Move() {
+    if (state_ == NORMAL) {
+        Vector3 translate = model_->GetTranslate();
 
-	Vector3 translate = model_->GetTranslate();
+        // 左スティックの入力取得
+        float lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
+        float ly = gamePad_.LeftStickY(); // -1.0 ~ +1.0
 
-    // 左スティックの入力取得
-    float lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
-    float ly = gamePad_.LeftStickY(); // -1.0 ~ +1.0
+        // 入力ベクトル
+        Vector2 move(lx, ly);
 
-    // 入力ベクトル
-    Vector2 move(lx, ly);
+        // 斜めで速くなりすぎないように長さをクランプ
+        float length = sqrt(move.x * move.x + move.y * move.y);
+        if (length > 1.0f)
+        {
+            move.x /= length;
+            move.y /= length;
+        }
 
-    // 斜めで速くなりすぎないように長さをクランプ
-    float length = sqrt(move.x * move.x + move.y * move.y);
-    if (length > 1.0f)
-    {
-        move.x /= length;
-        move.y /= length;
+        // 位置を更新（倒し量＝速度）
+        translate.x += move.x * speed_ * deltaTime;
+        translate.y += move.y * speed_ * deltaTime;
+
+        model_->SetTranslate(translate);
     }
-
-    // 位置を更新（倒し量＝速度）
-    translate.x += move.x * speed_ * deltaTime;
-    translate.y += move.y * speed_ * deltaTime;
-
-    model_->SetTranslate(translate);
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -151,7 +157,7 @@ void Player::UpdateReticle(Camera* camera) {
 }
 
 void Player::Attack() {
-    if (gamePad_.PushButton(GamePad::R)) {
+    if (gamePad_.PushButton(GamePad::R) && state_== NORMAL) {
         bulletSpawnTimer_ += deltaTime;
         if (bulletSpawnTimer_ >= bulletSpawnTime_) {
             for (auto& bullet : bullets_) {
@@ -161,6 +167,47 @@ void Player::Attack() {
                     break;
                 }
             }
+        }
+    }
+}
+
+void Player::Action() {
+    if (state_ == NORMAL && isCanDash) {
+        if (gamePad_.RightTrigger() >= 0.5f) {
+            state_ = DASH;
+            isCanDash = false;
+            rotateSpeed_ = -6.28f * 2.0f;
+            dashDirection_ = 1.0f;
+        } else if (gamePad_.LeftTrigger() >= 0.5f) {
+            state_ = DASH;
+            isCanDash = false;
+            rotateSpeed_ = 6.28f * 2.0f;
+            dashDirection_ = -1.0f;
+        }
+    }
+
+    if (state_ == DASH) {
+        rotate_.z += rotateSpeed_ * deltaTime;
+        model_->SetRotate(rotate_);
+
+        Vector3 translate = model_->GetTranslate();
+        translate.x += dashDirection_ * speed_ * deltaTime;
+        model_->SetTranslate(translate);
+
+        rotateTimer_ += deltaTime;
+        if (rotateTimer_ >= rotateTime_) {
+            rotateTimer_ = 0.0f;
+            rotate_.z = 0.0f;
+            model_->SetRotate(rotate_);
+            state_ = NORMAL;
+        }
+    }
+
+    if (state_ == NORMAL && !isCanDash) {
+        dashCoolTimer_ += deltaTime;
+        if (dashCoolTimer_ >= dashCoolTime) {
+            dashCoolTimer_ = 0.0f;
+            isCanDash = true;
         }
     }
 }

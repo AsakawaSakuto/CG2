@@ -60,7 +60,7 @@ void GameScene::Draw() {
 
 	player_->Draw();
 
-	ground_->Draw();
+	//ground_->Draw();
 
 	///
 	/// ↑描画処理ここまで
