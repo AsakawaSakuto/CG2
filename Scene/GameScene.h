@@ -75,7 +75,7 @@ private:
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>();
 	Camera* useCamera_ = nullptr;
-	bool isDebugCamera_ = true;
+	bool isDebugCamera_ = false;
 
 	void CameraController();
 	void DrawFPS_ImGui();

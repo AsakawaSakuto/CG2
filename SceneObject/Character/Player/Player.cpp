@@ -83,8 +83,8 @@ void Player::DrawImGui() {
     //ImGui::DragFloat3("fireOffset", &engineFireOffset_.x, 0.01f);
     //model_->DrawImGui("player");
     //engineFire_->DrawImGui("engineFire");
-    heal_->DrawImGui("h");
-    damage_->DrawImGui("d");
+    //heal_->DrawImGui("h");
+    //damage_->DrawImGui("d");
 }
 
 void Player::UpdateReticle(Camera* camera) {

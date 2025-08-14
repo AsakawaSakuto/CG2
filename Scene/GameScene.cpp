@@ -136,8 +136,7 @@ void GameScene::CameraController() {
 	if (input_->TriggerKey(DIK_SPACE)) {
 		if (isDebugCamera_) {
 			isDebugCamera_ = false;
-		}
-		else {
+		} else {
 			isDebugCamera_ = true;
 		}
 	}
