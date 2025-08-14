@@ -14,6 +14,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     engineFire_->SetUseEmitter(true);
 
     heal_->Initialize(dxCommon, "resources/image/particle/closs.png", 1);
+    damage_->Initialize(dxCommon, "resources/image/particle/star2.png", 1);
 
 	gamePad_.Initialize();
 
@@ -47,14 +48,11 @@ void Player::Update(Camera* camera) {
 
     UpdateParticle();
 
-    if (gamePad_.TriggerButton(GamePad::X)) {
-        Heal();
-    }
-
 	model_->Update(*camera);
 
     engineFire_->Update(*camera);
     heal_->Update(*camera);
+    damage_->Update(*camera);
 
     reticle3D_->Update(*camera);
     reticle2D_->Update();
@@ -71,6 +69,7 @@ void Player::Draw() {
 
     engineFire_->Draw();
     heal_->Draw();
+    damage_->Draw();
 
     reticle2D_->Draw();
     //reticle3D_->Draw();
@@ -84,7 +83,8 @@ void Player::DrawImGui() {
     //ImGui::DragFloat3("fireOffset", &engineFireOffset_.x, 0.01f);
     //model_->DrawImGui("player");
     //engineFire_->DrawImGui("engineFire");
-    //heal_->DrawImGui("h");
+    heal_->DrawImGui("h");
+    damage_->DrawImGui("d");
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -226,6 +226,8 @@ void Player::Action() {
 
     // ダッシュ中は実機のZ軸を回転＋動かす
     if (state_ == DASH) {
+        dashRotate_.x = moveRotate_.x;
+        dashRotate_.y = moveRotate_.y;
         dashRotate_.z += dashRotateSpeed_ * deltaTime_;
         model_->SetRotate(dashRotate_);
 
@@ -259,7 +261,6 @@ void Player::UpdateParticle() {
     engineFireEmitter_.count = 2;
     engineFireEmitter_.radius = 0.05f;
     engineFireEmitter_.frequency = 0.01f;
-    engineFireEmitter_.frequencyTime = 0.0f;
     engineFireEmitter_.isMove = true;
 
     engineFireRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -281,7 +282,6 @@ void Player::UpdateParticle() {
     healEmitter_.count = 2;
     healEmitter_.radius = 2.f;
     healEmitter_.frequency = 0.01f;
-    healEmitter_.frequencyTime = 0.0f;
     healEmitter_.isMove = true;
 
     healRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -308,12 +308,51 @@ void Player::UpdateParticle() {
     } else {
         heal_->SetUseEmitter(false);
     }
+
+    //--------------------------------------------//
+
+    damageEmitter_.count = 5;
+    damageEmitter_.radius = 0.01f;
+    damageEmitter_.frequency = 0.01f;
+    damageEmitter_.isMove = true;
+
+    damageRange_.minScale = { 0.1f,0.1f,0.1f };
+    damageRange_.maxScale = { 2.0f,2.0f,1.0f };
+    damageRange_.minVelocity = { -0.2f,-0.2f,-0.2f };
+    damageRange_.maxVelocity = { 0.2f,0.2f,0.2f };
+    damageRange_.minColor = { 0.1f,0.0f,0.0f };
+    damageRange_.maxColor = { 1.0f,0.1f,0.1f };
+    damageRange_.minLifeTime = 0.1f;
+    damageRange_.maxLifeTime = 0.3f;
+
+    damage_->SetEmitterValue(damageEmitter_);
+    damage_->SetEmitterRange(damageRange_);
+    damage_->SetEmitterPosition(model_->GetTranslate());
+
+    if (isDamage_) {
+        damage_->SetUseEmitter(true);
+        damageTimer_ += deltaTime_;
+        if (damageTimer_ >= damageTime_) {
+            damageTimer_ = 0.0f;
+            isDamage_ = false;
+        }
+    } else {
+        damage_->SetUseEmitter(false);
+    }
 }
 
 void Player::Heal() {
     if (!isHeal_) {
         isHeal_ = true;
         life_++;
+    }
+}
+
+void Player::Damage() {
+    if (!isDamage_) {
+        isDamage_ = true;
+        gamePad_.SetVibration(1.0f, 1.0f, 0.5f);
+        life_--;
     }
 }
 

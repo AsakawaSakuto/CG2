@@ -28,6 +28,8 @@ public:
 	Vector3 GetWorldPosition();
 
 	void Heal();
+
+	void Damage();
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
@@ -77,6 +79,13 @@ private:
 	float healTime_ = 0.75f;
 	float healTimer_ = 0.0f;
 	bool isHeal_ = false;
+
+	unique_ptr<Particles> damage_ = make_unique<Particles>();
+	EmitterSphere damageEmitter_ = {};
+	EmitterRange damageRange_ = {};
+	float damageTime_ = 0.1f;
+	float damageTimer_ = 0.0f;
+	bool isDamage_ = false;
 
 	//--- function ---//
 	void Move();

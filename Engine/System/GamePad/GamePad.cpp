@@ -58,6 +58,23 @@ void GamePad::Update() {
         buttons_[DPAD_DOWN] = (b & XINPUT_GAMEPAD_DPAD_DOWN) != 0;
         buttons_[DPAD_LEFT] = (b & XINPUT_GAMEPAD_DPAD_LEFT) != 0;
         buttons_[DPAD_RIGHT] = (b & XINPUT_GAMEPAD_DPAD_RIGHT) != 0;
+
+        if (isVib_) {
+            XINPUT_VIBRATION vib{};
+            vib.wRightMotorSpeed = static_cast<WORD>(vibValue_.x * 65535.0f);
+            vib.wLeftMotorSpeed = static_cast<WORD>(vibValue_.y * 65535.0f);
+            XInputSetState(padIndex_, &vib);
+            timer_ += deltaTime_;
+            if (timer_ >= time_) {
+                timer_ = 0.0f;
+                isVib_ = false;
+            }
+        } else {
+            XINPUT_VIBRATION vib{};
+            vib.wRightMotorSpeed = static_cast<WORD>(0.0f * 65535.0f);
+            vib.wLeftMotorSpeed = static_cast<WORD>(0.0f * 65535.0f);
+            XInputSetState(padIndex_, &vib);
+        }
     }
     else {
         connected_ = false;
@@ -86,12 +103,12 @@ bool GamePad::ReleaseButton(int button) const {
     return !buttons_[button] && buttonsPrev_[button];
 }
 
-void GamePad::SetVibration(float left01, float right01) {
+void GamePad::SetVibration(float left01, float right01, float Time) {
     if (!connected_) return;
     left01 = std::clamp(left01, 0.0f, 1.0f);
     right01 = std::clamp(right01, 0.0f, 1.0f);
-    XINPUT_VIBRATION vib{};
-    vib.wLeftMotorSpeed = static_cast<WORD>(left01 * 65535.0f);
-    vib.wRightMotorSpeed = static_cast<WORD>(right01 * 65535.0f);
-    XInputSetState(padIndex_, &vib);
+    vibValue_.x = right01;
+    vibValue_.y = left01;
+    time_ = Time;
+    isVib_ = true;
 }

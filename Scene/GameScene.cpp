@@ -29,6 +29,8 @@ void GameScene::Initialize() {
 
 	player_->Initialize(dxCommon_.get());
 	skyBox_->Initialize(dxCommon_.get());
+
+	gamePad_.Initialize();
 }
 
 void GameScene::Update() {
@@ -41,8 +43,16 @@ void GameScene::Update() {
 		endRequst_ = true;
 	}
 
+	gamePad_.Update();
 	input_->Update();
 	CameraController();
+
+	if (gamePad_.TriggerButton(GamePad::X)) {
+		player_->Heal();
+	}
+	if (gamePad_.TriggerButton(GamePad::Y)) {
+		player_->Damage();
+	}
 
 	player_->Update(useCamera_);
 	skyBox_->Update(useCamera_);

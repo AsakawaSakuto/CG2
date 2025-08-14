@@ -72,6 +72,9 @@ public:
 
 	//
 	void SetOffSet(Vector3 offset) { offset_ = offset; }
+
+	//
+	void SetEmit(bool emit) { emitter_.emit = emit; }
 private:
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;
@@ -101,7 +104,7 @@ private:
 
 	float totalTime_ = 0.0f;
 
-	bool isMove_;
+	bool isMove_ = false;
 
 	float emitterSpeed_ = 0.0f;
 

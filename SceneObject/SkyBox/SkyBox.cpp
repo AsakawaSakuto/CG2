@@ -6,6 +6,7 @@ void SkyBox::Initialize(DirectXCommon* dxCommon) {
 	right_->Initialize(dxCommon_, "resources/object3d/skyBox/skyBoxRight.obj");
 	top_->Initialize(dxCommon_, "resources/object3d/skyBox/skyBoxTop.obj");
 	bottom_->Initialize(dxCommon_, "resources/object3d/skyBox/skyBoxBottom.obj");
+	front_->Initialize(dxCommon_, "resources/object3d/skyBox/skyBoxfront.obj");
 }
 
 void SkyBox::Update(Camera* camera) {
@@ -24,6 +25,7 @@ void SkyBox::Update(Camera* camera) {
 	right_->Update(*camera);
 	top_->Update(*camera);
 	bottom_->Update(*camera);
+	front_->Update(*camera);
 }
 
 void SkyBox::Draw() {
@@ -31,6 +33,7 @@ void SkyBox::Draw() {
 	right_->Draw();
 	top_->Draw();
 	bottom_->Draw();
+	front_->Draw();
 }
 
 void SkyBox::DrawImGui() {

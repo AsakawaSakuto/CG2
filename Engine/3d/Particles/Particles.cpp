@@ -170,6 +170,12 @@ void Particles::DrawImGui(const char* objectName) {
 	}
 
 	ImGui::Checkbox("useEmitter", &useEmitter_);
+	
+	bool isEmitFlag = (emitter_.emit != 0); // uint32_t → bool に変換
+	// ImGui チェックボックス
+	if (ImGui::Checkbox("isEmit", &isEmitFlag)) {
+		emitter_.emit = isEmitFlag ? 1u : 0u; // bool → uint32_t に変換
+	}
 
 	ImGui::Text("RangeEdit");
 	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
@@ -491,13 +497,12 @@ void Particles::UpdateEmitter() {
 	if (useEmitter_) {
 		emitter_.frequencyTime += kDeltaTime_;
 		if (emitter_.frequency <= emitter_.frequencyTime) {
-			emitter_.frequencyTime -= emitter_.frequency;
+			emitter_.frequencyTime = 0.0f;
 			emitter_.emit = true;
 		} else {
 			emitter_.emit = false;
 		}
 	} else {
-		emitter_.emit = false;
 		emitter_.frequencyTime = 0.0f;
 	}
 	emitter_.kMaxParticle = kMaxParticles_;

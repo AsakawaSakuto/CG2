@@ -31,7 +31,7 @@ public:
     float RightTrigger()const { return rightTrigger_; }  // 0..1
 
     // 振動
-    void SetVibration(float left01, float right01); // 0..1
+    void SetVibration(float left01, float right01, float Time); // 0..1
 
     // ボタンのインデックス定義（使いやすいように公開）
     enum Button {
@@ -47,6 +47,12 @@ private:
     // 内部状態
     DWORD padIndex_ = 0;
     bool connected_ = false;
+
+    float deltaTime_ = 1.0f / 60.0f;
+    float time_ = 0.0f;
+    float timer_ = 0.0f;
+    bool isVib_ = false;
+    Vector2 vibValue_ = {};
 
     // アナログ
     float leftStickX_ = 0.0f, leftStickY_ = 0.0f;

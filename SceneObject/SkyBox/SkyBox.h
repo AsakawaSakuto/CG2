@@ -25,6 +25,7 @@ private:
 	unique_ptr<Object3d> right_ = make_unique<Object3d>();
 	unique_ptr<Object3d> top_ = make_unique<Object3d>();
 	unique_ptr<Object3d> bottom_ = make_unique<Object3d>();
+	unique_ptr<Object3d> front_ = make_unique<Object3d>();
 
 	float deltaTime_ = 1.0f / 60.0f;
 	float uvSpeed_ = 0.5f;
