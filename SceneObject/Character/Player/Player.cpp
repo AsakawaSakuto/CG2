@@ -144,7 +144,7 @@ void Player::UpdateReticle(Camera* camera) {
 
     Vector3 playerPos = GetWorldPosition();
     bulletVelocity_ = reticleWorldPosition - playerPos;
-    bulletVelocity_ = bulletVelocity_.Normalize() * bulletSpeed_;
+    bulletVelocity_ = bulletVelocity_.Normalize()/* * bulletSpeed_*/;
 }
 
 void Player::Move() {

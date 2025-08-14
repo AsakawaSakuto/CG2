@@ -44,8 +44,15 @@ void PlayerBullet::Update(Camera* camera) {
         model_->SetScale({ 1.0f,1.0f,1.0f });
     }
 
+    if (isAlive_) {
+        speed_ += 100.0f * deltaTime_;
+    } else {
+        speed_ = 0.0f;
+    }
+    speed_ = std::clamp(speed_, 0.0f, 200.0f);
+
     Vector3 translate = model_->GetTranslate();
-    translate += velocity_ * deltaTime_;
+    translate += velocity_ * speed_ * deltaTime_;
     model_->SetTranslate(translate);
 
     Vector3 rotateValue = { 0.0f,0.0f,2.0f };
