@@ -185,6 +185,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="SceneObject\Character\Player\Player.h" />
     <ClInclude Include="SceneObject\Character\Player\PlayerBullet.h" />
     <ClInclude Include="SceneObject\SkyBox\SkyBox.h" />
+    <ClInclude Include="Scene\AppContext.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Engine\2d\Triangle\Triangle.h" />
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />

@@ -29,6 +29,8 @@
 #include "Vector4.h"
 #include "Matrix4x4.h"
 
+#include"AppContext.h"
+
 #include "Player.h"
 #include "SkyBox.h"
 
@@ -38,6 +40,7 @@ using std::make_unique;
 
 class TitleScene {
 public:
+	explicit TitleScene(struct AppContext* ctx) : ctx_(ctx) {}
 
 	void Initialize();
 	void Finalize();
@@ -47,17 +50,12 @@ public:
 	bool IsEndRequst() { return endRequst_; }
 
 private:
+	AppContext* ctx_ = nullptr;
+
 	bool endRequst_ = false;
 	bool sceneChange_ = false;
-	MSG msg_{};
 
-	GamePad gamePad_;
-
-	// Core systems
-	unique_ptr<WinApp> winApp_ = make_unique<WinApp>();
-	unique_ptr<DirectXCommon> dxCommon_ = make_unique<DirectXCommon>();
-	unique_ptr<Input> input_ = make_unique<Input>();
-	D3ResourceLeakChecker d3ResourceLeakCheker_;
+	GamePad* gamePad_ = nullptr;
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
@@ -66,5 +64,4 @@ private:
 	bool isDebugCamera_ = false;
 
 	void CameraController();
-	void DrawFPS_ImGui();
 };

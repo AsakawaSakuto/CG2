@@ -2,56 +2,28 @@
 
 void GameScene::Initialize() {
 
-	char path[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, path);
-	OutputDebugStringA((std::string("CWD: ") + path + "\n").c_str());
+	debugCamera_->SetInput(&ctx_->input);
 
-	// main関数の先頭でCOMを初期化 03_00
-	CoInitializeEx(0, COINIT_MULTITHREADED);
+	player_->Initialize(&ctx_->dxCommon);
+	skyBox_->Initialize(&ctx_->dxCommon);
 
-	winApp_->Initialize(L"CG2_Window");
-	winApp_->EnableResize(true);
-
-	// ログのディレクトリを用意
-	Logger::Initialize();
-	std::filesystem::create_directory("logs");
-	//AllocConsole();
-	//FILE* fp;
-	//freopen_s(&fp, "CONOUT$", "w", stdout);
-
-	dxCommon_->Initialize(winApp_.get());
-
-	TextureManager::GetInstance()->Initialize(dxCommon_.get());
-
-	input_->Initialize(winApp_.get());
-
-	debugCamera_->SetInput(input_.get());
-
-	player_->Initialize(dxCommon_.get());
-	skyBox_->Initialize(dxCommon_.get());
-
-	gamePad_.Initialize();
+	gamePad_ = &ctx_->gamePad;
 }
 
 void GameScene::Update() {
-	while (PeekMessage(&msg_, nullptr, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&msg_);
-		DispatchMessage(&msg_);
-	}
 
-	if (msg_.message == WM_QUIT) {
-		endRequst_ = true;
-	}
-
-	gamePad_.Update();
-	input_->Update();
+	gamePad_->Update();
+	ctx_->input.Update();
 	CameraController();
 
-	if (gamePad_.TriggerButton(GamePad::X)) {
+	if (gamePad_->TriggerButton(GamePad::X)) {
 		player_->Heal();
 	}
-	if (gamePad_.TriggerButton(GamePad::Y)) {
+	if (gamePad_->TriggerButton(GamePad::Y)) {
 		player_->Damage();
+	}
+	if (gamePad_->TriggerButton(GamePad::A)) {
+		sceneChange_ = true;
 	}
 
 	player_->Update(useCamera_);
@@ -60,7 +32,7 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 
-	dxCommon_->PreDraw(); // ここより上に描画処理を書かない
+	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
 
 	///
 	/// ↓描画処理ここから
@@ -101,39 +73,15 @@ void GameScene::Draw() {
 	/// ↑ImGuiここまで
 	///
 
-	dxCommon_->PostDraw(); // ここより下に描画処理を書かない
+	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
 }
 
 void GameScene::Finalize() {
-	//ゲーム終了時にはCOMの終了処理を行っておく
-	CoUninitialize();
-
-	// Imguiの終了処理
-	// ImGuiの終了処理。詳細はさして重要ではないので解説は省略する。
-	// こういうもんである。初期化と逆順に行う
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
-
-	audio_->Reset();
-	audio2_->Reset();
-
-	// 解放処理(リソースチェックの前) 01_03
-	dxCommon_->CloseFence();
-	winApp_->Finalize();
-	TextureManager::GetInstance()->Finalize();
-
-	///
-	/// ↓開放処理ここから
-	///
-
-	///
-	/// ↑描画処理ここまで
-	///
+	
 }
 
 void GameScene::CameraController() {
-	if (input_->TriggerKey(DIK_SPACE)) {
+	if (ctx_->input.TriggerKey(DIK_SPACE)) {
 		if (isDebugCamera_) {
 			isDebugCamera_ = false;
 		} else {
