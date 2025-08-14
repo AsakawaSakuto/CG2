@@ -43,6 +43,11 @@ void TitleScene::Update() {
 	gamePad_.Update();
 	input_->Update();
 	CameraController();
+
+	if (gamePad_.TriggerButton(GamePad::A)) {
+		sceneChange_ = true;
+		return;
+	}
 }
 
 void TitleScene::Draw() {

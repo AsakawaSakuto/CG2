@@ -1,6 +1,6 @@
 #include"Audio.h"
 
-void Audio::Initialize(const std::string& fileName) {
+void AudioX::Initialize(const std::string& fileName) {
 	hr_ = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(hr_));
 
@@ -10,11 +10,11 @@ void Audio::Initialize(const std::string& fileName) {
 	soundData_ = SoundLoadWave(fileName);
 }
 
-void Audio::PlayAudio() {
+void AudioX::PlayAudio() {
 	SoundPlayWave(xAudio2_.Get(), soundData_);
 }
 
-void Audio::Reset() {
+void AudioX::Reset() {
 	xAudio2_.Reset();
 	SoundUnload(&soundData_);
 }

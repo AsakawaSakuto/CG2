@@ -43,10 +43,12 @@ public:
 	void Finalize();
 	void Update();
 	void Draw();
+	bool SceneChange() { return sceneChange_; }
 	bool IsEndRequst() { return endRequst_; }
 
 private:
 	bool endRequst_ = false;
+	bool sceneChange_ = false;
 	MSG msg_{};
 
 	GamePad gamePad_;

@@ -1,3 +1,4 @@
+#pragma once
 #include"AudioData.h"
 
 #pragma comment(lib, "dinput8.lib")
@@ -6,7 +7,7 @@
 #include <d3d12.h>
 #include <dxcapi.h>
 
-class Audio
+class AudioX
 {
 public:
 	

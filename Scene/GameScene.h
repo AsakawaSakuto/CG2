@@ -43,10 +43,12 @@ public:
 	void Finalize();
 	void Update();
 	void Draw();
+	bool SceneChange() { return sceneChange_; }
 	bool IsEndRequst() { return endRequst_; }
-
+	
 private:
 	bool endRequst_ = false;
+	bool sceneChange_ = false;
 	MSG msg_{};
 
 	GamePad gamePad_;
@@ -64,8 +66,8 @@ private:
 	unique_ptr<Object3d> ground_ = make_unique<Object3d>();
 
 	// Audio
-	unique_ptr<Audio> audio_ = make_unique<Audio>();
-	unique_ptr<Audio> audio2_ = make_unique<Audio>();
+	unique_ptr<AudioX> audio_ = make_unique<AudioX>();
+	unique_ptr<AudioX> audio2_ = make_unique<AudioX>();
 
 	// Other render objects
 	unique_ptr<Particles> particle_ = make_unique<Particles>();
