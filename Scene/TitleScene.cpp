@@ -16,17 +16,69 @@ void TitleScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
+	SceneController();
+
+	titleUI_->Update();
+
+	UpdateFade();
+}
+
+void TitleScene::Draw() {
+
+	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
+
+	///
+	/// ↓描画処理ここから
+	///
+
+	titleUI_->Draw();
+	fade_->Draw();
+
+	///
+	/// ↑描画処理ここまで
+	///
+
+	///
+	/// ↓ImGuiここから
+	///
+
+	// フレームの先頭でImguiにここからフレームが始まる旨を告げる
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
+	/*ImGui::ShowDemoWindow();*/
+
+	debugCamera_->DrawImgui();
+	fade_->DrawImGui("q");
+
+	// Imguiの内部コマンドを生成する
+	ImGui::Render();
+
+	///
+	/// ↑ImGuiここまで
+	///
+
+	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
+}
+
+void TitleScene::UpdateFade() {
 	if (isFade_) {
 		fadeAlpha_ += 0.5f * deltaTime_;
 		if (fadeAlpha_ >= 1.0f) {
 			if (state_ == kPlay) {
 				goGameScene_ = true;
-			} else if(state_ == kTutorial) {
+			}
+			else if (state_ == kTutorial) {
 				goTutorialScene_ = true;
 			}
 		}
 	}
+	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
+	fade_->Update();
+}
 
+void TitleScene::SceneController() {
 	if (!isFade_) {
 		switch (state_)
 		{
@@ -74,54 +126,6 @@ void TitleScene::Update() {
 			break;
 		}
 	}
-
-	titleUI_->Update();
-
-	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
-	fade_->Update();
-}
-
-void TitleScene::Draw() {
-
-	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
-
-	///
-	/// ↓描画処理ここから
-	///
-
-	titleUI_->Draw();
-	fade_->Draw();
-
-	///
-	/// ↑描画処理ここまで
-	///
-
-	///
-	/// ↓ImGuiここから
-	///
-
-	// フレームの先頭でImguiにここからフレームが始まる旨を告げる
-	ImGui_ImplDX12_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-	/*ImGui::ShowDemoWindow();*/
-
-	debugCamera_->DrawImgui();
-	fade_->DrawImGui("q");
-
-	// Imguiの内部コマンドを生成する
-	ImGui::Render();
-
-	///
-	/// ↑ImGuiここまで
-	///
-
-	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
-}
-
-void TitleScene::Finalize() {
-	
 }
 
 void TitleScene::CameraController() {

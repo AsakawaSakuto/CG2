@@ -38,5 +38,6 @@ private:
 	Camera* useCamera_ = nullptr;
 	bool isDebugCamera_ = false;
 
+	void UpdateFade();
 	void CameraController();
 };

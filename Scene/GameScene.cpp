@@ -34,15 +34,7 @@ void GameScene::Update() {
 	player_->Update(useCamera_);
 	skyBox_->Update(useCamera_);
 
-	if (isFade_) {
-		fadeAlpha_ += 0.5f * deltaTime_;
-	} else {
-		fadeAlpha_ -= 0.5f * deltaTime_;
-	}
-	fadeAlpha_ = std::clamp(fadeAlpha_, 0.0f, 1.0f);
-
-	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
-	fade_->Update();
+	UpdateFade();
 }
 
 void GameScene::Draw() {
@@ -91,8 +83,17 @@ void GameScene::Draw() {
 	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
 }
 
-void GameScene::Finalize() {
-	
+void GameScene::UpdateFade() {
+	if (isFade_) {
+		fadeAlpha_ += 0.5f * deltaTime_;
+	}
+	else {
+		fadeAlpha_ -= 0.5f * deltaTime_;
+	}
+	fadeAlpha_ = std::clamp(fadeAlpha_, 0.0f, 1.0f);
+
+	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
+	fade_->Update();
 }
 
 void GameScene::CameraController() {

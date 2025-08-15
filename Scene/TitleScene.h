@@ -43,7 +43,6 @@ public:
 	explicit TitleScene(struct AppContext* ctx) : ctx_(ctx) {}
 
 	void Initialize();
-	void Finalize();
 	void Update();
 	void Draw();
 	bool GoGameScene() { return goGameScene_; };
@@ -74,6 +73,8 @@ private:
 	Camera* useCamera_ = nullptr;
 	bool isDebugCamera_ = false;
 
+	void SceneController();
+	void UpdateFade();
 	void CameraController();
 
 	enum State {

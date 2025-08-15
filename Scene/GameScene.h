@@ -43,7 +43,6 @@ public:
 	explicit GameScene(struct AppContext* ctx) : ctx_(ctx) {}
 
 	void Initialize();
-	void Finalize();
 	void Update();
 	void Draw();
 	bool GoTitleScene() { return goTitleScene_; };
@@ -71,6 +70,7 @@ private:
 	Camera* useCamera_ = nullptr;
 	bool isDebugCamera_ = false;
 
+	void UpdateFade();
 	void CameraController();
 	void DrawFPS_ImGui();
 };
