@@ -60,6 +60,7 @@ private:
 	GamePad* gamePad_ = nullptr;
 
 	unique_ptr<Sprite> test_ = make_unique<Sprite>();
+	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();

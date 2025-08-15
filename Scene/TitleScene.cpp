@@ -4,6 +4,8 @@ void TitleScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
 	gamePad_ = &ctx_->gamePad;
 	test_->Initialize(&ctx_->dxCommon, "resources/image/1.png", { 128.0f,128.0f });
+	titleUI_->Initialize(&ctx_->dxCommon, "resources/image/titleUI1.png", { 1280.0f,720.0f });
+	titleUI_->SetPosition({ 640.0f,360.0f });
 }
 
 void TitleScene::Update() {
@@ -17,6 +19,7 @@ void TitleScene::Update() {
 	case TitleScene::kPlay:
 
 		test_->SetTexture("resources/image/1.png");
+		titleUI_->SetTexture("resources/image/titleUI1.png");
 
 		if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 			state_ = kTutorial;
@@ -30,6 +33,7 @@ void TitleScene::Update() {
 	case TitleScene::kTutorial:
 
 		test_->SetTexture("resources/image/2.png");
+		titleUI_->SetTexture("resources/image/titleUI2.png");
 
 		if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 			state_ = kQuit;
@@ -46,6 +50,7 @@ void TitleScene::Update() {
 	case TitleScene::kQuit:
 
 		test_->SetTexture("resources/image/3.png");
+		titleUI_->SetTexture("resources/image/titleUI3.png");
 
 		if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 			state_ = kTutorial;
@@ -58,6 +63,7 @@ void TitleScene::Update() {
 		break;
 	}
 	test_->Update();
+	titleUI_->Update();
 }
 
 void TitleScene::Draw() {
@@ -69,6 +75,7 @@ void TitleScene::Draw() {
 	///
 
 	test_->Draw();
+	titleUI_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -86,6 +93,8 @@ void TitleScene::Draw() {
 	/*ImGui::ShowDemoWindow();*/
 
 	debugCamera_->DrawImgui();
+
+	titleUI_->DrawImGui("ui");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
