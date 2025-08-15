@@ -127,7 +127,7 @@ void ChangeScene() {
 	case Scene::kTutorial:
 
 		if (tutorialScene) {
-			if (tutorialScene->GoTitle()) {
+			if (tutorialScene->GoTitleScene()) {
 				scene = Scene::kTitle;
 				delete tutorialScene;
 				tutorialScene = nullptr;

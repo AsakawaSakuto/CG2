@@ -73,7 +73,10 @@ void TitleScene::UpdateFade() {
 				goTutorialScene_ = true;
 			}
 		}
+	} else {
+		fadeAlpha_ -= 0.5f * deltaTime_;
 	}
+	fadeAlpha_ = std::clamp(fadeAlpha_, 0.0f, 1.0f);
 	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
 	fade_->Update();
 }

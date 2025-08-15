@@ -59,7 +59,7 @@ private:
 	float deltaTime_ = 1.0f / 60.0f;
 
 	bool isFade_ = false;
-	float fadeAlpha_ = 0.0f;
+	float fadeAlpha_ = 1.0f;
 
 	GamePad* gamePad_ = nullptr;
 
