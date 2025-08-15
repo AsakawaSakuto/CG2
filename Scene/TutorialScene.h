@@ -34,6 +34,7 @@ private:
 
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingUI_ = make_unique<Sprite>();
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();

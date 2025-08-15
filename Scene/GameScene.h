@@ -65,6 +65,7 @@ private:
 
 	unique_ptr<Sprite> fade_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
 
 	// Cameras

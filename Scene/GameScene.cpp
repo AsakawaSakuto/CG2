@@ -13,10 +13,14 @@ void GameScene::Initialize() {
 	fade_->SetPosition({ 640.0f,360.0f });
 	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
 
-	pauseBG_->Initialize(&ctx_->dxCommon, "resources/image/pauseUI1.png", { 1280.0f,720.0f });
+	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/loading.png", { 1280.0f,720.0f });
+	loadingUI_->SetPosition({ 640.0f,360.0f });
+	loadingUI_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });
+
+	pauseBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause1.png", { 1280.0f,720.0f });
 	pauseBG_->SetPosition({ 640.0f,360.0f });
 
-	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/pauseUI2.png", { 1280.0f,720.0f });
+	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause2.png", { 1280.0f,720.0f });
 	pauseUI_->SetPosition({ 640.0f,360.0f });
 }
 
@@ -63,6 +67,7 @@ void GameScene::Draw() {
 	}
 
 	fade_->Draw();
+	loadingUI_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -110,6 +115,9 @@ void GameScene::UpdateFade() {
 	}
 	fadeAlpha_ = std::clamp(fadeAlpha_, 0.0f, 1.0f);
 
+	loadingUI_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });
+	loadingUI_->Update();
+
 	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
 	fade_->Update();
 }
@@ -123,7 +131,7 @@ void GameScene::UpdatePause() {
 		switch (pause_)
 		{
 		case GameScene::kBack:
-			pauseUI_->SetTexture("resources/image/pauseUI2.png");
+			pauseUI_->SetTexture("resources/image/UI/pause2.png");
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				pause_ = kQuit;
@@ -134,7 +142,7 @@ void GameScene::UpdatePause() {
 			}
 			break;
 		case GameScene::kQuit:
-			pauseUI_->SetTexture("resources/image/pauseUI3.png");
+			pauseUI_->SetTexture("resources/image/UI/pause3.png");
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				pause_ = kBack;
