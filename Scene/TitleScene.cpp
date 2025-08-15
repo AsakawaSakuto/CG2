@@ -12,7 +12,7 @@ void TitleScene::Update() {
 	CameraController();
 
 	if (gamePad_->TriggerButton(GamePad::A)) {
-		sceneChange_ = true;
+		goGameScene_ = true;
 		return;
 	}
 }

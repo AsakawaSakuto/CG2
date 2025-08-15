@@ -9,7 +9,9 @@ GameScene* gameScene = nullptr;
 
 enum class Scene {
 	kTitle,
-	kGame
+	kGame,
+	kTutorial,
+	kResult
 };
 
 Scene scene = Scene::kTitle;
@@ -24,15 +26,15 @@ void DrawScene();
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// // プロセスで1回だけ
-	CoInitializeEx(nullptr, COINIT_MULTITHREADED);                   // 追加
-	// 追加
-	ctx.winApp.Initialize(L"CG2_Window");                            // 追加
-	ctx.winApp.EnableResize(true);                                   // 追加
-	ctx.dxCommon.Initialize(&ctx.winApp);                            // 追加
-	TextureManager::GetInstance()->Initialize(&ctx.dxCommon);        // 追加
-	Logger::Initialize(); std::filesystem::create_directory("logs"); // 追加
-	ctx.input.Initialize(&ctx.winApp);                               // 追加
-	ctx.gamePad.Initialize();                                        // 追加
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+	ctx.winApp.Initialize(L"CG2_Window");
+	ctx.winApp.EnableResize(true);
+	ctx.dxCommon.Initialize(&ctx.winApp);
+	TextureManager::GetInstance()->Initialize(&ctx.dxCommon);
+	Logger::Initialize(); std::filesystem::create_directory("logs");
+	ctx.input.Initialize(&ctx.winApp);
+	ctx.gamePad.Initialize();
 
 	// シーンの初期化
 	scene = Scene::kTitle;
@@ -80,7 +82,7 @@ void ChangeScene() {
 	{
 	case Scene::kTitle:
 
-		if (titleScene->SceneChange()) {
+		if (titleScene->GoGameScene()) {
 			scene = Scene::kGame;
 			delete titleScene;
 			titleScene = nullptr;
@@ -91,7 +93,7 @@ void ChangeScene() {
 		break;
 	case Scene::kGame:
 
-		if (gameScene->SceneChange()) {
+		if (gameScene->GoTitleScene()) {
 			scene = Scene::kTitle;
 			delete gameScene;
 			gameScene = nullptr;
@@ -110,18 +112,10 @@ void UpdateScene() {
 
 		titleScene->Update();
 
-		if (titleScene->IsEndRequst()) {
-			break;
-		}
-
 		break;
 	case Scene::kGame:
 
 		gameScene->Update();
-
-		if (gameScene->IsEndRequst()) {
-			break;
-		}
 
 		break;
 	}
@@ -130,10 +124,14 @@ void UpdateScene() {
 void DrawScene() {
 	switch (scene) {
 	case Scene::kTitle:
+
 		titleScene->Draw();
+
 		break;
 	case Scene::kGame:
+
 		gameScene->Draw();
+
 		break;
 	}
 };

@@ -46,14 +46,14 @@ public:
 	void Finalize();
 	void Update();
 	void Draw();
-	bool SceneChange() { return sceneChange_; }
-	bool IsEndRequst() { return endRequst_; }
+	bool GoGameScene() { return goGameScene_; };
+	bool GoTutorialScene() { return goTutorialScene_; }
 
 private:
 	AppContext* ctx_ = nullptr;
 
-	bool endRequst_ = false;
-	bool sceneChange_ = false;
+	bool goGameScene_ = false;
+	bool goTutorialScene_ = false;
 
 	GamePad* gamePad_ = nullptr;
 
@@ -64,4 +64,12 @@ private:
 	bool isDebugCamera_ = false;
 
 	void CameraController();
+
+	enum State {
+		kPlay,
+		kTutorial,
+		kQuit
+	};
+
+	State state_ = kPlay;
 };

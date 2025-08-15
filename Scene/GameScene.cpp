@@ -23,7 +23,8 @@ void GameScene::Update() {
 		player_->Damage();
 	}
 	if (gamePad_->TriggerButton(GamePad::A)) {
-		sceneChange_ = true;
+		goTitleScene_ = true;
+		return;
 	}
 
 	player_->Update(useCamera_);

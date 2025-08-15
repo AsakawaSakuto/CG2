@@ -46,14 +46,14 @@ public:
 	void Finalize();
 	void Update();
 	void Draw();
-	bool SceneChange() { return sceneChange_; }
-	bool IsEndRequst() { return endRequst_; }
+	bool GoTitleScene() { return goTitleScene_; };
+	bool GoResultScene() { return goResultScene_; }
 	
 private:
 	AppContext* ctx_ = nullptr;
 
-	bool endRequst_ = false;
-	bool sceneChange_ = false;
+	bool goTitleScene_ = false; 
+	bool goResultScene_ = false;
 
 	GamePad* gamePad_ = nullptr;
 
