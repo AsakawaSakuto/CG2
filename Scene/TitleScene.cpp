@@ -3,9 +3,11 @@
 void TitleScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
 	gamePad_ = &ctx_->gamePad;
-	test_->Initialize(&ctx_->dxCommon, "resources/image/1.png", { 128.0f,128.0f });
 	titleUI_->Initialize(&ctx_->dxCommon, "resources/image/titleUI1.png", { 1280.0f,720.0f });
 	titleUI_->SetPosition({ 640.0f,360.0f });
+	fade_->Initialize(&ctx_->dxCommon, "resources/image/fade.png", { 1280.0f,720.0f });
+	fade_->SetPosition({ 640.0f,360.0f });
+	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
 }
 
 void TitleScene::Update() {
@@ -14,56 +16,69 @@ void TitleScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
-	switch (state_)
-	{
-	case TitleScene::kPlay:
-
-		test_->SetTexture("resources/image/1.png");
-		titleUI_->SetTexture("resources/image/titleUI1.png");
-
-		if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
-			state_ = kTutorial;
+	if (isFade_) {
+		fadeAlpha_ += 0.5f * deltaTime_;
+		if (fadeAlpha_ >= 1.0f) {
+			if (state_ == kPlay) {
+				goGameScene_ = true;
+			} else if(state_ == kTutorial) {
+				goTutorialScene_ = true;
+			}
 		}
-
-		if (gamePad_->TriggerButton(GamePad::A)) {
-			goGameScene_ = true;
-		}
-
-		break;
-	case TitleScene::kTutorial:
-
-		test_->SetTexture("resources/image/2.png");
-		titleUI_->SetTexture("resources/image/titleUI2.png");
-
-		if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
-			state_ = kQuit;
-		}
-		if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
-			state_ = kPlay;
-		}
-
-		if (gamePad_->TriggerButton(GamePad::A)) {
-			goTutorialScene_ = true;
-		}
-
-		break;
-	case TitleScene::kQuit:
-
-		test_->SetTexture("resources/image/3.png");
-		titleUI_->SetTexture("resources/image/titleUI3.png");
-
-		if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
-			state_ = kTutorial;
-		}
-
-		if (gamePad_->TriggerButton(GamePad::A)) {
-			goQuit_ = true;
-		}
-
-		break;
 	}
-	test_->Update();
+
+	if (!isFade_) {
+		switch (state_)
+		{
+		case TitleScene::kPlay:
+
+			titleUI_->SetTexture("resources/image/titleUI1.png");
+
+			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+				state_ = kTutorial;
+			}
+
+			if (gamePad_->TriggerButton(GamePad::A)) {
+				isFade_ = true;
+			}
+
+			break;
+		case TitleScene::kTutorial:
+
+			titleUI_->SetTexture("resources/image/titleUI2.png");
+
+			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+				state_ = kQuit;
+			}
+			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+				state_ = kPlay;
+			}
+
+			if (gamePad_->TriggerButton(GamePad::A)) {
+				isFade_ = true;
+			}
+
+			break;
+		case TitleScene::kQuit:
+
+			titleUI_->SetTexture("resources/image/titleUI3.png");
+
+			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+				state_ = kTutorial;
+			}
+
+			if (gamePad_->TriggerButton(GamePad::A)) {
+				goQuit_ = true;
+			}
+
+			break;
+		}
+	}
+
 	titleUI_->Update();
+
+	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
+	fade_->Update();
 }
 
 void TitleScene::Draw() {
@@ -74,8 +89,8 @@ void TitleScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	test_->Draw();
 	titleUI_->Draw();
+	fade_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -93,8 +108,7 @@ void TitleScene::Draw() {
 	/*ImGui::ShowDemoWindow();*/
 
 	debugCamera_->DrawImgui();
-
-	titleUI_->DrawImGui("ui");
+	fade_->DrawImGui("q");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();

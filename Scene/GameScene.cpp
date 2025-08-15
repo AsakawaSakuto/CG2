@@ -8,6 +8,10 @@ void GameScene::Initialize() {
 	skyBox_->Initialize(&ctx_->dxCommon);
 
 	gamePad_ = &ctx_->gamePad;
+
+	fade_->Initialize(&ctx_->dxCommon, "resources/image/fade.png", { 1280.0f,720.0f });
+	fade_->SetPosition({ 640.0f,360.0f });
+	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
 }
 
 void GameScene::Update() {
@@ -29,6 +33,16 @@ void GameScene::Update() {
 
 	player_->Update(useCamera_);
 	skyBox_->Update(useCamera_);
+
+	if (isFade_) {
+		fadeAlpha_ += 0.5f * deltaTime_;
+	} else {
+		fadeAlpha_ -= 0.5f * deltaTime_;
+	}
+	fadeAlpha_ = std::clamp(fadeAlpha_, 0.0f, 1.0f);
+
+	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
+	fade_->Update();
 }
 
 void GameScene::Draw() {
@@ -42,7 +56,7 @@ void GameScene::Draw() {
 	skyBox_->Draw();
 	player_->Draw();
 
-	//ground_->Draw();
+	fade_->Draw();
 
 	///
 	/// ↑描画処理ここまで

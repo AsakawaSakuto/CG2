@@ -24,6 +24,11 @@ private:
 
 	bool goTitle_ = false;
 
+	float deltaTime_ = 1.0f / 60.0f;
+	bool isFade_ = false;
+	float fadeAlpha_ = 1.0f;
+	unique_ptr<Sprite> fade_ = make_unique<Sprite>();
+
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<SkyBox> skyBox_ = make_unique<SkyBox>();
 

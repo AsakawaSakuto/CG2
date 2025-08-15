@@ -57,10 +57,16 @@ private:
 	bool goTutorialScene_ = false;
 	bool goQuit_ = false;
 
+	float deltaTime_ = 1.0f / 60.0f;
+
+	bool isFade_ = false;
+	float fadeAlpha_ = 0.0f;
+
 	GamePad* gamePad_ = nullptr;
 
 	unique_ptr<Sprite> test_ = make_unique<Sprite>();
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> fade_ = make_unique<Sprite>();
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();

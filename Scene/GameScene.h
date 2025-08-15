@@ -57,8 +57,13 @@ private:
 
 	GamePad* gamePad_ = nullptr;
 
+	bool isFade_ = false;
+	float fadeAlpha_ = 1.0f;
+	float deltaTime_ = 1.0f / 60.0f;
+
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<SkyBox> skyBox_ = make_unique<SkyBox>();
+	unique_ptr<Sprite> fade_ = make_unique<Sprite>();
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
