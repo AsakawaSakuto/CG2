@@ -19,6 +19,8 @@ public:
 	void Draw();
 
 	void DrawImGui();
+
+	void SetTWallexture(const std::string& textureName);
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> left_ = make_unique<Object3d>();

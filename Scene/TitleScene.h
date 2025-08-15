@@ -48,14 +48,18 @@ public:
 	void Draw();
 	bool GoGameScene() { return goGameScene_; };
 	bool GoTutorialScene() { return goTutorialScene_; }
+	bool GoQuit() { return goQuit_; }
 
 private:
 	AppContext* ctx_ = nullptr;
 
 	bool goGameScene_ = false;
 	bool goTutorialScene_ = false;
+	bool goQuit_ = false;
 
 	GamePad* gamePad_ = nullptr;
+
+	unique_ptr<Sprite> test_ = make_unique<Sprite>();
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
@@ -68,7 +72,7 @@ private:
 	enum State {
 		kPlay,
 		kTutorial,
-		kQuit
+		kQuit,
 	};
 
 	State state_ = kPlay;

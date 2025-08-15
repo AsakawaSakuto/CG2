@@ -11,8 +11,9 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Ve
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 	
-	TextureManager::GetInstance()->LoadTexture(fileName);
-	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(fileName);
+	textureName_ = fileName;
+	TextureManager::GetInstance()->LoadTexture(textureName_);
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 
 	CreatePSO();
 
@@ -136,6 +137,18 @@ void Sprite::DrawImGui(const char* objectName) {
 
 	ImGui::End();
 
+}
+
+void Sprite::SetTexture(const std::string& textureName) {
+	// すでに同じテクスチャなら処理をスキップ
+	if (textureName_ == textureName) {
+		return;
+	}
+	textureName_ = textureName;
+	// .objの参照しているテクスチャファイル読み込み
+	TextureManager::GetInstance()->LoadTexture(textureName_);
+	// 読み込んだテクスチャの番号を取得
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
 void Sprite::CreateVertexResource() {

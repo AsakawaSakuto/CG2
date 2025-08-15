@@ -40,6 +40,8 @@ public:
 
 	Vector4& GetColor() { return materialData_->color; }
 
+	void SetTexture(const std::string& textureName);
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	HRESULT hr_;
@@ -49,6 +51,8 @@ private:
 	Vector2 uvScale_ = { 1.0f,1.0f };
 	Vector2 uvTranslate_ = { 0.0f,0.0f };
 	float uvRotate_ = 0.0f;
+
+	std::string textureName_;
 
 	//----------------------------------------------//
 

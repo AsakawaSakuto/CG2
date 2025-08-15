@@ -3,6 +3,7 @@
 void TitleScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
 	gamePad_ = &ctx_->gamePad;
+	test_->Initialize(&ctx_->dxCommon, "resources/image/1.png", { 128.0f,128.0f });
 }
 
 void TitleScene::Update() {
@@ -11,10 +12,52 @@ void TitleScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
-	if (gamePad_->TriggerButton(GamePad::A)) {
-		goGameScene_ = true;
-		return;
+	switch (state_)
+	{
+	case TitleScene::kPlay:
+
+		test_->SetTexture("resources/image/1.png");
+
+		if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+			state_ = kTutorial;
+		}
+
+		if (gamePad_->TriggerButton(GamePad::A)) {
+			goGameScene_ = true;
+		}
+
+		break;
+	case TitleScene::kTutorial:
+
+		test_->SetTexture("resources/image/2.png");
+
+		if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+			state_ = kQuit;
+		}
+		if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+			state_ = kPlay;
+		}
+
+		if (gamePad_->TriggerButton(GamePad::A)) {
+			goTutorialScene_ = true;
+		}
+
+		break;
+	case TitleScene::kQuit:
+
+		test_->SetTexture("resources/image/3.png");
+
+		if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+			state_ = kTutorial;
+		}
+
+		if (gamePad_->TriggerButton(GamePad::A)) {
+			goQuit_ = true;
+		}
+
+		break;
 	}
+	test_->Update();
 }
 
 void TitleScene::Draw() {
@@ -24,6 +67,8 @@ void TitleScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	test_->Draw();
 
 	///
 	/// ↑描画処理ここまで

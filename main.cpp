@@ -1,11 +1,14 @@
 #include"AppContext.h"
 #include"TitleScene.h"
 #include"GameScene.h"
+#include"TutorialScene.h"
 
 AppContext ctx;
+bool running = true;
 
 TitleScene* titleScene = nullptr;
 GameScene* gameScene = nullptr;
+TutorialScene* tutorialScene = nullptr;
 
 enum class Scene {
 	kTitle,
@@ -43,12 +46,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ゲームループ
 	MSG msg = {};
-	while (true) {
+	while (running) {
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-			if (msg.message == WM_QUIT) { goto APP_QUIT; }
+			if (msg.message == WM_QUIT) { running = false; break; }
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+		if (!running) break;
 
 		ChangeScene();
 
@@ -59,8 +63,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawScene();
 
 	} // メインループ外
-
-APP_QUIT:
 
 	// 終了
 	delete titleScene;
@@ -82,23 +84,57 @@ void ChangeScene() {
 	{
 	case Scene::kTitle:
 
-		if (titleScene->GoGameScene()) {
-			scene = Scene::kGame;
-			delete titleScene;
-			titleScene = nullptr;
-			gameScene = new GameScene(&ctx);
-			gameScene->Initialize();
+		if (titleScene != nullptr) {
+			if (titleScene->GoGameScene()) {
+				scene = Scene::kGame;
+				delete titleScene;
+				titleScene = nullptr;
+				gameScene = new GameScene(&ctx);
+				gameScene->Initialize();
+				break;
+			}
+
+			if (titleScene->GoTutorialScene()) {
+				scene = Scene::kTutorial;
+				delete titleScene;
+				titleScene = nullptr;
+				tutorialScene = new TutorialScene(&ctx);
+				tutorialScene->Initialize();
+				break;
+			}
+
+			if (titleScene->GoQuit()) {
+				running = false;
+				break;
+			}
 		}
 
 		break;
 	case Scene::kGame:
 
-		if (gameScene->GoTitleScene()) {
-			scene = Scene::kTitle;
-			delete gameScene;
-			gameScene = nullptr;
-			titleScene = new TitleScene(&ctx);
-			titleScene->Initialize();
+		if (gameScene != nullptr) {
+			if (gameScene->GoTitleScene()) {
+				scene = Scene::kTitle;
+				delete gameScene;
+				gameScene = nullptr;
+				titleScene = new TitleScene(&ctx);
+				titleScene->Initialize();
+			}
+			break;
+		}
+
+		break;
+	case Scene::kTutorial:
+
+		if (tutorialScene) {
+			if (tutorialScene->GoTitle()) {
+				scene = Scene::kTitle;
+				delete tutorialScene;
+				tutorialScene = nullptr;
+				titleScene = new TitleScene(&ctx);
+				titleScene->Initialize();
+			}
+			break;
 		}
 
 		break;
@@ -118,6 +154,11 @@ void UpdateScene() {
 		gameScene->Update();
 
 		break;
+	case Scene::kTutorial:
+
+		tutorialScene->Update();
+
+		break;
 	}
 };
 
@@ -131,6 +172,11 @@ void DrawScene() {
 	case Scene::kGame:
 
 		gameScene->Draw();
+
+		break;
+	case Scene::kTutorial:
+
+		tutorialScene->Draw();
 
 		break;
 	}

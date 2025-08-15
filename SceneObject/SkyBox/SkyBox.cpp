@@ -2,6 +2,7 @@
 
 void SkyBox::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
+
 	left_->Initialize(dxCommon_, "resources/object3d/skyBox/skyBoxLeft.obj");
 	right_->Initialize(dxCommon_, "resources/object3d/skyBox/skyBoxRight.obj");
 	top_->Initialize(dxCommon_, "resources/object3d/skyBox/skyBoxTop.obj");
@@ -40,3 +41,8 @@ void SkyBox::DrawImGui() {
 	left_->DrawImGui("L");
 	right_->DrawImGui("R");
 }
+
+void SkyBox::SetTWallexture(const std::string& textureName) {
+	left_->SetTexture(textureName);
+	right_->SetTexture(textureName);
+};
