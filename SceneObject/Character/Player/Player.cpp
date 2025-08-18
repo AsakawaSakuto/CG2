@@ -222,6 +222,7 @@ void Player::Attack() {
     }
 
     if (gamePad_.PushButton(GamePad::L) && state_ == NORMAL) {
+        moveSpeed_ = minSpeed_;
         beamChargeTimer_ += deltaTime_;
         beamChargeRadius_ += deltaTime_;
         beamCharge_->SetUseEmitter(true);
@@ -232,7 +233,7 @@ void Player::Attack() {
     }
 
     if (isBeamShot_) {
-        if (gamePad_.ReleaseButton(GamePad::L) && state_ == NORMAL) {
+        if (gamePad_.ReleaseButton(GamePad::L)) {
             if (!beam_->GetIsAlive()) {
                 beam_->Spawn(model_->GetTranslate(), beamVelocity_);
                 beam_->SetIsAlive(true);
@@ -240,15 +241,17 @@ void Player::Attack() {
                 beamCharge_->SetUseEmitter(false);
                 beamChargeTimer_ = 0.0f;
                 beamChargeRadius_ = 0.0f;
+                moveSpeed_ = maxSpeed_;
             }
         }
         beamChargeRange_.minColor = { 0.0f,0.0f,0.2f };
         beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
     } else {
-        if (gamePad_.ReleaseButton(GamePad::L) && state_ == NORMAL) {
+        if (gamePad_.ReleaseButton(GamePad::L)) {
             beamCharge_->SetUseEmitter(false);
             beamChargeTimer_ = 0.0f;
             beamChargeRadius_ = 0.0f;
+            moveSpeed_ = maxSpeed_;
         }
         beamChargeRange_.minColor = { 0.0f,0.0f,0.0f };
         beamChargeRange_.maxColor = { 1.0f,1.0f,1.0f };
