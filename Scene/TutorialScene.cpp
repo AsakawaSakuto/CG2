@@ -18,6 +18,9 @@ void TutorialScene::Initialize() {
 
 	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause2.png", { 1280.0f,720.0f });
 	pauseUI_->SetPosition({ 640.0f,360.0f });
+
+	testUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tutoUI1.png", { 1280.0f,128.0f });
+	testUI_->SetPosition({ 640.0f,-128.0f });
 }
 
 void TutorialScene::Update() {
@@ -26,13 +29,6 @@ void TutorialScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
-	if (gamePad_->TriggerButton(GamePad::X)) {
-		player_->Heal();
-	}
-	if (gamePad_->TriggerButton(GamePad::Y)) {
-		player_->Damage();
-	}
-
 	UpdatePause();
 
 	if (!isPause_) {
@@ -40,6 +36,8 @@ void TutorialScene::Update() {
 		skyBox_->Update(useCamera_);
 	}
 	
+	UpdateTutorialTest();
+
 	UpdateFade();
 }
 
@@ -56,6 +54,8 @@ void TutorialScene::Draw() {
 	if (isPause_) {
 		pauseBG_->Draw();
 		pauseUI_->Draw();
+	} else {
+		testUI_->Draw();
 	}
 
 	fade_->Draw();
@@ -78,6 +78,8 @@ void TutorialScene::Draw() {
 	debugCamera_->DrawImgui();
 
 	player_->DrawImGui();
+
+	ImGui::Text("%d", &testState_);
 
 	//skyBox_->DrawImGui();
 
@@ -140,6 +142,147 @@ void TutorialScene::UpdatePause() {
 
 	pauseBG_->Update();
 	pauseUI_->Update();
+}
+
+void TutorialScene::UpdateTutorialTest() {
+	switch (testState_) {
+	case Test1:
+		lX_ = gamePad_->LeftStickX();
+		lY_ = gamePad_->LeftStickY();
+
+		if (testUIPos_.y >= 128.0f) {
+			if (lX_ != 0.0f || lY_ != 0.0f) {
+				testUIClear_ = true;
+			}
+		}
+
+		if (testUIClear_) {
+			testUI_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y -= testUISpeed_ * deltaTime_;
+			if (testUIPos_.y <= -128.0f) {
+				testState_ = Test2;
+				testUIClear_ = false;
+				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+				testUI_->SetTexture("resources/image/UI/tutoUI2.png");
+			}
+		} else {
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y += testUISpeed_ * deltaTime_;
+		}
+		break;
+	case TutorialScene::Test2:
+		rX_ = gamePad_->RightStickX();
+		rY_ = gamePad_->RightStickY();
+
+		if (testUIPos_.y >= 128.0f) {
+			if (rX_ != 0.0f || rY_ != 0.0f) {
+				testUIClear_ = true;
+			}
+		}
+
+		if (testUIClear_) {
+			testUI_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y -= testUISpeed_ * deltaTime_;
+			if (testUIPos_.y <= -128.0f) {
+				testState_ = Test3;
+				testUIClear_ = false;
+				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+				testUI_->SetTexture("resources/image/UI/tutoUI3.png");
+			}
+		}
+		else {
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y += testUISpeed_ * deltaTime_;
+		}
+		break;
+	case TutorialScene::Test3:
+		if (testUIPos_.y >= 128.0f) {
+			if (gamePad_->PushButton(GamePad::R)) {
+				timer_ += deltaTime_;
+				if (timer_ >= 0.25f) {
+					testUIClear_ = true;
+					timer_ = 0.0f;
+				}
+			}
+		}
+
+		if (testUIClear_) {
+			testUI_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y -= testUISpeed_ * deltaTime_;
+			if (testUIPos_.y <= -128.0f) {
+				testState_ = Test4;
+				testUIClear_ = false;
+				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+				testUI_->SetTexture("resources/image/UI/tutoUI4.png");
+				timer_ = 0.0f;
+			}
+		}
+		else {
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y += testUISpeed_ * deltaTime_;
+		}
+		break;
+	case TutorialScene::Test4:
+		if (testUIPos_.y >= 128.0f) {
+			if (gamePad_->PushButton(GamePad::L)) {
+				timer_ += deltaTime_;
+			}
+
+			if (timer_ >= 1.5f && gamePad_->ReleaseButton(GamePad::L)) {
+				testUIClear_ = true;
+				timer_ = 0.0f;
+			} else if (timer_ < 1.5f && gamePad_->ReleaseButton(GamePad::L)) {
+				timer_ = 0.0f;
+			}
+		}
+
+		if (testUIClear_) {
+			testUI_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y -= testUISpeed_ * deltaTime_;
+			if (testUIPos_.y <= -128.0f) {
+				testState_ = Test5;
+				testUIClear_ = false;
+				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+				testUI_->SetTexture("resources/image/UI/tutoUI5.png");
+				timer_ = 0.0f;
+			}
+		}
+		else {
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y += testUISpeed_ * deltaTime_;
+		}
+		break;
+	case TutorialScene::Test5:
+		if (testUIPos_.y >= 128.0f) {
+			if (gamePad_->RightTrigger()>=1.0f|| gamePad_->LeftTrigger() >= 1.0f) {
+				testUIClear_ = true;
+			}
+		}
+
+		if (testUIClear_) {
+			testUI_->SetColor({ 0.0f,1.0f,0.0f,1.0f });
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y -= testUISpeed_ * deltaTime_;
+			if (testUIPos_.y <= -128.0f) {
+				testState_ = Test5;
+				testUIClear_ = false;
+				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+				testUI_->SetTexture("resources/image/UI/tutoUI5.png");
+			}
+		}
+		else {
+			testUIPos_ = testUI_->GetPosition();
+			testUIPos_.y += testUISpeed_ * deltaTime_;
+		}
+		break;
+	}
+	testUIPos_.y = std::clamp(testUIPos_.y, -128.0f, 128.0f);
+	testUI_->SetPosition(testUIPos_);
+	testUI_->Update();
 }
 
 void TutorialScene::CameraController() {

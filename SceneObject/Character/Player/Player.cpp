@@ -95,8 +95,8 @@ void Player::DrawImGui() {
     //engineFire_->DrawImGui("engineFire");
     //heal_->DrawImGui("h");
     //damage_->DrawImGui("d");
-    beamCharge_->DrawImGui("bc");
-    beam_->DrawImGui();
+    //beamCharge_->DrawImGui("bc");
+    //beam_->DrawImGui();
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -159,10 +159,10 @@ void Player::UpdateReticle(Camera* camera) {
 
     Vector3 playerPos = GetWorldPosition();
     bulletVelocity_ = reticleWorldPosition - playerPos;
-    bulletVelocity_ = bulletVelocity_.Normalize()/* * bulletSpeed_*/;
+    bulletVelocity_ = bulletVelocity_.Normalize();
 
     beamVelocity_ = reticleWorldPosition - playerPos;
-    beamVelocity_ = beamVelocity_.Normalize()/* * bulletSpeed_*/;
+    beamVelocity_ = beamVelocity_.Normalize();
 }
 
 void Player::Move() {

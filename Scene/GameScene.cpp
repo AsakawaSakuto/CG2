@@ -24,13 +24,6 @@ void GameScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
-	if (gamePad_->TriggerButton(GamePad::X)) {
-		player_->Heal();
-	}
-	if (gamePad_->TriggerButton(GamePad::Y)) {
-		player_->Damage();
-	}
-
 	UpdatePause();
 
 	if (!isPause_) {
