@@ -68,6 +68,8 @@ public:
 	// 色を取得（参照）
 	Vector4& GetColor() { return materialData_->color; }
 
+	Vector3& GetWorldPosition();
+
 	// 使用するテクスチャを変更
 	void SetTexture(const std::string& textureName);
 

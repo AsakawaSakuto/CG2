@@ -133,6 +133,14 @@ void Object3d::SetTexture(const std::string& textureName) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
+Vector3& Object3d::GetWorldPosition() {
+	Vector3 worldPos = {};
+	worldPos.x = worldMatrix.m[3][0];
+	worldPos.y = worldMatrix.m[3][1];
+	worldPos.z = worldMatrix.m[3][2];
+	return worldPos;
+}
+
 void Object3d::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);

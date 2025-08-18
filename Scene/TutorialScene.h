@@ -44,6 +44,7 @@ private:
 	unique_ptr<Sprite> testUI_ = make_unique<Sprite>();
 
 	unique_ptr<Object3d> enemy_ = make_unique<Object3d>();
+	unique_ptr<Object3d> enemyBullet_ = make_unique<Object3d>();
 
 	Vector2 testUIPos_ = { 0.0f,0.0f };
 
@@ -59,6 +60,17 @@ private:
 		Test5
 	};
 	Test testState_ = Test1;
+
+	// enemyValue
+
+	bool isUpDownMove_ = false;
+	bool isAttack_ = false;
+	bool isAlive_ = false;
+	float isAttackTimer_ = 0.0f;
+	float upDownSpeed_ = 2.0f;
+	float zRotateSpeed_ = 3.0f;
+	float bulletSpeed_ = 75.0f;
+	Vector3 bulletVelocity_ = {};
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
@@ -77,6 +89,7 @@ private:
 
 	void UpdatePause();
 	void UpdateFade();
-	void CameraController();
 	void UpdateTutorialTest();
+	void UpdateEnemy();
+	void CameraController();
 };

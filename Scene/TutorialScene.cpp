@@ -22,6 +22,8 @@ void TutorialScene::Initialize() {
 	testUI_->SetPosition({ 640.0f,-128.0f });
 
 	enemy_->Initialize(&ctx_->dxCommon, "resources/object3d/Enemy/enemy.obj");
+	enemy_->SetTranslate({ 0.0f,5.0f,50.0f });
+	enemyBullet_->Initialize(&ctx_->dxCommon, "resources/object3d/Enemy/enemyBullet.obj");
 }
 
 void TutorialScene::Update() {
@@ -32,10 +34,13 @@ void TutorialScene::Update() {
 
 	UpdatePause();
 
+	UpdateEnemy();
+
 	if (!isPause_) {
 		player_->Update(useCamera_);
 		skyBox_->Update(useCamera_);
 		enemy_->Update(*useCamera_);
+		enemyBullet_->Update(*useCamera_);
 	}
 	
 	UpdateTutorialTest();
@@ -54,6 +59,10 @@ void TutorialScene::Draw() {
 	player_->Draw();
 
 	enemy_->Draw();
+	
+	if (isAlive_) {
+		enemyBullet_->Draw();
+	}
 
 	if (isPause_) {
 		pauseBG_->Draw();
@@ -82,10 +91,6 @@ void TutorialScene::Draw() {
 	debugCamera_->DrawImgui();
 
 	player_->DrawImGui();
-
-	enemy_->DrawImGui("ball");
-
-	ImGui::Text("%d", &testState_);
 
 	//skyBox_->DrawImGui();
 
@@ -289,6 +294,66 @@ void TutorialScene::UpdateTutorialTest() {
 	testUIPos_.y = std::clamp(testUIPos_.y, -128.0f, 128.0f);
 	testUI_->SetPosition(testUIPos_);
 	testUI_->Update();
+}
+
+void TutorialScene::UpdateEnemy() {
+
+	// move
+	Vector3 pos = enemy_->GetTranslate();
+
+	if (isUpDownMove_) {
+		pos.y += upDownSpeed_ * deltaTime_;
+		if (pos.y >= 7.0f) {
+			isUpDownMove_ = false;
+		}
+	} else {
+		pos.y -= upDownSpeed_ * deltaTime_;
+		if (pos.y <= 3.0f) {
+			isUpDownMove_ = true;
+		}
+	}
+
+	enemy_->SetTranslate(pos);
+
+	// rotate
+	Vector3 rotate = enemy_->GetRotate();
+
+	if (isAttack_) {
+		isAttackTimer_ += deltaTime_;
+		rotate.z += zRotateSpeed_ * deltaTime_ * 4.0f;
+		if (isAttackTimer_ >= 1.5f) {
+			isAttackTimer_ = 0.0f;
+			isAttack_ = false;
+			isAlive_ = true;
+			enemyBullet_->SetTranslate(enemy_->GetTranslate());
+			bulletVelocity_ = player_->GetWorldPosition() - enemy_->GetWorldPosition();
+			bulletVelocity_ = bulletVelocity_.Normalize();
+		}
+	} else {
+		isAttackTimer_ += deltaTime_;
+		rotate.z += zRotateSpeed_ * deltaTime_;
+		if (isAttackTimer_ >= 5.0f) {
+			isAttackTimer_ = 0.0f;
+			isAttack_ = true;
+		}
+	}
+
+	enemy_->SetRotate(rotate);
+
+	// bulletMove
+	Vector3 bPos = enemyBullet_->GetTranslate();
+	bPos += bulletVelocity_ * bulletSpeed_ * deltaTime_;
+	if (bPos.z <= -50.0f) {
+		isAlive_ = false;
+	}
+	enemyBullet_->SetTranslate(bPos);
+
+	// bulletR
+	Vector3 bRotate = {};
+	rotate.y = std::atan2(bulletVelocity_.x, bulletVelocity_.z);
+	float horizontalLength = std::sqrt(bulletVelocity_.x * bulletVelocity_.x + bulletVelocity_.z * bulletVelocity_.z);
+	rotate.x = std::atan2(-bulletVelocity_.y, horizontalLength);
+	enemyBullet_->SetRotate(bRotate);
 }
 
 void TutorialScene::CameraController() {
