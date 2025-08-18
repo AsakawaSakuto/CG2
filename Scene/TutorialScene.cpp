@@ -7,7 +7,6 @@ void TutorialScene::Initialize() {
 	player_->Initialize(&ctx_->dxCommon);
 
 	skyBox_->Initialize(&ctx_->dxCommon);
-	skyBox_->SetTWallexture("resources/image/wall.png");
 
 	gamePad_ = &ctx_->gamePad;
 
@@ -21,6 +20,8 @@ void TutorialScene::Initialize() {
 
 	testUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tutoUI1.png", { 1280.0f,128.0f });
 	testUI_->SetPosition({ 640.0f,-128.0f });
+
+	enemy_->Initialize(&ctx_->dxCommon, "resources/object3d/Enemy/enemy.obj");
 }
 
 void TutorialScene::Update() {
@@ -34,6 +35,7 @@ void TutorialScene::Update() {
 	if (!isPause_) {
 		player_->Update(useCamera_);
 		skyBox_->Update(useCamera_);
+		enemy_->Update(*useCamera_);
 	}
 	
 	UpdateTutorialTest();
@@ -50,6 +52,8 @@ void TutorialScene::Draw() {
 
 	skyBox_->Draw();
 	player_->Draw();
+
+	enemy_->Draw();
 
 	if (isPause_) {
 		pauseBG_->Draw();
@@ -78,6 +82,8 @@ void TutorialScene::Draw() {
 	debugCamera_->DrawImgui();
 
 	player_->DrawImGui();
+
+	enemy_->DrawImGui("ball");
 
 	ImGui::Text("%d", &testState_);
 

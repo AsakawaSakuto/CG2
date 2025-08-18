@@ -43,6 +43,8 @@ private:
 
 	unique_ptr<Sprite> testUI_ = make_unique<Sprite>();
 
+	unique_ptr<Object3d> enemy_ = make_unique<Object3d>();
+
 	Vector2 testUIPos_ = { 0.0f,0.0f };
 
 	bool testUIClear_ = false;

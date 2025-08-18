@@ -67,7 +67,7 @@ private:
 
 	//--- reticle ---//
 	float reticleSpeed_ = 640.0f;
-	float kDistanceToReticle = 100.0f;
+	float kDistanceToReticle = 80.0f;
 	
 	//--- dash ---//
 	Vector3 dashRotate_ = {};
