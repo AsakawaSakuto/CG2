@@ -7,13 +7,7 @@ void TitleScene::Initialize() {
 	titleUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/title1.png", { 1280.0f,720.0f });
 	titleUI_->SetPosition({ 640.0f,360.0f });
 
-	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/loading.png", { 1280.0f,720.0f });
-	loadingUI_->SetPosition({ 640.0f,360.0f });
-	loadingUI_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });
-
-	fade_->Initialize(&ctx_->dxCommon, "resources/image/fade.png", { 1280.0f,720.0f });
-	fade_->SetPosition({ 640.0f,360.0f });
-	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
+	fade_->Initialize(&ctx_->dxCommon);
 }
 
 void TitleScene::Update() {
@@ -39,7 +33,6 @@ void TitleScene::Draw() {
 
 	titleUI_->Draw();
 	fade_->Draw();
-	loadingUI_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -57,7 +50,6 @@ void TitleScene::Draw() {
 	/*ImGui::ShowDemoWindow();*/
 
 	debugCamera_->DrawImgui();
-	fade_->DrawImGui("q");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
@@ -70,31 +62,20 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::UpdateFade() {
-	if (isFade_) {
-		fadeAlpha_ += 0.5f * deltaTime_;
-		if (fadeAlpha_ >= 1.0f) {
-			if (state_ == kPlay) {
-				goGameScene_ = true;
-			}
-			else if (state_ == kTutorial) {
-				goTutorialScene_ = true;
-			}
+
+	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
+		if (state_ == kPlay) {
+			goGameScene_ = true;
+		} else if (state_ == kTutorial) {
+			goTutorialScene_ = true;
 		}
-	} else {
-		fadeAlpha_ -= 0.5f * deltaTime_;
 	}
 
-	fadeAlpha_ = std::clamp(fadeAlpha_, 0.0f, 1.0f);
-
-	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
 	fade_->Update();
-
-	loadingUI_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });
-	loadingUI_->Update();
 }
 
 void TitleScene::SceneController() {
-	if (!isFade_) {
+	if (!fade_->GetIsFade() && fade_->GetFadeAlpha() <= 0.0f) {
 		switch (state_)
 		{
 		case TitleScene::kPlay:
@@ -106,7 +87,7 @@ void TitleScene::SceneController() {
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
-				isFade_ = true;
+				fade_->SetIsFade(true);
 			}
 
 			break;
@@ -122,7 +103,7 @@ void TitleScene::SceneController() {
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
-				isFade_ = true;
+				fade_->SetIsFade(true);
 			}
 
 			break;

@@ -9,13 +9,7 @@ void GameScene::Initialize() {
 
 	gamePad_ = &ctx_->gamePad;
 
-	fade_->Initialize(&ctx_->dxCommon, "resources/image/fade.png", { 1280.0f,720.0f });
-	fade_->SetPosition({ 640.0f,360.0f });
-	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
-
-	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/loading.png", { 1280.0f,720.0f });
-	loadingUI_->SetPosition({ 640.0f,360.0f });
-	loadingUI_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });
+	fade_->Initialize(&ctx_->dxCommon);
 
 	pauseBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause1.png", { 1280.0f,720.0f });
 	pauseBG_->SetPosition({ 640.0f,360.0f });
@@ -44,9 +38,6 @@ void GameScene::Update() {
 		skyBox_->Update(useCamera_);
 	}
 
-	pauseBG_->Update();
-	pauseUI_->Update();
-
 	UpdateFade();
 }
 
@@ -67,7 +58,6 @@ void GameScene::Draw() {
 	}
 
 	fade_->Draw();
-	loadingUI_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -105,20 +95,10 @@ void GameScene::Draw() {
 }
 
 void GameScene::UpdateFade() {
-	if (isFade_) {
-		fadeAlpha_ += 0.5f * deltaTime_;
-		if (fadeAlpha_ >= 1.0f) {
-			goTitleScene_ = true;
-		}
-	} else {
-		fadeAlpha_ -= 0.5f * deltaTime_;
+	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
+		goTitleScene_ = true;
 	}
-	fadeAlpha_ = std::clamp(fadeAlpha_, 0.0f, 1.0f);
 
-	loadingUI_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });
-	loadingUI_->Update();
-
-	fade_->SetColor({ 0.0f,0.0f,0.0f,fadeAlpha_ });
 	fade_->Update();
 }
 
@@ -149,7 +129,7 @@ void GameScene::UpdatePause() {
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
-				isFade_ = true;
+				fade_->SetIsFade(true);
 			}
 			break;
 		}
@@ -161,6 +141,9 @@ void GameScene::UpdatePause() {
 		}
 		pause_ = kBack;
 	}
+
+	pauseBG_->Update();
+	pauseUI_->Update();
 }
 
 void GameScene::CameraController() {

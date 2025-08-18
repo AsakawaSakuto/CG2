@@ -5,6 +5,7 @@
 #include"Camera.h"
 #include"Gamepad.h"
 #include"playerBullet.h"
+#include"playerBeam.h"
 #include"MatrixFunction.h"
 #include"Particles.h"
 
@@ -35,6 +36,7 @@ private:
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
 	unique_ptr<Object3d> reticle3D_ = make_unique<Object3d>();
 	unique_ptr<Sprite> reticle2D_ = make_unique<Sprite>();
+	unique_ptr<PlayerBeam> beam_ = make_unique<PlayerBeam>();
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	GamePad gamePad_;
@@ -52,6 +54,13 @@ private:
 	float bulletSpawnTime_ = 0.25f;
 	Vector3 bulletVelocity_ = {};
 	float bulletSpeed_ = 100.0f;
+
+	//--- baem ---//
+	float beamChargeTimer_ = 0.0f;
+	float beamChargeTime_ = 1.5f;
+	float beamChargeRadius_ = 0.0f;
+	bool isBeamShot_ = false;
+	Vector3 beamVelocity_ = {};
 
 	//--- reticle ---//
 	float reticleSpeed_ = 640.0f;
@@ -86,6 +95,11 @@ private:
 	float damageTime_ = 0.1f;
 	float damageTimer_ = 0.0f;
 	bool isDamage_ = false;
+
+	unique_ptr<Particles> beamCharge_ = make_unique<Particles>();
+	EmitterSphere beamChargeEmitter_ = {};
+	EmitterRange beamChargeRange_ = {};
+	Vector3 beamChargeOffset_ = { 0.0f,0.0f,2.0f };
 
 	//--- function ---//
 	void Move();

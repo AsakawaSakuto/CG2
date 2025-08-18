@@ -69,8 +69,8 @@ void PlayerBullet::Update(Camera* camera) {
 }
 
 void PlayerBullet::Draw() {
-    model_->Draw();
     if (isAlive_) {
+        model_->Draw();
         smork_->Draw();
     }
 }

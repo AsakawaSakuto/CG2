@@ -16,14 +16,18 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     heal_->Initialize(dxCommon, "resources/image/particle/closs.png", 1);
     damage_->Initialize(dxCommon, "resources/image/particle/star2.png", 1);
 
+    beamCharge_->Initialize(dxCommon, "resources/image/particle/box.png", 1);
+
 	gamePad_.Initialize();
 
     for (int i = 0; i < 32; ++i) {
         auto bullet = std::make_unique<PlayerBullet>();
-        bullet->Initialize(dxCommon_); // 重い処理はここで全部
+        bullet->Initialize(dxCommon_);
         bullet->SetIsAlive(false);
         bullets_.push_back(std::move(bullet));
     }
+
+    beam_->Initialize(dxCommon_);
 
     state_ = NORMAL;
 }
@@ -49,10 +53,14 @@ void Player::Update(Camera* camera) {
     UpdateParticle();
 
 	model_->Update(*camera);
+    beam_->Update(camera);
 
     engineFire_->Update(*camera);
     heal_->Update(*camera);
     damage_->Update(*camera);
+
+    beamCharge_->SetEmitterPosition(model_->GetTranslate());
+    beamCharge_->Update(*camera);
 
     reticle3D_->Update(*camera);
     reticle2D_->Update();
@@ -66,13 +74,15 @@ void Player::Draw() {
             bullet->Draw();
         }
     }
+    beam_->Draw();
 
     engineFire_->Draw();
     heal_->Draw();
     damage_->Draw();
+    beamCharge_->Draw();
 
     reticle2D_->Draw();
-    //reticle3D_->Draw();
+    reticle3D_->Draw();
 }
 
 void Player::DrawImGui() {
@@ -85,6 +95,8 @@ void Player::DrawImGui() {
     //engineFire_->DrawImGui("engineFire");
     //heal_->DrawImGui("h");
     //damage_->DrawImGui("d");
+    beamCharge_->DrawImGui("bc");
+    beam_->DrawImGui();
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -109,6 +121,9 @@ void Player::UpdateReticle(Camera* camera) {
     // 位置を更新（倒し量＝速度）
     position.x += move.x * reticleSpeed_ * deltaTime_;
     position.y -= move.y * reticleSpeed_ * deltaTime_;
+
+    position.x = std::clamp(position.x, 0.0f, 1280.0f);
+    position.y = std::clamp(position.y, 0.0f, 720.0f);
 
     reticle2D_->SetPosition(position);
 
@@ -145,6 +160,9 @@ void Player::UpdateReticle(Camera* camera) {
     Vector3 playerPos = GetWorldPosition();
     bulletVelocity_ = reticleWorldPosition - playerPos;
     bulletVelocity_ = bulletVelocity_.Normalize()/* * bulletSpeed_*/;
+
+    beamVelocity_ = reticleWorldPosition - playerPos;
+    beamVelocity_ = beamVelocity_.Normalize()/* * bulletSpeed_*/;
 }
 
 void Player::Move() {
@@ -202,6 +220,41 @@ void Player::Attack() {
             }
         }
     }
+
+    if (gamePad_.PushButton(GamePad::L) && state_ == NORMAL) {
+        beamChargeTimer_ += deltaTime_;
+        beamChargeRadius_ += deltaTime_;
+        beamCharge_->SetUseEmitter(true);
+        if (beamChargeTimer_ >= beamChargeTime_) {
+            beamChargeTimer_ = beamChargeTime_;
+            isBeamShot_ = true;
+        }
+    }
+
+    if (isBeamShot_) {
+        if (gamePad_.ReleaseButton(GamePad::L) && state_ == NORMAL) {
+            if (!beam_->GetIsAlive()) {
+                beam_->Spawn(model_->GetTranslate(), beamVelocity_);
+                beam_->SetIsAlive(true);
+                isBeamShot_ = false;
+                beamCharge_->SetUseEmitter(false);
+                beamChargeTimer_ = 0.0f;
+                beamChargeRadius_ = 0.0f;
+            }
+        }
+        beamChargeRange_.minColor = { 0.0f,0.0f,0.2f };
+        beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
+    } else {
+        if (gamePad_.ReleaseButton(GamePad::L) && state_ == NORMAL) {
+            beamCharge_->SetUseEmitter(false);
+            beamChargeTimer_ = 0.0f;
+            beamChargeRadius_ = 0.0f;
+        }
+        beamChargeRange_.minColor = { 0.0f,0.0f,0.0f };
+        beamChargeRange_.maxColor = { 1.0f,1.0f,1.0f };
+    }
+
+    beamChargeRadius_ = std::clamp(beamChargeRadius_, 0.0f, 1.5f);
 }
 
 void Player::Action() {
@@ -339,6 +392,25 @@ void Player::UpdateParticle() {
     } else {
         damage_->SetUseEmitter(false);
     }
+
+    //--------------------------------------------//
+
+    beamChargeEmitter_.count = 50;
+    beamChargeEmitter_.radius = beamChargeRadius_;
+    beamChargeEmitter_.frequency = 0.01f;
+    beamChargeEmitter_.isMove = true;
+
+    beamChargeRange_.minScale = { 0.1f,0.1f,0.1f };
+    beamChargeRange_.maxScale = { 1.0f,1.0f,1.0f };
+    beamChargeRange_.minVelocity = { -0.1f,-0.1f,-0.1f };
+    beamChargeRange_.maxVelocity = { 0.1f,0.1f,0.1f };
+    beamChargeRange_.minLifeTime = 0.1f;
+    beamChargeRange_.maxLifeTime = 0.1f;
+
+    beamCharge_->SetEmitterValue(beamChargeEmitter_);
+    beamCharge_->SetEmitterRange(beamChargeRange_);
+    beamCharge_->SetOffSet(beamChargeOffset_);
+    beamCharge_->SetEmitterPosition(model_->GetTranslate());
 }
 
 void Player::Heal() {

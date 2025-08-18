@@ -33,6 +33,7 @@
 
 #include "Player.h"
 #include "SkyBox.h"
+#include "Fade.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -56,16 +57,14 @@ private:
 
 	GamePad* gamePad_ = nullptr;
 
-	bool isFade_ = false;
-	float fadeAlpha_ = 1.0f;
 	float deltaTime_ = 1.0f / 60.0f;
 
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<SkyBox> skyBox_ = make_unique<SkyBox>();
 
-	unique_ptr<Sprite> fade_ = make_unique<Sprite>();
+	unique_ptr<Fade> fade_ = make_unique<Fade>();
+
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
-	unique_ptr<Sprite> loadingUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
 
 	// Cameras

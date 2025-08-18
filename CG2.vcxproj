@@ -54,7 +54,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;$(ProjectDir)Engine\System\GamePad;$(ProjectDir)SceneObject\Character\Player;$(ProjectDir)SceneObject\SkyBox;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;$(ProjectDir)Engine\System\GamePad;$(ProjectDir)SceneObject\Character\Player;$(ProjectDir)SceneObject\SkyBox;$(ProjectDir)SceneObject\Fade;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -80,7 +80,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;$(ProjectDir)Engine\System\GamePad;$(ProjectDir)SceneObject\Character\Player;$(ProjectDir)SceneObject\SkyBox;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;$(ProjectDir)Engine\System\GamePad;$(ProjectDir)SceneObject\Character\Player;$(ProjectDir)SceneObject\SkyBox;$(ProjectDir)SceneObject\Fade;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -116,7 +116,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\System\Utility\Logger\Logger.cpp" />
     <ClCompile Include="Engine\3d\Particles\Particles.cpp" />
     <ClCompile Include="SceneObject\Character\Player\Player.cpp" />
+    <ClCompile Include="SceneObject\Character\Player\PlayerBeam.cpp" />
     <ClCompile Include="SceneObject\Character\Player\PlayerBullet.cpp" />
+    <ClCompile Include="SceneObject\Fade\Fade.cpp" />
     <ClCompile Include="SceneObject\SkyBox\SkyBox.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="main.cpp" />
@@ -184,7 +186,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\ResourceData\PointLight.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleMaterial.h" />
     <ClInclude Include="SceneObject\Character\Player\Player.h" />
+    <ClInclude Include="SceneObject\Character\Player\PlayerBeam.h" />
     <ClInclude Include="SceneObject\Character\Player\PlayerBullet.h" />
+    <ClInclude Include="SceneObject\Fade\Fade.h" />
     <ClInclude Include="SceneObject\SkyBox\SkyBox.h" />
     <ClInclude Include="Scene\AppContext.h" />
     <ClInclude Include="Scene\GameScene.h" />
