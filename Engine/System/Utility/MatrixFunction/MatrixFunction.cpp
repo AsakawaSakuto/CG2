@@ -369,3 +369,23 @@ Vector3 TransformVtoM(const Vector3& v, const Matrix4x4& m) {
 
 	return result;
 }
+
+float Dot_(const Vector3& a, const Vector3& b) {
+	return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+bool IsCollideSphere(const Vector3& centerA, float radiusA,
+	const Vector3& centerB, float radiusB)
+{
+	// 中心間ベクトル
+	Vector3 d = { centerB.x - centerA.x, centerB.y - centerA.y, centerB.z - centerA.z };
+
+	// 中心間距離の二乗
+	float dist2 = Dot_(d, d);
+
+	// 半径の和
+	float r = radiusA + radiusB;
+
+	// 当たり判定：中心間距離 <= 半径の和
+	return dist2 <= (r * r);
+}

@@ -47,3 +47,8 @@ Matrix4x4 TransposeMatrix(const Matrix4x4& m);
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
 
 Vector3 TransformVtoM(const Vector3& v, const Matrix4x4& m);
+
+float Dot_(const Vector3& a, const Vector3& b);
+
+bool IsCollideSphere(const Vector3& centerA, float radiusA,
+	const Vector3& centerB, float radiusB);

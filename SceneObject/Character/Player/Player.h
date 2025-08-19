@@ -31,6 +31,7 @@ public:
 	void Heal();
 
 	void Damage();
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
@@ -112,8 +113,11 @@ private:
 	void UpdateParticle();
 
 	enum State {
-		NORMAL,
-		DASH,
+		NORMAL = 0,
+		DASH = 1,
 	};
 	State state_ = NORMAL;
+
+	public:
+		State GetState() { return state_; }
 };

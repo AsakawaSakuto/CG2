@@ -24,6 +24,7 @@ void TutorialScene::Initialize() {
 	enemy_->Initialize(&ctx_->dxCommon, "resources/object3d/Enemy/enemy.obj");
 	enemy_->SetTranslate({ 0.0f,5.0f,50.0f });
 	enemyBullet_->Initialize(&ctx_->dxCommon, "resources/object3d/Enemy/enemyBullet.obj");
+	enemyBullet_->SetTranslate({ 0.0f,0.0f,-50.0f });
 }
 
 void TutorialScene::Update() {
@@ -43,6 +44,15 @@ void TutorialScene::Update() {
 		enemyBullet_->Update(*useCamera_);
 	}
 	
+	if (player_->GetState() == 0 && isAlive_){
+		if (IsCollideSphere(
+			player_->GetWorldPosition(), 1.0f,
+			enemyBullet_->GetWorldPosition(), 0.5f)) {
+			isAlive_ = false;
+			player_->Damage();
+		}
+	}
+
 	UpdateTutorialTest();
 
 	UpdateFade();

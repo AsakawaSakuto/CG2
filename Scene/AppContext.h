@@ -3,6 +3,7 @@
 #include"DirectXCommon.h"
 #include"Input.h"
 #include"GamePad.h"
+
 struct AppContext {
 	WinApp winApp;
 	DirectXCommon dxCommon;
