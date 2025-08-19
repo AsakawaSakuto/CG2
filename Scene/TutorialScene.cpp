@@ -55,19 +55,17 @@ void TutorialScene::Update() {
 
 	UpdatePause();
 
-	UpdateEnemy();
-
 	UpdateCollision();
 
 	if (!isPause_) {
+		UpdateEnemy();
 		player_->Update(useCamera_);
 		skyBox_->Update(useCamera_);
 		enemy_->Update(*useCamera_);
 		enemyBullet_->Update(*useCamera_);
 		exprotion_->Update(*useCamera_);
+		UpdateTutorialTest();
 	}
-	
-	UpdateTutorialTest();
 
 	UpdateFade();
 }
@@ -113,12 +111,6 @@ void TutorialScene::Draw() {
 	ImGui::NewFrame();
 	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 	/*ImGui::ShowDemoWindow();*/
-
-	debugCamera_->DrawImgui();
-
-	player_->DrawImGui();
-
-	//skyBox_->DrawImGui();
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
@@ -305,15 +297,21 @@ void TutorialScene::UpdateTutorialTest() {
 			testUIPos_ = testUI_->GetPosition();
 			testUIPos_.y -= testUISpeed_ * deltaTime_;
 			if (testUIPos_.y <= -128.0f) {
-				testState_ = Test5;
+				testState_ = Test6;
 				testUIClear_ = false;
 				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-				testUI_->SetTexture("resources/image/UI/tutoUI5.png");
+				testUI_->SetTexture("resources/image/UI/tutoUI6.png");
 			}
-		}
-		else {
+		} else {
 			testUIPos_ = testUI_->GetPosition();
 			testUIPos_.y += testUISpeed_ * deltaTime_;
+		}
+		break;
+	case TutorialScene::Test6:
+		testUIPos_ = testUI_->GetPosition();
+		testUIPos_.y += testUISpeed_ * deltaTime_;
+		if (testUIPos_.y >= 128.0f) {
+			fade_->SetIsFade(true);
 		}
 		break;
 	}
@@ -412,6 +410,13 @@ void TutorialScene::UpdateCollision() {
 				bullet->SetIsAlive(false);
 				enemy_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 			}
+		}
+	}
+
+	if (player_->BeamIsAlive()) {
+		if (IsCollideSphere(player_->BeamWorldPosition(), 1.5f, enemyPos, enemyRadius)) {
+			player_->BeamHit();
+			enemy_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 		}
 	}
 }

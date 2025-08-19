@@ -20,10 +20,16 @@ public:
 	void DrawImGui();
 
 	void Spawn(Vector3 translate, Vector3 velocity);
+	
+	void Hit();
 
 	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }
 
 	bool GetIsAlive() { return isAlive_; }
+
+	Vector3 GetWorldPosition() { return model_->GetWorldPosition(); }
+
+	void SetEmitterRange(EmitterRange range) { beamRange_ = range; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 
@@ -38,6 +44,10 @@ private:
 
 	float time_ = 1.0f;
 	float timer_ = 0.0f;
+
+	float deleteTime_ = 0.15f;
+	float deleteTimer_ = 0.0f;
+	bool isDelete_ = false;
 
 	float speed_ = 300.0f;
 	Vector3 velocity_;

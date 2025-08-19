@@ -33,6 +33,12 @@ public:
 	void Damage();
 
 	std::vector<PlayerBullet*> GetAllBullets();
+
+	void BeamHit() { beam_->Hit(); }
+
+	Vector3 BeamWorldPosition() { return beam_->GetWorldPosition(); }
+
+	bool BeamIsAlive() { return beam_->GetIsAlive(); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
