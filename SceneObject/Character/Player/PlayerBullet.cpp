@@ -28,37 +28,32 @@ void PlayerBullet::Initialize(DirectXCommon* dxCommon) {
 
 void PlayerBullet::Update(Camera* camera) {
 
-    lifeTimer_ += deltaTime_;
-    if (lifeTimer_>=lifeTime_) {
+    if (lifeTimer_ >= lifeTime_) {
         isAlive_ = false;
     }
 
     if (isAlive_) {
+        lifeTimer_ += deltaTime_;
+
         Vector3 scale = model_->GetScale();
         scale.x -= 0.5f * deltaTime_;
         scale.y -= 0.5f * deltaTime_;
         scale.z -= 0.5f * deltaTime_;
         smorkRange_.maxScale = scale;
         model_->SetScale(scale);
-    } else {
-        model_->SetScale({ 1.0f,1.0f,1.0f });
-    }
 
-    if (isAlive_) {
         speed_ += 100.0f * deltaTime_;
-    } else {
-        speed_ = 0.0f;
+        speed_ = std::clamp(speed_, 0.0f, 200.0f);
+
+        Vector3 translate = model_->GetTranslate();
+        translate += velocity_ * speed_ * deltaTime_;
+        model_->SetTranslate(translate);
     }
-    speed_ = std::clamp(speed_, 0.0f, 200.0f);
 
-    Vector3 translate = model_->GetTranslate();
-    translate += velocity_ * speed_ * deltaTime_;
-    model_->SetTranslate(translate);
-
-    Vector3 rotateValue = { 0.0f,0.0f,2.0f };
+    /*Vector3 rotateValue = { 0.0f,0.0f,2.0f };
     Vector3 rotate = model_->GetRotate();
     rotate += rotateValue * deltaTime_;
-    model_->SetRotate(rotate);
+    model_->SetRotate(rotate);*/
 
     smork_->SetEmitterValue(smorkEmitter_);
     smork_->SetEmitterRange(smorkRange_);
@@ -81,8 +76,10 @@ void PlayerBullet::DrawImGui() {
 
 void PlayerBullet::Spawn(Vector3 translate, Vector3 velocity) {
     model_->SetTranslate(translate);
+    model_->SetScale({ 1.0f,1.0f,1.0f });
     isAlive_ = true;
     lifeTimer_ = 0.0f;
+    speed_ = 10.0f;
     velocity_ = velocity;
 
     Vector3 rotate = {};

@@ -32,6 +32,7 @@ public:
 
 	void Damage();
 
+	std::vector<PlayerBullet*> GetAllBullets();
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();

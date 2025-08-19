@@ -25,6 +25,26 @@ void TutorialScene::Initialize() {
 	enemy_->SetTranslate({ 0.0f,5.0f,50.0f });
 	enemyBullet_->Initialize(&ctx_->dxCommon, "resources/object3d/Enemy/enemyBullet.obj");
 	enemyBullet_->SetTranslate({ 0.0f,0.0f,-50.0f });
+
+	exprotion_->Initialize(&ctx_->dxCommon, "resources/image/particle/circle.png", 1);
+	exprotion_->SetUseEmitter(true);
+
+	exprotionEmitter_.isMove = true;
+	exprotionEmitter_.count = 50;
+	exprotionEmitter_.frequency = 0.01f;
+	exprotionEmitter_.radius = 0.1f;
+
+	exprotionRange_.minScale = { 1.0f,1.0f,0.0f };
+	exprotionRange_.maxScale = { 2.5f,2.5f,0.0f };
+	exprotionRange_.minVelocity = { -0.25f,-0.25f,-0.25f };
+	exprotionRange_.maxVelocity = { 0.25f,0.25f,0.25f };
+	exprotionRange_.minColor = { 0.5f,0.1f,0.0f };
+	exprotionRange_.maxColor = { 1.0f,0.3f,0.0f };
+	exprotionRange_.minLifeTime = 0.15f;
+	exprotionRange_.maxLifeTime = 0.3f;
+
+	exprotion_->SetEmitterValue(exprotionEmitter_);
+	exprotion_->SetEmitterRange(exprotionRange_);
 }
 
 void TutorialScene::Update() {
@@ -37,22 +57,16 @@ void TutorialScene::Update() {
 
 	UpdateEnemy();
 
+	UpdateCollision();
+
 	if (!isPause_) {
 		player_->Update(useCamera_);
 		skyBox_->Update(useCamera_);
 		enemy_->Update(*useCamera_);
 		enemyBullet_->Update(*useCamera_);
+		exprotion_->Update(*useCamera_);
 	}
 	
-	if (player_->GetState() == 0 && isAlive_){
-		if (IsCollideSphere(
-			player_->GetWorldPosition(), 0.75f,
-			enemyBullet_->GetWorldPosition(), 0.5f)) {
-			isAlive_ = false;
-			player_->Damage();
-		}
-	}
-
 	UpdateTutorialTest();
 
 	UpdateFade();
@@ -70,6 +84,8 @@ void TutorialScene::Draw() {
 
 	enemy_->Draw();
 	
+	exprotion_->Draw();
+
 	if (isAlive_) {
 		enemyBullet_->Draw();
 	}
@@ -364,6 +380,40 @@ void TutorialScene::UpdateEnemy() {
 	float horizontalLength = std::sqrt(bulletVelocity_.x * bulletVelocity_.x + bulletVelocity_.z * bulletVelocity_.z);
 	rotate.x = std::atan2(-bulletVelocity_.y, horizontalLength);
 	enemyBullet_->SetRotate(bRotate);
+}
+
+void TutorialScene::UpdateCollision() {
+	if (player_->GetState() == 0 && isAlive_) {
+		if (IsCollideSphere(
+			player_->GetWorldPosition(), 0.75f,
+			enemyBullet_->GetWorldPosition(), 0.5f)) {
+			isAlive_ = false;
+			player_->Damage();
+		}
+	}
+
+	exprotion_->SetEmitterPosition({ 0.0f,0.0f,-100.0f });
+	enemy_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
+	const Vector3 enemyPos = enemy_->GetWorldPosition();
+	const float enemyRadius = 1.5f;
+
+	std::vector<PlayerBullet*> bulletPtrs = player_->GetAllBullets();
+
+	for (PlayerBullet* bullet : bulletPtrs) {
+		if (!bullet->GetIsAlive()) continue;
+
+		Vector3 bulletPos = bullet->GetWorldPosition();
+		float bulletRadius = 0.5f;
+
+		if (bullet->GetIsAlive()) {
+			if (IsCollideSphere(bulletPos, bulletRadius, enemyPos, enemyRadius)) {
+				exprotion_->SetEmitterPosition(bullet->GetWorldPosition());
+				bullet->SetIsAlive(false);
+				enemy_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+			}
+		}
+	}
 }
 
 void TutorialScene::CameraController() {

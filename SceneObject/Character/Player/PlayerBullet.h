@@ -25,6 +25,8 @@ public:
 
 	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }
 
+	Vector3 GetWorldPosition() { return model_->GetWorldPosition(); }
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 

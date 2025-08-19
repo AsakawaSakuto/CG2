@@ -431,6 +431,14 @@ void Player::Damage() {
     }
 }
 
+std::vector<PlayerBullet*> Player::GetAllBullets() {
+    std::vector<PlayerBullet*> result;
+    for (auto& bullet : bullets_) {
+        result.push_back(bullet.get()); // unique_ptr → 生ポインタ
+    }
+    return result;
+}
+
 Vector3 Player::GetWorldPosition() {
     Vector3 worldPos = {};
     worldPos.x = model_->GetWorldMatrix().m[3][0];

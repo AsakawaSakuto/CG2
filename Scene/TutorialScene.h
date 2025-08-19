@@ -72,6 +72,10 @@ private:
 	float bulletSpeed_ = 75.0f;
 	Vector3 bulletVelocity_ = {};
 
+	unique_ptr<Particles> exprotion_ = make_unique<Particles>();
+	EmitterSphere exprotionEmitter_ = {};
+	EmitterRange exprotionRange_ = {};
+
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>();
@@ -89,7 +93,8 @@ private:
 
 	void UpdatePause();
 	void UpdateFade();
-	void UpdateTutorialTest();
 	void UpdateEnemy();
+	void UpdateCollision();
+	void UpdateTutorialTest();
 	void CameraController();
 };
