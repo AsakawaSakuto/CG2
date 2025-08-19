@@ -46,7 +46,7 @@ void TutorialScene::Update() {
 	
 	if (player_->GetState() == 0 && isAlive_){
 		if (IsCollideSphere(
-			player_->GetWorldPosition(), 1.0f,
+			player_->GetWorldPosition(), 0.75f,
 			enemyBullet_->GetWorldPosition(), 0.5f)) {
 			isAlive_ = false;
 			player_->Damage();
