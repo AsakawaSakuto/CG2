@@ -7,7 +7,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
     reticle3D_->Initialize(dxCommon_, "resources/object3d/cube.obj");
 
-    reticle2D_->Initialize(dxCommon_, "resources/image/reticle.png", {64.0f,64.0f});
+    reticle2D_->Initialize(dxCommon_, "resources/image/UI/crosshair.png", {64.0f,64.0f});
     reticle2D_->SetPosition({ 640.0f,360.0f });
 
     engineFire_->Initialize(dxCommon, "resources/image/particle/circle.png", 1);
@@ -82,7 +82,7 @@ void Player::Draw() {
     beamCharge_->Draw();
 
     reticle2D_->Draw();
-    reticle3D_->Draw();
+    //reticle3D_->Draw();
 }
 
 void Player::DrawImGui() {

@@ -40,6 +40,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ctx.gamePad.Initialize();
 
 	// シーンの初期化
+
 	scene = Scene::kTitle;
 	titleScene = new TitleScene(&ctx);
 	titleScene->Initialize();
@@ -64,7 +65,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	} // メインループ外
 
-	// 終了
 	delete titleScene;
 	delete gameScene;
 	// nullptrの代入

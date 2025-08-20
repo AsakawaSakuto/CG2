@@ -42,7 +42,7 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	skyBox_->Draw();
+	//skyBox_->Draw();
 	player_->Draw();
 
 	if (isPause_) {
@@ -70,10 +70,6 @@ void GameScene::Draw() {
 	DrawFPS_ImGui();
 
 	debugCamera_->DrawImgui();
-
-	player_->DrawImGui();
-
-	pauseUI_->DrawImGui("ui");
 
 	//skyBox_->DrawImGui();
 
