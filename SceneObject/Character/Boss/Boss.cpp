@@ -5,9 +5,13 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 
 	body_->Initialize(dxCommon_, "resources/object3d/boss/body.obj");
 	body_->SetTranslate({ 0.0f,0.0f,50.0f });
-	left_->Initialize(dxCommon_, "resources/object3d/boss/left.obj");
+	halo_->Initialize(dxCommon_, "resources/object3d/boss/halo.obj");
+	ringL_->Initialize(dxCommon_, "resources/object3d/boss/ringL.obj");
+	ringR_->Initialize(dxCommon_, "resources/object3d/boss/ringR.obj");
+
+	left_->Initialize(dxCommon_, "resources/object3d/boss/armL.obj");
 	left_->SetTranslate({ -10.0f,0.0f,50.0f });
-	right_->Initialize(dxCommon_, "resources/object3d/boss/right.obj");
+	right_->Initialize(dxCommon_, "resources/object3d/boss/armR.obj");
 	right_->SetTranslate({ 10.0f,0.0f,50.0f });
 
 	InitParticle();
@@ -15,6 +19,13 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 
 void Boss::Update(Camera* camera) {
 	body_->Update(*camera);
+	halo_->SetTranslate(body_->GetTranslate());
+	halo_->Update(*camera);
+	ringL_->SetTranslate(body_->GetTranslate());
+	ringL_->Update(*camera);
+	ringR_->SetTranslate(body_->GetTranslate());
+	ringR_->Update(*camera);
+
 	left_->Update(*camera);
 	right_->Update(*camera);
 
@@ -29,6 +40,10 @@ void Boss::Update(Camera* camera) {
 
 void Boss::Draw() {
 	body_->Draw();
+	halo_->Draw();
+	ringL_->Draw();
+	ringR_->Draw();
+
 	left_->Draw();
 	right_->Draw();
 
@@ -37,9 +52,9 @@ void Boss::Draw() {
 }
 
 void Boss::DrawImGui() {
-	body_->DrawImGui("b");
-	leftFire_->DrawImGui("lF");
-	rightFire_->DrawImGui("RF");
+	//body_->DrawImGui("b");
+	//leftFire_->DrawImGui("lF");
+	//rightFire_->DrawImGui("RF");
 }
 
 void Boss::InitParticle() {
