@@ -10,6 +10,9 @@ void Fade::Initialize(DirectXCommon* dxCommon) {
 	loadingUI_->Initialize(dxCommon_, "resources/image/UI/loading.png", { 1280.0f,720.0f });
 	loadingUI_->SetPosition({ 640.0f,360.0f });
 	loadingUI_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });
+
+	fadeAlpha_ = 1.0f;
+	isFade_ = false;
 }
 
 void Fade::Update() {

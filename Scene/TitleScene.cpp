@@ -1,5 +1,9 @@
 #include "TitleScene.h"
 
+void TitleScene::SetAppContext(AppContext* ctx) {
+	ctx_ = ctx;
+}
+
 void TitleScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
 	gamePad_ = &ctx_->gamePad;
@@ -8,6 +12,8 @@ void TitleScene::Initialize() {
 	titleUI_->SetPosition({ 640.0f,360.0f });
 
 	fade_->Initialize(&ctx_->dxCommon);
+
+	State state_ = kPlay;
 }
 
 void TitleScene::Update() {
@@ -24,6 +30,16 @@ void TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
+
+	if (!ctx_) {
+		OutputDebugStringA("ctx_ is nullptr\n");
+		return;
+	}
+
+	if (!ctx_->dxCommon.GetCommandList()) {
+		OutputDebugStringA("commandList_ is nullptr\n");
+		return;
+	}
 
 	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
 
@@ -65,9 +81,9 @@ void TitleScene::UpdateFade() {
 
 	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
 		if (state_ == kPlay) {
-			goGameScene_ = true;
+			IScene::sceneNo = GAME;
 		} else if (state_ == kTutorial) {
-			goTutorialScene_ = true;
+			IScene::sceneNo = TUTORIAL;
 		}
 	}
 
@@ -116,7 +132,7 @@ void TitleScene::SceneController() {
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
-				goQuit_ = true;
+				IScene::sceneNo = -1;
 			}
 
 			break;

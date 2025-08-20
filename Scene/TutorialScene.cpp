@@ -1,5 +1,9 @@
 #include"TutorialScene.h"
 
+void TutorialScene::SetAppContext(AppContext* ctx) {
+	ctx_ = ctx;
+}
+
 void TutorialScene::Initialize() {
 
 	debugCamera_->SetInput(&ctx_->input);
@@ -45,6 +49,22 @@ void TutorialScene::Initialize() {
 
 	exprotion_->SetEmitterValue(exprotionEmitter_);
 	exprotion_->SetEmitterRange(exprotionRange_);
+
+	lX_ = 0.0f;
+	lY_ = 0.0f;
+	rX_ = 0.0f;
+	rY_ = 0.0f;
+	timer_ = 0.0f;
+	testUIPos_ = { 0.0f,0.0f };
+	testUIClear_ = false;
+	isUpDownMove_ = false;
+	isAttack_ = false;
+	isAlive_ = false;
+	isPause_ = false;
+	isAttackTimer_ = 0.0f;
+
+	testState_ = Test1;
+	pause_ = kBack;
 }
 
 void TutorialScene::Update() {
@@ -71,6 +91,17 @@ void TutorialScene::Update() {
 }
 
 void TutorialScene::Draw() {
+
+	if (!ctx_) {
+		OutputDebugStringA("ctx_ is nullptr\n");
+		return;
+	}
+
+	if (!ctx_->dxCommon.GetCommandList()) {
+		OutputDebugStringA("commandList_ is nullptr\n");
+		return;
+	}
+
 	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
 
 	///
@@ -124,7 +155,7 @@ void TutorialScene::Draw() {
 
 void TutorialScene::UpdateFade() {
 	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
-		goTitleScene_ = true;
+		IScene::sceneNo = TITLE;
 	}
 	
 	fade_->Update();

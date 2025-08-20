@@ -1,5 +1,9 @@
 #include "GameScene.h"
 
+void GameScene::SetAppContext(AppContext* ctx) {
+	ctx_ = ctx;
+}
+
 void GameScene::Initialize() {
 
 	debugCamera_->SetInput(&ctx_->input);
@@ -35,6 +39,16 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
+
+	if (!ctx_) {
+		OutputDebugStringA("ctx_ is nullptr\n");
+		return;
+	}
+
+	if (!ctx_->dxCommon.GetCommandList()) {
+		OutputDebugStringA("commandList_ is nullptr\n");
+		return;
+	}
 
 	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
 
@@ -85,7 +99,7 @@ void GameScene::Draw() {
 
 void GameScene::UpdateFade() {
 	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
-		goTitleScene_ = true;
+		IScene::sceneNo = TITLE;
 	}
 
 	fade_->Update();

@@ -1,38 +1,24 @@
 #pragma once
+#include"IScene.h"
 #include"AppContext.h"
-
 #include"DebugCamera.h"
 
 #include "Player.h"
 #include "SkyBox.h"
 #include "Fade.h"
 
-class TutorialScene
+class TutorialScene : public IScene
 {
 public:
-
-	explicit TutorialScene(struct AppContext* ctx) : ctx_(ctx) {}
-
-	void Initialize();
-	void Update();
-	void Draw();
-	bool GoTitleScene() { return goTitleScene_; }
-
+	void SetAppContext(AppContext* ctx) override;
+	void Initialize() override;
+	void Update() override;
+	void Draw() override;
 private:
 	AppContext* ctx_ = nullptr;
 
 	GamePad* gamePad_ = nullptr;
 
-	float lX_ = 0.0f;
-	float lY_ = 0.0f;
-	float rX_ = 0.0f;
-	float rY_ = 0.0f;
-
-	bool goTitleScene_ = false;
-
-	float timer_ = 0.0f;
-
-	float deltaTime_ = 1.0f / 60.0f;
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 
 	unique_ptr<Player> player_ = make_unique<Player>();
@@ -45,6 +31,15 @@ private:
 
 	unique_ptr<Object3d> enemy_ = make_unique<Object3d>();
 	unique_ptr<Object3d> enemyBullet_ = make_unique<Object3d>();
+
+	float lX_ = 0.0f;
+	float lY_ = 0.0f;
+	float rX_ = 0.0f;
+	float rY_ = 0.0f;
+
+	float timer_ = 0.0f;
+
+	float deltaTime_ = 1.0f / 60.0f;
 
 	Vector2 testUIPos_ = { 0.0f,0.0f };
 
@@ -63,7 +58,6 @@ private:
 	Test testState_ = Test1;
 
 	// enemyValue
-
 	bool isUpDownMove_ = false;
 	bool isAttack_ = false;
 	bool isAlive_ = false;

@@ -1,4 +1,6 @@
 #pragma once
+#include "IScene.h"
+
 // Include
 #include "WinApp.h"
 #include "Input.h"
@@ -39,21 +41,14 @@ using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
 using std::make_unique;
 
-class GameScene {
+class GameScene : public IScene  {
 public:
-	explicit GameScene(struct AppContext* ctx) : ctx_(ctx) {}
-
-	void Initialize();
-	void Update();
-	void Draw();
-	bool GoTitleScene() { return goTitleScene_; };
-	bool GoResultScene() { return goResultScene_; }
-	
+	void SetAppContext(AppContext* ctx) override;
+	void Initialize() override;
+	void Update() override;
+	void Draw() override;
 private:
 	AppContext* ctx_ = nullptr;
-
-	bool goTitleScene_ = false; 
-	bool goResultScene_ = false;
 
 	GamePad* gamePad_ = nullptr;
 
