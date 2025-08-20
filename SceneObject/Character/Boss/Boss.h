@@ -4,8 +4,6 @@
 #include"Sprite.h"
 #include"Camera.h"
 #include"Gamepad.h"
-#include"playerBullet.h"
-#include"playerBeam.h"
 #include"MatrixFunction.h"
 #include"Particles.h"
 
@@ -25,4 +23,8 @@ public:
 	void DrawImGui();
 private:
 	DirectXCommon* dxCommon_ = nullptr;
+
+	unique_ptr<Object3d> body_ = make_unique<Object3d>();
+	unique_ptr<Object3d> left_ = make_unique<Object3d>();
+	unique_ptr<Object3d> right_ = make_unique<Object3d>();
 };

@@ -10,6 +10,7 @@ void GameScene::Initialize() {
 
 	player_->Initialize(&ctx_->dxCommon);
 	skyBox_->Initialize(&ctx_->dxCommon);
+	boss_->Initialize(&ctx_->dxCommon);
 
 	gamePad_ = &ctx_->gamePad;
 
@@ -36,6 +37,7 @@ void GameScene::Update() {
 
 	if (!isPause_) {
 		player_->Update(useCamera_);
+		boss_->Update(useCamera_);
 		skyBox_->Update(useCamera_);
 	}
 
@@ -62,6 +64,7 @@ void GameScene::Draw() {
 
 	//skyBox_->Draw();
 	player_->Draw();
+	boss_->Draw();
 
 	if (isPause_) {
 		pauseBG_->Draw();

@@ -34,6 +34,7 @@
 #include"AppContext.h"
 
 #include "Player.h"
+#include "Boss.h"
 #include "SkyBox.h"
 #include "Fade.h"
 
@@ -55,6 +56,8 @@ private:
 	float deltaTime_ = 1.0f / 60.0f;
 
 	unique_ptr<Player> player_ = make_unique<Player>();
+	unique_ptr<Boss> boss_ = make_unique<Boss>();
+
 	unique_ptr<SkyBox> skyBox_ = make_unique<SkyBox>();
 
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
