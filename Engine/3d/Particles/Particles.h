@@ -68,7 +68,7 @@ public:
 	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
 
 	//
-	void SetUseEmitter(bool useEmitter) { useEmitter_ = useEmitter; }
+	void UseEmitter(bool useEmitter) { useEmitter_ = useEmitter; }
 
 	//
 	void SetOffSet(Vector3 offset) { offset_ = offset; }

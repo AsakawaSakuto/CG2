@@ -41,8 +41,8 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 
 	// Emitterのデフォルト値
 	emitter_.count = 1;
-	emitter_.frequency = 0.01f;
-	emitter_.frequencyTime = 0.0f;
+	emitter_.spawnTime = 0.01f;
+	emitter_.spawnTimer = 0.0f;
 	emitter_.translate = { 0.0f, 0.0f, 0.0f };
 	emitter_.radius = 0.01f;
 	emitter_.emit = 0;
@@ -161,7 +161,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("OffSet", &offset_.x, 0.01f);
 	ImGui::DragFloat("SpawnSize", &emitter_.radius, 0.01f, 0.01f, 10.0f);
 	ImGui::DragInt("SpawnCount", &emitter_.count, 1, 0, static_cast<int>(kMaxParticles_));
-	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.01f, 10.0f);
+	ImGui::DragFloat("SpawnInterval", &emitter_.spawnTime, 0.01f, 0.01f, 10.0f);
 
 	bool isMoveFlag = (emitter_.isMove != 0); // uint32_t → bool に変換
 	// ImGui チェックボックス
@@ -197,7 +197,7 @@ void Particles::DrawImGui(const char* objectName) {
 		emitter_.translate = { 0.0f, 0.0f, 0.0f };
 		emitter_.radius = 0.01f;
 		emitter_.count = 1;
-		emitter_.frequency = 0.01f;
+		emitter_.spawnTime = 0.01f;
 
 		emitterRange_.minScale = { 0.1f,0.1f,0.1f };
 		emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
@@ -495,15 +495,15 @@ void Particles::CreateEmitterResource() {
 void Particles::UpdateEmitter() {
 	// このemitterSphereをCBufferとしてGPUへ転送
 	if (useEmitter_) {
-		emitter_.frequencyTime += kDeltaTime_;
-		if (emitter_.frequency <= emitter_.frequencyTime) {
-			emitter_.frequencyTime = 0.0f;
+		emitter_.spawnTimer += kDeltaTime_;
+		if (emitter_.spawnTime <= emitter_.spawnTimer) {
+			emitter_.spawnTimer = 0.0f;
 			emitter_.emit = true;
 		} else {
 			emitter_.emit = false;
 		}
 	} else {
-		emitter_.frequencyTime = 0.0f;
+		emitter_.spawnTimer = 0.0f;
 	}
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.translate += offset_;

@@ -11,7 +11,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     reticle2D_->SetPosition({ 640.0f,360.0f });
 
     engineFire_->Initialize(dxCommon_, "resources/image/particle/circle.png", 1);
-    engineFire_->SetUseEmitter(true);
+    engineFire_->UseEmitter(true);
 
     heal_->Initialize(dxCommon_, "resources/image/particle/closs.png", 1);
     damage_->Initialize(dxCommon_, "resources/image/particle/star2.png", 1);
@@ -232,7 +232,7 @@ void Player::Attack() {
         moveSpeed_ = minSpeed_;
         beamChargeTimer_ += deltaTime_;
         beamChargeRadius_ += deltaTime_;
-        beamCharge_->SetUseEmitter(true);
+        beamCharge_->UseEmitter(true);
         if (beamChargeTimer_ >= beamChargeTime_) {
             beamChargeTimer_ = beamChargeTime_;
             isBeamShot_ = true;
@@ -245,7 +245,7 @@ void Player::Attack() {
                 beam_->Spawn(model_->GetTranslate(), beamVelocity_);
                 beam_->SetIsAlive(true);
                 isBeamShot_ = false;
-                beamCharge_->SetUseEmitter(false);
+                beamCharge_->UseEmitter(false);
                 beamChargeTimer_ = 0.0f;
                 beamChargeRadius_ = 0.0f;
                 moveSpeed_ = maxSpeed_;
@@ -255,7 +255,7 @@ void Player::Attack() {
         beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
     } else {
         if (gamePad_.ReleaseButton(GamePad::L)) {
-            beamCharge_->SetUseEmitter(false);
+            beamCharge_->UseEmitter(false);
             beamChargeTimer_ = 0.0f;
             beamChargeRadius_ = 0.0f;
             moveSpeed_ = maxSpeed_;
@@ -323,7 +323,7 @@ void Player::Action() {
 void Player::UpdateParticle() {
     engineFireEmitter_.count = 2;
     engineFireEmitter_.radius = 0.05f;
-    engineFireEmitter_.frequency = 0.01f;
+    engineFireEmitter_.spawnTime = 0.01f;
     engineFireEmitter_.isMove = true;
 
     engineFireRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -344,7 +344,7 @@ void Player::UpdateParticle() {
 
     healEmitter_.count = 2;
     healEmitter_.radius = 2.f;
-    healEmitter_.frequency = 0.01f;
+    healEmitter_.spawnTime = 0.01f;
     healEmitter_.isMove = true;
 
     healRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -362,21 +362,21 @@ void Player::UpdateParticle() {
     heal_->SetOffSet({ 0.0f,0.5f,0.0f });
 
     if (isHeal_) {
-        heal_->SetUseEmitter(true);
+        heal_->UseEmitter(true);
         healTimer_ += deltaTime_;
         if (healTimer_ >= healTime_) {
             healTimer_ = 0.0f;
             isHeal_ = false;
         }
     } else {
-        heal_->SetUseEmitter(false);
+        heal_->UseEmitter(false);
     }
 
     //--------------------------------------------//
 
     damageEmitter_.count = 5;
     damageEmitter_.radius = 0.01f;
-    damageEmitter_.frequency = 0.01f;
+    damageEmitter_.spawnTime = 0.01f;
     damageEmitter_.isMove = true;
 
     damageRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -393,21 +393,21 @@ void Player::UpdateParticle() {
     damage_->SetEmitterPosition(model_->GetTranslate());
 
     if (isDamage_) {
-        damage_->SetUseEmitter(true);
+        damage_->UseEmitter(true);
         damageTimer_ += deltaTime_;
         if (damageTimer_ >= damageTime_) {
             damageTimer_ = 0.0f;
             isDamage_ = false;
         }
     } else {
-        damage_->SetUseEmitter(false);
+        damage_->UseEmitter(false);
     }
 
     //--------------------------------------------//
 
     beamChargeEmitter_.count = 50;
     beamChargeEmitter_.radius = beamChargeRadius_;
-    beamChargeEmitter_.frequency = 0.01f;
+    beamChargeEmitter_.spawnTime = 0.01f;
     beamChargeEmitter_.isMove = true;
 
     beamChargeRange_.minScale = { 0.1f,0.1f,0.1f };

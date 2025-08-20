@@ -1,13 +1,12 @@
 #pragma once
 #include"Vector3.h"
 
-struct EmitterSphere
-{
+struct EmitterSphere {
 	Vector3 translate;
 	float radius;
 	int count;
-	float frequency;
-	float frequencyTime;
+	float spawnTime;
+	float spawnTimer;
 	uint32_t emit;
 	uint32_t kMaxParticle;
 	uint32_t isMove;

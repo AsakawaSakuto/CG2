@@ -6,11 +6,11 @@ void PlayerBullet::Initialize(DirectXCommon* dxCommon) {
     //model_->SetUseLight(false);
 
     smork_->Initialize(dxCommon_, "resources/image/particle/smork.png", 1);
-    smork_->SetUseEmitter(true);
+    smork_->UseEmitter(true);
 
     smorkEmitter_.count = 1;
     smorkEmitter_.radius = 0.01f;
-    smorkEmitter_.frequency = 0.01f;
+    smorkEmitter_.spawnTime = 0.01f;
     smorkEmitter_.isMove = true;
 
     smorkRange_.minScale = { 0.0f,0.0f,0.0f };

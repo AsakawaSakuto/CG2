@@ -92,6 +92,8 @@ void GameScene::Draw() {
 
 	debugCamera_->DrawImgui();
 
+	boss_->DrawImGui();
+
 	//skyBox_->DrawImGui();
 
 	// Imguiの内部コマンドを生成する

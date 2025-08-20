@@ -31,11 +31,11 @@ void TutorialScene::Initialize() {
 	enemyBullet_->SetTranslate({ 0.0f,0.0f,-50.0f });
 
 	exprotion_->Initialize(&ctx_->dxCommon, "resources/image/particle/circle.png", 1);
-	exprotion_->SetUseEmitter(true);
+	exprotion_->UseEmitter(true);
 
 	exprotionEmitter_.isMove = true;
 	exprotionEmitter_.count = 50;
-	exprotionEmitter_.frequency = 0.01f;
+	exprotionEmitter_.spawnTime = 0.01f;
 	exprotionEmitter_.radius = 0.1f;
 
 	exprotionRange_.minScale = { 1.0f,1.0f,0.0f };

@@ -7,7 +7,7 @@ void PlayerBeam::Initialize(DirectXCommon* dxCommon) {
 	model_->SetTranslate({ 0.0f, 0.0f, -100.0f });
 
 	pBeam_->Initialize(dxCommon_, "resources/image/particle/circle.png", 2);
-	pBeam_->SetUseEmitter(true);
+	pBeam_->UseEmitter(true);
 
 	beamEmitter_.count = 100;
 	beamEmitter_.isMove = true;
