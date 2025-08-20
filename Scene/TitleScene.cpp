@@ -13,7 +13,7 @@ void TitleScene::Initialize() {
 
 	fade_->Initialize(&ctx_->dxCommon);
 
-	State state_ = kPlay;
+	state_ = kPlay;
 }
 
 void TitleScene::Update() {

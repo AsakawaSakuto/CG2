@@ -10,16 +10,17 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     reticle2D_->Initialize(dxCommon_, "resources/image/UI/crosshair.png", {64.0f,64.0f});
     reticle2D_->SetPosition({ 640.0f,360.0f });
 
-    engineFire_->Initialize(dxCommon, "resources/image/particle/circle.png", 1);
+    engineFire_->Initialize(dxCommon_, "resources/image/particle/circle.png", 1);
     engineFire_->SetUseEmitter(true);
 
-    heal_->Initialize(dxCommon, "resources/image/particle/closs.png", 1);
-    damage_->Initialize(dxCommon, "resources/image/particle/star2.png", 1);
+    heal_->Initialize(dxCommon_, "resources/image/particle/closs.png", 1);
+    damage_->Initialize(dxCommon_, "resources/image/particle/star2.png", 1);
 
-    beamCharge_->Initialize(dxCommon, "resources/image/particle/box.png", 1);
+    beamCharge_->Initialize(dxCommon_, "resources/image/particle/box.png", 1);
 
 	gamePad_.Initialize();
 
+    bullets_.clear();
     for (int i = 0; i < 32; ++i) {
         auto bullet = std::make_unique<PlayerBullet>();
         bullet->Initialize(dxCommon_);
