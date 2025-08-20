@@ -30,6 +30,12 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     beam_->Initialize(dxCommon_);
 
     state_ = NORMAL;
+    life_ = 3;
+    moveRotate_ = { 0.0f,0.0f,0.0f };
+    isBeamShot_ = false;
+    isCanDash = true;
+    isHeal_ = false;
+    isDamage_ = false;
 }
 
 void Player::Update(Camera* camera) {

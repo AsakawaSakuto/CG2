@@ -24,6 +24,9 @@ void PlayerBullet::Initialize(DirectXCommon* dxCommon) {
 
     smork_->SetEmitterValue(smorkEmitter_);
     smork_->SetEmitterRange(smorkRange_);
+
+    lifeTimer_ = 0.0f;
+    isAlive_ = false;
 }
 
 void PlayerBullet::Update(Camera* camera) {

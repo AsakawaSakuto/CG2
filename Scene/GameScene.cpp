@@ -20,6 +20,10 @@ void GameScene::Initialize() {
 
 	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause2.png", { 1280.0f,720.0f });
 	pauseUI_->SetPosition({ 640.0f,360.0f });
+
+
+	isPause_ = false;
+	pause_ = kBack;
 }
 
 void GameScene::Update() {

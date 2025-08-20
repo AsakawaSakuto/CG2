@@ -24,6 +24,12 @@ void PlayerBeam::Initialize(DirectXCommon* dxCommon) {
 
 	pBeam_->SetEmitterValue(beamEmitter_);
 	pBeam_->SetEmitterRange(beamRange_);
+
+	isAlive_ = false;
+	isDelete_ = false;
+
+	timer_ = 0.0f;
+	deleteTimer_ = 0.0f;
 }
 
 void PlayerBeam::Update(Camera* camera) {
