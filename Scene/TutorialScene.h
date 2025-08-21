@@ -3,8 +3,6 @@
 #include"AppContext.h"
 #include"DebugCamera.h"
 
-#include "Player.h"
-#include "SkyBox.h"
 #include "Fade.h"
 
 class TutorialScene : public IScene

@@ -33,9 +33,6 @@
 
 #include"AppContext.h"
 
-#include "Player.h"
-#include "Boss.h"
-#include "SkyBox.h"
 #include "Fade.h"
 
 using Microsoft::WRL::ComPtr;
@@ -57,12 +54,32 @@ private:
 
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 
+	unique_ptr<Sprite> reticle2D_ = make_unique<Sprite>();
+
+	unique_ptr<Object3d> yuka_ = make_unique<Object3d>();
+	unique_ptr<Object3d> player1_ = make_unique<Object3d>();
+	unique_ptr<Object3d> player2_ = make_unique<Object3d>();
+
+	// ---------- magic ---------- //
+	unique_ptr<Particles> fire_ = make_unique<Particles>();
+	EmitterSphere fireEmitter_ = {};
+	EmitterRange fireRange_ = {};
+	Vector3 firePos_ = {};
+	Vector3 fireVelocity_ = {};
+	bool fireIsAlive_ = false;
+	const float fireSpeed_ = 10.0f;
+	const float fireLifeTime_ = 5.0f;
+	float fireLifeTimer_ = 0.0f;
+
+	const float kDistanceToReticle = 60.0f;
+
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>();
 	Camera* useCamera_ = nullptr;
 	bool isDebugCamera_ = false;
 
+	void InitParticle();
 	void CameraController();
 	void DrawFPS_ImGui();
 };

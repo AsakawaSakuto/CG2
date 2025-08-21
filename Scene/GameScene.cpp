@@ -11,6 +11,20 @@ void GameScene::Initialize() {
 	gamePad_ = &ctx_->gamePad;
 
 	fade_->Initialize(&ctx_->dxCommon);
+
+	reticle2D_->Initialize(&ctx_->dxCommon, "resources/image/UI/crosshair.png",{64.0f, 64.0f});
+
+	yuka_->Initialize(&ctx_->dxCommon, "resources/object3d/yuka.obj");
+
+	player1_->Initialize(&ctx_->dxCommon, "resources/object3d/human.obj");
+	player1_->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+	player1_->SetTranslate({ 0.0f,0.0f,-30.0f });
+
+	player2_->Initialize(&ctx_->dxCommon, "resources/object3d/human.obj");
+	player2_->SetColor({ 0.0f,0.0f,1.0f,1.0f });
+	player2_->SetTranslate({ 0.0f,0.0f,30.0f });
+
+	InitParticle();
 }
 
 void GameScene::Update() {
@@ -27,6 +41,62 @@ void GameScene::Update() {
 		IScene::sceneNo = TITLE;
 	}
 
+	reticle2D_->SetPosition(ctx_->input.GetMousePos());
+	reticle2D_->Update();
+
+	// ビュー行列、プロジェクション行列、ビューポート行列（もしくは変換行列）を用意
+	Matrix4x4 viewMatrix = useCamera_->GetViewMatrix();
+	Matrix4x4 projectionMatrix = useCamera_->GetProjectionMatrix();
+	Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, WinApp::kClientWidth_, WinApp::kClientHeight_, 0.0f, 1.0f);
+
+	// 各行列の掛け算で合成行列（スクリーン→ビュー→ワールドの変換）を作る
+	Matrix4x4 matVPV = MultiplyMatrix(viewMatrix, MultiplyMatrix(projectionMatrix, viewportMatrix));
+
+	// 合成行列の逆行列を計算
+	Matrix4x4 matInverseVPV = InverseMatrix(matVPV);
+
+	// スクリーン座標（Z=0:ニア, Z=1:ファー）
+	Vector3 posNear = Vector3(reticle2D_->GetPosition().x, reticle2D_->GetPosition().y, 0.0f); // ニアクリップ面上のスクリーン座標
+	Vector3 posFar = Vector3(reticle2D_->GetPosition().x, reticle2D_->GetPosition().y, 1.0f);   // ファークリップ面上のスクリーン座標
+
+	// スクリーン座標 → ワールド座標への変換（合成行列の逆行列を使用）
+	posNear = TransformVtoM(posNear, matInverseVPV); // ワールド空間上のニア点
+	posFar = TransformVtoM(posFar, matInverseVPV);   // ワールド空間上のファー点
+
+	// マウスレイの方向（Far - Near）を求める
+	Vector3 mouseDirection = posFar - posNear;
+	mouseDirection = mouseDirection.Normalize(); // 正規化
+
+	// 任意の距離だけ進めた位置に3Dレティクルを配置
+	Vector3 reticleWorldPosition = posNear + mouseDirection * kDistanceToReticle;
+
+	Vector3 playerPos = player1_->GetWorldPosition();
+	fireVelocity_ = reticleWorldPosition - playerPos;
+	fireVelocity_ = fireVelocity_.Normalize();
+
+	if (ctx_->input.TriggerMouseButtonL()) {
+		if(!fireIsAlive_) {
+			fireIsAlive_ = true;
+			firePos_ = player1_->GetWorldPosition();
+		}
+	} 
+
+	if (fireIsAlive_) {
+		firePos_ += fireVelocity_ * fireSpeed_ * deltaTime_;
+		fireLifeTimer_ += deltaTime_;
+		if (fireLifeTimer_ >= fireLifeTime_) {
+			fireLifeTimer_ = 0.0f;
+			fireIsAlive_ = false;
+		}
+	}
+
+	player1_->Update(*useCamera_);
+	player2_->Update(*useCamera_);
+	yuka_->Update(*useCamera_);
+
+	fire_->SetEmitterPosition(firePos_);
+	fire_->Update(*useCamera_);
+
 	fade_->Update();
 }
 
@@ -38,6 +108,14 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
+	yuka_->Draw();
+
+	player1_->Draw();
+	player2_->Draw();
+
+	fire_->Draw();
+
+	reticle2D_->Draw();
 	fade_->Draw();
 
 	///
@@ -59,8 +137,6 @@ void GameScene::Draw() {
 
 	debugCamera_->DrawImgui();
 
-	//skyBox_->DrawImGui();
-
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 
@@ -71,8 +147,30 @@ void GameScene::Draw() {
 	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
 }
 
+void GameScene::InitParticle() {
+	fire_->Initialize(&ctx_->dxCommon, "resources/image/particle/fire.png", 2);
+	fire_->UseEmitter(true);
+
+	fireEmitter_.count = 10;
+	fireEmitter_.isMove = true;
+	fireEmitter_.radius = 0.01f;
+	fireEmitter_.spawnTime = 0.01f;
+
+	fireRange_.minScale = { 0.1f,0.1f,0.0f };
+	fireRange_.maxScale = { 1.0f,1.0f,0.0f };
+	fireRange_.minVelocity = { -0.05f,-0.01f,-0.05f };
+	fireRange_.maxVelocity = { 0.05f,0.2f,0.05f };
+	fireRange_.minColor = { 0.2f,0.0f,0.0f };
+	fireRange_.maxColor = { 1.0f,0.1f,0.0f };
+	fireRange_.minLifeTime = 0.2f;
+	fireRange_.maxLifeTime = 0.5f;
+
+	fire_->SetEmitterValue(fireEmitter_);
+	fire_->SetEmitterRange(fireRange_);
+}
+
 void GameScene::CameraController() {
-	if (ctx_->input.TriggerKey(DIK_SPACE)) {
+	if (ctx_->input.TriggerKey(DIK_Z)) {
 		if (isDebugCamera_) {
 			isDebugCamera_ = false;
 		} else {

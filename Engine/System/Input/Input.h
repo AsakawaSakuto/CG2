@@ -30,6 +30,7 @@ public:
 
 	void SetMousePosition(LONG x, LONG y);
 	Vector2 GetMouseDelta() const;
+	Vector2 GetMousePos() { return  previousMousePos_; }
 private:
 	WinApp* winApp_ = nullptr;
 	HRESULT result_;

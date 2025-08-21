@@ -33,8 +33,6 @@
 
 #include"AppContext.h"
 
-#include "Player.h"
-#include "SkyBox.h"
 #include "Fade.h"
 
 using Microsoft::WRL::ComPtr;
