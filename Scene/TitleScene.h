@@ -49,13 +49,11 @@ public:
 	void Draw() override;
 private:
 	AppContext* ctx_ = nullptr;
-
-	float deltaTime_ = 1.0f / 60.0f;
-
 	GamePad* gamePad_ = nullptr;
 
-	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
+
+	float deltaTime_ = 1.0f / 60.0f;
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
@@ -63,15 +61,5 @@ private:
 	Camera* useCamera_ = nullptr;
 	bool isDebugCamera_ = false;
 
-	void SceneController();
-	void UpdateFade();
 	void CameraController();
-
-	enum State {
-		kPlay,
-		kTutorial,
-		kQuit,
-	};
-
-	State state_ = kPlay;
 };

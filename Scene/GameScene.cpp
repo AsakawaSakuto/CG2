@@ -8,23 +8,9 @@ void GameScene::Initialize() {
 
 	debugCamera_->SetInput(&ctx_->input);
 
-	player_->Initialize(&ctx_->dxCommon);
-	skyBox_->Initialize(&ctx_->dxCommon);
-	boss_->Initialize(&ctx_->dxCommon);
-
 	gamePad_ = &ctx_->gamePad;
 
 	fade_->Initialize(&ctx_->dxCommon);
-
-	pauseBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause1.png", { 1280.0f,720.0f });
-	pauseBG_->SetPosition({ 640.0f,360.0f });
-
-	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause2.png", { 1280.0f,720.0f });
-	pauseUI_->SetPosition({ 640.0f,360.0f });
-
-
-	isPause_ = false;
-	pause_ = kBack;
 }
 
 void GameScene::Update() {
@@ -33,43 +19,24 @@ void GameScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
-	UpdatePause();
-
-	if (!isPause_) {
-		player_->Update(useCamera_);
-		boss_->Update(useCamera_);
-		skyBox_->Update(useCamera_);
+	if (ctx_->input.TriggerKey(DIK_SPACE)) {
+		fade_->SetIsFade(true);
 	}
 
-	UpdateFade();
+	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
+		IScene::sceneNo = TITLE;
+	}
+
+	fade_->Update();
 }
 
 void GameScene::Draw() {
-
-	if (!ctx_) {
-		OutputDebugStringA("ctx_ is nullptr\n");
-		return;
-	}
-
-	if (!ctx_->dxCommon.GetCommandList()) {
-		OutputDebugStringA("commandList_ is nullptr\n");
-		return;
-	}
 
 	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
 
 	///
 	/// ↓描画処理ここから
 	///
-
-	//skyBox_->Draw();
-	player_->Draw();
-	boss_->Draw();
-
-	if (isPause_) {
-		pauseBG_->Draw();
-		pauseUI_->Draw();
-	}
 
 	fade_->Draw();
 
@@ -92,8 +59,6 @@ void GameScene::Draw() {
 
 	debugCamera_->DrawImgui();
 
-	boss_->DrawImGui();
-
 	//skyBox_->DrawImGui();
 
 	// Imguiの内部コマンドを生成する
@@ -104,58 +69,6 @@ void GameScene::Draw() {
 	///
 
 	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
-}
-
-void GameScene::UpdateFade() {
-	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
-		IScene::sceneNo = TITLE;
-	}
-
-	fade_->Update();
-}
-
-void GameScene::UpdatePause() {
-	if (isPause_) {
-		if (gamePad_->TriggerButton(GamePad::START)) {
-			isPause_ = false;
-		}
-
-		switch (pause_)
-		{
-		case GameScene::kBack:
-			pauseUI_->SetTexture("resources/image/UI/pause2.png");
-
-			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
-				pause_ = kQuit;
-			}
-
-			if (gamePad_->TriggerButton(GamePad::A)) {
-				isPause_ = false;
-			}
-			break;
-		case GameScene::kQuit:
-			pauseUI_->SetTexture("resources/image/UI/pause3.png");
-
-			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
-				pause_ = kBack;
-			}
-
-			if (gamePad_->TriggerButton(GamePad::A)) {
-				fade_->SetIsFade(true);
-			}
-			break;
-		}
-
-	}
-	else {
-		if (gamePad_->TriggerButton(GamePad::START)) {
-			isPause_ = true;
-		}
-		pause_ = kBack;
-	}
-
-	pauseBG_->Update();
-	pauseUI_->Update();
 }
 
 void GameScene::CameraController() {
