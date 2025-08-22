@@ -44,6 +44,7 @@ private:
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
 	unique_ptr<Object3d> reticle3D_ = make_unique<Object3d>();
 	unique_ptr<Sprite> reticle2D_ = make_unique<Sprite>();
+	unique_ptr<Sprite> lifeUI_ = make_unique<Sprite>();
 	unique_ptr<PlayerBeam> beam_ = make_unique<PlayerBeam>();
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
@@ -83,7 +84,7 @@ private:
 	float dashRotateTimer_ = 0.0f;
 	float dashRotateTime_ = 0.49f;
 	float dashDirection_ = 0.0f;
-	float dashCoolTime_ = 3.0f;
+	float dashCoolTime_ = 1.0f;
 	float dashCoolTimer_ = 0.0f;
 	bool isCanDash = true;
 
@@ -118,6 +119,7 @@ private:
 	void Action();
 	void UpdateReticle(Camera* camera);
 	void UpdateParticle();
+	void UpdateLife();
 
 	enum State {
 		NORMAL = 0,

@@ -14,6 +14,8 @@ public:
 
 	void SetPosition(const Vector3& position) { transform_.translate = position; }
 
+	void DrawImgui();
+
 	Vector3& GetScale() { return transform_.scale; }
 	Vector3& GetRotate() { return transform_.rotate; }
 	Vector3& GetTranslate() { return transform_.translate; }

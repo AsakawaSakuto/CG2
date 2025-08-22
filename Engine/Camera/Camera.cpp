@@ -18,6 +18,14 @@ void Camera::Update() {
 	viewProjectionMatrix_ = MultiplyMatrix(viewMatrix_, projectionMatrix_);
 }
 
+void Camera::DrawImgui() {
+
+	ImGui::Begin("Camera Control");
+
+	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
+}
+
 Vector3 Camera::GetWorldPosition() {
 	// ワールド座標を入れる変数
 	Vector3 worldPos;

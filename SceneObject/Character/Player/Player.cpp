@@ -5,6 +5,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	model_->Initialize(dxCommon_, "resources/object3d/player/player.obj");
 
+    lifeUI_->Initialize(dxCommon_, "resources/image/UI/life3.png", { 1280.0f,720.0f });
+    lifeUI_->SetPosition({ 640.0f,360.0f });
+
     reticle3D_->Initialize(dxCommon_, "resources/object3d/cube.obj");
 
     reticle2D_->Initialize(dxCommon_, "resources/image/UI/crosshair.png", {64.0f,64.0f});
@@ -59,6 +62,8 @@ void Player::Update(Camera* camera) {
 
     UpdateParticle();
 
+    UpdateLife();
+
 	model_->Update(*camera);
     beam_->Update(camera);
 
@@ -87,6 +92,8 @@ void Player::Draw() {
     heal_->Draw();
     damage_->Draw();
     beamCharge_->Draw();
+
+    lifeUI_->Draw();
 
     reticle2D_->Draw();
     //reticle3D_->Draw();
@@ -421,6 +428,28 @@ void Player::UpdateParticle() {
     beamCharge_->SetEmitterRange(beamChargeRange_);
     beamCharge_->SetOffSet(beamChargeOffset_);
     beamCharge_->SetEmitterPosition(model_->GetTranslate());
+}
+
+void Player::UpdateLife() {
+    if (life_ <= 0) {
+        life_ = 0;
+    }
+
+    if (life_ >= 3) {
+        life_ = 3;
+    }
+
+    if (life_ == 3) {
+        lifeUI_->SetTexture("resources/image/UI/life3.png");
+    } else if (life_ == 2) {
+        lifeUI_->SetTexture("resources/image/UI/life2.png");
+    } else if (life_ == 1) {
+        lifeUI_->SetTexture("resources/image/UI/life1.png");
+    } else if (life_ == 0) {
+        lifeUI_->SetTexture("resources/image/UI/life0.png");
+    }
+
+    lifeUI_->Update();
 }
 
 void Player::Heal() {
