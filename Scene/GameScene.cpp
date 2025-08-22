@@ -8,8 +8,14 @@ void GameScene::Initialize() {
 
 	debugCamera_->SetInput(&ctx_->input);
 
+	cameraRx_ = -0.5f;
+	camera_->SetRotate({ cameraRx_,0.0f,0.0f });
+
 	player_->Initialize(&ctx_->dxCommon);
 	skyBox_->Initialize(&ctx_->dxCommon);
+
+	bossTy_ = 50.0f;
+	boss_->UseFire(false);
 	boss_->Initialize(&ctx_->dxCommon);
 
 	gamePad_ = &ctx_->gamePad;
@@ -23,23 +29,54 @@ void GameScene::Initialize() {
 	pauseUI_->SetPosition({ 640.0f,360.0f });
 
 	isStart = false;
+	startTimer_ = 0.0f;
 
 	isPause_ = false;
 	pause_ = kBack;
+
+	state_ = kStart;
 }
 
 void GameScene::Update() {
-
 	gamePad_->Update();
 	ctx_->input.Update();
 	CameraController();
 
 	UpdatePause();
 
-	if (!isPause_) {
-		player_->Update(useCamera_);
-		boss_->Update(useCamera_);
-		skyBox_->Update(useCamera_);
+	switch (state_) {
+	case GameScene::kStart:
+		if (!isPause_) {
+			if (!isStart) {
+				startTimer_ += deltaTime_;
+
+				cameraRx_ += deltaTime_ * cameraRxSpeed_;
+				cameraRx_ = std::clamp(cameraRx_, -0.5f, 0.0f);
+				camera_->SetRotate({ cameraRx_,0.0f,0.0f });
+
+				bossTy_ -= deltaTime_ * bossTySpeed_;
+				boss_->SetBodyTlansrate({ 0.0f,bossTy_ ,50.0f });
+				if (startTimer_ >= startTime_) {
+					startTimer_ = 0.0f;
+					isStart = true;
+					boss_->UseFire(true);
+					state_ = kPlay;
+				}
+			}
+			player_->Update(useCamera_);
+			boss_->Update(useCamera_);
+			skyBox_->Update(useCamera_);
+		}
+		break;
+	case GameScene::kPlay:
+
+		if (!isPause_) {
+			player_->Update(useCamera_);
+			boss_->Update(useCamera_);
+			skyBox_->Update(useCamera_);
+		}
+
+		break;
 	}
 
 	UpdateFade();

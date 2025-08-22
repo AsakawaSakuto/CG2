@@ -21,6 +21,12 @@ public:
 	void Draw();
 
 	void DrawImGui();
+
+	Vector3 GetBodyWorldPos() { return body_->GetWorldPosition(); }
+
+	void SetBodyTlansrate(Vector3 tlansrate) { body_->SetTranslate(tlansrate); }
+
+	void UseFire(bool use) { leftFire_->UseEmitter(use); rightFire_->UseEmitter(use); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 
@@ -38,6 +44,8 @@ private:
 
 	const float bodyRadius_ = 3.0f;
 	const float armRadius_ = 2.0f;
+
+	bool isStart_ = false;
 
 	void InitParticle();
 };

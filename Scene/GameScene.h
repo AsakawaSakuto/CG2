@@ -66,8 +66,14 @@ private:
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
 
 	bool isStart = false;
+	float startTimer_ = 0.0f;
+	const float startTime_ = 5.0f;
 
+	float bossTy_ = 50.0f;
+	const float bossTySpeed_ = 10.0f;
 	// Cameras
+	float cameraRx_ = -0.5f;
+	const float cameraRxSpeed_ = 0.1f;
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>();
 	Camera* useCamera_ = nullptr;
@@ -81,6 +87,13 @@ private:
 	};
 
 	Pause pause_ = kBack;
+
+	enum State {
+		kStart,
+		kPlay,
+	};
+
+	State state_ = kStart;
 
 	void UpdatePause();
 	void UpdateFade();

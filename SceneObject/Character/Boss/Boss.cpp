@@ -4,7 +4,7 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
 	body_->Initialize(dxCommon_, "resources/object3d/boss/body.obj");
-	body_->SetTranslate({ 0.0f,0.0f,50.0f });
+	body_->SetTranslate({ 0.0f,50.0f,50.0f });
 	halo_->Initialize(dxCommon_, "resources/object3d/boss/halo.obj");
 	ringL_->Initialize(dxCommon_, "resources/object3d/boss/ringL.obj");
 	ringR_->Initialize(dxCommon_, "resources/object3d/boss/ringR.obj");
@@ -13,6 +13,8 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	left_->SetTranslate({ -10.0f,0.0f,50.0f });
 	right_->Initialize(dxCommon_, "resources/object3d/boss/armR.obj");
 	right_->SetTranslate({ 10.0f,0.0f,50.0f });
+
+	isStart_ = false;
 
 	InitParticle();
 }
@@ -52,9 +54,9 @@ void Boss::Draw() {
 }
 
 void Boss::DrawImGui() {
-	//body_->DrawImGui("b");
-	//leftFire_->DrawImGui("lF");
-	//rightFire_->DrawImGui("RF");
+	body_->DrawImGui("b");
+	leftFire_->DrawImGui("lF");
+	rightFire_->DrawImGui("RF");
 }
 
 void Boss::InitParticle() {
@@ -66,9 +68,7 @@ void Boss::InitParticle() {
 	fireEmitter_.radius = 0.01f;
 	fireEmitter_.spawnTime = 0.1f;
 	leftFire_->SetEmitterValue(fireEmitter_);
-	leftFire_->UseEmitter(true);
 	rightFire_->SetEmitterValue(fireEmitter_);
-	rightFire_->UseEmitter(true);
 
 	fireRange_.minScale = { 0.1f,0.1f,0.0f };
 	fireRange_.maxScale = { 1.25f,1.25f,0.0f };

@@ -16,6 +16,8 @@ public:
 
 	void DrawImgui();
 
+	void SetRotate(Vector3 rotate) { transform_.rotate = rotate; }
+
 	Vector3& GetScale() { return transform_.scale; }
 	Vector3& GetRotate() { return transform_.rotate; }
 	Vector3& GetTranslate() { return transform_.translate; }
