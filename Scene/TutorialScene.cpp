@@ -93,16 +93,6 @@ void TutorialScene::Update() {
 
 void TutorialScene::Draw() {
 
-	if (!ctx_) {
-		OutputDebugStringA("ctx_ is nullptr\n");
-		return;
-	}
-
-	if (!ctx_->dxCommon.GetCommandList()) {
-		OutputDebugStringA("commandList_ is nullptr\n");
-		return;
-	}
-
 	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
 
 	///

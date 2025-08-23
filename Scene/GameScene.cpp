@@ -29,10 +29,33 @@ void GameScene::Initialize() {
 	pauseUI_->SetPosition({ 640.0f,360.0f });
 
 	skydome_->Initialize(&ctx_->dxCommon, "resources/object3d/skydome.obj");
+	skydome_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
 	InitLoad();
 
 	InitBuilding();
+
+    #pragma region InitP
+	exprotion_->Initialize(&ctx_->dxCommon, "resources/image/particle/circle.png", 1);
+	exprotion_->UseEmitter(true);
+
+	exprotionEmitter_.isMove = true;
+	exprotionEmitter_.count = 50;
+	exprotionEmitter_.spawnTime = 0.01f;
+	exprotionEmitter_.radius = 0.1f;
+
+	exprotionRange_.minScale = { 1.0f,1.0f,0.0f };
+	exprotionRange_.maxScale = { 2.5f,2.5f,0.0f };
+	exprotionRange_.minVelocity = { -0.25f,-0.25f,-0.25f };
+	exprotionRange_.maxVelocity = { 0.25f,0.25f,0.25f };
+	exprotionRange_.minColor = { 0.5f,0.1f,0.0f };
+	exprotionRange_.maxColor = { 1.0f,0.3f,0.0f };
+	exprotionRange_.minLifeTime = 0.15f;
+	exprotionRange_.maxLifeTime = 0.3f;
+
+	exprotion_->SetEmitterValue(exprotionEmitter_);
+	exprotion_->SetEmitterRange(exprotionRange_);
+#pragma endregion
 
 	isStart = false;
 	startTimer_ = 0.0f;
@@ -121,9 +144,12 @@ void GameScene::Update() {
 	case GameScene::kPlay:
 
 		if (!isPause_) {
+			UpdateCollision();
+
 			player_->Update(useCamera_);
 			boss_->SetPlayerPos(player_->GetWorldPosition());
 			boss_->Update(useCamera_);
+			exprotion_->Update(*useCamera_);
 
 			UpdateBuilding();
 			UpdateLoad();
@@ -189,6 +215,8 @@ void GameScene::Draw() {
 	player_->Draw();
 	boss_->Draw();
 
+	exprotion_->Draw();
+
 	if (isPause_) {
 		pauseBG_->Draw();
 		pauseUI_->Draw();
@@ -227,6 +255,54 @@ void GameScene::Draw() {
 	///
 
 	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
+}
+
+void GameScene::UpdateCollision() {
+	// プレイヤーがダメージを受ける側
+	if (player_->GetState() == 0) {
+		if (IsCollideSphere(
+			player_->GetWorldPosition(), 0.75f,
+			boss_->GetBossBulletPos(), 0.5f)) {
+			player_->Damage();
+			boss_->BulletHit();
+		}
+
+		if (IsCollideSphere(
+			player_->GetWorldPosition(), 0.75f,
+			boss_->GetArmPosL(), 1.0f)) {
+			player_->Damage();
+		}
+
+		if (IsCollideSphere(
+			player_->GetWorldPosition(), 0.75f,
+			boss_->GetArmPosR(), 1.0f)) {
+			player_->Damage();
+		}
+	}
+
+	// 敵がダメージを受ける側
+	exprotion_->SetEmitterPosition({ 0.0f,0.0f,-100.0f });
+	std::vector<PlayerBullet*> bulletPtrs = player_->GetAllBullets();
+
+	for (PlayerBullet* bullet : bulletPtrs) {
+		if (!bullet->GetIsAlive()) continue;
+
+		Vector3 bulletPos = bullet->GetWorldPosition();
+		float bulletRadius = 0.5f;
+
+		if (bullet->GetIsAlive()) {
+			if (IsCollideSphere(bulletPos, bulletRadius, boss_->GetBodyWorldPos(), 2.0f)) {
+				exprotion_->SetEmitterPosition(bullet->GetWorldPosition());
+				bullet->SetIsAlive(false);
+			}
+		}
+	}
+
+	if (player_->BeamIsAlive()) {
+		if (IsCollideSphere(player_->BeamWorldPosition(), 1.5f, boss_->GetBodyWorldPos(), 2.0f)) {
+			player_->BeamHit();
+		}
+	}
 }
 
 void GameScene::UpdateFade() {

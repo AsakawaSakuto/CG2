@@ -34,6 +34,13 @@ public:
 	void SetPlayerPos(Vector3 pPos) { playerPos_ = pPos; }
 
 	void SetIsStart(bool isStart) { isStart_ = isStart; }
+
+	Vector3 GetBossBulletPos() { return bullet_->GetPos(); }
+
+	Vector3 GetArmPosL() { return arm_->GetArmPosL(); }
+	Vector3 GetArmPosR() { return arm_->GetArmPosR(); }
+
+	void BulletHit() { bullet_->Hit(); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 

@@ -27,6 +27,9 @@ public:
 	void SetBossPos(Vector3 bPos) { bossPos_ = bPos; }
 
 	void InitParticle();
+
+	Vector3 GetArmPosL() { return armL_->GetWorldPosition(); }
+	Vector3 GetArmPosR() { return armR_->GetWorldPosition(); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 

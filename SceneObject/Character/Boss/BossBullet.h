@@ -32,6 +32,8 @@ public:
 	void SetTranslate(Vector3 t) { model_->SetTranslate(t); }
 
 	bool GetIsMove() { return isMove_; }
+
+	Vector3 GetPos() { return model_->GetWorldPosition(); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 

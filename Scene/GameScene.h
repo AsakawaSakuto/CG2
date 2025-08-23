@@ -65,6 +65,10 @@ private:
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
 
+	unique_ptr<Particles> exprotion_ = make_unique<Particles>();
+	EmitterSphere exprotionEmitter_ = {};
+	EmitterRange exprotionRange_ = {};
+
 	bool isStart = false;
 	float startTimer_ = 0.0f;
 	const float startTime_ = 5.0f;
@@ -96,9 +100,10 @@ private:
 	State state_ = kStart;
 
 	void InitLoad();
-	void UpdateLoad();
 	void InitBuilding();
+	void UpdateLoad();
 	void UpdateBuilding();
+	void UpdateCollision();
 	void DrawObject();
 	const float builSpeed_ = 50.0f;
 	const float backLine_ = 0.0f;

@@ -52,6 +52,10 @@ private:
 
 	GamePad gamePad_;
 
+	bool isInvincible_ = false;
+	float invincibleTimer_ = 0.0f;
+	const float invincibleTime_ = 1.0f;
+
 	bool useGamePad_ = false;
 	int life_ = 3;
 

@@ -41,12 +41,22 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     isHeal_ = false;
     isDamage_ = false;
     useGamePad_ = false;
+    isInvincible_ = false;
+    invincibleTimer_ = 0.0f;
 }
 
 void Player::Update(Camera* camera) {
 
     if (useGamePad_) {
         gamePad_.Update();
+    }
+
+    if (isInvincible_) {
+        invincibleTimer_ += deltaTime_;
+        if (invincibleTimer_ >= invincibleTime_) {
+            isInvincible_ = false;
+            invincibleTimer_ = 0.0f;
+        }
     }
 
 	Move();
@@ -468,8 +478,9 @@ void Player::Heal() {
 }
 
 void Player::Damage() {
-    if (!isDamage_) {
+    if (!isDamage_ && !isInvincible_) {
         isDamage_ = true;
+        isInvincible_ = true;
         gamePad_.SetVibration(1.0f, 1.0f, 0.5f);
         life_--;
     }
