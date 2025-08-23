@@ -28,7 +28,7 @@ void BossBullet::Update(Camera* camera) {
 
     if (isMove_) {
         Vector3 translate = model_->GetTranslate();
-        translate += velocity_ * speed_ * deltaTime_;
+        translate += velocity_ * speed_ * deltaTime_ * -1.0f;
         model_->SetTranslate(translate);
         lifeTimer_ += deltaTime_;
         if (lifeTimer_ >= lifeTime_) {

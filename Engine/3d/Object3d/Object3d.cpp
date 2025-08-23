@@ -305,7 +305,7 @@ void Object3d::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = true;
 	materialData_->uvTransform = MakeIdentityMatrix();
-	materialData_->shininess =30.0f;
+	materialData_->shininess = 100.0f;
 }
 
 void Object3d::CreateTransformationResource() {

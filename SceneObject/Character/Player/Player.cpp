@@ -99,7 +99,7 @@ void Player::Draw() {
     lifeUI_->Draw();
 
     reticle2D_->Draw();
-    //reticle3D_->Draw();
+    reticle3D_->Draw();
 }
 
 void Player::DrawImGui() {
@@ -107,7 +107,7 @@ void Player::DrawImGui() {
     //ImGui::DragFloat("BullerSpeed", &bulletSpeed_, 1.0f);
     //ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
     //ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
-    //ImGui::DragFloat3("fireOffset", &engineFireOffset_.x, 0.01f);
+    //ImGui::DragFloat3("player", &engineFireOffset_.x, 0.01f);
     //model_->DrawImGui("player");
     //engineFire_->DrawImGui("engineFire");
     //heal_->DrawImGui("h");
@@ -208,18 +208,14 @@ void Player::Move() {
         translate.x = std::clamp(translate.x, -9.5f, 9.5f);
         translate.y = std::clamp(translate.y, -1.0f, 9.0f);
 
-        // 実機の傾き
-        moveRotate_.y -= move.x * moveRotateSpeed_.x * deltaTime_;
-        moveRotate_.x += move.y * moveRotateSpeed_.y * deltaTime_;
-
-        moveRotate_.x = std::clamp(moveRotate_.x, -0.3f, 0.3f);
-        moveRotate_.y = std::clamp(moveRotate_.y, -0.3f, 0.3f);
-
-        engineFireOffset_.x = moveRotate_.y * -1.0f;;
-        engineFireOffset_.y = moveRotate_.x;
-
-        model_->SetRotate(moveRotate_);
         model_->SetTranslate(translate);
+
+        Vector3 velocity = reticle3D_->GetWorldPosition() - GetWorldPosition();
+        Vector3 rotate = model_->GetRotate();
+        rotate.y = std::atan2(velocity.x, velocity.z);
+        float horizontalLength = std::sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+        rotate.x = std::atan2(-velocity.y, horizontalLength);
+        model_->SetRotate(rotate);
     }
 }
 
@@ -348,6 +344,15 @@ void Player::UpdateParticle() {
     engineFire_->SetEmitterValue(engineFireEmitter_);
     engineFire_->SetEmitterRange(engineFireRange_);
     engineFire_->SetEmitterPosition(model_->GetTranslate());
+
+    Vector3 playerRot = model_->GetRotate();
+    const float scaleTY = 0.41f / 0.43f;
+    const float scaleTX = 0.75f / 0.72f;
+    Vector3 emitterOffset = { 0.0f, 0.0f,-1.5f };
+    emitterOffset.y = playerRot.x * scaleTY;
+    emitterOffset.x = playerRot.y * scaleTX;
+    emitterOffset.x *= -1.0f;
+    engineFireOffset_ = emitterOffset;
     engineFire_->SetOffSet(engineFireOffset_);
     
     //--------------------------------------------//

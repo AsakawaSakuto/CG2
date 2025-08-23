@@ -104,8 +104,8 @@ void Boss::Draw() {
 }
 
 void Boss::DrawImGui() {
-	body_->DrawImGui("b");
-	arm_->DrawImGui();
+	//body_->DrawImGui("b");
+	//arm_->DrawImGui();
 }
 
 void Boss::InitParticle() {
@@ -135,17 +135,17 @@ void Boss::InitParticle() {
 }
 
 void Boss::UpdateHalo() {
-	Vector3 velo = playerPos_ - halo_->GetWorldPosition() -= {0.0f, 10.0f, 0.0f};
+	Vector3 velo = halo_->GetWorldPosition() - playerPos_ += {0.0f, 7.5f, 0.0f};
 	if (!bullet_->GetIsMove()) {
 		bullet_->SetVelocity(velo); 
-		bullet_->SetTranslate(halo_->GetTranslate() += {0.0f, 10.0f, 0.0f});
+		bullet_->SetTranslate(halo_->GetTranslate() += {0.0f, 7.5f, 0.0f});
 	}
 
 	if (haloIsShot_) {
 		haloSpinSpeed_ = 10.0f;
 		bulletShotTimer_ += deltaTime_;
 		if (bulletShotTimer_ >= 1.0f) {
-			bullet_->Spawn(halo_->GetTranslate() += {0.0f,10.0f,0.0f}, velo);
+			bullet_->Spawn(halo_->GetTranslate() += {0.0f, 7.5f,0.0f}, velo);
 			bulletShotTimer_ = 0.0f;
 			haloIsShot_ = false;
 		}

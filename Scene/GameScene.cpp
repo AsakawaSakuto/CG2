@@ -126,6 +126,7 @@ void GameScene::Draw() {
 	camera_->DrawImgui();
 
 	boss_->DrawImGui();
+	player_->DrawImGui();
 
 	//skyBox_->DrawImGui();
 
