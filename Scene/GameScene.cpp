@@ -61,6 +61,7 @@ void GameScene::Update() {
 					startTimer_ = 0.0f;
 					isStart = true;
 					boss_->UseFire(true);
+					boss_->SetIsStart(true);
 					player_->UseGamePad(true);
 					state_ = kPlay;
 				}

@@ -116,6 +116,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\System\Utility\Logger\Logger.cpp" />
     <ClCompile Include="Engine\3d\Particles\Particles.cpp" />
     <ClCompile Include="SceneObject\Character\Boss\Boss.cpp" />
+    <ClCompile Include="SceneObject\Character\Boss\BossArm.cpp" />
     <ClCompile Include="SceneObject\Character\Boss\BossBullet.cpp" />
     <ClCompile Include="SceneObject\Character\Player\Player.cpp" />
     <ClCompile Include="SceneObject\Character\Player\PlayerBeam.cpp" />
@@ -190,6 +191,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\ResourceData\PointLight.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleMaterial.h" />
     <ClInclude Include="SceneObject\Character\Boss\Boss.h" />
+    <ClInclude Include="SceneObject\Character\Boss\BossArm.h" />
     <ClInclude Include="SceneObject\Character\Boss\BossBullet.h" />
     <ClInclude Include="SceneObject\Character\Player\Player.h" />
     <ClInclude Include="SceneObject\Character\Player\PlayerBeam.h" />

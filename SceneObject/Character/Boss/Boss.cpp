@@ -9,12 +9,8 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	ringL_->Initialize(dxCommon_, "resources/object3d/boss/ringL.obj");
 	ringR_->Initialize(dxCommon_, "resources/object3d/boss/ringR.obj");
 
-	armL_->Initialize(dxCommon_, "resources/object3d/boss/armL.obj");
-	armL_->SetTranslate({ -10.0f,0.0f,50.0f });
-	armR_->Initialize(dxCommon_, "resources/object3d/boss/armR.obj");
-	armR_->SetTranslate({ 10.0f,0.0f,50.0f });
-
 	bullet_->Initialize(dxCommon_);
+	arm_->Initialize(dxCommon_);
 
 	isStart_ = false;
 
@@ -23,6 +19,9 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	bulletShotTimer_ = 0.0f;
 	haloIsShot_ = false;
 
+	time_ = 0.0f;
+	startPosition_ = {};
+
 	InitParticle();
 }
 
@@ -30,16 +29,49 @@ void Boss::Update(Camera* camera) {
 	UpdateHalo();
 	bullet_->Update(camera);
 
+	arm_->SetBossPos(body_->GetWorldPosition());
+	arm_->Update(camera);
+
+	if (isStart_) {
+		// 初回だけ現在のワールド座標を初期位置として記録
+		if (time_ == 0.0f) {
+			startPosition_ = body_->GetWorldPosition();
+		}
+
+		// 経過時間を更新
+		time_ += deltaTime_;
+
+		// 移動範囲（振幅）
+		const float ampX = 20.0f; // X方向 ±20
+		const float ampY = 8.0f;  // Y方向 ±10
+
+		// 周期（秒）
+		const float periodX = 20.0f; // Xはn秒で1往復
+		const float periodY = 7.5f;  // Yはn秒で1往復
+
+		// 角速度（2πで1周期）
+		const float omegaX = 2.0f * 3.141592f / periodX;
+		const float omegaY = 2.0f * 3.141592f / periodY;
+
+		Vector3 translate = startPosition_;
+
+		// Xはsin、Yはsinで中心から動かす
+		translate.x = startPosition_.x + ampX * std::sin(omegaX * time_);
+		translate.y = startPosition_.y + ampY * std::sin(omegaY * time_);
+		translate.z = startPosition_.z;
+
+		body_->SetTranslate(translate);
+	}
+
 	body_->Update(*camera);
+
 	halo_->SetTranslate(body_->GetTranslate());
 	halo_->Update(*camera);
+
 	ringL_->SetTranslate(body_->GetTranslate());
 	ringL_->Update(*camera);
 	ringR_->SetTranslate(body_->GetTranslate());
 	ringR_->Update(*camera);
-
-	armL_->Update(*camera);
-	armR_->Update(*camera);
 
 	leftFire_->SetEmitterPosition(body_->GetTranslate());
 	leftFire_->SetOffSet({ -2.0f,-3.0f,0.0f });
@@ -52,14 +84,12 @@ void Boss::Update(Camera* camera) {
 
 void Boss::Draw() {
 	bullet_->Draw();
+	arm_->Draw();
 
 	body_->Draw();
 	halo_->Draw();
 	ringL_->Draw();
 	ringR_->Draw();
-
-	armL_->Draw();
-	armR_->Draw();
 
 	leftFire_->Draw();
 	rightFire_->Draw();
@@ -67,8 +97,7 @@ void Boss::Draw() {
 
 void Boss::DrawImGui() {
 	body_->DrawImGui("b");
-	armL_->DrawImGui("armL");
-	armR_->DrawImGui("armR");
+	arm_->DrawImGui();
 }
 
 void Boss::InitParticle() {

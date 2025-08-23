@@ -8,6 +8,7 @@
 #include"Particles.h"
 
 #include"BossBullet.h"
+#include"BossArm.h"
 
 #include <list>
 
@@ -31,12 +32,12 @@ public:
 	void UseFire(bool use) { leftFire_->UseEmitter(use); rightFire_->UseEmitter(use); }
 
 	void SetPlayerPos(Vector3 pPos) { playerPos_ = pPos; }
+
+	void SetIsStart(bool isStart) { isStart_ = isStart; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 
 	unique_ptr<Object3d> body_ = make_unique<Object3d>();
-	unique_ptr<Object3d> armL_ = make_unique<Object3d>();
-	unique_ptr<Object3d> armR_ = make_unique<Object3d>();
 	unique_ptr<Object3d> halo_ = make_unique<Object3d>();
 	unique_ptr<Object3d> ringL_ = make_unique<Object3d>();
 	unique_ptr<Object3d> ringR_ = make_unique<Object3d>();
@@ -45,6 +46,7 @@ private:
 	unique_ptr<Particles> rightFire_ = make_unique<Particles>();
 
 	unique_ptr<BossBullet> bullet_ = make_unique<BossBullet>();
+	unique_ptr<BossArm> arm_ = make_unique<BossArm>();
 
 	EmitterSphere fireEmitter_ = {};
 	EmitterRange fireRange_ = {};
@@ -53,6 +55,11 @@ private:
 
 	const float bodyRadius_ = 3.0f;
 	const float armRadius_ = 2.0f;
+
+	Vector2 speed_ = { 10.0f,5.0f };
+
+	float time_ = 0.0f;
+	Vector3 startPosition_ = {};
 
 	bool isStart_ = false;
 
