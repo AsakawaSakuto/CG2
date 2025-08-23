@@ -63,6 +63,16 @@ private:
 
 	unique_ptr<Object3d> builA_ = make_unique<Object3d>();
 	unique_ptr<Object3d> builB_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builC_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builD_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builE_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builF_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builG_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builH_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builI_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builJ_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builK_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builL_ = make_unique<Object3d>();
 
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 
@@ -98,6 +108,11 @@ private:
 	};
 
 	State state_ = kStart;
+
+	void InitBuilding();
+	void UpdateBuilding();
+	const float builSpeed_ = 50.0f;
+	const float backLine_ = 0.0f;
 
 	void UpdatePause();
 	void UpdateFade();

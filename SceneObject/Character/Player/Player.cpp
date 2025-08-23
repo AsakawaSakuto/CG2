@@ -99,7 +99,7 @@ void Player::Draw() {
     lifeUI_->Draw();
 
     reticle2D_->Draw();
-    reticle3D_->Draw();
+    //reticle3D_->Draw();
 }
 
 void Player::DrawImGui() {

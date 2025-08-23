@@ -30,12 +30,13 @@ void GameScene::Initialize() {
 
 	ground_->Initialize(&ctx_->dxCommon, "resources/object3d/ground.obj");
 	ground_->SetTranslate({ 0.0f,-20.0f,200.0f });
+	ground_->SetScale({ 5.0f,1.0f,5.0f });
+	ground_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
 	skydome_->Initialize(&ctx_->dxCommon, "resources/object3d/skydome.obj");
+	skydome_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
-	builA_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-a.obj");
-	builA_->SetSRT({ 10.0f,10.0f ,10.0f }, { 0.0f,-1.6f,0.0f }, { -30.0f,-20.0f,50.0f });
-	builB_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-b.obj");
+	InitBuilding();
 
 	isStart = false;
 	startTimer_ = 0.0f;
@@ -89,8 +90,19 @@ void GameScene::Update() {
 		break;
 	}
 
+	UpdateBuilding();
 	builA_->Update(*useCamera_);
 	builB_->Update(*useCamera_);
+	builC_->Update(*useCamera_);
+	builD_->Update(*useCamera_);
+	builE_->Update(*useCamera_);
+	builF_->Update(*useCamera_);
+	builG_->Update(*useCamera_);
+	builH_->Update(*useCamera_);
+	builI_->Update(*useCamera_);
+	builJ_->Update(*useCamera_);
+	builK_->Update(*useCamera_);
+	builL_->Update(*useCamera_);
 
 	ground_->Update(*useCamera_);
 	skydome_->Update(*useCamera_);
@@ -105,11 +117,21 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	//skydome_->Draw();
 	ground_->Draw();
+	skydome_->Draw();
 
 	builA_->Draw();
 	builB_->Draw();
+	builC_->Draw();
+	builD_->Draw();
+	builE_->Draw();
+	builF_->Draw();
+	builG_->Draw();
+	builH_->Draw();
+	builI_->Draw();
+	builJ_->Draw();
+	builK_->Draw();
+	builL_->Draw();
 
 	player_->Draw();
 	boss_->Draw();
@@ -145,10 +167,8 @@ void GameScene::Draw() {
 	player_->DrawImGui();
 
 	//ground_->DrawImGui("ground");
-	//skydome_->DrawImGui("skydome");
+	skydome_->DrawImGui("skydome");
 	
-	builA_->DrawImGui("builA");
-	builB_->DrawImGui("builB");
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 
@@ -210,6 +230,120 @@ void GameScene::UpdatePause() {
 	pauseBG_->Update();
 	pauseUI_->Update();
 }
+
+void GameScene::InitBuilding() {
+	builA_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-a.obj");
+	builA_->SetSRT({ 20.0f,20.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -40.0f,-20.0f,25.0f });
+	builB_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-b.obj");
+	builB_->SetSRT({ 22.0f,25.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -40.0f,-20.0f,73.0f });
+	builC_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-c.obj");
+	builC_->SetSRT({ 22.0f,40.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -44.0f,-20.0f,120.0f });
+	builD_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-d.obj");
+	builD_->SetSRT({ 25.0f,23.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -42.0f,-20.0f,150.0f });
+	builE_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-e.obj");
+	builE_->SetSRT({ 20.0f,35.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -40.0f,-20.0f,180.0f });
+	builF_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-f.obj");
+	builF_->SetSRT({ 25.0f,30.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -40.0f,-20.0f,210.0f });
+	builG_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-g.obj");
+	builG_->SetSRT({ 22.0f,30.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -44.0f,-20.0f,265.0f });
+	builH_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-h.obj");
+	builH_->SetSRT({ 30.0f,35.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -42.0f,-20.0f,290.0f });
+	builI_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-i.obj");
+	builI_->SetSRT({ 45.0f,40.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -40.0f,-20.0f,335.0f });
+	builJ_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-j.obj");
+	builJ_->SetSRT({ 35.0f,25.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -40.0f,-20.0f,382.0f });
+	builK_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-k.obj");
+	builK_->SetSRT({ 33.0f,40.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -42.0f,-20.0f,440.0f });
+	builL_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-l.obj");
+	builL_->SetSRT({ 32.0f,35.0f ,20.0f }, { 0.0f,-1.6f,0.0f }, { -42.0f,-20.0f,485.0f });
+}
+
+void GameScene::UpdateBuilding() {
+	Vector3 translateA = builA_->GetTranslate();
+	translateA.z -= builSpeed_ * deltaTime_;
+	if (translateA.z <= backLine_) {
+		translateA.z = 500.0f;
+	}
+
+	builA_->SetTranslate(translateA);
+	Vector3 translateB = builB_->GetTranslate();
+	translateB.z -= builSpeed_ * deltaTime_;
+	if (translateB.z <= backLine_) {
+		translateB.z = 500.0f;
+	}
+	builB_->SetTranslate(translateB);
+
+	Vector3 translateC = builC_->GetTranslate();
+	translateC.z -= builSpeed_ * deltaTime_;
+	if (translateC.z <= backLine_) {
+		translateC.z = 500.0f;
+	}
+	builC_->SetTranslate(translateC);
+
+	Vector3 translateD = builD_->GetTranslate();
+	translateD.z -= builSpeed_ * deltaTime_;
+	if (translateD.z <= backLine_) {
+		translateD.z = 500.0f;
+	}
+	builD_->SetTranslate(translateD);
+
+	Vector3 translateE = builE_->GetTranslate();
+	translateE.z -= builSpeed_ * deltaTime_;
+	if (translateE.z <= backLine_) {
+		translateE.z = 500.0f;
+	}
+
+	builE_->SetTranslate(translateE);
+
+	Vector3 translateF = builF_->GetTranslate();
+	translateF.z -= builSpeed_ * deltaTime_;
+	if (translateF.z <= backLine_) {
+		translateF.z = 500.0f;
+	}
+	builF_->SetTranslate(translateF);
+
+	Vector3 translateG = builG_->GetTranslate();
+	translateG.z -= builSpeed_ * deltaTime_;
+	if (translateG.z <= backLine_) {
+		translateG.z = 500.0f;
+	}
+	builG_->SetTranslate(translateG);
+
+	Vector3 translateH = builH_->GetTranslate();
+	translateH.z -= builSpeed_ * deltaTime_;
+	if (translateH.z <= backLine_) {
+		translateH.z = 500.0f;
+	}
+	builH_->SetTranslate(translateH);
+
+	Vector3 translateI = builI_->GetTranslate();
+	translateI.z -= builSpeed_ * deltaTime_;
+	if (translateI.z <= backLine_) {
+		translateI.z = 500.0f;
+	}
+	builI_->SetTranslate(translateI);
+
+	Vector3 translateJ = builJ_->GetTranslate();
+	translateJ.z -= builSpeed_ * deltaTime_;
+	if (translateJ.z <= backLine_) {
+		translateJ.z = 500.0f;
+	}
+	builJ_->SetTranslate(translateJ);
+
+	Vector3 translateK = builK_->GetTranslate();
+	translateK.z -= builSpeed_ * deltaTime_;
+	if (translateK.z <= backLine_) {
+		translateK.z = 500.0f;
+	}
+	builK_->SetTranslate(translateK);
+
+	Vector3 translateL = builL_->GetTranslate();
+	translateL.z -= builSpeed_ * deltaTime_;
+	if (translateL.z <= backLine_) {
+		translateL.z = 500.0f;
+	}
+	builL_->SetTranslate(translateL);
+};
 
 void GameScene::CameraController() {
 	if (ctx_->input.TriggerKey(DIK_SPACE)) {
