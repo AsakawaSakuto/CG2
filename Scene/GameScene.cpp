@@ -193,7 +193,14 @@ void GameScene::Update() {
 #pragma endregion
 
 			skydome_->Update(*useCamera_);
+
+			if (boss_->IsDie()) {
+				state_ = kEnd;
+			}
 		}
+
+		break; 
+	case GameScene::kEnd:
 
 		break;
 	}
@@ -282,6 +289,8 @@ void GameScene::UpdateCollision() {
 
 	// 敵がダメージを受ける側
 	exprotion_->SetEmitterPosition({ 0.0f,0.0f,-100.0f });
+	boss_->SetBodyColor({ 1.0f,1.0f,1.0f,1.0f });
+
 	std::vector<PlayerBullet*> bulletPtrs = player_->GetAllBullets();
 
 	for (PlayerBullet* bullet : bulletPtrs) {
@@ -294,6 +303,8 @@ void GameScene::UpdateCollision() {
 			if (IsCollideSphere(bulletPos, bulletRadius, boss_->GetBodyWorldPos(), 2.0f)) {
 				exprotion_->SetEmitterPosition(bullet->GetWorldPosition());
 				bullet->SetIsAlive(false);
+				boss_->SetBodyColor({ 0.0f,0.0f,0.0f,1.0f });
+				boss_->Damage();
 			}
 		}
 	}
@@ -301,6 +312,7 @@ void GameScene::UpdateCollision() {
 	if (player_->BeamIsAlive()) {
 		if (IsCollideSphere(player_->BeamWorldPosition(), 1.5f, boss_->GetBodyWorldPos(), 2.0f)) {
 			player_->BeamHit();
+			boss_->Damage();
 		}
 	}
 }

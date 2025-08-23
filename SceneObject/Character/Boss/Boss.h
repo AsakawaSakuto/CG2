@@ -40,8 +40,16 @@ public:
 	Vector3 GetArmPosL() { return arm_->GetArmPosL(); }
 	Vector3 GetArmPosR() { return arm_->GetArmPosR(); }
 
+	void SetBodyColor(Vector4 color) { body_->SetColor(color); }
+
 	void BulletHit() { bullet_->Hit(); }
+
+	void Damage() { life_--; };
+
+	bool IsDie() { if (life_ <= 0) { return true; } else { return false; } }
 private:
+	int life_ = 10;
+
 	DirectXCommon* dxCommon_ = nullptr;
 
 	unique_ptr<Object3d> body_ = make_unique<Object3d>();

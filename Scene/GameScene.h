@@ -95,6 +95,7 @@ private:
 	enum State {
 		kStart,
 		kPlay,
+		kEnd
 	};
 
 	State state_ = kStart;

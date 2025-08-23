@@ -11,6 +11,10 @@ void BossArm::Initialize(DirectXCommon* dxCommon) {
 	rightFire_->Initialize(dxCommon_, "resources/image/particle/fire.png", 2);
 	InitParticle();
 
+	bossPos_ = {};
+	armPosL_ = { -8.0f, 0.0f, 50.0f };
+	armPosR_ = { 8.0f,0.0f,50.0f };
+
 	isAction = false;
 	actionTimer_ = 0.0f;
 	isChange = false;

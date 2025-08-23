@@ -22,6 +22,8 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	time_ = 0.0f;
 	startPosition_ = {};
 
+	life_ = 10;
+
 	InitParticle();
 }
 

@@ -46,7 +46,7 @@ void PlayerBullet::Update(Camera* camera) {
         model_->SetScale(scale);
 
         speed_ += 100.0f * deltaTime_;
-        speed_ = std::clamp(speed_, 0.0f, 200.0f);
+        speed_ = std::clamp(speed_, 0.0f, 500.0f);
 
         Vector3 translate = model_->GetTranslate();
         translate += velocity_ * speed_ * deltaTime_;

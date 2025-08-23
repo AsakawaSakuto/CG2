@@ -38,7 +38,7 @@ private:
 	float lifeTime_ = 2.0f;
 	bool isAlive_ = false;
 
-	float speed_ = 50.0f;
+	float speed_ = 100.0f;
 
 	Vector3 velocity_ = {};
 

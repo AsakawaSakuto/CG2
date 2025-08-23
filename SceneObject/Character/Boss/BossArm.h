@@ -45,7 +45,6 @@ private:
 	EmitterSphere fireEmitterR_ = {};
 	EmitterRange fireRangeR_ = {};
 
-
 	Vector3 bossPos_ = {};
 
 	Vector3 armPosL_ = {};
