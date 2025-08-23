@@ -9,10 +9,10 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	ringL_->Initialize(dxCommon_, "resources/object3d/boss/ringL.obj");
 	ringR_->Initialize(dxCommon_, "resources/object3d/boss/ringR.obj");
 
-	left_->Initialize(dxCommon_, "resources/object3d/boss/armL.obj");
-	left_->SetTranslate({ -10.0f,0.0f,50.0f });
-	right_->Initialize(dxCommon_, "resources/object3d/boss/armR.obj");
-	right_->SetTranslate({ 10.0f,0.0f,50.0f });
+	armL_->Initialize(dxCommon_, "resources/object3d/boss/armL.obj");
+	armL_->SetTranslate({ -10.0f,0.0f,50.0f });
+	armR_->Initialize(dxCommon_, "resources/object3d/boss/armR.obj");
+	armR_->SetTranslate({ 10.0f,0.0f,50.0f });
 
 	bullet_->Initialize(dxCommon_);
 
@@ -38,8 +38,8 @@ void Boss::Update(Camera* camera) {
 	ringR_->SetTranslate(body_->GetTranslate());
 	ringR_->Update(*camera);
 
-	left_->Update(*camera);
-	right_->Update(*camera);
+	armL_->Update(*camera);
+	armR_->Update(*camera);
 
 	leftFire_->SetEmitterPosition(body_->GetTranslate());
 	leftFire_->SetOffSet({ -2.0f,-3.0f,0.0f });
@@ -58,8 +58,8 @@ void Boss::Draw() {
 	ringL_->Draw();
 	ringR_->Draw();
 
-	left_->Draw();
-	right_->Draw();
+	armL_->Draw();
+	armR_->Draw();
 
 	leftFire_->Draw();
 	rightFire_->Draw();
@@ -67,8 +67,8 @@ void Boss::Draw() {
 
 void Boss::DrawImGui() {
 	body_->DrawImGui("b");
-	leftFire_->DrawImGui("lF");
-	rightFire_->DrawImGui("RF");
+	armL_->DrawImGui("armL");
+	armR_->DrawImGui("armR");
 }
 
 void Boss::InitParticle() {
