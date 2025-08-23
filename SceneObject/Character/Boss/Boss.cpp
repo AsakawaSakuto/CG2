@@ -42,8 +42,11 @@ void Boss::Update(Camera* camera) {
 		time_ += deltaTime_;
 
 		// 移動範囲（振幅）
-		const float ampX = 20.0f; // X方向 ±20
-		const float ampY = 8.0f;  // Y方向 ±10
+		const float ampX = 20.0f; // X方向 ±n
+		const float ampY = 8.0f;  // Y方向 ±n
+
+		const float rX = 0.4f; // X方向 ±n
+		const float rY = 0.8f;  // Y方向 ±n
 
 		// 周期（秒）
 		const float periodX = 20.0f; // Xはn秒で1往復
@@ -54,13 +57,16 @@ void Boss::Update(Camera* camera) {
 		const float omegaY = 2.0f * 3.141592f / periodY;
 
 		Vector3 translate = startPosition_;
-
 		// Xはsin、Yはsinで中心から動かす
 		translate.x = startPosition_.x + ampX * std::sin(omegaX * time_);
 		translate.y = startPosition_.y + ampY * std::sin(omegaY * time_);
 		translate.z = startPosition_.z;
-
 		body_->SetTranslate(translate);
+
+		Vector3 rotate = body_->GetRotate();
+		rotate.x = rX * std::sin(omegaY * time_) * -1.0f;
+		rotate.y = rY * std::sin(omegaX * time_);
+		body_->SetRotate(rotate);
 	}
 
 	body_->Update(*camera);
