@@ -63,9 +63,11 @@ void Boss::Update(Camera* camera) {
 		translate.z = startPosition_.z;
 		body_->SetTranslate(translate);
 
+		Vector3 velocity = body_->GetWorldPosition() - playerPos_;
 		Vector3 rotate = body_->GetRotate();
-		rotate.x = rX * std::sin(omegaY * time_) * -1.0f;
-		rotate.y = rY * std::sin(omegaX * time_);
+		rotate.y = std::atan2(velocity.x, velocity.z);
+		float horizontalLength = std::sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+		rotate.x = std::atan2(-velocity.y, horizontalLength);
 		body_->SetRotate(rotate);
 	}
 
