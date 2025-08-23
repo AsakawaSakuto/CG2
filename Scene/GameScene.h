@@ -74,6 +74,19 @@ private:
 	unique_ptr<Object3d> builK_ = make_unique<Object3d>();
 	unique_ptr<Object3d> builL_ = make_unique<Object3d>();
 
+	unique_ptr<Object3d> builM_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builN_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builO_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builP_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builQ_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builR_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builS_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builT_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builU_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builV_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builW_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builX_ = make_unique<Object3d>();
+
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
