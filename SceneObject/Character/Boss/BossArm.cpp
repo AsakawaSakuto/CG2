@@ -93,9 +93,8 @@ void BossArm::Draw() {
 void BossArm::DrawImGui() {
 	//armL_->DrawImGui("aL");
 	//armR_->DrawImGui("aR");
-
-	leftFire_->DrawImGui("FL");
-	rightFire_->DrawImGui("FR");
+	//leftFire_->DrawImGui("FL");
+	//rightFire_->DrawImGui("FR");
 }
 
 void BossArm::InitParticle() {
