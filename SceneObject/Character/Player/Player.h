@@ -39,6 +39,8 @@ public:
 	Vector3 BeamWorldPosition() { return beam_->GetWorldPosition(); }
 
 	bool BeamIsAlive() { return beam_->GetIsAlive(); }
+
+	void UseGamePad(bool useGamePad) { useGamePad_ = useGamePad; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
@@ -50,6 +52,7 @@ private:
 
 	GamePad gamePad_;
 
+	bool useGamePad_ = false;
 	int life_ = 3;
 
 	float deltaTime_ = 1.0f / 60.0f;

@@ -12,6 +12,7 @@ void GameScene::Initialize() {
 	camera_->SetRotate({ cameraRx_,0.0f,0.0f });
 
 	player_->Initialize(&ctx_->dxCommon);
+	player_->UseGamePad(false);
 	skyBox_->Initialize(&ctx_->dxCommon);
 
 	bossTy_ = 50.0f;
@@ -60,6 +61,7 @@ void GameScene::Update() {
 					startTimer_ = 0.0f;
 					isStart = true;
 					boss_->UseFire(true);
+					player_->UseGamePad(true);
 					state_ = kPlay;
 				}
 			}
@@ -72,6 +74,7 @@ void GameScene::Update() {
 
 		if (!isPause_) {
 			player_->Update(useCamera_);
+			boss_->SetPlayerPos(player_->GetWorldPosition());
 			boss_->Update(useCamera_);
 			skyBox_->Update(useCamera_);
 		}

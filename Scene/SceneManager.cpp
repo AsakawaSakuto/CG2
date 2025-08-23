@@ -22,7 +22,7 @@ int SceneManager::Run() {
     appContext_ = std::make_unique<AppContext>();
 
     // 各種初期化
-    appContext_->winApp.Initialize(L"CG2_Window");
+    appContext_->winApp.Initialize(L"Zhot");
     appContext_->winApp.EnableResize(true);
     appContext_->dxCommon.Initialize(&appContext_->winApp);
     TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);

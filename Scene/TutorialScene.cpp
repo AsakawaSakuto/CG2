@@ -9,6 +9,7 @@ void TutorialScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
 
 	player_->Initialize(&ctx_->dxCommon);
+	player_->UseGamePad(true);
 
 	skyBox_->Initialize(&ctx_->dxCommon);
 

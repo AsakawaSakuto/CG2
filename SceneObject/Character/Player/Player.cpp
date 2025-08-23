@@ -40,11 +40,14 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     isCanDash = true;
     isHeal_ = false;
     isDamage_ = false;
+    useGamePad_ = false;
 }
 
 void Player::Update(Camera* camera) {
 
-	gamePad_.Update();
+    if (useGamePad_) {
+        gamePad_.Update();
+    }
 
 	Move();
 

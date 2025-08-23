@@ -14,12 +14,22 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	right_->Initialize(dxCommon_, "resources/object3d/boss/armR.obj");
 	right_->SetTranslate({ 10.0f,0.0f,50.0f });
 
+	bullet_->Initialize(dxCommon_);
+
 	isStart_ = false;
+
+	haloRy_ = 0.0f;
+	haloSpinSpeed_ = 3.0f;
+	bulletShotTimer_ = 0.0f;
+	haloIsShot_ = false;
 
 	InitParticle();
 }
 
 void Boss::Update(Camera* camera) {
+	UpdateHalo();
+	bullet_->Update(camera);
+
 	body_->Update(*camera);
 	halo_->SetTranslate(body_->GetTranslate());
 	halo_->Update(*camera);
@@ -41,6 +51,8 @@ void Boss::Update(Camera* camera) {
 }
 
 void Boss::Draw() {
+	bullet_->Draw();
+
 	body_->Draw();
 	halo_->Draw();
 	ringL_->Draw();
@@ -83,4 +95,31 @@ void Boss::InitParticle() {
 	fireRange_.minVelocity = { -0.12f,-0.25f,-0.1f };
 	fireRange_.maxVelocity = { 0.0f,0.0f,0.1f };
 	leftFire_->SetEmitterRange(fireRange_);
+}
+
+void Boss::UpdateHalo() {
+	Vector3 velo = playerPos_ - halo_->GetWorldPosition() -= {0.0f, 10.0f, 0.0f};
+	if (!bullet_->GetIsMove()) {
+		bullet_->SetVelocity(velo); 
+		bullet_->SetTranslate(halo_->GetTranslate() += {0.0f, 10.0f, 0.0f});
+	}
+
+	if (haloIsShot_) {
+		haloSpinSpeed_ = 10.0f;
+		bulletShotTimer_ += deltaTime_;
+		if (bulletShotTimer_ >= 1.0f) {
+			bullet_->Spawn(halo_->GetTranslate() += {0.0f,10.0f,0.0f}, velo);
+			bulletShotTimer_ = 0.0f;
+			haloIsShot_ = false;
+		}
+	} else {
+		haloSpinSpeed_ = 3.0f;
+		bulletShotTimer_ += deltaTime_;
+		if (bulletShotTimer_ >= bulletShotTime_) {
+			bulletShotTimer_ = 0.0f;
+			haloIsShot_ = true;
+		}
+	}
+	haloRy_ += haloSpinSpeed_ * deltaTime_;
+	halo_->SetRotate({ 0.0f,haloRy_,0.0f});
 }

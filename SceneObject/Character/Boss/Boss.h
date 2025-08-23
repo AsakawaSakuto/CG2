@@ -7,6 +7,8 @@
 #include"MatrixFunction.h"
 #include"Particles.h"
 
+#include"BossBullet.h"
+
 #include <list>
 
 using std::unique_ptr;
@@ -27,6 +29,8 @@ public:
 	void SetBodyTlansrate(Vector3 tlansrate) { body_->SetTranslate(tlansrate); }
 
 	void UseFire(bool use) { leftFire_->UseEmitter(use); rightFire_->UseEmitter(use); }
+
+	void SetPlayerPos(Vector3 pPos) { playerPos_ = pPos; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 
@@ -39,13 +43,27 @@ private:
 
 	unique_ptr<Particles> leftFire_ = make_unique<Particles>();
 	unique_ptr<Particles> rightFire_ = make_unique<Particles>();
+
+	unique_ptr<BossBullet> bullet_ = make_unique<BossBullet>();
+
 	EmitterSphere fireEmitter_ = {};
 	EmitterRange fireRange_ = {};
+
+	Vector3 playerPos_ = {};
 
 	const float bodyRadius_ = 3.0f;
 	const float armRadius_ = 2.0f;
 
 	bool isStart_ = false;
 
+	const float deltaTime_ = 1.0f / 60.0f;
+
+	float haloRy_ = 0.0f;
+	float haloSpinSpeed_ = 3.0f;
+	float bulletShotTimer_ = 0.0f;
+	const float bulletShotTime_ = 5.0f;
+	bool haloIsShot_ = false;
+
 	void InitParticle();
+	void UpdateHalo();
 };
