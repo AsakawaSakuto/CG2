@@ -9,7 +9,7 @@ DebugCamera::DebugCamera() {
 	transform_ = { {1.f,1.f,1.f},{0.f,0.f,0.f},{0.f,2.f,-30.f} };
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = InverseMatrix(worldMatrix_);
-	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, 1280.f / 720.f,0.1f, 100.f);
+	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, 1280.f / 720.f,0.1f, 1000.f);
 	viewProjectionMatrix_ = MultiplyMatrix(viewMatrix_, projectionMatrix_);
 }
 

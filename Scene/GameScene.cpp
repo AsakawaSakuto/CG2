@@ -28,13 +28,9 @@ void GameScene::Initialize() {
 	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause2.png", { 1280.0f,720.0f });
 	pauseUI_->SetPosition({ 640.0f,360.0f });
 
-	ground_->Initialize(&ctx_->dxCommon, "resources/object3d/ground.obj");
-	ground_->SetTranslate({ 0.0f,-20.0f,200.0f });
-	ground_->SetScale({ 5.0f,1.0f,5.0f });
-	//ground_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
-
 	skydome_->Initialize(&ctx_->dxCommon, "resources/object3d/skydome.obj");
-	//skydome_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+
+	InitLoad();
 
 	InitBuilding();
 
@@ -77,6 +73,49 @@ void GameScene::Update() {
 			}
 			player_->Update(useCamera_);
 			boss_->Update(useCamera_);
+
+			UpdateBuilding();
+			UpdateLoad();
+
+            #pragma region ObjectUpdate
+
+			builA_->Update(*useCamera_);
+			builB_->Update(*useCamera_);
+			builC_->Update(*useCamera_);
+			builD_->Update(*useCamera_);
+			builE_->Update(*useCamera_);
+			builF_->Update(*useCamera_);
+			builG_->Update(*useCamera_);
+			builH_->Update(*useCamera_);
+			builI_->Update(*useCamera_);
+			builJ_->Update(*useCamera_);
+			builK_->Update(*useCamera_);
+			builL_->Update(*useCamera_);
+
+			builM_->Update(*useCamera_);
+			builN_->Update(*useCamera_);
+			builO_->Update(*useCamera_);
+			builP_->Update(*useCamera_);
+			builQ_->Update(*useCamera_);
+			builR_->Update(*useCamera_);
+			builS_->Update(*useCamera_);
+			builT_->Update(*useCamera_);
+			builU_->Update(*useCamera_);
+			builV_->Update(*useCamera_);
+			builW_->Update(*useCamera_);
+			builX_->Update(*useCamera_);
+
+			loadA_->Update(*useCamera_);
+			loadB_->Update(*useCamera_);
+			loadC_->Update(*useCamera_);
+			loadD_->Update(*useCamera_);
+			loadE_->Update(*useCamera_);
+			loadF_->Update(*useCamera_);
+			loadEnd_->Update(*useCamera_);
+
+#pragma endregion
+
+			skydome_->Update(*useCamera_);
 		}
 		break;
 	case GameScene::kPlay:
@@ -85,40 +124,53 @@ void GameScene::Update() {
 			player_->Update(useCamera_);
 			boss_->SetPlayerPos(player_->GetWorldPosition());
 			boss_->Update(useCamera_);
+
+			UpdateBuilding();
+			UpdateLoad();
+
+            #pragma region ObjectUpdate
+
+			builA_->Update(*useCamera_);
+			builB_->Update(*useCamera_);
+			builC_->Update(*useCamera_);
+			builD_->Update(*useCamera_);
+			builE_->Update(*useCamera_);
+			builF_->Update(*useCamera_);
+			builG_->Update(*useCamera_);
+			builH_->Update(*useCamera_);
+			builI_->Update(*useCamera_);
+			builJ_->Update(*useCamera_);
+			builK_->Update(*useCamera_);
+			builL_->Update(*useCamera_);
+
+			builM_->Update(*useCamera_);
+			builN_->Update(*useCamera_);
+			builO_->Update(*useCamera_);
+			builP_->Update(*useCamera_);
+			builQ_->Update(*useCamera_);
+			builR_->Update(*useCamera_);
+			builS_->Update(*useCamera_);
+			builT_->Update(*useCamera_);
+			builU_->Update(*useCamera_);
+			builV_->Update(*useCamera_);
+			builW_->Update(*useCamera_);
+			builX_->Update(*useCamera_);
+
+			loadA_->Update(*useCamera_);
+			loadB_->Update(*useCamera_);
+			loadC_->Update(*useCamera_);
+			loadD_->Update(*useCamera_);
+			loadE_->Update(*useCamera_);
+			loadF_->Update(*useCamera_);
+			loadEnd_->Update(*useCamera_);
+
+#pragma endregion
+
+			skydome_->Update(*useCamera_);
 		}
 
 		break;
 	}
-
-	UpdateBuilding();
-	builA_->Update(*useCamera_);
-	builB_->Update(*useCamera_);
-	builC_->Update(*useCamera_);
-	builD_->Update(*useCamera_);
-	builE_->Update(*useCamera_);
-	builF_->Update(*useCamera_);
-	builG_->Update(*useCamera_);
-	builH_->Update(*useCamera_);
-	builI_->Update(*useCamera_);
-	builJ_->Update(*useCamera_);
-	builK_->Update(*useCamera_);
-	builL_->Update(*useCamera_);
-
-	builM_->Update(*useCamera_);
-	builN_->Update(*useCamera_);
-	builO_->Update(*useCamera_);
-	builP_->Update(*useCamera_);
-	builQ_->Update(*useCamera_);
-	builR_->Update(*useCamera_);
-	builS_->Update(*useCamera_);
-	builT_->Update(*useCamera_);
-	builU_->Update(*useCamera_);
-	builV_->Update(*useCamera_);
-	builW_->Update(*useCamera_);
-	builX_->Update(*useCamera_);
-
-	ground_->Update(*useCamera_);
-	skydome_->Update(*useCamera_);
 	UpdateFade();
 }
 
@@ -130,34 +182,9 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	ground_->Draw();
 	skydome_->Draw();
 
-	builA_->Draw();
-	builB_->Draw();
-	builC_->Draw();
-	builD_->Draw();
-	builE_->Draw();
-	builF_->Draw();
-	builG_->Draw();
-	builH_->Draw();
-	builI_->Draw();
-	builJ_->Draw();
-	builK_->Draw();
-	builL_->Draw();
-
-	builM_->Draw();
-	builN_->Draw();
-	builO_->Draw();
-	builP_->Draw();
-	builQ_->Draw();
-	builR_->Draw();
-	builS_->Draw();
-	builT_->Draw();
-	builU_->Draw();
-	builV_->Draw();
-	builW_->Draw();
-	builX_->Draw();
+	DrawObject();
 
 	player_->Draw();
 	boss_->Draw();
@@ -191,9 +218,6 @@ void GameScene::Draw() {
 
 	boss_->DrawImGui();
 	player_->DrawImGui();
-
-	//ground_->DrawImGui("ground");
-	skydome_->DrawImGui("skydome");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
@@ -479,6 +503,104 @@ void GameScene::UpdateBuilding() {
 	}
 	builX_->SetTranslate(translateX);
 };
+
+void GameScene::InitLoad() {
+	loadA_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-crossing.obj");
+	loadB_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-driveway-double.obj");
+	loadC_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-crossing.obj");
+	loadD_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-driveway-double.obj");
+	loadE_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-crossing.obj");
+	loadF_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-driveway-double.obj");
+	loadA_->SetSRT({ 101.0f,30.0f,70.0f }, { 0.0f,1.57f,0.0f }, { 0.0f,-20.0f,100.0f });
+	loadB_->SetSRT({ 101.0f,30.0f,70.0f }, { 0.0f,1.57f,0.0f }, { 0.0f,-20.0f,200.0f });
+	loadC_->SetSRT({ 101.0f,30.0f,70.0f }, { 0.0f,1.57f,0.0f }, { 0.0f,-20.0f,300.0f });
+	loadD_->SetSRT({ 101.0f,30.0f,70.0f }, { 0.0f,1.57f,0.0f }, { 0.0f,-20.0f,400.0f });
+	loadE_->SetSRT({ 101.0f,30.0f,70.0f }, { 0.0f,1.57f,0.0f }, { 0.0f,-20.0f,500.0f });
+	loadF_->SetSRT({ 101.0f,30.0f,70.0f }, { 0.0f,1.57f,0.0f }, { 0.0f,-20.0f,600.0f });
+
+	loadEnd_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-end-barrier.obj");
+	loadEnd_->SetSRT({ 100.0f,30.0f,60.0f }, { 0.0f,-1.57f,0.0f }, { 0.0f,-20.0f,440.0f });
+}
+
+void GameScene::UpdateLoad() {
+	Vector3 translateA = loadA_->GetTranslate();
+	translateA.z -= builSpeed_ * deltaTime_;
+	if (translateA.z <= backLine_) {
+		translateA.z = 600.0f;
+	}
+	loadA_->SetTranslate(translateA);
+
+	Vector3 translateB = loadB_->GetTranslate();
+	translateB.z -= builSpeed_ * deltaTime_;
+	if (translateB.z <= backLine_) {
+		translateB.z = 600.0f;
+	}
+	loadB_->SetTranslate(translateB);
+
+	Vector3 translateC = loadC_->GetTranslate();
+	translateC.z -= builSpeed_ * deltaTime_;
+	if (translateC.z <= backLine_) {
+		translateC.z = 600.0f;
+	}
+	loadC_->SetTranslate(translateC);
+
+	Vector3 translateD = loadD_->GetTranslate();
+	translateD.z -= builSpeed_ * deltaTime_;
+	if (translateD.z <= backLine_) {
+		translateD.z = 600.0f;
+	}
+	loadD_->SetTranslate(translateD);
+
+	Vector3 translateE = loadE_->GetTranslate();
+	translateE.z -= builSpeed_ * deltaTime_;
+	if (translateE.z <= backLine_) {
+		translateE.z = 600.0f;
+	}
+	loadE_->SetTranslate(translateE);
+
+	Vector3 translateF = loadF_->GetTranslate();
+	translateF.z -= builSpeed_ * deltaTime_;
+	if (translateF.z <= backLine_) {
+		translateF.z = 600.0f;
+	}
+	loadF_->SetTranslate(translateF);
+}
+
+void GameScene::DrawObject() {
+	loadA_->Draw();
+	loadB_->Draw();
+	loadC_->Draw();
+	loadD_->Draw();
+	loadE_->Draw();
+	loadF_->Draw();
+	loadEnd_->Draw();
+
+	builA_->Draw();
+	builB_->Draw();
+	builC_->Draw();
+	builD_->Draw();
+	builE_->Draw();
+	builF_->Draw();
+	builG_->Draw();
+	builH_->Draw();
+	builI_->Draw();
+	builJ_->Draw();
+	builK_->Draw();
+	builL_->Draw();
+
+	builM_->Draw();
+	builN_->Draw();
+	builO_->Draw();
+	builP_->Draw();
+	builQ_->Draw();
+	builR_->Draw();
+	builS_->Draw();
+	builT_->Draw();
+	builU_->Draw();
+	builV_->Draw();
+	builW_->Draw();
+	builX_->Draw();
+}
 
 void GameScene::CameraController() {
 	if (ctx_->input.TriggerKey(DIK_SPACE)) {
