@@ -13,7 +13,6 @@ void GameScene::Initialize() {
 
 	player_->Initialize(&ctx_->dxCommon);
 	player_->UseGamePad(false);
-	skyBox_->Initialize(&ctx_->dxCommon);
 
 	bossTy_ = 50.0f;
 	boss_->UseFire(false);
@@ -28,6 +27,15 @@ void GameScene::Initialize() {
 
 	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause2.png", { 1280.0f,720.0f });
 	pauseUI_->SetPosition({ 640.0f,360.0f });
+
+	ground_->Initialize(&ctx_->dxCommon, "resources/object3d/ground.obj");
+	ground_->SetTranslate({ 0.0f,-20.0f,200.0f });
+
+	skydome_->Initialize(&ctx_->dxCommon, "resources/object3d/skydome.obj");
+
+	builA_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-a.obj");
+	builA_->SetSRT({ 10.0f,10.0f ,10.0f }, { 0.0f,-1.6f,0.0f }, { -30.0f,-20.0f,50.0f });
+	builB_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-b.obj");
 
 	isStart = false;
 	startTimer_ = 0.0f;
@@ -68,7 +76,6 @@ void GameScene::Update() {
 			}
 			player_->Update(useCamera_);
 			boss_->Update(useCamera_);
-			skyBox_->Update(useCamera_);
 		}
 		break;
 	case GameScene::kPlay:
@@ -77,12 +84,16 @@ void GameScene::Update() {
 			player_->Update(useCamera_);
 			boss_->SetPlayerPos(player_->GetWorldPosition());
 			boss_->Update(useCamera_);
-			skyBox_->Update(useCamera_);
 		}
 
 		break;
 	}
 
+	builA_->Update(*useCamera_);
+	builB_->Update(*useCamera_);
+
+	ground_->Update(*useCamera_);
+	skydome_->Update(*useCamera_);
 	UpdateFade();
 }
 
@@ -94,7 +105,12 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	//skyBox_->Draw();
+	//skydome_->Draw();
+	ground_->Draw();
+
+	builA_->Draw();
+	builB_->Draw();
+
 	player_->Draw();
 	boss_->Draw();
 
@@ -128,8 +144,11 @@ void GameScene::Draw() {
 	boss_->DrawImGui();
 	player_->DrawImGui();
 
-	//skyBox_->DrawImGui();
-
+	//ground_->DrawImGui("ground");
+	//skydome_->DrawImGui("skydome");
+	
+	builA_->DrawImGui("builA");
+	builB_->DrawImGui("builB");
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 

@@ -6,10 +6,14 @@ void TitleScene::SetAppContext(AppContext* ctx) {
 
 void TitleScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
+	camera_->SetPosition({ 0.0f,0.0f,0.0f });
+
 	gamePad_ = &ctx_->gamePad;
 
 	titleUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/title1.png", { 1280.0f,720.0f });
 	titleUI_->SetPosition({ 640.0f,360.0f });
+
+	building_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-h.obj");
 
 	fade_->Initialize(&ctx_->dxCommon);
 
@@ -26,26 +30,20 @@ void TitleScene::Update() {
 
 	titleUI_->Update();
 
+	building_->Update(*useCamera_);
+
 	UpdateFade();
 }
 
 void TitleScene::Draw() {
-
-	if (!ctx_) {
-		OutputDebugStringA("ctx_ is nullptr\n");
-		return;
-	}
-
-	if (!ctx_->dxCommon.GetCommandList()) {
-		OutputDebugStringA("commandList_ is nullptr\n");
-		return;
-	}
 
 	ctx_->dxCommon.PreDraw(); // ここより上に描画処理を書かない
 
 	///
 	/// ↓描画処理ここから
 	///
+
+	building_->Draw();
 
 	titleUI_->Draw();
 	fade_->Draw();
@@ -66,7 +64,8 @@ void TitleScene::Draw() {
 	/*ImGui::ShowDemoWindow();*/
 
 	debugCamera_->DrawImgui();
-
+	building_->DrawImGui("b");
+	camera_->DrawImgui();
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 

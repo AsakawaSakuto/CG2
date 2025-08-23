@@ -85,6 +85,8 @@ public:
 	void SetUvRotate(float uvR) { uvRotate_ = uvR; }
 
 	void SetUseLight(bool use) { materialData_->enableLighting = use; }
+
+	void SetSRT(Vector3 s, Vector3 r, Vector3 t) { transform_.scale = s; transform_.rotate = r; transform_.translate = t; }
 private:
 	Matrix4x4 worldMatrix;
 

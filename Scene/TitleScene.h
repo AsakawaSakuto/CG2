@@ -57,6 +57,8 @@ private:
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 
+	unique_ptr<Object3d> building_ = make_unique<Object3d>();
+
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>();

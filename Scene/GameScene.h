@@ -58,7 +58,11 @@ private:
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<Boss> boss_ = make_unique<Boss>();
 
-	unique_ptr<SkyBox> skyBox_ = make_unique<SkyBox>();
+	unique_ptr<Object3d> ground_ = make_unique<Object3d>();
+	unique_ptr<Object3d> skydome_ = make_unique<Object3d>();
+
+	unique_ptr<Object3d> builA_ = make_unique<Object3d>();
+	unique_ptr<Object3d> builB_ = make_unique<Object3d>();
 
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 
