@@ -174,13 +174,13 @@ void TitleScene::Draw() {
 	player_->Draw();
 	engineFire_->Draw();
 
-	flag1_->Draw();
-	flag2_->Draw();
-	flag3_->Draw();
-
-	titleUI_->Draw();
-
-	ranking_->DrawRanking();
+	if (!isStart_) {
+		flag1_->Draw();
+		flag2_->Draw();
+		flag3_->Draw();
+		titleUI_->Draw();
+		ranking_->DrawRanking();
+	}
 
 	fade_->Draw();
 

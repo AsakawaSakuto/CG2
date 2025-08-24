@@ -36,52 +36,7 @@ void GameScene::Initialize() {
 
 	InitBuilding();
 
-    #pragma region InitP
-	exprotion_->Initialize(&ctx_->dxCommon, "resources/image/particle/circle.png", 1);
-	exprotion_->UseEmitter(true);
-
-	exprotionEmitter_.isMove = true;
-	exprotionEmitter_.count = 50;
-	exprotionEmitter_.spawnTime = 0.01f;
-	exprotionEmitter_.radius = 0.1f;
-
-	exprotionRange_.minScale = { 1.0f,1.0f,0.0f };
-	exprotionRange_.maxScale = { 2.5f,2.5f,0.0f };
-	exprotionRange_.minVelocity = { -0.25f,-0.25f,-0.25f };
-	exprotionRange_.maxVelocity = { 0.25f,0.25f,0.25f };
-	exprotionRange_.minColor = { 0.5f,0.1f,0.0f };
-	exprotionRange_.maxColor = { 1.0f,0.3f,0.0f };
-	exprotionRange_.minLifeTime = 0.15f;
-	exprotionRange_.maxLifeTime = 0.3f;
-
-	exprotion_->SetEmitterValue(exprotionEmitter_);
-	exprotion_->SetEmitterRange(exprotionRange_);
-
-	endParticle_->Initialize(&ctx_->dxCommon, "resources/image/particle/star.png", 1);
-	endParticle_->UseEmitter(true);
-
-	endParticleEmitter_.isMove = true;
-	endParticleEmitter_.count = 50;
-	endParticleEmitter_.spawnTime = 0.01f;
-	endParticleEmitter_.radius = 0.1f;
-
-	endParticleScale_ = 1.0f;
-	endParticleVelocity_ = 0.1f;
-
-	endParticleRange_.minScale = { endParticleScale_,endParticleScale_,0.0f };
-	endParticleRange_.maxScale = { endParticleScale_,endParticleScale_,0.0f };
-	endParticleRange_.minVelocity = { -endParticleVelocity_,-endParticleVelocity_,-endParticleVelocity_ };
-	endParticleRange_.maxVelocity = { endParticleVelocity_,endParticleVelocity_,endParticleVelocity_ };
-	endParticleRange_.minColor = { 0.0f,0.0f,0.0f };
-	endParticleRange_.maxColor = { 1.0f,1.0f,1.0f };
-	endParticleRange_.minLifeTime = 0.1f;
-	endParticleRange_.maxLifeTime = 0.5f;
-
-	endParticle_->SetEmitterValue(endParticleEmitter_);
-	endParticle_->SetEmitterRange(endParticleRange_);
-
-	endTimer_ = 0.0f;
-#pragma endregion
+	InitParticle();
 
 	isStart = false;
 	startTimer_ = 0.0f;
@@ -352,12 +307,11 @@ void GameScene::Draw() {
 
 	//DrawFPS_ImGui();
 
-	debugCamera_->DrawImgui();
-	camera_->DrawImgui();
+	/*debugCamera_->DrawImgui();
+	camera_->DrawImgui();*/
 
 	boss_->DrawImGui();
 	player_->DrawImGui();
-	//ranking_->DrawImGui();
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 
@@ -469,6 +423,53 @@ void GameScene::UpdatePause() {
 
 	pauseBG_->Update();
 	pauseUI_->Update();
+}
+
+void GameScene::InitParticle() {
+	exprotion_->Initialize(&ctx_->dxCommon, "resources/image/particle/circle.png", 1);
+	exprotion_->UseEmitter(true);
+
+	exprotionEmitter_.isMove = true;
+	exprotionEmitter_.count = 50;
+	exprotionEmitter_.spawnTime = 0.01f;
+	exprotionEmitter_.radius = 0.1f;
+
+	exprotionRange_.minScale = { 1.0f,1.0f,0.0f };
+	exprotionRange_.maxScale = { 2.5f,2.5f,0.0f };
+	exprotionRange_.minVelocity = { -0.25f,-0.25f,-0.25f };
+	exprotionRange_.maxVelocity = { 0.25f,0.25f,0.25f };
+	exprotionRange_.minColor = { 0.5f,0.1f,0.0f };
+	exprotionRange_.maxColor = { 1.0f,0.3f,0.0f };
+	exprotionRange_.minLifeTime = 0.15f;
+	exprotionRange_.maxLifeTime = 0.3f;
+
+	exprotion_->SetEmitterValue(exprotionEmitter_);
+	exprotion_->SetEmitterRange(exprotionRange_);
+
+	endParticle_->Initialize(&ctx_->dxCommon, "resources/image/particle/circle.png", 1);
+	endParticle_->UseEmitter(true);
+
+	endParticleEmitter_.isMove = true;
+	endParticleEmitter_.count = 50;
+	endParticleEmitter_.spawnTime = 0.01f;
+	endParticleEmitter_.radius = 0.1f;
+
+	endParticleScale_ = 1.0f;
+	endParticleVelocity_ = 0.1f;
+
+	endParticleRange_.minScale = { endParticleScale_,endParticleScale_,0.0f };
+	endParticleRange_.maxScale = { endParticleScale_,endParticleScale_,0.0f };
+	endParticleRange_.minVelocity = { -endParticleVelocity_,-endParticleVelocity_,-endParticleVelocity_ };
+	endParticleRange_.maxVelocity = { endParticleVelocity_,endParticleVelocity_,endParticleVelocity_ };
+	endParticleRange_.minColor = { 0.0f,0.0f,0.0f };
+	endParticleRange_.maxColor = { 1.0f,1.0f,1.0f };
+	endParticleRange_.minLifeTime = 0.1f;
+	endParticleRange_.maxLifeTime = 0.5f;
+
+	endParticle_->SetEmitterValue(endParticleEmitter_);
+	endParticle_->SetEmitterRange(endParticleRange_);
+
+	endTimer_ = 0.0f;
 }
 
 void GameScene::InitBuilding() {

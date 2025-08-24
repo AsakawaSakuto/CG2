@@ -109,6 +109,7 @@ private:
 
 	State state_ = kStart;
 
+	void InitParticle();
 	void InitLoad();
 	void InitBuilding();
 	void UpdateLoad();
