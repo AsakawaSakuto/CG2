@@ -282,10 +282,10 @@ void TutorialScene::UpdateTutorialTest() {
 				timer_ += deltaTime_;
 			}
 
-			if (timer_ >= 1.5f && gamePad_->ReleaseButton(GamePad::L)) {
+			if (timer_ >= 1.0f && gamePad_->ReleaseButton(GamePad::L)) {
 				testUIClear_ = true;
 				timer_ = 0.0f;
-			} else if (timer_ < 1.5f && gamePad_->ReleaseButton(GamePad::L)) {
+			} else if (timer_ < 1.0f && gamePad_->ReleaseButton(GamePad::L)) {
 				timer_ = 0.0f;
 			}
 		}

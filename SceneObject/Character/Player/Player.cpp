@@ -5,6 +5,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	model_->Initialize(dxCommon_, "resources/object3d/player/player.obj");
 
+    menu_->Initialize(dxCommon_, "resources/image/UI/menu.png", { 64.0f,64.0f });
+    menu_->SetPosition({ 48.0f,48.0f });
+
     lifeUI_->Initialize(dxCommon_, "resources/image/UI/life3.png", { 1280.0f,720.0f });
     lifeUI_->SetPosition({ 640.0f,360.0f });
 
@@ -108,6 +111,7 @@ void Player::Update(Camera* camera) {
 
     gauge_->Update();
     gaugeUI_->Update();
+    menu_->Update();
 }
 
 void Player::Draw() {
@@ -129,6 +133,7 @@ void Player::Draw() {
 
     gauge_->Draw();
     gaugeUI_->Draw();
+    menu_->Draw();
 
     reticle2D_->Draw();
     //reticle3D_->Draw();

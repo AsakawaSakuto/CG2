@@ -49,6 +49,7 @@ private:
 	unique_ptr<Sprite> lifeUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> gaugeUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> gauge_ = make_unique<Sprite>();
+	unique_ptr<Sprite> menu_ = make_unique<Sprite>();
 	unique_ptr<PlayerBeam> beam_ = make_unique<PlayerBeam>();
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
