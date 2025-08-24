@@ -389,3 +389,7 @@ bool IsCollideSphere(const Vector3& centerA, float radiusA,
 	// 当たり判定：中心間距離 <= 半径の和
 	return dist2 <= (r * r);
 }
+
+float Lerp(float start, float end, float t) {
+	return start + (end - start) * t;
+};

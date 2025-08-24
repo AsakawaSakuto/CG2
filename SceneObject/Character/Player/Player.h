@@ -47,10 +47,15 @@ private:
 	unique_ptr<Object3d> reticle3D_ = make_unique<Object3d>();
 	unique_ptr<Sprite> reticle2D_ = make_unique<Sprite>();
 	unique_ptr<Sprite> lifeUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> gaugeUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> gauge_ = make_unique<Sprite>();
 	unique_ptr<PlayerBeam> beam_ = make_unique<PlayerBeam>();
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	GamePad gamePad_;
+
+	float gaugePosX_ = 37.0f;
+	float gaugeScaleX_ = 1.0f;
 
 	bool isInvincible_ = false;
 	float invincibleTimer_ = 0.0f;
@@ -76,7 +81,7 @@ private:
 
 	//--- baem ---//
 	float beamChargeTimer_ = 0.0f;
-	float beamChargeTime_ = 1.5f;
+	float beamChargeTime_ = 1.0f;
 	float beamChargeRadius_ = 0.0f;
 	bool isBeamShot_ = false;
 	Vector3 beamVelocity_ = {};

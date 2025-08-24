@@ -30,6 +30,8 @@ public:
 
 	void SetPosition(const Vector2& position) { position_ = position; }
 
+	void SetScale(const Vector2& s) { transform_.scale = { s.x,s.y,1.0f }; }
+
 	void SetSize(const Vector2& size) { size_ = size; }
 
 	void SetColor(const Vector4& Color) { materialData_->color = Color; }

@@ -55,6 +55,31 @@ void GameScene::Initialize() {
 
 	exprotion_->SetEmitterValue(exprotionEmitter_);
 	exprotion_->SetEmitterRange(exprotionRange_);
+
+	endParticle_->Initialize(&ctx_->dxCommon, "resources/image/particle/star.png", 1);
+	endParticle_->UseEmitter(true);
+
+	endParticleEmitter_.isMove = true;
+	endParticleEmitter_.count = 50;
+	endParticleEmitter_.spawnTime = 0.01f;
+	endParticleEmitter_.radius = 0.1f;
+
+	endParticleScale_ = 1.0f;
+	endParticleVelocity_ = 0.1f;
+
+	endParticleRange_.minScale = { endParticleScale_,endParticleScale_,0.0f };
+	endParticleRange_.maxScale = { endParticleScale_,endParticleScale_,0.0f };
+	endParticleRange_.minVelocity = { -endParticleVelocity_,-endParticleVelocity_,-endParticleVelocity_ };
+	endParticleRange_.maxVelocity = { endParticleVelocity_,endParticleVelocity_,endParticleVelocity_ };
+	endParticleRange_.minColor = { 0.0f,0.0f,0.0f };
+	endParticleRange_.maxColor = { 1.0f,1.0f,1.0f };
+	endParticleRange_.minLifeTime = 0.1f;
+	endParticleRange_.maxLifeTime = 0.5f;
+
+	endParticle_->SetEmitterValue(endParticleEmitter_);
+	endParticle_->SetEmitterRange(endParticleRange_);
+
+	endTimer_ = 0.0f;
 #pragma endregion
 
 	isStart = false;
@@ -202,6 +227,73 @@ void GameScene::Update() {
 		break; 
 	case GameScene::kEnd:
 
+		if (!isPause_) {
+
+			player_->Update(useCamera_);
+			exprotion_->Update(*useCamera_);
+
+			UpdateBuilding();
+			UpdateLoad();
+
+            #pragma region ObjectUpdate
+
+			builA_->Update(*useCamera_);
+			builB_->Update(*useCamera_);
+			builC_->Update(*useCamera_);
+			builD_->Update(*useCamera_);
+			builE_->Update(*useCamera_);
+			builF_->Update(*useCamera_);
+			builG_->Update(*useCamera_);
+			builH_->Update(*useCamera_);
+			builI_->Update(*useCamera_);
+			builJ_->Update(*useCamera_);
+			builK_->Update(*useCamera_);
+			builL_->Update(*useCamera_);
+
+			builM_->Update(*useCamera_);
+			builN_->Update(*useCamera_);
+			builO_->Update(*useCamera_);
+			builP_->Update(*useCamera_);
+			builQ_->Update(*useCamera_);
+			builR_->Update(*useCamera_);
+			builS_->Update(*useCamera_);
+			builT_->Update(*useCamera_);
+			builU_->Update(*useCamera_);
+			builV_->Update(*useCamera_);
+			builW_->Update(*useCamera_);
+			builX_->Update(*useCamera_);
+
+			loadA_->Update(*useCamera_);
+			loadB_->Update(*useCamera_);
+			loadC_->Update(*useCamera_);
+			loadD_->Update(*useCamera_);
+			loadE_->Update(*useCamera_);
+			loadF_->Update(*useCamera_);
+			loadEnd_->Update(*useCamera_);
+
+#pragma endregion
+
+			skydome_->Update(*useCamera_);
+			exprotion_->Update(*useCamera_);
+
+			endParticleScale_ += deltaTime_ * 2.5f;
+			endParticleVelocity_ += deltaTime_ * 1.0f;
+			endParticleRange_.minScale = { endParticleScale_,endParticleScale_,0.0f };
+			endParticleRange_.maxScale = { endParticleScale_,endParticleScale_,0.0f };
+			endParticleRange_.minVelocity = { -endParticleVelocity_,-endParticleVelocity_,-endParticleVelocity_ };
+			endParticleRange_.maxVelocity = { endParticleVelocity_,endParticleVelocity_,endParticleVelocity_ };
+			endParticle_->SetEmitterRange(endParticleRange_);
+
+			endParticle_->SetEmitterPosition(boss_->GetBodyWorldPos());
+			endParticle_->Update(*useCamera_);
+
+			endTimer_ += deltaTime_;
+			if (endTimer_ >= 3.0f) {
+				endTimer_ = 0.0f;
+				fade_->SetIsFade(true);
+			}
+		}
+
 		break;
 	}
 	UpdateFade();
@@ -219,10 +311,14 @@ void GameScene::Draw() {
 
 	DrawObject();
 
-	player_->Draw();
 	boss_->Draw();
+	player_->Draw();
 
 	exprotion_->Draw();
+
+	if (state_ == kEnd) {
+		endParticle_->Draw();
+	}
 
 	if (isPause_) {
 		pauseBG_->Draw();
@@ -246,14 +342,13 @@ void GameScene::Draw() {
 	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 	/*ImGui::ShowDemoWindow();*/
 
-	DrawFPS_ImGui();
+	//DrawFPS_ImGui();
 
 	debugCamera_->DrawImgui();
 	camera_->DrawImgui();
 
 	boss_->DrawImGui();
 	player_->DrawImGui();
-
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 
@@ -297,10 +392,9 @@ void GameScene::UpdateCollision() {
 		if (!bullet->GetIsAlive()) continue;
 
 		Vector3 bulletPos = bullet->GetWorldPosition();
-		float bulletRadius = 0.5f;
 
 		if (bullet->GetIsAlive()) {
-			if (IsCollideSphere(bulletPos, bulletRadius, boss_->GetBodyWorldPos(), 2.0f)) {
+			if (IsCollideSphere(bulletPos, 1.0f, boss_->GetBodyWorldPos(), 2.5f)) {
 				exprotion_->SetEmitterPosition(bullet->GetWorldPosition());
 				bullet->SetIsAlive(false);
 				boss_->SetBodyColor({ 0.0f,0.0f,0.0f,1.0f });
@@ -310,7 +404,7 @@ void GameScene::UpdateCollision() {
 	}
 
 	if (player_->BeamIsAlive()) {
-		if (IsCollideSphere(player_->BeamWorldPosition(), 1.5f, boss_->GetBodyWorldPos(), 2.0f)) {
+		if (IsCollideSphere(player_->BeamWorldPosition(), 1.5f, boss_->GetBodyWorldPos(), 2.5f)) {
 			player_->BeamHit();
 			boss_->Damage();
 		}
@@ -326,7 +420,7 @@ void GameScene::UpdateFade() {
 }
 
 void GameScene::UpdatePause() {
-	if (isPause_) {
+	if (isPause_ && !fade_->GetIsFade()) {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = false;
 		}
@@ -357,8 +451,7 @@ void GameScene::UpdatePause() {
 			break;
 		}
 
-	}
-	else {
+	} else if(!isPause_ && !fade_->GetIsFade()) {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = true;
 		}

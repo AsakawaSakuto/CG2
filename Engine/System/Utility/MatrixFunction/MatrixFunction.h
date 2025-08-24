@@ -52,3 +52,5 @@ float Dot_(const Vector3& a, const Vector3& b);
 
 bool IsCollideSphere(const Vector3& centerA, float radiusA,
 	const Vector3& centerB, float radiusB);
+
+float Lerp(float start, float end, float t);

@@ -111,7 +111,7 @@ void Sprite::DrawImGui(const char* objectName) {
 
 	ImGui::Text("Transform");
 	ImGui::DragFloat2("translate", &position_.x, 1.f);
-	ImGui::DragFloat2("scale", &transform_.scale.x, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat2("scale", &transform_.scale.x, 0.01f, 0.0f);
 	ImGui::DragFloat("rotate", &transform_.rotate.z, 0.01f);
 
 	if (ImGui::Button("tReset")) {

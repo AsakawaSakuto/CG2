@@ -8,6 +8,17 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     lifeUI_->Initialize(dxCommon_, "resources/image/UI/life3.png", { 1280.0f,720.0f });
     lifeUI_->SetPosition({ 640.0f,360.0f });
 
+    gaugeUI_->Initialize(dxCommon_, "resources/image/UI/gauge.png", { 1280.0f,720.0f });
+    gaugeUI_->SetPosition({ 640.0f,360.0f });
+
+    gaugePosX_ = 30.0f;
+    gaugeScaleX_ = 1.0f;
+
+    gauge_->Initialize(dxCommon_, "resources/image/0.png", { 1.0f,1.0f });
+    gauge_->SetPosition({ gaugePosX_,550.0f });
+    gauge_->SetScale({ gaugeScaleX_,22.0f });
+    gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
     reticle3D_->Initialize(dxCommon_, "resources/object3d/cube.obj");
 
     reticle2D_->Initialize(dxCommon_, "resources/image/UI/crosshair.png", {64.0f,64.0f});
@@ -89,6 +100,14 @@ void Player::Update(Camera* camera) {
 
     reticle3D_->Update(*camera);
     reticle2D_->Update();
+
+    gaugePosX_ = std::clamp(gaugePosX_, 30.0f, 83.0f);
+    gaugeScaleX_ = std::clamp(gaugeScaleX_, 1.0f, 95.0f);
+    gauge_->SetPosition({ gaugePosX_,550.0f });
+    gauge_->SetScale({ gaugeScaleX_,22.0f });
+
+    gauge_->Update();
+    gaugeUI_->Update();
 }
 
 void Player::Draw() {
@@ -108,6 +127,9 @@ void Player::Draw() {
 
     lifeUI_->Draw();
 
+    gauge_->Draw();
+    gaugeUI_->Draw();
+
     reticle2D_->Draw();
     //reticle3D_->Draw();
 }
@@ -124,6 +146,7 @@ void Player::DrawImGui() {
     //damage_->DrawImGui("d");
     //beamCharge_->DrawImGui("bc");
     //beam_->DrawImGui();
+    //gauge_->DrawImGui("g");
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -249,9 +272,14 @@ void Player::Attack() {
         beamChargeTimer_ += deltaTime_;
         beamChargeRadius_ += deltaTime_;
         beamCharge_->UseEmitter(true);
+
+        gaugePosX_ = Lerp(30.0f, 83.0f, beamChargeTimer_);
+        gaugeScaleX_ = Lerp(1.0f, 95.0f, beamChargeTimer_);
+
         if (beamChargeTimer_ >= beamChargeTime_) {
             beamChargeTimer_ = beamChargeTime_;
             isBeamShot_ = true;
+            gauge_->SetColor({ 0.0f,0.5f,0.8f,1.0f });
         }
     }
 
@@ -266,6 +294,9 @@ void Player::Attack() {
                 beamChargeRadius_ = 0.0f;
                 moveSpeed_ = maxSpeed_;
             }
+            gaugePosX_ = 30.0f;
+            gaugeScaleX_ = 1.0f;
+            gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
         }
         beamChargeRange_.minColor = { 0.0f,0.0f,0.2f };
         beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
@@ -275,6 +306,9 @@ void Player::Attack() {
             beamChargeTimer_ = 0.0f;
             beamChargeRadius_ = 0.0f;
             moveSpeed_ = maxSpeed_;
+            gaugePosX_ = 30.0f;
+            gaugeScaleX_ = 1.0f;
+            gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
         }
         beamChargeRange_.minColor = { 0.0f,0.0f,0.0f };
         beamChargeRange_.maxColor = { 1.0f,1.0f,1.0f };
