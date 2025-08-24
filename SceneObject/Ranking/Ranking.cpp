@@ -15,9 +15,31 @@ void Ranking::Initialize(DirectXCommon* dxCommon) {
 	timerColon_->SetPosition({ 1066.0f,64.0f });
 
 	top1Num1_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top1Num1_->SetPosition({ 205.0f,100.0f });
 	top1Num2_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top1Num2_->SetPosition({ 275.0f,100.0f });
 	top1Num3_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top1Num3_->SetPosition({ 315.0f,100.0f });
 	top1Colon_->Initialize(dxCommon_, "resources/image/number/colon.png", { 32.0f,64.0f });
+	top1Colon_->SetPosition({ 240.0f,100.0f });
+
+	top2Num1_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top2Num1_->SetPosition({ 205.0f,220.0f });
+	top2Num2_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top2Num2_->SetPosition({ 275.0f,220.0f });
+	top2Num3_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top2Num3_->SetPosition({ 315.0f,220.0f });
+	top2Colon_->Initialize(dxCommon_, "resources/image/number/colon.png", { 32.0f,64.0f });
+	top2Colon_->SetPosition({ 240.0f,220.0f });
+
+	top3Num1_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top3Num1_->SetPosition({ 205.0f,340.0f });
+	top3Num2_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top3Num2_->SetPosition({ 275.0f,340.0f });
+	top3Num3_->Initialize(dxCommon_, "resources/image/number/0.png", { 32.0f,64.0f });
+	top3Num3_->SetPosition({ 315.0f,340.0f });
+	top3Colon_->Initialize(dxCommon_, "resources/image/number/colon.png", { 32.0f,64.0f });
+	top3Colon_->SetPosition({ 240.0f,340.0f });
 
 	timer_ = 0.0f;
 	seconds_ = 0.0f;
@@ -84,6 +106,32 @@ void Ranking::UpdateRanking() {
 	top1Num2_->Update();
 	top1Num3_->Update();
 	top1Colon_->Update();
+
+	int seconds4 = ranking[1] / 60;
+	int seconds5 = (ranking[1] / 10) % 6; // 0～5
+	int seconds6 = ranking[1] % 10;       // 0～9
+
+	top2Num1_->SetTexture(numberTextures[seconds4]);
+	top2Num2_->SetTexture(numberTextures[seconds5]);
+	top2Num3_->SetTexture(numberTextures[seconds6]);
+
+	top2Num1_->Update();
+	top2Num2_->Update();
+	top2Num3_->Update();
+	top2Colon_->Update();
+
+	int seconds7 = ranking[2] / 60;
+	int seconds8 = (ranking[2] / 10) % 6; // 0～5
+	int seconds9 = ranking[2] % 10;       // 0～9
+
+	top3Num1_->SetTexture(numberTextures[seconds7]);
+	top3Num2_->SetTexture(numberTextures[seconds8]);
+	top3Num3_->SetTexture(numberTextures[seconds9]);
+
+	top3Num1_->Update();
+	top3Num2_->Update();
+	top3Num3_->Update();
+	top3Colon_->Update();
 }
 
 void Ranking::DrawRanking() {
@@ -91,6 +139,16 @@ void Ranking::DrawRanking() {
 	top1Num2_->Draw();
 	top1Num3_->Draw();
 	top1Colon_->Draw();
+
+	top2Num1_->Draw();
+	top2Num2_->Draw();
+	top2Num3_->Draw();
+	top2Colon_->Draw();
+
+	top3Num1_->Draw();
+	top3Num2_->Draw();
+	top3Num3_->Draw();
+	top3Colon_->Draw();
 }
 
 void Ranking::IsEndGame() {
@@ -115,9 +173,4 @@ void Ranking::DrawImGui() {
 	ImGui::Text("ran1=%d", ranking[1]);
 	ImGui::Text("ran2=%d", ranking[2]);
 	ImGui::End();
-
-	top1Num1_->DrawImGui("1");
-	top1Num2_->DrawImGui("2");
-	top1Num3_->DrawImGui("3");
-	top1Colon_->DrawImGui("colon");
 }

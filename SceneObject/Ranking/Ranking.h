@@ -39,10 +39,10 @@ private:
 	unique_ptr<Sprite> top2Num3_ = make_unique<Sprite>();
 	unique_ptr<Sprite> top2Colon_ = make_unique<Sprite>();
 
-	unique_ptr<Sprite> top3erNum1_ = make_unique<Sprite>();
-	unique_ptr<Sprite> top3erNum2_ = make_unique<Sprite>();
-	unique_ptr<Sprite> top3erNum3_ = make_unique<Sprite>();
-	unique_ptr<Sprite> top3erColon_ = make_unique<Sprite>();
+	unique_ptr<Sprite> top3Num1_ = make_unique<Sprite>();
+	unique_ptr<Sprite> top3Num2_ = make_unique<Sprite>();
+	unique_ptr<Sprite> top3Num3_ = make_unique<Sprite>();
+	unique_ptr<Sprite> top3Colon_ = make_unique<Sprite>();
 
 	const float deltaTime_ = 1.0f / 60.0f;
 	float timer_ = 0.0f;

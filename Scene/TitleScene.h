@@ -60,6 +60,11 @@ private:
 	bool pModelMove_ = false;
 
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
+
+	unique_ptr<Sprite> flag1_ = make_unique<Sprite>();
+	unique_ptr<Sprite> flag2_ = make_unique<Sprite>();
+	unique_ptr<Sprite> flag3_ = make_unique<Sprite>();
+
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 	unique_ptr<Ranking> ranking_ = make_unique<Ranking>();
 
@@ -95,6 +100,7 @@ private:
 	void SceneController();
 	void UpdateFade();
 	void CameraController();
+	void InitObj();
 
 	enum State {
 		kPlay,

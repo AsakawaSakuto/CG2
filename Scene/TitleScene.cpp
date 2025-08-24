@@ -14,35 +14,14 @@ void TitleScene::Initialize() {
 	titleUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/title1.png", { 1280.0f,720.0f });
 	titleUI_->SetPosition({ 640.0f,360.0f });
 
-	buildingA_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-a.obj");
-	buildingB_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-b.obj");
-	buildingC_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-c.obj");
-	buildingD_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-d.obj");
-	buildingE_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-e.obj");
-	buildingF_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-f.obj");
-	buildingG_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-g.obj");
-	buildingH_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-h.obj");
-	buildingI_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-i.obj");
-	buildingJ_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-j.obj");
-	buildingK_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-k.obj");
-	buildingL_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-l.obj");
-	buildingA_->SetSRT({ 2.0f,2.0f ,2.0f }, { 0.0f,-1.56f,0.0f }, { -4.93f,0.0f,10.6f });
-	buildingB_->SetSRT({ 4.0f,2.0f ,2.0f }, { 0.0f,-1.56f,0.0f }, { -4.88f,0.0f,17.06f });
-	buildingC_->SetSRT({ 4.0f,3.0f ,4.0f }, { 0.0f,-1.56f,0.0f }, { -6.51f,0.0f,22.49f });
-	buildingD_->SetSRT({ 6.0f,4.0f ,4.0f }, { 0.0f,-1.56f,0.0f }, { -5.91f,0.0f,26.99f });
-	buildingE_->SetSRT({ 3.0f,3.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.14f,0.0f,8.57f });
-	buildingF_->SetSRT({ 2.0f,2.0f ,2.0f }, { 0.0f,1.57f,0.0f }, { 1.66f,0.0f,14.01f });
-	buildingG_->SetSRT({ 3.0f,3.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.82f,0.0f,17.6f });
-	buildingH_->SetSRT({ 5.0f,6.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.25f,0.0f,26.2f });
-	buildingI_->SetSRT({ 8.5f,10.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.5f,0.0f,35.0f });
-	buildingJ_->SetSRT({ 40.0f,10.0f ,40.0f }, { 0.0f,1.57f,0.0f }, { 20.0f,0.0f,40.0f });
-	buildingK_->SetSRT({ 10.0f,7.5f ,3.0f }, { 0.0f,-1.56f,0.0f }, { -9.0f,0.0f,18.0f });
-	buildingL_->SetSRT({ 6.0f,6.0f ,5.0f }, { 0.0f,-1.56f,0.0f }, { -6.4f,0.0f,33.5f });
+	flag1_->Initialize(&ctx_->dxCommon, "resources/image/UI/flag1.png", { 128.0f,128.0f });
+	flag1_->SetPosition({ 100.0f,100.0f });
+	flag2_->Initialize(&ctx_->dxCommon, "resources/image/UI/flag2.png", { 128.0f,128.0f });
+	flag2_->SetPosition({ 100.0f,220.0f });
+	flag3_->Initialize(&ctx_->dxCommon, "resources/image/UI/flag3.png", { 128.0f,128.0f });
+	flag3_->SetPosition({ 100.0f,340.0f });
 
-	load_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-crossing.obj");
-	load2_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-slant-curve.obj");
-	load_->SetSRT({ 20.0f,1.0f,5.0f }, { 0.0f,1.58f,0.0f }, { -1.2f,0.0f,17.5f });
-	load2_->SetSRT({ 5.0f,7.0f,5.0f }, { 0.0f,1.58f,0.0f }, { -1.06f,-0.13f,32.53f });
+	InitObj();
 
 	skydome_->Initialize(&ctx_->dxCommon, "resources/object3d/skydome.obj");
 	skydome_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
@@ -132,6 +111,10 @@ void TitleScene::Update() {
 
 	SceneController();
 
+	flag1_->Update();
+	flag2_->Update();
+	flag3_->Update();
+
 	titleUI_->Update();
 
 	buildingA_->Update(*useCamera_);
@@ -191,6 +174,10 @@ void TitleScene::Draw() {
 	player_->Draw();
 	engineFire_->Draw();
 
+	flag1_->Draw();
+	flag2_->Draw();
+	flag3_->Draw();
+
 	titleUI_->Draw();
 
 	ranking_->DrawRanking();
@@ -213,7 +200,7 @@ void TitleScene::Draw() {
 	/*ImGui::ShowDemoWindow();*/
 
 	//debugCamera_->DrawImgui();
-	//ranking_->DrawImGui();
+	
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 
@@ -287,6 +274,38 @@ void TitleScene::SceneController() {
 			break;
 		}
 	}
+}
+
+void TitleScene::InitObj() {
+	buildingA_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-a.obj");
+	buildingB_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-b.obj");
+	buildingC_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-c.obj");
+	buildingD_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-d.obj");
+	buildingE_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-e.obj");
+	buildingF_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-f.obj");
+	buildingG_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-g.obj");
+	buildingH_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-h.obj");
+	buildingI_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-i.obj");
+	buildingJ_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-j.obj");
+	buildingK_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-k.obj");
+	buildingL_->Initialize(&ctx_->dxCommon, "resources/object3d/building/building-l.obj");
+	buildingA_->SetSRT({ 2.0f,2.0f ,2.0f }, { 0.0f,-1.56f,0.0f }, { -4.93f,0.0f,10.6f });
+	buildingB_->SetSRT({ 4.0f,2.0f ,2.0f }, { 0.0f,-1.56f,0.0f }, { -4.88f,0.0f,17.06f });
+	buildingC_->SetSRT({ 4.0f,3.0f ,4.0f }, { 0.0f,-1.56f,0.0f }, { -6.51f,0.0f,22.49f });
+	buildingD_->SetSRT({ 6.0f,4.0f ,4.0f }, { 0.0f,-1.56f,0.0f }, { -5.91f,0.0f,26.99f });
+	buildingE_->SetSRT({ 3.0f,3.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.14f,0.0f,8.57f });
+	buildingF_->SetSRT({ 2.0f,2.0f ,2.0f }, { 0.0f,1.57f,0.0f }, { 1.66f,0.0f,14.01f });
+	buildingG_->SetSRT({ 3.0f,3.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.82f,0.0f,17.6f });
+	buildingH_->SetSRT({ 5.0f,6.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.25f,0.0f,26.2f });
+	buildingI_->SetSRT({ 8.5f,10.0f ,3.0f }, { 0.0f,1.57f,0.0f }, { 2.5f,0.0f,35.0f });
+	buildingJ_->SetSRT({ 40.0f,10.0f ,40.0f }, { 0.0f,1.57f,0.0f }, { 20.0f,0.0f,40.0f });
+	buildingK_->SetSRT({ 10.0f,7.5f ,3.0f }, { 0.0f,-1.56f,0.0f }, { -9.0f,0.0f,18.0f });
+	buildingL_->SetSRT({ 6.0f,6.0f ,5.0f }, { 0.0f,-1.56f,0.0f }, { -6.4f,0.0f,33.5f });
+
+	load_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-crossing.obj");
+	load2_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-slant-curve.obj");
+	load_->SetSRT({ 20.0f,1.0f,5.0f }, { 0.0f,1.58f,0.0f }, { -1.2f,0.0f,17.5f });
+	load2_->SetSRT({ 5.0f,7.0f,5.0f }, { 0.0f,1.58f,0.0f }, { -1.06f,-0.13f,32.53f });
 }
 
 void TitleScene::CameraController() {
