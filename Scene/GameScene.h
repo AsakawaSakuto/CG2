@@ -37,6 +37,7 @@
 #include "Boss.h"
 #include "SkyBox.h"
 #include "Fade.h"
+#include "Ranking.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -61,6 +62,7 @@ private:
 	unique_ptr<Object3d> skydome_ = make_unique<Object3d>();
 
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
+	unique_ptr<Ranking> ranking_ = make_unique<Ranking>();
 
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();

@@ -21,6 +21,7 @@ void GameScene::Initialize() {
 	gamePad_ = &ctx_->gamePad;
 
 	fade_->Initialize(&ctx_->dxCommon);
+	ranking_->Initialize(&ctx_->dxCommon);
 
 	pauseBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause1.png", { 1280.0f,720.0f });
 	pauseBG_->SetPosition({ 640.0f,360.0f });
@@ -219,7 +220,10 @@ void GameScene::Update() {
 
 			skydome_->Update(*useCamera_);
 
+			ranking_->Update();
+
 			if (boss_->IsDie()) {
+				ranking_->IsEndGame();
 				state_ = kEnd;
 			}
 		}
@@ -316,6 +320,10 @@ void GameScene::Draw() {
 
 	exprotion_->Draw();
 
+	if (state_ == kPlay) {
+		ranking_->Draw();
+	}
+
 	if (state_ == kEnd) {
 		endParticle_->Draw();
 	}
@@ -349,6 +357,7 @@ void GameScene::Draw() {
 
 	boss_->DrawImGui();
 	player_->DrawImGui();
+	//ranking_->DrawImGui();
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 

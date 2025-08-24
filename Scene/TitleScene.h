@@ -36,6 +36,7 @@
 #include "Player.h"
 #include "SkyBox.h"
 #include "Fade.h"
+#include "ranking.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -54,10 +55,36 @@ private:
 
 	GamePad* gamePad_ = nullptr;
 
+	bool isStart_ = false;
+	float startTimer_ = 0.0f;
+	bool pModelMove_ = false;
+
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
+	unique_ptr<Ranking> ranking_ = make_unique<Ranking>();
 
-	unique_ptr<Object3d> building_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingA_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingB_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingC_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingD_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingE_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingF_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingG_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingH_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingI_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingJ_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingK_ = make_unique<Object3d>();
+	unique_ptr<Object3d> buildingL_ = make_unique<Object3d>();
+
+	unique_ptr<Object3d> load_ = make_unique<Object3d>();
+	unique_ptr<Object3d> load2_ = make_unique<Object3d>();
+
+	unique_ptr<Object3d> skydome_ = make_unique<Object3d>();
+
+	unique_ptr<Object3d> player_ = make_unique<Object3d>();
+	unique_ptr<Particles> engineFire_ = make_unique<Particles>();
+	EmitterSphere engineFireEmitter_ = {};
+	EmitterRange engineFireRange_ = {};
 
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
