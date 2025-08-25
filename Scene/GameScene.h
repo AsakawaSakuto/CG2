@@ -37,7 +37,7 @@
 #include "Boss.h"
 #include "SkyBox.h"
 #include "Fade.h"
-#include "Ranking.h"
+#include "SceneObject/Ranking/Ranking.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;

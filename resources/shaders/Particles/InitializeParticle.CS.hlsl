@@ -13,9 +13,9 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
     uint particlesIndex = DTid.x;
     if (particlesIndex == 0)
     {
-        gFreeListIndex[0] = gEmitter.kMaxParticle - 1;
+        gFreeListIndex[0] = gEmitter.kMaxParticle;
     }
-    
+
     if (particlesIndex < gEmitter.kMaxParticle)
     {
         gParticles[particlesIndex] = (Particle) 0;

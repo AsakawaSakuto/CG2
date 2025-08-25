@@ -29,16 +29,19 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
         if (gParticles[particleIndex].color.a <= 0.0f)
         {
             gParticles[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
+
             int freeListIndex;
             InterlockedAdd(gFreeListIndex[0], 1, freeListIndex);
-            if ((freeListIndex + 1) < gEmitter.kMaxParticle)
+
+            if (freeListIndex < gEmitter.kMaxParticle)
             {
-                gFreeList[freeListIndex + 1] = particleIndex;
+                gFreeList[freeListIndex] = particleIndex;
             }
             else
             {
-                InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+                InterlockedAdd(gFreeListIndex[0], -1);
             }
         }
+
     }
 }
