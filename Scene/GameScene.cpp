@@ -394,7 +394,7 @@ void GameScene::UpdateCollision() {
 				exprotion_->SetEmitterPosition(bullet->GetWorldPosition());
 				bullet->SetIsAlive(false);
 				boss_->SetBodyColor({ 0.0f,0.0f,0.0f,1.0f });
-				boss_->Damage();
+				boss_->Damage(3.0f);
 			}
 		}
 	}
@@ -402,7 +402,7 @@ void GameScene::UpdateCollision() {
 	if (player_->BeamIsAlive()) {
 		if (IsCollideSphere(player_->BeamWorldPosition(), 1.5f, boss_->GetBodyWorldPos(), 2.5f)) {
 			player_->BeamHit();
-			boss_->Damage();
+			boss_->Damage(10.0f);
 		}
 	}
 }

@@ -44,13 +44,13 @@ public:
 
 	void BulletHit() { bullet_->Hit(); }
 
-	void Damage() { life_--; };
+	void Damage(float damage) { life_ -= damage; };
 
 	bool IsDie() { if (life_ <= 0) { return true; } else { return false; } }
 
 	BulletState GetBulletState() { return bullet_->GetBulletState(); }
 private:
-	int life_ = 10;
+	float life_ = 390.0f;
 
 	DirectXCommon* dxCommon_ = nullptr;
 

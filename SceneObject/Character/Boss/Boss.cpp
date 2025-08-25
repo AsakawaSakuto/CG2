@@ -14,7 +14,7 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	hpUI2_->Initialize(dxCommon_, "resources/image/UI/bossHpBar2.png", { 1280.0f, 720.0f });
 	hpUI2_->SetPosition({ 640.0f,373.0f });
 	
-	hpBar_->Initialize(dxCommon_, "resources/image/white16x16.png", { 1.0f, 1.0f });
+	hpBar_->Initialize(dxCommon_, "resources/image/2.png", { 1.0f, 1.0f });
 	hpBar_->SetScale({ 390.0f,15.0f });
 	hpBar_->SetPosition({ 330.0f,43.0f });
 
@@ -31,7 +31,7 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	time_ = 0.0f;
 	startPosition_ = {};
 
-	life_ = 10;
+	life_ = 10.0f;
 
 	InitParticle();
 }
@@ -102,6 +102,10 @@ void Boss::Update(Camera* camera) {
 
 	hpUI_->Update();
 	hpUI2_->Update();
+
+	float tempTx = 135.0f + (life_ / 2.0f);
+	hpBar_->SetScale({life_,15.0f });
+	hpBar_->SetPosition({ tempTx,43.0f });
 	hpBar_->Update();
 }
 
@@ -126,8 +130,8 @@ void Boss::DrawImGui() {
 	//body_->DrawImGui("b");
 	//arm_->DrawImGui();
 	hpBar_->DrawImGui("bar");
-	hpUI_->DrawImGui("1");
-	hpUI2_->DrawImGui("2");
+	//hpUI_->DrawImGui("1");
+	//hpUI2_->DrawImGui("2");
 }
 
 void Boss::InitParticle() {

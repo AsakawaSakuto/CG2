@@ -48,35 +48,30 @@ void Ranking::Initialize(DirectXCommon* dxCommon) {
 }
 
 void Ranking::Update() {
-
 	// 経過時間を加算
 	timer_ += deltaTime_;
 	seconds_ += deltaTime_;
 
-	// 秒を整数に変換
-	totalSeconds_ = (int)seconds_;
-
-	// 10の位と1の位を取得
-	int secondsTens = (totalSeconds_ / 10) % 6; // 0～5
-	int secondsOnes = totalSeconds_ % 10;       // 0～9
-
-	// 60秒経過したらリセット
-	if (totalSeconds_ >= 60) {
-		totalSeconds_ = 0;
-		minutes_++;
+	// 秒を整数に変換（最大9分59秒＝599秒まで）
+	totalSeconds_ = static_cast<int>(seconds_);
+	if (totalSeconds_ >= 599) {
+		totalSeconds_ = 599;
 	}
 
-	if (minutes_ >= 9) {
-		minutes_ = 9;
-	}
+	// 分と秒を正しく計算
+	int minutes = totalSeconds_ / 60;
+	int seconds = totalSeconds_ % 60;
+	int secondsTens = seconds / 10;
+	int secondsOnes = seconds % 10;
 
-	// 1の位
-	timerNum3_->SetTexture(numberTextures[secondsOnes]);
-	// 10の位
+	// テクスチャ設定
+	timerNum1_->SetTexture(numberTextures[minutes]);
 	timerNum2_->SetTexture(numberTextures[secondsTens]);
-	// 分の位
-	timerNum1_->SetTexture(numberTextures[minutes_]);
+	timerNum3_->SetTexture(numberTextures[secondsOnes]);
 
+	// 60秒経過で分を加算する処理は不要なので削除
+
+	// 更新
 	timerNum1_->Update();
 	timerNum2_->Update();
 	timerNum3_->Update();
@@ -96,13 +91,14 @@ void Ranking::UpdateRanking() {
 		top1Num2_->SetTexture("resources/image/number/haifun.png");
 		top1Num3_->SetTexture("resources/image/number/haifun.png");
 	} else {
-		int seconds1 = ranking[0] / 60;
-		int seconds2 = (ranking[0] / 10) % 6; // 0～5
-		int seconds3 = ranking[0] % 10;       // 0～9
+		int minutes = ranking[0] / 60;
+		int seconds = ranking[0] % 60;
+		int secondsTens = seconds / 10;
+		int secondsOnes = seconds % 10;
 
-		top1Num1_->SetTexture(numberTextures[seconds1]);
-		top1Num2_->SetTexture(numberTextures[seconds2]);
-		top1Num3_->SetTexture(numberTextures[seconds3]);
+		top1Num1_->SetTexture(numberTextures[minutes]);
+		top1Num2_->SetTexture(numberTextures[secondsTens]);
+		top1Num3_->SetTexture(numberTextures[secondsOnes]);
 	}
 
 	top1Num1_->Update();
@@ -115,13 +111,14 @@ void Ranking::UpdateRanking() {
 		top2Num2_->SetTexture("resources/image/number/haifun.png");
 		top2Num3_->SetTexture("resources/image/number/haifun.png");
 	} else {
-		int seconds4 = ranking[1] / 60;
-		int seconds5 = (ranking[1] / 10) % 6; // 0～5
-		int seconds6 = ranking[1] % 10;       // 0～9
+		int minutes = ranking[1] / 60;
+		int seconds = ranking[1] % 60;
+		int secondsTens = seconds / 10;
+		int secondsOnes = seconds % 10;
 
-		top2Num1_->SetTexture(numberTextures[seconds4]);
-		top2Num2_->SetTexture(numberTextures[seconds5]);
-		top2Num3_->SetTexture(numberTextures[seconds6]);
+		top2Num1_->SetTexture(numberTextures[minutes]);
+		top2Num2_->SetTexture(numberTextures[secondsTens]);
+		top2Num3_->SetTexture(numberTextures[secondsOnes]);
 	}
 
 	top2Num1_->Update();
@@ -134,13 +131,14 @@ void Ranking::UpdateRanking() {
 		top3Num2_->SetTexture("resources/image/number/haifun.png");
 		top3Num3_->SetTexture("resources/image/number/haifun.png");
 	} else {
-		int seconds7 = ranking[2] / 60;
-		int seconds8 = (ranking[2] / 10) % 6; // 0～5
-		int seconds9 = ranking[2] % 10;       // 0～9
+		int minutes = ranking[2] / 60;
+		int seconds = ranking[2] % 60;
+		int secondsTens = seconds / 10;
+		int secondsOnes = seconds % 10;
 
-		top3Num1_->SetTexture(numberTextures[seconds7]);
-		top3Num2_->SetTexture(numberTextures[seconds8]);
-		top3Num3_->SetTexture(numberTextures[seconds9]);
+		top3Num1_->SetTexture(numberTextures[minutes]);
+		top3Num2_->SetTexture(numberTextures[secondsTens]);
+		top3Num3_->SetTexture(numberTextures[secondsOnes]);
 	}
 
 	top3Num1_->Update();
@@ -183,9 +181,5 @@ void Ranking::IsEndGame() {
 }
 
 void Ranking::DrawImGui() {
-	ImGui::Begin("ranking");
-	ImGui::Text("ran0=%d", ranking[0]);
-	ImGui::Text("ran1=%d", ranking[1]);
-	ImGui::Text("ran2=%d", ranking[2]);
-	ImGui::End();
+
 }

@@ -68,7 +68,7 @@ private:
 	float deltaTime_ = 1.0f / 60.0f;
 
 	float moveSpeed_ = 15.0f;
-	float minSpeed_ = 10.0f;
+	float minSpeed_ = 7.5f;
 	float maxSpeed_ = 15.0f;
 
 	Vector2 moveRotateSpeed_ = { 0.7f,0.7f };
