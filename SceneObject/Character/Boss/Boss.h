@@ -65,6 +65,9 @@ private:
 	unique_ptr<BossBullet> bullet_ = make_unique<BossBullet>();
 	unique_ptr<BossArm> arm_ = make_unique<BossArm>();
 
+	unique_ptr<Sprite> hpUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> hpUI2_ = make_unique<Sprite>();
+
 	EmitterSphere fireEmitter_ = {};
 	EmitterRange fireRange_ = {};
 

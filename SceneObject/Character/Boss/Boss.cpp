@@ -9,6 +9,11 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	ringL_->Initialize(dxCommon_, "resources/object3d/boss/ringL.obj");
 	ringR_->Initialize(dxCommon_, "resources/object3d/boss/ringR.obj");
 
+	hpUI_->Initialize(dxCommon_, "resources/image/UI/bossHpBar.png", { 1280.0f, 720.0f });
+	hpUI_->SetPosition({ 640.0f,360.0f });
+	hpUI2_->Initialize(dxCommon_, "resources/image/UI/bossHpBar2.png", { 1280.0f, 720.0f });
+	hpUI2_->SetPosition({ 640.0f,360.0f });
+
 	bullet_->Initialize(dxCommon_);
 	arm_->Initialize(dxCommon_);
 
@@ -90,6 +95,9 @@ void Boss::Update(Camera* camera) {
 	rightFire_->SetEmitterPosition(body_->GetTranslate());
 	rightFire_->SetOffSet({ 2.0f,-3.0f,0.0f });
 	rightFire_->Update(*camera);
+
+	hpUI_->Update();
+	hpUI2_->Update();
 }
 
 void Boss::Draw() {
@@ -103,6 +111,9 @@ void Boss::Draw() {
 
 	leftFire_->Draw();
 	rightFire_->Draw();
+
+	hpUI2_->Draw();
+	hpUI_->Draw();
 }
 
 void Boss::DrawImGui() {
@@ -144,7 +155,7 @@ void Boss::UpdateHalo() {
 	}
 
 	if (haloIsShot_) {
-		haloSpinSpeed_ = 10.0f;
+		haloSpinSpeed_ = 20.0f;
 		bulletShotTimer_ += deltaTime_;
 		if (bulletShotTimer_ >= 1.0f) {
 			bullet_->Spawn(halo_->GetTranslate() += {0.0f, 7.5f,0.0f}, velo);
