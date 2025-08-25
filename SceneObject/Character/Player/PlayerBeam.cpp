@@ -10,6 +10,7 @@ void PlayerBeam::Initialize(DirectXCommon* dxCommon) {
 	pBeam_->UseEmitter(true);
 
 	beamEmitter_.count = 100;
+	beamEmitter_.spawnTime = 0.01f;
 	beamEmitter_.isMove = true;
 	beamEmitter_.radius = 1.5f;
 
