@@ -213,7 +213,8 @@ void GameScene::Update() {
 		if (!isPause_) {
 
 			player_->Update(useCamera_);
-			exprotion_->Update(*useCamera_);
+
+			boss_->SetBodyColor({ 1.0f,1.0f,1.0f,1.0f });
 			boss_->DieUpdate(useCamera_);
 
 			UpdateBuilding();
@@ -258,6 +259,8 @@ void GameScene::Update() {
 #pragma endregion
 
 			skydome_->Update(*useCamera_);
+
+			exprotion_->SetEmitterPosition({ 0.0f,0.0f,-100.0f });
 			exprotion_->Update(*useCamera_);
 
 			endTimer_ += deltaTime_;
@@ -453,8 +456,8 @@ void GameScene::InitParticle() {
 
 	exprotionRange_.minScale = { 1.0f,1.0f,0.0f };
 	exprotionRange_.maxScale = { 2.5f,2.5f,0.0f };
-	exprotionRange_.minVelocity = { -0.25f,-0.25f,-0.25f };
-	exprotionRange_.maxVelocity = { 0.25f,0.25f,0.25f };
+	exprotionRange_.minVelocity = { -0.75f,-0.75f,-0.75f };
+	exprotionRange_.maxVelocity = { 0.75f,0.75f,0.75f };
 	exprotionRange_.minColor = { 0.5f,0.1f,0.0f };
 	exprotionRange_.maxColor = { 1.0f,0.3f,0.0f };
 	exprotionRange_.minLifeTime = 0.15f;
