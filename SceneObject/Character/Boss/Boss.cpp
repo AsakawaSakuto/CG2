@@ -129,7 +129,7 @@ void Boss::Draw() {
 void Boss::DrawImGui() {
 	//body_->DrawImGui("b");
 	//arm_->DrawImGui();
-	hpBar_->DrawImGui("bar");
+	//hpBar_->DrawImGui("bar");
 	//hpUI_->DrawImGui("1");
 	//hpUI2_->DrawImGui("2");
 }
@@ -162,6 +162,7 @@ void Boss::InitParticle() {
 
 void Boss::UpdateHalo() {
 	Vector3 velo = halo_->GetWorldPosition() - playerPos_ += {0.0f, 7.5f, 0.0f};
+	velo = velo.Normalize();
 	if (!bullet_->GetIsMove()) {
 		bullet_->SetVelocity(velo); 
 		bullet_->SetTranslate(halo_->GetTranslate() += {0.0f, 7.5f, 0.0f});

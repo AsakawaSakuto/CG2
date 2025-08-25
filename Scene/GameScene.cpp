@@ -302,9 +302,7 @@ void GameScene::Draw() {
 	if (state_ == kStart) {
 		keepOut1_->Draw();
 		keepOut2_->Draw();
-	}
-
-	if (state_ == kPlay) {
+	} else {
 		ranking_->Draw();
 	}
 

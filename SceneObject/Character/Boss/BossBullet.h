@@ -53,7 +53,7 @@ private:
 	Vector3 velocity_ = {};
 	Vector3 scale_ = { 0.0f,0.0f,0.0f };
 
-	const float speed_ = 3.0f;
+	const float speed_ = 150.0f;
 
 	const float lifeTime_ = 3.0f;
 	float lifeTimer_ = 0.0f;
