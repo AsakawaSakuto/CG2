@@ -20,6 +20,8 @@ public:
 
 	void Update(Camera* camera);
 
+	void DieUpdate(Camera* camera);
+
 	void Draw();
 
 	void DrawImGui();

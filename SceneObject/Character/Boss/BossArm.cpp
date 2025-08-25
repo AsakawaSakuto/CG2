@@ -86,6 +86,29 @@ void BossArm::Update(Camera* camera) {
 	armR_->Update(*camera);
 }
 
+void BossArm::DieUpdate(Camera* camera) {
+
+	Vector3 alT = armL_->GetTranslate();
+	alT.y -= 7.5f * deltaTime_;
+	armL_->SetTranslate(alT);
+
+	Vector3 arT = armR_->GetTranslate();
+	arT.y -= 7.5f * deltaTime_;
+	armR_->SetTranslate(arT);
+
+	leftFire_->SetEmitterPosition(armL_->GetWorldPosition());
+	leftFire_->SetOffSet({ 3.25f,0.0f,0.0f });
+
+	rightFire_->SetEmitterPosition(armR_->GetWorldPosition());
+	rightFire_->SetOffSet({ -3.25f,0.0f,0.0f });
+
+	leftFire_->Update(*camera);
+	rightFire_->Update(*camera);
+
+	armL_->Update(*camera);
+	armR_->Update(*camera);
+}
+
 void BossArm::Draw() {
 	leftFire_->Draw();
 	rightFire_->Draw();

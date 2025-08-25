@@ -109,6 +109,62 @@ void Boss::Update(Camera* camera) {
 	hpBar_->Update();
 }
 
+void Boss::DieUpdate(Camera* camera) {
+
+	arm_->DieUpdate(camera);
+
+	Vector3 bT = body_->GetTranslate();
+	bT.y -= deltaTime_ * dieFoolSpeed_;
+
+	if (bT.y <= -25.0f) {
+		bT.y = -25.0f;
+	}
+
+	body_->SetTranslate(bT);
+
+	Vector3 bR = body_->GetRotate();
+	bR.x += deltaTime_ * dieRotateSpeed_;
+	bR.y -= deltaTime_ * dieRotateSpeed_;
+	bR.z += deltaTime_ * dieRotateSpeed_;
+	body_->SetRotate(bR);
+
+	body_->Update(*camera);
+
+	halo_->SetTranslate(body_->GetTranslate());
+	halo_->Update(*camera);
+	ringL_->SetTranslate(body_->GetTranslate());
+	ringL_->Update(*camera);
+	ringR_->SetTranslate(body_->GetTranslate());
+	ringR_->Update(*camera);
+
+	if (IsDie()) {
+		leftFire_->UseEmitter(false); 
+		rightFire_->UseEmitter(false);
+	}
+
+	leftFire_->SetEmitterPosition(body_->GetTranslate());
+	leftFire_->SetOffSet({ -2.0f,-3.0f,0.0f });
+	leftFire_->Update(*camera);
+	rightFire_->SetEmitterPosition(body_->GetTranslate());
+	rightFire_->SetOffSet({ 2.0f,-3.0f,0.0f });
+	rightFire_->Update(*camera);
+
+	dieSmork_->SetEmitterPosition(body_->GetTranslate());
+	dieSmork_->Update(*camera);
+
+	dieFire_->SetEmitterPosition(body_->GetTranslate());
+	dieFire_->Update(*camera);
+	if (bT.y >= -24.0f) {
+		dieFire_->UseEmitter(false);
+		dieFire_->SetEmit(false);
+	} else {
+		dieSmork_->UseEmitter(false);
+		dieSmork_->SetEmit(false);
+
+		dieFire_->UseEmitter(true);
+	}
+}
+
 void Boss::Draw() {
 	bullet_->Draw();
 	arm_->Draw();
@@ -121,6 +177,11 @@ void Boss::Draw() {
 	leftFire_->Draw();
 	rightFire_->Draw();
 
+	if (IsDie()) {
+		dieSmork_->Draw();
+		dieFire_->Draw();
+	}
+
 	hpUI2_->Draw();
 	hpBar_->Draw();
 	hpUI_->Draw();
@@ -132,6 +193,13 @@ void Boss::DrawImGui() {
 	//hpBar_->DrawImGui("bar");
 	//hpUI_->DrawImGui("1");
 	//hpUI2_->DrawImGui("2");
+	//ImGui::Begin("b");
+	//ImGui::DragFloat("foolS", &dieFoolSpeed_, 0.1f);
+	//ImGui::DragFloat("RotateS", &dieRotateSpeed_, 0.1f);
+	//ImGui::End();
+	//body_->DrawImGui("body");
+	//dieSmork_->DrawImGui("dieSmork");
+	//dieFire_->DrawImGui("dieFire");
 }
 
 void Boss::InitParticle() {
@@ -158,6 +226,43 @@ void Boss::InitParticle() {
 	fireRange_.minVelocity = { -0.12f,-0.25f,-0.1f };
 	fireRange_.maxVelocity = { 0.0f,0.0f,0.1f };
 	leftFire_->SetEmitterRange(fireRange_);
+
+	dieSmork_->Initialize(dxCommon_, "resources/image/particle/Smork.png", 2);
+	dieSmork_->UseEmitter(true);
+
+	dieSmorkEmitter_.count = 10;
+	dieSmorkEmitter_.isMove = true;
+	dieSmorkEmitter_.radius = 0.01f;
+	dieSmorkEmitter_.spawnTime = 0.01f;
+	dieSmork_->SetEmitterValue(dieSmorkEmitter_);
+
+	dieSmorkRange_.minScale = { 0.1f,0.1f,0.0f };
+	dieSmorkRange_.maxScale = { 1.25f,1.25f,0.0f };
+	dieSmorkRange_.minVelocity = { -0.2f,0.25f,-0.1f };
+	dieSmorkRange_.maxVelocity = { 0.2f,1.0f,0.1f };
+	dieSmorkRange_.minColor = { 1.0f,1.0f,1.0f };
+	dieSmorkRange_.maxColor = { 1.0f,1.0f,1.0f };
+	dieSmorkRange_.minLifeTime = 0.1f;
+	dieSmorkRange_.maxLifeTime = 1.0f;
+	dieSmork_->SetEmitterRange(dieSmorkRange_);
+
+	dieFire_->Initialize(dxCommon_, "resources/image/particle/fire.png", 20);
+
+	dieFireEmitter_.count = 100;
+	dieFireEmitter_.isMove = true;
+	dieFireEmitter_.radius = 0.01f;
+	dieFireEmitter_.spawnTime = 0.01f;
+	dieFire_->SetEmitterValue(dieFireEmitter_);
+
+	dieFireRange_.minScale = { 0.1f,0.1f,0.0f };
+	dieFireRange_.maxScale = { 5.0f,5.0f,0.0f };
+	dieFireRange_.minVelocity = { -0.75f,0.0f,-0.1f };
+	dieFireRange_.maxVelocity = { 0.75f,5.0f,0.1f };
+	dieFireRange_.minColor = { 0.75f,0.1f,0.0f };
+	dieFireRange_.maxColor = { 1.0f,0.3f,0.0f };
+	dieFireRange_.minLifeTime = 0.1f;
+	dieFireRange_.maxLifeTime = 1.0f;
+	dieFire_->SetEmitterRange(dieFireRange_);
 }
 
 void Boss::UpdateHalo() {

@@ -214,6 +214,7 @@ void GameScene::Update() {
 
 			player_->Update(useCamera_);
 			exprotion_->Update(*useCamera_);
+			boss_->DieUpdate(useCamera_);
 
 			UpdateBuilding();
 			UpdateLoad();
@@ -259,19 +260,8 @@ void GameScene::Update() {
 			skydome_->Update(*useCamera_);
 			exprotion_->Update(*useCamera_);
 
-			endParticleScale_ += deltaTime_ * 1.0f;
-			endParticleVelocity_ += deltaTime_ * 1.0f;
-			endParticleRange_.minScale = { endParticleScale_,endParticleScale_,0.0f };
-			endParticleRange_.maxScale = { endParticleScale_,endParticleScale_,0.0f };
-			endParticleRange_.minVelocity = { -endParticleVelocity_,-endParticleVelocity_,-endParticleVelocity_ };
-			endParticleRange_.maxVelocity = { endParticleVelocity_,endParticleVelocity_,endParticleVelocity_ };
-			endParticle_->SetEmitterRange(endParticleRange_);
-
-			endParticle_->SetEmitterPosition(boss_->GetBodyWorldPos());
-			endParticle_->Update(*useCamera_);
-
 			endTimer_ += deltaTime_;
-			if (endTimer_ >= 3.0f) {
+			if (endTimer_ >= 4.0f) {
 				endTimer_ = 0.0f;
 				fade_->SetIsFade(true);
 			}
@@ -304,10 +294,6 @@ void GameScene::Draw() {
 		keepOut2_->Draw();
 	} else {
 		ranking_->Draw();
-	}
-
-	if (state_ == kEnd) {
-		endParticle_->Draw();
 	}
 
 	if (isPause_) {
@@ -476,29 +462,6 @@ void GameScene::InitParticle() {
 
 	exprotion_->SetEmitterValue(exprotionEmitter_);
 	exprotion_->SetEmitterRange(exprotionRange_);
-
-	endParticle_->Initialize(&ctx_->dxCommon, "resources/image/particle/circle.png", 100);
-	endParticle_->UseEmitter(true);
-
-	endParticleEmitter_.isMove = true;
-	endParticleEmitter_.count = 100;
-	endParticleEmitter_.spawnTime = 0.01f;
-	endParticleEmitter_.radius = 1.f;
-
-	endParticleScale_ = 1.0f;
-	endParticleVelocity_ = 0.1f;
-
-	endParticleRange_.minScale = { endParticleScale_,endParticleScale_,0.0f };
-	endParticleRange_.maxScale = { endParticleScale_,endParticleScale_,0.0f };
-	endParticleRange_.minVelocity = { -endParticleVelocity_,-endParticleVelocity_,-endParticleVelocity_ };
-	endParticleRange_.maxVelocity = { endParticleVelocity_,endParticleVelocity_,endParticleVelocity_ };
-	endParticleRange_.minColor = { 0.9f,0.0f,0.0f };
-	endParticleRange_.maxColor = { 1.0f,0.5f,0.0f };
-	endParticleRange_.minLifeTime = 0.1f;
-	endParticleRange_.maxLifeTime = 1.0f;
-
-	endParticle_->SetEmitterValue(endParticleEmitter_);
-	endParticle_->SetEmitterRange(endParticleRange_);
 
 	endTimer_ = 0.0f;
 }

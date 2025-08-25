@@ -25,6 +25,8 @@ public:
 
 	void DrawImGui();
 
+	void DieUpdate(Camera* camera);
+
 	Vector3 GetBodyWorldPos() { return body_->GetWorldPosition(); }
 
 	void SetBodyTlansrate(Vector3 tlansrate) { body_->SetTranslate(tlansrate); }
@@ -76,6 +78,17 @@ private:
 
 	const float bodyRadius_ = 3.0f;
 	const float armRadius_ = 2.0f;
+
+	unique_ptr<Particles> dieSmork_ = make_unique<Particles>();
+	EmitterSphere dieSmorkEmitter_ = {};
+	EmitterRange dieSmorkRange_ = {};
+
+	unique_ptr<Particles> dieFire_ = make_unique<Particles>();
+	EmitterSphere dieFireEmitter_ = {};
+	EmitterRange dieFireRange_ = {};
+
+	float dieFoolSpeed_ = 7.5f;
+	float dieRotateSpeed_ = 1.5f;
 
 	Vector2 speed_ = { 10.0f,5.0f };
 

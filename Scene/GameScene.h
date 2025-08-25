@@ -76,11 +76,6 @@ private:
 	EmitterSphere exprotionEmitter_ = {};
 	EmitterRange exprotionRange_ = {};
 
-	unique_ptr<Particles> endParticle_ = make_unique<Particles>();
-	EmitterSphere endParticleEmitter_ = {};
-	EmitterRange endParticleRange_ = {};
-	float endParticleScale_ = 1.0f;
-	float endParticleVelocity_ = 0.1f;
 	float endTimer_ = 0.0f;
 
 	bool isStart = false;

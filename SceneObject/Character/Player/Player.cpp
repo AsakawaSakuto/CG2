@@ -27,7 +27,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     reticle2D_->Initialize(dxCommon_, "resources/image/UI/crosshair.png", {64.0f,64.0f});
     reticle2D_->SetPosition({ 640.0f,360.0f });
 
-    engineFire_->Initialize(dxCommon_, "resources/image/particle/circle.png", 1);
+    engineFire_->Initialize(dxCommon_, "resources/image/particle/circle.png", 2);
     engineFire_->UseEmitter(true);
 
     heal_->Initialize(dxCommon_, "resources/image/particle/closs.png", 1);
@@ -338,10 +338,6 @@ void Player::Action() {
         }
     }
 
-    if (state_ == NORMAL) {
-        engineFireEmitter_.count = 2;
-    }
-
     // ダッシュ中は実機のZ軸を回転＋動かす
     if (state_ == DASH) {
         dashRotate_.x = moveRotate_.x;
@@ -353,8 +349,6 @@ void Player::Action() {
         translate.x += dashDirection_ * moveSpeed_ * deltaTime_;
         translate.x = std::clamp(translate.x, -9.5f, 9.5f);
         model_->SetTranslate(translate);
-
-        engineFireEmitter_.count = 10;
 
         dashRotateTimer_ += deltaTime_;
         if (dashRotateTimer_ >= dashRotateTime_) {
@@ -373,10 +367,17 @@ void Player::Action() {
             isCanDash = true;
         }
     }
+
+    if (state_ == NORMAL) {
+        engineFireEmitter_.count = 2;
+    } else if (state_ == DASH) {
+        engineFireEmitter_.count = 10;
+    }
+
+    engineFire_->SetEmitterValue(engineFireEmitter_);
 }
 
 void Player::UpdateParticle() {
-    engineFireEmitter_.count = 2;
     engineFireEmitter_.radius = 0.05f;
     engineFireEmitter_.spawnTime = 0.01f;
     engineFireEmitter_.isMove = true;
