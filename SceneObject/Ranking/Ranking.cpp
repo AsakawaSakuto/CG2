@@ -1,6 +1,6 @@
 #include"Ranking.h"
 
-static int ranking[3] = { 599, 599, 599 };
+static int ranking[3] = { 600, 600, 600 };
 
 void Ranking::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
@@ -94,39 +94,57 @@ void Ranking::Draw() {
 }
 
 void Ranking::UpdateRanking() {
-	int seconds1 = ranking[0] / 60;
-	int seconds2 = (ranking[0] / 10) % 6; // 0～5
-	int seconds3 = ranking[0] % 10;       // 0～9
+	if (ranking[0] == 600) {
+		top1Num1_->SetTexture("resources/image/number/haifun.png");
+		top1Num2_->SetTexture("resources/image/number/haifun.png");
+		top1Num3_->SetTexture("resources/image/number/haifun.png");
+	} else {
+		int seconds1 = ranking[0] / 60;
+		int seconds2 = (ranking[0] / 10) % 6; // 0～5
+		int seconds3 = ranking[0] % 10;       // 0～9
 
-	top1Num1_->SetTexture(numberTextures[seconds1]);
-	top1Num2_->SetTexture(numberTextures[seconds2]);
-	top1Num3_->SetTexture(numberTextures[seconds3]);
+		top1Num1_->SetTexture(numberTextures[seconds1]);
+		top1Num2_->SetTexture(numberTextures[seconds2]);
+		top1Num3_->SetTexture(numberTextures[seconds3]);
+	}
 
 	top1Num1_->Update();
 	top1Num2_->Update();
 	top1Num3_->Update();
 	top1Colon_->Update();
+	
+	if (ranking[1] == 600) {
+		top2Num1_->SetTexture("resources/image/number/haifun.png");
+		top2Num2_->SetTexture("resources/image/number/haifun.png");
+		top2Num3_->SetTexture("resources/image/number/haifun.png");
+	} else {
+		int seconds4 = ranking[1] / 60;
+		int seconds5 = (ranking[1] / 10) % 6; // 0～5
+		int seconds6 = ranking[1] % 10;       // 0～9
 
-	int seconds4 = ranking[1] / 60;
-	int seconds5 = (ranking[1] / 10) % 6; // 0～5
-	int seconds6 = ranking[1] % 10;       // 0～9
-
-	top2Num1_->SetTexture(numberTextures[seconds4]);
-	top2Num2_->SetTexture(numberTextures[seconds5]);
-	top2Num3_->SetTexture(numberTextures[seconds6]);
+		top2Num1_->SetTexture(numberTextures[seconds4]);
+		top2Num2_->SetTexture(numberTextures[seconds5]);
+		top2Num3_->SetTexture(numberTextures[seconds6]);
+	}
 
 	top2Num1_->Update();
 	top2Num2_->Update();
 	top2Num3_->Update();
 	top2Colon_->Update();
 
-	int seconds7 = ranking[2] / 60;
-	int seconds8 = (ranking[2] / 10) % 6; // 0～5
-	int seconds9 = ranking[2] % 10;       // 0～9
+	if (ranking[2] == 600) {
+		top3Num1_->SetTexture("resources/image/number/haifun.png");
+		top3Num2_->SetTexture("resources/image/number/haifun.png");
+		top3Num3_->SetTexture("resources/image/number/haifun.png");
+	} else {
+		int seconds7 = ranking[2] / 60;
+		int seconds8 = (ranking[2] / 10) % 6; // 0～5
+		int seconds9 = ranking[2] % 10;       // 0～9
 
-	top3Num1_->SetTexture(numberTextures[seconds7]);
-	top3Num2_->SetTexture(numberTextures[seconds8]);
-	top3Num3_->SetTexture(numberTextures[seconds9]);
+		top3Num1_->SetTexture(numberTextures[seconds7]);
+		top3Num2_->SetTexture(numberTextures[seconds8]);
+		top3Num3_->SetTexture(numberTextures[seconds9]);
+	}
 
 	top3Num1_->Update();
 	top3Num2_->Update();
