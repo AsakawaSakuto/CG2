@@ -328,7 +328,11 @@ void GameScene::UpdateCollision() {
 		if (IsCollideSphere(
 			player_->GetWorldPosition(), 0.75f,
 			boss_->GetBossBulletPos(), 0.5f)) {
-			player_->Damage();
+			if (boss_->GetBulletState() == DAMAGE) {
+				player_->Damage();
+			} else if (boss_->GetBulletState() == HEAL) {
+				player_->Heal();
+			}
 			boss_->BulletHit();
 		}
 

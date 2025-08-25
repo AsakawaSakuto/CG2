@@ -47,6 +47,8 @@ public:
 	void Damage() { life_--; };
 
 	bool IsDie() { if (life_ <= 0) { return true; } else { return false; } }
+
+	BulletState GetBulletState() { return bullet_->GetBulletState(); }
 private:
 	int life_ = 10;
 

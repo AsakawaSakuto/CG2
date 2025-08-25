@@ -7,6 +7,9 @@
 #include"MatrixFunction.h"
 #include"Particles.h"
 
+#include"BulletState.h"
+#include"Random.h"
+
 #include <list>
 
 using std::unique_ptr;
@@ -29,15 +32,18 @@ public:
 
 	void SetVelocity(Vector3 velo) { velocity_ = velo; }
 
-	void SetTranslate(Vector3 t) { model_->SetTranslate(t); }
+	void SetTranslate(Vector3 t) { model_->SetTranslate(t);heal_->SetTranslate(t);}
 
 	bool GetIsMove() { return isMove_; }
 
-	Vector3 GetPos() { return model_->GetWorldPosition(); }
+	Vector3 GetPos();
+
+	BulletState GetBulletState() { return bState_; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
+	unique_ptr<Object3d> heal_ = make_unique<Object3d>();
 
 	const float deltaTime_ = 1.0f / 60.0f;
 
@@ -51,4 +57,8 @@ private:
 
 	const float lifeTime_ = 3.0f;
 	float lifeTimer_ = 0.0f;
+
+	BulletState bState_ = DAMAGE;
+	int randNum_ = 0;
+	Random rand_;
 };
