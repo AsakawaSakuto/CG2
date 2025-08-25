@@ -67,6 +67,7 @@ private:
 
 	unique_ptr<Sprite> hpUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> hpUI2_ = make_unique<Sprite>();
+	unique_ptr<Sprite> hpBar_ = make_unique<Sprite>();
 
 	EmitterSphere fireEmitter_ = {};
 	EmitterRange fireRange_ = {};

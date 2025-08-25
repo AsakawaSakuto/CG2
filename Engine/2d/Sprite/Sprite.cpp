@@ -111,7 +111,7 @@ void Sprite::DrawImGui(const char* objectName) {
 
 	ImGui::Text("Transform");
 	ImGui::DragFloat2("translate", &position_.x, 1.f);
-	ImGui::DragFloat2("scale", &transform_.scale.x, 0.01f, 0.0f);
+	ImGui::DragFloat2("scale", &transform_.scale.x, 1.f);
 	ImGui::DragFloat("rotate", &transform_.rotate.z, 0.01f);
 
 	if (ImGui::Button("tReset")) {
@@ -175,10 +175,10 @@ void Sprite::CreateVertexResource() {
 	vertexData_[2].position = { right + width,bottom + height,0.0f,1.0f }; // 右下
 	vertexData_[3].position = { right + width,top,0.0f,1.0f };    // 右上
 	
-	vertexData_[0].texcoord = { 0.f,1.0f };
+	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[1].texcoord = { 0.0f,0.0f };
-	vertexData_[2].texcoord = { 1.f,1.f };
-	vertexData_[3].texcoord = { 1.f,0.0f };
+	vertexData_[2].texcoord = { 1.0f,1.0f };
+	vertexData_[3].texcoord = { 1.0f,0.0f };
 
 	for (uint32_t i = 0; i < 4; i++) {
 		vertexData_[i].normal = { 0.0f,0.0f,-1.0f };

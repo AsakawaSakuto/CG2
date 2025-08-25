@@ -55,17 +55,14 @@ void Ranking::Update() {
 
 	// 秒を整数に変換
 	totalSeconds_ = (int)seconds_;
-	if (totalSeconds_ >= 599) {
-		totalSeconds_ = 599;
-	}
 
 	// 10の位と1の位を取得
 	int secondsTens = (totalSeconds_ / 10) % 6; // 0～5
 	int secondsOnes = totalSeconds_ % 10;       // 0～9
 
 	// 60秒経過したらリセット
-	if (seconds_ >= 60.0f) {
-		seconds_ = 0.0f;
+	if (totalSeconds_ >= 60) {
+		totalSeconds_ = 0;
 		minutes_++;
 	}
 
