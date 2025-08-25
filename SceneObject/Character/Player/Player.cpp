@@ -33,7 +33,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     heal_->Initialize(dxCommon_, "resources/image/particle/closs.png", 1);
     damage_->Initialize(dxCommon_, "resources/image/particle/star2.png", 1);
 
-    beamCharge_->Initialize(dxCommon_, "resources/image/particle/box.png", 1);
+    beamCharge_->Initialize(dxCommon_, "resources/image/particle/box.png", 10);
 
 	gamePad_.Initialize();
 
@@ -438,7 +438,7 @@ void Player::UpdateParticle() {
 
     //--------------------------------------------//
 
-    damageEmitter_.count = 5;
+    damageEmitter_.count = 50;
     damageEmitter_.radius = 0.01f;
     damageEmitter_.spawnTime = 0.01f;
     damageEmitter_.isMove = true;
