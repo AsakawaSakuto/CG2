@@ -67,6 +67,11 @@ private:
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
 
+	unique_ptr<Sprite> keepOut1_ = make_unique<Sprite>();
+	unique_ptr<Sprite> keepOut2_ = make_unique<Sprite>();
+	float keepOutSpeed_ = 0.5f;
+	float keepOutDeltaTime_ = 1.0f / 300.0f;
+
 	unique_ptr<Particles> exprotion_ = make_unique<Particles>();
 	EmitterSphere exprotionEmitter_ = {};
 	EmitterRange exprotionRange_ = {};

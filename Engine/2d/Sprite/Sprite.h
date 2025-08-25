@@ -44,6 +44,9 @@ public:
 
 	void SetTexture(const std::string& textureName);
 
+	Vector2 GetUvTranslate_() { return uvTranslate_; }
+
+	void SetUvTranslate(Vector2 uvT) { uvTranslate_ = uvT; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	HRESULT hr_;

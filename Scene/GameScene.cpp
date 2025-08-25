@@ -32,6 +32,11 @@ void GameScene::Initialize() {
 	skydome_->Initialize(&ctx_->dxCommon, "resources/object3d/skydome.obj");
 	skydome_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
+	keepOut1_->Initialize(&ctx_->dxCommon, "resources/image/UI/keepOut1.png", { 1280.0f,360.0f });
+	keepOut2_->Initialize(&ctx_->dxCommon, "resources/image/UI/keepOut2.png", { 1280.0f,360.0f });
+	keepOut1_->SetPosition({ 640.0f,180.0f });
+	keepOut2_->SetPosition({ 640.0f,541.0f });
+
 	InitLoad();
 
 	InitBuilding();
@@ -118,6 +123,25 @@ void GameScene::Update() {
 			loadEnd_->Update(*useCamera_);
 
 #pragma endregion
+
+			Vector2 uvT1 = keepOut1_->GetUvTranslate_();
+			uvT1.x += keepOutSpeed_ * deltaTime_;
+			keepOut1_->SetUvTranslate(uvT1);
+
+			Vector4 cA1 = keepOut1_->GetColor();
+			cA1.w -= keepOutDeltaTime_;
+			keepOut1_->SetColor(cA1);
+
+			Vector2 uvT2 = keepOut2_->GetUvTranslate_();
+			uvT2.x -= keepOutSpeed_ * deltaTime_;
+			keepOut2_->SetUvTranslate(uvT2);
+
+			Vector4 cA2 = keepOut2_->GetColor();
+			cA2.w -= keepOutDeltaTime_;
+			keepOut2_->SetColor(cA2);
+
+			keepOut1_->Update();
+			keepOut2_->Update();
 
 			skydome_->Update(*useCamera_);
 		}
@@ -274,6 +298,11 @@ void GameScene::Draw() {
 	player_->Draw();
 
 	exprotion_->Draw();
+
+	if (state_ == kStart) {
+		keepOut1_->Draw();
+		keepOut2_->Draw();
+	}
 
 	if (state_ == kPlay) {
 		ranking_->Draw();
