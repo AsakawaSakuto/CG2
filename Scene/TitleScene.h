@@ -59,8 +59,12 @@ private:
 	float startTimer_ = 0.0f;
 	bool pModelMove_ = false;
 
-	unique_ptr<AudioX> test_ = make_unique<AudioX>();
-	unique_ptr<AudioX> test2_ = make_unique<AudioX>();
+	float quitTimer_ = 0.0f;
+	bool isQuit_ = false;
+
+	unique_ptr<AudioX> selectSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> pushSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> quitSE_ = make_unique<AudioX>();
 
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
 

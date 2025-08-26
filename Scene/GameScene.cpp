@@ -50,6 +50,11 @@ void GameScene::Initialize() {
 	pause_ = kBack;
 
 	state_ = kStart;
+
+	selectSE_->Initialize("resources/sound/scene/select.mp3");
+	pauseSE_->Initialize("resources/sound/scene/pause.mp3");
+	pushSE_->Initialize("resources/sound/scene/push.mp3");
+	quitSE_->Initialize("resources/sound/scene/gameQuit.mp3");
 }
 
 void GameScene::Update() {
@@ -336,6 +341,11 @@ void GameScene::Update() {
 
 		break;
 	}
+	selectSE_->Update();
+	pauseSE_->Update();
+	pushSE_->Update();
+	quitSE_->Update();
+
 	UpdateFade();
 }
 
@@ -402,6 +412,13 @@ void GameScene::Draw() {
 	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
 }
 
+void GameScene::CloseSound() {
+	selectSE_->Reset();
+	pauseSE_->Reset();
+	pushSE_->Reset();
+	quitSE_->Reset();
+}
+
 void GameScene::UpdateCollision() {
 	// プレイヤーがダメージを受ける側
 	if (player_->GetState() == 0) {
@@ -460,6 +477,7 @@ void GameScene::UpdateCollision() {
 
 void GameScene::UpdateFade() {
 	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
+		CloseSound();
 		IScene::sceneNo = TITLE;
 	}
 
@@ -470,6 +488,7 @@ void GameScene::UpdatePause() {
 	if (isPause_ && !fade_->GetIsFade()) {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = false;
+			pauseSE_->PlayAudio();
 		}
 
 		switch (pause_)
@@ -479,10 +498,12 @@ void GameScene::UpdatePause() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				pause_ = kQuit;
+				selectSE_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				isPause_ = false;
+				pushSE_->PlayAudio();
 			}
 			break;
 		case GameScene::kQuit:
@@ -490,10 +511,12 @@ void GameScene::UpdatePause() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				pause_ = kBack;
+				selectSE_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
+				quitSE_->PlayAudio();
 			}
 			break;
 		}
@@ -501,6 +524,7 @@ void GameScene::UpdatePause() {
 	} else if(!isPause_ && !fade_->GetIsFade()) {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = true;
+			pauseSE_->PlayAudio();
 		}
 		pause_ = kBack;
 	}

@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "SkyBox.h"
 #include "Fade.h"
+#include "Audio.h"
 
 class TutorialScene : public IScene
 {
@@ -86,10 +87,16 @@ private:
 
 	Pause pause_ = kBack;
 
+	unique_ptr<AudioX> selectSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> pushSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> quitSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> pauseSE_ = make_unique<AudioX>();
+
 	void UpdatePause();
 	void UpdateFade();
 	void UpdateEnemy();
 	void UpdateCollision();
 	void UpdateTutorialTest();
 	void CameraController();
+	void CloseSound();
 };

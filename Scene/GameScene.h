@@ -38,6 +38,7 @@
 #include "SkyBox.h"
 #include "Fade.h"
 #include "SceneObject/Ranking/Ranking.h"
+#include "Audio.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -55,6 +56,11 @@ private:
 	GamePad* gamePad_ = nullptr;
 
 	float deltaTime_ = 1.0f / 60.0f;
+
+	unique_ptr<AudioX> selectSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> pushSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> quitSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> pauseSE_ = make_unique<AudioX>();
 
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<Boss> boss_ = make_unique<Boss>();
@@ -110,6 +116,7 @@ private:
 
 	State state_ = kStart;
 
+	void CloseSound();
 	void InitParticle();
 	void InitLoad();
 	void InitBuilding();

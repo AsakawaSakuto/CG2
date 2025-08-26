@@ -66,6 +66,11 @@ void TutorialScene::Initialize() {
 
 	testState_ = Test1;
 	pause_ = kBack;
+
+	selectSE_->Initialize("resources/sound/scene/select.mp3");
+	pauseSE_->Initialize("resources/sound/scene/pause.mp3");
+	pushSE_->Initialize("resources/sound/scene/push.mp3");
+	quitSE_->Initialize("resources/sound/scene/gameQuit.mp3");
 }
 
 void TutorialScene::Update() {
@@ -89,6 +94,11 @@ void TutorialScene::Update() {
 	}
 
 	UpdateFade();
+
+	selectSE_->Update();
+	pauseSE_->Update();
+	pushSE_->Update();
+	quitSE_->Update();
 }
 
 void TutorialScene::Draw() {
@@ -144,8 +154,16 @@ void TutorialScene::Draw() {
 	ctx_->dxCommon.PostDraw(); // ここより下に描画処理を書かない
 }
 
+void TutorialScene::CloseSound() {
+	selectSE_->Reset();
+	pauseSE_->Reset();
+	pushSE_->Reset();
+	quitSE_->Reset();
+}
+
 void TutorialScene::UpdateFade() {
 	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
+		CloseSound();
 		IScene::sceneNo = TITLE;
 	}
 	
@@ -156,6 +174,7 @@ void TutorialScene::UpdatePause() {
 	if (isPause_) {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = false;
+			pauseSE_->PlayAudio();
 		}
 
 		switch (pause_)
@@ -165,10 +184,12 @@ void TutorialScene::UpdatePause() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				pause_ = kQuit;
+				selectSE_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				isPause_ = false;
+				pushSE_->PlayAudio();
 			}
 			break;
 		case TutorialScene::kQuit:
@@ -176,10 +197,12 @@ void TutorialScene::UpdatePause() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				pause_ = kBack;
+				selectSE_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
+				quitSE_->PlayAudio();
 			}
 			break;
 		}
@@ -187,6 +210,7 @@ void TutorialScene::UpdatePause() {
 	} else {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = true;
+			pauseSE_->PlayAudio();
 		}
 		pause_ = kBack;
 	}

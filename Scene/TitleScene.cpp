@@ -61,12 +61,11 @@ void TitleScene::Initialize() {
 
 	state_ = kPlay;
 
-	test_->Initialize("resources/sound/sord.mp3");
-	test2_->Initialize("resources/sound/sord.mp3");
-	test2_->PlayAudio(true);
+	selectSE_->Initialize("resources/sound/Scene/select.mp3");
+	pushSE_->Initialize("resources/sound/Scene/push.mp3");
+	quitSE_->Initialize("resources/sound/Scene/gamequit.mp3");
 }
-// { 0.3f,-0.4f,0.0f }
-// { 4.0f,6.0f,1.6f }
+
 void TitleScene::Update() {
 
 	if (isStart_ && !pModelMove_) {
@@ -146,8 +145,9 @@ void TitleScene::Update() {
 
 	ranking_->UpdateRanking();
 
-	test_->Update();
-	test2_->Update();
+	selectSE_->Update();
+	pushSE_->Update();
+	quitSE_->Update();
 
 	UpdateFade();
 }
@@ -244,12 +244,13 @@ void TitleScene::SceneController() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				state_ = kTutorial;
-				test_->PlayAudio();
+				selectSE_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
 				isStart_ = true;
+				pushSE_->PlayAudio();
 			}
 
 			break;
@@ -259,16 +260,17 @@ void TitleScene::SceneController() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				state_ = kQuit;
-				test_->PlayAudio();
+				selectSE_->PlayAudio();
 			}
 			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				state_ = kPlay;
-				test_->PlayAudio();
+				selectSE_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
 				isStart_ = true;
+				pushSE_->PlayAudio();
 			}
 
 			break;
@@ -278,14 +280,24 @@ void TitleScene::SceneController() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				state_ = kTutorial;
-				test_->PlayAudio();
+				selectSE_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
-				IScene::sceneNo = -1;
+				quitSE_->PlayAudio();
+				isQuit_ = true;
 			}
 
 			break;
+		}
+
+		if (isQuit_) {
+			quitTimer_ += deltaTime_;
+			if (quitTimer_ >= 0.25f) {
+				quitTimer_ = 0.0f;
+				isQuit_ = false;
+				IScene::sceneNo = -1;
+			}
 		}
 	}
 }
@@ -323,8 +335,9 @@ void TitleScene::InitObj() {
 }
 
 void TitleScene::CloseSound() {
-	test_->Reset();
-	test2_->Reset();
+	selectSE_->Reset();
+	pushSE_->Reset();
+	quitSE_->Reset();
 }
 
 void TitleScene::CameraController() {
