@@ -60,6 +60,10 @@ void TitleScene::Initialize() {
 	startTimer_ = 0.0f;
 
 	state_ = kPlay;
+
+	test_->Initialize("resources/sound/sord.mp3");
+	test2_->Initialize("resources/sound/sord.mp3");
+	test2_->PlayAudio(true);
 }
 // { 0.3f,-0.4f,0.0f }
 // { 4.0f,6.0f,1.6f }
@@ -142,6 +146,9 @@ void TitleScene::Update() {
 
 	ranking_->UpdateRanking();
 
+	test_->Update();
+	test2_->Update();
+
 	UpdateFade();
 }
 
@@ -217,8 +224,10 @@ void TitleScene::UpdateFade() {
 	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
 		if (state_ == kPlay) {
 			IScene::sceneNo = GAME;
+			CloseSound();
 		} else if (state_ == kTutorial) {
 			IScene::sceneNo = TUTORIAL;
+			CloseSound();
 		}
 	}
 
@@ -235,6 +244,7 @@ void TitleScene::SceneController() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				state_ = kTutorial;
+				test_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
@@ -249,9 +259,11 @@ void TitleScene::SceneController() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				state_ = kQuit;
+				test_->PlayAudio();
 			}
 			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				state_ = kPlay;
+				test_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
@@ -266,6 +278,7 @@ void TitleScene::SceneController() {
 
 			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				state_ = kTutorial;
+				test_->PlayAudio();
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
@@ -307,6 +320,11 @@ void TitleScene::InitObj() {
 	load2_->Initialize(&ctx_->dxCommon, "resources/object3d/load/road-slant-curve.obj");
 	load_->SetSRT({ 20.0f,1.0f,5.0f }, { 0.0f,1.58f,0.0f }, { -1.2f,0.0f,17.5f });
 	load2_->SetSRT({ 5.0f,7.0f,5.0f }, { 0.0f,1.58f,0.0f }, { -1.06f,-0.13f,32.53f });
+}
+
+void TitleScene::CloseSound() {
+	test_->Reset();
+	test2_->Reset();
 }
 
 void TitleScene::CameraController() {

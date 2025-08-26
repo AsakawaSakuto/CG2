@@ -59,6 +59,9 @@ private:
 	float startTimer_ = 0.0f;
 	bool pModelMove_ = false;
 
+	unique_ptr<AudioX> test_ = make_unique<AudioX>();
+	unique_ptr<AudioX> test2_ = make_unique<AudioX>();
+
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
 
 	unique_ptr<Sprite> flag1_ = make_unique<Sprite>();
@@ -101,6 +104,7 @@ private:
 	void UpdateFade();
 	void CameraController();
 	void InitObj();
+	void CloseSound();
 
 	enum State {
 		kPlay,

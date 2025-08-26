@@ -1,20 +1,68 @@
-#include"Audio.h"
+// Audio.cpp
+// // AudioX実装。XAudio2エンジンとマスターボイスを作成し、PCM共有→インスタンス再生。
 
-void AudioX::Initialize(const std::string& fileName) {
-	hr_ = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
-	assert(SUCCEEDED(hr_));
+#include "Audio.h"
+#include <cassert>
 
-	hr_ = xAudio2_->CreateMasteringVoice(&masterVoice_);
-	assert(SUCCEEDED(hr_));
+void AudioX::Initialize(const std::string& filePath) {
+    HRESULT hr = XAudio2Create(&xAudio2_);
+    assert(SUCCEEDED(hr) && "XAudio2Create failed");
 
-	soundData_ = SoundLoadWave(fileName);
+    IXAudio2MasteringVoice* mv = nullptr;
+    hr = xAudio2_->CreateMasteringVoice(&mv);
+    assert(SUCCEEDED(hr) && "CreateMasteringVoice failed");
+    mastering_.reset(mv);
+
+    SoundData sd = SoundLoadAudio(filePath); // // WAVでもMP3でもOK
+    wfex_ = sd.wfex;
+
+    // // PCM共有用に移し替え
+    pcmShared_ = std::make_shared<std::vector<BYTE>>(std::move(sd.pcm));
 }
 
-void AudioX::PlayAudio() {
-	SoundPlayWave(xAudio2_.Get(), soundData_);
+void AudioX::PlayAudio(bool loop) {
+    if (!xAudio2_ || !mastering_ || !pcmShared_ || pcmShared_->empty()) return;
+
+    auto inst = std::make_unique<ClipInstance>();
+    inst->pcm_ = pcmShared_;
+    inst->wfex_ = wfex_;
+    inst->loop_ = loop;
+    inst->Play(xAudio2_.Get());
+    actives_.push_back(std::move(inst));
+}
+
+void AudioX::Update() {
+    for (size_t i = 0; i < actives_.size(); ) {
+        if (!actives_[i] || actives_[i]->Finished()) {
+            actives_.erase(actives_.begin() + i);
+        }
+        else {
+            ++i;
+        }
+    }
 }
 
 void AudioX::Reset() {
-	xAudio2_.Reset();
-	SoundUnload(&soundData_);
+    // // まず全インスタンス停止→破棄
+    for (auto& a : actives_) {
+        if (a) a->Stop();
+    }
+    actives_.clear();
+
+    // // 共有PCM破棄（他所で共有されていれば自動延命される）
+    pcmShared_.reset();
+
+    mastering_.reset();
+    xAudio2_.Reset();
+}
+
+void AudioX::SetVolume(float volume) {
+    // // クランプ
+    if (volume < 0.0f) volume = 0.0f;
+    if (volume > 2.0f) volume = 2.0f;
+    for (auto& a : actives_) {
+        if (a && a->voice_) {
+            a->voice_->SetVolume(volume);
+        }
+    }
 }
