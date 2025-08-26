@@ -10,6 +10,8 @@
 #include"BossBullet.h"
 #include"BossArm.h"
 
+#include"Audio.h"
+
 #include <list>
 
 using std::unique_ptr;
@@ -51,10 +53,14 @@ public:
 	bool IsDie() { if (life_ <= 0.0f) { return true; } else { return false; } }
 
 	BulletState GetBulletState() { return bullet_->GetBulletState(); }
+
+	void CloseSound();
 private:
 	float life_ = 390.0f;
 
 	DirectXCommon* dxCommon_ = nullptr;
+
+	unique_ptr<AudioX> tuiraku_ = make_unique<AudioX>();
 
 	unique_ptr<Object3d> body_ = make_unique<Object3d>();
 	unique_ptr<Object3d> halo_ = make_unique<Object3d>();

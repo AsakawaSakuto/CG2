@@ -61,6 +61,12 @@ private:
 	unique_ptr<AudioX> pushSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> quitSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> pauseSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> alertSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> tuirakuSE_ = make_unique<AudioX>();
+
+	unique_ptr<AudioX> bgm_ = make_unique<AudioX>();
+
+	float alertVolume_ = 1.0f;
 
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<Boss> boss_ = make_unique<Boss>();

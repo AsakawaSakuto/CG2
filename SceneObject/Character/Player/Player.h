@@ -9,6 +9,8 @@
 #include"MatrixFunction.h"
 #include"Particles.h"
 
+#include"Audio.h"
+
 #include <list>
 
 using std::unique_ptr;
@@ -45,6 +47,8 @@ public:
 	void UseGamePad(bool useGamePad) { useGamePad_ = useGamePad; }
 
 	bool IsDie() { if (life_ == 0) { return true; } else { return false; } }
+
+	void CloseSound();
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
@@ -56,6 +60,11 @@ private:
 	unique_ptr<Sprite> menu_ = make_unique<Sprite>();
 	unique_ptr<PlayerBeam> beam_ = make_unique<PlayerBeam>();
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
+
+	unique_ptr<AudioX> healSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> damageSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> dashSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> bShotSE_ = make_unique<AudioX>();
 
 	GamePad gamePad_;
 

@@ -61,9 +61,12 @@ void TitleScene::Initialize() {
 
 	state_ = kPlay;
 
+	ririkuVolume_ = 2.0f;
+
 	selectSE_->Initialize("resources/sound/Scene/select.mp3");
 	pushSE_->Initialize("resources/sound/Scene/push.mp3");
 	quitSE_->Initialize("resources/sound/Scene/gamequit.mp3");
+	ririkuSE_->Initialize("resources/sound/SE/ririku.mp3");
 }
 
 void TitleScene::Update() {
@@ -89,6 +92,8 @@ void TitleScene::Update() {
 		if (startTimer_ >= 1.0f){
 			startTimer_ = 0.0f;
 			pModelMove_ = true;
+
+			ririkuSE_->PlayAudio();
 		}
 	}
 
@@ -106,6 +111,10 @@ void TitleScene::Update() {
 		Vector3 pR = player_->GetRotate();
 		pR.x -= 0.1f * deltaTime_;
 		player_->SetRotate(pR);
+
+		ririkuVolume_ -= 0.5f * deltaTime_;
+		if (ririkuVolume_ <= 0.0f) { ririkuVolume_ = 0.0f; }
+		ririkuSE_->SetVolume(ririkuVolume_);
 	}
 
 	gamePad_->Update();
@@ -148,6 +157,7 @@ void TitleScene::Update() {
 	selectSE_->Update();
 	pushSE_->Update();
 	quitSE_->Update();
+	ririkuSE_->Update();
 
 	UpdateFade();
 }
@@ -338,6 +348,7 @@ void TitleScene::CloseSound() {
 	selectSE_->Reset();
 	pushSE_->Reset();
 	quitSE_->Reset();
+	ririkuSE_->Reset();
 }
 
 void TitleScene::CameraController() {

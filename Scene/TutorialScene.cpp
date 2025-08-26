@@ -164,6 +164,7 @@ void TutorialScene::CloseSound() {
 void TutorialScene::UpdateFade() {
 	if (fade_->GetFadeAlpha() >= 1.0f && fade_->GetIsFade()) {
 		CloseSound();
+		player_->CloseSound();
 		IScene::sceneNo = TITLE;
 	}
 	
@@ -433,6 +434,7 @@ void TutorialScene::UpdateCollision() {
 			enemyBullet_->GetWorldPosition(), 0.5f)) {
 			isAlive_ = false;
 			player_->Damage();
+			player_->Heal();
 		}
 	}
 

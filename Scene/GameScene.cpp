@@ -55,6 +55,13 @@ void GameScene::Initialize() {
 	pauseSE_->Initialize("resources/sound/scene/pause.mp3");
 	pushSE_->Initialize("resources/sound/scene/push.mp3");
 	quitSE_->Initialize("resources/sound/scene/gameQuit.mp3");
+	alertSE_->Initialize("resources/sound/SE/alert.mp3");
+	tuirakuSE_->Initialize("resources/sound/SE/tuiraku.mp3");
+
+	bgm_->Initialize("resources/sound/BGM/gameSceneBGM.mp3");
+
+	alertSE_->PlayAudio(true);
+	alertVolume_ = 1.0f;
 }
 
 void GameScene::Update() {
@@ -68,6 +75,10 @@ void GameScene::Update() {
 	case GameScene::kStart:
 		if (!isPause_) {
 			if (!isStart) {
+				alertVolume_ -= 0.2f * deltaTime_;
+				if (alertVolume_ <= 0.0f) { alertVolume_ = 0.0f; }
+				alertSE_->SetVolume(alertVolume_);
+
 				startTimer_ += deltaTime_;
 
 				cameraRx_ += deltaTime_ * cameraRxSpeed_;
@@ -83,6 +94,9 @@ void GameScene::Update() {
 					boss_->SetIsStart(true);
 					player_->UseGamePad(true);
 					state_ = kPlay;
+
+					alertSE_->Reset();
+					bgm_->PlayAudio(true);
 				}
 			}
 			player_->Update(useCamera_);
@@ -337,6 +351,8 @@ void GameScene::Update() {
 		if (endTimer_ >= 4.0f) {
 			endTimer_ = 0.0f;
 			fade_->SetIsFade(true);
+
+			tuirakuSE_->PlayAudio();
 		}
 
 		break;
@@ -345,6 +361,10 @@ void GameScene::Update() {
 	pauseSE_->Update();
 	pushSE_->Update();
 	quitSE_->Update();
+	alertSE_->Update();
+	tuirakuSE_->Update();
+
+	bgm_->Update();
 
 	UpdateFade();
 }
@@ -417,6 +437,13 @@ void GameScene::CloseSound() {
 	pauseSE_->Reset();
 	pushSE_->Reset();
 	quitSE_->Reset();
+	alertSE_->Reset();
+	tuirakuSE_->Reset();
+
+	player_->CloseSound();
+	boss_->CloseSound();
+
+	bgm_->Reset();
 }
 
 void GameScene::UpdateCollision() {

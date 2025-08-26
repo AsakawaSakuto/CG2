@@ -34,6 +34,8 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	life_ = 10.0f;
 
 	InitParticle();
+
+	tuiraku_->Initialize("resources/sound/SE/tuiraku.mp3");
 }
 
 void Boss::Update(Camera* camera) {
@@ -107,12 +109,18 @@ void Boss::Update(Camera* camera) {
 	hpBar_->SetScale({life_,15.0f });
 	hpBar_->SetPosition({ tempTx,43.0f });
 	hpBar_->Update();
+
+	tuiraku_->Update();
 }
 
 void Boss::DieUpdate(Camera* camera) {
 
 	Vector3 bR = body_->GetRotate();
 	Vector3 bT = body_->GetTranslate();
+
+	if (bT.y >= -14.99f && bT.y <= -14.85f) {
+		tuiraku_->PlayAudio();
+	}
 
 	if (bT.y <= -15.0f) {
 		bT.y = -15.0f;
@@ -163,6 +171,8 @@ void Boss::DieUpdate(Camera* camera) {
 
 		dieFire_->UseEmitter(true);
 	}
+
+	tuiraku_->Update();
 }
 
 void Boss::Draw() {
@@ -291,4 +301,8 @@ void Boss::UpdateHalo() {
 	}
 	haloRy_ += haloSpinSpeed_ * deltaTime_;
 	halo_->SetRotate({ 0.0f,haloRy_,0.0f});
+}
+
+void Boss::CloseSound() {
+	tuiraku_->Reset();
 }

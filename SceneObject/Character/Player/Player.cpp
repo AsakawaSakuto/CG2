@@ -60,7 +60,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     isCanDash = true;
 
     state_ = NORMAL;
-    life_ = 1;
+    life_ = 3;
     moveRotate_ = { 0.0f,0.0f,0.0f };
     isBeamShot_ = false;
     isCanDash = true;
@@ -69,6 +69,12 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     useGamePad_ = false;
     isInvincible_ = false;
     invincibleTimer_ = 0.0f;
+
+    healSE_->Initialize("resources/sound/SE/heal.mp3");
+    damageSE_->Initialize("resources/sound/SE/pHit.wav");
+    dashSE_->Initialize("resources/sound/SE/dash.mp3");
+    bShotSE_->Initialize("resources/sound/SE/pShot.mp3");
+    bShotSE_->SetVolume(0.001f);
 }
 
 void Player::Update(Camera* camera) {
@@ -124,6 +130,11 @@ void Player::Update(Camera* camera) {
     gauge_->Update();
     gaugeUI_->Update();
     menu_->Update();
+
+    healSE_->Update();
+    dashSE_->Update();
+    damageSE_->Update();
+    bShotSE_->Update();
 }
 
 void Player::DieUpdate(Camera* camera) {
@@ -342,6 +353,9 @@ void Player::Attack() {
                 if (!bullet->GetIsAlive()) {
                     bullet->Spawn(model_->GetTranslate(), bulletVelocity_); // 軽い処理
                     bulletSpawnTimer_ = 0.0f;
+
+                    bShotSE_->SetVolume(0.001f);
+                    bShotSE_->PlayAudio();
                     break;
                 }
             }
@@ -406,11 +420,15 @@ void Player::Action() {
             isCanDash = false;
             dashRotateSpeed_ = -6.28f * 2.0f;
             dashDirection_ = 1.0f;
+
+            dashSE_->PlayAudio();
         } else if (gamePad_.LeftTrigger() >= 0.5f) {
             state_ = DASH;
             isCanDash = false;
             dashRotateSpeed_ = 6.28f * 2.0f;
             dashDirection_ = -1.0f;
+
+            dashSE_->PlayAudio();
         }
     }
 
@@ -626,6 +644,7 @@ void Player::Heal() {
     if (!isHeal_) {
         isHeal_ = true;
         life_++;
+        healSE_->PlayAudio();
     }
 }
 
@@ -633,8 +652,8 @@ void Player::Damage() {
     if (!isDamage_ && !isInvincible_) {
         isDamage_ = true;
         isInvincible_ = true;
-        gamePad_.SetVibration(1.0f, 1.0f, 0.5f);
         life_ --;
+        damageSE_->PlayAudio();
     }
 }
 
@@ -652,4 +671,11 @@ Vector3 Player::GetWorldPosition() {
     worldPos.y = model_->GetWorldMatrix().m[3][1];
     worldPos.z = model_->GetWorldMatrix().m[3][2];
     return worldPos;
+}
+
+void Player::CloseSound() {
+    healSE_->Reset();
+    dashSE_->Reset();
+    damageSE_->Reset();
+    bShotSE_->Reset();
 }
