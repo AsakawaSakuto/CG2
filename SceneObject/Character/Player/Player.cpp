@@ -60,7 +60,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     isCanDash = true;
 
     state_ = NORMAL;
-    life_ = 3;
+    life_ = 1;
     moveRotate_ = { 0.0f,0.0f,0.0f };
     isBeamShot_ = false;
     isCanDash = true;
@@ -74,7 +74,6 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     damageSE_->Initialize("resources/sound/SE/pHit.wav");
     dashSE_->Initialize("resources/sound/SE/dash.mp3");
     bShotSE_->Initialize("resources/sound/SE/pShot.mp3");
-    bShotSE_->SetVolume(0.001f);
 }
 
 void Player::Update(Camera* camera) {
@@ -354,8 +353,8 @@ void Player::Attack() {
                     bullet->Spawn(model_->GetTranslate(), bulletVelocity_); // 軽い処理
                     bulletSpawnTimer_ = 0.0f;
 
-                    bShotSE_->SetVolume(0.001f);
                     bShotSE_->PlayAudio();
+                    bShotSE_->SetVolume(0.5f);
                     break;
                 }
             }

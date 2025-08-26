@@ -35,7 +35,8 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 
 	InitParticle();
 
-	tuiraku_->Initialize("resources/sound/SE/tuiraku.mp3");
+	tuirakuSE_->Initialize("resources/sound/SE/tuiraku.mp3");
+	foolSE_->Initialize("resources/sound/SE/fool.mp3");
 }
 
 void Boss::Update(Camera* camera) {
@@ -110,7 +111,8 @@ void Boss::Update(Camera* camera) {
 	hpBar_->SetPosition({ tempTx,43.0f });
 	hpBar_->Update();
 
-	tuiraku_->Update();
+	tuirakuSE_->Update();
+	foolSE_->Update();
 }
 
 void Boss::DieUpdate(Camera* camera) {
@@ -119,7 +121,8 @@ void Boss::DieUpdate(Camera* camera) {
 	Vector3 bT = body_->GetTranslate();
 
 	if (bT.y >= -14.99f && bT.y <= -14.85f) {
-		tuiraku_->PlayAudio();
+		tuirakuSE_->PlayAudio();
+		foolSE_->Reset();
 	}
 
 	if (bT.y <= -15.0f) {
@@ -172,7 +175,8 @@ void Boss::DieUpdate(Camera* camera) {
 		dieFire_->UseEmitter(true);
 	}
 
-	tuiraku_->Update();
+	tuirakuSE_->Update();
+	foolSE_->Update();
 }
 
 void Boss::Draw() {
@@ -304,5 +308,6 @@ void Boss::UpdateHalo() {
 }
 
 void Boss::CloseSound() {
-	tuiraku_->Reset();
+	tuirakuSE_->Reset();
+	foolSE_->Reset();
 }

@@ -63,6 +63,7 @@ private:
 	unique_ptr<AudioX> pauseSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> alertSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> tuirakuSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> foolSE_ = make_unique<AudioX>();
 
 	unique_ptr<AudioX> bgm_ = make_unique<AudioX>();
 

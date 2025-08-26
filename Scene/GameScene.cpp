@@ -57,6 +57,7 @@ void GameScene::Initialize() {
 	quitSE_->Initialize("resources/sound/scene/gameQuit.mp3");
 	alertSE_->Initialize("resources/sound/SE/alert.mp3");
 	tuirakuSE_->Initialize("resources/sound/SE/tuiraku.mp3");
+	foolSE_->Initialize("resources/sound/SE/fool.mp3");
 
 	bgm_->Initialize("resources/sound/BGM/gameSceneBGM.mp3");
 
@@ -223,10 +224,12 @@ void GameScene::Update() {
 			if (boss_->IsDie()) {
 				ranking_->IsEndGame();
 				state_ = kBossEnd;
+				boss_->PlayFoolSound();
 			}
 
 			if (player_->IsDie()) {
 				state_ = kPlayerEnd;
+				foolSE_->PlayAudio();
 			}
 		}
 
@@ -352,6 +355,7 @@ void GameScene::Update() {
 			endTimer_ = 0.0f;
 			fade_->SetIsFade(true);
 
+			foolSE_->Reset();
 			tuirakuSE_->PlayAudio();
 		}
 
@@ -363,6 +367,7 @@ void GameScene::Update() {
 	quitSE_->Update();
 	alertSE_->Update();
 	tuirakuSE_->Update();
+	foolSE_->Update();
 
 	bgm_->Update();
 
@@ -439,6 +444,7 @@ void GameScene::CloseSound() {
 	quitSE_->Reset();
 	alertSE_->Reset();
 	tuirakuSE_->Reset();
+	foolSE_->Reset();
 
 	player_->CloseSound();
 	boss_->CloseSound();
