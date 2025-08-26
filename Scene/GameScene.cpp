@@ -390,8 +390,8 @@ void GameScene::Draw() {
 	/*debugCamera_->DrawImgui();
 	camera_->DrawImgui();*/
 
-	boss_->DrawImGui();
-	player_->DrawImGui();
+	//boss_->DrawImGui();
+	//player_->DrawImGui();
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 

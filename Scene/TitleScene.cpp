@@ -200,7 +200,7 @@ void TitleScene::Draw() {
 	/*ImGui::ShowDemoWindow();*/
 
 	//debugCamera_->DrawImgui();
-	engineFire_->DrawImGui("f");
+	//engineFire_->DrawImGui("f");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
