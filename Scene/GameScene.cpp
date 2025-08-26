@@ -203,12 +203,16 @@ void GameScene::Update() {
 
 			if (boss_->IsDie()) {
 				ranking_->IsEndGame();
-				state_ = kEnd;
+				state_ = kBossEnd;
+			}
+
+			if (player_->IsDie()) {
+				state_ = kPlayerEnd;
 			}
 		}
 
 		break; 
-	case GameScene::kEnd:
+	case GameScene::kBossEnd:
 
 		if (!isPause_) {
 
@@ -268,6 +272,66 @@ void GameScene::Update() {
 				endTimer_ = 0.0f;
 				fade_->SetIsFade(true);
 			}
+		}
+
+		break;
+	case GameScene::kPlayerEnd:
+
+		player_->DieUpdate(useCamera_);
+
+		boss_->SetBodyColor({ 1.0f,1.0f,1.0f,1.0f });
+		boss_->Update(useCamera_);
+
+		UpdateBuilding();
+		UpdateLoad();
+
+        #pragma region ObjectUpdate
+
+		builA_->Update(*useCamera_);
+		builB_->Update(*useCamera_);
+		builC_->Update(*useCamera_);
+		builD_->Update(*useCamera_);
+		builE_->Update(*useCamera_);
+		builF_->Update(*useCamera_);
+		builG_->Update(*useCamera_);
+		builH_->Update(*useCamera_);
+		builI_->Update(*useCamera_);
+		builJ_->Update(*useCamera_);
+		builK_->Update(*useCamera_);
+		builL_->Update(*useCamera_);
+
+		builM_->Update(*useCamera_);
+		builN_->Update(*useCamera_);
+		builO_->Update(*useCamera_);
+		builP_->Update(*useCamera_);
+		builQ_->Update(*useCamera_);
+		builR_->Update(*useCamera_);
+		builS_->Update(*useCamera_);
+		builT_->Update(*useCamera_);
+		builU_->Update(*useCamera_);
+		builV_->Update(*useCamera_);
+		builW_->Update(*useCamera_);
+		builX_->Update(*useCamera_);
+
+		loadA_->Update(*useCamera_);
+		loadB_->Update(*useCamera_);
+		loadC_->Update(*useCamera_);
+		loadD_->Update(*useCamera_);
+		loadE_->Update(*useCamera_);
+		loadF_->Update(*useCamera_);
+		loadEnd_->Update(*useCamera_);
+
+#pragma endregion
+
+		skydome_->Update(*useCamera_);
+
+		exprotion_->SetEmitterPosition({ 0.0f,0.0f,-100.0f });
+		exprotion_->Update(*useCamera_);
+
+		endTimer_ += deltaTime_;
+		if (endTimer_ >= 4.0f) {
+			endTimer_ = 0.0f;
+			fade_->SetIsFade(true);
 		}
 
 		break;

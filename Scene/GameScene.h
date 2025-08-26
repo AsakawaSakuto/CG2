@@ -104,7 +104,8 @@ private:
 	enum State {
 		kStart,
 		kPlay,
-		kEnd
+		kBossEnd,
+		kPlayerEnd
 	};
 
 	State state_ = kStart;

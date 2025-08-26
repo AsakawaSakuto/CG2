@@ -114,20 +114,65 @@ void Player::Update(Camera* camera) {
     menu_->Update();
 }
 
+void Player::DieUpdate(Camera* camera) {
+
+    Vector3 mT = model_->GetTranslate();
+    Vector3 mR = model_->GetRotate();
+    mR.x += dieRySpeed_ * deltaTime_;
+
+    if (mR.x >= 1.5f) {
+        mR.x = 1.5f;
+    } else {
+        mT.y -= dieTySpeed_ * deltaTime_;
+        mT.z += dieTzSpeed_ * deltaTime_;
+    }
+
+    model_->SetRotate(mR);
+    model_->SetTranslate(mT);
+
+    model_->Update(*camera);
+
+    beam_->Update(camera);
+
+    engineFire_->Update(*camera);
+    heal_->Update(*camera);
+    damage_->Update(*camera);
+
+    beamCharge_->SetEmitterPosition(model_->GetTranslate());
+    beamCharge_->Update(*camera);
+
+    reticle3D_->Update(*camera);
+    reticle2D_->Update();
+
+    gaugePosX_ = std::clamp(gaugePosX_, 30.0f, 83.0f);
+    gaugeScaleX_ = std::clamp(gaugeScaleX_, 1.0f, 95.0f);
+    gauge_->SetPosition({ gaugePosX_,550.0f });
+    gauge_->SetScale({ gaugeScaleX_,22.0f });
+
+    gauge_->Update();
+    gaugeUI_->Update();
+    menu_->Update();
+}
+
 void Player::Draw() {
 	model_->Draw();
     
-    for (auto& bullet : bullets_) {
-        if (bullet->GetIsAlive()) {
-            bullet->Draw();
-        }
-    }
-    beam_->Draw();
+    if (IsDie()) {
 
-    engineFire_->Draw();
-    heal_->Draw();
-    damage_->Draw();
-    beamCharge_->Draw();
+    } else {
+
+        for (auto& bullet : bullets_) {
+            if (bullet->GetIsAlive()) {
+                bullet->Draw();
+            }
+        }
+        beam_->Draw();
+
+        engineFire_->Draw();
+        heal_->Draw();
+        damage_->Draw();
+        beamCharge_->Draw();
+    }
 
     lifeUI_->Draw();
 
@@ -145,13 +190,19 @@ void Player::DrawImGui() {
     //ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
     //ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
     //ImGui::DragFloat3("player", &engineFireOffset_.x, 0.01f);
-    //model_->DrawImGui("player");
+    model_->DrawImGui("player");
     //engineFire_->DrawImGui("engineFire");
     //heal_->DrawImGui("h");
     //damage_->DrawImGui("d");
     //beamCharge_->DrawImGui("bc");
     //beam_->DrawImGui();
     //gauge_->DrawImGui("g");
+    ImGui::Begin("foolSpeed");
+
+    ImGui::DragFloat("fy", &dieTySpeed_, 0.1f);
+    ImGui::DragFloat("fz", &dieTzSpeed_, 0.1f);
+
+    ImGui::End();
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -522,7 +573,7 @@ void Player::Damage() {
         isDamage_ = true;
         isInvincible_ = true;
         gamePad_.SetVibration(1.0f, 1.0f, 0.5f);
-        life_--;
+        life_ --;
     }
 }
 

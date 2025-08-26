@@ -22,6 +22,8 @@ public:
 
 	void Update(Camera* camera);
 
+	void DieUpdate(Camera* camera);
+
 	void Draw();
 
 	void DrawImGui();
@@ -41,6 +43,8 @@ public:
 	bool BeamIsAlive() { return beam_->GetIsAlive(); }
 
 	void UseGamePad(bool useGamePad) { useGamePad_ = useGamePad; }
+
+	bool IsDie() { if (life_ == 0) { return true; } else { return false; } }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
@@ -54,6 +58,10 @@ private:
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	GamePad gamePad_;
+
+	float dieTySpeed_ = 2.5f;
+	float dieTzSpeed_ = 7.5f;
+	float dieRySpeed_ = 1.5f / 5.0f;
 
 	float gaugePosX_ = 37.0f;
 	float gaugeScaleX_ = 1.0f;
