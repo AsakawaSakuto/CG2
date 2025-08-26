@@ -67,6 +67,10 @@ void TitleScene::Initialize() {
 	pushSE_->Initialize("resources/sound/Scene/push.mp3");
 	quitSE_->Initialize("resources/sound/Scene/gamequit.mp3");
 	ririkuSE_->Initialize("resources/sound/SE/ririku.mp3");
+
+	bgm_->Initialize("resources/sound/BGM/titleSceneBGM.mp3");
+	bgm_->PlayAudio(true);
+	bgm_->SetVolume(0.1f);
 }
 
 void TitleScene::Update() {
@@ -93,6 +97,7 @@ void TitleScene::Update() {
 			startTimer_ = 0.0f;
 			pModelMove_ = true;
 
+			bgm_->Reset();
 			ririkuSE_->PlayAudio();
 		}
 	}
@@ -158,6 +163,7 @@ void TitleScene::Update() {
 	pushSE_->Update();
 	quitSE_->Update();
 	ririkuSE_->Update();
+	bgm_->Update();
 
 	UpdateFade();
 }
@@ -349,6 +355,7 @@ void TitleScene::CloseSound() {
 	pushSE_->Reset();
 	quitSE_->Reset();
 	ririkuSE_->Reset();
+	bgm_->Reset();
 }
 
 void TitleScene::CameraController() {

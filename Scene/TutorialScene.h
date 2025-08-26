@@ -91,6 +91,8 @@ private:
 	unique_ptr<AudioX> pushSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> quitSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> pauseSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> clearSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> bgm_ = make_unique<AudioX>();
 
 	void UpdatePause();
 	void UpdateFade();

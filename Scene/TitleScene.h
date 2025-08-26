@@ -66,6 +66,7 @@ private:
 	unique_ptr<AudioX> pushSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> quitSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> ririkuSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> bgm_ = make_unique<AudioX>();
 
 	float ririkuVolume_ = 2.0f;
 

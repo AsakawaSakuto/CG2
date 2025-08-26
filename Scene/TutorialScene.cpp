@@ -71,6 +71,11 @@ void TutorialScene::Initialize() {
 	pauseSE_->Initialize("resources/sound/scene/pause.mp3");
 	pushSE_->Initialize("resources/sound/scene/push.mp3");
 	quitSE_->Initialize("resources/sound/scene/gameQuit.mp3");
+	clearSE_->Initialize("resources/sound/SE/tutoClear.mp3");
+
+	bgm_->Initialize("resources/sound/BGM/tutoSceneBGM.mp3");
+	bgm_->PlayAudio(true);
+	bgm_->SetVolume(0.1f);
 }
 
 void TutorialScene::Update() {
@@ -99,6 +104,8 @@ void TutorialScene::Update() {
 	pauseSE_->Update();
 	pushSE_->Update();
 	quitSE_->Update();
+	clearSE_->Update();
+	bgm_->Update();
 }
 
 void TutorialScene::Draw() {
@@ -159,6 +166,8 @@ void TutorialScene::CloseSound() {
 	pauseSE_->Reset();
 	pushSE_->Reset();
 	quitSE_->Reset();
+	clearSE_->Reset();
+	bgm_->Reset();
 }
 
 void TutorialScene::UpdateFade() {
@@ -229,6 +238,7 @@ void TutorialScene::UpdateTutorialTest() {
 		if (testUIPos_.y >= 128.0f) {
 			if (lX_ != 0.0f || lY_ != 0.0f) {
 				testUIClear_ = true;
+				clearSE_->PlayAudio();
 			}
 		}
 
@@ -254,6 +264,7 @@ void TutorialScene::UpdateTutorialTest() {
 		if (testUIPos_.y >= 128.0f) {
 			if (rX_ != 0.0f || rY_ != 0.0f) {
 				testUIClear_ = true;
+				clearSE_->PlayAudio();
 			}
 		}
 
@@ -279,6 +290,7 @@ void TutorialScene::UpdateTutorialTest() {
 				timer_ += deltaTime_;
 				if (timer_ >= 0.25f) {
 					testUIClear_ = true;
+					clearSE_->PlayAudio();
 					timer_ = 0.0f;
 				}
 			}
@@ -309,6 +321,7 @@ void TutorialScene::UpdateTutorialTest() {
 
 			if (timer_ >= 1.0f && gamePad_->ReleaseButton(GamePad::L)) {
 				testUIClear_ = true;
+				clearSE_->PlayAudio();
 				timer_ = 0.0f;
 			} else if (timer_ < 1.0f && gamePad_->ReleaseButton(GamePad::L)) {
 				timer_ = 0.0f;
@@ -336,6 +349,7 @@ void TutorialScene::UpdateTutorialTest() {
 		if (testUIPos_.y >= 128.0f) {
 			if (gamePad_->RightTrigger()>=1.0f|| gamePad_->LeftTrigger() >= 1.0f) {
 				testUIClear_ = true;
+				clearSE_->PlayAudio();
 			}
 		}
 
