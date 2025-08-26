@@ -89,11 +89,25 @@ void BossArm::Update(Camera* camera) {
 void BossArm::DieUpdate(Camera* camera) {
 
 	Vector3 alT = armL_->GetTranslate();
-	alT.y -= 7.5f * deltaTime_;
+
+	if (alT.y <= -15.0f) {
+		alT.y = -15.0f;
+	} else {
+		alT.y -= 7.5f * deltaTime_;
+		alT.z += 10.0f * deltaTime_;
+	}
+
 	armL_->SetTranslate(alT);
 
 	Vector3 arT = armR_->GetTranslate();
-	arT.y -= 7.5f * deltaTime_;
+	
+	if (arT.y <= -15.0f) {
+		arT.y = -15.0f;
+	} else {
+		arT.y -= 7.5f * deltaTime_;
+		arT.z += 10.0f * deltaTime_;
+	}
+
 	armR_->SetTranslate(arT);
 
 	leftFire_->SetEmitterPosition(armL_->GetWorldPosition());

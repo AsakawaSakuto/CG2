@@ -351,8 +351,8 @@ void GameScene::Draw() {
 
 	DrawObject();
 
-	boss_->Draw();
 	player_->Draw();
+	boss_->Draw();
 
 	exprotion_->Draw();
 

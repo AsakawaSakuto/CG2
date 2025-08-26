@@ -59,9 +59,17 @@ private:
 
 	GamePad gamePad_;
 
+	unique_ptr<Particles> dieFire_ = make_unique<Particles>();
+	EmitterSphere dieFireEmitter_ = {};
+	EmitterRange dieFireRange_ = {};
+
+	unique_ptr<Particles> dieSmork_ = make_unique<Particles>();
+	EmitterSphere dieSmorkEmitter_ = {};
+	EmitterRange dieSmorkRange_ = {};
+
 	float dieTySpeed_ = 2.5f;
 	float dieTzSpeed_ = 7.5f;
-	float dieRySpeed_ = 1.5f / 5.0f;
+	float dieRySpeed_ = 1.5f / 4.0f;
 
 	float gaugePosX_ = 37.0f;
 	float gaugeScaleX_ = 1.0f;

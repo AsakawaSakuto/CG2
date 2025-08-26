@@ -35,6 +35,12 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
     beamCharge_->Initialize(dxCommon_, "resources/image/particle/box.png", 10);
 
+    dieFire_->Initialize(dxCommon_, "resources/image/particle/fire.png", 20);
+    dieFire_->UseEmitter(false);
+
+    dieSmork_->Initialize(dxCommon_, "resources/image/particle/smork.png", 2);
+    dieSmork_->UseEmitter(false);
+
 	gamePad_.Initialize();
 
     bullets_.clear();
@@ -47,8 +53,14 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
     beam_->Initialize(dxCommon_);
 
+    bulletSpawnTimer_ = 0.0f;
+    beamChargeTimer_ = 0.0f;
+    beamChargeRadius_ = 0.0f;
+    dashCoolTimer_ = 0.0f;
+    isCanDash = true;
+
     state_ = NORMAL;
-    life_ = 3;
+    life_ = 1;
     moveRotate_ = { 0.0f,0.0f,0.0f };
     isBeamShot_ = false;
     isCanDash = true;
@@ -122,7 +134,10 @@ void Player::DieUpdate(Camera* camera) {
 
     if (mR.x >= 1.5f) {
         mR.x = 1.5f;
+        dieFire_->UseEmitter(true);
+        dieSmork_->UseEmitter(false);
     } else {
+        dieSmork_->UseEmitter(true);
         mT.y -= dieTySpeed_ * deltaTime_;
         mT.z += dieTzSpeed_ * deltaTime_;
     }
@@ -131,6 +146,13 @@ void Player::DieUpdate(Camera* camera) {
     model_->SetTranslate(mT);
 
     model_->Update(*camera);
+
+    UpdateParticle();
+    dieFire_->SetEmitterPosition(model_->GetTranslate());
+    dieFire_->Update(*camera);
+
+    dieSmork_->SetEmitterPosition(model_->GetTranslate());
+    dieSmork_->Update(*camera);
 
     beam_->Update(camera);
 
@@ -158,7 +180,8 @@ void Player::Draw() {
 	model_->Draw();
     
     if (IsDie()) {
-
+        dieFire_->Draw();
+        dieSmork_->Draw();
     } else {
 
         for (auto& bullet : bullets_) {
@@ -203,6 +226,8 @@ void Player::DrawImGui() {
     ImGui::DragFloat("fz", &dieTzSpeed_, 0.1f);
 
     ImGui::End();
+
+    dieFire_->DrawImGui("direFire");
 }
 
 void Player::UpdateReticle(Camera* camera) {
@@ -537,6 +562,42 @@ void Player::UpdateParticle() {
     beamCharge_->SetEmitterRange(beamChargeRange_);
     beamCharge_->SetOffSet(beamChargeOffset_);
     beamCharge_->SetEmitterPosition(model_->GetTranslate());
+
+    //--------------------------------------------//
+
+    dieFireEmitter_.count = 100;
+    dieFireEmitter_.radius = 1.0f;
+    dieFireEmitter_.spawnTime = 0.01f;
+    dieFireEmitter_.isMove = true;
+
+    dieFireRange_.minScale = { 0.1f,0.1f,0.1f };
+    dieFireRange_.maxScale = { 1.5f,1.5f,1.5f };
+    dieFireRange_.minVelocity = { -0.5f,0.0f,-0.5f };
+    dieFireRange_.maxVelocity = { 0.5f,2.0f,0.5f };
+    dieFireRange_.minColor = { 0.9f,0.0f,0.0f };
+    dieFireRange_.maxColor = { 1.0f,0.5f,0.0f };
+    dieFireRange_.minLifeTime = 1.0f;
+    dieFireRange_.maxLifeTime = 2.0f;
+
+    dieFire_->SetEmitterValue(dieFireEmitter_);
+    dieFire_->SetEmitterRange(dieFireRange_);
+
+    dieSmorkEmitter_.count = 2;
+    dieSmorkEmitter_.radius = 0.5f;
+    dieSmorkEmitter_.spawnTime = 0.01f;
+    dieSmorkEmitter_.isMove = true;
+
+    dieSmorkRange_.minScale = { 0.1f,0.1f,0.1f };
+    dieSmorkRange_.maxScale = { 1.0f,1.0f,1.0f };
+    dieSmorkRange_.minVelocity = { -0.05f,0.0f,-0.05f };
+    dieSmorkRange_.maxVelocity = { 0.05f,1.0f,0.05f };
+    dieSmorkRange_.minColor = { 1.0f,1.0f,1.0f };
+    dieSmorkRange_.maxColor = { 1.0f,1.0f,1.0f };
+    dieSmorkRange_.minLifeTime = 0.1f;
+    dieSmorkRange_.maxLifeTime = 0.75f;
+
+    dieSmork_->SetEmitterValue(dieSmorkEmitter_);
+    dieSmork_->SetEmitterRange(dieSmorkRange_);
 }
 
 void Player::UpdateLife() {

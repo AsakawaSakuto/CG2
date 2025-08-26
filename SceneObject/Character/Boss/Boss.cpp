@@ -111,24 +111,26 @@ void Boss::Update(Camera* camera) {
 
 void Boss::DieUpdate(Camera* camera) {
 
-	arm_->DieUpdate(camera);
-
+	Vector3 bR = body_->GetRotate();
 	Vector3 bT = body_->GetTranslate();
-	bT.y -= deltaTime_ * dieFoolSpeed_;
 
-	if (bT.y <= -25.0f) {
-		bT.y = -25.0f;
+	if (bT.y <= -15.0f) {
+		bT.y = -15.0f;
+	} else {
+		bT.y -= deltaTime_ * dieFoolSpeed_;
+		bT.z += deltaTime_ * 10.0f;
+
+		bR.x += deltaTime_ * dieRotateSpeed_;
+		bR.y -= deltaTime_ * dieRotateSpeed_;
+		bR.z += deltaTime_ * dieRotateSpeed_;
 	}
 
 	body_->SetTranslate(bT);
-
-	Vector3 bR = body_->GetRotate();
-	bR.x += deltaTime_ * dieRotateSpeed_;
-	bR.y -= deltaTime_ * dieRotateSpeed_;
-	bR.z += deltaTime_ * dieRotateSpeed_;
 	body_->SetRotate(bR);
 
 	body_->Update(*camera);
+
+	arm_->DieUpdate(camera);
 
 	halo_->SetTranslate(body_->GetTranslate());
 	halo_->Update(*camera);
@@ -137,10 +139,8 @@ void Boss::DieUpdate(Camera* camera) {
 	ringR_->SetTranslate(body_->GetTranslate());
 	ringR_->Update(*camera);
 
-	if (IsDie()) {
-		leftFire_->UseEmitter(false); 
-		rightFire_->UseEmitter(false);
-	}
+	leftFire_->UseEmitter(false);
+	rightFire_->UseEmitter(false);
 
 	leftFire_->SetEmitterPosition(body_->GetTranslate());
 	leftFire_->SetOffSet({ -2.0f,-3.0f,0.0f });
@@ -154,7 +154,7 @@ void Boss::DieUpdate(Camera* camera) {
 
 	dieFire_->SetEmitterPosition(body_->GetTranslate());
 	dieFire_->Update(*camera);
-	if (bT.y >= -24.0f) {
+	if (bT.y >= -14.0f) {
 		dieFire_->UseEmitter(false);
 		dieFire_->SetEmit(false);
 	} else {
@@ -188,7 +188,7 @@ void Boss::Draw() {
 }
 
 void Boss::DrawImGui() {
-	//body_->DrawImGui("b");
+	body_->DrawImGui("b");
 	//arm_->DrawImGui();
 	//hpBar_->DrawImGui("bar");
 	//hpUI_->DrawImGui("1");
