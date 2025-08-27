@@ -258,13 +258,14 @@ void TitleScene::SceneController() {
 
 			titleUI_->SetTexture("resources/image/UI/title1.png");
 
-			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)||
+				ctx_->input.TriggerKey(DIK_S) || ctx_->input.TriggerKey(DIK_D)) {
 				state_ = kTutorial;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
 
-			if (gamePad_->TriggerButton(GamePad::A)) {
+			if (gamePad_->TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 				fade_->SetIsFade(true);
 				isStart_ = true;
 				pushSE_->PlayAudio();
@@ -276,18 +277,20 @@ void TitleScene::SceneController() {
 
 			titleUI_->SetTexture("resources/image/UI/title2.png");
 
-			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT) ||
+				ctx_->input.TriggerKey(DIK_S) || ctx_->input.TriggerKey(DIK_D)) {
 				state_ = kQuit;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
-			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT) ||
+				ctx_->input.TriggerKey(DIK_W) || ctx_->input.TriggerKey(DIK_A)) {
 				state_ = kPlay;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
 
-			if (gamePad_->TriggerButton(GamePad::A)) {
+			if (gamePad_->TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 				fade_->SetIsFade(true);
 				isStart_ = true;
 				pushSE_->PlayAudio();
@@ -299,13 +302,14 @@ void TitleScene::SceneController() {
 
 			titleUI_->SetTexture("resources/image/UI/title3.png");
 
-			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT) || 
+				ctx_->input.TriggerKey(DIK_W) || ctx_->input.TriggerKey(DIK_A)) {
 				state_ = kTutorial;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
 
-			if (gamePad_->TriggerButton(GamePad::A)) {
+			if (gamePad_->TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 				quitSE_->PlayAudio();
 				quitSE_->SetVolume(2.0f);
 				isQuit_ = true;
@@ -366,15 +370,6 @@ void TitleScene::CloseSound() {
 }
 
 void TitleScene::CameraController() {
-	if (ctx_->input.TriggerKey(DIK_SPACE)) {
-		if (isDebugCamera_) {
-			isDebugCamera_ = false;
-		}
-		else {
-			isDebugCamera_ = true;
-		}
-	}
-
 	if (isDebugCamera_) {
 		if (debugCamera_ != nullptr) {
 			debugCamera_->Update();
