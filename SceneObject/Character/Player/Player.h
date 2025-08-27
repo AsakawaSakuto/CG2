@@ -65,6 +65,8 @@ private:
 	unique_ptr<AudioX> damageSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> dashSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> bShotSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> beamChargeSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> beamShotSE_ = make_unique<AudioX>();
 
 	GamePad gamePad_;
 

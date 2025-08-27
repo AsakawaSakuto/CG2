@@ -97,6 +97,15 @@ public:
     // // 全インスタンスに音量を適用（0.0f～2.0f）
     void SetVolume(float volume);
 
+    // 再生中の全インスタンスを即時停止して破棄（PCMとXAudio2は残す）
+    void StopAll();
+
+    // 直近に再生開始した1インスタンスだけ止める（任意）
+    void StopLatest();
+
+    // ループ再生インスタンスだけ止める（任意）
+    void StopAllLoops();
+
     ~AudioX() { Reset(); }
 
 private:

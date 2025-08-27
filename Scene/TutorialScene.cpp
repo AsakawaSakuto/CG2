@@ -72,6 +72,8 @@ void TutorialScene::Initialize() {
 	pushSE_->Initialize("resources/sound/scene/push.mp3");
 	quitSE_->Initialize("resources/sound/scene/gameQuit.mp3");
 	clearSE_->Initialize("resources/sound/SE/tutoClear.mp3");
+	spinSE_->Initialize("resources/sound/SE/spin.mp3");
+	shotSE_->Initialize("resources/sound/SE/enemyShot.mp3");
 
 	bgm_->Initialize("resources/sound/BGM/tutoSceneBGM.mp3");
 	bgm_->PlayAudio(true);
@@ -105,6 +107,9 @@ void TutorialScene::Update() {
 	pushSE_->Update();
 	quitSE_->Update();
 	clearSE_->Update();
+	spinSE_->Update();
+	shotSE_->Update();
+
 	bgm_->Update();
 }
 
@@ -167,6 +172,8 @@ void TutorialScene::CloseSound() {
 	pushSE_->Reset();
 	quitSE_->Reset();
 	clearSE_->Reset();
+	spinSE_->Reset();
+	shotSE_->Reset();
 	bgm_->Reset();
 }
 
@@ -212,7 +219,7 @@ void TutorialScene::UpdatePause() {
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
-				quitSE_->PlayAudio();
+				pushSE_->PlayAudio();
 			}
 			break;
 		}
@@ -413,6 +420,8 @@ void TutorialScene::UpdateEnemy() {
 			enemyBullet_->SetTranslate(enemy_->GetTranslate());
 			bulletVelocity_ = player_->GetWorldPosition() - enemy_->GetWorldPosition();
 			bulletVelocity_ = bulletVelocity_.Normalize();
+
+			shotSE_->PlayAudio();
 		}
 	} else {
 		isAttackTimer_ += deltaTime_;
@@ -420,6 +429,8 @@ void TutorialScene::UpdateEnemy() {
 		if (isAttackTimer_ >= 5.0f) {
 			isAttackTimer_ = 0.0f;
 			isAttack_ = true;
+
+			spinSE_->PlayAudio();
 		}
 	}
 

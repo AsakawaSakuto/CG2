@@ -74,6 +74,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     damageSE_->Initialize("resources/sound/SE/pHit.wav");
     dashSE_->Initialize("resources/sound/SE/dash.mp3");
     bShotSE_->Initialize("resources/sound/SE/pShot.mp3");
+    beamChargeSE_->Initialize("resources/sound/SE/beamCharge.mp3");
+    beamShotSE_->Initialize("resources/sound/SE/beamShot.mp3");
 }
 
 void Player::Update(Camera* camera) {
@@ -134,6 +136,8 @@ void Player::Update(Camera* camera) {
     dashSE_->Update();
     damageSE_->Update();
     bShotSE_->Update();
+    beamChargeSE_->Update();
+    beamShotSE_->Update();
 }
 
 void Player::DieUpdate(Camera* camera) {
@@ -354,14 +358,20 @@ void Player::Attack() {
                     bulletSpawnTimer_ = 0.0f;
 
                     bShotSE_->PlayAudio();
-                    bShotSE_->SetVolume(0.5f);
+                    bShotSE_->SetVolume(0.2f);
                     break;
                 }
             }
         }
     }
 
-    if (gamePad_.PushButton(GamePad::L) && state_ == NORMAL) {
+    if (gamePad_.TriggerButton(GamePad::L)) {
+        if(!isBeamShot_) {
+            beamChargeSE_->PlayAudio();
+        }
+    }
+
+    if (gamePad_.PushButton(GamePad::L)) {
         moveSpeed_ = minSpeed_;
         beamChargeTimer_ += deltaTime_;
         beamChargeRadius_ += deltaTime_;
@@ -387,6 +397,8 @@ void Player::Attack() {
                 beamChargeTimer_ = 0.0f;
                 beamChargeRadius_ = 0.0f;
                 moveSpeed_ = maxSpeed_;
+
+                beamShotSE_->PlayAudio();
             }
             gaugePosX_ = 30.0f;
             gaugeScaleX_ = 1.0f;
@@ -403,6 +415,8 @@ void Player::Attack() {
             gaugePosX_ = 30.0f;
             gaugeScaleX_ = 1.0f;
             gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
+            beamChargeSE_->StopAll();
         }
         beamChargeRange_.minColor = { 0.0f,0.0f,0.0f };
         beamChargeRange_.maxColor = { 1.0f,1.0f,1.0f };
@@ -677,4 +691,6 @@ void Player::CloseSound() {
     dashSE_->Reset();
     damageSE_->Reset();
     bShotSE_->Reset();
+    beamChargeSE_->Reset();
+    beamShotSE_->Reset();
 }

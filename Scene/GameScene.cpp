@@ -550,7 +550,7 @@ void GameScene::UpdatePause() {
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
-				quitSE_->PlayAudio();
+				pushSE_->PlayAudio();
 			}
 			break;
 		}

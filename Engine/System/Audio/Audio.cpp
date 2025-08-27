@@ -66,3 +66,32 @@ void AudioX::SetVolume(float volume) {
         }
     }
 }
+
+void AudioX::StopAll() {
+    // // 再生中のボイスを即停止→キュー破棄
+    for (auto& a : actives_) {
+        if (a) a->Stop();
+    }
+    // // DestroyVoice は unique_ptr のデリータが実行
+    actives_.clear();
+    // // PCM(pcmShared_)とXAudio2は残るので、すぐ PlayAudio() し直せる
+}
+
+void AudioX::StopLatest() {
+    if (actives_.empty()) return;
+    auto& a = actives_.back();
+    if (a) a->Stop();
+    actives_.pop_back();
+}
+
+void AudioX::StopAllLoops() {
+    for (size_t i = 0; i < actives_.size();) {
+        auto& a = actives_[i];
+        if (a && a->loop_) {
+            a->Stop();
+            actives_.erase(actives_.begin() + i);
+            continue;
+        }
+        ++i;
+    }
+}
