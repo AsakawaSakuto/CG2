@@ -20,46 +20,56 @@ void Input::Initialize(WinApp* winApp) {
 
 void Input::Update() {
 
-	memcpy(keyPre_, key_, sizeof(key_));
+    // // 前フレームのキーボード状態をバックアップ
+    memcpy(keyPre_, key_, sizeof(key_));
 
-	// キーボードの取得開始
-	keyboard_->Acquire();
-	keyboard_->GetDeviceState(sizeof(key_), key_);
+    // ===== キーボード（失敗時はゼロクリアで安全側） =====
+    if (keyboard_) {
+        HRESULT hr = keyboard_->Acquire();
+        if (SUCCEEDED(hr)) {
+            hr = keyboard_->GetDeviceState(sizeof(key_), key_);
+        }
+        if (FAILED(hr)) {
+            // // フォーカス喪失/入力ロスト等。落とさず0埋めで次フレーム再取得。
+            ZeroMemory(key_, sizeof(key_));
+        }
+    } else {
+        ZeroMemory(key_, sizeof(key_));
+    }
 
-	// マウス座標更新
-	previousMousePos_ = currentMousePos_;
-	currentMousePos_ = {
-		static_cast<float>(winApp_->GetMouseX()),
-		static_cast<float>(winApp_->GetMouseY())
-	};
+    // ===== マウス座標（グローバル→クライアント。ウィンドウ外でも更新される） =====
+    previousMousePos_ = currentMousePos_;
+    POINT pt{};
+    if (::GetCursorPos(&pt)) {
+        ::ScreenToClient(winApp_->GetHWND(), &pt);
+        currentMousePos_.x = static_cast<float>(pt.x);
+        currentMousePos_.y = static_cast<float>(pt.y);
+    }
 
-	// マウスボタンの前フレーム値保存
-	preMouseL_ = isMouseL_;
-	preMouseR_ = isMouseR_;
+    // // 画面内に留めたい場合は任意でクランプ
+    // currentMousePos_.x = std::clamp(currentMousePos_.x, 0.0f, (float)WinApp::kClientWidth_  - 1.0f);
+    // currentMousePos_.y = std::clamp(currentMousePos_.y, 0.0f, (float)WinApp::kClientHeight_ - 1.0f);
 
-	// WinAppから現在のボタン状態を取得
-	isMouseL_ = winApp_->MouseLButtonDown();
-	isMouseR_ = winApp_->MouseRButtonDown();
+    // ===== マウスボタン（WinApp依存をやめてグローバル取得） =====
+    preMouseL_ = isMouseL_;
+    preMouseR_ = isMouseR_;
+    isMouseL_ = (::GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+    isMouseR_ = (::GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0;
 
-	// ホイール入力取得
-	wheelDelta_ = static_cast<float>(winApp_->GetWheelDelta()) / WHEEL_DELTA;
-	winApp_->ResetWheelDelta();
+    // ===== ホイール（これはメッセージ由来のまま） =====
+    wheelDelta_ = static_cast<float>(winApp_->GetWheelDelta()) / WHEEL_DELTA;
+    winApp_->ResetWheelDelta();
 }
 
-bool Input::PushKey(BYTE keyNumber) {
-	if (key_[keyNumber])
-	{
-		return true;
-	}
-	return false;
+bool Input::PushKey(int keyNumber) {
+	// // ここで範囲外を弾く（0..255のみ）
+	if (keyNumber < 0 || keyNumber > 255) { return false; }
+	return key_[keyNumber] != 0;
 }
 
-bool Input::TriggerKey(BYTE keyNumber) {
-	if (key_[keyNumber] && !keyPre_[keyNumber])
-	{
-		return true;
-	}
-	return false;
+bool Input::TriggerKey(int keyNumber) {
+	if (keyNumber < 0 || keyNumber > 255) { return false; }
+	return (key_[keyNumber] && !keyPre_[keyNumber]);
 }
 
 void Input::SetMousePosition(LONG x, LONG y) {

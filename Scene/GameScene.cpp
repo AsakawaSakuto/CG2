@@ -13,6 +13,7 @@ void GameScene::Initialize() {
 
 	player_->Initialize(&ctx_->dxCommon);
 	player_->UseGamePad(false);
+	player_->SetInput(&ctx_->input);
 
 	bossTy_ = 50.0f;
 	boss_->UseFire(false);
@@ -520,7 +521,7 @@ void GameScene::UpdateFade() {
 
 void GameScene::UpdatePause() {
 	if (isPause_ && !fade_->GetIsFade()) {
-		if (gamePad_->TriggerButton(GamePad::START)) {
+		if (gamePad_->TriggerButton(GamePad::START) || ctx_->input.TriggerKey(DIK_TAB)) {
 			isPause_ = false;
 			pauseSE_->PlayAudio();
 			pauseSE_->SetVolume(0.5f);
@@ -531,13 +532,13 @@ void GameScene::UpdatePause() {
 		case GameScene::kBack:
 			pauseUI_->SetTexture("resources/image/UI/pause2.png");
 
-			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT) || ctx_->input.TriggerKey(DIK_D)) {
 				pause_ = kQuit;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
 
-			if (gamePad_->TriggerButton(GamePad::A)) {
+			if (gamePad_->TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 				isPause_ = false;
 				pushSE_->PlayAudio();
 				pushSE_->SetVolume(0.5f);
@@ -546,13 +547,13 @@ void GameScene::UpdatePause() {
 		case GameScene::kQuit:
 			pauseUI_->SetTexture("resources/image/UI/pause3.png");
 
-			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT) || ctx_->input.TriggerKey(DIK_A)) {
 				pause_ = kBack;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
 
-			if (gamePad_->TriggerButton(GamePad::A)) {
+			if (gamePad_->TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 				fade_->SetIsFade(true);
 				pushSE_->PlayAudio();
 				pushSE_->SetVolume(0.5f);
@@ -561,7 +562,7 @@ void GameScene::UpdatePause() {
 		}
 
 	} else if(!isPause_ && !fade_->GetIsFade()) {
-		if (gamePad_->TriggerButton(GamePad::START)) {
+		if (gamePad_->TriggerButton(GamePad::START) || ctx_->input.TriggerKey(DIK_TAB) || player_->IsScreenOut()) {
 			isPause_ = true;
 			pauseSE_->PlayAudio();
 			pauseSE_->SetVolume(0.5f);
@@ -919,13 +920,6 @@ void GameScene::DrawObject() {
 }
 
 void GameScene::CameraController() {
-	if (ctx_->input.TriggerKey(DIK_SPACE)) {
-		if (isDebugCamera_) {
-			isDebugCamera_ = false;
-		} else {
-			isDebugCamera_ = true;
-		}
-	}
 
 	if (isDebugCamera_) {
 		if (debugCamera_ != nullptr) {

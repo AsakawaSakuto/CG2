@@ -60,7 +60,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     isCanDash = true;
 
     state_ = NORMAL;
-    life_ = 1;
+    life_ = 3;
     moveRotate_ = { 0.0f,0.0f,0.0f };
     isBeamShot_ = false;
     isCanDash = true;
@@ -76,6 +76,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     bShotSE_->Initialize("resources/sound/SE/pShot.mp3");
     beamChargeSE_->Initialize("resources/sound/SE/beamCharge.mp3");
     beamShotSE_->Initialize("resources/sound/SE/beamShot.mp3");
+
+    isScreenOut_ = false;
+    isScreenIn_ = false;
 }
 
 void Player::Update(Camera* camera) {
@@ -227,7 +230,7 @@ void Player::DrawImGui() {
     //ImGui::DragFloat("BulledSpawn", &bulletSpawnTime_, 0.01f);
     //ImGui::DragFloat("Distance", &kDistanceToReticle, 1.0f);
     //ImGui::DragFloat3("player", &engineFireOffset_.x, 0.01f);
-    model_->DrawImGui("player");
+    //model_->DrawImGui("player");
     //engineFire_->DrawImGui("engineFire");
     //heal_->DrawImGui("h");
     //damage_->DrawImGui("d");
@@ -236,8 +239,12 @@ void Player::DrawImGui() {
     //gauge_->DrawImGui("g");
     ImGui::Begin("foolSpeed");
 
-    ImGui::DragFloat("fy", &dieTySpeed_, 0.1f);
-    ImGui::DragFloat("fz", &dieTzSpeed_, 0.1f);
+    ImGui::Text("m X:%f Y%f", input_->GetMousePos().x, input_->GetMousePos().y);
+    if (isScreenOut_) {
+        ImGui::Text("true");
+    } else {
+        ImGui::Text("false");
+    }
 
     ImGui::End();
 
@@ -245,32 +252,57 @@ void Player::DrawImGui() {
 }
 
 void Player::UpdateReticle(Camera* camera) {
+    Vector2 position;
+    if (gamePad_.IsConnected()) {
+        position = reticle2D_->GetPosition();
 
-    Vector2 position = reticle2D_->GetPosition();
+        // 左スティックの入力取得
+        float lx = gamePad_.RightStickX(); // -1.0 ~ +1.0
+        float ly = gamePad_.RightStickY(); // -1.0 ~ +1.0
 
-    // 左スティックの入力取得
-    float lx = gamePad_.RightStickX(); // -1.0 ~ +1.0
-    float ly = gamePad_.RightStickY(); // -1.0 ~ +1.0
+        // 入力ベクトル
+        Vector2 move(lx, ly);
 
-    // 入力ベクトル
-    Vector2 move(lx, ly);
+        // 斜めで速くなりすぎないように長さをクランプ
+        float length = sqrt(move.x * move.x + move.y * move.y);
+        if (length > 1.0f)
+        {
+            move.x /= length;
+            move.y /= length;
+        }
 
-    // 斜めで速くなりすぎないように長さをクランプ
-    float length = sqrt(move.x * move.x + move.y * move.y);
-    if (length > 1.0f)
-    {
-        move.x /= length;
-        move.y /= length;
+        // 位置を更新（倒し量＝速度）
+        position.x += move.x * reticleSpeed_ * deltaTime_;
+        position.y -= move.y * reticleSpeed_ * deltaTime_;
+
+        position.x = std::clamp(position.x, 0.0f, 1280.0f);
+        position.y = std::clamp(position.y, 0.0f, 720.0f);
+
+        reticle2D_->SetPosition(position);
+    } else {
+        position = input_->GetMousePos();
+        reticle2D_->SetPosition(position);
+
+        // 画面サイズ
+        const float w = static_cast<float>(WinApp::kClientWidth_);
+        const float h = static_cast<float>(WinApp::kClientHeight_);
+
+        // マウス座標
+        const Vector2 mp = input_->GetMousePos();
+
+        // まず「画面内か」を判定（ANDで内側全部を満たす）
+        const bool isInside =
+            (mp.x >= 0.0f) && (mp.x < w) &&
+            (mp.y >= 0.0f) && (mp.y < h);
+
+        // 画面外なら true、中なら false を明示代入
+        if (!isInside) {
+            isScreenOut_ = true;
+        } else {
+            isScreenOut_ = false;
+        }
+
     }
-
-    // 位置を更新（倒し量＝速度）
-    position.x += move.x * reticleSpeed_ * deltaTime_;
-    position.y -= move.y * reticleSpeed_ * deltaTime_;
-
-    position.x = std::clamp(position.x, 0.0f, 1280.0f);
-    position.y = std::clamp(position.y, 0.0f, 720.0f);
-
-    reticle2D_->SetPosition(position);
 
     //-------------------------------------------------//
 
@@ -314,9 +346,30 @@ void Player::Move() {
     if (state_ == NORMAL) {
         Vector3 translate = model_->GetTranslate();
 
-        // 左スティックの入力取得
-        float lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
-        float ly = gamePad_.LeftStickY(); // -1.0 ~ +1.0
+        float lx = 0.0f;
+        float ly = 0.0f;
+
+        if (gamePad_.IsConnected()) {
+            // 左スティックの入力取得
+            lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
+            ly = gamePad_.LeftStickY(); // -1.0 ~ +1.0
+        } else {
+            if (input_->PushKey(DIK_A)) {
+                lx = -1.0f;
+            }
+            
+            if (input_->PushKey(DIK_D)) {
+                lx = 1.0f;
+            }
+            
+            if (input_->PushKey(DIK_W)) {
+                ly = 1.0f;
+            }
+            
+            if (input_->PushKey(DIK_S)) {
+                ly = -1.0f;
+            }
+        }
 
         // 入力ベクトル
         Vector2 move(lx, ly);
@@ -349,7 +402,7 @@ void Player::Move() {
 
 void Player::Attack() {
     // Rボタントリガーで弾を発射
-    if (gamePad_.PushButton(GamePad::R) && state_== NORMAL) {
+    if (gamePad_.PushButton(GamePad::R) && state_== NORMAL || input_->PushMouseButtonL() && state_ == NORMAL) {
         bulletSpawnTimer_ += deltaTime_;
         if (bulletSpawnTimer_ >= bulletSpawnTime_) {
             for (auto& bullet : bullets_) {
@@ -365,13 +418,13 @@ void Player::Attack() {
         }
     }
 
-    if (gamePad_.TriggerButton(GamePad::L)) {
+    if (gamePad_.TriggerButton(GamePad::L) || input_->TriggerMouseButtonR()) {
         if(!isBeamShot_) {
             beamChargeSE_->PlayAudio();
         }
     }
 
-    if (gamePad_.PushButton(GamePad::L)) {
+    if (gamePad_.PushButton(GamePad::L) || input_->PushMouseButtonR()) {
         moveSpeed_ = minSpeed_;
         beamChargeTimer_ += deltaTime_;
         beamChargeRadius_ += deltaTime_;
@@ -388,7 +441,7 @@ void Player::Attack() {
     }
 
     if (isBeamShot_) {
-        if (gamePad_.ReleaseButton(GamePad::L)) {
+        if (gamePad_.ReleaseButton(GamePad::L) || !input_->PushMouseButtonR()) {
             if (!beam_->GetIsAlive()) {
                 beam_->Spawn(model_->GetTranslate(), beamVelocity_);
                 beam_->SetIsAlive(true);
@@ -407,7 +460,7 @@ void Player::Attack() {
         beamChargeRange_.minColor = { 0.0f,0.0f,0.2f };
         beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
     } else {
-        if (gamePad_.ReleaseButton(GamePad::L)) {
+        if (gamePad_.ReleaseButton(GamePad::L) || !input_->PushMouseButtonR()) {
             beamCharge_->UseEmitter(false);
             beamChargeTimer_ = 0.0f;
             beamChargeRadius_ = 0.0f;
@@ -428,14 +481,14 @@ void Player::Attack() {
 void Player::Action() {
     // ZR ZL で左右にダッシュ
     if (state_ == NORMAL && isCanDash) {
-        if (gamePad_.RightTrigger() >= 0.5f) {
+        if (gamePad_.RightTrigger() >= 0.5f || input_->TriggerKey(DIK_SPACE) && input_->PushKey(DIK_D)) {
             state_ = DASH;
             isCanDash = false;
             dashRotateSpeed_ = -6.28f * 2.0f;
             dashDirection_ = 1.0f;
 
             dashSE_->PlayAudio();
-        } else if (gamePad_.LeftTrigger() >= 0.5f) {
+        } else if (gamePad_.LeftTrigger() >= 0.5f || input_->TriggerKey(DIK_SPACE) && input_->PushKey(DIK_A)) {
             state_ = DASH;
             isCanDash = false;
             dashRotateSpeed_ = 6.28f * 2.0f;

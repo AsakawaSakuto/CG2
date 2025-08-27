@@ -10,6 +10,7 @@
 #include"Particles.h"
 
 #include"Audio.h"
+#include"Input.h"
 
 #include <list>
 
@@ -49,6 +50,11 @@ public:
 	bool IsDie() { if (life_ == 0) { return true; } else { return false; } }
 
 	void CloseSound();
+
+	void SetInput(Input* input) { input_ = input; }
+
+	bool IsScreenOut() { return isScreenOut_; }
+	bool IsScreenIn() { return isScreenIn_; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
@@ -69,6 +75,10 @@ private:
 	unique_ptr<AudioX> beamShotSE_ = make_unique<AudioX>();
 
 	GamePad gamePad_;
+
+	Input* input_ = nullptr;
+	bool isScreenOut_ = false;
+	bool isScreenIn_ = false;
 
 	unique_ptr<Particles> dieFire_ = make_unique<Particles>();
 	EmitterSphere dieFireEmitter_ = {};

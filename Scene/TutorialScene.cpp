@@ -10,6 +10,7 @@ void TutorialScene::Initialize() {
 
 	player_->Initialize(&ctx_->dxCommon);
 	player_->UseGamePad(true);
+	player_->SetInput(&ctx_->input);
 
 	skyBox_->Initialize(&ctx_->dxCommon);
 
@@ -156,6 +157,8 @@ void TutorialScene::Draw() {
 	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 	/*ImGui::ShowDemoWindow();*/
 
+	player_->DrawImGui();
+
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 
@@ -189,7 +192,7 @@ void TutorialScene::UpdateFade() {
 
 void TutorialScene::UpdatePause() {
 	if (isPause_) {
-		if (gamePad_->TriggerButton(GamePad::START)) {
+		if (gamePad_->TriggerButton(GamePad::START) || ctx_->input.TriggerKey(DIK_TAB)) {
 			isPause_ = false;
 			pauseSE_->PlayAudio();
 			pauseSE_->SetVolume(0.5f);
@@ -200,13 +203,13 @@ void TutorialScene::UpdatePause() {
 		case TutorialScene::kBack:
 			pauseUI_->SetTexture("resources/image/UI/pause2.png");
 
-			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT) || ctx_->input.TriggerKey(DIK_D)) {
 				pause_ = kQuit;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
 
-			if (gamePad_->TriggerButton(GamePad::A)) {
+			if (gamePad_->TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 				isPause_ = false;
 				pushSE_->PlayAudio();
 				pushSE_->SetVolume(0.5f);
@@ -215,13 +218,13 @@ void TutorialScene::UpdatePause() {
 		case TutorialScene::kQuit:
 			pauseUI_->SetTexture("resources/image/UI/pause3.png");
 
-			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
+			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT) || ctx_->input.TriggerKey(DIK_A)) {
 				pause_ = kBack;
 				selectSE_->PlayAudio();
 				selectSE_->SetVolume(0.5f);
 			}
 
-			if (gamePad_->TriggerButton(GamePad::A)) {
+			if (gamePad_->TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 				fade_->SetIsFade(true);
 				pushSE_->PlayAudio();
 				pushSE_->SetVolume(0.5f);
@@ -230,7 +233,7 @@ void TutorialScene::UpdatePause() {
 		}
 
 	} else {
-		if (gamePad_->TriggerButton(GamePad::START)) {
+		if (gamePad_->TriggerButton(GamePad::START) || ctx_->input.TriggerKey(DIK_TAB) || player_->IsScreenOut()) {
 			isPause_ = true;
 			pauseSE_->PlayAudio();
 			pauseSE_->SetVolume(0.5f);
@@ -245,8 +248,26 @@ void TutorialScene::UpdatePause() {
 void TutorialScene::UpdateTutorialTest() {
 	switch (testState_) {
 	case Test1:
-		lX_ = gamePad_->LeftStickX();
-		lY_ = gamePad_->LeftStickY();
+		if (ctx_->gamePad.IsConnected()) {
+			lX_ = gamePad_->LeftStickX();
+			lY_ = gamePad_->LeftStickY();
+		} else {
+			if (ctx_->input.PushKey(DIK_A)) {
+				lX_ = -1.0f;
+			}
+
+			if (ctx_->input.PushKey(DIK_D)) {
+				lX_ = 1.0f;
+			}
+
+			if (ctx_->input.PushKey(DIK_W)) {
+				lY_ = 1.0f;
+			}
+
+			if (ctx_->input.PushKey(DIK_S)) {
+				lY_ = -1.0f;
+			}
+		}
 
 		if (testUIPos_.y >= 128.0f) {
 			if (lX_ != 0.0f || lY_ != 0.0f) {
@@ -271,8 +292,13 @@ void TutorialScene::UpdateTutorialTest() {
 		}
 		break;
 	case TutorialScene::Test2:
-		rX_ = gamePad_->RightStickX();
-		rY_ = gamePad_->RightStickY();
+		if (ctx_->gamePad.IsConnected()) {
+			rX_ = gamePad_->RightStickX();
+			rY_ = gamePad_->RightStickY();
+		} else {
+			rX_ = ctx_->input.GetMousePos().x;
+			rY_ = ctx_->input.GetMousePos().y;
+		}
 
 		if (testUIPos_.y >= 128.0f) {
 			if (rX_ != 0.0f || rY_ != 0.0f) {
@@ -299,7 +325,7 @@ void TutorialScene::UpdateTutorialTest() {
 		break;
 	case TutorialScene::Test3:
 		if (testUIPos_.y >= 128.0f) {
-			if (gamePad_->PushButton(GamePad::R)) {
+			if (gamePad_->PushButton(GamePad::R) || ctx_->input.PushMouseButtonL()) {
 				timer_ += deltaTime_;
 				if (timer_ >= 0.25f) {
 					testUIClear_ = true;
@@ -328,15 +354,15 @@ void TutorialScene::UpdateTutorialTest() {
 		break;
 	case TutorialScene::Test4:
 		if (testUIPos_.y >= 128.0f) {
-			if (gamePad_->PushButton(GamePad::L)) {
-				timer_ += deltaTime_;
+			if (gamePad_->PushButton(GamePad::L) || ctx_->input.PushMouseButtonR()) {
+				if (!testUIClear_) {
+					timer_ += deltaTime_;
+				}
 			}
 
-			if (timer_ >= 1.0f && gamePad_->ReleaseButton(GamePad::L)) {
+			if (timer_ >= 1.0f) {
 				testUIClear_ = true;
 				clearSE_->PlayAudio();
-				timer_ = 0.0f;
-			} else if (timer_ < 1.0f && gamePad_->ReleaseButton(GamePad::L)) {
 				timer_ = 0.0f;
 			}
 		}
@@ -360,7 +386,9 @@ void TutorialScene::UpdateTutorialTest() {
 		break;
 	case TutorialScene::Test5:
 		if (testUIPos_.y >= 128.0f) {
-			if (gamePad_->RightTrigger()>=1.0f|| gamePad_->LeftTrigger() >= 1.0f) {
+			if (gamePad_->RightTrigger()>=1.0f|| gamePad_->LeftTrigger() >= 1.0f
+				|| ctx_->input.PushKey(DIK_A)&&ctx_->input.TriggerKey(DIK_SPACE)
+				|| ctx_->input.PushKey(DIK_D) && ctx_->input.TriggerKey(DIK_SPACE)) {
 				testUIClear_ = true;
 				clearSE_->PlayAudio();
 			}
@@ -501,14 +529,6 @@ void TutorialScene::UpdateCollision() {
 }
 
 void TutorialScene::CameraController() {
-	if (ctx_->input.TriggerKey(DIK_SPACE)) {
-		if (isDebugCamera_) {
-			isDebugCamera_ = false;
-		}
-		else {
-			isDebugCamera_ = true;
-		}
-	}
 
 	if (isDebugCamera_) {
 		if (debugCamera_ != nullptr) {

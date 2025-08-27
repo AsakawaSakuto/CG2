@@ -16,6 +16,7 @@ public:
 	void Update() override;
 	void Draw() override;
 private:
+
 	AppContext* ctx_ = nullptr;
 
 	GamePad* gamePad_ = nullptr;
