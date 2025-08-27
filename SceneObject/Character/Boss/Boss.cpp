@@ -31,7 +31,7 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	time_ = 0.0f;
 	startPosition_ = {};
 
-	life_ = 390.0f;
+	life_ = 1.0f;
 
 	InitParticle();
 
@@ -263,7 +263,7 @@ void Boss::InitParticle() {
 	dieSmorkRange_.maxLifeTime = 1.0f;
 	dieSmork_->SetEmitterRange(dieSmorkRange_);
 
-	dieFire_->Initialize(dxCommon_, "resources/image/particle/fire.png", 20);
+	dieFire_->Initialize(dxCommon_, "resources/image/particle/circle.png", 50);
 
 	dieFireEmitter_.count = 100;
 	dieFireEmitter_.isMove = true;

@@ -35,7 +35,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
     beamCharge_->Initialize(dxCommon_, "resources/image/particle/box.png", 10);
 
-    dieFire_->Initialize(dxCommon_, "resources/image/particle/fire.png", 20);
+    dieFire_->Initialize(dxCommon_, "resources/image/particle/circle.png", 100);
     dieFire_->UseEmitter(false);
 
     dieSmork_->Initialize(dxCommon_, "resources/image/particle/smork.png", 2);
@@ -730,7 +730,7 @@ void Player::UpdateParticle() {
 
     //--------------------------------------------//
 
-    dieFireEmitter_.count = 100;
+    dieFireEmitter_.count = 250;
     dieFireEmitter_.radius = 1.0f;
     dieFireEmitter_.spawnTime = 0.01f;
     dieFireEmitter_.isMove = true;
