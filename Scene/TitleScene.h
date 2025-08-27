@@ -71,6 +71,7 @@ private:
 	float ririkuVolume_ = 2.0f;
 
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> deviceUI_ = make_unique<Sprite>();
 
 	unique_ptr<Sprite> flag1_ = make_unique<Sprite>();
 	unique_ptr<Sprite> flag2_ = make_unique<Sprite>();

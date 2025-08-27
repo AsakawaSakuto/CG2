@@ -71,6 +71,9 @@ void TitleScene::Initialize() {
 	bgm_->Initialize("resources/sound/BGM/titleSceneBGM.mp3");
 	bgm_->PlayAudio(true);
 	bgm_->SetVolume(0.5f);
+
+	deviceUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/useDevice1.png", { 1280.0f,720.0f });
+	deviceUI_->SetPosition({ 640.0f,360.0f });
 }
 
 void TitleScene::Update() {
@@ -165,6 +168,13 @@ void TitleScene::Update() {
 	ririkuSE_->Update();
 	bgm_->Update();
 
+	if (ctx_->gamePad.IsConnected()) {
+		deviceUI_->SetTexture("resources/image/UI/useDevice1.png");
+	} else {
+		deviceUI_->SetTexture("resources/image/UI/useDevice2.png");
+	}
+	deviceUI_->Update();
+
 	UpdateFade();
 }
 
@@ -204,6 +214,8 @@ void TitleScene::Draw() {
 		titleUI_->Draw();
 		ranking_->DrawRanking();
 	}
+
+	deviceUI_->Draw();
 
 	fade_->Draw();
 

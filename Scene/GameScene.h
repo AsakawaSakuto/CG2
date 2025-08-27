@@ -77,6 +77,8 @@ private:
 	unique_ptr<Fade> fade_ = make_unique<Fade>();
 	unique_ptr<Ranking> ranking_ = make_unique<Ranking>();
 
+	unique_ptr<Sprite> deviceUI_ = make_unique<Sprite>();
+
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
 

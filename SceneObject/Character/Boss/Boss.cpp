@@ -107,6 +107,7 @@ void Boss::Update(Camera* camera) {
 	hpUI_->Update();
 	hpUI2_->Update();
 
+	life_ = std::clamp(life_, 0.0f, 390.0f);
 	float tempTx = 135.0f + (life_ / 2.0f);
 	hpBar_->SetScale({life_,15.0f });
 	hpBar_->SetPosition({ tempTx,43.0f });

@@ -29,6 +29,8 @@ private:
 	unique_ptr<Sprite> pauseBG_ = make_unique<Sprite>();
 	unique_ptr<Sprite> pauseUI_ = make_unique<Sprite>();
 
+	unique_ptr<Sprite> deviceUI_ = make_unique<Sprite>();
+
 	unique_ptr<Sprite> testUI_ = make_unique<Sprite>();
 
 	unique_ptr<Object3d> enemy_ = make_unique<Object3d>();
