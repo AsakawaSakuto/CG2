@@ -45,13 +45,13 @@ public:
 
 	bool BeamIsAlive() { return beam_->GetIsAlive(); }
 
-	void UseGamePad(bool useGamePad) { useGamePad_ = useGamePad; }
-
 	bool IsDie() { if (life_ == 0) { return true; } else { return false; } }
 
 	void CloseSound();
 
 	void SetInput(Input* input) { input_ = input; }
+
+	void SetGamePad(GamePad* gamePad) { gamePad_ = gamePad; }
 
 	bool IsScreenOut() { return isScreenOut_; }
 	bool IsScreenIn() { return isScreenIn_; }
@@ -74,7 +74,7 @@ private:
 	unique_ptr<AudioX> beamChargeSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> beamShotSE_ = make_unique<AudioX>();
 
-	GamePad gamePad_;
+	GamePad* gamePad_ = nullptr;
 
 	Input* input_ = nullptr;
 	bool isScreenOut_ = false;
@@ -99,7 +99,6 @@ private:
 	float invincibleTimer_ = 0.0f;
 	const float invincibleTime_ = 1.0f;
 
-	bool useGamePad_ = false;
 	int life_ = 3;
 
 	float deltaTime_ = 1.0f / 60.0f;

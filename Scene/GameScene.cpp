@@ -12,8 +12,8 @@ void GameScene::Initialize() {
 	camera_->SetRotate({ cameraRx_,0.0f,0.0f });
 
 	player_->Initialize(&ctx_->dxCommon);
-	player_->UseGamePad(false);
 	player_->SetInput(&ctx_->input);
+	player_->SetGamePad(&ctx_->gamePad);
 
 	bossTy_ = 50.0f;
 	boss_->UseFire(false);
@@ -94,7 +94,6 @@ void GameScene::Update() {
 					isStart = true;
 					boss_->UseFire(true);
 					boss_->SetIsStart(true);
-					player_->UseGamePad(true);
 					state_ = kPlay;
 
 					alertSE_->Reset();

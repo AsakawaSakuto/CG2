@@ -64,7 +64,6 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     isCanDash = true;
     isHeal_ = false;
     isDamage_ = false;
-    useGamePad_ = false;
     isInvincible_ = false;
     invincibleTimer_ = 0.0f;
 
@@ -80,10 +79,6 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 }
 
 void Player::Update(Camera* camera) {
-    useGamePad_ = gamePad_.IsConnected();
-    if (useGamePad_) {
-        gamePad_.Update();
-    }
 
     if (isInvincible_) {
         invincibleTimer_ += deltaTime_;
@@ -132,7 +127,7 @@ void Player::Update(Camera* camera) {
     gauge_->Update();
     gaugeUI_->Update();
 
-    if (gamePad_.IsConnected()) {
+    if (gamePad_->IsConnected()) {
         menu_->SetTexture("resources/image/UI/menu.png");
     } else {
         menu_->SetTexture("resources/image/UI/keyboard_tab.png");
@@ -258,12 +253,12 @@ void Player::DrawImGui() {
 
 void Player::UpdateReticle(Camera* camera) {
     Vector2 position;
-    if (gamePad_.IsConnected()) {
+    if (gamePad_->IsConnected()) {
         position = reticle2D_->GetPosition();
 
         // 左スティックの入力取得
-        float lx = gamePad_.RightStickX(); // -1.0 ~ +1.0
-        float ly = gamePad_.RightStickY(); // -1.0 ~ +1.0
+        float lx = gamePad_->RightStickX(); // -1.0 ~ +1.0
+        float ly = gamePad_->RightStickY(); // -1.0 ~ +1.0
 
         // 入力ベクトル
         Vector2 move(lx, ly);
@@ -284,6 +279,8 @@ void Player::UpdateReticle(Camera* camera) {
         position.y = std::clamp(position.y, 0.0f, 720.0f);
 
         reticle2D_->SetPosition(position);
+
+        isScreenOut_ = false;
     } else {
         position = input_->GetMousePos();
         reticle2D_->SetPosition(position);
@@ -306,7 +303,6 @@ void Player::UpdateReticle(Camera* camera) {
         } else {
             isScreenOut_ = false;
         }
-
     }
 
     //-------------------------------------------------//
@@ -354,10 +350,10 @@ void Player::Move() {
         float lx = 0.0f;
         float ly = 0.0f;
 
-        if (gamePad_.IsConnected()) {
+        if (gamePad_->IsConnected()) {
             // 左スティックの入力取得
-            lx = gamePad_.LeftStickX(); // -1.0 ~ +1.0
-            ly = gamePad_.LeftStickY(); // -1.0 ~ +1.0
+            lx = gamePad_->LeftStickX(); // -1.0 ~ +1.0
+            ly = gamePad_->LeftStickY(); // -1.0 ~ +1.0
         } else {
             if (input_->PushKey(DIK_A)) {
                 lx = -1.0f;
@@ -406,95 +402,174 @@ void Player::Move() {
 }
 
 void Player::Attack() {
-    // Rボタントリガーで弾を発射
-    if (gamePad_.PushButton(GamePad::R) && state_== NORMAL || input_->PushMouseButtonL() && state_ == NORMAL) {
-        bulletSpawnTimer_ += deltaTime_;
-        if (bulletSpawnTimer_ >= bulletSpawnTime_) {
-            for (auto& bullet : bullets_) {
-                if (!bullet->GetIsAlive()) {
-                    bullet->Spawn(model_->GetTranslate(), bulletVelocity_); // 軽い処理
-                    bulletSpawnTimer_ = 0.0f;
+    if (gamePad_->IsConnected()) {
+        // Rボタントリガーで弾を発射
+        if (gamePad_->PushButton(GamePad::R) && state_ == NORMAL) {
+            bulletSpawnTimer_ += deltaTime_;
+            if (bulletSpawnTimer_ >= bulletSpawnTime_) {
+                for (auto& bullet : bullets_) {
+                    if (!bullet->GetIsAlive()) {
+                        bullet->Spawn(model_->GetTranslate(), bulletVelocity_); // 軽い処理
+                        bulletSpawnTimer_ = 0.0f;
 
-                    bShotSE_->PlayAudio();
-                    bShotSE_->SetVolume(0.5f);
-                    break;
+                        bShotSE_->PlayAudio();
+                        bShotSE_->SetVolume(0.5f);
+                        break;
+                    }
                 }
             }
         }
-    }
 
-    if (gamePad_.TriggerButton(GamePad::L) || input_->TriggerMouseButtonR()) {
-        if(!isBeamShot_) {
-            beamChargeSE_->PlayAudio();
-            beamChargeSE_->SetVolume(0.5f);
+        if (gamePad_->TriggerButton(GamePad::L)) {
+            if (!isBeamShot_) {
+                beamChargeSE_->PlayAudio();
+                beamChargeSE_->SetVolume(0.5f);
+            }
         }
-    }
 
-    if (gamePad_.PushButton(GamePad::L) || input_->PushMouseButtonR()) {
-        moveSpeed_ = minSpeed_;
-        beamChargeTimer_ += deltaTime_;
-        beamChargeRadius_ += deltaTime_;
-        beamCharge_->UseEmitter(true);
+        if (gamePad_->PushButton(GamePad::L)) {
+            moveSpeed_ = minSpeed_;
+            beamChargeTimer_ += deltaTime_;
+            beamChargeRadius_ += deltaTime_;
+            beamCharge_->UseEmitter(true);
 
-        gaugePosX_ = Lerp(30.0f, 83.0f, beamChargeTimer_);
-        gaugeScaleX_ = Lerp(1.0f, 95.0f, beamChargeTimer_);
+            gaugePosX_ = Lerp(30.0f, 83.0f, beamChargeTimer_);
+            gaugeScaleX_ = Lerp(1.0f, 95.0f, beamChargeTimer_);
 
-        if (beamChargeTimer_ >= beamChargeTime_) {
-            beamChargeTimer_ = beamChargeTime_;
-            isBeamShot_ = true;
-            gauge_->SetColor({ 0.0f,0.5f,0.8f,1.0f });
+            if (beamChargeTimer_ >= beamChargeTime_) {
+                beamChargeTimer_ = beamChargeTime_;
+                isBeamShot_ = true;
+                gauge_->SetColor({ 0.0f,0.5f,0.8f,1.0f });
+            }
         }
-    }
 
-    if (isBeamShot_) {
-        if (gamePad_.ReleaseButton(GamePad::L) || !input_->PushMouseButtonR()) {
-            if (!beam_->GetIsAlive()) {
-                beam_->Spawn(model_->GetTranslate(), beamVelocity_);
-                beam_->SetIsAlive(true);
-                isBeamShot_ = false;
+        if (isBeamShot_) {
+            if (gamePad_->ReleaseButton(GamePad::L)) {
+                if (!beam_->GetIsAlive()) {
+                    beam_->Spawn(model_->GetTranslate(), beamVelocity_);
+                    beam_->SetIsAlive(true);
+                    isBeamShot_ = false;
+                    beamCharge_->UseEmitter(false);
+                    beamChargeTimer_ = 0.0f;
+                    beamChargeRadius_ = 0.0f;
+                    moveSpeed_ = maxSpeed_;
+
+                    beamShotSE_->PlayAudio();
+                }
+                gaugePosX_ = 30.0f;
+                gaugeScaleX_ = 1.0f;
+                gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+            }
+            beamChargeRange_.minColor = { 0.0f,0.0f,0.2f };
+            beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
+        } else {
+            if (gamePad_->ReleaseButton(GamePad::L)) {
                 beamCharge_->UseEmitter(false);
                 beamChargeTimer_ = 0.0f;
                 beamChargeRadius_ = 0.0f;
                 moveSpeed_ = maxSpeed_;
+                gaugePosX_ = 30.0f;
+                gaugeScaleX_ = 1.0f;
+                gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-                beamShotSE_->PlayAudio();
+                beamChargeSE_->StopAll();
             }
-            gaugePosX_ = 30.0f;
-            gaugeScaleX_ = 1.0f;
-            gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+            beamChargeRange_.minColor = { 0.0f,0.0f,0.0f };
+            beamChargeRange_.maxColor = { 1.0f,1.0f,1.0f };
         }
-        beamChargeRange_.minColor = { 0.0f,0.0f,0.2f };
-        beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
+
+        beamChargeRadius_ = std::clamp(beamChargeRadius_, 0.0f, 1.5f);
     } else {
-        if (gamePad_.ReleaseButton(GamePad::L) || !input_->PushMouseButtonR()) {
-            beamCharge_->UseEmitter(false);
-            beamChargeTimer_ = 0.0f;
-            beamChargeRadius_ = 0.0f;
-            moveSpeed_ = maxSpeed_;
-            gaugePosX_ = 30.0f;
-            gaugeScaleX_ = 1.0f;
-            gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+        // Rボタントリガーで弾を発射
+        if (input_->PushMouseButtonL() && state_ == NORMAL) {
+            bulletSpawnTimer_ += deltaTime_;
+            if (bulletSpawnTimer_ >= bulletSpawnTime_) {
+                for (auto& bullet : bullets_) {
+                    if (!bullet->GetIsAlive()) {
+                        bullet->Spawn(model_->GetTranslate(), bulletVelocity_); // 軽い処理
+                        bulletSpawnTimer_ = 0.0f;
 
-            beamChargeSE_->StopAll();
+                        bShotSE_->PlayAudio();
+                        bShotSE_->SetVolume(0.5f);
+                        break;
+                    }
+                }
+            }
         }
-        beamChargeRange_.minColor = { 0.0f,0.0f,0.0f };
-        beamChargeRange_.maxColor = { 1.0f,1.0f,1.0f };
-    }
 
-    beamChargeRadius_ = std::clamp(beamChargeRadius_, 0.0f, 1.5f);
+        if (input_->TriggerMouseButtonR()) {
+            if (!isBeamShot_) {
+                beamChargeSE_->PlayAudio();
+                beamChargeSE_->SetVolume(0.5f);
+            }
+        }
+
+        if (input_->PushMouseButtonR()) {
+            moveSpeed_ = minSpeed_;
+            beamChargeTimer_ += deltaTime_;
+            beamChargeRadius_ += deltaTime_;
+            beamCharge_->UseEmitter(true);
+
+            gaugePosX_ = Lerp(30.0f, 83.0f, beamChargeTimer_);
+            gaugeScaleX_ = Lerp(1.0f, 95.0f, beamChargeTimer_);
+
+            if (beamChargeTimer_ >= beamChargeTime_) {
+                beamChargeTimer_ = beamChargeTime_;
+                isBeamShot_ = true;
+                gauge_->SetColor({ 0.0f,0.5f,0.8f,1.0f });
+            }
+        }
+
+        if (isBeamShot_) {
+            if (input_->ReleaseMouseButtonR()) {
+                if (!beam_->GetIsAlive()) {
+                    beam_->Spawn(model_->GetTranslate(), beamVelocity_);
+                    beam_->SetIsAlive(true);
+                    isBeamShot_ = false;
+                    beamCharge_->UseEmitter(false);
+                    beamChargeTimer_ = 0.0f;
+                    beamChargeRadius_ = 0.0f;
+                    moveSpeed_ = maxSpeed_;
+
+                    beamShotSE_->PlayAudio();
+                }
+                gaugePosX_ = 30.0f;
+                gaugeScaleX_ = 1.0f;
+                gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+            }
+            beamChargeRange_.minColor = { 0.0f,0.0f,0.2f };
+            beamChargeRange_.maxColor = { 0.0f,0.5f,0.8f };
+        } else {
+            if (input_->ReleaseMouseButtonR()) {
+                beamCharge_->UseEmitter(false);
+                beamChargeTimer_ = 0.0f;
+                beamChargeRadius_ = 0.0f;
+                moveSpeed_ = maxSpeed_;
+                gaugePosX_ = 30.0f;
+                gaugeScaleX_ = 1.0f;
+                gauge_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
+                beamChargeSE_->StopAll();
+            }
+            beamChargeRange_.minColor = { 0.0f,0.0f,0.0f };
+            beamChargeRange_.maxColor = { 1.0f,1.0f,1.0f };
+        }
+
+        beamChargeRadius_ = std::clamp(beamChargeRadius_, 0.0f, 1.5f);
+    }
 }
 
 void Player::Action() {
     // ZR ZL で左右にダッシュ
     if (state_ == NORMAL && isCanDash) {
-        if (gamePad_.RightTrigger() >= 0.5f || input_->TriggerKey(DIK_SPACE) && input_->PushKey(DIK_D)) {
+        if (gamePad_->RightTrigger() >= 0.5f || input_->TriggerKey(DIK_SPACE) && input_->PushKey(DIK_D)) {
             state_ = DASH;
             isCanDash = false;
             dashRotateSpeed_ = -6.28f * 2.0f;
             dashDirection_ = 1.0f;
 
             dashSE_->PlayAudio();
-        } else if (gamePad_.LeftTrigger() >= 0.5f || input_->TriggerKey(DIK_SPACE) && input_->PushKey(DIK_A)) {
+        } else if (gamePad_->LeftTrigger() >= 0.5f || input_->TriggerKey(DIK_SPACE) && input_->PushKey(DIK_A)) {
             state_ = DASH;
             isCanDash = false;
             dashRotateSpeed_ = 6.28f * 2.0f;
