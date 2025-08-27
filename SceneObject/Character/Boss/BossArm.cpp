@@ -19,6 +19,9 @@ void BossArm::Initialize(DirectXCommon* dxCommon) {
 	actionTimer_ = 0.0f;
 	isChange = false;
 	changeTimer_ = 0.0f;
+
+	armShotSE_->Initialize("resources/sound/SE/armShot.mp3");
+	armFireSE_->Initialize("resources/sound/SE/armFire.mp3");
 }
 
 void BossArm::Update(Camera* camera) {
@@ -38,6 +41,8 @@ void BossArm::Update(Camera* camera) {
 			changeTimer_ = 0.0f;
 			armPosL_ = { 15.0f,0.0f,0.0f };
 			armPosR_ = { -15.0f,8.0f,0.0f };
+
+			armFireSE_->PlayAudio();
 		} else if (changeTimer_ >= changeTime_ && isChange) {
 			isChange = false;
 			isAction = false;
@@ -70,6 +75,8 @@ void BossArm::Update(Camera* camera) {
 		if (actionTimer_ >= actionTime_) {
 			actionTimer_ = 0.0f;
 			isAction = true;
+
+			armShotSE_->PlayAudio();
 		}
 	}
 
@@ -84,6 +91,9 @@ void BossArm::Update(Camera* camera) {
 
 	armL_->Update(*camera);
 	armR_->Update(*camera);
+
+	armShotSE_->Update();
+	armFireSE_->Update();
 }
 
 void BossArm::DieUpdate(Camera* camera) {

@@ -31,12 +31,13 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	time_ = 0.0f;
 	startPosition_ = {};
 
-	life_ = 10.0f;
+	life_ = 100.0f;
 
 	InitParticle();
 
 	tuirakuSE_->Initialize("resources/sound/SE/tuiraku.mp3");
 	foolSE_->Initialize("resources/sound/SE/fool.mp3");
+	bSpawnSE_->Initialize("resources/sound/SE/bossBulletSpawn.mp3");
 }
 
 void Boss::Update(Camera* camera) {
@@ -113,6 +114,7 @@ void Boss::Update(Camera* camera) {
 
 	tuirakuSE_->Update();
 	foolSE_->Update();
+	bSpawnSE_->Update();
 }
 
 void Boss::DieUpdate(Camera* camera) {
@@ -294,6 +296,8 @@ void Boss::UpdateHalo() {
 			bullet_->Spawn(halo_->GetTranslate() += {0.0f, 7.5f,0.0f}, velo);
 			bulletShotTimer_ = 0.0f;
 			haloIsShot_ = false;
+
+			bSpawnSE_->PlayAudio();
 		}
 	} else {
 		haloSpinSpeed_ = 3.0f;
@@ -310,4 +314,7 @@ void Boss::UpdateHalo() {
 void Boss::CloseSound() {
 	tuirakuSE_->Reset();
 	foolSE_->Reset();
+	bSpawnSE_->Reset();
+	bullet_->CloseSound();
+	arm_->CloseSound();
 }

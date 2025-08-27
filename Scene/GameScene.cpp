@@ -523,6 +523,7 @@ void GameScene::UpdatePause() {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = false;
 			pauseSE_->PlayAudio();
+			pauseSE_->SetVolume(0.5f);
 		}
 
 		switch (pause_)
@@ -533,11 +534,13 @@ void GameScene::UpdatePause() {
 			if (gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				pause_ = kQuit;
 				selectSE_->PlayAudio();
+				selectSE_->SetVolume(0.5f);
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				isPause_ = false;
 				pushSE_->PlayAudio();
+				pushSE_->SetVolume(0.5f);
 			}
 			break;
 		case GameScene::kQuit:
@@ -546,11 +549,13 @@ void GameScene::UpdatePause() {
 			if (gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				pause_ = kBack;
 				selectSE_->PlayAudio();
+				selectSE_->SetVolume(0.5f);
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
 				pushSE_->PlayAudio();
+				pushSE_->SetVolume(0.5f);
 			}
 			break;
 		}
@@ -559,6 +564,7 @@ void GameScene::UpdatePause() {
 		if (gamePad_->TriggerButton(GamePad::START)) {
 			isPause_ = true;
 			pauseSE_->PlayAudio();
+			pauseSE_->SetVolume(0.5f);
 		}
 		pause_ = kBack;
 	}

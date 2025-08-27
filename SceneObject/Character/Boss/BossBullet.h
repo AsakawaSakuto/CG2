@@ -9,6 +9,7 @@
 
 #include"BulletState.h"
 #include"Random.h"
+#include"Audio.h"
 
 #include <list>
 
@@ -39,8 +40,12 @@ public:
 	Vector3 GetPos();
 
 	BulletState GetBulletState() { return bState_; }
+
+	void CloseSound() { bShotSE_->Reset(); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
+
+	unique_ptr<AudioX> bShotSE_ = make_unique<AudioX>();
 
 	unique_ptr<Object3d> model_ = make_unique<Object3d>();
 	unique_ptr<Object3d> heal_ = make_unique<Object3d>();

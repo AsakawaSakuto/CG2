@@ -13,6 +13,8 @@ void BossBullet::Initialize(DirectXCommon* dxCommon) {
 
     bState_ = HEAL;
     randNum_ = 0;
+
+    bShotSE_->Initialize("resources/sound/SE/bossShot.mp3");
 }
 
 void BossBullet::Update(Camera* camera) {
@@ -24,7 +26,10 @@ void BossBullet::Update(Camera* camera) {
         scale_.y = std::clamp(scale_.y, 0.0f, 1.0f);
         scale_.z = std::clamp(scale_.z, 0.0f, 1.0f);
         if (scale_.x >= 1.0f) {
-            isMove_ = true;
+            if (!isMove_) {
+                bShotSE_->PlayAudio();
+                isMove_ = true;
+            }
         }
     } else {
         scale_ = { 0.0f,0.0f,0.0f };
@@ -57,6 +62,8 @@ void BossBullet::Update(Camera* camera) {
 
     heal_->SetScale(scale_);
     heal_->Update(*camera);
+
+    bShotSE_->Update();
 }
 
 void BossBullet::Draw() {
@@ -78,7 +85,7 @@ void BossBullet::Spawn(Vector3 translate, Vector3 velocity) {
     randNum_ = rand_.Int(1, 100);
     if (randNum_<=15) {
         bState_ = HEAL;
-    } else {
+    }  else {
         bState_ = DAMAGE;
     }
 

@@ -261,12 +261,14 @@ void TitleScene::SceneController() {
 			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				state_ = kTutorial;
 				selectSE_->PlayAudio();
+				selectSE_->SetVolume(0.5f);
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
 				isStart_ = true;
 				pushSE_->PlayAudio();
+				pushSE_->SetVolume(0.5f);
 			}
 
 			break;
@@ -277,16 +279,19 @@ void TitleScene::SceneController() {
 			if (gamePad_->TriggerButton(GamePad::DPAD_DOWN) || gamePad_->TriggerButton(GamePad::DPAD_RIGHT)) {
 				state_ = kQuit;
 				selectSE_->PlayAudio();
+				selectSE_->SetVolume(0.5f);
 			}
 			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				state_ = kPlay;
 				selectSE_->PlayAudio();
+				selectSE_->SetVolume(0.5f);
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				fade_->SetIsFade(true);
 				isStart_ = true;
 				pushSE_->PlayAudio();
+				pushSE_->SetVolume(0.5f);
 			}
 
 			break;
@@ -297,10 +302,12 @@ void TitleScene::SceneController() {
 			if (gamePad_->TriggerButton(GamePad::DPAD_UP) || gamePad_->TriggerButton(GamePad::DPAD_LEFT)) {
 				state_ = kTutorial;
 				selectSE_->PlayAudio();
+				selectSE_->SetVolume(0.5f);
 			}
 
 			if (gamePad_->TriggerButton(GamePad::A)) {
 				quitSE_->PlayAudio();
+				quitSE_->SetVolume(2.0f);
 				isQuit_ = true;
 			}
 

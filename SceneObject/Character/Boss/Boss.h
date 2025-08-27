@@ -64,6 +64,7 @@ private:
 
 	unique_ptr<AudioX> tuirakuSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> foolSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> bSpawnSE_ = make_unique<AudioX>();
 
 	unique_ptr<Object3d> body_ = make_unique<Object3d>();
 	unique_ptr<Object3d> halo_ = make_unique<Object3d>();

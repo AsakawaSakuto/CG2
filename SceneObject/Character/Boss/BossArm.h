@@ -7,6 +7,8 @@
 #include"MatrixFunction.h"
 #include"Particles.h"
 
+#include"Audio.h"
+
 #include <list>
 
 using std::unique_ptr;
@@ -32,8 +34,13 @@ public:
 
 	Vector3 GetArmPosL() { return armL_->GetWorldPosition(); }
 	Vector3 GetArmPosR() { return armR_->GetWorldPosition(); }
+
+	void CloseSound() { armShotSE_->Reset(); armFireSE_->Reset(); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
+
+	unique_ptr<AudioX> armShotSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> armFireSE_ = make_unique<AudioX>();
 
 	const float deltaTime_ = 1.0f / 60.0f;
 
