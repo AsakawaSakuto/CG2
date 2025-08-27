@@ -41,8 +41,6 @@ void Player::Initialize(DirectXCommon* dxCommon) {
     dieSmork_->Initialize(dxCommon_, "resources/image/particle/smork.png", 2);
     dieSmork_->UseEmitter(false);
 
-	gamePad_.Initialize();
-
     bullets_.clear();
     for (int i = 0; i < 32; ++i) {
         auto bullet = std::make_unique<PlayerBullet>();
@@ -82,7 +80,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 }
 
 void Player::Update(Camera* camera) {
-
+    useGamePad_ = gamePad_.IsConnected();
     if (useGamePad_) {
         gamePad_.Update();
     }
@@ -133,6 +131,13 @@ void Player::Update(Camera* camera) {
 
     gauge_->Update();
     gaugeUI_->Update();
+
+    if (gamePad_.IsConnected()) {
+        menu_->SetTexture("resources/image/UI/menu.png");
+    } else {
+        menu_->SetTexture("resources/image/UI/keyboard_tab.png");
+    }
+
     menu_->Update();
 
     healSE_->Update();
@@ -411,7 +416,7 @@ void Player::Attack() {
                     bulletSpawnTimer_ = 0.0f;
 
                     bShotSE_->PlayAudio();
-                    bShotSE_->SetVolume(0.2f);
+                    bShotSE_->SetVolume(0.5f);
                     break;
                 }
             }
@@ -421,6 +426,7 @@ void Player::Attack() {
     if (gamePad_.TriggerButton(GamePad::L) || input_->TriggerMouseButtonR()) {
         if(!isBeamShot_) {
             beamChargeSE_->PlayAudio();
+            beamChargeSE_->SetVolume(0.5f);
         }
     }
 

@@ -99,7 +99,7 @@ void GameScene::Update() {
 
 					alertSE_->Reset();
 					bgm_->PlayAudio(true);
-					bgm_->SetVolume(0.1f);
+					bgm_->SetVolume(0.5f);
 				}
 			}
 			player_->Update(useCamera_);

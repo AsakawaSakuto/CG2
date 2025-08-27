@@ -70,7 +70,7 @@ void TitleScene::Initialize() {
 
 	bgm_->Initialize("resources/sound/BGM/titleSceneBGM.mp3");
 	bgm_->PlayAudio(true);
-	bgm_->SetVolume(0.1f);
+	bgm_->SetVolume(0.5f);
 }
 
 void TitleScene::Update() {

@@ -31,7 +31,7 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	time_ = 0.0f;
 	startPosition_ = {};
 
-	life_ = 100.0f;
+	life_ = 390.0f;
 
 	InitParticle();
 
@@ -298,6 +298,7 @@ void Boss::UpdateHalo() {
 			haloIsShot_ = false;
 
 			bSpawnSE_->PlayAudio();
+			bSpawnSE_->SetVolume(0.2f);
 		}
 	} else {
 		haloSpinSpeed_ = 3.0f;

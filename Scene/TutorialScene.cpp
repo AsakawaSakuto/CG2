@@ -24,7 +24,11 @@ void TutorialScene::Initialize() {
 	pauseUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/pause2.png", { 1280.0f,720.0f });
 	pauseUI_->SetPosition({ 640.0f,360.0f });
 
-	testUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tutoUI1.png", { 1280.0f,128.0f });
+	if (gamePad_->IsConnected()) {
+		testUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tutoUI1.png", { 1280.0f,128.0f });
+	} else {
+		testUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/MtutoUI1.png", { 1280.0f,128.0f });
+	}
 	testUI_->SetPosition({ 640.0f,-128.0f });
 
 	enemy_->Initialize(&ctx_->dxCommon, "resources/object3d/Enemy/enemy.obj");
@@ -78,7 +82,7 @@ void TutorialScene::Initialize() {
 
 	bgm_->Initialize("resources/sound/BGM/tutoSceneBGM.mp3");
 	bgm_->PlayAudio(true);
-	bgm_->SetVolume(0.1f);
+	bgm_->SetVolume(0.5f);
 }
 
 void TutorialScene::Update() {
@@ -156,8 +160,6 @@ void TutorialScene::Draw() {
 	ImGui::NewFrame();
 	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 	/*ImGui::ShowDemoWindow();*/
-
-	player_->DrawImGui();
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
@@ -284,7 +286,11 @@ void TutorialScene::UpdateTutorialTest() {
 				testState_ = Test2;
 				testUIClear_ = false;
 				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-				testUI_->SetTexture("resources/image/UI/tutoUI2.png");
+				if (gamePad_->IsConnected()) {
+					testUI_->SetTexture("resources/image/UI/tutoUI2.png");
+				} else {
+					testUI_->SetTexture("resources/image/UI/MtutoUI2.png");
+				}
 			}
 		} else {
 			testUIPos_ = testUI_->GetPosition();
@@ -315,7 +321,11 @@ void TutorialScene::UpdateTutorialTest() {
 				testState_ = Test3;
 				testUIClear_ = false;
 				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-				testUI_->SetTexture("resources/image/UI/tutoUI3.png");
+				if (gamePad_->IsConnected()) {
+					testUI_->SetTexture("resources/image/UI/tutoUI3.png");
+				} else {
+					testUI_->SetTexture("resources/image/UI/MtutoUI3.png");
+				}
 			}
 		}
 		else {
@@ -343,7 +353,11 @@ void TutorialScene::UpdateTutorialTest() {
 				testState_ = Test4;
 				testUIClear_ = false;
 				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-				testUI_->SetTexture("resources/image/UI/tutoUI4.png");
+				if (gamePad_->IsConnected()) {
+					testUI_->SetTexture("resources/image/UI/tutoUI4.png");
+				} else {
+					testUI_->SetTexture("resources/image/UI/MtutoUI4.png");
+				}
 				timer_ = 0.0f;
 			}
 		}
@@ -375,7 +389,11 @@ void TutorialScene::UpdateTutorialTest() {
 				testState_ = Test5;
 				testUIClear_ = false;
 				testUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-				testUI_->SetTexture("resources/image/UI/tutoUI5.png");
+				if (gamePad_->IsConnected()) {
+					testUI_->SetTexture("resources/image/UI/tutoUI5.png");
+				} else {
+					testUI_->SetTexture("resources/image/UI/MtutoUI5.png");
+				}
 				timer_ = 0.0f;
 			}
 		}

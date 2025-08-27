@@ -83,3 +83,7 @@ Vector2 Input::GetMouseDelta() const {
 		currentMousePos_.y - previousMousePos_.y
 	};
 }
+
+// 前フレームは押していて、今フレームは押していない → リリース
+bool Input::ReleaseMouseButtonL() const { return preMouseL_ && !isMouseL_; }
+bool Input::ReleaseMouseButtonR() const { return preMouseR_ && !isMouseR_; }

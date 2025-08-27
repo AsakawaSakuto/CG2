@@ -28,6 +28,9 @@ public:
 	bool TriggerMouseButtonL() const { return (isMouseL_ && !preMouseL_); }
 	bool TriggerMouseButtonR() const { return (isMouseR_ && !preMouseR_); }
 
+	bool ReleaseMouseButtonL() const;
+	bool ReleaseMouseButtonR() const;
+
 	void SetMousePosition(LONG x, LONG y);
 	Vector2 GetMouseDelta() const;
 
