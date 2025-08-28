@@ -23,7 +23,7 @@ int SceneManager::Run() {
 
     // 各種初期化
     appContext_->winApp.Initialize(L"Zhot");
-    appContext_->winApp.EnableResize(true);
+    appContext_->winApp.EnableResize(false);
     appContext_->dxCommon.Initialize(&appContext_->winApp);
     TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);
     Logger::Initialize(); std::filesystem::create_directory("logs");
