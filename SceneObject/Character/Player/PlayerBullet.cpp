@@ -82,7 +82,7 @@ void PlayerBullet::Spawn(Vector3 translate, Vector3 velocity) {
     model_->SetScale({ 1.0f,1.0f,1.0f });
     isAlive_ = true;
     lifeTimer_ = 0.0f;
-    speed_ = 10.0f;
+    speed_ = 25.0f;
     velocity_ = velocity;
 
     Vector3 rotate = {};

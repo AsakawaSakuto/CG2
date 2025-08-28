@@ -83,7 +83,7 @@ void BossBullet::Spawn(Vector3 translate, Vector3 velocity) {
     heal_->SetScale(scale_);
 
     randNum_ = rand_.Int(1, 100);
-    if (randNum_<=15) {
+    if (randNum_ <= 10) {
         bState_ = HEAL;
     }  else {
         bState_ = DAMAGE;
