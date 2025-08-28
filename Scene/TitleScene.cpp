@@ -75,8 +75,11 @@ void TitleScene::Initialize() {
 	deviceUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/useDevice1.png", { 1280.0f,720.0f });
 	deviceUI_->SetPosition({ 640.0f,360.0f });
 
-	f11_->Initialize(&ctx_->dxCommon, "resources/image/UI/f11.png", { 128.0f,128.0f });
+	f11_->Initialize(&ctx_->dxCommon, "resources/image/UI/f11.png", { 96.0f,96.0f });
 	f11_->SetPosition({ 1216.0f,64.0f });
+
+	titleLogo_->Initialize(&ctx_->dxCommon, "resources/image/UI/titleLogo.png", { 768.0f,256.0f });
+	titleLogo_->SetPosition({ 1150.0f,190.0f });
 }
 
 void TitleScene::Update() {
@@ -179,6 +182,7 @@ void TitleScene::Update() {
 
 	deviceUI_->Update();
 	f11_->Update();
+	titleLogo_->Update();
 
 	UpdateFade();
 }
@@ -220,6 +224,7 @@ void TitleScene::Draw() {
 		deviceUI_->Draw();
 		ranking_->DrawRanking();
 		f11_->Draw();
+		titleLogo_->Draw();
 	}
 
 	fade_->Draw();
@@ -239,6 +244,7 @@ void TitleScene::Draw() {
 	// 開発用UIの処理、実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 	/*ImGui::ShowDemoWindow();*/
 
+	//titleLogo_->DrawImGui("f");
 	//debugCamera_->DrawImgui();
 	//engineFire_->DrawImGui("f");
 

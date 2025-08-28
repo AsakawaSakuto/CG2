@@ -31,7 +31,7 @@ void Boss::Initialize(DirectXCommon* dxCommon) {
 	time_ = 0.0f;
 	startPosition_ = {};
 
-	life_ = 1.0f;
+	life_ = 390.0f;
 
 	InitParticle();
 
@@ -183,7 +183,6 @@ void Boss::DieUpdate(Camera* camera) {
 }
 
 void Boss::Draw() {
-	bullet_->Draw();
 	arm_->Draw();
 
 	body_->Draw();
@@ -197,6 +196,8 @@ void Boss::Draw() {
 	if (IsDie()) {
 		dieSmork_->Draw();
 		dieFire_->Draw();
+	} else {
+		bullet_->Draw();
 	}
 
 	hpUI2_->Draw();
