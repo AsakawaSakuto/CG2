@@ -74,6 +74,9 @@ void TitleScene::Initialize() {
 
 	deviceUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/useDevice1.png", { 1280.0f,720.0f });
 	deviceUI_->SetPosition({ 640.0f,360.0f });
+
+	f11_->Initialize(&ctx_->dxCommon, "resources/image/UI/f11.png", { 128.0f,128.0f });
+	f11_->SetPosition({ 1216.0f,64.0f });
 }
 
 void TitleScene::Update() {
@@ -173,7 +176,9 @@ void TitleScene::Update() {
 	} else {
 		deviceUI_->SetTexture("resources/image/UI/useDevice2.png");
 	}
+
 	deviceUI_->Update();
+	f11_->Update();
 
 	UpdateFade();
 }
@@ -212,10 +217,10 @@ void TitleScene::Draw() {
 		flag2_->Draw();
 		flag3_->Draw();
 		titleUI_->Draw();
+		deviceUI_->Draw();
 		ranking_->DrawRanking();
+		f11_->Draw();
 	}
-
-	deviceUI_->Draw();
 
 	fade_->Draw();
 

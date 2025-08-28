@@ -176,3 +176,46 @@ void WinApp::Finalize() {
     CloseWindow(hwnd_);
     CoUninitialize();
 }
+
+void WinApp::EnterBorderlessFullscreen() {
+    if (isFullscreen_) return;
+    HWND hwnd = GetHWND();
+
+    // いまのスタイルと位置を保存
+    windowStyle_ = GetWindowLong(hwnd, GWL_STYLE);
+    windowExStyle_ = GetWindowLong(hwnd, GWL_EXSTYLE);
+    GetWindowRect(hwnd, &windowRectBeforeFS_);
+
+    // 表示中のモニタ全面サイズを取得
+    HMONITOR hMon = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi{ sizeof(mi) };
+    GetMonitorInfo(hMon, &mi);
+    const RECT r = mi.rcMonitor;
+
+    //枠を消して全面に拡張
+    SetWindowLong(hwnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+    SetWindowLong(hwnd, GWL_EXSTYLE, 0);
+    SetWindowPos(hwnd, HWND_TOP, r.left, r.top,
+        r.right - r.left, r.bottom - r.top,
+        SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+    ShowWindow(hwnd, SW_MAXIMIZE);
+
+    isFullscreen_ = true;
+}
+
+void WinApp::ExitBorderlessFullscreen() {
+    if (!isFullscreen_) return;
+    HWND hwnd = GetHWND();
+
+    // もとのスタイルと位置に戻す
+    SetWindowLong(hwnd, GWL_STYLE, windowStyle_);
+    SetWindowLong(hwnd, GWL_EXSTYLE, windowExStyle_);
+    SetWindowPos(hwnd, nullptr,
+        windowRectBeforeFS_.left, windowRectBeforeFS_.top,
+        windowRectBeforeFS_.right - windowRectBeforeFS_.left,
+        windowRectBeforeFS_.bottom - windowRectBeforeFS_.top,
+        SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
+    ShowWindow(hwnd, SW_SHOWNORMAL);
+
+    isFullscreen_ = false;
+}

@@ -192,6 +192,9 @@ void DirectXCommon::CreateSwapChain() {
     // SwapChain4にキャスト
     hr_ = tempSwapChain.As(&swapChain_);
     assert(SUCCEEDED(hr_));
+
+    // 追加：DXGIのAlt+Enter既定動作を無効化（自前で制御するため）
+    dxgiFactory_->MakeWindowAssociation(winApp_->GetHWND(), DXGI_MWA_NO_ALT_ENTER);
 }
 
 void DirectXCommon::CreateDepthBuffer() {
@@ -514,4 +517,30 @@ ParticleDescriptorAllocator& DirectXCommon::GetParticleAlloc() {
         particleAllocInitialized_ = true;
     }
     return *particleAlloc_;
+}
+
+void DirectXCommon::ResizeToWindow() {
+    // GPUの実行完了を待機（これをしないとResizeBuffersが失敗しやすい）
+    WaitForGPU();
+
+    // // 既存リソースの参照を手放す
+    for (int i = 0; i < 2; ++i) {
+        swapChainResources_[i].Reset();
+    }
+    depthStencilResource_.Reset();
+
+    // 0指定で“現在のクライアントサイズ”に自動フィット
+    const UINT bufferCount = swapChainDesc_.BufferCount ? swapChainDesc_.BufferCount : 2;
+    hr_ = swapChain_->ResizeBuffers(
+        bufferCount,
+        0, 0, DXGI_FORMAT_R8G8B8A8_UNORM,
+        0
+    );
+    assert(SUCCEEDED(hr_));
+
+    // バックバッファ・DSV・VP/Scissor を作り直す
+    CreateRenderTargetView();
+    CreateDepthBuffer();
+    CreateViewportRect();
+    CreateScissorRect();
 }

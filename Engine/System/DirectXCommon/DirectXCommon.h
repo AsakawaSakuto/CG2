@@ -44,6 +44,7 @@ public:
 
     void WaitForGPU();
 
+    void ResizeToWindow();
     //
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
