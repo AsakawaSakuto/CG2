@@ -180,9 +180,6 @@
     <ClCompile Include="Engine\3d\Particles\Particles.cpp">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\GameScene.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\System\GamePad\GamePad.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -196,12 +193,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="SceneObject\SkyBox\SkyBox.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\TitleScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\TutorialScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="SceneObject\Fade\Fade.cpp">
@@ -226,6 +217,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="SceneObject\Ranking\Ranking.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\TestScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SecondTestScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -338,9 +335,6 @@
     <ClInclude Include="Engine\3d\Sphere\SphereData.h">
       <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\GameScene.h">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\2d\Triangle\Triangle.h">
       <Filter>ソース ファイル\Engine\2d\Triangle</Filter>
     </ClInclude>
@@ -401,13 +395,7 @@
     <ClInclude Include="SceneObject\SkyBox\SkyBox.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\TitleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\AppContext.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\TutorialScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="SceneObject\Fade\Fade.h">
@@ -438,6 +426,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Random.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\TestScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SecondTestScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

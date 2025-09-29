@@ -2,11 +2,10 @@
 
 SceneManager::SceneManager() {
     // 全シーン初期化
-    sceneArr_[0] = std::make_unique<TitleScene>();
-    sceneArr_[1] = std::make_unique<TutorialScene>();
-    sceneArr_[2] = std::make_unique<GameScene>();
+    sceneArr_[0] = std::make_unique<TestScene>();
+    sceneArr_[1] = std::make_unique<SecondTestScene>();
 
-    currentSceneNo_ = TITLE;
+    currentSceneNo_ = TEST;
     prevSceneNo_ = 0;
 }
 
@@ -22,7 +21,7 @@ int SceneManager::Run() {
     appContext_ = std::make_unique<AppContext>();
 
     // 各種初期化
-    appContext_->winApp.Initialize(L"Zhot");
+    appContext_->winApp.Initialize(L"Engine");
     appContext_->winApp.EnableResize(false);
     appContext_->dxCommon.Initialize(&appContext_->winApp);
     TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);
@@ -31,7 +30,7 @@ int SceneManager::Run() {
     appContext_->gamePad.Initialize();
 
     // 各シーンにAppContextを渡す
-    for (int i = 0; i < static_cast<int>(3); i++) {
+    for (int i = 0; i < static_cast<int>(2); i++) {
         sceneArr_[i]->SetAppContext(appContext_.get());
     }
 

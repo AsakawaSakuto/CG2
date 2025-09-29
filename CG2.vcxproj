@@ -124,7 +124,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="SceneObject\Fade\Fade.cpp" />
     <ClCompile Include="SceneObject\Ranking\Ranking.cpp" />
     <ClCompile Include="SceneObject\SkyBox\SkyBox.cpp" />
-    <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\System\Utility\MatrixFunction\MatrixFunction.cpp" />
     <ClCompile Include="Engine\3d\Object3d\Object3d.cpp" />
@@ -136,8 +135,8 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\2d\Triangle\Triangle.cpp" />
     <ClCompile Include="Scene\IScene.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
-    <ClCompile Include="Scene\TitleScene.cpp" />
-    <ClCompile Include="Scene\TutorialScene.cpp" />
+    <ClCompile Include="Scene\SecondTestScene.cpp" />
+    <ClCompile Include="Scene\TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\3d\Particles\ParticleDescriptorAllocator.h" />
@@ -202,14 +201,13 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="SceneObject\Ranking\Ranking.h" />
     <ClInclude Include="SceneObject\SkyBox\SkyBox.h" />
     <ClInclude Include="Scene\AppContext.h" />
-    <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Engine\2d\Triangle\Triangle.h" />
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />
     <ClInclude Include="Scene\IScene.h" />
     <ClInclude Include="Scene\Random.h" />
     <ClInclude Include="Scene\SceneManager.h" />
-    <ClInclude Include="Scene\TitleScene.h" />
-    <ClInclude Include="Scene\TutorialScene.h" />
+    <ClInclude Include="Scene\SecondTestScene.h" />
+    <ClInclude Include="Scene\TestScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

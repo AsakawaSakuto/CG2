@@ -1,10 +1,9 @@
 #pragma once
 #include"AppContext.h"
 
-enum SCENE { 
-    TITLE = 0,
-    TUTORIAL = 1, 
-    GAME = 2
+enum SCENE {
+    TEST = 0,
+	SECONDTEST = 1,
 };
 
 class IScene {
