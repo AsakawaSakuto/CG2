@@ -6,14 +6,16 @@ void TestScene::SetAppContext(AppContext* ctx) {
 
 void TestScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
-	camera_->SetPosition({ 4.0f,6.0f,1.6f });
-	camera_->SetRotate({ 0.3f,-0.4f,0.0f });
+	camera_->SetPosition({ 0.0f,0.0f,-10.0f });
+	camera_->SetRotate({ 0.0f, 0.0f,0.0f });
 
 	gamePad_ = &ctx_->gamePad;
 
 	pModelMove_ = false;
 	isStart_ = false;
 	startTimer_ = 0.0f;
+
+	bunny_->Initialize(&ctx_->dxCommon, "resources/object3d/bunny.obj");
 }
 
 void TestScene::Update() {
@@ -22,6 +24,7 @@ void TestScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
+	bunny_->Update(*useCamera_);
 }
 
 void TestScene::Draw() {
@@ -31,6 +34,8 @@ void TestScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	bunny_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -48,8 +53,10 @@ void TestScene::Draw() {
 	/*ImGui::ShowDemoWindow();*/
 
 	//titleLogo_->DrawImGui("f");
-	//debugCamera_->DrawImgui();
+	debugCamera_->DrawImgui();
 	//engineFire_->DrawImGui("f");
+
+	bunny_->DrawImGui("bunny");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
@@ -67,8 +74,7 @@ void TestScene::CameraController() {
 			debugCamera_->Update();
 			useCamera_ = debugCamera_.get();
 		}
-	}
-	else {
+	} else {
 		if (camera_ != nullptr) {
 			camera_->Update();
 			useCamera_ = camera_.get();

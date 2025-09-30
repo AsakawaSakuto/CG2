@@ -62,11 +62,13 @@ private:
 	float quitTimer_ = 0.0f;
 	bool isQuit_ = false;
 
+	unique_ptr<Object3d> bunny_ = make_unique<Object3d>();
+
 	// Cameras
 	unique_ptr<Camera> camera_ = make_unique<Camera>();
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>();
 	Camera* useCamera_ = nullptr;
-	bool isDebugCamera_ = false;
+	bool isDebugCamera_ = true;
 
 	void CameraController();
 	void InitObj();
