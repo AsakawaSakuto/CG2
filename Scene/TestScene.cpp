@@ -15,7 +15,7 @@ void TestScene::Initialize() {
 	isStart_ = false;
 	startTimer_ = 0.0f;
 
-	bunny_->Initialize(&ctx_->dxCommon, "resources/object3d/bunny.obj");
+	//bunny_->Initialize(&ctx_->dxCommon, "resources/object3d/bunny.obj");
 }
 
 void TestScene::Update() {
@@ -24,7 +24,7 @@ void TestScene::Update() {
 	ctx_->input.Update();
 	CameraController();
 
-	bunny_->Update(*useCamera_);
+	//bunny_->Update(*useCamera_);
 }
 
 void TestScene::Draw() {
@@ -35,7 +35,7 @@ void TestScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	bunny_->Draw();
+	//bunny_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -56,7 +56,7 @@ void TestScene::Draw() {
 	debugCamera_->DrawImgui();
 	//engineFire_->DrawImGui("f");
 
-	bunny_->DrawImGui("bunny");
+	//bunny_->DrawImGui("bunny");
 
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
