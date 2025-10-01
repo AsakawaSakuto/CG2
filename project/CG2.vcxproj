@@ -149,6 +149,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\System\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\System\GamePad\GamePad.cpp" />
+    <ClCompile Include="Engine\System\HeapManager\HeapManager.cpp" />
     <ClCompile Include="Engine\System\Utility\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Engine\System\Utility\CreateResource\CreateResource.cpp" />
     <ClCompile Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.cpp" />
@@ -158,6 +159,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Development|x64'">$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\3d\Object3d;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Engine\System\DirectXCommon\DirectXCommon.cpp" />
+    <ClCompile Include="Engine\System\Utility\GameTimer\GameTimer.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -204,6 +206,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Particles\Struct\PreView.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\System\GamePad\GamePad.h" />
+    <ClInclude Include="Engine\System\HeapManager\HeapManager.h" />
     <ClInclude Include="Engine\System\ResourceData\BlendMode.h" />
     <ClInclude Include="Engine\System\Audio\Audio.h" />
     <ClInclude Include="Engine\System\Audio\AudioData.h" />
@@ -216,6 +219,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\System\ResourceData\DirectionalLight.h" />
     <ClInclude Include="Engine\System\DirectXCommon\DirectXCommon.h" />
+    <ClInclude Include="Engine\System\Utility\GameTimer\GameTimer.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
