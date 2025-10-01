@@ -1,14 +1,15 @@
 #pragma once
 #include"IScene.h"
-
-#include"TestScene.h"
-#include"SecondTestScene.h"
-
+#include"Application/SceneManager/Scene/TitleScene.h"
+#include"Application/SceneManager/Scene/GameScene.h"
 #include<memory>
+
+// シーン数
+constexpr uint32_t sceneNum = 2;
 
 class SceneManager {
 private:
-    std::unique_ptr<IScene> sceneArr_[2]; // 最大4シーン想定
+    std::unique_ptr<IScene> sceneArr_[sceneNum];
     int currentSceneNo_;
     int prevSceneNo_;
 public:

@@ -44,10 +44,10 @@ public:
 	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle);
 
 	// 更新 パーティクルの動きや行列更新
-	void Update(Camera& useCamera);
+	void Update();
 
 	// 描画処理
-	void Draw();
+	void Draw(Camera& useCamera);
 
 	// ImGuiでのパラメータ表示
 	void DrawImGui(const char* objectName);
@@ -76,6 +76,8 @@ public:
 	//
 	void SetEmit(bool emit) { emitter_.emit = emit; }
 private:
+	Camera camera_;
+
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;
 	uint32_t idxUavParticles_;

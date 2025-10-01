@@ -10,14 +10,14 @@ GameTimer::GameTimer(float duration, bool loop)
     : duration_(duration), loop_(loop) {
 }
 
-void GameTimer::Update(float deltaTime) {
+void GameTimer::Update() {
     if (!isActive_) return;
 
     // 前フレームのループフラグをリセット
     loopedThisFrame_ = false;
 
     // タイムスケールを適用
-    float scaledDeltaTime = deltaTime * timeScale_;
+    float scaledDeltaTime = deltaTime_ * timeScale_;
     currentTime_ += scaledDeltaTime;
 
     // コールバックをチェック
@@ -35,8 +35,7 @@ void GameTimer::Update(float deltaTime) {
             for (auto& callback : callbacks_) {
                 callback.triggered = false;
             }
-        }
-        else {
+        } else {
             isActive_ = false;
         }
     }

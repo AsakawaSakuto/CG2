@@ -1,11 +1,11 @@
 #include "SceneManager.h"
 
 SceneManager::SceneManager() {
-    // 全シーン初期化
-    sceneArr_[0] = std::make_unique<TestScene>();
-    sceneArr_[1] = std::make_unique<SecondTestScene>();
+	// シーン初期化、Enumと配列の順番を合わせること
+    sceneArr_[0] = std::make_unique<TitleScene>();
+    sceneArr_[1] = std::make_unique<GameScene>();
 
-    currentSceneNo_ = TEST;
+    currentSceneNo_ = TITLE;
     prevSceneNo_ = 0;
 }
 
@@ -30,7 +30,7 @@ int SceneManager::Run() {
     appContext_->gamePad.Initialize();
 
     // 各シーンにAppContextを渡す
-    for (int i = 0; i < static_cast<int>(2); i++) {
+    for (int i = 0; i < static_cast<int>(sceneNum); i++) {
         sceneArr_[i]->SetAppContext(appContext_.get());
     }
 

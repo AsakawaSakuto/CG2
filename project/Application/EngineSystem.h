@@ -1,6 +1,6 @@
 #pragma once
-#include "IScene.h"
-#include"AppContext.h"
+#include "Application/SceneManager/IScene.h"
+#include "AppContext.h"
 
 // Include
 #include "WinApp.h"
@@ -31,3 +31,8 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
+
+// Utility
+#include "Engine/system/Utility/Random/Random.h"
+#include "Engine/system/Utility/Easing/Easing.h"
+#include "Engine/system/Utility/GameTimer/GameTimer.h"

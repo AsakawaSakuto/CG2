@@ -2,7 +2,9 @@
 #include <functional>
 #include <vector>
 #include <string>
-#include "Engine/System/Utility/Easing/Easing.h"  // --- EasingUtilを使用 ---
+
+#include "Engine/System/Utility/Easing/Easing.h"
+#include "DeltaTime.h"
 
 /// @brief ゲーム用タイマークラス
 /// シーン遷移、ゲーム内演出のタイミング制御に使用（イージングは分離）
@@ -25,7 +27,7 @@ public:
 
     /// @brief タイマーの更新
     /// @param deltaTime 前フレームからの経過時間（秒）
-    void Update(float deltaTime);
+    void Update();
 
     /// @brief タイマーを開始
     /// @param duration タイマーの継続時間（秒）
