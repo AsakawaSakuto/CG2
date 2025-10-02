@@ -2,7 +2,7 @@
 #include"IScene.h"
 #include"Application/SceneManager/Scene/TitleScene.h"
 #include"Application/SceneManager/Scene/GameScene.h"
-#include"Application/SceneManager/Temp/TempScene.h"
+#include"Application/SceneManager/Test/TestScene.h"
 #include<memory>
 
 // シーン数

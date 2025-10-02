@@ -2,7 +2,7 @@
 #include"Application/AppContext.h"
 
 enum SCENE {
-    TEMP,
+    TEST,
     TITLE,
     GAME
 };
