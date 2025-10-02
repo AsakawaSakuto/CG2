@@ -7,7 +7,7 @@ using namespace Microsoft::WRL;
 
 //"resources/uvChecker.png"
 
-void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
+void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
@@ -39,7 +39,7 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 	CreateSpotLightResource();
 }
 
-void Object3d::Update() {
+void Model::Update() {
 
 	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
 
@@ -89,7 +89,7 @@ void Object3d::Update() {
 	materialData_->uvTransform = scale * rot * trans;
 }
 
-void Object3d::Draw(Camera& useCamera) {
+void Model::Draw(Camera& useCamera) {
 	camera_ = useCamera;
 
 	// --- 描画処理 ---
@@ -122,7 +122,7 @@ void Object3d::Draw(Camera& useCamera) {
 		1, 0, 0);
 }
 
-void Object3d::SetTexture(const std::string& textureName) {
+void Model::SetTexture(const std::string& textureName) {
 	// すでに同じテクスチャなら処理をスキップ
 	if (textureName_ == textureName) {
 		return;
@@ -134,7 +134,7 @@ void Object3d::SetTexture(const std::string& textureName) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
-Vector3 Object3d::GetWorldPosition() {
+Vector3 Model::GetWorldPosition() {
 	Vector3 worldPos = {};
 	worldPos.x = worldMatrix.m[3][0];
 	worldPos.y = worldMatrix.m[3][1];
@@ -142,7 +142,7 @@ Vector3 Object3d::GetWorldPosition() {
 	return worldPos;
 }
 
-void Object3d::DrawImGui(const char* objectName) {
+void Model::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
@@ -282,7 +282,7 @@ void Object3d::DrawImGui(const char* objectName) {
 	ImGui::End();
 }
 
-void Object3d::CreateVertexResource() {
+void Model::CreateVertexResource() {
 	// 頂点リソースをつくる
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * modelData_.vertices.size());
 	// リソースの先頭のアドレスから使う
@@ -297,7 +297,7 @@ void Object3d::CreateVertexResource() {
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(Object3dVertexData) * modelData_.vertices.size()); 
 }
 
-void Object3d::CreateMaterialResource() {
+void Model::CreateMaterialResource() {
 	// MaterialResource
 	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dMaterial));
 	// 書き込むためのアドレスを取得
@@ -309,7 +309,7 @@ void Object3d::CreateMaterialResource() {
 	materialData_->shininess = 100.0f;
 }
 
-void Object3d::CreateTransformationResource() {
+void Model::CreateTransformationResource() {
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dTransformationMatrix));
 	// 書き込むためのアドレスを取得
@@ -320,7 +320,7 @@ void Object3d::CreateTransformationResource() {
 	transformationData_->WorldInverseTranspose;
 }
 
-void Object3d::CreateDirectionalLightResource() {
+void Model::CreateDirectionalLightResource() {
 	// ライトのリソースを作る
 	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
 	// リソースをマップしてデータを書き込む
@@ -333,14 +333,14 @@ void Object3d::CreateDirectionalLightResource() {
 	directionalLightData_->useHalfLambert = true;
 }
 
-void Object3d::CreateCameraResource() {
+void Model::CreateCameraResource() {
 	cameraResource_ = CreateBufferResource(device_.Get(), sizeof(CameraForGPU));
 	assert(cameraResource_ != nullptr);
 	HRESULT hr = cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 	assert(SUCCEEDED(hr));
 }
 
-void Object3d::CreatePointLightResource() {
+void Model::CreatePointLightResource() {
 	pointLightResource_ = CreateBufferResource(device_.Get(), sizeof(PointLight));
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData_));
 	pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
@@ -351,7 +351,7 @@ void Object3d::CreatePointLightResource() {
 	pointLightData_->useLight = false;
 }
 
-void Object3d::CreateSpotLightResource() {
+void Model::CreateSpotLightResource() {
 	spotLightResource_ = CreateBufferResource(device_.Get(), sizeof(SpotLight));
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
 	spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
@@ -365,7 +365,7 @@ void Object3d::CreateSpotLightResource() {
 	spotLightData_->useLight = false;
 }
 
-void Object3d::CreatePSO() {
+void Model::CreatePSO() {
 
 	CreateRootSignature();
 	InputLayoutSet();
@@ -401,7 +401,7 @@ void Object3d::CreatePSO() {
 	assert(SUCCEEDED(hr_));
 }
 
-void Object3d::CreateRootSignature() {
+void Model::CreateRootSignature() {
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -486,7 +486,7 @@ void Object3d::CreateRootSignature() {
 	}
 }
 
-void Object3d::InputLayoutSet() {
+void Model::InputLayoutSet() {
 
 	// POSITION
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -519,7 +519,7 @@ void Object3d::InputLayoutSet() {
 	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
 }
 
-void Object3d::CompileShaders() {
+void Model::CompileShaders() {
 
 	// Shaderをコンパイルする
 	vertexShaderBlob_ = dxCommon_->CompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
@@ -529,7 +529,7 @@ void Object3d::CompileShaders() {
 	assert(pixelShaderBlob_ != nullptr);
 }
 
-void Object3d::BlendStateSet() {
+void Model::BlendStateSet() {
 	// すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 	// CG3↓
@@ -545,7 +545,7 @@ void Object3d::BlendStateSet() {
 
 }
 
-void Object3d::RasiterzerStateSet() {
+void Model::RasiterzerStateSet() {
 	
 	// 裏面（時計回り）を表示しない
 	rasterizerDescSolid_.CullMode = D3D12_CULL_MODE_NONE;
@@ -558,7 +558,7 @@ void Object3d::RasiterzerStateSet() {
 	rasterizerDescWireFrame_.FillMode = D3D12_FILL_MODE_WIREFRAME;
 }
 
-void Object3d::DepthStencilStateSet() {
+void Model::DepthStencilStateSet() {
 	// Depthの機能を有効化する
 	depthStencilDesc_.DepthEnable = true;
 	// 書き込みします

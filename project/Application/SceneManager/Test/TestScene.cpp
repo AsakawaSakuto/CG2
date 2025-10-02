@@ -1,0 +1,98 @@
+#include "TestScene.h"
+
+void TestScene::SetAppContext(AppContext* ctx) {
+	ctx_ = ctx;
+}
+
+void TestScene::Initialize() {
+	// inputSystemの初期化
+	gamePad_ = &ctx_->gamePad;
+	input_ = &ctx_->input;
+
+	// カメラの初期化
+	debugCamera_->SetInput(&ctx_->input);
+	normalCamera_->SetPosition({ 0.0f,0.0f,-10.0f });
+	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
+
+	// オブジェクトの初期化
+	model_->Initialize(&ctx_->dxCommon, "resources/model/cube.obj");
+	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png", { 128.0f,128.0f });
+	sprite_->SetPosition({ 640.0f, 360.0f });
+
+	// 汎用機能
+	gameTimer_.Start(2.0f, true);
+}
+
+void TestScene::Update() {
+	// inputSystemの更新
+	gamePad_->Update();
+	ctx_->input.Update();
+
+	// カメラ切り替え&更新
+	CameraController();
+
+	//model_->SetTranslate({ EasingUtil::LerpVector3(startPos_,endPos_,gameTimer_.GetProgress(),EasingUtil::Type::EaseInBack) });
+
+	// オブジェクトの更新
+	model_->Update();
+	sprite_->Update();
+
+	// 汎用機能の更新
+	gameTimer_.Update();
+}
+
+void TestScene::Draw() {
+
+	// ここより上に描画処理を書かない
+	ctx_->dxCommon.PreDraw();
+
+	///
+	/// ↓描画処理ここから
+	///
+
+	model_->Draw(*useCamera_);
+
+	sprite_->Draw();
+
+	///
+	/// ↑描画処理ここまで
+	///
+
+	// フレームの先頭でImguiにここからフレームが始まる旨を告げる
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	///
+	/// ↓ImGuiここから
+	///
+
+	model_->DrawImGui("Model");
+
+	sprite_->DrawImGui("Sprite");
+
+	///
+	/// ↑ImGuiここまで
+	///
+
+	// Imguiの内部コマンドを生成する
+	ImGui::Render();
+
+	// ここより下に描画処理を書かない
+	ctx_->dxCommon.PostDraw();
+}
+
+void TestScene::CameraController() {
+	if (useDebugCamera_) {
+		if (debugCamera_ != nullptr) {
+			debugCamera_->Update();
+			useCamera_ = debugCamera_.get();
+		}
+	}
+	else {
+		if (normalCamera_ != nullptr) {
+			normalCamera_->Update();
+			useCamera_ = normalCamera_.get();
+		}
+	}
+}

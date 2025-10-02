@@ -2,10 +2,11 @@
 #include"IScene.h"
 #include"Application/SceneManager/Scene/TitleScene.h"
 #include"Application/SceneManager/Scene/GameScene.h"
+#include"Application/SceneManager/Test/TestScene.h"
 #include<memory>
 
 // シーン数
-constexpr uint32_t sceneNum = 2;
+constexpr uint32_t sceneNum = 3;
 
 class SceneManager {
 private:
