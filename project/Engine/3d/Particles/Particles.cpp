@@ -14,8 +14,8 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 
 	idxSrvParticles_ =      alloc.Allocate();
 	idxUavParticles_ =      alloc.Allocate();
-	idxUavFreeListIndex_ = alloc.Allocate();
-	idxUavFreeList_ =      alloc.Allocate();
+	idxUavFreeListIndex_ =  alloc.Allocate();
+	idxUavFreeList_ =       alloc.Allocate();
 
 	// ブレンドモードを加算合成に初期化
 	blendMode_ = kBlendModeAdd;
@@ -68,15 +68,15 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePerFrameResource();
 }
 
-void Particles::Update(Camera& useCamera) {
+void Particles::Update() {
 
 	// ---- カメラ関連の行列計算（PreView構造体に書き込む） ----
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_.GetScale(), camera_.GetRotate(), camera_.GetTranslate());
 	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
 	Matrix4x4 billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
 
 	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 1000.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(camera_.GetFovY(), static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), camera_.GetNearClip(), camera_.GetFarClip());
 
 	// PreViewリソースに書き込み
 	PerView tempPreView;
@@ -95,7 +95,8 @@ void Particles::Update(Camera& useCamera) {
 	UpdateParticle();
 }
 
-void Particles::Draw() {
+void Particles::Draw(Camera& useCamera) {
+	camera_ = useCamera;
 
 	// ルートシグネチャの設定（パイプラインステートだけでは設定されないため明示的に指定が必要）
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());

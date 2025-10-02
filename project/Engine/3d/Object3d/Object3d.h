@@ -38,10 +38,10 @@ public:
 	void Initialize(DirectXCommon* dxCommon, const std::string& ModelPath);
 
 	// 更新
-	void Update(Camera& useCamera);
+	void Update();
 
 	// 描画
-	void Draw();
+	void Draw(Camera& useCamera);
 
 	// ImGuiの描画
 	void DrawImGui(const char* objectName);
@@ -89,6 +89,7 @@ public:
 	void SetSRT(Vector3 s, Vector3 r, Vector3 t) { transform_.scale = s; transform_.rotate = r; transform_.translate = t; }
 private:
 	Matrix4x4 worldMatrix;
+	Camera camera_;
 
 	// ワールド変換行列情報
 	Transform transform_;

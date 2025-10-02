@@ -28,7 +28,7 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 
-	direction_ = {1.0f,-1.0f,1.0f};
+	direction_ = { 1.0f,-1.0f,1.0f };
 
 	CreateVertexResource();
 	CreateMaterialResource();
@@ -39,9 +39,25 @@ void Object3d::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath
 	CreateSpotLightResource();
 }
 
-void Object3d::Update(Camera& useCamera) {
+void Object3d::Update() {
 
-	cameraData_->worldPosition = useCamera.GetTranslate(); // カメラの位置を渡す
+	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
+
+	// 行列の内容を更新
+	worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_.GetScale(), camera_.GetRotate(), camera_.GetTranslate());
+	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(camera_.GetFovY(), static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), camera_.GetNearClip(), camera_.GetFarClip());
+	Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
+
+	// 追加処理：法線変換行列を計算
+	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
+
+	// 書き込み
+	//transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, MultiplyMatrix(worldMatrix,worldViewProjectionMatrix));
+	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+	transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
+	transformationData_->WorldInverseTranspose = worldInverseMatrix;
 
 	directionalLightData_->direction = direction_;
 
@@ -54,22 +70,6 @@ void Object3d::Update(Camera& useCamera) {
 	if (transform_.scale.z <= 0.0f) {
 		transform_.scale.z = 0.0f;
 	}
-
-	// 行列の内容を更新して三角形を動かす
-	worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(useCamera.GetScale(), useCamera.GetRotate(), useCamera.GetTranslate());
-	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), 0.1f, 1000.0f);
-	Matrix4x4 worldViewProjectionMatrix = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrix));
-
-	// 追加処理：法線変換行列を計算
-	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
-
-	// 書き込み
-	//transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, MultiplyMatrix(worldMatrix,worldViewProjectionMatrix));
-	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
-	transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
-	transformationData_->WorldInverseTranspose = worldInverseMatrix;
 
 	Matrix4x4 scale = MakeIdentityMatrix();
 	scale.m[0][0] = uvScale_.x;
@@ -89,9 +89,10 @@ void Object3d::Update(Camera& useCamera) {
 	materialData_->uvTransform = scale * rot * trans;
 }
 
-void Object3d::Draw() {
+void Object3d::Draw(Camera& useCamera) {
+	camera_ = useCamera;
 
-	commandList_ = dxCommon_->GetCommandList();
+	// --- 描画処理 ---
 	
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature_.Get());
