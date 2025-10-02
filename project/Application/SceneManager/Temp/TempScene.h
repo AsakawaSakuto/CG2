@@ -27,4 +27,7 @@ private:
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
 	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
 	void CameraController();
+
+	// Objects
+	unique_ptr<Model> model_ = make_unique<Model>();
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include "SceneManager.h"
+#include "application/SceneManager/SceneManager.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     SceneManager sceneManager;

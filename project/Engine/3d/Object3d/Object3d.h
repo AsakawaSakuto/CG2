@@ -32,7 +32,7 @@
 #include"CameraForGPU.h"
 #include"MatrixFunction.h"
 
-class Object3d {
+class Model {
 public:
 	// 初期化
 	void Initialize(DirectXCommon* dxCommon, const std::string& ModelPath);

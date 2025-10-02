@@ -2,10 +2,11 @@
 
 SceneManager::SceneManager() {
 	// シーン初期化、Enumと配列の順番を合わせること
-    sceneArr_[0] = std::make_unique<TitleScene>();
-    sceneArr_[1] = std::make_unique<GameScene>();
+    sceneArr_[0] = std::make_unique<TempScene>();
+    sceneArr_[1] = std::make_unique<TitleScene>();
+    sceneArr_[2] = std::make_unique<GameScene>();
 
-    currentSceneNo_ = TITLE;
+    currentSceneNo_ = TEMP;
     prevSceneNo_ = 0;
 }
 

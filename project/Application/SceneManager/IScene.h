@@ -2,6 +2,7 @@
 #include"Application/AppContext.h"
 
 enum SCENE {
+    TEMP,
     TITLE,
     GAME
 };
