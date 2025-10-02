@@ -63,8 +63,7 @@ void GameScene::CameraController() {
 			debugCamera_->Update();
 			useCamera_ = debugCamera_.get();
 		}
-	}
-	else {
+	} else {
 		if (normalCamera_ != nullptr) {
 			normalCamera_->Update();
 			useCamera_ = normalCamera_.get();

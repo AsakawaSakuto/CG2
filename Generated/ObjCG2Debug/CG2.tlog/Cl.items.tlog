@@ -1,3 +1,6 @@
+C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\SceneManager\Scene\GameScene.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\GameScene.obj
+C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\SceneManager\Scene\TitleScene.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\TitleScene.obj
+C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\SceneManager\Temp\TempScene.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\TempScene.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\3d\Particles\ParticleDescriptorAllocator.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\ParticleDescriptorAllocator.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\System\Audio\Audio.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Audio.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\System\Audio\AudioData.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\AudioData.obj
@@ -21,15 +24,7 @@ C:\Users\k024g\OneDrive\デスクトップ\CG2\project\externals\imgui\imgui_wid
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\System\Input\Input.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Input.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\System\Utility\Logger\Logger.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Logger.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\3d\Particles\Particles.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Particles.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Character\Boss\Boss.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Boss.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Character\Boss\BossArm.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\BossArm.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Character\Boss\BossBullet.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\BossBullet.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Character\Player\Player.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Player.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Character\Player\PlayerBeam.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\PlayerBeam.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Character\Player\PlayerBullet.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\PlayerBullet.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Fade\Fade.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Fade.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\Ranking\Ranking.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Ranking.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\SceneObject\SkyBox\SkyBox.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\SkyBox.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\main.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\main.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\System\Utility\MatrixFunction\MatrixFunction.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\MatrixFunction.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\3d\Object3d\Object3d.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Object3d.obj
@@ -39,7 +34,5 @@ C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\System\WinApp\WinA
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\3d\Sphere\Sphere.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Sphere.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\3d\Sphere\SphereData.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\SphereData.obj
 C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Engine\2d\Triangle\Triangle.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\Triangle.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\Scene\IScene.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\IScene.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\Scene\SceneManager.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\SceneManager.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\Scene\SecondTestScene.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\SecondTestScene.obj
-C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\Scene\TestScene.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\TestScene.obj
+C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\SceneManager\IScene.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\IScene.obj
+C:\Users\k024g\OneDrive\デスクトップ\CG2\project\Application\SceneManager\SceneManager.cpp;C:\Users\k024g\OneDrive\デスクトップ\CG2\Generated\ObjCG2Debug\SceneManager.obj
