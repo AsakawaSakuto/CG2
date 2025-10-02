@@ -14,7 +14,7 @@ public:
 	void Draw() override;
 
 private:
-	// AppContext
+	// AppContext 
 	AppContext* ctx_ = nullptr;
 
 	// InputSystem
