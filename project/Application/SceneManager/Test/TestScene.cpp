@@ -19,6 +19,9 @@ void TestScene::Initialize() {
 	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png", { 128.0f,128.0f });
 	sprite_->SetPosition({ 640.0f, 360.0f });
 
+	player_->Initialize(&ctx_->dxCommon);
+	player_->SetInputSystem(input_);
+
 	// 汎用機能
 	gameTimer_.Start(2.0f, true);
 }
@@ -37,6 +40,8 @@ void TestScene::Update() {
 	model_->Update();
 	sprite_->Update();
 
+    player_->Update();
+
 	// 汎用機能の更新
 	gameTimer_.Update();
 }
@@ -50,9 +55,10 @@ void TestScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	model_->Draw(*useCamera_);
+	player_->Draw(*useCamera_);
 
-	sprite_->Draw();
+	//model_->Draw(*useCamera_);
+	//sprite_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -67,9 +73,10 @@ void TestScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	model_->DrawImGui("Model");
+	//model_->DrawImGui("Model");
+	//sprite_->DrawImGui("Sprite");
 
-	sprite_->DrawImGui("Sprite");
+	debugCamera_->DrawImgui();
 
 	///
 	/// ↑ImGuiここまで

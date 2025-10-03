@@ -31,6 +31,8 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
+#include "Engine/System/Utility/Math/Sphere.h"
+#include "Engine/System/Utility/Math/AABB.h"
 
 // Utility
 #include "Engine/system/Utility/Random/Random.h"
