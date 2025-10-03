@@ -46,6 +46,8 @@ public:
 	// ImGuiの描画
 	void DrawImGui(const char* objectName);
 
+	void SetTransform(const Transform& transform) { transform_ = transform; }
+
 	// 座標を設定
 	void SetTranslate(Vector3 position) { transform_.translate = position; }
 

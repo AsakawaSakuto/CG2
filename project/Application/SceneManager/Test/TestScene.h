@@ -2,6 +2,8 @@
 #include"Application/EngineSystem.h"
 #include"Application/SceneManager/IScene.h"
 
+#include"Application/GameObject/Player/Player.h"
+
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
 using std::make_unique;
@@ -31,6 +33,7 @@ private:
 	// Objects
 	unique_ptr<Model> model_ = make_unique<Model>();
 	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
+	unique_ptr<Player> player_ = make_unique<Player>();
 
 	// UtilSystem
 	GameTimer gameTimer_;
