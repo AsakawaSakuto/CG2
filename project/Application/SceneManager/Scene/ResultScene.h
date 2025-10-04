@@ -14,12 +14,6 @@ public:
 	void Draw() override;
 
 private:
-	// AppContext
-	AppContext* ctx_ = nullptr;
-
-	// InputSystem
-	GamePad* gamePad_ = nullptr;
-	Input* input_ = nullptr;
 
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ

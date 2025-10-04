@@ -16,9 +16,6 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	// inputSystemの更新
-	gamePad_->Update();
-	ctx_->input.Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -45,6 +42,8 @@ void GameScene::Draw() {
 	///
 	/// ↓ImGuiここから
 	///
+
+	DrawSceneName();
 
 	///
 	/// ↑ImGuiここまで

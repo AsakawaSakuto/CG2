@@ -16,9 +16,10 @@ void TitleScene::Initialize() {
 }
 
 void TitleScene::Update() {
-	// inputSystemの更新
-	gamePad_->Update();
-	ctx_->input.Update();
+
+	if (input_->TriggerKey(DIK_Z)) {
+		ChangeScene(GAME);
+	}
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -45,6 +46,8 @@ void TitleScene::Draw() {
 	///
 	/// ↓ImGuiここから
 	///
+
+	DrawSceneName();
 
 	///
 	/// ↑ImGuiここまで

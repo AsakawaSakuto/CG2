@@ -56,8 +56,8 @@ int SceneManager::Run() {
         if (!running) break;
 
         // 入力更新（共通処理）
-        //appContext_->input.Update();
-        //appContext_->gamePad.Update();
+        appContext_->input.Update();
+        appContext_->gamePad.Update();
 
         if (GetAsyncKeyState(VK_F11) & 1) {
             if (!appContext_->winApp.IsFullscreen()) {
