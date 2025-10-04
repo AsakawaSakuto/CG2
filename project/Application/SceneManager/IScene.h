@@ -4,7 +4,8 @@
 enum SCENE {
     TEST,
     TITLE,
-    GAME
+    GAME,
+    RESULT
 };
 
 class IScene {

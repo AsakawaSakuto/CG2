@@ -4,6 +4,9 @@
 using std::unique_ptr;
 using std::make_unique;
 
+/// <summary>
+/// ゲームで使う3Dオブジェクトの基底クラス
+/// </summary>
 class GameObject {
 public:
     virtual void Initialize(DirectXCommon* dxCommon) = 0;
