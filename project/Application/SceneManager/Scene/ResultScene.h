@@ -6,7 +6,7 @@ using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
 using std::make_unique;
 
-class TitleScene : public IScene {
+class ResultScene : public IScene {
 public:
 	void SetAppContext(AppContext* ctx) override;
 	void Initialize() override;
@@ -20,5 +20,5 @@ private:
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
 	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
-	void CameraController();                                           
+	void CameraController();
 };

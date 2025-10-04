@@ -1,10 +1,10 @@
-#include "GameScene.h"
+#include "ResultScene.h"
 
-void GameScene::SetAppContext(AppContext* ctx) {
+void ResultScene::SetAppContext(AppContext* ctx) {
 	ctx_ = ctx;
 }
 
-void GameScene::Initialize() {
+void ResultScene::Initialize() {
 	// inputSystemの初期化
 	gamePad_ = &ctx_->gamePad;
 	input_ = &ctx_->input;
@@ -15,13 +15,13 @@ void GameScene::Initialize() {
 	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
 }
 
-void GameScene::Update() {
+void ResultScene::Update() {
 
 	// カメラ切り替え&更新
 	CameraController();
 }
 
-void GameScene::Draw() {
+void ResultScene::Draw() {
 
 	// ここより上に描画処理を書かない
 	ctx_->dxCommon.PreDraw();
@@ -56,7 +56,7 @@ void GameScene::Draw() {
 	ctx_->dxCommon.PostDraw();
 }
 
-void GameScene::CameraController() {
+void ResultScene::CameraController() {
 	if (useDebugCamera_) {
 		if (debugCamera_ != nullptr) {
 			debugCamera_->Update();

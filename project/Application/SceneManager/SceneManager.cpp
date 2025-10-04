@@ -5,6 +5,7 @@ SceneManager::SceneManager() {
     sceneArr_[0] = std::make_unique<TestScene>();
     sceneArr_[1] = std::make_unique<TitleScene>();
     sceneArr_[2] = std::make_unique<GameScene>();
+    sceneArr_[3] = std::make_unique<ResultScene>();
 
     currentSceneNo_ = TEST;
     prevSceneNo_ = TEST;
@@ -55,8 +56,8 @@ int SceneManager::Run() {
         if (!running) break;
 
         // 入力更新（共通処理）
-        //appContext_->input.Update();
-        //appContext_->gamePad.Update();
+        appContext_->input.Update();
+        appContext_->gamePad.Update();
 
         if (GetAsyncKeyState(VK_F11) & 1) {
             if (!appContext_->winApp.IsFullscreen()) {
