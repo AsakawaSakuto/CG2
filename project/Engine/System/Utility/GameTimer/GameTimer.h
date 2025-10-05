@@ -32,7 +32,7 @@ public:
     /// @brief タイマーを開始
     /// @param duration タイマーの継続時間（秒）
     /// @param loop ループするかどうか
-    void Start(float duration, bool loop = false);
+    void Start(float duration, bool loop = false, bool countdown = false);
 
     /// @brief タイマーを停止
     void Stop();
@@ -151,6 +151,7 @@ private:
     bool loop_ = false;                 // ループするかどうか
     bool finished_ = false;             // タイマーが完了したかどうか
     bool loopedThisFrame_ = false;      // このフレームでループしたかどうか
+    bool isCountdown_ = false;          // カウントダウンモードかどうか
 
     // タイムスケール機能
     float timeScale_ = 1.0f;            // タイムスケール
