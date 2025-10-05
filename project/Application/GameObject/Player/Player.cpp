@@ -31,7 +31,7 @@ void Player::Update() {
 	}
 
 	// 上昇
-	velocity_.y += acceleration_.y;
+	velocity_.y += acceleration_.y * deltaTime_;
 	transform_.translate.y += velocity_.y * deltaTime_;
 
 	// モデルに座標情報を反映
