@@ -482,6 +482,5 @@
     <None Include="resources\shaders\Sprite\Sprite.hlsli">
       <Filter>シェーダーファイル\Sprite</Filter>
     </None>
-    <None Include="Application\ReadMe.md" />
   </ItemGroup>
 </Project>
