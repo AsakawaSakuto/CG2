@@ -11,7 +11,7 @@ void TestScene::Initialize() {
 
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
-	normalCamera_->SetPosition({ 0.0f,0.0f,-10.0f });
+	normalCamera_->SetPosition({ 0.0f,0.0f,-30.0f });
 	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
 
 	// オブジェクトの初期化
@@ -41,6 +41,10 @@ void TestScene::Update() {
 	sprite_->Update();
 
     player_->Update();
+
+	// カメラの座標XYをプレイヤーの座標XYに合わせる
+	Vector3 pPos = player_->GetPosition();
+	normalCamera_->SetPosition({pPos.x, pPos.y, -30.0f});
 
 	// 汎用機能の更新
 	gameTimer_.Update();
@@ -77,6 +81,11 @@ void TestScene::Draw() {
 	//sprite_->DrawImGui("Sprite");
 
 	debugCamera_->DrawImgui();
+
+	// プレイヤーのImGui
+	player_->DrawImgui();
+
+	DrawSceneName();
 
 	///
 	/// ↑ImGuiここまで

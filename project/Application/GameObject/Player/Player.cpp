@@ -11,6 +11,10 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	transform_.translate = { 0.0f,0.0f,0.0f };
 	CollitionSphere_.center = transform_.translate;
 	CollitionSphere_.radius = 1.0f;
+
+	// 速度関連初期化
+	acceleration_ = {0.0f, 0.98f};
+	velocity_ = {};
 }
 
 void Player::Update() {
@@ -26,6 +30,10 @@ void Player::Update() {
 		transform_.translate.x += 5.0f * deltaTime_;
 	}
 
+	// 上昇
+	velocity_.y += acceleration_.y;
+	transform_.translate.y += velocity_.y * deltaTime_;
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -33,4 +41,19 @@ void Player::Update() {
 
 void Player::Draw(Camera useCamera) {
 	model_->Draw(useCamera);
+}
+
+void Player::DrawImgui()
+{
+	ImGui::Begin("Player Control");
+
+	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
+
+	if (ImGui::Button("Reset")) {
+		transform_.translate = {0.0f, 0.0f, 0.0f};
+		transform_.rotate = {0.0f, 0.0f, 0.0f};
+	}
+
+	ImGui::End();
 }

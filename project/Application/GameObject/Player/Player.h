@@ -1,7 +1,7 @@
 #pragma once
 #include "Application/GameObject/GameObject.h"
 
-class Player : GameObject
+class Player : public GameObject
 {
 public:
 	void Initialize(DirectXCommon* dxCommon) override;
@@ -10,6 +10,17 @@ public:
 	~Player() {}
 
 	void SetInputSystem(Input* inInput) { input_ = inInput; }
+
+	// ImGui表示
+	void DrawImgui();
+
+	// Getter
+	Vector3 GetPosition() const { return transform_.translate; }
+
 private:
 	Input* input_ = nullptr;
+
+	// 速度関連
+	Vector3 acceleration_{};
+	Vector3 velocity_{};
 };
