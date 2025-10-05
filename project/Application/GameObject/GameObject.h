@@ -21,10 +21,12 @@ public:
     virtual void Draw(Camera useCamera) = 0;
     virtual ~GameObject() {}
 	Sphere GetCollitionSphere() { return CollitionSphere_; }
+    AABB GetCollisionAABB() { return CollisionAABB_; }
 protected:
     unique_ptr<Model> model_ = make_unique<Model>();
 	DirectXCommon* dxCommon_ = nullptr;
 
 	Transform transform_;
 	Sphere CollitionSphere_;
+    AABB CollisionAABB_;
 };

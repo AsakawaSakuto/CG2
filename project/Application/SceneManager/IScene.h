@@ -1,5 +1,9 @@
 #pragma once
 #include"Application/AppContext.h"
+#include"Application/GameUI/SceneFade/SceneFade.h"
+
+using std::unique_ptr;
+using std::make_unique;
 
 enum SCENE {
     TEST,
@@ -7,6 +11,8 @@ enum SCENE {
     GAME,
     RESULT
 };
+
+class SceneFade;
 
 class IScene {
 protected:
@@ -18,6 +24,9 @@ protected:
     // InputSystem
     GamePad* gamePad_ = nullptr;
     Input* input_ = nullptr;
+
+    // Fade
+	SceneFade* sceneFade_ = nullptr;
 
 	void DrawSceneName();
 
