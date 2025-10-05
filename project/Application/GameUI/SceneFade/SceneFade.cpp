@@ -17,13 +17,14 @@ void SceneFade::Update() {
 	fadeInTimer_.Update();
 	fadeOutTimer_.Update();
 
-	// フェードイン処理（透明から不透明へ）
+	// --- フェードイン（透明→黒） ---
 	if (fadeInTimer_.IsActive()) {
-		fadeAlpha_ = fadeInTimer_.GetProgress();
+		fadeAlpha_ = fadeInTimer_.GetProgress();  // 0 → 1
 	}
-	// フェードアウト処理（不透明から透明へ）
+
+	// --- フェードアウト（黒→透明） ---
 	else if (fadeOutTimer_.IsActive()) {
-		fadeAlpha_ = fadeOutTimer_.GetProgress();
+		fadeAlpha_ = 1.0f - fadeOutTimer_.GetProgress();  // 1 → 0
 	}
 
 	backBlack_->SetColor({ 1.0f,1.0f,1.0f,fadeAlpha_ });

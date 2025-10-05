@@ -14,6 +14,7 @@ public:
 	void Draw() override;
 
 private:
+	int goSceneNum_ = 0; // 0ならタイトル、1ならリザルト
 
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
