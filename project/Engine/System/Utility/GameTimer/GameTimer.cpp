@@ -13,44 +13,62 @@ GameTimer::GameTimer(float duration, bool loop)
 void GameTimer::Update() {
     if (!isActive_) return;
 
-    // 前フレームのループフラグをリセット
     loopedThisFrame_ = false;
 
-    // タイムスケールを適用
     float scaledDeltaTime = deltaTime_ * timeScale_;
-    currentTime_ += scaledDeltaTime;
 
-    // コールバックをチェック
-    CheckAndExecuteCallbacks();
+    if (isCountdown_) {
+        currentTime_ -= scaledDeltaTime;
+        if (currentTime_ <= 0.0f) {
+            finished_ = true;
 
-    if (currentTime_ >= duration_) {
-        finished_ = true;
+            if (loop_) {
+                currentTime_ = duration_;
+                finished_ = false;
+                loopedThisFrame_ = true;
 
-        if (loop_) {
-            currentTime_ = 0.0f;
-            finished_ = false;  // ループ時は完了フラグをリセット
-            loopedThisFrame_ = true;  // ループ発生をマーク
-
-            // ループ時はコールバックの発火状態もリセット
-            for (auto& callback : callbacks_) {
-                callback.triggered = false;
+                for (auto& callback : callbacks_) {
+                    callback.triggered = false;
+                }
+            } else {
+                currentTime_ = 0.0f;
+                isActive_ = false;
             }
-        } else {
-            isActive_ = false;
+        }
+    } else {
+        currentTime_ += scaledDeltaTime;
+        if (currentTime_ >= duration_) {
+            finished_ = true;
+
+            if (loop_) {
+                currentTime_ = 0.0f;
+                finished_ = false;
+                loopedThisFrame_ = true;
+
+                for (auto& callback : callbacks_) {
+                    callback.triggered = false;
+                }
+            } else {
+                isActive_ = false;
+            }
         }
     }
+
+    CheckAndExecuteCallbacks();
 }
 
-void GameTimer::Start(float duration, bool loop) {
+
+void GameTimer::Start(float duration, bool loop, bool countdown) {
     duration_ = duration;
     loop_ = loop;
-    currentTime_ = 0.0f;
+    isCountdown_ = countdown;
     isActive_ = true;
     finished_ = false;
     useFrameMode_ = false;
-    loopedThisFrame_ = false;  // ループフラグもリセット
+    loopedThisFrame_ = false;
 
-    // コールバックの発火状態をリセット
+    currentTime_ = countdown ? duration : 0.0f;
+
     for (auto& callback : callbacks_) {
         callback.triggered = false;
     }
@@ -93,7 +111,14 @@ bool GameTimer::IsFinished() const {
 
 float GameTimer::GetProgress() const {
     if (duration_ <= 0.0f) return 1.0f;
-    return (std::min)(1.0f, currentTime_ / duration_);
+
+    float progress = currentTime_ / duration_;
+    progress = std::clamp(progress, 0.0f, 1.0f);
+
+    if (isCountdown_) {
+        progress = 1.0f - progress;
+    }
+    return progress;
 }
 
 float GameTimer::GetEasedProgress(EasingUtil::Type easingType) const {
