@@ -16,6 +16,10 @@ public:
 	void Draw() override;
 
 private:
+	// カメラの座標Xをプレイヤーに合わせる
+	void UpdateCameraToPlayer();
+
+private:
 	// AppContext
 	AppContext* ctx_ = nullptr;
 

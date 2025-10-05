@@ -42,9 +42,8 @@ void TestScene::Update() {
 
     player_->Update();
 
-	// カメラの座標XYをプレイヤーの座標XYに合わせる
-	Vector3 pPos = player_->GetPosition();
-	normalCamera_->SetPosition({pPos.x, pPos.y, -30.0f});
+	// カメラの座標Yをプレイヤーの座標Yに合わせる
+	UpdateCameraToPlayer();
 
 	// 汎用機能の更新
 	gameTimer_.Update();
@@ -96,6 +95,12 @@ void TestScene::Draw() {
 
 	// ここより下に描画処理を書かない
 	ctx_->dxCommon.PostDraw();
+}
+
+void TestScene::UpdateCameraToPlayer() {
+	// カメラの座標Yをプレイヤーの座標Yに合わせる
+	Vector3 pPos = player_->GetPosition();
+	normalCamera_->SetPosition({0.0f, pPos.y + player_->CameraOffset(), -30.0f});
 }
 
 void TestScene::CameraController() {
