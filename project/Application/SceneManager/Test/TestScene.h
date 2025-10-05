@@ -27,7 +27,7 @@ private:
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
-	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
+	bool useDebugCamera_ = false;                                       // デバッグカメラ使用フラグ
 	void CameraController();
 
 	// Objects

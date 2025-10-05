@@ -1,6 +1,12 @@
 #pragma once
 #include "Application/EngineSystem.h"
 
+struct InitializeContext
+{
+	Camera* camera = nullptr;
+	DirectXCommon* dxCommon = nullptr;
+};
+
 using std::unique_ptr;
 using std::make_unique;
 
@@ -10,6 +16,7 @@ using std::make_unique;
 class GameObject {
 public:
     virtual void Initialize(DirectXCommon* dxCommon) = 0;
+    //virtual void Initialize(DirectXCommon* dxCommon, Camera* camera) = 0;
     virtual void Update() = 0;
     virtual void Draw(Camera useCamera) = 0;
     virtual ~GameObject() {}
