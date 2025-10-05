@@ -13,9 +13,29 @@ void GameScene::Initialize() {
 	debugCamera_->SetInput(&ctx_->input);
 	normalCamera_->SetPosition({ 0.0f,0.0f,-10.0f });
 	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
+
+	sceneFade_ = new SceneFade();
+	sceneFade_->Initialize(&ctx_->dxCommon);
+	sceneFade_->StartFadeOut(1.0f);
 }
 
 void GameScene::Update() {
+
+	if (input_->TriggerKey(DIK_ESCAPE)) {
+		sceneFade_->StartFadeIn(1.0f);
+		goSceneNum_ = SCENE::TITLE;
+	}
+
+	if (input_->TriggerKey(DIK_SPACE)) {
+		sceneFade_->StartFadeIn(1.0f);
+		goSceneNum_ = SCENE::RESULT;
+	}
+
+	if (sceneFade_->EndFadeIn()) {
+		ChangeScene(goSceneNum_);
+	}
+
+	sceneFade_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -29,6 +49,8 @@ void GameScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	sceneFade_->Draw();
 
 	///
 	/// ↑描画処理ここまで

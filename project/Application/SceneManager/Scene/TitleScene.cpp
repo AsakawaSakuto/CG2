@@ -16,11 +16,12 @@ void TitleScene::Initialize() {
 	
 	sceneFade_ = new SceneFade();
 	sceneFade_->Initialize(&ctx_->dxCommon);
+	sceneFade_->StartFadeOut(1.0f);
 }
 
 void TitleScene::Update() {
 
-	if (input_->TriggerKey(DIK_Z)) {
+	if (input_->TriggerKey(DIK_SPACE)) {
 		sceneFade_->StartFadeIn(1.0f);
 	}
 	if (sceneFade_->EndFadeIn()) {
