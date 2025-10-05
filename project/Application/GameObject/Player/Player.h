@@ -20,6 +20,7 @@ public:
 private:
 	Input* input_ = nullptr;
 
+	// 速度関連
 	Vector3 acceleration_{};
 	Vector3 velocity_{};
 };
