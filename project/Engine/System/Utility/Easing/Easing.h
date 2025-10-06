@@ -7,7 +7,7 @@
 #include"Vector3.h"
 
 /// @brief イージング関数ユーティリティ
-namespace EasingUtil {
+namespace Easing {
 
     /// @brief イージングタイプ
     /// 各イージングの動きの特徴をコメントで説明
