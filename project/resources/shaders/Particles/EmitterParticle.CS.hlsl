@@ -24,18 +24,38 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 uint particleIndex = gFreeList[freeListIndex - 1];
                 uint baseSeed = particleIndex + countIndex * 12345 + gPerFrame.index * 6789;
 
-                gParticles[particleIndex].scale = lerp(gRange.minScale, gRange.maxScale, RandomFloat(baseSeed + 500));
+                if (gEmitter.enableScaleFade == 0)
+                {
+                    gParticles[particleIndex].scale = lerp(gRange.minScale, gRange.maxScale, RandomFloat(baseSeed + 500));
+                }
+                else
+                {
+                    gParticles[particleIndex].scale.x = gEmitter.startScale;
+                    gParticles[particleIndex].scale.y = gEmitter.startScale;
+                    gParticles[particleIndex].scale.z = gEmitter.startScale;
+                }
+                
+                if (gEmitter.enableColorFade == 0)
+                {
+                    gParticles[particleIndex].color.r = lerp(gRange.minColor.r, gRange.maxColor.r, GenerateColorR(baseSeed + 3001));
+                    gParticles[particleIndex].color.g = lerp(gRange.minColor.g, gRange.maxColor.g, GenerateColorG(baseSeed + 3002));
+                    gParticles[particleIndex].color.b = lerp(gRange.minColor.b, gRange.maxColor.b, GenerateColorB(baseSeed + 3003));
+                }
+                else
+                {
+                    gParticles[particleIndex].color.r = gEmitter.startColor.r;
+                    gParticles[particleIndex].color.g = gEmitter.startColor.g;
+                    gParticles[particleIndex].color.b = gEmitter.startColor.b;
+                }
+                
                 gParticles[particleIndex].translate = GenerateSpherePositionCustom(baseSeed + 5000, gEmitter.translate, gEmitter.radius);
-                gParticles[particleIndex].color.r = lerp(gRange.minColor.r, gRange.maxColor.r, GenerateColorR(baseSeed + 3001));
-                gParticles[particleIndex].color.g = lerp(gRange.minColor.g, gRange.maxColor.g, GenerateColorG(baseSeed + 3002));
-                gParticles[particleIndex].color.b = lerp(gRange.minColor.b, gRange.maxColor.b, GenerateColorB(baseSeed + 3003));
                 gParticles[particleIndex].color.a = 1.0f;
                 gParticles[particleIndex].rotate = float3(0.0f, 0.0f, 0.0f);
                 gParticles[particleIndex].velocity = float3(
                 RandomRange(baseSeed + 2001, gRange.minVelocity.x, gRange.maxVelocity.x),
                 RandomRange(baseSeed + 2002, gRange.minVelocity.y, gRange.maxVelocity.y),
-                RandomRange(baseSeed + 2003, gRange.minVelocity.z, gRange.maxVelocity.z)
-            );
+                RandomRange(baseSeed + 2003, gRange.minVelocity.z, gRange.maxVelocity.z));
+                gParticles[particleIndex].rotateVelocity = lerp(gRange.minRotateVelocity, gRange.maxRotateVelocity, RandomFloat(baseSeed + 500));
                 gParticles[particleIndex].lifeTime = lerp(gRange.minLifeTime, gRange.maxLifeTime, RandomFloat(baseSeed + 4000));
                 gParticles[particleIndex].currentTime = 0.0f;
             }
