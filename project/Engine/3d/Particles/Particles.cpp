@@ -48,7 +48,6 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.emit = 0;
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.isMove = 0;
-	
 
 	// Emitterの範囲
 	emitterRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -57,10 +56,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitterRange_.maxTranslate = { 1.0f, 1.0f, 1.0f };
 	emitterRange_.minColor = { 0.0f,0.0f,0.0f };
 	emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
-	emitterRange_.minVelocity = { -0.1f,-0.1f,0.0f };
-	emitterRange_.maxVelocity = { 0.1f,0.1f,0.0f };
+	emitterRange_.minVelocity = { -5.0f, -5.0f, 0.0f };
+	emitterRange_.maxVelocity = {  5.0f,  5.0f, 0.0f };
 	emitterRange_.minLifeTime = 0.1f;
 	emitterRange_.maxLifeTime = 0.5f;
+	emitterRange_.minRotateVelocity = -5.0f;
+	emitterRange_.maxRotateVelocity =  5.0f;
 
 	CreateEmitterResource();
 	CreateParticleResource();
@@ -187,6 +188,8 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("maxColor", &emitterRange_.maxColor.x, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat("minLifeTime", &emitterRange_.minLifeTime, 0.01f);
 	ImGui::DragFloat("maxLifeTime", &emitterRange_.maxLifeTime, 0.01f);
+	ImGui::DragFloat("minRotateVelocity", &emitterRange_.minRotateVelocity, 0.01f);
+	ImGui::DragFloat("maxRotateVelocity", &emitterRange_.maxRotateVelocity, 0.01f);
 
 	const char* directionLabels[] = { "None", "Normal", "Add","Subtract","Multily" ,"Screen" };
 	int current = static_cast<int>(blendMode_);

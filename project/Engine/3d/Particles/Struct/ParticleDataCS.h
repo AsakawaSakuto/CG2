@@ -15,4 +15,7 @@ struct ParticleDataCS {
     float currentTime;   //  4 bytes
     float pad5[2];       //  8 bytes → 合計16バイト
     Vector4 color;       // 16 bytes
+
+    float rotateVelocity; // 4 bytes
+	float pad6[3];        // 12 bytes → 合計16バイト
 };

@@ -34,8 +34,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 gParticles[particleIndex].velocity = float3(
                 RandomRange(baseSeed + 2001, gRange.minVelocity.x, gRange.maxVelocity.x),
                 RandomRange(baseSeed + 2002, gRange.minVelocity.y, gRange.maxVelocity.y),
-                RandomRange(baseSeed + 2003, gRange.minVelocity.z, gRange.maxVelocity.z)
-            );
+                RandomRange(baseSeed + 2003, gRange.minVelocity.z, gRange.maxVelocity.z));
+                gParticles[particleIndex].rotateVelocity = lerp(gRange.minRotateVelocity, gRange.maxRotateVelocity, RandomFloat(baseSeed + 500));
                 gParticles[particleIndex].lifeTime = lerp(gRange.minLifeTime, gRange.maxLifeTime, RandomFloat(baseSeed + 4000));
                 gParticles[particleIndex].currentTime = 0.0f;
             }

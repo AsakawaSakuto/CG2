@@ -19,7 +19,8 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
         {
             if (gEmitter.isMove != 0)
             {
-                gParticles[particleIndex].translate += gParticles[particleIndex].velocity;
+                gParticles[particleIndex].translate += gParticles[particleIndex].velocity * gPerFrame.deltaTime;
+                gParticles[particleIndex].rotate.z += gParticles[particleIndex].rotateVelocity * gPerFrame.deltaTime;
             }
             gParticles[particleIndex].currentTime += gPerFrame.deltaTime;
             float alpha = 1.0f - (gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime);

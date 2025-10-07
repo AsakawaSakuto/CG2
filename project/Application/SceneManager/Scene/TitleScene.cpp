@@ -17,6 +17,8 @@ void TitleScene::Initialize() {
 	sceneFade_ = new SceneFade();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
+
+	particle_->Initialize(&ctx_->dxCommon, "resources/image/particle/box.png", 1);
 }
 
 void TitleScene::Update() {
@@ -30,6 +32,8 @@ void TitleScene::Update() {
 
 	sceneFade_->Update();
 
+	particle_->Update();
+
 	// カメラ切り替え&更新
 	CameraController();
 }
@@ -42,6 +46,8 @@ void TitleScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	particle_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -57,6 +63,8 @@ void TitleScene::Draw() {
 	///
 	/// ↓ImGuiここから
 	///
+
+	particle_->DrawImGui("p");
 
 	DrawSceneName();
 
