@@ -46,26 +46,41 @@ void Player::Update() {
 	// プレイヤーの回転
 	RotateChange();
 
+	// 弾をためる
+	BulletCharge();
+
+	// 弾を発射する
+	BulletShot();
+
+	// 弾の更新
+	BulletUpdate();
+
+	// スタン解除
+	StunRemoved();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
 }
 
-void Player::Draw(Camera useCamera) { model_->Draw(useCamera); }
-
-void Player::DrawImgui() {
-	ImGui::Begin("Player Control");
-
-	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("Velocity", &velocity_.x, 0.01f);
-
-	if (ImGui::Button("Reset")) {
-		transform_.translate = {0.0f, 0.0f, 0.0f};
-		transform_.rotate = {0.0f, 0.0f, 0.0f};
+void Player::Draw(Camera useCamera) { 
+	// プレイヤー描画
+	if (stunTimer_ % 2 == 0) {
+		model_->Draw(useCamera);
 	}
 
-	ImGui::End();
+	// 弾の描画
+	for (auto& bullet : bullets_) {
+		bullet->Draw(useCamera);
+	}
+}
+
+void Player::DrawImgui() {
+	// プレイヤーのImGui
+	PlayerImGui();
+
+	// 弾のImGui
+	BulletImGui();
 }
 
 void Player::MovePlayerUpward() {
@@ -148,5 +163,119 @@ void Player::RotateChange() {
 
 	if (std::abs(transform_.rotate.z - targetRotationZ) < 0.01f) {
 		transform_.rotate.z = targetRotationZ;
+	}
+}
+
+void Player::BulletCharge() {
+	// ゲージが最大値なら早期リターン
+	if (bulletGauge_ >= BULLET_GAUGE_MAX) {
+		return;
+	}
+
+	///////////// 仮の処理 /////////////
+	num_++;
+
+	// 2秒に一回ゲージをためる
+	if (num_ >= 120) {
+		bulletGauge_++;
+		num_ = 0;
+	}
+	///////////// 仮の処理 /////////////
+}
+
+void Player::BulletShot() { 
+	if (input_->PushKey(DIK_SPACE)) {
+		// 弾の生成
+		auto bullet = std::make_unique<Bullet>();
+		bullet->Initialize(dxCommon_, transform_.translate);
+		
+		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
+		if (direction_ == Direction::UP) {
+			bullet->SetVelocity(bullet->GetSpeed());
+		} else {
+			bullet->SetVelocity(-bullet->GetSpeed());
+		}
+
+		bullets_.push_back(std::move(bullet));
+
+		// プレイヤー減速
+		SpeedDown();
+	}
+}
+
+void Player::BulletUpdate() {
+	// 弾の更新
+	for (auto& bullet : bullets_) {
+		bullet->Update();
+	}
+
+	// 弾の削除
+	if (!bullets_.empty()) {
+		bullets_.erase(
+		    std::remove_if(
+		        bullets_.begin(), bullets_.end(),
+		        [](const std::unique_ptr<Bullet>& bullet) {
+			        float y = bullet->GetTransform().translate.y;
+			        return y > 50.0f || y < -50.0f; // 高さの上限50　下限-50
+		        }),
+		    bullets_.end());
+	}
+}
+
+void Player::PlayerImGui() {
+	// プレイヤーのImGui
+	ImGui::Begin("Player Control");
+
+	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("Velocity", &velocity_.x, 0.01f);
+	ImGui::Text("BulletGauge: %d", bulletGauge_);
+	ImGui::Text("Bullet Count: %d", static_cast<int>(bullets_.size()));
+
+	if (ImGui::Button("Reset")) {
+		transform_.translate = {0.0f, 0.0f, 0.0f};
+		transform_.rotate = {0.0f, 0.0f, 0.0f};
+		velocity_.y = 0.0f;
+		bulletGauge_ = 0;
+	}
+
+	ImGui::End();
+}
+
+void Player::BulletImGui() {
+	// 弾のImGui
+	ImGui::Begin("Bullet");
+
+	if (!bullets_.empty()) {
+		ImGui::DragFloat3("Translate", &bullets_[0]->GetTransform().translate.x, 0.01f);
+	}
+
+	ImGui::End();
+}
+
+void Player::SpeedDown() { 
+	// 減速
+	velocity_.y += (direction_ == Direction::UP ? -0.5f : 0.5f); 
+}
+
+void Player::Stun() { 
+	// 敵にヒットしたら減速
+	if (!isStun_) {
+		isStun_ = true;
+		stunTimer_ = kStunDuration;
+
+		// 減速
+		SpeedDown();
+	}
+}
+
+void Player::StunRemoved() {
+	if (isStun_) {
+		stunTimer_--;
+		if (stunTimer_ <= 0) {
+			isStun_ = false;
+			stunTimer_ = 0;
+		}
+		return;
 	}
 }

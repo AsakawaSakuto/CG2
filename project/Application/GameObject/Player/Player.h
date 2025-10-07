@@ -1,5 +1,7 @@
 #pragma once
 #include "Application/GameObject/GameObject.h"
+#include "Bullet.h"
+#include <vector>
 
 enum class Direction
 {
@@ -22,6 +24,7 @@ public:
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
 	float CameraOffset() const { return cameraOffset_; }
+	Direction GetDirection() const { return direction_; }
 
 private:
 	// プレイヤーの上昇
@@ -39,6 +42,30 @@ private:
 	// プレイヤーの回転
 	void RotateChange();
 
+	// 弾のゲージを貯める
+	void BulletCharge();
+
+	// 弾を撃つ
+	void BulletShot();
+
+	// 弾の更新処理
+	void BulletUpdate();
+
+	// プレイヤーのImGui
+	void PlayerImGui();
+
+	// 弾のImGui
+	void BulletImGui();
+
+	// 減速
+	void SpeedDown();
+
+	// スタン
+	void Stun();
+
+	// スタン解除
+	void StunRemoved();
+
 private:
 	Input* input_ = nullptr;
 
@@ -54,4 +81,19 @@ private:
 
 	// プレイヤーの進行方向
 	Direction direction_ = Direction::UP;
+
+	// 弾のゲージ
+	int bulletGauge_ = 0;
+	// 弾のゲージ最大数
+	const int BULLET_GAUGE_MAX = 5;
+	// テスト用の変数
+	int num_ = 0;
+
+	// 弾
+	std::vector<std::unique_ptr<Bullet>> bullets_{};
+
+	// スタン関連
+	bool isStun_ = false;
+	int stunTimer_ = 0;
+	const int kStunDuration = 60; // スタンする時間(フレーム)
 };
