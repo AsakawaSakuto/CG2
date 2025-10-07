@@ -20,11 +20,35 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             if (gEmitter.isMove != 0)
             {
                 gParticles[particleIndex].translate += gParticles[particleIndex].velocity * gPerFrame.deltaTime;
+                // Z軸の回転のみを更新する場合
                 gParticles[particleIndex].rotate.z += gParticles[particleIndex].rotateVelocity * gPerFrame.deltaTime;
             }
             gParticles[particleIndex].currentTime += gPerFrame.deltaTime;
-            float alpha = 1.0f - (gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime);
-            gParticles[particleIndex].color.a = saturate(alpha);
+            
+            // 透明度フェードのフラグをチェックして適用
+            if (gEmitter.enableAlphaFade != 0)
+            {
+                float alpha = 1.0f - (gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime);
+                gParticles[particleIndex].color.a = saturate(alpha);
+            }
+            
+            // スケールフェードのフラグをチェックして適用
+            if (gEmitter.enableScaleFade != 0)
+            {
+                // 生存時間の進行度 (0.0 = 開始, 1.0 = 終了)
+                float lifeProgress = gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime;
+                lifeProgress = saturate(lifeProgress);
+                
+                // 開始スケールから終了スケールに線形補間
+                float currentScaleMultiplier = lerp(gEmitter.startScale, gEmitter.endScale, lifeProgress);
+                
+                // 元のスケール値に倍率を適用（初期スケールを保持する必要がある場合は別途管理が必要）
+                // ここでは現在のスケールに倍率を適用
+                float3 baseScale = gParticles[particleIndex].scale;
+                // 基準スケールを1として、倍率を適用
+                gParticles[particleIndex].scale = baseScale * currentScaleMultiplier;
+            }
+            // フラグがfalseの場合、スケールは初期値のまま維持
         }
         
         if (gParticles[particleIndex].color.a <= 0.0f)

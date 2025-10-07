@@ -32,6 +32,10 @@ struct EmitterSphere {
     uint emit;
     uint kMaxParticle;
     uint isMove;
+    uint enableAlphaFade; // 透明度フェードフラグ
+    uint enableScaleFade; // スケールフェードフラグ
+    float startScale;     // 開始時のスケール倍率
+    float endScale;       // 終了時のスケール倍率
 };
 
 struct EmitterRange {

@@ -24,7 +24,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 uint particleIndex = gFreeList[freeListIndex - 1];
                 uint baseSeed = particleIndex + countIndex * 12345 + gPerFrame.index * 6789;
 
-                gParticles[particleIndex].scale = lerp(gRange.minScale, gRange.maxScale, RandomFloat(baseSeed + 500));
+                if (gEmitter.enableScaleFade == 0)
+                {
+                    gParticles[particleIndex].scale = lerp(gRange.minScale, gRange.maxScale, RandomFloat(baseSeed + 500));
+                }
+                else
+                {
+                    gParticles[particleIndex].scale.x = gEmitter.startScale;
+                    gParticles[particleIndex].scale.y = gEmitter.startScale;
+                    gParticles[particleIndex].scale.z = gEmitter.startScale;
+                }
                 gParticles[particleIndex].translate = GenerateSpherePositionCustom(baseSeed + 5000, gEmitter.translate, gEmitter.radius);
                 gParticles[particleIndex].color.r = lerp(gRange.minColor.r, gRange.maxColor.r, GenerateColorR(baseSeed + 3001));
                 gParticles[particleIndex].color.g = lerp(gRange.minColor.g, gRange.maxColor.g, GenerateColorG(baseSeed + 3002));

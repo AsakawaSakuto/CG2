@@ -48,6 +48,10 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.emit = 0;
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.isMove = 0;
+	emitter_.enableAlphaFade = 1; // デフォルトで透明度フェードを有効にする
+	emitter_.enableScaleFade = 0; // デフォルトでスケールフェードを無効にする
+	emitter_.startScale = 1.0f;   // 開始時のスケール倍率
+	emitter_.endScale = 0.0f;     // 終了時のスケール倍率（0で消失）
 
 	// Emitterの範囲
 	emitterRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -177,6 +181,24 @@ void Particles::DrawImGui(const char* objectName) {
 	// ImGui チェックボックス
 	if (ImGui::Checkbox("isEmit", &isEmitFlag)) {
 		emitter_.emit = isEmitFlag ? 1u : 0u; // bool → uint32_t に変換
+	}
+
+	bool enableAlphaFadeFlag = (emitter_.enableAlphaFade != 0); // uint32_t → bool に変換
+	// ImGui チェックボックス
+	if (ImGui::Checkbox("Enable Alpha Fade", &enableAlphaFadeFlag)) {
+		emitter_.enableAlphaFade = enableAlphaFadeFlag ? 1u : 0u; // bool → uint32_t に変換
+	}
+
+	bool enableScaleFadeFlag = (emitter_.enableScaleFade != 0); // uint32_t → bool に変換
+	// ImGui チェックボックス
+	if (ImGui::Checkbox("Enable Scale Fade", &enableScaleFadeFlag)) {
+		emitter_.enableScaleFade = enableScaleFadeFlag ? 1u : 0u; // bool → uint32_t に変換
+	}
+
+	// スケールフェードが有効な場合のみ、開始・終了スケールを表示
+	if (emitter_.enableScaleFade != 0) {
+		ImGui::DragFloat("Start Scale", &emitter_.startScale, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat("End Scale", &emitter_.endScale, 0.01f, 0.0f, 10.0f);
 	}
 
 	ImGui::Text("RangeEdit");
