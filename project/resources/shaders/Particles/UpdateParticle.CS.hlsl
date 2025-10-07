@@ -42,11 +42,10 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
                 // 開始スケールから終了スケールに線形補間
                 float currentScaleMultiplier = lerp(gEmitter.startScale, gEmitter.endScale, lifeProgress);
                 
-                // 元のスケール値に倍率を適用（初期スケールを保持する必要がある場合は別途管理が必要）
-                // ここでは現在のスケールに倍率を適用
-                float3 baseScale = gParticles[particleIndex].scale;
                 // 基準スケールを1として、倍率を適用
-                gParticles[particleIndex].scale = baseScale * currentScaleMultiplier;
+                gParticles[particleIndex].scale.x = currentScaleMultiplier;
+                gParticles[particleIndex].scale.y = currentScaleMultiplier;
+                gParticles[particleIndex].scale.z = currentScaleMultiplier;
             }
             // フラグがfalseの場合、スケールは初期値のまま維持
         }
