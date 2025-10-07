@@ -36,6 +36,9 @@ struct EmitterSphere {
     uint enableScaleFade; // スケールフェードフラグ
     float startScale;     // 開始時のスケール倍率
     float endScale;       // 終了時のスケール倍率
+    uint enableColorFade; // スケールフェードフラグ
+    float3 startColor;
+    float3 endColor;
 };
 
 struct EmitterRange {

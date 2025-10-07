@@ -34,10 +34,21 @@ void main(uint3 DTid : SV_DispatchThreadID)
                     gParticles[particleIndex].scale.y = gEmitter.startScale;
                     gParticles[particleIndex].scale.z = gEmitter.startScale;
                 }
+                
+                if (gEmitter.enableColorFade == 0)
+                {
+                    gParticles[particleIndex].color.r = lerp(gRange.minColor.r, gRange.maxColor.r, GenerateColorR(baseSeed + 3001));
+                    gParticles[particleIndex].color.g = lerp(gRange.minColor.g, gRange.maxColor.g, GenerateColorG(baseSeed + 3002));
+                    gParticles[particleIndex].color.b = lerp(gRange.minColor.b, gRange.maxColor.b, GenerateColorB(baseSeed + 3003));
+                }
+                else
+                {
+                    gParticles[particleIndex].color.r = gEmitter.startColor.r;
+                    gParticles[particleIndex].color.g = gEmitter.startColor.g;
+                    gParticles[particleIndex].color.b = gEmitter.startColor.b;
+                }
+                
                 gParticles[particleIndex].translate = GenerateSpherePositionCustom(baseSeed + 5000, gEmitter.translate, gEmitter.radius);
-                gParticles[particleIndex].color.r = lerp(gRange.minColor.r, gRange.maxColor.r, GenerateColorR(baseSeed + 3001));
-                gParticles[particleIndex].color.g = lerp(gRange.minColor.g, gRange.maxColor.g, GenerateColorG(baseSeed + 3002));
-                gParticles[particleIndex].color.b = lerp(gRange.minColor.b, gRange.maxColor.b, GenerateColorB(baseSeed + 3003));
                 gParticles[particleIndex].color.a = 1.0f;
                 gParticles[particleIndex].rotate = float3(0.0f, 0.0f, 0.0f);
                 gParticles[particleIndex].velocity = float3(

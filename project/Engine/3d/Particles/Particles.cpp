@@ -41,8 +41,8 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 
 	// Emitterのデフォルト値
 	emitter_.count = 1;
-	emitter_.spawnTime = 0.01f;
-	emitter_.spawnTimer = 0.0f;
+	emitter_.frequency = 0.01f;      // 追加
+	emitter_.frequencyTime = 0.0f;   // 追加
 	emitter_.translate = { 0.0f, 0.0f, 0.0f };
 	emitter_.radius = 0.01f;
 	emitter_.emit = 0;
@@ -52,6 +52,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.enableScaleFade = 0; // デフォルトでスケールフェードを無効にする
 	emitter_.startScale = 1.0f;   // 開始時のスケール倍率
 	emitter_.endScale = 0.0f;     // 終了時のスケール倍率（0で消失）
+	emitter_.enableColorFade = 0; // デフォルトでカラー補間を無効にする
+	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
+	emitter_.endColor = { 1.0f, 0.0f, 0.0f };
+	emitter_.pad1 = 0.0f;         // 追加
+	emitter_.pad2 = 0.0f;         // 追加
+	emitter_.pad3 = 0.0f;         // 追加
 
 	// Emitterの範囲
 	emitterRange_.minScale = { 0.1f,0.1f,0.1f };
@@ -166,8 +172,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
 	ImGui::DragFloat3("OffSet", &offset_.x, 0.01f);
 	ImGui::DragFloat("SpawnSize", &emitter_.radius, 0.01f, 0.01f, 10.0f);
-	ImGui::DragInt("SpawnCount", &emitter_.count, 1, 0, static_cast<int>(kMaxParticles_));
-	ImGui::DragFloat("SpawnInterval", &emitter_.spawnTime, 0.01f, 0.01f, 10.0f);
+	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.01f, 10.0f);
 
 	bool isMoveFlag = (emitter_.isMove != 0); // uint32_t → bool に変換
 	// ImGui チェックボックス
@@ -200,6 +205,18 @@ void Particles::DrawImGui(const char* objectName) {
 		ImGui::DragFloat("Start Scale", &emitter_.startScale, 0.01f, 0.0f, 10.0f);
 		ImGui::DragFloat("End Scale", &emitter_.endScale, 0.01f, 0.0f, 10.0f);
 	}
+	
+	bool enableColorFadeFlag = (emitter_.enableColorFade != 0); // uint32_t → bool に変換
+	// ImGui チェックボックス
+	if (ImGui::Checkbox("Enable Color Fade", &enableColorFadeFlag)) {
+		emitter_.enableColorFade = enableColorFadeFlag ? 1u : 0u; // bool → uint32_t に変換
+	}
+
+	// スケールフェードが有効な場合のみ、開始・終了スケールを表示
+	if (emitter_.enableColorFade != 0) {
+		ImGui::DragFloat3("Start Scale", &emitter_.startColor.x, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat3("End Scale", &emitter_.endColor.x, 0.01f, 0.0f, 1.0f);
+	}
 
 	ImGui::Text("RangeEdit");
 	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
@@ -223,7 +240,7 @@ void Particles::DrawImGui(const char* objectName) {
 		emitter_.translate = { 0.0f, 0.0f, 0.0f };
 		emitter_.radius = 0.01f;
 		emitter_.count = 1;
-		emitter_.spawnTime = 0.01f;
+		emitter_.frequency = 0.01f;
 
 		emitterRange_.minScale = { 0.1f,0.1f,0.1f };
 		emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
@@ -521,18 +538,19 @@ void Particles::CreateEmitterResource() {
 void Particles::UpdateEmitter() {
 	// このemitterSphereをCBufferとしてGPUへ転送
 	if (useEmitter_) {
-		emitter_.spawnTimer += kDeltaTime_;
-		if (emitter_.spawnTime <= emitter_.spawnTimer) {
-			emitter_.spawnTimer = 0.0f;
+		emitter_.frequencyTime += kDeltaTime_;
+		if (emitter_.frequency <= emitter_.frequencyTime) {
+			emitter_.frequencyTime = 0.0f;
 			emitter_.emit = true;
 		} else {
 			emitter_.emit = false;
 		}
 	} else {
-		emitter_.spawnTimer = 0.0f;
+		emitter_.frequencyTime = 0.0f;
 	}
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.translate += offset_;
+	
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
 	EmitterRange* mappedRange = nullptr;
 	emitterRangeResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedRange));
