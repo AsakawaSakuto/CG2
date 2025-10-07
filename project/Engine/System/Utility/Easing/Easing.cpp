@@ -1,7 +1,7 @@
 #include "Easing.h"
 #include <numbers>
 
-namespace EasingUtil {
+namespace Easing {
 
     float Apply(float t, Type type) {
         // tを0.0～1.0の範囲にクランプ
@@ -349,4 +349,4 @@ namespace EasingUtil {
         }
     }
 
-} // namespace EasingUtil
+}

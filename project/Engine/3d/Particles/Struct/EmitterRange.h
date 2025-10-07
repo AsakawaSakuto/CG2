@@ -26,4 +26,8 @@ struct EmitterRange {
     float minLifeTime;
     float maxLifeTime;
     float pad9[2];
+
+    float minRotateVelocity;
+    float maxRotateVelocity;
+    float pad10[2];
 };

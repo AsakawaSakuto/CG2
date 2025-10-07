@@ -18,6 +18,9 @@ struct Particle {
     float currentTime;
     float2 pad5;
     float4 color;
+    
+    float rotateVelocity;
+    float3 pad6;
 };
 
 struct EmitterSphere {
@@ -29,6 +32,13 @@ struct EmitterSphere {
     uint emit;
     uint kMaxParticle;
     uint isMove;
+    uint enableAlphaFade; // 透明度フェードフラグ
+    uint enableScaleFade; // スケールフェードフラグ
+    float startScale;     // 開始時のスケール倍率
+    float endScale;       // 終了時のスケール倍率
+    uint enableColorFade; // スケールフェードフラグ
+    float3 startColor;
+    float3 endColor;
 };
 
 struct EmitterRange {
@@ -55,6 +65,10 @@ struct EmitterRange {
     float minLifeTime;
     float maxLifeTime;
     float2 pad9;
+    
+    float minRotateVelocity;
+    float maxRotateVelocity;
+    float2 pad10;
 };
 
 struct PerView {

@@ -15,17 +15,60 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
     uint particleIndex = DTid.x;
     if (particleIndex < gEmitter.kMaxParticle)
     {
-        if (gParticles[particleIndex].color.a != 0.0f)
+        if (gParticles[particleIndex].color.a > 0.0f)
         {
             if (gEmitter.isMove != 0)
             {
-                gParticles[particleIndex].translate += gParticles[particleIndex].velocity;
+                gParticles[particleIndex].translate += gParticles[particleIndex].velocity * gPerFrame.deltaTime;
+                // rotateVelocityはfloat型なので直接使用
+                float rotVel = gParticles[particleIndex].rotateVelocity;
+                gParticles[particleIndex].rotate.z += rotVel * gPerFrame.deltaTime;
             }
             gParticles[particleIndex].currentTime += gPerFrame.deltaTime;
-            float alpha = 1.0f - (gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime);
-            gParticles[particleIndex].color.a = saturate(alpha);
+            
+            // 生存時間の進行度 (0.0 = 開始, 1.0 = 終了)
+            float lifeProgress = gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime;
+            lifeProgress = saturate(lifeProgress);
+            
+            // 透明度フェードのフラグをチェックして適用
+            if (gEmitter.enableAlphaFade != 0)
+            {
+                float alpha = 1.0f - lifeProgress;
+                gParticles[particleIndex].color.a = saturate(alpha);
+            }
+            
+            // スケールフェードのフラグをチェックして適用
+            if (gEmitter.enableScaleFade != 0)
+            {
+                // 開始スケールから終了スケールに線形補間
+                float currentScaleMultiplier = lerp(gEmitter.startScale, gEmitter.endScale, lifeProgress);
+                
+                // 基準スケールを1として、倍率を適用
+                gParticles[particleIndex].scale.x = currentScaleMultiplier;
+                gParticles[particleIndex].scale.y = currentScaleMultiplier;
+                gParticles[particleIndex].scale.z = currentScaleMultiplier;
+            }
+            
+            // カラーフェードのフラグをチェックして適用
+            if (gEmitter.enableColorFade != 0)
+            {
+                // 開始カラーから終了カラーに線形補間
+                float3 currentColor = lerp(gEmitter.startColor, gEmitter.endColor, lifeProgress);
+                
+                // カラーを適用
+                gParticles[particleIndex].color.r = currentColor.r;
+                gParticles[particleIndex].color.g = currentColor.g;
+                gParticles[particleIndex].color.b = currentColor.b;
+            }
+            
+            // ライフタイムが終了したかチェック
+            if (gParticles[particleIndex].currentTime >= gParticles[particleIndex].lifeTime)
+            {
+                gParticles[particleIndex].color.a = 0.0f;
+            }
         }
         
+        // アルファ値が0以下になったパーティクルをフリーリストに戻す
         if (gParticles[particleIndex].color.a <= 0.0f)
         {
             gParticles[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
@@ -42,6 +85,5 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
                 InterlockedAdd(gFreeListIndex[0], -1);
             }
         }
-
     }
 }

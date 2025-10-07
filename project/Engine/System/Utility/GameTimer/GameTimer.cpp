@@ -121,9 +121,9 @@ float GameTimer::GetProgress() const {
     return progress;
 }
 
-float GameTimer::GetEasedProgress(EasingUtil::Type easingType) const {
+float GameTimer::GetEasedProgress(Easing::Type easingType) const {
     float progress = GetProgress();
-    return EasingUtil::Apply(progress, easingType);  // --- EasingUtilを使用 ---
+    return Easing::Apply(progress, easingType);  // --- EasingUtilを使用 ---
 }
 
 float GameTimer::GetRemainingTime() const {

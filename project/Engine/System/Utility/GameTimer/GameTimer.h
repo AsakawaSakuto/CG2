@@ -61,7 +61,7 @@ public:
     /// @brief --- EasingUtilを使用したイージング進行状況を取得 ---
     /// @param easingType イージングタイプ
     /// @return イージング適用済み進行状況
-    float GetEasedProgress(EasingUtil::Type easingType = EasingUtil::Type::Linear) const;
+    float GetEasedProgress(Easing::Type easingType = Easing::Type::Linear) const;
 
     /// @brief 残り時間を取得
     /// @return 残り時間（秒）
