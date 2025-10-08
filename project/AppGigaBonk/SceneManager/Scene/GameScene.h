@@ -1,6 +1,7 @@
 #pragma once
 #include"AppGigaBonk/EngineSystem.h"
 #include"AppGigaBonk/SceneManager/IScene.h"
+#include"AppGigaBonk/GameObject/Player/Player.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -15,6 +16,9 @@ public:
 
 private:
 	int goSceneNum_ = 0; // 0ならタイトル、1ならリザルト
+
+	unique_ptr<Model> ground_ = make_unique<Model>();
+	unique_ptr<Player> player_ = make_unique<Player>();
 
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ

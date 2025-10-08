@@ -204,19 +204,16 @@
     <ClCompile Include="AppGigaBonk\SceneManager\Scene\TitleScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="AppGigaBonk\SceneManager\Temp\TempScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="AppGigaBonk\SceneManager\IScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="AppGigaBonk\SceneManager\SceneManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="AppGigaBonk\GameUI\Temp\TempGameUI.cpp">
+    <ClCompile Include="AppGigaBonk\GameUI\SceneFade\SceneFade.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="AppGigaBonk\GameUI\SceneFade\SceneFade.cpp">
+    <ClCompile Include="AppGigaBonk\GameObject\Player\Player.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -419,22 +416,22 @@
     <ClInclude Include="AppGigaBonk\SceneManager\Scene\TitleScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="AppGigaBonk\SceneManager\Temp\TempScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="AppGigaBonk\SceneManager\IScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="AppGigaBonk\SceneManager\SceneManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="AppGigaBonk\GameUI\GameUI.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppGigaBonk\GameUI\Temp\TempGameUI.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="AppGigaBonk\GameUI\SceneFade\SceneFade.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\GameObject\Player\Player.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\GameObject\GameObject.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\GameUI\GameUI.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
