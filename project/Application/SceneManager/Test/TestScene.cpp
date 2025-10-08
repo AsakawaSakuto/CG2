@@ -97,6 +97,8 @@ void TestScene::Draw() {
 	// プレイヤーのImGui
 	player_->DrawImgui();
 
+	player_->DrawImGuiJsonState();
+
 	DrawSceneName();
 
 	ImGui::Begin("Thorn");
