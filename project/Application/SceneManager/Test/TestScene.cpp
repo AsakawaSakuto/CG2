@@ -15,26 +15,21 @@ void TestScene::Initialize() {
 	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
 
 	// オブジェクトの初期化
-	model_->Initialize(&ctx_->dxCommon, "resources/model/cube.obj");
+	model_->Initialize(&ctx_->dxCommon, "resources/model/bg.obj");
 	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png", { 128.0f,128.0f });
 	sprite_->SetPosition({ 640.0f, 360.0f });
 
 	player_->Initialize(&ctx_->dxCommon);
-	player_->SetInputSystem(input_);
+	player_->SetInputSystem(&ctx_->input);
 
 	// 汎用機能
 	gameTimer_.Start(2.0f, true);
 }
 
 void TestScene::Update() {
-	// inputSystemの更新
-	gamePad_->Update();
-	ctx_->input.Update();
 
 	// カメラ切り替え&更新
 	CameraController();
-
-	//model_->SetTranslate({ EasingUtil::LerpVector3(startPos_,endPos_,gameTimer_.GetProgress(),EasingUtil::Type::EaseInBack) });
 
 	// オブジェクトの更新
 	model_->Update();
@@ -60,7 +55,7 @@ void TestScene::Draw() {
 
 	player_->Draw(*useCamera_);
 
-	//model_->Draw(*useCamera_);
+	model_->Draw(*useCamera_);
 	//sprite_->Draw();
 
 	///

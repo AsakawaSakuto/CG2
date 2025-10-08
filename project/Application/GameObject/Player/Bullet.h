@@ -6,17 +6,14 @@ class Bullet : public GameObject {
 public:
 
 	void Initialize(DirectXCommon* dxCommon) override;
-	void Initialize(DirectXCommon* dxCommon, Vector3 translate);
 	void Update() override;
 	void Draw(Camera useCamera) override;
-	void Draw(Camera useCamera, Model* model);
+
+	void Spawn(Vector3 position, float velocity);
 
 	// Getter
 	float GetSpeed() const { return speed_; }
 	Transform& GetTransform() { return transform_; }
-
-	// Setter
-	void SetVelocity(float velocity);
 
 private:
 	float speed_ = 10.0f;
