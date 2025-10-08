@@ -3,7 +3,7 @@
 void Thorn::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "resources/model/player/player.obj");
+	model_->Initialize(dxCommon_, "resources/model/sphere.obj");
 
 	transform_.scale = {0.5f, 0.5f, 0.5f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
@@ -15,6 +15,21 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 	CollisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
 }
 
-void Thorn::Update() {}
+void Thorn::Update() {
+	if (!isAlive_)
+		return;
+
+	model_->SetTransform(transform_);
+	model_->Update();
+}
 
 void Thorn::Draw(Camera useCamera) { model_->Draw(useCamera); }
+
+void Thorn::Spawn(Vector3 position) {
+	if (isAlive_)
+		return;
+	else {
+		isAlive_ = true;
+		transform_.translate = position;
+	}
+}

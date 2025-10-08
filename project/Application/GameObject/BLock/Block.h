@@ -1,19 +1,18 @@
 #pragma once
 #include "Application/GameObject/GameObject.h"
 
-class Thorn : GameObject {
+class Block : public GameObject{
 public:
 	void Initialize(DirectXCommon* dxCommon) override;
 	void Update() override;
 	void Draw(Camera useCamera) override;
-	~Thorn() {}
-
-	bool GetIsAlive() const { return isAlive_; }
-
-	Transform& GetTransform() { return transform_; }
+	~Block() {}
 
 	// 生成時の位置設定
 	void Spawn(Vector3 position);
+
+	// Getter
+	Transform& GetTransform() { return transform_; }
 
 	// Setter
 	void SetPosition(Vector3 position) { transform_.translate = position; }

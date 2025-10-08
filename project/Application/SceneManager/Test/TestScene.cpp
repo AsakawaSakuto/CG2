@@ -1,8 +1,6 @@
 #include "TestScene.h"
 
-void TestScene::SetAppContext(AppContext* ctx) {
-	ctx_ = ctx;
-}
+void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
 void TestScene::Initialize() {
 	// inputSystemの初期化
@@ -11,19 +9,25 @@ void TestScene::Initialize() {
 
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
-	normalCamera_->SetPosition({ 0.0f,0.0f,-30.0f });
-	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
+	normalCamera_->SetPosition({0.0f, 0.0f, -30.0f});
+	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
 	// オブジェクトの初期化
 	model_->Initialize(&ctx_->dxCommon, "resources/model/bg.obj");
-	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png", { 128.0f,128.0f });
-	sprite_->SetPosition({ 640.0f, 360.0f });
+	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png", {128.0f, 128.0f});
+	sprite_->SetPosition({640.0f, 360.0f});
 
 	player_->Initialize(&ctx_->dxCommon);
 	player_->SetInputSystem(&ctx_->input);
 
+	// マップの初期化
+	map_->Initialize();
+
 	// 汎用機能
 	gameTimer_.Start(2.0f, true);
+
+	// オブジェクトの配置
+	SpawnObjectsByMapChip();
 }
 
 void TestScene::Update() {
@@ -35,13 +39,20 @@ void TestScene::Update() {
 	model_->Update();
 	sprite_->Update();
 
-    player_->Update();
+	player_->Update();
 
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
 	UpdateCameraToPlayer();
 
 	// 汎用機能の更新
 	gameTimer_.Update();
+
+	// トゲの更新処理
+	for (auto& thorn : thorns_) {
+		if (thorn->GetIsAlive()) {
+			thorn->Update();
+		}
+	}
 }
 
 void TestScene::Draw() {
@@ -56,7 +67,14 @@ void TestScene::Draw() {
 	player_->Draw(*useCamera_);
 
 	model_->Draw(*useCamera_);
-	//sprite_->Draw();
+	// sprite_->Draw();
+
+	// トゲの描画処理
+	for (auto& thorn : thorns_) {
+		if (thorn->GetIsAlive()) {
+			thorn->Draw(*useCamera_);
+		}
+	}
 
 	///
 	/// ↑描画処理ここまで
@@ -71,8 +89,8 @@ void TestScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	//model_->DrawImGui("Model");
-	//sprite_->DrawImGui("Sprite");
+	// model_->DrawImGui("Model");
+	// sprite_->DrawImGui("Sprite");
 
 	debugCamera_->DrawImgui();
 
@@ -80,6 +98,14 @@ void TestScene::Draw() {
 	player_->DrawImgui();
 
 	DrawSceneName();
+
+	ImGui::Begin("Thorn");
+
+	if (thorns_.size() > 0) {
+		ImGui::DragFloat3("Translate", &thorns_[0]->GetTransform().translate.x, 0.01f);
+	}
+
+	ImGui::End();
 
 	///
 	/// ↑ImGuiここまで
@@ -98,14 +124,37 @@ void TestScene::UpdateCameraToPlayer() {
 	normalCamera_->SetPosition({0.0f, pPos.y + player_->CameraOffset(), -30.0f});
 }
 
+void TestScene::SpawnObjectsByMapChip() {
+	for (int y = 0; y < map_->GetRowCount(); ++y) {
+		for (int x = 0; x < map_->GetColumnCount(); ++x) {
+			int tile = map_->GetMapData(y, x);
+
+			// タイルごとの描画処理
+			switch (static_cast<TileType>(tile)) {
+			case TileType::EMPTY:
+				// 空
+
+				break;
+			case TileType::THORN:
+				// トゲの描画処理
+				auto thorn = std::make_unique<Thorn>();
+				thorn->Initialize(&ctx_->dxCommon);
+				thorn->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) - 5.0f, 0.0f});
+				thorns_.push_back(std::move(thorn));
+
+				break;
+			}
+		}
+	}
+}
+
 void TestScene::CameraController() {
 	if (useDebugCamera_) {
 		if (debugCamera_ != nullptr) {
 			debugCamera_->Update();
 			useCamera_ = debugCamera_.get();
 		}
-	}
-	else {
+	} else {
 		if (normalCamera_ != nullptr) {
 			normalCamera_->Update();
 			useCamera_ = normalCamera_.get();

@@ -91,7 +91,7 @@ void Player::MovePlayerUpward() {
 
 void Player::ClampPlayerVelocity() {
 	// プレイヤーの速度を一定の値に収める
-	velocity_.y = std::clamp(velocity_.y, -4.0f, 4.0f);
+	velocity_.y = std::clamp(velocity_.y, -MAX_SPEED, MAX_SPEED);
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
@@ -184,6 +184,10 @@ void Player::BulletCharge() {
 }
 
 void Player::BulletShot() { 
+	if (bulletGauge_ <= 0) {
+		return;
+	}
+
 	if (input_->TriggerKey(DIK_SPACE)) {
 		// 弾の生成
 		auto bullet = std::make_unique<Bullet>();
@@ -200,6 +204,9 @@ void Player::BulletShot() {
 
 		// プレイヤー減速
 		SpeedDown();
+
+		// ゲージを減らす
+		--bulletGauge_;
 	}
 }
 
@@ -246,9 +253,9 @@ void Player::BulletImGui() {
 	// 弾のImGui
 	ImGui::Begin("Bullet");
 
-	if (!bullets_.empty()) {
+	/*if (!bullets_.empty()) {
 		ImGui::DragFloat3("Translate", &bullets_[0]->GetTransform().translate.x, 0.01f);
-	}
+	}*/
 
 	ImGui::End();
 }
