@@ -1,11 +1,16 @@
 #include "Application/GameObject/Player/Player.h"
 #include <numbers>
 
+#include "State/PlayerStateLoader.h"
+
 void Player::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_ = dxCommon;
 
 	model_->Initialize(dxCommon_, "resources/model/player/player.obj");
+
+	// JSONからステータスを読み込み
+	state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");
 
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
@@ -91,7 +96,7 @@ void Player::MovePlayerUpward() {
 
 void Player::ClampPlayerVelocity() {
 	// プレイヤーの速度を一定の値に収める
-	velocity_.y = std::clamp(velocity_.y, -MAX_SPEED, MAX_SPEED);
+	velocity_.y = std::clamp(velocity_.y, -state_.maxSpeed, state_.maxSpeed);
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
@@ -137,13 +142,13 @@ void Player::CameraOffsetChange() {
 	const float smoothing = 0.025f; // 小さいほどゆっくり
 
 	// 補間処理
-	cameraOffset_ = std::lerp(cameraOffset_, targetOffset, smoothing);
+	state_.cameraOffset = std::lerp(state_.cameraOffset, targetOffset, smoothing);
 
 	// velocityの符号が反転したかチェック
 	bool velocityFlipped = (direction_ == Direction::UP && velocity_.y > 0.0f) || (direction_ == Direction::DOWN && velocity_.y < 0.0f);
 
 	if (velocityFlipped) {
-		cameraOffset_ = targetOffset;
+		state_.cameraOffset = targetOffset;
 		isOffsetChange_ = false;
 	}
 }
@@ -168,7 +173,7 @@ void Player::RotateChange() {
 
 void Player::BulletCharge() {
 	// ゲージが最大値なら早期リターン
-	if (bulletGauge_ >= BULLET_GAUGE_MAX) {
+	if (bulletGauge_ >= state_.bulletGaugeMax) {
 		return;
 	}
 
@@ -249,6 +254,23 @@ void Player::PlayerImGui() {
 	ImGui::End();
 }
 
+void Player::DrawImGuiJsonState() {
+	ImGui::Begin("Player State");
+
+	// --- JSONから読み込んだパラメータを直接編集 ---
+	ImGui::DragFloat("Max Speed", &state_.maxSpeed, 0.01f, 0.0f, 100.0f);
+	ImGui::DragFloat("Camera Offset", &state_.cameraOffset, 0.01f, -20.0f, 20.0f);
+	ImGui::DragInt("Bullet Gauge Max", &state_.bulletGaugeMax, 1, 1, 100);
+	ImGui::DragInt("Stun Duration", &state_.stunDuration, 1, 0, 600);
+
+	// --- JSONへ保存ボタン ---
+	if (ImGui::Button("Save JSON")) {
+		PlayerStateLoader::Save("Resources/Data/playerState.json", state_);
+	}
+
+	ImGui::End();
+}
+
 void Player::BulletImGui() {
 	// 弾のImGui
 	ImGui::Begin("Bullet");
@@ -269,7 +291,7 @@ void Player::Stun() {
 	// 敵にヒットしたら減速
 	if (!isStun_) {
 		isStun_ = true;
-		stunTimer_ = kStunDuration;
+		stunTimer_ = state_.stunDuration;
 
 		// 減速
 		SpeedDown();

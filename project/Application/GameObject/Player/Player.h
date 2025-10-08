@@ -2,6 +2,7 @@
 #include "Application/GameObject/GameObject.h"
 #include "Bullet.h"
 #include <vector>
+#include "State/PlayerState.h"
 
 enum class Direction
 {
@@ -21,9 +22,11 @@ public:
 	// ImGui表示
 	void DrawImgui();
 
+	void DrawImGuiJsonState();
+
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
-	float CameraOffset() const { return cameraOffset_; }
+	float CameraOffset() const { return state_.cameraOffset; }
 	Direction GetDirection() const { return direction_; }
 
 private:
@@ -67,6 +70,9 @@ private:
 	void StunRemoved();
 
 private:
+	// プレイヤーのStateをJsonで管理
+	PlayerState state_;
+
 	Input* input_ = nullptr;
 
 	// 速度関連
@@ -77,7 +83,7 @@ private:
 	bool isOffsetChange_ = false;
 
 	// プレイヤーとカメラのオフセット
-	float cameraOffset_ = 4.0f;
+	//float cameraOffset_ = 4.0f;
 
 	// プレイヤーの進行方向
 	Direction direction_ = Direction::UP;
@@ -85,7 +91,7 @@ private:
 	// 弾のゲージ
 	int bulletGauge_ = 0;
 	// 弾のゲージ最大数
-	const int BULLET_GAUGE_MAX = 5;
+	//const int BULLET_GAUGE_MAX = 5;
 	// テスト用の変数
 	int num_ = 0;
 
@@ -95,8 +101,8 @@ private:
 	// スタン関連
 	bool isStun_ = false;
 	int stunTimer_ = 0;
-	const int kStunDuration = 60; // スタンする時間(フレーム)
+	//const int kStunDuration = 60; // スタンする時間(フレーム)
 
 	// プレイヤー最高速度
-	const float MAX_SPEED = 6.0f;
+	//const float MAX_SPEED = 6.0f;
 };
