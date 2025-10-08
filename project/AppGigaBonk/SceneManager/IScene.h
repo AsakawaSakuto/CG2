@@ -1,12 +1,10 @@
 #pragma once
-#include"Application/AppContext.h"
-#include"Application/GameUI/SceneFade/SceneFade.h"
+#include"AppGigaBonk/AppContext.h"
 
 using std::unique_ptr;
 using std::make_unique;
 
 enum SCENE {
-    TEST,
     TITLE,
     GAME,
     RESULT,
