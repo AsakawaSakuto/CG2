@@ -13,6 +13,10 @@ void Bullet::Initialize(DirectXCommon* dxCommon) {
 }
 
 void Bullet::Update() {
+	if (!isAlive_) {
+		return;
+	}
+
 	// 位置更新
 	transform_.translate.y += velocity_ * deltaTime_;
 
