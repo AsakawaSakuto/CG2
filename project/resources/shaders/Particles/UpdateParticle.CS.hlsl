@@ -20,10 +20,15 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             if (gEmitter.isMove != 0)
             {
                 gParticles[particleIndex].translate += gParticles[particleIndex].velocity * gPerFrame.deltaTime;
+            }
+            
+            if (gEmitter.enableRotateMove != 0)
+            {
                 // rotateVelocityはfloat型なので直接使用
                 float rotVel = gParticles[particleIndex].rotateVelocity;
                 gParticles[particleIndex].rotate.z += rotVel * gPerFrame.deltaTime;
             }
+            
             gParticles[particleIndex].currentTime += gPerFrame.deltaTime;
             
             // 生存時間の進行度 (0.0 = 開始, 1.0 = 終了)
@@ -41,12 +46,13 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             if (gEmitter.enableScaleFade != 0)
             {
                 // 開始スケールから終了スケールに線形補間
-                float currentScaleMultiplier = lerp(gEmitter.startScale, gEmitter.endScale, lifeProgress);
+                float currentScaleMultiplierX = lerp(gEmitter.startScale.x, gEmitter.endScale.x, lifeProgress);
+                float currentScaleMultiplierY = lerp(gEmitter.startScale.y, gEmitter.endScale.y, lifeProgress);
                 
                 // 基準スケールを1として、倍率を適用
-                gParticles[particleIndex].scale.x = currentScaleMultiplier;
-                gParticles[particleIndex].scale.y = currentScaleMultiplier;
-                gParticles[particleIndex].scale.z = currentScaleMultiplier;
+                gParticles[particleIndex].scale.x = currentScaleMultiplierX;
+                gParticles[particleIndex].scale.y = currentScaleMultiplierY;
+                gParticles[particleIndex].scale.z = 0.0f;
             }
             
             // カラーフェードのフラグをチェックして適用

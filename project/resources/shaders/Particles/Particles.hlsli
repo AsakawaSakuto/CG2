@@ -26,19 +26,28 @@ struct Particle {
 struct EmitterSphere {
     float3 translate;
     float radius;
+    
     uint count;
     float frequency;
     float frequencyTime;
     uint emit;
+    
     uint kMaxParticle;
     uint isMove;
     uint enableAlphaFade; // 透明度フェードフラグ
     uint enableScaleFade; // スケールフェードフラグ
-    float startScale;     // 開始時のスケール倍率
-    float endScale;       // 終了時のスケール倍率
+    
+    float2 startScale;     // 開始時のスケール倍率
+    float2 endScale;       // 終了時のスケール倍率
+    
     uint enableColorFade; // スケールフェードフラグ
+    uint enableRotateMove;
+    float2 pad1;
+    
     float3 startColor;
+    float pad2;
     float3 endColor;
+    float pad3;
 };
 
 struct EmitterRange {

@@ -30,9 +30,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 }
                 else
                 {
-                    gParticles[particleIndex].scale.x = gEmitter.startScale;
-                    gParticles[particleIndex].scale.y = gEmitter.startScale;
-                    gParticles[particleIndex].scale.z = gEmitter.startScale;
+                    gParticles[particleIndex].scale.x = gEmitter.startScale.x;
+                    gParticles[particleIndex].scale.y = gEmitter.startScale.y;
+                    gParticles[particleIndex].scale.z = 0.0f;
                 }
                 
                 if (gEmitter.enableColorFade == 0)
