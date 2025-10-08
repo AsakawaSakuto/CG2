@@ -18,6 +18,10 @@ void GameScene::Initialize() {
 	sceneFade_ = new SceneFade();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
+
+	ground_->Initialize(&ctx_->dxCommon, "resources/gigabonk/model/ground.obj");
+	player_->Initialize(&ctx_->dxCommon);
+	player_->SetInputSystem(&ctx_->input);
 }
 
 void GameScene::Update() {
@@ -38,6 +42,10 @@ void GameScene::Update() {
 
 	sceneFade_->Update();
 
+	player_->Update();
+
+	ground_->Update();
+
 	// カメラ切り替え&更新
 	CameraController();
 }
@@ -50,6 +58,10 @@ void GameScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	player_->Draw(*useCamera_);
+
+	ground_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
