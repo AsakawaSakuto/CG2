@@ -21,6 +21,8 @@ public:
     virtual ~GameObject() {}
 	Sphere GetCollitionSphere() { return CollitionSphere_; }
     AABB GetCollisionAABB() { return CollisionAABB_; }
+	bool GetIsAlive() const { return isAlive_; }
+	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }
 protected:
     unique_ptr<Model> model_ = make_unique<Model>();
 	DirectXCommon* dxCommon_ = nullptr;
@@ -28,4 +30,5 @@ protected:
 	Transform transform_;
 	Sphere CollitionSphere_;
     AABB CollisionAABB_;
+    bool isAlive_;
 };

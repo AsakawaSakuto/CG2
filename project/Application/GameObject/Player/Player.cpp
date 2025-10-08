@@ -184,16 +184,16 @@ void Player::BulletCharge() {
 }
 
 void Player::BulletShot() { 
-	if (input_->PushKey(DIK_SPACE)) {
+	if (input_->TriggerKey(DIK_SPACE)) {
 		// 弾の生成
 		auto bullet = std::make_unique<Bullet>();
-		bullet->Initialize(dxCommon_, transform_.translate);
+		bullet->Initialize(dxCommon_);
 		
 		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
 		if (direction_ == Direction::UP) {
-			bullet->SetVelocity(bullet->GetSpeed());
+			bullet->Spawn(transform_.translate, bullet->GetSpeed());
 		} else {
-			bullet->SetVelocity(-bullet->GetSpeed());
+			bullet->Spawn(transform_.translate, -bullet->GetSpeed());
 		}
 
 		bullets_.push_back(std::move(bullet));
