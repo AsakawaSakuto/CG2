@@ -214,8 +214,8 @@ void Particles::DrawImGui(const char* objectName) {
 
 	// スケールフェードが有効な場合のみ、開始・終了スケールを表示
 	if (emitter_.enableColorFade != 0) {
-		ImGui::DragFloat3("Start Scale", &emitter_.startColor.x, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat3("End Scale", &emitter_.endColor.x, 0.01f, 0.0f, 1.0f);
+		ImGui::ColorEdit3("Start Color", &emitter_.startColor.x);
+		ImGui::ColorEdit3("End Color", &emitter_.endColor.x);
 	}
 
 	bool enableRotateMoveFlag = (emitter_.enableRotateMove != 0); // uint32_t → bool に変換
