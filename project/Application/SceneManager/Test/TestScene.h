@@ -3,6 +3,8 @@
 #include"Application/SceneManager/IScene.h"
 
 #include"Application/GameObject/Player/Player.h"
+#include"Application/Map/Map.h"
+#include <Application/GameObject/Thorn/Thorn.h>
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -18,6 +20,9 @@ public:
 private:
 	// カメラの座標Xをプレイヤーに合わせる
 	void UpdateCameraToPlayer();
+
+	// マップチップに基づいてオブジェクトを配置する
+	void SpawnObjectsByMapChip();
 
 private:
 	// AppContext
@@ -38,9 +43,13 @@ private:
 	unique_ptr<Model> model_ = make_unique<Model>();
 	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
 	unique_ptr<Player> player_ = make_unique<Player>();
+	std::vector<std::unique_ptr<Thorn>> thorns_;
 
 	// UtilSystem
 	GameTimer gameTimer_;
+
+	// Map
+	unique_ptr<Map> map_ = make_unique<Map>();
 
 	//
 	Vector3 startPos_ = { 0.0f,0.0f,0.0f };

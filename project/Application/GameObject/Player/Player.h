@@ -90,10 +90,13 @@ private:
 	int num_ = 0;
 
 	// 弾
-	std::vector<std::unique_ptr<Bullet>> bullets_{};
+	std::list<std::unique_ptr<Bullet>> bullets_{};
 
 	// スタン関連
 	bool isStun_ = false;
 	int stunTimer_ = 0;
 	const int kStunDuration = 60; // スタンする時間(フレーム)
+
+	// プレイヤー最高速度
+	const float MAX_SPEED = 6.0f;
 };
