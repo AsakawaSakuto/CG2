@@ -15,11 +15,13 @@ struct EmitterSphere {
 	uint32_t enableAlphaFade; // 4 bytes
 	uint32_t enableScaleFade; // 4 bytes -> 16バイト境界
 	
-	float startScale;         // 4 bytes
-	float endScale;           // 4 bytes
+	Vector2 startScale;         // 4 bytes
+	Vector2 endScale;           // 4 bytes
+
 	uint32_t enableColorFade; // 4 bytes
-	float pad1;               // 4 bytes パディング -> 16バイト境界
-	
+	uint32_t enableRotateMove;
+	float pad1[2];
+
 	Vector3 startColor;       // 12 bytes
 	float pad2;               // 4 bytes パディング -> 16バイト境界
 	

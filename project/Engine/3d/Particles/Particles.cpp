@@ -50,12 +50,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.isMove = 0;
 	emitter_.enableAlphaFade = 1; // デフォルトで透明度フェードを有効にする
 	emitter_.enableScaleFade = 0; // デフォルトでスケールフェードを無効にする
-	emitter_.startScale = 1.0f;   // 開始時のスケール倍率
-	emitter_.endScale = 0.0f;     // 終了時のスケール倍率（0で消失）
+	emitter_.startScale = { 1.0f ,1.0f };   // 開始時のスケール倍率
+	emitter_.endScale = { 0.0f ,0.0f };     // 終了時のスケール倍率（0で消失）
 	emitter_.enableColorFade = 0; // デフォルトでカラー補間を無効にする
+	emitter_.enableRotateMove = 0;
 	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
 	emitter_.endColor = { 1.0f, 0.0f, 0.0f };
-	emitter_.pad1 = 0.0f;         // 追加
 	emitter_.pad2 = 0.0f;         // 追加
 	emitter_.pad3 = 0.0f;         // 追加
 
@@ -202,8 +202,8 @@ void Particles::DrawImGui(const char* objectName) {
 
 	// スケールフェードが有効な場合のみ、開始・終了スケールを表示
 	if (emitter_.enableScaleFade != 0) {
-		ImGui::DragFloat("Start Scale", &emitter_.startScale, 0.01f, 0.0f, 10.0f);
-		ImGui::DragFloat("End Scale", &emitter_.endScale, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat2("Start Scale", &emitter_.startScale.x, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat2("End Scale", &emitter_.endScale.x, 0.01f, 0.0f, 10.0f);
 	}
 	
 	bool enableColorFadeFlag = (emitter_.enableColorFade != 0); // uint32_t → bool に変換
@@ -216,6 +216,12 @@ void Particles::DrawImGui(const char* objectName) {
 	if (emitter_.enableColorFade != 0) {
 		ImGui::DragFloat3("Start Scale", &emitter_.startColor.x, 0.01f, 0.0f, 1.0f);
 		ImGui::DragFloat3("End Scale", &emitter_.endColor.x, 0.01f, 0.0f, 1.0f);
+	}
+
+	bool enableRotateMoveFlag = (emitter_.enableRotateMove != 0); // uint32_t → bool に変換
+	// ImGui チェックボックス
+	if (ImGui::Checkbox("Enable Rotate Move", &enableRotateMoveFlag)) {
+		emitter_.enableRotateMove = enableRotateMoveFlag ? 1u : 0u; // bool → uint32_t に変換
 	}
 
 	ImGui::Text("RangeEdit");
