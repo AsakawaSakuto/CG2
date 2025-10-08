@@ -186,12 +186,6 @@
     <ClCompile Include="Engine\3d\Particles\ParticleDescriptorAllocator.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\SceneManager\SceneManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\SceneManager\IScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\System\HeapManager\HeapManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -201,49 +195,28 @@
     <ClCompile Include="Engine\System\Utility\Easing\Easing.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\SceneManager\Scene\TitleScene.cpp">
+    <ClCompile Include="AppGigaBonk\SceneManager\Scene\GameScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\SceneManager\Scene\GameScene.cpp">
+    <ClCompile Include="AppGigaBonk\SceneManager\Scene\ResultScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\SceneManager\Temp\TempScene.cpp">
+    <ClCompile Include="AppGigaBonk\SceneManager\Scene\TitleScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\SceneManager\Test\TestScene.cpp">
+    <ClCompile Include="AppGigaBonk\SceneManager\Temp\TempScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\GameObject\Player\Player.cpp">
+    <ClCompile Include="AppGigaBonk\SceneManager\IScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\GameObject\Temp\TempGameObject.cpp">
+    <ClCompile Include="AppGigaBonk\SceneManager\SceneManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\SceneManager\Scene\ResultScene.cpp">
+    <ClCompile Include="AppGigaBonk\GameUI\Temp\TempGameUI.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\GameUI\SceneFade\SceneFade.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\GameUI\Temp\TempGameUI.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\GameObject\Collison\Collison.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\GameObject\Player\Bullet.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\GameObject\Player\PlayerWing.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\GameObject\Thorn\Thorn.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\GameObject\ExperiencePoints\ExperiencePoints.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Map\Map.cpp">
+    <ClCompile Include="AppGigaBonk\GameUI\SceneFade\SceneFade.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -407,15 +380,6 @@
     <ClInclude Include="Engine\3d\Particles\ParticleDescriptorAllocator.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\AppContext.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SceneManager\IScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SceneManager\SceneManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\System\Utility\Random\Random.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -428,25 +392,7 @@
     <ClInclude Include="Engine\System\Utility\Easing\Easing.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\EngineSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\System\Utility\GameTimer\DeltaTime.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SceneManager\Scene\TitleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SceneManager\Scene\GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SceneManager\Temp\TempScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SceneManager\Test\TestScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\GameObject\GameObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\Utility\Math\Sphere.h">
@@ -455,43 +401,40 @@
     <ClInclude Include="Engine\System\Utility\Math\AABB.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\Player\Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\GameObject\Temp\TempGameObject.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\SceneManager\Scene\ResultScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\GameUI\SceneFade\SceneFade.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\GameUI\GameUI.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\GameUI\Temp\TempGameUI.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\System\Utility\Collision\Collision.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\Collison\Collison.h">
+    <ClInclude Include="AppGigaBonk\AppContext.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\Player\Bullet.h">
+    <ClInclude Include="AppGigaBonk\EngineSystem.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\Player\PlayerWing.h">
+    <ClInclude Include="AppGigaBonk\SceneManager\Scene\GameScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\Thorn\Thorn.h">
+    <ClInclude Include="AppGigaBonk\SceneManager\Scene\ResultScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\ExperiencePoints\ExperiencePoints.h">
+    <ClInclude Include="AppGigaBonk\SceneManager\Scene\TitleScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Map\Map.h">
+    <ClInclude Include="AppGigaBonk\SceneManager\Temp\TempScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\SceneManager\IScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\SceneManager\SceneManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\GameUI\GameUI.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\GameUI\Temp\TempGameUI.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppGigaBonk\GameUI\SceneFade\SceneFade.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
