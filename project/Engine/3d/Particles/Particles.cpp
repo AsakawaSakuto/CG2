@@ -168,15 +168,14 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
-	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
-	ImGui::DragFloat("Radius", &emitter_.radius, 0.1f, 0.0f, 1000.0f);
+	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
+	ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
 
 	ImGui::Separator();
 
 	ImGui::Checkbox("UseEmitter", reinterpret_cast<bool*>(&emitter_.useEmitter));
 	ImGui::Checkbox("Emit", reinterpret_cast<bool*>(&emitter_.emit));
 	ImGui::DragInt("Count", reinterpret_cast<int*>(&emitter_.count), 1, 0, 10000);
-	ImGui::DragInt("MaxParticle", reinterpret_cast<int*>(&emitter_.kMaxParticle), 1, 0, 100000);
 
 	ImGui::Separator();
 
@@ -244,20 +243,33 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
-	if (ImGui::Button("Save JSON to Load")) {
+	if (ImGui::Button("Load to Json")) {
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
 	}
 
 	ImGui::Spacing();
 
-	if (ImGui::Button("Save JSON to Resources")) {
+	if (ImGui::Button("Save to Json")) {
 		EmitterStateLoader::Save(jsonFilePath_, emitter_);
 	}
 
 	ImGui::Spacing();
 
-	if (ImGui::Button("Save JSON to CPP Dir")) {
+	if (ImGui::Button("Generate to Json")) {
 		EmitterStateLoader::SaveToCurrentDir(emitter_, objectName);
+	}
+
+	ImGui::Separator();
+
+	// デバッグ情報表示
+	ImGui::Text("DEBUG INFO");
+	ImGui::Text("Max Particles: %u", kMaxParticles_);
+	ImGui::Text("Dispatch Count: %u", kDispatchCount);
+
+	// パーティクル強制リセット
+	if (ImGui::Button("Force Reset All Particles")) {
+		// 初期化シェーダーを再実行してパーティクルをリセット
+		ResetAllParticles();
 	}
 
 	ImGui::End();
@@ -417,6 +429,11 @@ void Particles::CreateParticleResource() {
 	csUpdateDesc.CS = { csUpdateBlob->GetBufferPointer(), csUpdateBlob->GetBufferSize() };
 	device_->CreateComputePipelineState(&csUpdateDesc, IID_PPV_ARGS(&csUpdatePipelineState_));
 
+	// 初期化実行
+	ExecuteInitialization();
+}
+
+void Particles::ExecuteInitialization() {
 	// 1. コマンドアロケータ/リスト作成（DIRECTでOK）
 	ComPtr<ID3D12CommandAllocator> alloc;
 	device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&alloc));
@@ -456,6 +473,12 @@ void Particles::CreateParticleResource() {
 	dxCommon_->GetCommandQueue()->ExecuteCommandLists(_countof(lists), lists);
 	// 必要に応じてWaitForGPU()でGPU待ち
 	dxCommon_->WaitForGPU();
+}
+
+void Particles::ResetAllParticles() {
+	OutputDebugStringA("Force resetting all particles...\n");
+	ExecuteInitialization();
+	OutputDebugStringA("Particle reset completed.\n");
 }
 
 void Particles::UpdateParticle() {

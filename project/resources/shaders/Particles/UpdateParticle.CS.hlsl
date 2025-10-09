@@ -15,6 +15,8 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
     uint particleIndex = DTid.x;
     if (particleIndex < gEmitter.kMaxParticle)
     {
+        bool shouldReturnToFreeList = false;
+        
         if (gParticles[particleIndex].color.a > 0.0f)
         {
             gParticles[particleIndex].currentTime += gPerFrame.deltaTime;
@@ -84,23 +86,47 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             if (gParticles[particleIndex].currentTime >= gParticles[particleIndex].lifeTime)
             {
                 gParticles[particleIndex].color.a = 0.0f;
+                shouldReturnToFreeList = true;
+            }
+            
+            // アルファ値が0以下になったパーティクルもフリーリストに戻す
+            if (gParticles[particleIndex].color.a <= 0.0f)
+            {
+                shouldReturnToFreeList = true;
             }
         }
-        
-        // アルファ値が0以下になったパーティクルをフリーリストに戻す
-        if (gParticles[particleIndex].color.a <= 0.0f)
+        else
         {
+            // アルファ値が0以下のパーティクルはフリーリストに戻す対象
+            shouldReturnToFreeList = true;
+        }
+        
+        // フリーリストに戻す処理（修正版）
+        if (shouldReturnToFreeList)
+        {
+            // パーティクルを完全にリセット
             gParticles[particleIndex].scale = float3(0.0f, 0.0f, 0.0f);
+            gParticles[particleIndex].rotate = float3(0.0f, 0.0f, 0.0f);
+            gParticles[particleIndex].translate = float3(0.0f, 0.0f, 0.0f);
+            gParticles[particleIndex].velocity = float3(0.0f, 0.0f, 0.0f);
+            gParticles[particleIndex].color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+            gParticles[particleIndex].currentTime = 0.0f;
+            gParticles[particleIndex].lifeTime = 0.0f;
+            gParticles[particleIndex].rotateVelocity = 0.0f;
+            gParticles[particleIndex].saveScale = float3(0.0f, 0.0f, 0.0f);
 
-            int freeListIndex;
-            InterlockedAdd(gFreeListIndex[0], 1, freeListIndex);
-
-            if (freeListIndex < gEmitter.kMaxParticle)
+            // フリーリストに安全に追加
+            int originalFreeListIndex;
+            InterlockedAdd(gFreeListIndex[0], 1, originalFreeListIndex);
+            
+            // 範囲チェックを厳密に行う
+            if (originalFreeListIndex >= 0 && originalFreeListIndex < gEmitter.kMaxParticle)
             {
-                gFreeList[freeListIndex] = particleIndex;
+                gFreeList[originalFreeListIndex] = particleIndex;
             }
             else
             {
+                // 範囲外の場合は元に戻す
                 InterlockedAdd(gFreeListIndex[0], -1);
             }
         }

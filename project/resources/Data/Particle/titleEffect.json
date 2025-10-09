@@ -5,8 +5,8 @@
     "count": 1,
     "emit": 0,
     "endColor": [
-        1.0,
-        1.0,
+        0.0,
+        0.17647075653076172,
         1.0
     ],
     "endRotateVelocity": -1.0,

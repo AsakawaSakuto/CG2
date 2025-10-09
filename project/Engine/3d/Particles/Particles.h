@@ -78,6 +78,10 @@ public:
 		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_); };
 private:
+	void ExecuteInitialization();
+
+	void ResetAllParticles();
+
 	Camera camera_;
 
 	std::string jsonFilePath_;
