@@ -5,6 +5,7 @@
 #include"Application/GameObject/Player/Player.h"
 #include"Application/Map/Map.h"
 #include <Application/GameObject/Thorn/Thorn.h>
+#include <Application/GameObject/Block/Block.h>
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -43,7 +44,8 @@ private:
 	unique_ptr<Model> model_ = make_unique<Model>();
 	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
 	unique_ptr<Player> player_ = make_unique<Player>();
-	std::vector<std::unique_ptr<Thorn>> thorns_;
+	std::vector<std::shared_ptr<Thorn>> thorns_;
+	std::vector<std::shared_ptr<Block>> blocks_;
 
 	// UtilSystem
 	GameTimer gameTimer_;

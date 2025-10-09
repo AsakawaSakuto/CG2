@@ -2,5 +2,5 @@
     "bulletGaugeMax": 5,
     "cameraOffset": -4.0,
     "maxSpeed": 5.0,
-    "stunDuration": 30
+    "stunDuration": 1.0
 }

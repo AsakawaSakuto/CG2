@@ -11,13 +11,16 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 
 	// 当たり判定(AABB)
 	Vector3 t = transform_.translate;
-	CollisionAABB_.max = {t.x + 1.0f, t.y + 1.0f, t.z + 1.0f};
-	CollisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
+	collisionAABB_.max = {t.x + 1.0f, t.y + 1.0f, t.z + 1.0f};
+	collisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
 }
 
 void Thorn::Update() {
 	if (!isAlive_)
 		return;
+
+	// トゲのサイズを更新
+	UpgradeThorn();
 
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -31,5 +34,24 @@ void Thorn::Spawn(Vector3 position) {
 	else {
 		isAlive_ = true;
 		transform_.translate = position;
+		collisionSphere_.center = transform_.translate;
+	}
+}
+
+void Thorn::UpgradeThorn() { 
+	switch (type_)
+	{ 
+	case ThornType::MIN:
+		transform_.scale = {0.5f, 0.5f, 0.5f};
+		collisionSphere_.radius = 0.25f;
+		break;
+	case ThornType::MIDDLE:
+		transform_.scale = {0.7f, 0.7f, 0.7f};
+		collisionSphere_.radius = 0.35f;
+		break;
+	case ThornType::MAX:
+		transform_.scale = {1.0f, 1.0f, 1.0f};
+		collisionSphere_.radius = 0.5f;
+		break;
 	}
 }

@@ -19,6 +19,7 @@ void TestScene::Initialize() {
 
 	player_->Initialize(&ctx_->dxCommon);
 	player_->SetInputSystem(&ctx_->input);
+	player_->SetGamePadSystem(&ctx_->gamePad);
 
 	// マップの初期化
 	map_->Initialize();
@@ -28,6 +29,10 @@ void TestScene::Initialize() {
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip();
+
+	// プレイヤーに他のゲームオブジェクトの情報を渡す
+	player_->SetThrons(thorns_);
+	player_->SetBlocks(blocks_);
 }
 
 void TestScene::Update() {
@@ -53,6 +58,13 @@ void TestScene::Update() {
 			thorn->Update();
 		}
 	}
+
+	// ブロックの更新処理
+	for (auto& block : blocks_) {
+		if (block->GetIsAlive()) {
+			block->Update();
+		}
+	}
 }
 
 void TestScene::Draw() {
@@ -73,6 +85,13 @@ void TestScene::Draw() {
 	for (auto& thorn : thorns_) {
 		if (thorn->GetIsAlive()) {
 			thorn->Draw(*useCamera_);
+		}
+	}
+
+	// ブロックの描画処理
+	for (auto& block : blocks_) {
+		if (block->GetIsAlive()) {
+			block->Draw(*useCamera_);
 		}
 	}
 
@@ -132,19 +151,20 @@ void TestScene::SpawnObjectsByMapChip() {
 			int tile = map_->GetMapData(y, x);
 
 			// タイルごとの描画処理
-			switch (static_cast<TileType>(tile)) {
-			case TileType::EMPTY:
-				// 空
-
-				break;
-			case TileType::THORN:
+			if (static_cast<TileType>(tile) == TileType::THORN) {
 				// トゲの描画処理
 				auto thorn = std::make_unique<Thorn>();
 				thorn->Initialize(&ctx_->dxCommon);
-				thorn->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) - 5.0f, 0.0f});
+				thorn->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) * -1.0f + 10.0f, 0.0f});
 				thorns_.push_back(std::move(thorn));
+			}
 
-				break;
+			if (static_cast<TileType>(tile) == TileType::BLOCK) {
+				// トゲの描画処理
+				auto block = std::make_unique<Block>();
+				block->Initialize(&ctx_->dxCommon);
+				block->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) * -1.0f + 10.0f, 0.0f});
+				blocks_.push_back(std::move(block));
 			}
 		}
 	}

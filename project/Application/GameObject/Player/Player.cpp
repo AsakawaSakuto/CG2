@@ -1,4 +1,6 @@
 #include "Application/GameObject/Player/Player.h"
+#include "Application/GameObject/Block/Block.h"
+#include "Application/GameObject/Thorn/Thorn.h"
 #include <numbers>
 
 #include "State/PlayerStateLoader.h"
@@ -15,8 +17,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
-	CollitionSphere_.center = transform_.translate;
-	CollitionSphere_.radius = 1.0f;
+	collisionSphere_.center = transform_.translate;
+	collisionSphere_.radius = 1.0f;
 
 	// 速度関連初期化
 	acceleration_ = {0.0f, 0.98f};
@@ -26,13 +28,16 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 void Player::Update() {
 
 	// 当たり判定用の球の中心を更新
-	CollitionSphere_.center = transform_.translate;
+	collisionSphere_.center = transform_.translate;
 
-	if (input_->PushKey(DIK_LEFT)) {
+	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT) || input_->PushKey(DIK_LEFT);
+	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT);
+
+	if (isLeftMove) {
 		transform_.translate.x -= 5.0f * deltaTime_;
 	}
 
-	if (input_->PushKey(DIK_RIGHT)) {
+	if (isRightMove) {
 		transform_.translate.x += 5.0f * deltaTime_;
 	}
 
@@ -63,16 +68,23 @@ void Player::Update() {
 	// スタン解除
 	StunRemoved();
 
+	// トゲとの当たり判定
+	ThornCollision();
+
+	// ブロックとの当たり判定
+	BlockCollision();
+
+	// 弾とトゲの当たり判定
+	BulletThornCollison();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
 }
 
-void Player::Draw(Camera useCamera) { 
+void Player::Draw(Camera useCamera) {
 	// プレイヤー描画
-	if (stunTimer_ % 2 == 0) {
-		model_->Draw(useCamera);
-	}
+	model_->Draw(useCamera);
 
 	// 弾の描画
 	for (auto& bullet : bullets_) {
@@ -103,7 +115,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最高地点に到達したとき
 	if (transform_.translate.y >= maxHeight && direction_ == Direction::UP) {
 		// 反転
-		//transform_.rotate.z = std::numbers::pi_v<float>;
+		// transform_.rotate.z = std::numbers::pi_v<float>;
 
 		// オフセット変更
 		isOffsetChange_ = true;
@@ -118,7 +130,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
 		// 反転
-		//transform_.rotate.z = 0.0f;
+		// transform_.rotate.z = 0.0f;
 
 		// オフセット変更
 		isOffsetChange_ = true;
@@ -188,16 +200,18 @@ void Player::BulletCharge() {
 	///////////// 仮の処理 /////////////
 }
 
-void Player::BulletShot() { 
+void Player::BulletShot() {
 	if (bulletGauge_ <= 0) {
 		return;
 	}
 
-	if (input_->TriggerKey(DIK_SPACE)) {
+	bool isShot = gamePad_->TriggerButton(gamePad_->A) || input_->TriggerKey(DIK_SPACE);
+
+	if (isShot) {
 		// 弾の生成
 		auto bullet = std::make_unique<Bullet>();
 		bullet->Initialize(dxCommon_);
-		
+
 		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
 		if (direction_ == Direction::UP) {
 			bullet->Spawn(transform_.translate, bullet->GetSpeed());
@@ -261,7 +275,7 @@ void Player::DrawImGuiJsonState() {
 	ImGui::DragFloat("Max Speed", &state_.maxSpeed, 0.01f, 0.0f, 100.0f);
 	ImGui::DragFloat("Camera Offset", &state_.cameraOffset, 0.01f, -20.0f, 20.0f);
 	ImGui::DragInt("Bullet Gauge Max", &state_.bulletGaugeMax, 1, 1, 100);
-	ImGui::DragInt("Stun Duration", &state_.stunDuration, 1, 0, 600);
+	ImGui::DragFloat("Stun Duration", &state_.stunDuration, 0.1f, 0.0f, 60.0f);
 
 	// --- JSONへ保存ボタン ---
 	if (ImGui::Button("Save JSON")) {
@@ -276,35 +290,68 @@ void Player::BulletImGui() {
 	ImGui::Begin("Bullet");
 
 	/*if (!bullets_.empty()) {
-		ImGui::DragFloat3("Translate", &bullets_[0]->GetTransform().translate.x, 0.01f);
+	    ImGui::DragFloat3("Translate", &bullets_[0]->GetTransform().translate.x, 0.01f);
 	}*/
 
 	ImGui::End();
 }
 
-void Player::SpeedDown() { 
+void Player::SpeedDown() {
 	// 減速
-	velocity_.y += (direction_ == Direction::UP ? -0.5f : 0.5f); 
+	velocity_.y += (direction_ == Direction::UP ? -0.5f : 0.5f);
 }
 
-void Player::Stun() { 
+void Player::Stun() {
 	// 敵にヒットしたら減速
-	if (!isStun_) {
-		isStun_ = true;
-		stunTimer_ = state_.stunDuration;
+	if (!stunTimer_.IsActive()) {
+		stunTimer_.Start(state_.stunDuration, false);
 
 		// 減速
 		SpeedDown();
 	}
 }
 
-void Player::StunRemoved() {
-	if (isStun_) {
-		stunTimer_--;
-		if (stunTimer_ <= 0) {
-			isStun_ = false;
-			stunTimer_ = 0;
+void Player::StunRemoved() { stunTimer_.Update(); }
+
+void Player::ThornCollision() {
+	for (auto& thorn : thorns_) {
+		if (Collision::IsHit(thorn->GetCollitionSphere(), collisionSphere_) && direction_ == Direction::DOWN) {
+			// エサをばら撒く
+
+
+			// スタン
+			Stun();
+
+			// トゲを非アクティブにする
+			thorn->SetIsAlive(false);
+			break;
 		}
-		return;
+	}
+}
+
+void Player::BlockCollision() {
+	for (auto& block : blocks_) {
+		if (Collision::IsHit(block->GetCollitionSphere(), collisionSphere_)) { 
+			// ブロックを非アクティブにする
+			block->SetIsAlive(false);
+			break;
+		}
+	}
+}
+
+void Player::BulletThornCollison() {
+	for (auto& bullet : bullets_) {
+		for (auto& thorn : thorns_) {
+			if (Collision::IsHit(bullet->GetCollitionSphere(), thorn->GetCollitionSphere())) {
+				// トゲを強化する
+				switch (thorn->GetThornType()) {
+				case ThornType::MIN:
+					thorn->SetThornType(ThornType::MIDDLE);
+					break;
+				case ThornType::MIDDLE:
+					thorn->SetThornType(ThornType::MAX);
+				}
+			}
+		}
 	}
 }
