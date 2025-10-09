@@ -19,8 +19,8 @@ public:
     virtual void Update() = 0;
     virtual void Draw(Camera useCamera) = 0;
     virtual ~GameObject() {}
-	Sphere GetCollitionSphere() { return CollitionSphere_; }
-    AABB GetCollisionAABB() { return CollisionAABB_; }
+	Sphere GetCollitionSphere() { return collisionSphere_; }
+    AABB GetCollisionAABB() { return collisionAABB_; }
 	bool GetIsAlive() const { return isAlive_; }
 	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }
 protected:
@@ -28,7 +28,7 @@ protected:
 	DirectXCommon* dxCommon_ = nullptr;
 
 	Transform transform_;
-	Sphere CollitionSphere_;
-    AABB CollisionAABB_;
+	Sphere collisionSphere_;
+    AABB collisionAABB_;
     bool isAlive_;
 };

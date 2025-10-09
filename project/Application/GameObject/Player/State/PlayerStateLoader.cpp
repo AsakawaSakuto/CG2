@@ -17,7 +17,7 @@ PlayerState PlayerStateLoader::Load(const std::string& filePath) {
     status.maxSpeed = data.value("maxSpeed", 6.0f);
     status.cameraOffset = data.value("cameraOffsetUp", 4.0f);
     status.bulletGaugeMax = data.value("bulletGaugeMax", 5);
-    status.stunDuration = data.value("stunDuration", 60);
+    status.stunDuration = data.value("stunDuration", 1.0f);
 
     return status;
 }

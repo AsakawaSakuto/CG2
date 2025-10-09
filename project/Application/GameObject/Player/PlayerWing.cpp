@@ -14,8 +14,8 @@ void PlayerWing::Initialize(DirectXCommon* dxCommon, Vector3 translate)
 
 	// 当たり判定(AABB)
 	Vector3 t = transform_.translate;
-	CollisionAABB_.max = {t.x + 2.0f, t.y + 1.0f, t.z + 1.0f};
-	CollisionAABB_.min = {t.x - 2.0f, t.y - 1.0f, t.z - 1.0f};
+	collisionAABB_.max = {t.x + 2.0f, t.y + 1.0f, t.z + 1.0f};
+	collisionAABB_.min = {t.x - 2.0f, t.y - 1.0f, t.z - 1.0f};
 }
 
 void PlayerWing::Update() {
