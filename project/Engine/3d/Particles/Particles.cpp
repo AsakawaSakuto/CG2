@@ -40,38 +40,43 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	kDispatchCount = num;
 
 	// Emitterのデフォルト値
-	emitter_.count = 1;
-	emitter_.frequency = 0.01f;      // 追加
-	emitter_.frequencyTime = 0.0f;   // 追加
 	emitter_.translate = { 0.0f, 0.0f, 0.0f };
-	emitter_.radius = 0.01f;
-	emitter_.emit = 0;
+	emitter_.radius = 0.5f;                 // 小さめの範囲
+	emitter_.useEmitter = 1;
+	emitter_.emit = 1;
+	emitter_.count = 5;                     // 複数のパーティクルを生成
 	emitter_.kMaxParticle = kMaxParticles_;
-	emitter_.isMove = 0;
-	emitter_.enableAlphaFade = 1; // デフォルトで透明度フェードを有効にする
-	emitter_.enableScaleFade = 0; // デフォルトでスケールフェードを無効にする
-	emitter_.startScale = { 1.0f ,1.0f };   // 開始時のスケール倍率
-	emitter_.endScale = { 0.0f ,0.0f };     // 終了時のスケール倍率（0で消失）
-	emitter_.enableColorFade = 0; // デフォルトでカラー補間を無効にする
-	emitter_.enableRotateMove = 0;
+	emitter_.frequency = 0.5f;              // 短い間隔で生成
+	emitter_.frequencyTime = 0.0f;
+	emitter_.startScale = { 1.0f, 1.0f };
+	emitter_.endScale = { 0.5f, 0.5f };
+	emitter_.scaleFade = 0;                 // デバッグ用：スケールフェード無効
+	emitter_.scaleRandom = 0;
+	emitter_.minScale = { 0.5f, 0.5f, 0.5f };
+	emitter_.maxScale = { 1.5f, 1.5f, 1.5f };
+	emitter_.rotateMove = 0;                // デバッグ用：回転無効
+	emitter_.startRotateVelocity = 0.0f;
+	emitter_.endRotateVelocity = 0.0f;
+	emitter_.rotateVelocityRandom = 0;
+	emitter_.minRotateVelocity = 0.0f;
+	emitter_.maxRotateVelocity = 0.0f;
+	emitter_.enableAlphaFade = 0;           // デバッグ用：アルファフェード無効
+	emitter_.enableColorFade = 0;           // デバッグ用：カラーフェード無効
 	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
 	emitter_.endColor = { 1.0f, 0.0f, 0.0f };
-	emitter_.pad2 = 0.0f;         // 追加
-	emitter_.pad3 = 0.0f;         // 追加
-
-	// Emitterの範囲
-	emitterRange_.minScale = { 0.1f,0.1f,0.1f };
-	emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
-	emitterRange_.minTranslate = { 1.0f, 1.0f, 1.0f };
-	emitterRange_.maxTranslate = { 1.0f, 1.0f, 1.0f };
-	emitterRange_.minColor = { 0.0f,0.0f,0.0f };
-	emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
-	emitterRange_.minVelocity = { -5.0f, -5.0f, 0.0f };
-	emitterRange_.maxVelocity = {  5.0f,  5.0f, 0.0f };
-	emitterRange_.minLifeTime = 0.1f;
-	emitterRange_.maxLifeTime = 0.5f;
-	emitterRange_.minRotateVelocity = -5.0f;
-	emitterRange_.maxRotateVelocity =  5.0f;
+	emitter_.colorRandom = 0;
+	emitter_.minColor = { 1.0f, 1.0f, 1.0f };
+	emitter_.maxColor = { 1.0f, 1.0f, 1.0f };
+	emitter_.enableMove = 0;                // デバッグ用：移動無効
+	emitter_.startVelocity = { 0.0f, 0.0f, 0.0f };
+	emitter_.endVelocity = { 0.0f, 0.0f, 0.0f };
+	emitter_.velocityRandom = 0;
+	emitter_.minVelocity = { 0.0f, 0.0f, 0.0f };
+	emitter_.maxVelocity = { 0.0f, 0.0f, 0.0f };
+	emitter_.lifeTime = 10.0f;              // 長い寿命
+	emitter_.lifeTimeRandom = 0;
+	emitter_.minLifeTime = 5.0f;
+	emitter_.maxLifeTime = 15.0f;
 
 	CreateEmitterResource();
 	CreateParticleResource();
@@ -163,106 +168,53 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
-	ImGui::Text("kMaxParticle:%d", kMaxParticles_);
-	ImGui::Text("kDispatchCount:%d", kDispatchCount);
+	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
+	ImGui::DragFloat("Radius", &emitter_.radius, 0.1f, 0.0f, 1000.0f);
 
-	ImGui::Separator();
+	ImGui::Checkbox("UseEmitter", reinterpret_cast<bool*>(&emitter_.useEmitter));
+	ImGui::Checkbox("Emit", reinterpret_cast<bool*>(&emitter_.emit));
+	ImGui::DragInt("Count", reinterpret_cast<int*>(&emitter_.count), 1, 0, 10000);
+	ImGui::DragInt("MaxParticle", reinterpret_cast<int*>(&emitter_.kMaxParticle), 1, 0, 100000);
 
-	ImGui::Text("EmitterEdit");
-	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
-	ImGui::DragFloat3("OffSet", &offset_.x, 0.01f);
-	ImGui::DragFloat("SpawnSize", &emitter_.radius, 0.01f, 0.01f, 10.0f);
-	ImGui::DragFloat("SpawnInterval", &emitter_.frequency, 0.01f, 0.01f, 10.0f);
+	ImGui::DragFloat("Frequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("FrequencyTime", &emitter_.frequencyTime, 0.01f, 0.0f, 10.0f);  // frequencyTimerをfrequencyTimeに修正
 
-	bool isMoveFlag = (emitter_.isMove != 0); // uint32_t → bool に変換
-	// ImGui チェックボックス
-	if (ImGui::Checkbox("Move Particles", &isMoveFlag)) {
-		emitter_.isMove = isMoveFlag ? 1u : 0u; // bool → uint32_t に変換
-	}
+	ImGui::DragFloat2("StartScale", &emitter_.startScale.x, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat2("EndScale", &emitter_.endScale.x, 0.01f, 0.0f, 10.0f);
 
-	ImGui::Checkbox("useEmitter", &useEmitter_);
-	
-	bool isEmitFlag = (emitter_.emit != 0); // uint32_t → bool に変換
-	// ImGui チェックボックス
-	if (ImGui::Checkbox("isEmit", &isEmitFlag)) {
-		emitter_.emit = isEmitFlag ? 1u : 0u; // bool → uint32_t に変換
-	}
+	ImGui::Checkbox("ScaleFade", reinterpret_cast<bool*>(&emitter_.scaleFade));
+	ImGui::Checkbox("ScaleRandom", reinterpret_cast<bool*>(&emitter_.scaleRandom));
+	ImGui::DragFloat3("MinScale", &emitter_.minScale.x, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat3("MaxScale", &emitter_.maxScale.x, 0.01f, 0.0f, 10.0f);
 
-	bool enableAlphaFadeFlag = (emitter_.enableAlphaFade != 0); // uint32_t → bool に変換
-	// ImGui チェックボックス
-	if (ImGui::Checkbox("Enable Alpha Fade", &enableAlphaFadeFlag)) {
-		emitter_.enableAlphaFade = enableAlphaFadeFlag ? 1u : 0u; // bool → uint32_t に変換
-	}
+	ImGui::Checkbox("RotateMove", reinterpret_cast<bool*>(&emitter_.rotateMove));
+	ImGui::DragFloat("StartRotateVelocity", &emitter_.startRotateVelocity, 0.01f);
+	ImGui::DragFloat("EndRotateVelocity", &emitter_.endRotateVelocity, 0.01f);
+	ImGui::Checkbox("RotateVelocityRandom", reinterpret_cast<bool*>(&emitter_.rotateVelocityRandom));
+	ImGui::DragFloat("MinRotateVelocity", &emitter_.minRotateVelocity, 0.01f);
+	ImGui::DragFloat("MaxRotateVelocity", &emitter_.maxRotateVelocity, 0.01f);
 
-	bool enableScaleFadeFlag = (emitter_.enableScaleFade != 0); // uint32_t → bool に変換
-	// ImGui チェックボックス
-	if (ImGui::Checkbox("Enable Scale Fade", &enableScaleFadeFlag)) {
-		emitter_.enableScaleFade = enableScaleFadeFlag ? 1u : 0u; // bool → uint32_t に変換
-	}
+	ImGui::Checkbox("EnableAlphaFade", reinterpret_cast<bool*>(&emitter_.enableAlphaFade));
+	ImGui::Checkbox("EnableColorFade", reinterpret_cast<bool*>(&emitter_.enableColorFade));
 
-	// スケールフェードが有効な場合のみ、開始・終了スケールを表示
-	if (emitter_.enableScaleFade != 0) {
-		ImGui::DragFloat2("Start Scale", &emitter_.startScale.x, 0.01f, 0.0f, 10.0f);
-		ImGui::DragFloat2("End Scale", &emitter_.endScale.x, 0.01f, 0.0f, 10.0f);
-	}
-	
-	bool enableColorFadeFlag = (emitter_.enableColorFade != 0); // uint32_t → bool に変換
-	// ImGui チェックボックス
-	if (ImGui::Checkbox("Enable Color Fade", &enableColorFadeFlag)) {
-		emitter_.enableColorFade = enableColorFadeFlag ? 1u : 0u; // bool → uint32_t に変換
-	}
+	ImGui::ColorEdit3("StartColor", &emitter_.startColor.x);
+	ImGui::ColorEdit3("EndColor", &emitter_.endColor.x);
 
-	// スケールフェードが有効な場合のみ、開始・終了スケールを表示
-	if (emitter_.enableColorFade != 0) {
-		ImGui::ColorEdit3("Start Color", &emitter_.startColor.x);
-		ImGui::ColorEdit3("End Color", &emitter_.endColor.x);
-	}
+	ImGui::Checkbox("ColorRandom", reinterpret_cast<bool*>(&emitter_.colorRandom));
+	ImGui::ColorEdit3("MinColor", &emitter_.minColor.x);
+	ImGui::ColorEdit3("MaxColor", &emitter_.maxColor.x);
 
-	bool enableRotateMoveFlag = (emitter_.enableRotateMove != 0); // uint32_t → bool に変換
-	// ImGui チェックボックス
-	if (ImGui::Checkbox("Enable Rotate Move", &enableRotateMoveFlag)) {
-		emitter_.enableRotateMove = enableRotateMoveFlag ? 1u : 0u; // bool → uint32_t に変換
-	}
+	ImGui::Checkbox("EnableMove", reinterpret_cast<bool*>(&emitter_.enableMove));
+	ImGui::DragFloat3("StartVelocity", &emitter_.startVelocity.x, 0.01f);
+	ImGui::DragFloat3("EndVelocity", &emitter_.endVelocity.x, 0.01f);
+	ImGui::Checkbox("VelocityRandom", reinterpret_cast<bool*>(&emitter_.velocityRandom));
+	ImGui::DragFloat3("MinVelocity", &emitter_.minVelocity.x, 0.01f);
+	ImGui::DragFloat3("MaxVelocity", &emitter_.maxVelocity.x, 0.01f);
 
-	ImGui::Text("RangeEdit");
-	ImGui::DragFloat3("minScale", &emitterRange_.minScale.x, 0.01f);
-	ImGui::DragFloat3("maxScale", &emitterRange_.maxScale.x, 0.01f);
-	ImGui::DragFloat3("minVelocity", &emitterRange_.minVelocity.x, 0.01f);
-	ImGui::DragFloat3("maxVelocity", &emitterRange_.maxVelocity.x, 0.01f);
-	ImGui::DragFloat3("minColor", &emitterRange_.minColor.x, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat3("maxColor", &emitterRange_.maxColor.x, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("minLifeTime", &emitterRange_.minLifeTime, 0.01f);
-	ImGui::DragFloat("maxLifeTime", &emitterRange_.maxLifeTime, 0.01f);
-	ImGui::DragFloat("minRotateVelocity", &emitterRange_.minRotateVelocity, 0.01f);
-	ImGui::DragFloat("maxRotateVelocity", &emitterRange_.maxRotateVelocity, 0.01f);
-
-	const char* directionLabels[] = { "None", "Normal", "Add","Subtract","Multily" ,"Screen" };
-	int current = static_cast<int>(blendMode_);
-	ImGui::Combo("BlendMode", &current, directionLabels, 6);
-	blendMode_ = static_cast<BlendMode>(current);
-
-	if (ImGui::Button("Reset"))
-	{
-		emitter_.translate = { 0.0f, 0.0f, 0.0f };
-		emitter_.radius = 0.01f;
-		emitter_.count = 1;
-		emitter_.frequency = 0.01f;
-
-		emitterRange_.minScale = { 0.1f,0.1f,0.1f };
-		emitterRange_.maxScale = { 1.0f,1.0f,1.0f };
-
-		emitterRange_.minTranslate = { 1.0f, 1.0f, 1.0f };
-		emitterRange_.maxTranslate = { 1.0f, 1.0f, 1.0f };
-
-		emitterRange_.minColor = { 0.0f,0.0f,0.0f };
-		emitterRange_.maxColor = { 1.0f,1.0f,1.0f };
-
-		emitterRange_.minVelocity = { -0.1f,-0.1f,0.0f };
-		emitterRange_.maxVelocity = { 0.1f,0.1f,0.0f };
-
-		emitterRange_.minLifeTime = 0.1f;
-		emitterRange_.maxLifeTime = 0.5f;
-	}
+	ImGui::DragFloat("LifeTime", &emitter_.lifeTime, 0.01f, 0.0f, 100.0f);
+	ImGui::Checkbox("LifeTimeRandom", reinterpret_cast<bool*>(&emitter_.lifeTimeRandom));
+	ImGui::DragFloat("MinLifeTime", &emitter_.minLifeTime, 0.01f, 0.0f, 100.0f);
+	ImGui::DragFloat("MaxLifeTime", &emitter_.maxLifeTime, 0.01f, 0.0f, 100.0f);
 
 	ImGui::End();
 }
@@ -543,8 +495,8 @@ void Particles::CreateEmitterResource() {
 
 void Particles::UpdateEmitter() {
 	// このemitterSphereをCBufferとしてGPUへ転送
-	if (useEmitter_) {
-		emitter_.frequencyTime += kDeltaTime_;
+	if (emitter_.useEmitter) {
+		emitter_.frequencyTime += kDeltaTime_;  // frequencyTimerをfrequencyTimeに修正
 		if (emitter_.frequency <= emitter_.frequencyTime) {
 			emitter_.frequencyTime = 0.0f;
 			emitter_.emit = true;
@@ -592,6 +544,7 @@ void Particles::UpdatePerFrame() {
 	mapped->time = totalTime_;      // 例えば経過時間など
 	mapped->deltaTime = kDeltaTime_;  // フレームごとの経過時間
 	mapped->index = frameIndex;
+	mapped->pad1 = 0.0f;            // パディングを初期化
 }
 
 void Particles::CreatePerViewResource() {

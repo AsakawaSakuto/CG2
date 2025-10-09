@@ -26,58 +26,79 @@ struct Particle {
 struct EmitterSphere {
     float3 translate;
     float radius;
-    
+	
+    uint useEmitter;
+    uint emit;
     uint count;
+    uint kMaxParticle;
+
     float frequency;
     float frequencyTime;
-    uint emit;
-    
-    uint kMaxParticle;
-    uint isMove;
-    uint enableAlphaFade; // 透明度フェードフラグ
-    uint enableScaleFade; // スケールフェードフラグ
-    
-    float2 startScale;     // 開始時のスケール倍率
-    float2 endScale;       // 終了時のスケール倍率
-    
-    uint enableColorFade; // スケールフェードフラグ
-    uint enableRotateMove;
-    float2 pad1;
-    
-    float3 startColor;
-    float pad2;
-    float3 endColor;
-    float pad3;
-};
+    float pad2[2];
 
-struct EmitterRange {
+    float2 startScale;
+    float2 endScale;
+
+    uint scaleFade;
+    uint scaleRandom;
+    float pad3[2];
+
     float3 minScale;
-    float pad1;
-    float3 maxScale;
-    float pad2;
-    
-    float3 minTranslate;
-    float pad3;
-    float3 maxTranslate;
     float pad4;
-    
-    float3 minColor;
+    float3 maxScale;
     float pad5;
-    float3 maxColor;
-    float pad6;
-    
-    float3 minVelocity;
-    float pad7;
-    float3 maxVelocity;
-    float pad8;
-    
-    float minLifeTime;
-    float maxLifeTime;
-    float2 pad9;
+
+    uint rotateMove;
+    float startRotateVelocity;
+    float endRotateVelocity;
+    uint rotateVelocityRandom;
     
     float minRotateVelocity;
     float maxRotateVelocity;
-    float2 pad10;
+    float2 pad6;
+
+    uint enableAlphaFade;
+    uint enableColorFade;
+    float pad7[2];
+
+    float3 startColor;
+    float pad8;
+    float3 endColor;
+    float pad9;
+
+    uint colorRandom;
+    float pad10[3];
+
+    float3 minColor;
+    float pad11;
+    float3 maxColor;
+    float pad12;
+
+    uint enableMove;
+    float pad13[3];
+    
+    float3 startVelocity;
+    float pad14;
+
+    float3 endVelocity;
+    float pad15;
+
+    uint velocityRandom;
+    float pad16[3];
+
+    float3 minVelocity;
+    float pad17;
+    float3 maxVelocity;
+    float pad18;
+
+    float lifeTime;
+    uint lifeTimeRandom;
+    float minLifeTime;
+    float maxLifeTime;
+};
+
+struct EmitterRange {
+    float3 pos;
 };
 
 struct PerView {
@@ -89,6 +110,7 @@ struct PerFrame {
     float time;
     float deltaTime;
     uint index;
+    float pad1;  // 16バイト境界に合わせるためのパディング
 };
 
 class RandomGenerator {

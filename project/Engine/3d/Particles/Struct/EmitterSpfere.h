@@ -1,30 +1,77 @@
 #pragma once
 #include"Vector3.h"
+#include"Vector2.h"
 
 struct EmitterSphere {
-	Vector3 translate;        // 12 bytes
-	float radius;             // 4 bytes -> 16バイト境界
+	Vector3 translate;
+	float radius;
 	
-	uint32_t count;           // 4 bytes
-	float frequency;          // 4 bytes (HLSL側と合わせるために追加)
-	float frequencyTime;      // 4 bytes (HLSL側と合わせるために追加)  
-	uint32_t emit;            // 4 bytes -> 16バイト境界
-	
-	uint32_t kMaxParticle;    // 4 bytes
-	uint32_t isMove;          // 4 bytes
-	uint32_t enableAlphaFade; // 4 bytes
-	uint32_t enableScaleFade; // 4 bytes -> 16バイト境界
-	
-	Vector2 startScale;         // 4 bytes
-	Vector2 endScale;           // 4 bytes
+	uint32_t useEmitter;
+	uint32_t emit;
+	uint32_t count;
+	uint32_t kMaxParticle;
 
-	uint32_t enableColorFade; // 4 bytes
-	uint32_t enableRotateMove;
-	float pad1[2];
+	float frequency;
+	float frequencyTime;  // HLSLと一致させる
+	float pad2[2];
 
-	Vector3 startColor;       // 12 bytes
-	float pad2;               // 4 bytes パディング -> 16バイト境界
+	Vector2 startScale;
+	Vector2 endScale;
+
+	uint32_t scaleFade;
+	uint32_t scaleRandom;
+	float pad3[2];
+
+	Vector3 minScale;
+	float pad4;
+	Vector3 maxScale;
+	float pad5;
+
+	uint32_t rotateMove;
+	float startRotateVelocity;
+	float endRotateVelocity;
+	uint32_t rotateVelocityRandom;
+
+	float minRotateVelocity;
+	float maxRotateVelocity;
+	float pad6[2];
+
+	uint32_t enableAlphaFade;
+	uint32_t enableColorFade;
+	float pad7[2];
+
+	Vector3 startColor;
+	float pad8;
+	Vector3 endColor;
+	float pad9;
+
+	uint32_t colorRandom;
+	float pad10[3];
+
+	Vector3 minColor;
+	float pad11;
+	Vector3 maxColor;
+	float pad12;
+
+	uint32_t enableMove;
+	float pad13[3];
 	
-	Vector3 endColor;         // 12 bytes
-	float pad3;               // 4 bytes パディング -> 16バイト境界
+	Vector3 startVelocity;
+	float pad14;
+
+	Vector3 endVelocity;
+	float pad15;
+
+	uint32_t velocityRandom;
+	float pad16[3];
+
+	Vector3 minVelocity;
+	float pad17;
+	Vector3 maxVelocity;
+	float pad18;
+
+	float lifeTime;
+	uint32_t lifeTimeRandom;
+	float minLifeTime;
+	float maxLifeTime;
 };

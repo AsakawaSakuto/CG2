@@ -68,7 +68,7 @@ public:
 	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
 
 	//
-	void UseEmitter(bool useEmitter) { useEmitter_ = useEmitter; }
+	void UseEmitter(bool useEmitter) { emitter_.useEmitter = useEmitter; }
 
 	//
 	void SetOffSet(Vector3 offset) { offset_ = offset; }
@@ -101,8 +101,6 @@ private:
 	
 	// 1フレームあたりの固定デルタタイム
 	const float kDeltaTime_ = 1.0f / 60.0f;
-
-	bool useEmitter_ = false;
 
 	float totalTime_ = 0.0f;
 
