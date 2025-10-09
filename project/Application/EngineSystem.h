@@ -24,7 +24,6 @@
 #include "SphereData.h"
 #include "Triangle.h"
 #include "Particles.h"
-#include "EmitterRange.h"
 #include "EmitterSpfere.h"
 
 // Math

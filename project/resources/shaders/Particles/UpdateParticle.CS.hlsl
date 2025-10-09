@@ -17,33 +17,32 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
     {
         if (gParticles[particleIndex].color.a > 0.0f)
         {
+            gParticles[particleIndex].currentTime += gPerFrame.deltaTime;
+            // 生存時間の進行度 (0.0 = 開始, 1.0 = 終了)
+            float lifeProgress = gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime;
+            lifeProgress = saturate(lifeProgress);
+            
             if (gEmitter.isMove != 0)
             {
                 gParticles[particleIndex].translate += gParticles[particleIndex].velocity * gPerFrame.deltaTime;
             }
             
-            if (gEmitter.enableRotateMove != 0)
+            if (gEmitter.rotateMove != 0)
             {
                 // rotateVelocityはfloat型なので直接使用
                 float rotVel = gParticles[particleIndex].rotateVelocity;
                 gParticles[particleIndex].rotate.z += rotVel * gPerFrame.deltaTime;
             }
             
-            gParticles[particleIndex].currentTime += gPerFrame.deltaTime;
-            
-            // 生存時間の進行度 (0.0 = 開始, 1.0 = 終了)
-            float lifeProgress = gParticles[particleIndex].currentTime / gParticles[particleIndex].lifeTime;
-            lifeProgress = saturate(lifeProgress);
-            
             // 透明度フェードのフラグをチェックして適用
-            if (gEmitter.enableAlphaFade != 0)
+            if (gEmitter.alphaFade != 0)
             {
                 float alpha = 1.0f - lifeProgress;
                 gParticles[particleIndex].color.a = saturate(alpha);
             }
             
             // スケールフェードのフラグをチェックして適用
-            if (gEmitter.enableScaleFade != 0)
+            if (gEmitter.scaleFade != 0)
             {
                 // 開始スケールから終了スケールに線形補間
                 float currentScaleMultiplierX = lerp(gEmitter.startScale.x, gEmitter.endScale.x, lifeProgress);
@@ -56,7 +55,7 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             }
             
             // カラーフェードのフラグをチェックして適用
-            if (gEmitter.enableColorFade != 0)
+            if (gEmitter.colorFade != 0)
             {
                 // 開始カラーから終了カラーに線形補間
                 float3 currentColor = lerp(gEmitter.startColor, gEmitter.endColor, lifeProgress);

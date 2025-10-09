@@ -401,9 +401,6 @@
     <ClInclude Include="Engine\3d\Particles\Struct\PreFrame.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Particles\Struct\EmitterRange.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\3d\Object3d\Struct\Object3dSubMesh.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>

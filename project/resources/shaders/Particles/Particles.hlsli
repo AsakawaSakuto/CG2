@@ -57,8 +57,8 @@ struct EmitterSphere {
     float maxRotateVelocity;
     float2 pad6;
 
-    uint enableAlphaFade;
-    uint enableColorFade;
+    uint alphaFade;
+    uint colorFade;
     float pad7[2];
 
     float3 startColor;
@@ -74,7 +74,7 @@ struct EmitterSphere {
     float3 maxColor;
     float pad12;
 
-    uint enableMove;
+    uint isMove;
     float pad13[3];
     
     float3 startVelocity;
@@ -95,10 +95,6 @@ struct EmitterSphere {
     uint lifeTimeRandom;
     float minLifeTime;
     float maxLifeTime;
-};
-
-struct EmitterRange {
-    float3 pos;
 };
 
 struct PerView {

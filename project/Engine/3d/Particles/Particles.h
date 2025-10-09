@@ -26,7 +26,6 @@
 #include "PreView.h"
 #include "PreFrame.h"
 #include "EmitterSpfere.h"
-#include "EmitterRange.h"
 
 #include "ParticleDescriptorAllocator.h"
 
@@ -60,9 +59,6 @@ public:
 
 	// エミッタの値をセット
 	void SetEmitterValue(const EmitterSphere& emitter) { emitter_ = emitter; }
-
-	// エミッタ範囲の値をセット
-	void SetEmitterRange(const EmitterRange& emitterRange) { emitterRange_ = emitterRange; }
 
 	//
 	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
@@ -136,7 +132,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterRangeResource_;
 	EmitterSphere emitter_ = {};
-	EmitterRange emitterRange_ = {};
 	void CreateEmitterResource();
 	void UpdateEmitter();
 

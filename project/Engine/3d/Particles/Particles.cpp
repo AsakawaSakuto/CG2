@@ -46,7 +46,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.emit = 1;
 	emitter_.count = 5;                     // 複数のパーティクルを生成
 	emitter_.kMaxParticle = kMaxParticles_;
-	emitter_.frequency = 0.5f;              // 短い間隔で生成
+	emitter_.frequency = 5.0f;              // 短い間隔で生成
 	emitter_.frequencyTime = 0.0f;
 	emitter_.startScale = { 1.0f, 1.0f };
 	emitter_.endScale = { 0.5f, 0.5f };
@@ -60,14 +60,14 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.rotateVelocityRandom = 0;
 	emitter_.minRotateVelocity = 0.0f;
 	emitter_.maxRotateVelocity = 0.0f;
-	emitter_.enableAlphaFade = 0;           // デバッグ用：アルファフェード無効
-	emitter_.enableColorFade = 0;           // デバッグ用：カラーフェード無効
+	emitter_.alphaFade = 0;           // デバッグ用：アルファフェード無効
+	emitter_.colorFade = 0;           // デバッグ用：カラーフェード無効
 	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
 	emitter_.endColor = { 1.0f, 0.0f, 0.0f };
 	emitter_.colorRandom = 0;
 	emitter_.minColor = { 1.0f, 1.0f, 1.0f };
 	emitter_.maxColor = { 1.0f, 1.0f, 1.0f };
-	emitter_.enableMove = 0;                // デバッグ用：移動無効
+	emitter_.isMove = 0;                // デバッグ用：移動無効
 	emitter_.startVelocity = { 0.0f, 0.0f, 0.0f };
 	emitter_.endVelocity = { 0.0f, 0.0f, 0.0f };
 	emitter_.velocityRandom = 0;
@@ -194,8 +194,8 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat("MinRotateVelocity", &emitter_.minRotateVelocity, 0.01f);
 	ImGui::DragFloat("MaxRotateVelocity", &emitter_.maxRotateVelocity, 0.01f);
 
-	ImGui::Checkbox("EnableAlphaFade", reinterpret_cast<bool*>(&emitter_.enableAlphaFade));
-	ImGui::Checkbox("EnableColorFade", reinterpret_cast<bool*>(&emitter_.enableColorFade));
+	ImGui::Checkbox("EnableAlphaFade", reinterpret_cast<bool*>(&emitter_.alphaFade));
+	ImGui::Checkbox("EnableColorFade", reinterpret_cast<bool*>(&emitter_.colorFade));
 
 	ImGui::ColorEdit3("StartColor", &emitter_.startColor.x);
 	ImGui::ColorEdit3("EndColor", &emitter_.endColor.x);
@@ -204,7 +204,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::ColorEdit3("MinColor", &emitter_.minColor.x);
 	ImGui::ColorEdit3("MaxColor", &emitter_.maxColor.x);
 
-	ImGui::Checkbox("EnableMove", reinterpret_cast<bool*>(&emitter_.enableMove));
+	ImGui::Checkbox("EnableMove", reinterpret_cast<bool*>(&emitter_.isMove));
 	ImGui::DragFloat3("StartVelocity", &emitter_.startVelocity.x, 0.01f);
 	ImGui::DragFloat3("EndVelocity", &emitter_.endVelocity.x, 0.01f);
 	ImGui::Checkbox("VelocityRandom", reinterpret_cast<bool*>(&emitter_.velocityRandom));
@@ -321,7 +321,7 @@ void Particles::CreateParticleResource() {
 	//----------------------------------------------------------------//
 
 	// 1. RootSignature作成
-	D3D12_ROOT_PARAMETER csRootParams[6] = {};
+	D3D12_ROOT_PARAMETER csRootParams[5] = {};
 	csRootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u0: Particleバッファ
 	csRootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	csRootParams[0].Descriptor.ShaderRegister = 0;
@@ -341,10 +341,6 @@ void Particles::CreateParticleResource() {
 	csRootParams[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b6: PerFrame
 	csRootParams[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	csRootParams[4].Descriptor.ShaderRegister = 6;
-
-	csRootParams[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // b7: EmitterRange
-	csRootParams[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	csRootParams[5].Descriptor.ShaderRegister = 7;
 
 	D3D12_ROOT_SIGNATURE_DESC csRootSigDesc = {};
 	csRootSigDesc.pParameters = csRootParams;
@@ -435,7 +431,6 @@ void Particles::UpdateParticle() {
 	commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());       // u2
 	commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress());         // b5
 	commandList_->SetComputeRootConstantBufferView(4, perFrameResource_->GetGPUVirtualAddress());        // b6
-	commandList_->SetComputeRootConstantBufferView(5, emitterRangeResource_->GetGPUVirtualAddress());    // b7
 	// Emitterの処理を実行
 	commandList_->Dispatch(1, 1, 1);
 
@@ -479,18 +474,6 @@ void Particles::CreateEmitterResource() {
 		nullptr,
 		IID_PPV_ARGS(&emitterResource_)
 	);
-    
-	CD3DX12_HEAP_PROPERTIES heapProps2(D3D12_HEAP_TYPE_UPLOAD);
-	CD3DX12_RESOURCE_DESC resourceDesc2 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(EmitterRange));
-
-	device_->CreateCommittedResource(
-		&heapProps2,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc2,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&emitterRangeResource_)
-	);
 }
 
 void Particles::UpdateEmitter() {
@@ -508,12 +491,6 @@ void Particles::UpdateEmitter() {
 	}
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.translate += offset_;
-	
-	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
-	EmitterRange* mappedRange = nullptr;
-	emitterRangeResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedRange));
-	// ここで値をコピーまたは書き換え
-	*mappedRange = emitterRange_; // 構造体ごとコピー
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
 	EmitterSphere* mappedEmitter = nullptr;

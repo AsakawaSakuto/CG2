@@ -36,8 +36,8 @@ struct EmitterSphere {
 	float maxRotateVelocity;
 	float pad6[2];
 
-	uint32_t enableAlphaFade;
-	uint32_t enableColorFade;
+	uint32_t alphaFade;
+	uint32_t colorFade;
 	float pad7[2];
 
 	Vector3 startColor;
@@ -53,7 +53,7 @@ struct EmitterSphere {
 	Vector3 maxColor;
 	float pad12;
 
-	uint32_t enableMove;
+	uint32_t isMove;
 	float pad13[3];
 	
 	Vector3 startVelocity;
