@@ -1,0 +1,89 @@
+{
+    "alphaFade": 0,
+    "colorFade": 1,
+    "colorRandom": 0,
+    "count": 1,
+    "emit": 0,
+    "endColor": [
+        0.0,
+        0.17647075653076172,
+        1.0
+    ],
+    "endRotateVelocity": -1.0,
+    "endScale": [
+        0.0,
+        0.0
+    ],
+    "endVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "frequency": 0.10000000149011612,
+    "frequencyTime": 0.06666667014360428,
+    "isMove": 0,
+    "kMaxParticle": 512,
+    "lifeTime": 2.0,
+    "lifeTimeRandom": 0,
+    "maxColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "maxLifeTime": 5.0,
+    "maxRotateVelocity": 1.0,
+    "maxScale": [
+        1.5,
+        1.5,
+        1.5
+    ],
+    "maxVelocity": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "minColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "minLifeTime": 1.0,
+    "minRotateVelocity": -1.0,
+    "minScale": [
+        0.5,
+        0.5,
+        0.5
+    ],
+    "minVelocity": [
+        -1.0,
+        -1.0,
+        -1.0
+    ],
+    "radius": 3.0,
+    "rotateMove": 1,
+    "rotateVelocityRandom": 0,
+    "scaleFade": 1,
+    "scaleRandom": 0,
+    "startColor": [
+        0.18021909892559052,
+        0.6127451062202454,
+        0.0
+    ],
+    "startRotateVelocity": 1.0,
+    "startScale": [
+        1.0,
+        1.0
+    ],
+    "startVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "translate": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "useEmitter": 1,
+    "velocityRandom": 0
+}

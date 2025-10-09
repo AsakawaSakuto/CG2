@@ -26,13 +26,14 @@
 #include "PreView.h"
 #include "PreFrame.h"
 #include "EmitterSpfere.h"
-#include "EmitterRange.h"
 
 #include "ParticleDescriptorAllocator.h"
 
 #include <random>
 #include <numbers>
 #include <memory>
+
+#include"Json/EmitterStateLoder.h"
 
 #pragma endregion
 // パーティクルクラス
@@ -61,22 +62,29 @@ public:
 	// エミッタの値をセット
 	void SetEmitterValue(const EmitterSphere& emitter) { emitter_ = emitter; }
 
-	// エミッタ範囲の値をセット
-	void SetEmitterRange(const EmitterRange& emitterRange) { emitterRange_ = emitterRange; }
-
 	//
 	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
 
 	//
-	void UseEmitter(bool useEmitter) { useEmitter_ = useEmitter; }
+	void UseEmitter(bool useEmitter) { emitter_.useEmitter = useEmitter; }
 
 	//
 	void SetOffSet(Vector3 offset) { offset_ = offset; }
 
 	//
 	void SetEmit(bool emit) { emitter_.emit = emit; }
+
+	void LoadJson(const std::string& filePath) {
+		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
+		emitter_ = EmitterStateLoader::Load(jsonFilePath_); };
 private:
+	void ExecuteInitialization();
+
+	void ResetAllParticles();
+
 	Camera camera_;
+
+	std::string jsonFilePath_;
 
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;
@@ -101,8 +109,6 @@ private:
 	
 	// 1フレームあたりの固定デルタタイム
 	const float kDeltaTime_ = 1.0f / 60.0f;
-
-	bool useEmitter_ = false;
 
 	float totalTime_ = 0.0f;
 
@@ -138,7 +144,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterRangeResource_;
 	EmitterSphere emitter_ = {};
-	EmitterRange emitterRange_ = {};
 	void CreateEmitterResource();
 	void UpdateEmitter();
 
