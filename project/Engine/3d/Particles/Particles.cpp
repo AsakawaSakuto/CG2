@@ -244,6 +244,12 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
+	if (ImGui::Button("Save JSON to Load")) {
+		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
+	}
+
+	ImGui::Spacing();
+
 	if (ImGui::Button("Save JSON to Resources")) {
 		EmitterStateLoader::Save(jsonFilePath_, emitter_);
 	}
@@ -251,7 +257,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Spacing();
 
 	if (ImGui::Button("Save JSON to CPP Dir")) {
-		EmitterStateLoader::SaveToCurrentDir(emitter_);
+		EmitterStateLoader::SaveToCurrentDir(emitter_, objectName);
 	}
 
 	ImGui::End();

@@ -75,8 +75,8 @@ public:
 	void SetEmit(bool emit) { emitter_.emit = emit; }
 
 	void LoadJson(const std::string& filePath) {
-		jsonFilePath_ = filePath;
-		EmitterStateLoader::Load(jsonFilePath_); };
+		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
+		emitter_ = EmitterStateLoader::Load(jsonFilePath_); };
 private:
 	Camera camera_;
 

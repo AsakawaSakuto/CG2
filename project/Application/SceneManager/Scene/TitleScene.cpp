@@ -19,6 +19,7 @@ void TitleScene::Initialize() {
 	sceneFade_->StartFadeOut(1.0f);
 
 	particle_->Initialize(&ctx_->dxCommon, "resources/image/particle/box.png", 1);
+	particle_->LoadJson("titleEffect");
 }
 
 void TitleScene::Update() {
@@ -64,7 +65,7 @@ void TitleScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	particle_->DrawImGui("p");
+	particle_->DrawImGui("titleEffect");
 
 	DrawSceneName();
 

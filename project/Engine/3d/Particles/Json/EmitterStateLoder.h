@@ -11,5 +11,5 @@ public:
     static void Save(const std::string& filePath, const EmitterSphere& state);
 
     // cppのある階層にJsonファイルを出力する関数
-    static void SaveToCurrentDir(const EmitterSphere& state);
+    static void SaveToCurrentDir(const EmitterSphere& state, const std::string& ImGuiName);
 };

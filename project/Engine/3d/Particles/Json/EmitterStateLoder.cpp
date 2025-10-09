@@ -166,11 +166,12 @@ void EmitterStateLoader::Save(const std::string& filePath, const EmitterSphere& 
 // =============================================================
 //               SaveToCurrentDir (自動出力版)
 // =============================================================
-void EmitterStateLoader::SaveToCurrentDir(const EmitterSphere& state) {
+void EmitterStateLoader::SaveToCurrentDir(const EmitterSphere& state, const std::string& ImGuiName) {
     try {
-        fs::path currentFilePath = __FILE__;
-        fs::path currentDir = currentFilePath.parent_path();
-        fs::path outPath = currentDir / "EmitterState_output.json";
+        fs::path currentDir = fs::current_path();
+        fs::path outPath = currentDir / "Resources" / "Data" / "Particle" / (ImGuiName + ".json");
+
+        printf("[DEBUG] currentDir: %s\n", currentDir.string().c_str());
 
         Save(outPath.string(), state);
         printf("[INFO] Emitter state saved to: %s\n", outPath.string().c_str());
