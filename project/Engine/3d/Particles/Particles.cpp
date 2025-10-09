@@ -41,42 +41,42 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 
 	// Emitterのデフォルト値
 	emitter_.translate = { 0.0f, 0.0f, 0.0f };
-	emitter_.radius = 0.5f;                 // 小さめの範囲
+	emitter_.radius = 1.0f;
 	emitter_.useEmitter = 1;
-	emitter_.emit = 1;
-	emitter_.count = 5;                     // 複数のパーティクルを生成
+	emitter_.emit = 0;
+	emitter_.count = 1;
 	emitter_.kMaxParticle = kMaxParticles_;
-	emitter_.frequency = 5.0f;              // 短い間隔で生成
+	emitter_.frequency = 1.0f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.startScale = { 1.0f, 1.0f };
-	emitter_.endScale = { 0.5f, 0.5f };
-	emitter_.scaleFade = 0;                 // デバッグ用：スケールフェード無効
+	emitter_.endScale = { 0.0f, 0.0f };
+	emitter_.scaleFade = 0;
 	emitter_.scaleRandom = 0;
 	emitter_.minScale = { 0.5f, 0.5f, 0.5f };
 	emitter_.maxScale = { 1.5f, 1.5f, 1.5f };
-	emitter_.rotateMove = 0;                // デバッグ用：回転無効
+	emitter_.rotateMove = 0;
 	emitter_.startRotateVelocity = 0.0f;
 	emitter_.endRotateVelocity = 0.0f;
 	emitter_.rotateVelocityRandom = 0;
-	emitter_.minRotateVelocity = 0.0f;
-	emitter_.maxRotateVelocity = 0.0f;
-	emitter_.alphaFade = 0;           // デバッグ用：アルファフェード無効
-	emitter_.colorFade = 0;           // デバッグ用：カラーフェード無効
+	emitter_.minRotateVelocity = -1.0f;
+	emitter_.maxRotateVelocity = 1.0f;
+	emitter_.alphaFade = 0;
+	emitter_.colorFade = 0;
 	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
 	emitter_.endColor = { 1.0f, 0.0f, 0.0f };
 	emitter_.colorRandom = 0;
-	emitter_.minColor = { 1.0f, 1.0f, 1.0f };
+	emitter_.minColor = { 0.0f, 0.0f, 0.0f };
 	emitter_.maxColor = { 1.0f, 1.0f, 1.0f };
-	emitter_.isMove = 0;                // デバッグ用：移動無効
+	emitter_.isMove = 0;
 	emitter_.startVelocity = { 0.0f, 0.0f, 0.0f };
 	emitter_.endVelocity = { 0.0f, 0.0f, 0.0f };
 	emitter_.velocityRandom = 0;
-	emitter_.minVelocity = { 0.0f, 0.0f, 0.0f };
-	emitter_.maxVelocity = { 0.0f, 0.0f, 0.0f };
-	emitter_.lifeTime = 10.0f;              // 長い寿命
+	emitter_.minVelocity = { -1.0f, -1.0f, -1.0f };
+	emitter_.maxVelocity = { 1.0f, 1.0f, 1.0f };
+	emitter_.lifeTime = 2.0f;
 	emitter_.lifeTimeRandom = 0;
-	emitter_.minLifeTime = 5.0f;
-	emitter_.maxLifeTime = 15.0f;
+	emitter_.minLifeTime = 1.0f;
+	emitter_.maxLifeTime = 5.0f;
 
 	CreateEmitterResource();
 	CreateParticleResource();
@@ -171,28 +171,55 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.1f);
 	ImGui::DragFloat("Radius", &emitter_.radius, 0.1f, 0.0f, 1000.0f);
 
+	ImGui::Separator();
+
 	ImGui::Checkbox("UseEmitter", reinterpret_cast<bool*>(&emitter_.useEmitter));
 	ImGui::Checkbox("Emit", reinterpret_cast<bool*>(&emitter_.emit));
 	ImGui::DragInt("Count", reinterpret_cast<int*>(&emitter_.count), 1, 0, 10000);
 	ImGui::DragInt("MaxParticle", reinterpret_cast<int*>(&emitter_.kMaxParticle), 1, 0, 100000);
 
+	ImGui::Separator();
+
 	ImGui::DragFloat("Frequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
 	ImGui::DragFloat("FrequencyTime", &emitter_.frequencyTime, 0.01f, 0.0f, 10.0f);  // frequencyTimerをfrequencyTimeに修正
 
+	ImGui::Separator();
+
+	ImGui::Checkbox("EnableMove", reinterpret_cast<bool*>(&emitter_.isMove));
+	ImGui::DragFloat3("StartVelocity", &emitter_.startVelocity.x, 0.01f);
+	ImGui::DragFloat3("EndVelocity", &emitter_.endVelocity.x, 0.01f);
+
+	ImGui::Checkbox("VelocityRandom", reinterpret_cast<bool*>(&emitter_.velocityRandom));
+	if (emitter_.velocityRandom) {
+		ImGui::DragFloat3("MinVelocity", &emitter_.minVelocity.x, 0.01f);
+		ImGui::DragFloat3("MaxVelocity", &emitter_.maxVelocity.x, 0.01f);
+	}
+
+	ImGui::Separator();
+
+	ImGui::Checkbox("ScaleFade", reinterpret_cast<bool*>(&emitter_.scaleFade));
 	ImGui::DragFloat2("StartScale", &emitter_.startScale.x, 0.01f, 0.0f, 10.0f);
 	ImGui::DragFloat2("EndScale", &emitter_.endScale.x, 0.01f, 0.0f, 10.0f);
 
-	ImGui::Checkbox("ScaleFade", reinterpret_cast<bool*>(&emitter_.scaleFade));
 	ImGui::Checkbox("ScaleRandom", reinterpret_cast<bool*>(&emitter_.scaleRandom));
-	ImGui::DragFloat3("MinScale", &emitter_.minScale.x, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat3("MaxScale", &emitter_.maxScale.x, 0.01f, 0.0f, 10.0f);
+	if (emitter_.scaleRandom) {
+		ImGui::DragFloat3("MinScale", &emitter_.minScale.x, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat3("MaxScale", &emitter_.maxScale.x, 0.01f, 0.0f, 10.0f);
+	}
+
+	ImGui::Separator();
 
 	ImGui::Checkbox("RotateMove", reinterpret_cast<bool*>(&emitter_.rotateMove));
 	ImGui::DragFloat("StartRotateVelocity", &emitter_.startRotateVelocity, 0.01f);
 	ImGui::DragFloat("EndRotateVelocity", &emitter_.endRotateVelocity, 0.01f);
+
 	ImGui::Checkbox("RotateVelocityRandom", reinterpret_cast<bool*>(&emitter_.rotateVelocityRandom));
-	ImGui::DragFloat("MinRotateVelocity", &emitter_.minRotateVelocity, 0.01f);
-	ImGui::DragFloat("MaxRotateVelocity", &emitter_.maxRotateVelocity, 0.01f);
+	if (emitter_.rotateVelocityRandom) {
+		ImGui::DragFloat("MinRotateVelocity", &emitter_.minRotateVelocity, 0.01f);
+		ImGui::DragFloat("MaxRotateVelocity", &emitter_.maxRotateVelocity, 0.01f);
+	}
+
+	ImGui::Separator();
 
 	ImGui::Checkbox("EnableAlphaFade", reinterpret_cast<bool*>(&emitter_.alphaFade));
 	ImGui::Checkbox("EnableColorFade", reinterpret_cast<bool*>(&emitter_.colorFade));
@@ -201,20 +228,31 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::ColorEdit3("EndColor", &emitter_.endColor.x);
 
 	ImGui::Checkbox("ColorRandom", reinterpret_cast<bool*>(&emitter_.colorRandom));
-	ImGui::ColorEdit3("MinColor", &emitter_.minColor.x);
-	ImGui::ColorEdit3("MaxColor", &emitter_.maxColor.x);
+	if (emitter_.colorRandom) {
+		ImGui::ColorEdit3("MinColor", &emitter_.minColor.x);
+		ImGui::ColorEdit3("MaxColor", &emitter_.maxColor.x);
+	}
 
-	ImGui::Checkbox("EnableMove", reinterpret_cast<bool*>(&emitter_.isMove));
-	ImGui::DragFloat3("StartVelocity", &emitter_.startVelocity.x, 0.01f);
-	ImGui::DragFloat3("EndVelocity", &emitter_.endVelocity.x, 0.01f);
-	ImGui::Checkbox("VelocityRandom", reinterpret_cast<bool*>(&emitter_.velocityRandom));
-	ImGui::DragFloat3("MinVelocity", &emitter_.minVelocity.x, 0.01f);
-	ImGui::DragFloat3("MaxVelocity", &emitter_.maxVelocity.x, 0.01f);
+	ImGui::Separator();
 
 	ImGui::DragFloat("LifeTime", &emitter_.lifeTime, 0.01f, 0.0f, 100.0f);
 	ImGui::Checkbox("LifeTimeRandom", reinterpret_cast<bool*>(&emitter_.lifeTimeRandom));
-	ImGui::DragFloat("MinLifeTime", &emitter_.minLifeTime, 0.01f, 0.0f, 100.0f);
-	ImGui::DragFloat("MaxLifeTime", &emitter_.maxLifeTime, 0.01f, 0.0f, 100.0f);
+	if (emitter_.lifeTimeRandom) {
+		ImGui::DragFloat("MinLifeTime", &emitter_.minLifeTime, 0.01f, 0.0f, 100.0f);
+		ImGui::DragFloat("MaxLifeTime", &emitter_.maxLifeTime, 0.01f, 0.0f, 100.0f);
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::Button("Save JSON to Resources")) {
+		EmitterStateLoader::Save(jsonFilePath_, emitter_);
+	}
+
+	ImGui::Spacing();
+
+	if (ImGui::Button("Save JSON to CPP Dir")) {
+		EmitterStateLoader::SaveToCurrentDir(emitter_);
+	}
 
 	ImGui::End();
 }

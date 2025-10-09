@@ -12,7 +12,7 @@ struct EmitterSphere {
 	uint32_t kMaxParticle;
 
 	float frequency;
-	float frequencyTime;  // HLSLと一致させる
+	float frequencyTime;
 	float pad2[2];
 
 	Vector2 startScale;

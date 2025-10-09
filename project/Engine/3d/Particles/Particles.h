@@ -33,6 +33,8 @@
 #include <numbers>
 #include <memory>
 
+#include"Json/EmitterStateLoder.h"
+
 #pragma endregion
 // パーティクルクラス
 class Particles
@@ -71,8 +73,14 @@ public:
 
 	//
 	void SetEmit(bool emit) { emitter_.emit = emit; }
+
+	void LoadJson(const std::string& filePath) {
+		jsonFilePath_ = filePath;
+		EmitterStateLoader::Load(jsonFilePath_); };
 private:
 	Camera camera_;
+
+	std::string jsonFilePath_;
 
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;

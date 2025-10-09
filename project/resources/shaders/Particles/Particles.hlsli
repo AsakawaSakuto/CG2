@@ -34,14 +34,14 @@ struct EmitterSphere {
 
     float frequency;
     float frequencyTime;
-    float pad2[2];
+    float2 pad2;
 
     float2 startScale;
     float2 endScale;
 
     uint scaleFade;
     uint scaleRandom;
-    float pad3[2];
+    float2 pad3;
 
     float3 minScale;
     float pad4;
@@ -59,7 +59,7 @@ struct EmitterSphere {
 
     uint alphaFade;
     uint colorFade;
-    float pad7[2];
+    float2 pad7;
 
     float3 startColor;
     float pad8;
@@ -67,7 +67,7 @@ struct EmitterSphere {
     float pad9;
 
     uint colorRandom;
-    float pad10[3];
+    float3 pad10;
 
     float3 minColor;
     float pad11;
@@ -75,7 +75,7 @@ struct EmitterSphere {
     float pad12;
 
     uint isMove;
-    float pad13[3];
+    float3 pad13;
     
     float3 startVelocity;
     float pad14;
@@ -84,7 +84,7 @@ struct EmitterSphere {
     float pad15;
 
     uint velocityRandom;
-    float pad16[3];
+    float3 pad16;
 
     float3 minVelocity;
     float pad17;
