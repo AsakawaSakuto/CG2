@@ -4,6 +4,9 @@
 #include <vector>
 #include "State/PlayerState.h"
 
+class Thorn;
+class Block;
+
 enum class Direction
 {
 	UP = 0,
@@ -18,6 +21,7 @@ public:
 	~Player() {}
 
 	void SetInputSystem(Input* inInput) { input_ = inInput; }
+	void SetGamePadSystem(GamePad* inGamePad) { gamePad_ = inGamePad; }
 
 	// ImGui表示
 	void DrawImgui();
@@ -28,6 +32,10 @@ public:
 	Vector3 GetPosition() const { return transform_.translate; }
 	float CameraOffset() const { return state_.cameraOffset; }
 	Direction GetDirection() const { return direction_; }
+
+	// Setter
+	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
+	void SetBlocks(std::vector<std::shared_ptr<Block>>& blocks) { blocks_ = blocks; }
 
 private:
 	// プレイヤーの上昇
@@ -69,11 +77,21 @@ private:
 	// スタン解除
 	void StunRemoved();
 
+	// トゲとの当たり判定
+	void ThornCollision();
+
+	// ブロックとの当たり判定
+	void BlockCollision();
+
+	// 弾とトゲの当たり判定
+	void BulletThornCollison();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState state_;
 
 	Input* input_ = nullptr;
+	GamePad* gamePad_ = nullptr;
 
 	// 速度関連
 	Vector3 acceleration_{};
@@ -100,9 +118,17 @@ private:
 
 	// スタン関連
 	bool isStun_ = false;
-	int stunTimer_ = 0;
+	//int stunTimer_ = 0;
 	//const int kStunDuration = 60; // スタンする時間(フレーム)
 
 	// プレイヤー最高速度
 	//const float MAX_SPEED = 6.0f;
+
+	GameTimer stunTimer_;
+
+	// トゲ
+	std::vector<std::shared_ptr<Thorn>> thorns_;
+
+	// ブロック
+	std::vector<std::shared_ptr<Block>> blocks_;
 };

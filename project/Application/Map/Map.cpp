@@ -2,7 +2,7 @@
 
 void Map::Initialize() {
 	// マップチップデータ読み込み格納
-	LoadMapCSV("resources/map/map.csv");
+	LoadMapCSV("resources/map/map1.csv");
 }
 
 void Map::Update() {}
