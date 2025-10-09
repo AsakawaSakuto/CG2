@@ -210,8 +210,8 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Separator();
 
 	ImGui::Checkbox("RotateMove", reinterpret_cast<bool*>(&emitter_.rotateMove));
-	ImGui::DragFloat("StartRotateVelocity", &emitter_.startRotateVelocity, 0.01f);
-	ImGui::DragFloat("EndRotateVelocity", &emitter_.endRotateVelocity, 0.01f);
+	ImGui::DragFloat("RightRotateVelocity", &emitter_.startRotateVelocity, 0.01f);
+	ImGui::DragFloat("LeftRotateVelocity", &emitter_.endRotateVelocity, 0.01f);
 
 	ImGui::Checkbox("RotateVelocityRandom", reinterpret_cast<bool*>(&emitter_.rotateVelocityRandom));
 	if (emitter_.rotateVelocityRandom) {

@@ -44,14 +44,28 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             // スケールフェードのフラグをチェックして適用
             if (gEmitter.scaleFade != 0)
             {
-                // 開始スケールから終了スケールに線形補間
-                float currentScaleMultiplierX = lerp(gEmitter.startScale.x, gEmitter.endScale.x, lifeProgress);
-                float currentScaleMultiplierY = lerp(gEmitter.startScale.y, gEmitter.endScale.y, lifeProgress);
+                if (gEmitter.scaleRandom != 0)
+                {
+                    // 開始スケールから終了スケールに線形補間
+                    float currentScaleMultiplierX = lerp(gParticles[particleIndex].saveScale.x, 0.0f, lifeProgress);
+                    float currentScaleMultiplierY = lerp(gParticles[particleIndex].saveScale.y, 0.0f, lifeProgress);
                 
-                // 基準スケールを1として、倍率を適用
-                gParticles[particleIndex].scale.x = currentScaleMultiplierX;
-                gParticles[particleIndex].scale.y = currentScaleMultiplierY;
-                gParticles[particleIndex].scale.z = 0.0f;
+                    // 基準スケールを1として、倍率を適用
+                    gParticles[particleIndex].scale.x = currentScaleMultiplierX;
+                    gParticles[particleIndex].scale.y = currentScaleMultiplierY;
+                    gParticles[particleIndex].scale.z = 0.0f;
+                }
+                else
+                {
+                    // 開始スケールから終了スケールに線形補間
+                    float currentScaleMultiplierX = lerp(gEmitter.startScale.x, gEmitter.endScale.x, lifeProgress);
+                    float currentScaleMultiplierY = lerp(gEmitter.startScale.y, gEmitter.endScale.y, lifeProgress);
+                
+                    // 基準スケールを1として、倍率を適用
+                    gParticles[particleIndex].scale.x = currentScaleMultiplierX;
+                    gParticles[particleIndex].scale.y = currentScaleMultiplierY;
+                    gParticles[particleIndex].scale.z = 0.0f;
+                }
             }
             
             // カラーフェードのフラグをチェックして適用

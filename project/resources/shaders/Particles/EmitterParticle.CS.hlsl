@@ -26,6 +26,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 if (gEmitter.scaleRandom != 0)
                 {
                     gParticles[particleIndex].scale = lerp(gEmitter.minScale, gEmitter.maxScale, RandomFloat(baseSeed + 500));
+                    gParticles[particleIndex].saveScale = gParticles[particleIndex].scale;
                 }
                 else
                 {
@@ -69,7 +70,15 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 }
                 else
                 {
-                    gParticles[particleIndex].rotateVelocity = gEmitter.startRotateVelocity;
+                    float random = lerp(-1.0f, 1.0f, RandomFloat(baseSeed + 600));
+                    if (random >= 0.0f)
+                    {
+                        gParticles[particleIndex].rotateVelocity = gEmitter.startRotateVelocity;
+                    }
+                    else
+                    {
+                        gParticles[particleIndex].rotateVelocity = gEmitter.endRotateVelocity;
+                    }
                 }
                 
                 if (gEmitter.lifeTimeRandom != 0)

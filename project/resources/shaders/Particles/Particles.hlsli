@@ -8,19 +8,27 @@ struct VertexShaderOutput {
 struct Particle {
     float3 scale;
     float pad1;
+    
     float3 rotate;
     float pad2;
+    
     float3 translate;
     float pad3;
+    
     float3 velocity;
     float pad4;
+    
     float lifeTime;
     float currentTime;
     float2 pad5;
+    
     float4 color;
     
     float rotateVelocity;
     float3 pad6;
+    
+    float3 saveScale;
+    float pad7;
 };
 
 struct EmitterSphere {
