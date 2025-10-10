@@ -37,12 +37,7 @@ void DebugCamera::Update() {
 		transform_.rotate.y = 0.0f;
 		transform_.rotate.z = 0.0f;
 	}
-	if (input_->PushKey(DIK_T)) {
-		transform_.translate.x = 0.0f;
-		transform_.translate.y = 0.0f;
-		transform_.translate.z = -10.0f;
-	}
-
+	
 	if (input_->PushKey(DIK_A)) {
 		transform_.translate.x -= 0.05f * moveSpeedMultiplier;
 	}

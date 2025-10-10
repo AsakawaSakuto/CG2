@@ -180,3 +180,15 @@ void EmitterStateLoader::SaveToCurrentDir(const EmitterSphere& state, const std:
         printf("[ERROR] SaveToCurrentDir failed: %s\n", e.what());
     }
 }
+
+bool EmitterStateLoader::InputText(const char* label, std::string& str, ImGuiInputTextFlags flags) {
+    // 現在の文字列サイズに合わせてバッファを確保
+    static char buffer[256]; // 一時的な入力用バッファ（256文字まで対応）
+    strncpy_s(buffer, str.c_str(), sizeof(buffer));
+
+    if (ImGui::InputText(label, buffer, sizeof(buffer), flags)) {
+        str = buffer; // 入力結果をstd::stringに反映
+        return true;  // 変更があったことを通知
+    }
+    return false; // 変更なし
+}

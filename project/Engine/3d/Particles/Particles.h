@@ -85,6 +85,9 @@ private:
 	Camera camera_;
 
 	std::string jsonFilePath_;
+	std::string loadToSaveName_ = "emitterData";
+	std::string generateName = "emitterData";
+	std::string texturePath_ = "textureName";
 
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;

@@ -18,7 +18,7 @@ void TitleScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	particle_->Initialize(&ctx_->dxCommon, "resources/image/particle/box.png", 1);
+	particle_->Initialize(&ctx_->dxCommon, "resources/image/particle/fire.png", 2);
 	particle_->LoadJson("titleEffect");
 }
 
