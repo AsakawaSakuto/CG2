@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Application/GameObject/Player/Player.h"
 #include "Application/GameObject/Block/Block.h"
 #include "Application/GameObject/Thorn/Thorn.h"
@@ -20,9 +21,13 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 1.0f;
 
+	// プレイヤーの羽の初期化
+	playerWing_->Initialize(dxCommon_);
+	playerWing_->SetPosition(transform_.translate);
+
 	// 速度関連初期化
-	acceleration_ = {0.0f, 0.98f};
-	velocity_ = {};
+	acceleration_ = {0.0f, 1.5f, 0.0f};
+	velocity_ = {7.0f, 0.0f};
 }
 
 void Player::Update() {
@@ -34,12 +39,18 @@ void Player::Update() {
 	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT);
 
 	if (isLeftMove) {
-		transform_.translate.x -= 5.0f * deltaTime_;
+		transform_.translate.x -= velocity_.x * deltaTime_;
 	}
 
 	if (isRightMove) {
-		transform_.translate.x += 5.0f * deltaTime_;
+		transform_.translate.x += velocity_.x * deltaTime_;
 	}
+
+	// プレイヤーの羽の位置をプレイヤーに合わせる
+	playerWing_->SetPosition(transform_.translate);
+
+	// プレイヤーの羽の更新
+	playerWing_->Update();
 
 	// プレイヤーの上昇
 	MovePlayerUpward();
@@ -48,7 +59,7 @@ void Player::Update() {
 	ClampPlayerVelocity();
 
 	// プレイヤーの反転処理
-	ReverseIfAboveLimit(-10.0f, 10.0f);
+	ReverseIfAboveLimit(START_LINE, END_LINE);
 
 	// カメラのオフセット変更(補間)
 	CameraOffsetChange();
@@ -77,6 +88,12 @@ void Player::Update() {
 	// 弾とトゲの当たり判定
 	BulletThornCollison();
 
+	// カメラシェイクの値を更新
+	UpdateCameraShake();
+
+	// プレイヤーの羽の状態更新
+	WingStateUpdate();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -90,6 +107,9 @@ void Player::Draw(Camera useCamera) {
 	for (auto& bullet : bullets_) {
 		bullet->Draw(useCamera);
 	}
+
+	// プレイヤーの羽の描画
+	playerWing_->Draw(useCamera);
 }
 
 void Player::DrawImgui() {
@@ -97,7 +117,15 @@ void Player::DrawImgui() {
 	PlayerImGui();
 
 	// 弾のImGui
-	BulletImGui();
+	//BulletImGui();
+
+	ImGui::Begin("test");
+
+	ImGui::Text("shakeAmountX : %f", shakeAmount_.x);
+	ImGui::Text("shakeAmountY : %f", shakeAmount_.y);
+	ImGui::Text("isShake : %d", isShake_);
+
+	ImGui::End();
 }
 
 void Player::MovePlayerUpward() {
@@ -114,12 +142,6 @@ void Player::ClampPlayerVelocity() {
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最高地点に到達したとき
 	if (transform_.translate.y >= maxHeight && direction_ == Direction::UP) {
-		// 反転
-		// transform_.rotate.z = std::numbers::pi_v<float>;
-
-		// オフセット変更
-		isOffsetChange_ = true;
-
 		// プレイヤーの進行方向を徐々に反対方向に
 		acceleration_.y *= -1;
 
@@ -129,12 +151,6 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
-		// 反転
-		// transform_.rotate.z = 0.0f;
-
-		// オフセット変更
-		isOffsetChange_ = true;
-
 		// プレイヤーの進行方向を徐々に反対方向に
 		acceleration_.y *= -1;
 
@@ -144,31 +160,21 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 }
 
 void Player::CameraOffsetChange() {
-	if (!isOffsetChange_)
-		return;
-
 	// 方向に応じて目標オフセットを決定
-	float targetOffset = (direction_ == Direction::UP) ? 4.0f : -4.0f;
-
-	// 補間係数
-	const float smoothing = 0.025f; // 小さいほどゆっくり
-
-	// 補間処理
-	state_.cameraOffset = std::lerp(state_.cameraOffset, targetOffset, smoothing);
+	float targetOffset = (direction_ == Direction::UP) ? CAMERA_OFFSET_TOP : CAMERA_OFFSET_BOTTOM;
 
 	// velocityの符号が反転したかチェック
 	bool velocityFlipped = (direction_ == Direction::UP && velocity_.y > 0.0f) || (direction_ == Direction::DOWN && velocity_.y < 0.0f);
 
+	// 徐々にオフセットを目標値に近づける
 	if (velocityFlipped) {
-		state_.cameraOffset = targetOffset;
-		isOffsetChange_ = false;
+		state_.cameraOffset += velocity_.y * deltaTime_;
 	}
+
+	 state_.cameraOffset = std::clamp(state_.cameraOffset, CAMERA_OFFSET_BOTTOM, CAMERA_OFFSET_TOP);
 }
 
 void Player::RotateChange() {
-	if (!isOffsetChange_)
-		return;
-
 	// 目標回転角
 	float targetRotationZ = (direction_ == Direction::UP) ? 0.0f : std::numbers::pi_v<float>;
 
@@ -242,7 +248,11 @@ void Player::BulletUpdate() {
 		        bullets_.begin(), bullets_.end(),
 		        [](const std::unique_ptr<Bullet>& bullet) {
 			        float y = bullet->GetTransform().translate.y;
-			        return y > 50.0f || y < -50.0f; // 高さの上限50　下限-50
+
+					//////////////// 変更予定 ////////////////
+			        return y > 100.0f || y < -100.0f; // 高さの上限100　下限-100
+					//////////////// 変更予定 ////////////////
+
 		        }),
 		    bullets_.end());
 	}
@@ -276,6 +286,8 @@ void Player::DrawImGuiJsonState() {
 	ImGui::DragFloat("Camera Offset", &state_.cameraOffset, 0.01f, -20.0f, 20.0f);
 	ImGui::DragInt("Bullet Gauge Max", &state_.bulletGaugeMax, 1, 1, 100);
 	ImGui::DragFloat("Stun Duration", &state_.stunDuration, 0.1f, 0.0f, 60.0f);
+	ImGui::DragFloat("SpeedDown Strength", &state_.speedDownStrength, 0.1f, 0.0f, 10.0f);
+	ImGui::DragFloat("Camera ShakeStrength", &state_.shakeStrength, 0.01f, 0.0f, 2.0f);
 
 	// --- JSONへ保存ボタン ---
 	if (ImGui::Button("Save JSON")) {
@@ -298,7 +310,7 @@ void Player::BulletImGui() {
 
 void Player::SpeedDown() {
 	// 減速
-	velocity_.y += (direction_ == Direction::UP ? -0.5f : 0.5f);
+	velocity_.y += (direction_ == Direction::UP ? -state_.speedDownStrength : state_.speedDownStrength);
 }
 
 void Player::Stun() {
@@ -315,16 +327,26 @@ void Player::StunRemoved() { stunTimer_.Update(); }
 
 void Player::ThornCollision() {
 	for (auto& thorn : thorns_) {
-		if (Collision::IsHit(thorn->GetCollitionSphere(), collisionSphere_) && direction_ == Direction::DOWN) {
-			// エサをばら撒く
+		if (Collision::IsHit(thorn->GetCollitionSphere(), collisionSphere_)) {
+			if (direction_ == Direction::DOWN) {
+				// エサをばら撒く
 
+				// スタン
+				// Stun();
 
-			// スタン
-			Stun();
+				// シェイク用のフラグを立てる
+				if (!isShake_) {
+					isShake_ = true;
+				}
 
-			// トゲを非アクティブにする
-			thorn->SetIsAlive(false);
-			break;
+				// トゲを非アクティブにする
+				thorn->SetIsAlive(false);
+				break;
+			} else if (direction_ == Direction::UP) {
+				// スタン
+				Stun();
+				break;
+			}
 		}
 	}
 }
@@ -353,5 +375,34 @@ void Player::BulletThornCollison() {
 				}
 			}
 		}
+	}
+}
+
+void Player::UpdateCameraShake() {
+	float shakeDecayRate_ = 2.0f; // 揺れの減衰速度
+
+	if (isShake_) {
+		state_.shakeStrength -= shakeDecayRate_ * deltaTime_;
+		state_.shakeStrength -= shakeDecayRate_ * deltaTime_;
+
+		state_.shakeStrength = std::max(0.0f, state_.shakeStrength);
+		state_.shakeStrength = std::max(0.0f, state_.shakeStrength);
+
+		shakeAmount_.x = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * state_.shakeStrength;
+		shakeAmount_.y = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * state_.shakeStrength;
+
+		if (state_.shakeStrength <= 0.01f) {
+			isShake_ = false;
+			shakeAmount_ = {0.0f, 0.0f};
+			state_.shakeStrength = 0.5f;
+		}
+	}
+}
+
+void Player::WingStateUpdate() {
+	if (direction_ == Direction::UP) {
+		playerWing_->SetIsAlive(true);
+	} else if (direction_ == Direction::DOWN) {
+		playerWing_->SetIsAlive(false);
 	}
 }

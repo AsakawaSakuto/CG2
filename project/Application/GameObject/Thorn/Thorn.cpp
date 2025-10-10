@@ -13,6 +13,7 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 	Vector3 t = transform_.translate;
 	collisionAABB_.max = {t.x + 1.0f, t.y + 1.0f, t.z + 1.0f};
 	collisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
+	collisionSphere_.radius = 0.25f;
 }
 
 void Thorn::Update() {
