@@ -24,7 +24,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePSO();
 
 	// テクスチャ名を保持しておく
-	textureName_ = TextureName;
+	textureName_ = "resources/image/particle/" + TextureName + ".png";
 
 	// テクスチャマネージャー初期化とテクスチャの読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
@@ -168,6 +168,25 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
+	if (EmitterStateLoader::InputText("texture Name", texturePath_)) {
+		// 入力が変更されたらここに来る
+		printf("Generate Name Changed to: %s\n", texturePath_.c_str());
+	}
+
+	if (ImGui::Button("Load Texture")) {
+		// すでに同じテクスチャなら処理をスキップ
+		if (textureName_ == texturePath_) {
+			return;
+		}
+		textureName_ = "resources/image/particle/" + texturePath_ + ".png";
+		// .objの参照しているテクスチャファイル読み込み
+		TextureManager::GetInstance()->LoadTexture(textureName_);
+		// 読み込んだテクスチャの番号を取得
+		textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+	}
+
+	ImGui::Separator();
+
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
 	ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
 
@@ -243,20 +262,33 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
+	if (EmitterStateLoader::InputText("File Name", loadToSaveName_)) {
+		// 入力が変更されたらここに来る
+		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
+	}
+
 	if (ImGui::Button("Load to Json")) {
+		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
 	}
 
 	ImGui::Spacing();
 
 	if (ImGui::Button("Save to Json")) {
+		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
 		EmitterStateLoader::Save(jsonFilePath_, emitter_);
 	}
 
+	ImGui::Separator();
 	ImGui::Spacing();
 
+	if (EmitterStateLoader::InputText("Generate Name", generateName)) {
+		// 入力が変更されたらここに来る
+		printf("Generate Name Changed to: %s\n", generateName.c_str());
+	}
+
 	if (ImGui::Button("Generate to Json")) {
-		EmitterStateLoader::SaveToCurrentDir(emitter_, objectName);
+		EmitterStateLoader::SaveToCurrentDir(emitter_, generateName);
 	}
 
 	ImGui::Separator();
