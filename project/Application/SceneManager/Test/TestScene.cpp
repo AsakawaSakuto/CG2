@@ -142,7 +142,7 @@ void TestScene::Draw() {
 void TestScene::UpdateCameraToPlayer() {
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
 	Vector3 pPos = player_->GetPosition();
-	normalCamera_->SetPosition({0.0f, pPos.y + player_->CameraOffset(), -30.0f});
+	normalCamera_->SetPosition({0.0f + player_->GetShakeAmount().x, pPos.y + player_->CameraOffset() + player_->GetShakeAmount().x, -30.0f});
 }
 
 void TestScene::SpawnObjectsByMapChip() {
@@ -155,7 +155,7 @@ void TestScene::SpawnObjectsByMapChip() {
 				// トゲの描画処理
 				auto thorn = std::make_unique<Thorn>();
 				thorn->Initialize(&ctx_->dxCommon);
-				thorn->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) * -1.0f + 10.0f, 0.0f});
+				thorn->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) * -1.0f + player_->GetEndLine(), 0.0f});
 				thorns_.push_back(std::move(thorn));
 			}
 
@@ -163,7 +163,7 @@ void TestScene::SpawnObjectsByMapChip() {
 				// トゲの描画処理
 				auto block = std::make_unique<Block>();
 				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) * -1.0f + 10.0f, 0.0f});
+				block->Spawn({static_cast<float>(x) - 8.0f, static_cast<float>(y) * -1.0f + player_->GetEndLine(), 0.0f});
 				blocks_.push_back(std::move(block));
 			}
 		}

@@ -16,6 +16,6 @@ public:
 	Transform& GetTransform() { return transform_; }
 
 private:
-	float speed_ = 10.0f;
+	float speed_ = 15.0f;
 	float velocity_ = 0.0f;
 };

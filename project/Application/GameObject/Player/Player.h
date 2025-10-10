@@ -3,6 +3,7 @@
 #include "Bullet.h"
 #include <vector>
 #include "State/PlayerState.h"
+#include "PlayerWing.h"
 
 class Thorn;
 class Block;
@@ -32,6 +33,9 @@ public:
 	Vector3 GetPosition() const { return transform_.translate; }
 	float CameraOffset() const { return state_.cameraOffset; }
 	Direction GetDirection() const { return direction_; }
+	Vector2 GetShakeAmount() const { return shakeAmount_; }
+	float GetStartLine() const { return START_LINE; }
+	float GetEndLine() const { return END_LINE; }
 
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
@@ -86,6 +90,12 @@ private:
 	// 弾とトゲの当たり判定
 	void BulletThornCollison();
 
+	// カメラシェイクの数値を更新
+	void UpdateCameraShake();
+
+	// プレイヤーの羽の状態更新
+	void WingStateUpdate();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState state_;
@@ -97,19 +107,11 @@ private:
 	Vector3 acceleration_{};
 	Vector3 velocity_{};
 
-	// オフセット変更フラグ
-	bool isOffsetChange_ = false;
-
-	// プレイヤーとカメラのオフセット
-	//float cameraOffset_ = 4.0f;
-
 	// プレイヤーの進行方向
 	Direction direction_ = Direction::UP;
 
 	// 弾のゲージ
 	int bulletGauge_ = 0;
-	// 弾のゲージ最大数
-	//const int BULLET_GAUGE_MAX = 5;
 	// テスト用の変数
 	int num_ = 0;
 
@@ -118,11 +120,6 @@ private:
 
 	// スタン関連
 	bool isStun_ = false;
-	//int stunTimer_ = 0;
-	//const int kStunDuration = 60; // スタンする時間(フレーム)
-
-	// プレイヤー最高速度
-	//const float MAX_SPEED = 6.0f;
 
 	GameTimer stunTimer_;
 
@@ -131,4 +128,19 @@ private:
 
 	// ブロック
 	std::vector<std::shared_ptr<Block>> blocks_;
+
+	// プレイヤーの羽
+	std::unique_ptr<PlayerWing> playerWing_ = std::make_unique<PlayerWing>();
+
+	// スタートライン、最終ライン
+	const float START_LINE = -100.0f;
+	const float END_LINE = 100.0f;
+
+	// カメラオフセット
+	const float CAMERA_OFFSET_TOP = 4.0f;
+	const float CAMERA_OFFSET_BOTTOM = -4.0f;
+
+	// シェイク関連
+	bool isShake_ = false;
+	Vector2 shakeAmount_ = {0.0f, 0.0f};
 };
