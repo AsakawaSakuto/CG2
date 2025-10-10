@@ -3,7 +3,7 @@
 void Bullet::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "resources/model/player/bullet/bullet.obj");
+	model_->Initialize(dxCommon_, "player/bullet/bullet.obj");
 
 	transform_.scale = { 1.0f, 1.0f, 1.0f };
 	transform_.rotate = { 0.0f, 0.0f, 0.0f };

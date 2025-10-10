@@ -93,6 +93,8 @@ private:
 	Matrix4x4 worldMatrix;
 	Camera camera_;
 
+	std::string modelPath_;
+
 	// ワールド変換行列情報
 	Transform transform_;
 

@@ -3,7 +3,7 @@
 void Thorn::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "resources/model/sphere.obj");
+	model_->Initialize(dxCommon_, "sphere.obj");
 
 	transform_.scale = {0.5f, 0.5f, 0.5f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};

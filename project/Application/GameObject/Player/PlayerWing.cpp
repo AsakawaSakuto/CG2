@@ -3,7 +3,7 @@
 void PlayerWing::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "resources/model/cube.obj");
+	model_->Initialize(dxCommon_, "cube.obj");
 
 	transform_.scale = {2.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
