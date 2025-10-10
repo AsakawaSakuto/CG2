@@ -14,7 +14,9 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 	CreatePSO();
 
-	modelData_ = LoadObject3dFile(modelPath);
+	modelPath_ = "resources/model/" + modelPath;
+
+	modelData_ = LoadObject3dFile(modelPath_);
 
 	textureName_ = modelData_.material.textureFilePath;
 

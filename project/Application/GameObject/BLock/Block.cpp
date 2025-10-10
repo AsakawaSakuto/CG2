@@ -2,7 +2,7 @@
 void Block::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "resources/model/cube.obj");
+	model_->Initialize(dxCommon_, "cube.obj");
 
 	transform_.scale = {0.5f, 0.5f, 0.5f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};

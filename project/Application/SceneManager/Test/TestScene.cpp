@@ -13,7 +13,7 @@ void TestScene::Initialize() {
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
 	// オブジェクトの初期化
-	model_->Initialize(&ctx_->dxCommon, "resources/model/bg.obj");
+	model_->Initialize(&ctx_->dxCommon, "bg.obj");
 	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png", {128.0f, 128.0f});
 	sprite_->SetPosition({640.0f, 360.0f});
 
