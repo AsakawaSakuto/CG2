@@ -1,13 +1,13 @@
 {
-    "alphaFade": 1,
+    "alphaFade": 0,
     "colorFade": 1,
     "colorRandom": 1,
     "count": 1,
     "emit": 1,
     "endColor": [
-        1.0,
-        0.38235294818878174,
-        0.0
+        0.0,
+        0.058823585510253906,
+        1.0
     ],
     "endRotateVelocity": -1.0,
     "endScale": [
@@ -62,12 +62,12 @@
     "radius": 1.0,
     "rotateMove": 0,
     "rotateVelocityRandom": 0,
-    "scaleFade": 0,
+    "scaleFade": 1,
     "scaleRandom": 0,
     "startColor": [
-        1.0,
         0.0,
-        0.0
+        1.0,
+        0.02941155433654785
     ],
     "startRotateVelocity": 1.0,
     "startScale": [

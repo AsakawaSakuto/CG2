@@ -24,7 +24,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	CreatePSO();
 
 	// テクスチャ名を保持しておく
-	textureName_ = TextureName;
+	textureName_ = "resources/image/particle/" + TextureName + ".png";
 
 	// テクスチャマネージャー初期化とテクスチャの読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
