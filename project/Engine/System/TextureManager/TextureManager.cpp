@@ -63,6 +63,48 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
     return textureData.srvHandleGPU;
 }
 
+Vector2 TextureManager::GetTextureSize(const std::string& filePath) {
+    // まず該当するテクスチャがロード済みかチェック
+    auto it = std::find_if(
+        textureDatas_.begin(), textureDatas_.end(),
+        [&](const TextureData& data) {
+            return data.filePath == filePath;
+        });
+
+    if (it == textureDatas_.end()) {
+        // ロードされていなければ先にロード
+        LoadTexture(filePath);
+        
+        // 再度検索
+        it = std::find_if(
+            textureDatas_.begin(), textureDatas_.end(),
+            [&](const TextureData& data) {
+                return data.filePath == filePath;
+            });
+    }
+
+    assert(it != textureDatas_.end() && "Texture not found after loading");
+    
+    return Vector2{
+        static_cast<float>(it->matadata.width),
+        static_cast<float>(it->matadata.height)
+    };
+}
+
+Vector2 TextureManager::GetTextureSizeByIndex(uint32_t textureIndex) {
+    // 範囲外アクセスチェック
+    assert(textureIndex >= kSRVIndexTop_);
+    uint32_t index = textureIndex - kSRVIndexTop_;
+    assert(index < textureDatas_.size());
+
+    // テクスチャデータの参照を取得
+    const TextureData& textureData = textureDatas_[index];
+    return Vector2{
+        static_cast<float>(textureData.matadata.width),
+        static_cast<float>(textureData.matadata.height)
+    };
+}
+
 void TextureManager::LoadTexture(const std::string& filePath) {
     // 重複チェックは最初にやる
     if (texturePathToIndex_.contains(filePath)) {

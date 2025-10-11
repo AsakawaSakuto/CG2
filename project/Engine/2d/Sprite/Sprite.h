@@ -18,7 +18,8 @@ class Sprite
 {
 public:
 
-	void Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 size);
+	// サイズを画像から自動取得する版
+	void Initialize(DirectXCommon* dxCommon, const std::string& fileName);
 
 	void Update();
 

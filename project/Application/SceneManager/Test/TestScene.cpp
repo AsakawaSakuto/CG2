@@ -14,7 +14,7 @@ void TestScene::Initialize() {
 
 	// オブジェクトの初期化
 	model_->Initialize(&ctx_->dxCommon, "bg.obj");
-	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png", {128.0f, 128.0f});
+	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png");
 	sprite_->SetPosition({640.0f, 360.0f});
 
 	player_->Initialize(&ctx_->dxCommon);
@@ -87,7 +87,7 @@ void TestScene::Draw() {
 	player_->Draw(*useCamera_);
 
 	model_->Draw(*useCamera_);
-	// sprite_->Draw();
+	//sprite_->Draw();
 
 	// トゲの描画処理
 	for (auto& thorn : thorns_) {
@@ -117,7 +117,7 @@ void TestScene::Draw() {
 	///
 
 	// model_->DrawImGui("Model");
-	// sprite_->DrawImGui("Sprite");
+	//sprite_->DrawImGui("Sprite");
 
 	debugCamera_->DrawImgui();
 

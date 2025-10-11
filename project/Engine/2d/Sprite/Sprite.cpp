@@ -5,7 +5,7 @@
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
-void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 size) {
+void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName) {
 	//
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
@@ -15,9 +15,11 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Ve
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 
+	// テクスチャからサイズを自動取得
+	size_ = TextureManager::GetInstance()->GetTextureSize(textureName_);
+
 	CreatePSO();
 
-	size_ = size;
 	transform_.scale = { 1.f,1.f,1.f };
 	transform_.translate = { 0.f,0.f,0.f };
 
@@ -197,7 +199,7 @@ void Sprite::CreateIndexResource() {
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
 	// 表面（三角形2枚）
 	indexData_[0] = 0; indexData_[1] = 1; indexData_[2] = 2;
-	indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
+indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
 
 	// 裏面（三角形2枚、巻き方向を逆に）
 	/*indexData_[6] = 2; indexData_[7] = 1; indexData_[8] = 0;
