@@ -28,6 +28,12 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// 速度関連初期化
 	acceleration_ = {0.0f, 1.5f, 0.0f};
 	velocity_ = {7.0f, 0.0f};
+
+	// スコア
+	score_ = 0;
+
+	// 弾のゲージ
+	bulletGauge_ = 0;
 }
 
 void Player::Update() {
@@ -94,6 +100,12 @@ void Player::Update() {
 	// プレイヤーの羽の状態更新
 	WingStateUpdate();
 
+	// トゲのクールダウン更新
+	TickThornCooldown();
+
+	// プレイヤーの羽とトゲの当たり判定
+	WingThornCollision();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -116,16 +128,19 @@ void Player::DrawImgui() {
 	// プレイヤーのImGui
 	PlayerImGui();
 
-	// 弾のImGui
-	//BulletImGui();
+	// スコアのImgui
+	ScoreImGui();
 
-	ImGui::Begin("test");
+	// 弾のImGui
+	// BulletImGui();
+
+	/*ImGui::Begin("test");
 
 	ImGui::Text("shakeAmountX : %f", shakeAmount_.x);
 	ImGui::Text("shakeAmountY : %f", shakeAmount_.y);
 	ImGui::Text("isShake : %d", isShake_);
 
-	ImGui::End();
+	ImGui::End();*/
 }
 
 void Player::MovePlayerUpward() {
@@ -171,7 +186,7 @@ void Player::CameraOffsetChange() {
 		state_.cameraOffset += velocity_.y * deltaTime_;
 	}
 
-	 state_.cameraOffset = std::clamp(state_.cameraOffset, CAMERA_OFFSET_BOTTOM, CAMERA_OFFSET_TOP);
+	state_.cameraOffset = std::clamp(state_.cameraOffset, CAMERA_OFFSET_BOTTOM, CAMERA_OFFSET_TOP);
 }
 
 void Player::RotateChange() {
@@ -249,10 +264,9 @@ void Player::BulletUpdate() {
 		        [](const std::unique_ptr<Bullet>& bullet) {
 			        float y = bullet->GetTransform().translate.y;
 
-					//////////////// 変更予定 ////////////////
+			        //////////////// 変更予定 ////////////////
 			        return y > 100.0f || y < -100.0f; // 高さの上限100　下限-100
-					//////////////// 変更予定 ////////////////
-
+			                                          //////////////// 変更予定 ////////////////
 		        }),
 		    bullets_.end());
 	}
@@ -327,22 +341,26 @@ void Player::StunRemoved() { stunTimer_.Update(); }
 
 void Player::ThornCollision() {
 	for (auto& thorn : thorns_) {
-		if (Collision::IsHit(thorn->GetCollitionSphere(), collisionSphere_)) {
+		if (Collision::IsHit(thorn->GetCollitionSphere(), collisionSphere_) && thorn->GetIsAlive()) {
 			if (direction_ == Direction::DOWN) {
-				// エサをばら撒く
-
-				// スタン
-				// Stun();
+				;
 
 				// シェイク用のフラグを立てる
 				if (!isShake_) {
 					isShake_ = true;
 				}
 
+				// スコア加算
+				AddScore(thorn->GetScoreAmount());
+
 				// トゲを非アクティブにする
 				thorn->SetIsAlive(false);
 				break;
 			} else if (direction_ == Direction::UP) {
+
+				// 弾のゲージリセット
+				ResetBulletGauge();
+
 				// スタン
 				Stun();
 				break;
@@ -353,9 +371,12 @@ void Player::ThornCollision() {
 
 void Player::BlockCollision() {
 	for (auto& block : blocks_) {
-		if (Collision::IsHit(block->GetCollitionSphere(), collisionSphere_)) { 
+		if (Collision::IsHit(block->GetCollitionSphere(), collisionSphere_) && block->GetIsAlive()) {
 			// ブロックを非アクティブにする
 			block->SetIsAlive(false);
+
+			// スコア加算
+			AddScore(block->GetScoreAmount());
 			break;
 		}
 	}
@@ -364,14 +385,22 @@ void Player::BlockCollision() {
 void Player::BulletThornCollison() {
 	for (auto& bullet : bullets_) {
 		for (auto& thorn : thorns_) {
+			if (!thorn->CanUpgradeBullet()) {
+				continue; // クールダウン中のトゲはスキップ
+			}
+
 			if (Collision::IsHit(bullet->GetCollitionSphere(), thorn->GetCollitionSphere())) {
-				// トゲを強化する
 				switch (thorn->GetThornType()) {
 				case ThornType::MIN:
 					thorn->SetThornType(ThornType::MIDDLE);
+					thorn->SetUpgradeCooldownBullet(10); // 10フレームのクールダウン
 					break;
 				case ThornType::MIDDLE:
 					thorn->SetThornType(ThornType::MAX);
+					thorn->SetUpgradeCooldownBullet(10);
+					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -404,5 +433,65 @@ void Player::WingStateUpdate() {
 		playerWing_->SetIsAlive(true);
 	} else if (direction_ == Direction::DOWN) {
 		playerWing_->SetIsAlive(false);
+	}
+}
+
+void Player::AddScore(int score) { score_ += score; }
+
+void Player::ScoreImGui() {
+	ImGui::Begin("Score");
+
+	ImGui::Text("TotalScore : %d", score_);
+	ImGui::Text("distance : %f", dis);
+
+	ImGui::End();
+}
+
+void Player::TickThornCooldown() {
+	for (auto& thorn : thorns_) {
+		thorn->TickCooldown();
+	}
+}
+
+void Player::WingThornCollision() {
+	for (auto& thorn : thorns_) {
+		if (!thorn->CanUpgradeWing()) {
+			continue; // クールダウン中のトゲはスキップ
+		}
+
+		if (Collision::IsHit(thorn->GetCollisionAABB(), playerWing_->GetCollisionAABB()) && playerWing_->GetIsAlive()) {
+
+			// 羽とトゲの距離に応じてスコア加算
+			Vector3 hitPos = thorn->GetPosition();
+			dis = (hitPos - transform_.translate).Length(); // 3Dベクトルの距離
+
+			if (dis < kNearThreshold) {
+				AddScoreByDistance(thorn, kNearScore); // 近距離スコア
+			} else {
+				AddScoreByDistance(thorn, kFarScore); // 遠距離スコア
+			}
+
+			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
+
+			break;
+		}
+	}
+}
+
+void Player::ResetBulletGauge() { bulletGauge_ = 0; }
+
+void Player::AddScoreByDistance(std::shared_ptr<Thorn>& thorn, int scoreAmount) {
+	switch (thorn->GetThornType()) {
+	case ThornType::MIN:
+		AddScore(scoreAmount); // 等倍
+		break;
+	case ThornType::MIDDLE:
+		AddScore(scoreAmount * 2); // 2倍
+		break;
+	case ThornType::MAX:
+		AddScore(scoreAmount * 3); // 3倍
+		break;
+	default:
+		break;
 	}
 }

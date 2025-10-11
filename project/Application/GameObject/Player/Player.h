@@ -96,6 +96,24 @@ private:
 	// プレイヤーの羽の状態更新
 	void WingStateUpdate();
 
+	// スコア加算
+	void AddScore(int score);
+
+	// スコアのImGui
+	void ScoreImGui();
+
+	// トゲのクールダウン更新
+	void TickThornCooldown();
+
+	// プレイヤーの羽とトゲの当たり判定
+	void WingThornCollision();
+
+	// 弾のゲージリセット
+	void ResetBulletGauge();
+
+	// プレイヤーとの距離に応じて加算するスコアを変化させる
+	void AddScoreByDistance(std::shared_ptr<Thorn>& thorn, int scoreAmount);
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState state_;
@@ -143,4 +161,14 @@ private:
 	// シェイク関連
 	bool isShake_ = false;
 	Vector2 shakeAmount_ = {0.0f, 0.0f};
+
+	// スコア
+	int score_ = 0;
+
+	// 羽関連(スコア)
+	const float kNearThreshold = 1.9f;
+	const int kNearScore = 1000;
+	const int kFarScore = 1;
+
+	float dis{};
 };

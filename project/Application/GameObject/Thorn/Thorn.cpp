@@ -13,6 +13,8 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 	Vector3 t = transform_.translate;
 	collisionAABB_.max = {t.x + 1.0f, t.y + 1.0f, t.z + 1.0f};
 	collisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
+
+	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 0.25f;
 }
 
@@ -36,12 +38,21 @@ void Thorn::Spawn(Vector3 position) {
 		isAlive_ = true;
 		transform_.translate = position;
 		collisionSphere_.center = transform_.translate;
+
+		Vector3 t = transform_.translate;
+		collisionAABB_.max = {t.x + 1.0f, t.y + 1.0f, t.z + 1.0f};
+		collisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
 	}
 }
 
-void Thorn::UpgradeThorn() { 
-	switch (type_)
-	{ 
+void Thorn::TickCooldown() {
+	if (upgradeCooldownFramesBullet_ > 0) {
+		--upgradeCooldownFramesBullet_;
+	}
+}
+
+void Thorn::UpgradeThorn() {
+	switch (type_) {
 	case ThornType::MIN:
 		transform_.scale = {0.5f, 0.5f, 0.5f};
 		collisionSphere_.radius = 0.25f;

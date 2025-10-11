@@ -23,7 +23,9 @@ private:
 	void UpdateCameraToPlayer();
 
 	// マップチップに基づいてオブジェクトを配置する
-	void SpawnObjectsByMapChip();
+	void SpawnObjectsByMapChip(float mag, float mapHeight);
+
+	void SpawnObjectsByMapChip2(float mag, float mapHeight);
 
 private:
 	// AppContext
