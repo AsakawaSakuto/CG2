@@ -16,6 +16,7 @@
 #include <wrl/client.h>
 
 #include "externals/DirectXTex/DirectXTex.h"
+#include "Vector2.h"
 
 class TextureManager
 {
@@ -37,6 +38,10 @@ public:
 
 	// テクスチャ番号からGPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureIndex);
+
+	// テクスチャのサイズを取得
+	Vector2 GetTextureSize(const std::string& filePath);
+	Vector2 GetTextureSizeByIndex(uint32_t textureIndex);
 
 	//
 	size_t GetTextureCount() const {return textureDatas_.size();}

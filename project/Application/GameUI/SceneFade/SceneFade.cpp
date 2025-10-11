@@ -3,8 +3,8 @@
 void SceneFade::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	backBlack_->Initialize(dxCommon_, "resources/image/fade.png", { 1280.0f,720.0f });
-	loadingText_->Initialize(dxCommon_, "resources/image/loading.png", { 1280.0f,720.0f });
+	backBlack_->Initialize(dxCommon_, "resources/image/fade.png");
+	loadingText_->Initialize(dxCommon_, "resources/image/loading.png");
 
 	backBlack_->SetPosition({ 640.0f,360.0f });
 	loadingText_->SetPosition({ 640.0f,360.0f });
