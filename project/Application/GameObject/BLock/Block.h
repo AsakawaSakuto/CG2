@@ -13,7 +13,12 @@ public:
 
 	// Getter
 	Transform& GetTransform() { return transform_; }
+	int GetScoreAmount() const { return scoreAmount_; }
 
 	// Setter
 	void SetPosition(Vector3 position) { transform_.translate = position; }
+
+private:
+	// スコア加算量
+	int scoreAmount_ = 100;
 };

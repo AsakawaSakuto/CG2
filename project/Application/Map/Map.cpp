@@ -2,7 +2,8 @@
 
 void Map::Initialize() {
 	// マップチップデータ読み込み格納
-	LoadMapCSV("resources/map/map1.csv");
+	mapData1_ = LoadMapCSV("resources/map/map5.csv");
+	mapData2_ = LoadMapCSV("resources/map/map4.csv");
 }
 
 void Map::Update() {}
@@ -30,7 +31,7 @@ void Map::Draw() {
 	//}
 }
 
-void Map::LoadMapCSV(const std::string& filename) {
+std::vector<std::vector<int>> Map::LoadMapCSV(const std::string& filename) {
 	std::vector<std::vector<int>> mapData;
 	std::ifstream file(filename);
 	std::string line;
@@ -47,12 +48,19 @@ void Map::LoadMapCSV(const std::string& filename) {
 		mapData.push_back(row);
 	}
 
-	mapData_ = mapData;
+	return mapData;
 }
 
 int Map::GetMapData(int row, int col) const {
 	if (row < 0 || row >= GetRowCount() || col < 0 || col >= GetColumnCount()) {
 		return static_cast<int>(TileType::EMPTY); // 範囲外は空タイル
 	}
-	return mapData_[row][col];
+	return mapData1_[row][col];
+}
+
+int Map::GetMapData2(int row, int col) const {
+	if (row < 0 || row >= GetRowCount2() || col < 0 || col >= GetColumnCount2()) {
+		return static_cast<int>(TileType::EMPTY); // 範囲外は空タイル
+	}
+	return mapData2_[row][col];
 }

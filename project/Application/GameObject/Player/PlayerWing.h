@@ -1,7 +1,7 @@
 #pragma once
 #include "Application/GameObject/GameObject.h"
 
-class PlayerWing : GameObject {
+class PlayerWing : public GameObject {
 public:
 	void Initialize(DirectXCommon* dxCommon) override;
 	void Update() override;
@@ -13,5 +13,5 @@ public:
 	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }
 
 private:
-
+	void CollisionUpdate();
 };
