@@ -116,25 +116,10 @@ void TestScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	// model_->DrawImGui("Model");
-	//sprite_->DrawImGui("Sprite");
-
-	debugCamera_->DrawImgui();
-
 	// プレイヤーのImGui
 	player_->DrawImgui();
 
-	player_->DrawImGuiJsonState();
-
 	DrawSceneName();
-
-	ImGui::Begin("Thorn");
-
-	if (thorns_.size() > 0) {
-		ImGui::DragFloat3("Translate", &thorns_[0]->GetTransform().translate.x, 0.01f);
-	}
-
-	ImGui::End();
 
 	///
 	/// ↑ImGuiここまで

@@ -4,6 +4,7 @@
 #include <vector>
 #include "State/PlayerState.h"
 #include "PlayerWing.h"
+#include "State/BulletState.h"
 
 class Thorn;
 class Block;
@@ -27,11 +28,9 @@ public:
 	// ImGui表示
 	void DrawImgui();
 
-	void DrawImGuiJsonState();
-
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
-	float CameraOffset() const { return state_.cameraOffset; }
+	float CameraOffset() const { return playerState_.cameraOffset; }
 	Direction GetDirection() const { return direction_; }
 	Vector2 GetShakeAmount() const { return shakeAmount_; }
 	float GetStartLine() const { return START_LINE; }
@@ -73,7 +72,7 @@ private:
 	void BulletImGui();
 
 	// 減速
-	void SpeedDown();
+	void SpeedDown(float speedDpwnStrength);
 
 	// スタン
 	void Stun();
@@ -114,9 +113,22 @@ private:
 	// プレイヤーとの距離に応じて加算するスコアを変化させる
 	void AddScoreByDistance(std::shared_ptr<Thorn>& thorn, int scoreAmount);
 
+	// デバッグ用のベクトル表示
+	void ShowLabeledVector3(const char* label, float* vec);
+
+	// ImGui自動生成関数
+	void DrawImGuiForJson(nlohmann::json& json);
+
+	// ImGuiプレイヤー
+	void DrawImGuiJsonStatePlayer();
+
+	// ImGui弾
+	void DrawImGuiJsonStateBullet();
+
 private:
 	// プレイヤーのStateをJsonで管理
-	PlayerState state_;
+	PlayerState playerState_;
+	BulletState bulletState_;
 
 	Input* input_ = nullptr;
 	GamePad* gamePad_ = nullptr;
