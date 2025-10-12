@@ -1,8 +1,8 @@
 {
-      "bulletGaugeMax": 5,
-      "cameraOffset": 4.0,
-      "maxSpeed": 10.0,
-      "shakeStrength": 0.5,
-      "speedDownStrength": 3.0,
-      "stunDuration": 1.0
+    "cameraOffset": -4.0,
+    "maxSpeed": 10.0,
+    "shakeStrength": 0.5,
+    "speedDownStrengthBullet": 1.0,
+    "speedDownStrengthThorn": 2.0,
+    "stunDuration": 1.0
 }

@@ -4,6 +4,6 @@
 
 class PlayerStateLoader {
 public:
-    static PlayerState Load(const std::string& filePath);
-    static void Save(const std::string& filePath, const PlayerState& state);
+    //static PlayerState Load(const std::string& filePath);
+    //static void Save(const std::string& filePath, const PlayerState& state);
 };
