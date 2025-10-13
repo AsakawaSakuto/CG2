@@ -12,10 +12,11 @@ public:
 	void Spawn(Vector3 position, float velocity);
 
 	// Getter
-	float GetSpeed() const { return speed_; }
+	//float GetSpeed() const { return speed_; }
 	Transform& GetTransform() { return transform_; }
 
+
 private:
-	float speed_ = 15.0f;
+	//float speed_ = 0.0f;
 	float velocity_ = 0.0f;
 };

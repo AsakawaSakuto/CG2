@@ -4,7 +4,8 @@
 #include "Application/GameObject/Thorn/Thorn.h"
 #include <numbers>
 
-#include "State/PlayerStateLoader.h"
+//#include "State/PlayerStateLoader.h"
+#include "Application/GameObject/State/JsonState.h"
 
 void Player::Initialize(DirectXCommon* dxCommon) {
 
@@ -13,7 +14,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	model_->Initialize(dxCommon_, "player/player.obj");
 
 	// JSONからステータスを読み込み
-	state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");
+	//state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");
+	playerState_ = JsonState::Load<PlayerState>("Resources/Data/playerState.json");
+	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
@@ -41,8 +44,8 @@ void Player::Update() {
 	// 当たり判定用の球の中心を更新
 	collisionSphere_.center = transform_.translate;
 
-	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT) || input_->PushKey(DIK_LEFT);
-	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT);
+	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
+	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
 
 	if (isLeftMove) {
 		transform_.translate.x -= velocity_.x * deltaTime_;
@@ -131,16 +134,11 @@ void Player::DrawImgui() {
 	// スコアのImgui
 	ScoreImGui();
 
-	// 弾のImGui
-	// BulletImGui();
+	// プレイヤーのステータス
+	DrawImGuiJsonStatePlayer();
 
-	/*ImGui::Begin("test");
-
-	ImGui::Text("shakeAmountX : %f", shakeAmount_.x);
-	ImGui::Text("shakeAmountY : %f", shakeAmount_.y);
-	ImGui::Text("isShake : %d", isShake_);
-
-	ImGui::End();*/
+	// 弾のステータス
+	DrawImGuiJsonStateBullet();
 }
 
 void Player::MovePlayerUpward() {
@@ -151,7 +149,7 @@ void Player::MovePlayerUpward() {
 
 void Player::ClampPlayerVelocity() {
 	// プレイヤーの速度を一定の値に収める
-	velocity_.y = std::clamp(velocity_.y, -state_.maxSpeed, state_.maxSpeed);
+	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed, playerState_.maxSpeed);
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
@@ -183,10 +181,10 @@ void Player::CameraOffsetChange() {
 
 	// 徐々にオフセットを目標値に近づける
 	if (velocityFlipped) {
-		state_.cameraOffset += velocity_.y * deltaTime_;
+		playerState_.cameraOffset += velocity_.y * deltaTime_;
 	}
 
-	state_.cameraOffset = std::clamp(state_.cameraOffset, CAMERA_OFFSET_BOTTOM, CAMERA_OFFSET_TOP);
+	playerState_.cameraOffset = std::clamp(playerState_.cameraOffset, CAMERA_OFFSET_BOTTOM, CAMERA_OFFSET_TOP);
 }
 
 void Player::RotateChange() {
@@ -206,7 +204,7 @@ void Player::RotateChange() {
 
 void Player::BulletCharge() {
 	// ゲージが最大値なら早期リターン
-	if (bulletGauge_ >= state_.bulletGaugeMax) {
+	if (bulletGauge_ >= bulletState_.bulletGaugeMax) {
 		return;
 	}
 
@@ -235,15 +233,15 @@ void Player::BulletShot() {
 
 		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
 		if (direction_ == Direction::UP) {
-			bullet->Spawn(transform_.translate, bullet->GetSpeed());
+			bullet->Spawn(transform_.translate, bulletState_.maxSpeed);
 		} else {
-			bullet->Spawn(transform_.translate, -bullet->GetSpeed());
+			bullet->Spawn(transform_.translate, -bulletState_.maxSpeed);
 		}
 
 		bullets_.push_back(std::move(bullet));
 
 		// プレイヤー減速
-		SpeedDown();
+		SpeedDown(playerState_.speedDownStrengthBullet);
 
 		// ゲージを減らす
 		--bulletGauge_;
@@ -255,18 +253,17 @@ void Player::BulletUpdate() {
 	for (auto& bullet : bullets_) {
 		bullet->Update();
 	}
+	
+	float playerPosY = transform_.translate.y;
 
 	// 弾の削除
 	if (!bullets_.empty()) {
 		bullets_.erase(
 		    std::remove_if(
 		        bullets_.begin(), bullets_.end(),
-		        [](const std::unique_ptr<Bullet>& bullet) {
+		        [playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
 			        float y = bullet->GetTransform().translate.y;
-
-			        //////////////// 変更予定 ////////////////
-			        return y > 100.0f || y < -100.0f; // 高さの上限100　下限-100
-			                                          //////////////// 変更予定 ////////////////
+			        return y > playerPosY + 11.0f || y < playerPosY - 11.0f; // 画面外に出たら削除
 		        }),
 		    bullets_.end());
 	}
@@ -275,13 +272,24 @@ void Player::BulletUpdate() {
 void Player::PlayerImGui() {
 	// プレイヤーのImGui
 	ImGui::Begin("Player Control");
+	
+	// 座標
+	ShowLabeledVector3("Translate", &transform_.translate.x);
 
-	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("Velocity", &velocity_.x, 0.01f);
+	// 回転
+	ShowLabeledVector3("Rotate", &transform_.rotate.x);
+
+	// 大きさ
+	ShowLabeledVector3("Scale", &transform_.scale.x);
+
+	// 速度
+	ShowLabeledVector3("Velocity", &velocity_.x);
+	
+	// 弾のステータス
 	ImGui::Text("BulletGauge: %d", bulletGauge_);
 	ImGui::Text("Bullet Count: %d", static_cast<int>(bullets_.size()));
 
+	// リセットボタン
 	if (ImGui::Button("Reset")) {
 		transform_.translate = {0.0f, 0.0f, 0.0f};
 		transform_.rotate = {0.0f, 0.0f, 0.0f};
@@ -292,20 +300,19 @@ void Player::PlayerImGui() {
 	ImGui::End();
 }
 
-void Player::DrawImGuiJsonState() {
+void Player::DrawImGuiJsonStatePlayer() {
 	ImGui::Begin("Player State");
 
-	// --- JSONから読み込んだパラメータを直接編集 ---
-	ImGui::DragFloat("Max Speed", &state_.maxSpeed, 0.01f, 0.0f, 100.0f);
-	ImGui::DragFloat("Camera Offset", &state_.cameraOffset, 0.01f, -20.0f, 20.0f);
-	ImGui::DragInt("Bullet Gauge Max", &state_.bulletGaugeMax, 1, 1, 100);
-	ImGui::DragFloat("Stun Duration", &state_.stunDuration, 0.1f, 0.0f, 60.0f);
-	ImGui::DragFloat("SpeedDown Strength", &state_.speedDownStrength, 0.1f, 0.0f, 10.0f);
-	ImGui::DragFloat("Camera ShakeStrength", &state_.shakeStrength, 0.01f, 0.0f, 2.0f);
+	nlohmann::json jsonState = playerState_;
+	
+	// JsonNo中身をImGuiで表示する
+	DrawImGuiForJson(jsonState);
+
+	playerState_ = jsonState.get<PlayerState>();
 
 	// --- JSONへ保存ボタン ---
 	if (ImGui::Button("Save JSON")) {
-		PlayerStateLoader::Save("Resources/Data/playerState.json", state_);
+		JsonState::Save("Resources/Data/playerState.json", playerState_);
 	}
 
 	ImGui::End();
@@ -322,18 +329,18 @@ void Player::BulletImGui() {
 	ImGui::End();
 }
 
-void Player::SpeedDown() {
+void Player::SpeedDown(float speedDpwnStrength) {
 	// 減速
-	velocity_.y += (direction_ == Direction::UP ? -state_.speedDownStrength : state_.speedDownStrength);
+	velocity_.y += (direction_ == Direction::UP ? -speedDpwnStrength : speedDpwnStrength);
 }
 
 void Player::Stun() {
 	// 敵にヒットしたら減速
 	if (!stunTimer_.IsActive()) {
-		stunTimer_.Start(state_.stunDuration, false);
+		stunTimer_.Start(playerState_.stunDuration, false);
 
 		// 減速
-		SpeedDown();
+		SpeedDown(playerState_.speedDownStrengthThorn);
 	}
 }
 
@@ -372,6 +379,11 @@ void Player::ThornCollision() {
 void Player::BlockCollision() {
 	for (auto& block : blocks_) {
 		if (Collision::IsHit(block->GetCollitionSphere(), collisionSphere_) && block->GetIsAlive()) {
+			// シェイク用のフラグを立てる
+			if (!isShake_) {
+				isShake_ = true;
+			}
+
 			// ブロックを非アクティブにする
 			block->SetIsAlive(false);
 
@@ -411,19 +423,19 @@ void Player::UpdateCameraShake() {
 	float shakeDecayRate_ = 2.0f; // 揺れの減衰速度
 
 	if (isShake_) {
-		state_.shakeStrength -= shakeDecayRate_ * deltaTime_;
-		state_.shakeStrength -= shakeDecayRate_ * deltaTime_;
+		playerState_.shakeStrength -= shakeDecayRate_ * deltaTime_;
+		playerState_.shakeStrength -= shakeDecayRate_ * deltaTime_;
 
-		state_.shakeStrength = std::max(0.0f, state_.shakeStrength);
-		state_.shakeStrength = std::max(0.0f, state_.shakeStrength);
+		playerState_.shakeStrength = std::max(0.0f, playerState_.shakeStrength);
+		playerState_.shakeStrength = std::max(0.0f, playerState_.shakeStrength);
 
-		shakeAmount_.x = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * state_.shakeStrength;
-		shakeAmount_.y = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * state_.shakeStrength;
+		shakeAmount_.x = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * playerState_.shakeStrength;
+		shakeAmount_.y = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * playerState_.shakeStrength;
 
-		if (state_.shakeStrength <= 0.01f) {
+		if (playerState_.shakeStrength <= 0.01f) {
 			isShake_ = false;
 			shakeAmount_ = {0.0f, 0.0f};
-			state_.shakeStrength = 0.5f;
+			playerState_.shakeStrength = 0.5f;
 		}
 	}
 }
@@ -494,4 +506,72 @@ void Player::AddScoreByDistance(std::shared_ptr<Thorn>& thorn, int scoreAmount) 
 	default:
 		break;
 	}
+}
+
+void Player::ShowLabeledVector3(const char* label, float* vec) {
+	ImGui::Text("%s", label);
+	ImGui::PushID(label);
+
+	ImGui::PushItemWidth(60);
+	ImGui::Text("X");
+	ImGui::SameLine();
+	ImGui::DragFloat("##X", &vec[0], 0.1f);
+	ImGui::SameLine();
+	ImGui::Text("Y");
+	ImGui::SameLine();
+	ImGui::DragFloat("##Y", &vec[1], 0.1f);
+	ImGui::SameLine();
+	ImGui::Text("Z");
+	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &vec[2], 0.1f);
+
+	ImGui::PopItemWidth();
+	ImGui::PopID();
+}
+
+void Player::DrawImGuiForJson(nlohmann::json& json) {
+	for (auto& [key, value] : json.items()) {
+		if (value.is_number_float()) {
+			float val = value.get<float>();
+			if (ImGui::DragFloat(key.c_str(), &val, 0.01f))
+				value = val;
+		} else if (value.is_number_integer()) {
+			int val = value.get<int>();
+			if (ImGui::DragInt(key.c_str(), &val))
+				value = val;
+		} else if (value.is_string()) {
+			std::string str = value.get<std::string>();
+			char buf[256];
+			strncpy_s(buf, str.c_str(), sizeof(buf));
+			if (ImGui::InputText(key.c_str(), buf, sizeof(buf)))
+				value = std::string(buf);
+		} else if (value.is_object()) {
+			if (ImGui::TreeNode(key.c_str())) {
+				DrawImGuiForJson(value);
+				ImGui::TreePop();
+			}
+		} else if (value.is_boolean()) {
+			bool val = value.get<bool>();
+			if (ImGui::Checkbox(key.c_str(), &val))
+				value = val;
+		}
+	}
+}
+
+void Player::DrawImGuiJsonStateBullet() {
+	ImGui::Begin("Bullet State");
+
+	nlohmann::json jsonState = bulletState_;
+
+	// JsonNo中身をImGuiで表示する
+	DrawImGuiForJson(jsonState);
+
+	bulletState_ = jsonState.get<BulletState>();
+
+	// --- JSONへ保存ボタン ---
+	if (ImGui::Button("Save JSON")) {
+		JsonState::Save("Resources/Data/bulletState.json", bulletState_);
+	}
+
+	ImGui::End();
 }
