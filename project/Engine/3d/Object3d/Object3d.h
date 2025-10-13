@@ -164,37 +164,4 @@ private:
 	void CreateSpotLightResource();
 
 	HRESULT hr_;  // エラー確認用変数
-
-	// RootSignature（シェーダとの接続点）の作成
-	void CreateRootSignature();
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-
-	// Graphics Pipeline State Object（描画設定）の作成
-	void CreatePSO();
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_ = {};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateSolid_;      // 通常描画用
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateWireframe_;  // ワイヤーフレーム描画用
-
-	// 頂点レイアウトの設定
-	void InputLayoutSet();
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {};  // 頂点要素のレイアウト（位置・UV・法線など）
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_ = {};        // 頂点レイアウト全体
-
-	// シェーダの読み込みとコンパイル
-	void CompileShaders();
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-
-	// ブレンドステート（透明処理など）の設定
-	void BlendStateSet();
-	D3D12_BLEND_DESC blendDesc_{};
-
-	// ラスタライザステート（描画方法：塗りつぶし or ワイヤーフレームなど）
-	void RasiterzerStateSet();
-	D3D12_RASTERIZER_DESC rasterizerDescSolid_{};
-	D3D12_RASTERIZER_DESC rasterizerDescWireFrame_{};
-
-	// 深度ステンシル（奥行き）テストの設定
-	void DepthStencilStateSet();
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 };
