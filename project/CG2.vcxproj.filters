@@ -168,15 +168,6 @@
     <ClCompile Include="Engine\System\Audio\AudioData.cpp">
       <Filter>ソース ファイル\Engine\System\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\3d\Sphere\Sphere.cpp">
-      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3d\Sphere\SphereData.cpp">
-      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\2d\Triangle\Triangle.cpp">
-      <Filter>ソース ファイル\Engine\2d\Triangle</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\3d\Particles\Particles.cpp">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClCompile>
@@ -362,15 +353,6 @@
     <ClInclude Include="Engine\System\Audio\AudioData.h">
       <Filter>ソース ファイル\Engine\System\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3d\Sphere\Sphere.h">
-      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3d\Sphere\SphereData.h">
-      <Filter>ソース ファイル\Engine\3d\Sphere</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\2d\Triangle\Triangle.h">
-      <Filter>ソース ファイル\Engine\2d\Triangle</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\3d\Particles\Particles.h">
       <Filter>ソース ファイル\Engine\3d\Particles</Filter>
     </ClInclude>
@@ -515,6 +497,7 @@
     <ClInclude Include="Engine\3d\Particles\Json\EmitterStateLoder.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\System\Utility\Math\Plane.h">
     <ClInclude Include="Application\GameObject\State\JsonState.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>

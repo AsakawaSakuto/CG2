@@ -201,9 +201,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\2d\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
-    <ClCompile Include="Engine\3d\Sphere\Sphere.cpp" />
-    <ClCompile Include="Engine\3d\Sphere\SphereData.cpp" />
-    <ClCompile Include="Engine\2d\Triangle\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -258,6 +255,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\Utility\GameTimer\DeltaTime.h" />
     <ClInclude Include="Engine\System\Utility\GameTimer\GameTimer.h" />
     <ClInclude Include="Engine\System\Utility\Math\AABB.h" />
+    <ClInclude Include="Engine\System\Utility\Math\Plane.h" />
     <ClInclude Include="Engine\System\Utility\Math\Sphere.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
@@ -284,12 +282,9 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Object3d\Struct\Object3dVertexData.h" />
     <ClInclude Include="Engine\System\WinApp\WinApp.h" />
     <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h" />
-    <ClInclude Include="Engine\3d\Sphere\Sphere.h" />
-    <ClInclude Include="Engine\3d\Sphere\SphereData.h" />
     <ClInclude Include="Engine\3d\Particles\Particles.h" />
     <ClInclude Include="Engine\System\ResourceData\PointLight.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleMaterial.h" />
-    <ClInclude Include="Engine\2d\Triangle\Triangle.h" />
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />
     <ClInclude Include="Engine\System\Utility\Random\Random.h" />
     <ClInclude Include="Application\GameObject\State\JsonState.h" />

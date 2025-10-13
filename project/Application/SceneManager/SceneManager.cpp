@@ -24,6 +24,10 @@ int SceneManager::Run() {
 
     // 各種初期化
     appContext_->winApp.Initialize(L"Engine");
+    
+    // exeのアイコン設定
+    appContext_->winApp.SetIconFromTexture("resources/image/uvChecker.png");
+    
     appContext_->winApp.EnableResize(false);
     appContext_->dxCommon.Initialize(&appContext_->winApp);
     TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);
@@ -68,6 +72,18 @@ int SceneManager::Run() {
             appContext_->dxCommon.ResizeToWindow();
         }
 
+        // ★★★ 動的アイコン変更の例（フルスクリーン状態に応じて変更）★★★
+        // static bool lastFullscreenState = false;
+        // bool currentFullscreenState = appContext_->winApp.IsFullscreen();
+        // if (lastFullscreenState != currentFullscreenState) {
+        //     if (currentFullscreenState) {
+        //         appContext_->winApp.SetIconFromTexture("resources/icons/fullscreen_icon.png");
+        //     } else {
+        //         appContext_->winApp.SetIconFromTexture("resources/icons/normal_icon.png");
+        //     }
+        //     lastFullscreenState = currentFullscreenState;
+        // }
+
         // シーン切り替えチェック
         int nextSceneNo = sceneArr_[currentSceneNo_]->GetSceneNo();
 
@@ -81,6 +97,19 @@ int SceneManager::Run() {
             currentSceneNo_ = nextSceneNo;
             sceneArr_[currentSceneNo_]->SetAppContext(appContext_.get());
             sceneArr_[currentSceneNo_]->Initialize();
+            
+            // ★★★ シーン変更時にアイコンを変更する例 ★★★
+            // switch (currentSceneNo_) {
+            //     case TITLE:
+            //         appContext_->winApp.SetIconFromTexture("resources/icons/title_icon.png");
+            //         break;
+            //     case GAME:
+            //         appContext_->winApp.SetIconFromTexture("resources/icons/game_icon.png");
+            //         break;
+            //     case RESULT:
+            //         appContext_->winApp.SetIconFromTexture("resources/icons/result_icon.png");
+            //         break;
+            // }
         }
 
         // 更新・描画

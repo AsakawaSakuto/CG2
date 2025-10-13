@@ -20,9 +20,6 @@
 // Object
 #include "Sprite.h"
 #include "Object3d.h"
-#include "Sphere.h"
-#include "SphereData.h"
-#include "Triangle.h"
 #include "Particles.h"
 #include "EmitterSpfere.h"
 

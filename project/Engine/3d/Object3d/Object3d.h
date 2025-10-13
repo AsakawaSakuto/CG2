@@ -89,6 +89,13 @@ public:
 	void SetUseLight(bool use) { materialData_->enableLighting = use; }
 
 	void SetSRT(Vector3 s, Vector3 r, Vector3 t) { transform_.scale = s; transform_.rotate = r; transform_.translate = t; }
+
+	// フラスタムカリング関連
+	void SetBoundingRadius(float radius) { boundingRadius_ = radius; }
+	float GetBoundingRadius() const { return boundingRadius_; }
+	void SetEnableFrustumCulling(bool enable) { enableFrustumCulling_ = enable; }
+	bool GetEnableFrustumCulling() const { return enableFrustumCulling_; }
+
 private:
 	Matrix4x4 worldMatrix;
 	Camera camera_;
@@ -111,6 +118,10 @@ private:
 	Vector2 uvScale_ = { 1.0f,1.0f };
 	Vector2 uvTranslate_ = { 0.0f,0.0f };
 	float uvRotate_ = 0.0f;
+
+	// フラスタムカリング関連
+	float boundingRadius_ = 1.0f; // オブジェクトのバウンディング半径
+	bool enableFrustumCulling_ = true; // フラスタムカリング有効/無効
 
 	//-----------------------------------------------------------//
 

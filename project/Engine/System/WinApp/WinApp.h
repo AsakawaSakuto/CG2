@@ -27,11 +27,15 @@ public:
     void EnableResize(bool enable);
     void Finalize();
 
+    // アイコン設定機能
+    void SetIconFromTexture(const std::string& texturePath);
+    void SetIconFromTexture(const std::wstring& texturePath);
+
     // // 既定サイズ（初期ウィンドウ作成にのみ使用）
     static const int32_t kClientWidth_ = 1280;
     static const int32_t kClientHeight_ = 720;
 
-    // // ★ここを“動的取得”に変更（ハードコード返却を廃止）
+    // // ★ここを"動的取得"に変更（ハードコード返却を廃止）
     int32_t GetWidth()  const { RECT rc{}; GetClientRect(hwnd_, &rc); return rc.right - rc.left; }   // //
     int32_t GetHeight() const { RECT rc{}; GetClientRect(hwnd_, &rc); return rc.bottom - rc.top; }   // //
 
@@ -62,6 +66,15 @@ private:
     bool isRButtonDown_ = false;
     LONG mouseX_ = 0;
     LONG mouseY_ = 0;
+
+    // アイコン関連
+    HICON hIcon_ = nullptr;
+    HICON hIconSmall_ = nullptr;
+
+    // プライベートヘルパー関数
+    HICON LoadIconFromTexture(const std::wstring& texturePath, int iconSize);
+    void SetWindowIcon();
+    void CleanupIcons();
 
     // // ★追加：フルスクリーン復帰用の保存値
     bool  isFullscreen_ = false;    // //
