@@ -3,6 +3,9 @@
 
 #include "ParticleDescriptorAllocator.h" 
 
+// 修正: PSOManagerをインクルード（相対パス修正）
+#include "../PSOManager/PSOManager.h"
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"Winmm.lib")
@@ -25,6 +28,9 @@ void DirectXCommon::Initialize(WinApp* winApp) {
     CreateScissorRect();
     CreateShaderCompiler();
     CreateImgui();
+
+    // 追加: PSOManagerの初期化
+    PSOManager::GetInstance().Initialize(this);
 }
 
 void DirectXCommon::CreateDevice() {

@@ -96,30 +96,6 @@ private:
 
 	//----------------------------------------------//
 
-	void CreateRootSignature();
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-
-	void CreatePSO();
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_ = {};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
-
-	void InputLayoutSet();
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {};
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_ = {};
-
-	void CompileShaders();
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-
-	void BlendStateSet();
-	D3D12_BLEND_DESC blendDesc_{};
-
-	void RasiterzerStateSet();
-	D3D12_RASTERIZER_DESC rasterizerDesc_{};
-
-	void DepthStencilStateSet();
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
-
 	void CreateVertexResource();
 	void CreateIndexResource();
 	void CreateMaterialResource();

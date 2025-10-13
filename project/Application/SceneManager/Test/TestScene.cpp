@@ -12,11 +12,6 @@ void TestScene::Initialize() {
 	normalCamera_->SetPosition({0.0f, 0.0f, -30.0f});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
-	// オブジェクトの初期化
-	model_->Initialize(&ctx_->dxCommon, "bg.obj");
-	sprite_->Initialize(&ctx_->dxCommon, "resources/image/uvChecker.png");
-	sprite_->SetPosition({640.0f, 360.0f});
-
 	player_->Initialize(&ctx_->dxCommon);
 	player_->SetInputSystem(&ctx_->input);
 	player_->SetGamePadSystem(&ctx_->gamePad);
@@ -47,10 +42,6 @@ void TestScene::Update() {
 
 	// カメラ切り替え&更新
 	CameraController();
-
-	// オブジェクトの更新
-	model_->Update();
-	sprite_->Update();
 
 	player_->Update();
 
@@ -85,9 +76,6 @@ void TestScene::Draw() {
 	///
 
 	player_->Draw(*useCamera_);
-
-	model_->Draw(*useCamera_);
-	//sprite_->Draw();
 
 	// トゲの描画処理
 	for (auto& thorn : thorns_) {
