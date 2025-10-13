@@ -1,5 +1,8 @@
+#define NOMINMAX
 #include "Object3d.h"
 #include "WinApp.h"
+#include <algorithm>
+#include <cmath>
 
 #include<cassert>
 #pragma comment(lib,"d3d12.lib")
@@ -17,6 +20,22 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	modelPath_ = "resources/model/" + modelPath;
 
 	modelData_ = LoadObject3dFile(modelPath_);
+
+	// バウンディング半径を自動計算
+	float maxDistanceSquared = 0.0f;
+	for (const auto& vertex : modelData_.vertices) {
+		float distanceSquared = 
+			vertex.position.x * vertex.position.x +
+			vertex.position.y * vertex.position.y +
+			vertex.position.z * vertex.position.z;
+		maxDistanceSquared = std::max(maxDistanceSquared, distanceSquared);
+	}
+	boundingRadius_ = std::sqrt(maxDistanceSquared);
+	
+	// 最小値を保証（0の場合のフォールバック）
+	if (boundingRadius_ < 0.1f) {
+		boundingRadius_ = 1.0f;
+	}
 
 	textureName_ = modelData_.material.textureFilePath;
 
@@ -93,6 +112,19 @@ void Model::Update() {
 
 void Model::Draw(Camera& useCamera) {
 	camera_ = useCamera;
+
+	// フラスタムカリングのチェック
+	if (enableFrustumCulling_) {
+		Vector3 worldPosition = GetWorldPosition();
+		// スケールを考慮したバウンディング半径を計算
+		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
+		float adjustedRadius = boundingRadius_ * maxScale;
+		
+		// カメラのフラスタム内にない場合は描画をスキップ
+		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
+			return; // 描画をスキップ
+		}
+	}
 
 	// --- 描画処理 ---
 	
@@ -175,6 +207,12 @@ void Model::DrawImGui(const char* objectName) {
 		materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
+	ImGui::Separator();
+
+	ImGui::Text("Culling");
+	ImGui::Checkbox("Enable Frustum Culling", &enableFrustumCulling_);
+	ImGui::DragFloat("Bounding Radius", &boundingRadius_, 0.1f, 0.1f, 100.0f);
+	
 	ImGui::Separator();
 
 	ImGui::Text("LightEdit");
@@ -563,7 +601,7 @@ void Model::RasiterzerStateSet() {
 void Model::DepthStencilStateSet() {
 	// Depthの機能を有効化する
 	depthStencilDesc_.DepthEnable = true;
-	// 書き込みします
+	// 書き込みます
 	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	// 比較関数LessEqual、つまり、深ければ描画される
 	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;

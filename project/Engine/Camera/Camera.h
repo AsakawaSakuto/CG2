@@ -3,8 +3,15 @@
 #include "Transform.h"
 #include "Matrix4x4.h"
 #include "MatrixFunction.h"
+#include "Vector3.h"
+#include "Engine/System/Utility/Math/Plane.h"
 
 #include "WinApp.h"
+
+// フラスタム構造体
+struct Frustum {
+	Plane planes[6]; // 6つの平面（左、右、上、下、近、遠）
+};
 
 class Camera {
 public:
@@ -34,6 +41,11 @@ public:
 	float GetNearClip() { return nearClip_; }
 	float GetFarClip() { return farClip_; }
 	float GetFovY() { return fovY_; }
+
+	// フラスタムカリング関連
+	Frustum GetFrustum() const { return frustum_; }
+	bool IsInFrustum(const Vector3& position, float radius) const;
+
 protected:
 	Matrix4x4 worldMatrix_;
 	Matrix4x4 viewProjectionMatrix_;
@@ -44,5 +56,12 @@ protected:
 	float nearClip_ = 0.1f;
 	float farClip_ = 1000.0f;
 	float fovY_ = 0.45f;
+
+	// フラスタム
+	Frustum frustum_;
+
+private:
+	// フラスタムを更新する
+	void UpdateFrustum();
 };
 
