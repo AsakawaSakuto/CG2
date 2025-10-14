@@ -19,8 +19,8 @@ void TitleScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	particle_->Initialize(&ctx_->dxCommon, "circle", 2);
-	particle_->LoadJson("temp");
+	particle_->Initialize(&ctx_->dxCommon, "star", 2);
+	particle_->LoadJson("oneStar");
 
 	particle2_->Initialize(&ctx_->dxCommon, "circle2", 2);
 	particle2_->LoadJson("temp");
@@ -54,7 +54,7 @@ void TitleScene::Draw() {
 	///
 
 	particle_->Draw(*useCamera_);
-	particle2_->Draw(*useCamera_);
+	//particle2_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -72,7 +72,7 @@ void TitleScene::Draw() {
 	///
 
 	particle_->DrawImGui("titleEffect");
-	particle2_->DrawImGui("titleEffect2");
+	//particle2_->DrawImGui("titleEffect2");
 
 	DrawSceneName();
 
