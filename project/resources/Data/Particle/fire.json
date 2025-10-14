@@ -2,11 +2,18 @@
     "alphaFade": 1,
     "colorFade": 1,
     "colorRandom": 1,
-    "count": 1,
+    "coneAngle": 45.0,
+    "coneDirection": [
+        0.0,
+        1.0,
+        0.0
+    ],
+    "coneHeight": 1.0,
+    "count": 5,
     "emit": 1,
     "endColor": [
         1.0,
-        0.38235294818878174,
+        0.0,
         0.0
     ],
     "endRotateVelocity": -1.0,
@@ -21,10 +28,17 @@
     ],
     "frequency": 0.009999999776482582,
     "frequencyTime": 0.0,
+    "hemisphereAngle": 90.0,
     "isMove": 1,
     "kMaxParticle": 1024,
-    "lifeTime": 3.0,
+    "lifeTime": 2.5,
     "lifeTimeRandom": 0,
+    "lineLength": 1.0,
+    "lineStart": [
+        0.0,
+        0.0,
+        0.0
+    ],
     "maxColor": [
         1.0,
         1.0,
@@ -38,8 +52,8 @@
         1.5
     ],
     "maxVelocity": [
-        0.5,
-        5.0,
+        0.0,
+        2.0,
         0.0
     ],
     "minColor": [
@@ -55,18 +69,39 @@
         0.5
     ],
     "minVelocity": [
-        -0.5,
+        0.0,
         0.0,
         0.0
     ],
-    "radius": 1.0,
+    "planeHeight": 1.0,
+    "planeNormal": [
+        0.0,
+        1.0,
+        0.0
+    ],
+    "planeWidth": 1.0,
+    "radius": 5.0,
+    "ringAngle": 0.0,
+    "ringInnerRadius": 5.0,
+    "ringNormal": [
+        0.0,
+        1.0,
+        0.0
+    ],
+    "ringOuterRadius": 5.0,
     "rotateMove": 0,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
+    "shapeType": 6,
+    "size": [
+        1.0,
+        1.0,
+        1.0
+    ],
     "startColor": [
         1.0,
-        0.0,
+        0.11764705181121826,
         0.0
     ],
     "startRotateVelocity": 1.0,
@@ -79,6 +114,7 @@
         0.0,
         0.0
     ],
+    "texturePath": "circle3",
     "translate": [
         0.0,
         0.0,

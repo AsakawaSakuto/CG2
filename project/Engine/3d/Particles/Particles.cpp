@@ -99,6 +99,9 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.ringAngle = 0.0f;    // Default ring rotation angle
 	emitter_.ringNormal = { 0.0f, 1.0f, 0.0f };  // Default ring normal (up)
 
+	// Initialize texture path
+	emitter_.texturePath = TextureName;
+
 	CreateEmitterResource();
 	CreateParticleResource();
 	CreatePerViewResource();
@@ -197,12 +200,6 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
-	// Particle Control Section
-	ImGui::Text("PARTICLE CONTROL");
-
-	// 現在の再生状態を表示
-	ImGui::Text("Status: %s", isPlaying_ ? "Playing" : "Stopped");
-
 	// Play/Stop control buttons
 	if (ImGui::Button("Play (Loop)")) {
 		Play(true);
@@ -220,19 +217,60 @@ void Particles::DrawImGui(const char* objectName) {
 		Stop();
 	}
 
+	// 現在の再生状態を表示
+	ImGui::Text("Status: %s", isPlaying_ ? "Playing" : "Stopped");
+
 	ImGui::Separator();
 
-	if (EmitterStateLoader::InputText("texture Name", texturePath_)) {
+	if (EmitterStateLoader::InputText("File Name", loadToSaveName_)) {
 		// 入力が変更されたらここに来る
-		printf("Generate Name Changed to: %s\n", texturePath_.c_str());
+		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
+	}
+
+	if (ImGui::Button("Load to Json")) {
+		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
+		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
+
+		// JSONから読み込んだテクスチャパスを適用
+		if (!emitter_.texturePath.empty()) {
+			std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
+			if (textureName_ != newTextureName) {
+				textureName_ = newTextureName;
+				// テクスチャファイル読み込み
+				TextureManager::GetInstance()->LoadTexture(textureName_);
+				// 読み込んだテクスチャの番号を取得
+				textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+			}
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Save to Json")) {
+		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
+		EmitterStateLoader::Save(jsonFilePath_, emitter_);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Generate to Json")) {
+		EmitterStateLoader::SaveToCurrentDir(emitter_, loadToSaveName_);
+	}
+
+	ImGui::Separator();
+
+	if (EmitterStateLoader::InputText("texture Name", emitter_.texturePath)) {
+		// 入力が変更されたらここに来る
+		printf("Texture Name Changed to: %s\n", emitter_.texturePath.c_str());
 	}
 
 	if (ImGui::Button("Load Texture")) {
 		// すでに同じテクスチャなら処理をスキップ
-		if (textureName_ == texturePath_) {
+		std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
+		if (textureName_ == newTextureName) {
 			return;
 		}
-		textureName_ = "resources/image/particle/" + texturePath_ + ".png";
+		textureName_ = newTextureName;
 		// .objの参照しているテクスチャファイル読み込み
 		TextureManager::GetInstance()->LoadTexture(textureName_);
 		// 読み込んだテクスチャの番号を取得
@@ -571,32 +609,6 @@ void Particles::DrawImGui(const char* objectName) {
 	if (emitter_.lifeTimeRandom) {
 		ImGui::DragFloat("MinLifeTime", &emitter_.minLifeTime, 0.01f, 0.0f, 100.0f);
 		ImGui::DragFloat("MaxLifeTime", &emitter_.maxLifeTime, 0.01f, 0.0f, 100.0f);
-	}
-
-	ImGui::Separator();
-
-	if (EmitterStateLoader::InputText("File Name", loadToSaveName_)) {
-		// 入力が変更されたらここに来る
-		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
-	}
-
-	if (ImGui::Button("Load to Json")) {
-		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
-		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
-
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Save to Json")) {
-		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
-		EmitterStateLoader::Save(jsonFilePath_, emitter_);
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Generate to Json")) {
-		EmitterStateLoader::SaveToCurrentDir(emitter_, loadToSaveName_);
 	}
 
 	ImGui::Separator();

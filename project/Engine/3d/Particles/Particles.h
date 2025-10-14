@@ -100,7 +100,20 @@ public:
 
 	void LoadJson(const std::string& filePath) {
 		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
-		emitter_ = EmitterStateLoader::Load(jsonFilePath_); };
+		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
+		
+		// JSONから読み込んだテクスチャパスを適用
+		if (!emitter_.texturePath.empty()) {
+			std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
+			if (textureName_ != newTextureName) {
+				textureName_ = newTextureName;
+				// テクスチャファイル読み込み
+				TextureManager::GetInstance()->LoadTexture(textureName_);
+				// 読み込んだテクスチャの番号を取得
+				textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+			}
+		}
+	};
 private:
 	void ExecuteInitialization();
 
@@ -111,7 +124,6 @@ private:
 	std::string jsonFilePath_;
 	std::string loadToSaveName_ = "temp";
 	std::string generateName = "emitterData";
-	std::string texturePath_ = "circle";
 
 	// パーティクルの再生状態
 	bool isPlaying_ = false;
@@ -214,7 +226,7 @@ private:
 	ParticleMaterial* materialData_ = nullptr;         // マテリアル
 
 	// リソース作成系の内部関数
-	void CreateVertexResource();           // 頂点
+	void CreateVertexResource();           // 項点
 	void CreateIndexResource();            // インデックス
 	void CreateMaterialResource();         // マテリアル
 
