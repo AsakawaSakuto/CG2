@@ -92,6 +92,13 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.coneDirection = { 0.0f, 1.0f, 0.0f };  // Default direction (up)
 	emitter_.hemisphereAngle = 180.0f;  // Default hemisphere angle (full hemisphere)
 
+	// Initialize angle-based plane and ring fields
+	emitter_.planeNormal = { 0.0f, 1.0f, 0.0f };  // Default plane normal (up)
+	emitter_.planeWidth = 2.0f;   // Default plane width
+	emitter_.planeHeight = 2.0f;  // Default plane height
+	emitter_.ringAngle = 0.0f;    // Default ring rotation angle
+	emitter_.ringNormal = { 0.0f, 1.0f, 0.0f };  // Default ring normal (up)
+
 	CreateEmitterResource();
 	CreateParticleResource();
 	CreatePerViewResource();
@@ -250,7 +257,11 @@ void Particles::DrawImGui(const char* objectName) {
 		"Cone (Volume)",
 		"Cone (Surface)",
 		"Hemisphere (Volume)",
-		"Hemisphere (Surface)"
+		"Hemisphere (Surface)",
+		"Plane (Angle Volume)",
+		"Plane (Angle Edges)",
+		"Ring (Angle Volume)",
+		"Ring (Angle Edge)"
 	};
 	int currentShape = static_cast<int>(emitter_.shapeType);
 	if (ImGui::Combo("Emitter Shape", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
@@ -405,6 +416,88 @@ void Particles::DrawImGui(const char* objectName) {
 				emitter_.coneDirection.x /= dirLength;
 				emitter_.coneDirection.y /= dirLength;
 				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::PLANE_ANGLE:
+		{
+			ImGui::DragFloat("Plane Width", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat("Plane Height", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat3("Plane Normal", &emitter_.planeNormal.x, 0.01f);
+			ImGui::Text("Volume - particles spawn on plane surface");
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
+			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
+			                         emitter_.planeNormal.z * emitter_.planeNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.planeNormal.x /= normalLength;
+				emitter_.planeNormal.y /= normalLength;
+				emitter_.planeNormal.z /= normalLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::PLANE_ANGLE_EDGE:
+		{
+			ImGui::DragFloat("Plane Width", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat("Plane Height", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat3("Plane Normal", &emitter_.planeNormal.x, 0.01f);
+			ImGui::Text("Edges only - particles spawn on plane edges");
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
+			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
+			                         emitter_.planeNormal.z * emitter_.planeNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.planeNormal.x /= normalLength;
+				emitter_.planeNormal.y /= normalLength;
+				emitter_.planeNormal.z /= normalLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::RING_ANGLE:
+		{
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Ring Normal", &emitter_.ringNormal.x, 0.01f);
+			ImGui::DragFloat("Ring Angle", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
+			ImGui::Text("Volume - particles spawn in ring area");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.ringNormal.x * emitter_.ringNormal.x + 
+			                         emitter_.ringNormal.y * emitter_.ringNormal.y + 
+			                         emitter_.ringNormal.z * emitter_.ringNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.ringNormal.x /= normalLength;
+				emitter_.ringNormal.y /= normalLength;
+				emitter_.ringNormal.z /= normalLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::RING_ANGLE_EDGE:
+		{
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Ring Normal", &emitter_.ringNormal.x, 0.01f);
+			ImGui::DragFloat("Ring Angle", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
+			ImGui::Text("Edge only - particles spawn on ring circumference");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.ringNormal.x * emitter_.ringNormal.x + 
+			                         emitter_.ringNormal.y * emitter_.ringNormal.y + 
+			                         emitter_.ringNormal.z * emitter_.ringNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.ringNormal.x /= normalLength;
+				emitter_.ringNormal.y /= normalLength;
+				emitter_.ringNormal.z /= normalLength;
 			}
 			break;
 		}

@@ -45,6 +45,10 @@ struct Particle {
 #define EMITTER_SHAPE_CONE_SURFACE 10
 #define EMITTER_SHAPE_HEMISPHERE_VOLUME 11
 #define EMITTER_SHAPE_HEMISPHERE_SURFACE 12
+#define EMITTER_SHAPE_PLANE_ANGLE 13
+#define EMITTER_SHAPE_PLANE_ANGLE_EDGE 14
+#define EMITTER_SHAPE_RING_ANGLE 15
+#define EMITTER_SHAPE_RING_ANGLE_EDGE 16
 
 struct EmitterSphere {
     float3 translate;
@@ -134,6 +138,13 @@ struct EmitterSphere {
     float coneHeight;       // Cone height
     float3 coneDirection;   // Cone direction vector
     float hemisphereAngle;  // Hemisphere angle in degrees (0-180)
+    
+    // New fields for angle-based plane and ring emitters
+    float3 planeNormal;     // Plane normal vector (for PLANE_ANGLE types)
+    float planeWidth;       // Plane width
+    float planeHeight;      // Plane height
+    float ringAngle;        // Ring rotation angle around normal axis
+    float3 ringNormal;      // Ring normal vector (for RING_ANGLE types)
 };
 
 struct PerView {
@@ -562,6 +573,123 @@ float3 GenerateHemisphereSurfacePosition(uint baseSeed, float3 center, float3 di
     return center + localPos;
 }
 
+// Plane angle emitter - generates position on an oriented plane surface
+float3 GeneratePlaneAnglePosition(uint baseSeed, float3 center, float3 normal, float width, float height)
+{
+    float u = RandomFloat(baseSeed + 0) - 0.5f; // [-0.5, 0.5]
+    float v = RandomFloat(baseSeed + 1) - 0.5f; // [-0.5, 0.5]
+    
+    // Create orthogonal basis vectors from the normal
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedNormal = normalize(normal);
+    
+    // If normal is parallel to up, use right vector instead
+    if (abs(dot(normalizedNormal, up)) > 0.999f)
+    {
+        up = float3(1.0f, 0.0f, 0.0f);
+    }
+    
+    float3 right = normalize(cross(up, normalizedNormal));
+    float3 forward = cross(normalizedNormal, right);
+    
+    // Generate position on plane
+    float3 localPos = right * (u * width) + forward * (v * height);
+    
+    return center + localPos;
+}
+
+// Plane angle edge emitter - generates position only on plane edges
+float3 GeneratePlaneAngleEdgePosition(uint baseSeed, float3 center, float3 normal, float width, float height)
+{
+    // Choose which edge to spawn on (4 edges)
+    uint edgeIndex = uint(RandomFloat(baseSeed + 2) * 4.0f);
+    
+    // Create orthogonal basis vectors from the normal
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedNormal = normalize(normal);
+    
+    if (abs(dot(normalizedNormal, up)) > 0.999f)
+    {
+        up = float3(1.0f, 0.0f, 0.0f);
+    }
+    
+    float3 right = normalize(cross(up, normalizedNormal));
+    float3 forward = cross(normalizedNormal, right);
+    
+    float u = RandomFloat(baseSeed + 0) - 0.5f; // [-0.5, 0.5]
+    float3 localPos;
+    
+    switch (edgeIndex)
+    {
+        case 0: // Top edge
+            localPos = right * (u * width) + forward * (height * 0.5f);
+            break;
+        case 1: // Bottom edge
+            localPos = right * (u * width) + forward * (-height * 0.5f);
+            break;
+        case 2: // Right edge
+            localPos = right * (width * 0.5f) + forward * (u * height);
+            break;
+        default: // Left edge
+            localPos = right * (-width * 0.5f) + forward * (u * height);
+            break;
+    }
+    
+    return center + localPos;
+}
+
+// Ring angle emitter - generates position in a rotatable ring area
+float3 GenerateRingAnglePosition(uint baseSeed, float3 center, float3 normal, float innerRadius, float outerRadius)
+{
+    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
+    float radiusLerp = RandomFloat(baseSeed + 1);
+    float radius = lerp(innerRadius, outerRadius, radiusLerp);
+    
+    // Create orthogonal basis vectors from the normal
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedNormal = normalize(normal);
+    
+    if (abs(dot(normalizedNormal, up)) > 0.999f)
+    {
+        up = float3(1.0f, 0.0f, 0.0f);
+    }
+    
+    float3 right = normalize(cross(up, normalizedNormal));
+    float3 forward = cross(normalizedNormal, right);
+    
+    // Generate position in ring plane
+    float3 localPos = right * (cos(angle) * radius) + forward * (sin(angle) * radius);
+    
+    return center + localPos;
+}
+
+// Ring angle edge emitter - generates position only on ring circumference
+float3 GenerateRingAngleEdgePosition(uint baseSeed, float3 center, float3 normal, float innerRadius, float outerRadius)
+{
+    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
+    
+    // Choose between inner or outer circumference
+    float edgeChoice = RandomFloat(baseSeed + 2);
+    float radius = (edgeChoice < 0.5f) ? innerRadius : outerRadius;
+    
+    // Create orthogonal basis vectors from the normal
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedNormal = normalize(normal);
+    
+    if (abs(dot(normalizedNormal, up)) > 0.999f)
+    {
+        up = float3(1.0f, 0.0f, 0.0f);
+    }
+    
+    float3 right = normalize(cross(up, normalizedNormal));
+    float3 forward = cross(normalizedNormal, right);
+    
+    // Generate position on ring circumference
+    float3 localPos = right * (cos(angle) * radius) + forward * (sin(angle) * radius);
+    
+    return center + localPos;
+}
+
 // Universal position generator based on emitter type
 float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
 {
@@ -605,6 +733,18 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
             
         case EMITTER_SHAPE_HEMISPHERE_SURFACE:
             return GenerateHemisphereSurfacePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.radius, emitter.hemisphereAngle);
+            
+        case EMITTER_SHAPE_PLANE_ANGLE:
+            return GeneratePlaneAnglePosition(baseSeed, emitter.translate, emitter.planeNormal, emitter.planeWidth, emitter.planeHeight);
+            
+        case EMITTER_SHAPE_PLANE_ANGLE_EDGE:
+            return GeneratePlaneAngleEdgePosition(baseSeed, emitter.translate, emitter.planeNormal, emitter.planeWidth, emitter.planeHeight);
+            
+        case EMITTER_SHAPE_RING_ANGLE:
+            return GenerateRingAnglePosition(baseSeed, emitter.translate, emitter.ringNormal, emitter.ringInnerRadius, emitter.ringOuterRadius);
+            
+        case EMITTER_SHAPE_RING_ANGLE_EDGE:
+            return GenerateRingAngleEdgePosition(baseSeed, emitter.translate, emitter.ringNormal, emitter.ringInnerRadius, emitter.ringOuterRadius);
             
         default:
             return GenerateSpherePositionCustom(baseSeed, emitter.translate, emitter.radius);
