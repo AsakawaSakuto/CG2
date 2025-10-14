@@ -36,11 +36,15 @@ struct Particle {
 #define EMITTER_SHAPE_LINE 1
 #define EMITTER_SHAPE_SPHERE_VOLUME 2
 #define EMITTER_SHAPE_SPHERE_SURFACE 3
-#define EMITTER_SHAPE_BOX_VOLUME 4
-#define EMITTER_SHAPE_BOX_SURFACE 5
-#define EMITTER_SHAPE_RING_XZ 6
+#define EMITTER_SHAPE_BOX 4
+#define EMITTER_SHAPE_RING 5
+#define EMITTER_SHAPE_BOX_SURFACE 6
 #define EMITTER_SHAPE_RING_XY 7
 #define EMITTER_SHAPE_RING_YZ 8
+#define EMITTER_SHAPE_CONE 9
+#define EMITTER_SHAPE_CONE_SURFACE 10
+#define EMITTER_SHAPE_HEMISPHERE 11
+#define EMITTER_SHAPE_HEMISPHERE_SURFACE 12
 
 struct EmitterSphere {
     float3 translate;
@@ -124,7 +128,12 @@ struct EmitterSphere {
     
     float ringInnerRadius;  // For ring emitter
     float ringOuterRadius;  // For ring emitter
-    float2 padNew;
+    
+    // New fields for cone and hemisphere emitters
+    float coneAngle;        // Cone angle in degrees (0-180)
+    float coneHeight;       // Cone height
+    float3 coneDirection;   // Cone direction vector
+    float hemisphereAngle;  // Hemisphere angle in degrees (0-180)
 };
 
 struct PerView {
@@ -356,6 +365,203 @@ float3 GenerateRingYZPosition(uint baseSeed, float3 center, float innerRadius, f
     return center + localPos;
 }
 
+// Cone emitter - generates position within a cone volume
+float3 GenerateConePosition(uint baseSeed, float3 center, float3 direction, float angle, float height)
+{
+    // Convert angle from degrees to radians
+    float angleRad = angle * 3.14159265f / 180.0f;
+    float maxRadius = tan(angleRad) * height;
+    
+    // Random height along the cone
+    float t = RandomFloat(baseSeed + 0);
+    float currentHeight = height * t;
+    
+    // Random radius at this height (cone gets wider as height increases)
+    float currentMaxRadius = maxRadius * t;
+    float radiusRandom = RandomFloat(baseSeed + 1);
+    float currentRadius = currentMaxRadius * sqrt(radiusRandom); // sqrt for uniform distribution
+    
+    // Random angle around the cone axis
+    float theta = RandomFloat(baseSeed + 2) * 2.0f * 3.14159265f;
+    
+    // Generate local position in cone space (assuming direction is +Y)
+    float3 localPos = float3(
+        cos(theta) * currentRadius,
+        currentHeight,
+        sin(theta) * currentRadius
+    );
+    
+    // Create rotation matrix to align with cone direction
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedDir = normalize(direction);
+    
+    // If direction is not up, rotate the local position
+    if (abs(dot(normalizedDir, up)) < 0.999f)
+    {
+        float3 right = normalize(cross(up, normalizedDir));
+        float3 forward = cross(normalizedDir, right);
+        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
+    }
+    else if (dot(normalizedDir, up) < 0.0f)
+    {
+        // Direction is down, flip Y
+        localPos.y = -localPos.y;
+    }
+    
+    return center + localPos;
+}
+
+// Cone surface emitter - generates position only on cone surface
+float3 GenerateConeSurfacePosition(uint baseSeed, float3 center, float3 direction, float angle, float height)
+{
+    // Convert angle from degrees to radians
+    float angleRad = angle * 3.14159265f / 180.0f;
+    float maxRadius = tan(angleRad) * height;
+    
+    // Choose between cone surface or base
+    float surfaceChoice = RandomFloat(baseSeed + 3);
+    float3 localPos;
+    
+    if (surfaceChoice < 0.8f) // 80% chance for cone surface
+    {
+        // Random height along the cone
+        float t = RandomFloat(baseSeed + 0);
+        float currentHeight = height * t;
+        
+        // Radius at this height
+        float currentRadius = maxRadius * t;
+        
+        // Random angle around the cone axis
+        float theta = RandomFloat(baseSeed + 2) * 2.0f * 3.14159265f;
+        
+        localPos = float3(
+            cos(theta) * currentRadius,
+            currentHeight,
+            sin(theta) * currentRadius
+        );
+    }
+    else // 20% chance for base
+    {
+        // Random position on the base circle
+        float theta = RandomFloat(baseSeed + 2) * 2.0f * 3.14159265f;
+        float radiusRandom = RandomFloat(baseSeed + 1);
+        float baseRadius = maxRadius * sqrt(radiusRandom);
+        
+        localPos = float3(
+            cos(theta) * baseRadius,
+            height,
+            sin(theta) * baseRadius
+        );
+    }
+    
+    // Create rotation matrix to align with cone direction
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedDir = normalize(direction);
+    
+    // If direction is not up, rotate the local position
+    if (abs(dot(normalizedDir, up)) < 0.999f)
+    {
+        float3 right = normalize(cross(up, normalizedDir));
+        float3 forward = cross(normalizedDir, right);
+        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
+    }
+    else if (dot(normalizedDir, up) < 0.0f)
+    {
+        // Direction is down, flip Y
+        localPos.y = -localPos.y;
+    }
+    
+    return center + localPos;
+}
+
+// Hemisphere emitter - generates position within a hemisphere volume
+float3 GenerateHemispherePosition(uint baseSeed, float3 center, float3 direction, float radius, float angle)
+{
+    // Convert angle from degrees to radians
+    float angleRad = angle * 3.14159265f / 180.0f;
+    float maxCosTheta = cos(angleRad);
+    
+    // Generate random spherical coordinates within the hemisphere
+    float u = RandomFloat(baseSeed + 0);
+    float v = RandomFloat(baseSeed + 1);
+    float w = RandomFloat(baseSeed + 2);
+    
+    // Constrain theta to hemisphere angle
+    float cosTheta = lerp(maxCosTheta, 1.0f, u);
+    float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
+    float phi = 2.0f * 3.14159265f * v;
+    
+    // Random radius within hemisphere
+    float r = radius * pow(w, 1.0f / 3.0f);
+    
+    // Generate local position in hemisphere space (assuming direction is +Y)
+    float3 localPos = float3(
+        r * sinTheta * cos(phi),
+        r * cosTheta,
+        r * sinTheta * sin(phi)
+    );
+    
+    // Rotate to align with hemisphere direction
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedDir = normalize(direction);
+    
+    if (abs(dot(normalizedDir, up)) < 0.999f)
+    {
+        float3 right = normalize(cross(up, normalizedDir));
+        float3 forward = cross(normalizedDir, right);
+        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
+    }
+    else if (dot(normalizedDir, up) < 0.0f)
+    {
+        // Direction is down, flip Y
+        localPos.y = -localPos.y;
+    }
+    
+    return center + localPos;
+}
+
+// Hemisphere surface emitter - generates position only on hemisphere surface
+float3 GenerateHemisphereSurfacePosition(uint baseSeed, float3 center, float3 direction, float radius, float angle)
+{
+    // Convert angle from degrees to radians
+    float angleRad = angle * 3.14159265f / 180.0f;
+    float maxCosTheta = cos(angleRad);
+    
+    // Generate random spherical coordinates on the hemisphere surface
+    float u = RandomFloat(baseSeed + 0);
+    float v = RandomFloat(baseSeed + 1);
+    
+    // Constrain theta to hemisphere angle
+    float cosTheta = lerp(maxCosTheta, 1.0f, u);
+    float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
+    float phi = 2.0f * 3.14159265f * v;
+    
+    // Generate local position on hemisphere surface (assuming direction is +Y)
+    float3 localPos = float3(
+        radius * sinTheta * cos(phi),
+        radius * cosTheta,
+        radius * sinTheta * sin(phi)
+    );
+    
+    // Rotate to align with hemisphere direction
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    float3 normalizedDir = normalize(direction);
+    
+    if (abs(dot(normalizedDir, up)) < 0.999f)
+    {
+        float3 right = normalize(cross(up, normalizedDir));
+        float3 forward = cross(normalizedDir, right);
+        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
+    }
+    else if (dot(normalizedDir, up) < 0.0f)
+    {
+        // Direction is down, flip Y
+        localPos.y = -localPos.y;
+    }
+    
+    return center + localPos;
+}
+
 // Universal position generator based on emitter type
 float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
 {
@@ -373,10 +579,10 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
         case EMITTER_SHAPE_SPHERE_SURFACE:
             return GenerateSphereSurfacePosition(baseSeed, emitter.translate, emitter.radius);
             
-        case EMITTER_SHAPE_BOX_VOLUME:
+        case EMITTER_SHAPE_BOX:
             return GenerateBoxPosition(baseSeed, emitter.translate, emitter.size);
             
-        case EMITTER_SHAPE_RING_XZ:
+        case EMITTER_SHAPE_RING:
             return GenerateRingPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius, float3(0.0f, 1.0f, 0.0f));
             
         case EMITTER_SHAPE_BOX_SURFACE:
@@ -387,6 +593,18 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
             
         case EMITTER_SHAPE_RING_YZ:
             return GenerateRingYZPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius);
+            
+        case EMITTER_SHAPE_CONE:
+            return GenerateConePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.coneAngle, emitter.coneHeight);
+            
+        case EMITTER_SHAPE_CONE_SURFACE:
+            return GenerateConeSurfacePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.coneAngle, emitter.coneHeight);
+            
+        case EMITTER_SHAPE_HEMISPHERE:
+            return GenerateHemispherePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.radius, emitter.hemisphereAngle);
+            
+        case EMITTER_SHAPE_HEMISPHERE_SURFACE:
+            return GenerateHemisphereSurfacePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.radius, emitter.hemisphereAngle);
             
         default:
             return GenerateSpherePositionCustom(baseSeed, emitter.translate, emitter.radius);

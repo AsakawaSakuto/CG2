@@ -8,11 +8,15 @@ enum class EmitterShapeType : uint32_t {
 	LINE = 1,
 	SPHERE_VOLUME = 2,
 	SPHERE_SURFACE = 3,
-	BOX_VOLUME = 4,
-	BOX_SURFACE = 5,
-	RING_XZ = 6,
+	BOX = 4,
+	RING = 5,
+	BOX_SURFACE = 6,
 	RING_XY = 7,
-	RING_YZ = 8
+	RING_YZ = 8,
+	CONE = 9,
+	CONE_SURFACE = 10,
+	HEMISPHERE = 11,
+	HEMISPHERE_SURFACE = 12
 };
 
 struct EmitterState {
@@ -96,5 +100,10 @@ struct EmitterState {
 	
 	float ringInnerRadius;
 	float ringOuterRadius;
-	float padNew[2];
+	
+	// New fields for cone and hemisphere emitters
+	float coneAngle;        // Cone angle in degrees (0-180)
+	float coneHeight;       // Cone height
+	Vector3 coneDirection;  // Cone direction vector
+	float hemisphereAngle;  // Hemisphere angle in degrees (0-180)
 };

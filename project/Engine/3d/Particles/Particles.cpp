@@ -86,6 +86,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.ringInnerRadius = 0.5f;  // Default ring inner radius
 	emitter_.ringOuterRadius = 1.0f;  // Default ring outer radius
 
+	// Initialize cone and hemisphere fields
+	emitter_.coneAngle = 45.0f;  // Default cone angle in degrees
+	emitter_.coneHeight = 2.0f;  // Default cone height
+	emitter_.coneDirection = { 0.0f, 1.0f, 0.0f };  // Default direction (up)
+	emitter_.hemisphereAngle = 180.0f;  // Default hemisphere angle (full hemisphere)
+
 	CreateEmitterResource();
 	CreateParticleResource();
 	CreatePerViewResource();
@@ -236,11 +242,15 @@ void Particles::DrawImGui(const char* objectName) {
 		"Line", 
 		"Sphere (Volume)", 
 		"Sphere (Surface)", 
-		"Box (Volume)", 
+		"Box", 
+		"Ring", 
 		"Box (Surface)", 
-		"Ring (XZ Plane)", 
 		"Ring (XY Plane)", 
-		"Ring (YZ Plane)" 
+		"Ring (YZ Plane)",
+		"Cone",
+		"Cone (Surface)",
+		"Hemisphere",
+		"Hemisphere (Surface)"
 	};
 	int currentShape = static_cast<int>(emitter_.shapeType);
 	if (ImGui::Combo("Emitter Shape", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
@@ -251,18 +261,23 @@ void Particles::DrawImGui(const char* objectName) {
 	switch (static_cast<EmitterShapeType>(emitter_.shapeType))
 	{
 		case EmitterShapeType::POINT:
+		{
 			// Point emitter has no additional parameters
 			ImGui::Text("Point emitter - particles spawn at exact position");
 			break;
-			
+		}
+		
 		case EmitterShapeType::LINE:
+		{
 			ImGui::DragFloat3("Line Start", &emitter_.lineStart.x, 0.01f);
 			ImGui::DragFloat3("Line Direction", &emitter_.size.x, 0.01f);
 			ImGui::DragFloat("Line Length", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
 			break;
-			
+		}
+		
 		case EmitterShapeType::SPHERE_VOLUME:
 		case EmitterShapeType::SPHERE_SURFACE:
+		{
 			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
 			if (static_cast<EmitterShapeType>(emitter_.shapeType) == EmitterShapeType::SPHERE_SURFACE) {
 				ImGui::Text("Surface only - particles spawn on sphere surface");
@@ -270,18 +285,24 @@ void Particles::DrawImGui(const char* objectName) {
 				ImGui::Text("Volume - particles spawn inside sphere");
 			}
 			break;
-			
-		case EmitterShapeType::BOX_VOLUME:
+		}
+		
+		case EmitterShapeType::BOX:
+		{
 			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Volume - particles spawn inside box");
 			break;
-			
+		}
+		
 		case EmitterShapeType::BOX_SURFACE:
+		{
 			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Surface only - particles spawn on box faces");
 			break;
-			
-		case EmitterShapeType::RING_XZ:
+		}
+		
+		case EmitterShapeType::RING:
+		{
 			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Ring in XZ plane (horizontal)");
@@ -290,8 +311,10 @@ void Particles::DrawImGui(const char* objectName) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
 			}
 			break;
-			
+		}
+		
 		case EmitterShapeType::RING_XY:
+		{
 			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Ring in XY plane (vertical facing forward)");
@@ -300,8 +323,10 @@ void Particles::DrawImGui(const char* objectName) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
 			}
 			break;
-			
+		}
+		
 		case EmitterShapeType::RING_YZ:
+		{
 			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Ring in YZ plane (vertical facing right)");
@@ -310,6 +335,79 @@ void Particles::DrawImGui(const char* objectName) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
 			}
 			break;
+		}
+		
+		case EmitterShapeType::CONE:
+		{
+			ImGui::DragFloat("Cone Angle", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat("Cone Height", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Cone Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Volume - particles spawn inside cone");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                      emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                      emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::CONE_SURFACE:
+		{
+			ImGui::DragFloat("Cone Angle", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat("Cone Height", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Cone Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Surface only - particles spawn on cone surface");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::HEMISPHERE:
+		{
+			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			ImGui::DragFloat("Hemisphere Angle", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat3("Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Volume - particles spawn inside hemisphere");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::HEMISPHERE_SURFACE:
+		{
+			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			ImGui::DragFloat("Hemisphere Angle", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat3("Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Surface only - particles spawn on hemisphere surface");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
 	}
 
 	ImGui::Separator();

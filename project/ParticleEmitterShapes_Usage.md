@@ -13,6 +13,10 @@ This guide demonstrates how to use the newly implemented particle emitter shapes
 7. **Box Surface Emitter** - Spawns particles only on box surfaces
 8. **Ring XY Emitter** - Spawns particles on a ring in XY plane (vertical facing forward)
 9. **Ring YZ Emitter** - Spawns particles on a ring in YZ plane (vertical facing right)
+10. **Cone Emitter** - Spawns particles inside a cone volume (adjustable angle)
+11. **Cone Surface Emitter** - Spawns particles only on cone surface (adjustable angle)
+12. **Hemisphere Emitter** - Spawns particles inside a hemisphere volume (adjustable angle)
+13. **Hemisphere Surface Emitter** - Spawns particles only on hemisphere surface (adjustable angle)
 
 ## Usage Examples
 
@@ -82,9 +86,41 @@ emitter.translate = {0.0f, 0.0f, 0.0f};     // Center of ring
 emitter.ringInnerRadius = 1.0f;             // Inner radius
 emitter.ringOuterRadius = 3.0f;             // Outer radius
 particles.SetEmitterValue(emitter);
+
+// Example 10: Cone Emitter
+emitter.shapeType = static_cast<uint32_t>(EmitterShapeType::CONE);
+emitter.translate = {0.0f, 0.0f, 0.0f};     // Base center of cone
+emitter.coneAngle = 45.0f;                  // Cone angle in degrees (0-180)
+emitter.coneHeight = 3.0f;                  // Cone height
+emitter.coneDirection = {0.0f, 1.0f, 0.0f}; // Direction (normalized)
+particles.SetEmitterValue(emitter);
+
+// Example 11: Cone Surface Emitter
+emitter.shapeType = static_cast<uint32_t>(EmitterShapeType::CONE_SURFACE);
+emitter.translate = {0.0f, 0.0f, 0.0f};     // Base center of cone
+emitter.coneAngle = 30.0f;                  // Cone angle in degrees (0-180)
+emitter.coneHeight = 2.0f;                  // Cone height
+emitter.coneDirection = {0.0f, 1.0f, 0.0f}; // Direction (normalized)
+particles.SetEmitterValue(emitter);
+
+// Example 12: Hemisphere Emitter
+emitter.shapeType = static_cast<uint32_t>(EmitterShapeType::HEMISPHERE);
+emitter.translate = {0.0f, 0.0f, 0.0f};     // Center of hemisphere
+emitter.radius = 2.0f;                      // Hemisphere radius
+emitter.hemisphereAngle = 90.0f;            // Hemisphere angle in degrees (0-180)
+emitter.coneDirection = {0.0f, 1.0f, 0.0f}; // Direction (normalized)
+particles.SetEmitterValue(emitter);
+
+// Example 13: Hemisphere Surface Emitter
+emitter.shapeType = static_cast<uint32_t>(EmitterShapeType::HEMISPHERE_SURFACE);
+emitter.translate = {0.0f, 0.0f, 0.0f};     // Center of hemisphere
+emitter.radius = 1.5f;                      // Hemisphere radius
+emitter.hemisphereAngle = 120.0f;           // Hemisphere angle in degrees (0-180)
+emitter.coneDirection = {0.0f, 1.0f, 0.0f}; // Direction (normalized)
+particles.SetEmitterValue(emitter);
 ```
 
-### Using in Game Scenes
+### Advanced Usage Examples
 
 ```cpp
 // In your scene class (e.g., GameScene.cpp)
@@ -93,134 +129,95 @@ private:
     std::unique_ptr<Particles> fireParticles_;
     std::unique_ptr<Particles> smokeParticles_;
     std::unique_ptr<Particles> explosionParticles_;
-    std::unique_ptr<Particles> portalParticles_;
-    std::unique_ptr<Particles> shieldParticles_;
+    std::unique_ptr<Particles> torchParticles_;
+    std::unique_ptr<Particles> fountainParticles_;
+    std::unique_ptr<Particles> flashlightParticles_;
 
 public:
     void Initialize() {
-        // Fire effect using sphere surface emitter
-        fireParticles_ = std::make_unique<Particles>();
-        fireParticles_->Initialize(dxCommon_, "fire", 1);
+        // Torch fire effect using cone emitter
+        torchParticles_ = std::make_unique<Particles>();
+        torchParticles_->Initialize(dxCommon_, "flame", 1);
         
-        EmitterState fireEmitter = {};
-        fireEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::SPHERE_SURFACE);
-        fireEmitter.translate = {0.0f, 0.0f, 0.0f};
-        fireEmitter.radius = 0.5f;
-        fireEmitter.count = 5;
-        fireEmitter.frequency = 0.1f;
-        fireEmitter.startVelocity = {0.0f, 2.0f, 0.0f};
-        fireEmitter.startColor = {1.0f, 0.3f, 0.0f};
-        fireEmitter.endColor = {1.0f, 0.0f, 0.0f};
-        fireEmitter.colorFade = 1;
-        fireEmitter.alphaFade = 1;
-        fireEmitter.lifeTime = 2.0f;
-        fireParticles_->SetEmitterValue(fireEmitter);
+        EmitterState torchEmitter = {};
+        torchEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::CONE);
+        torchEmitter.translate = {0.0f, 2.0f, 0.0f};
+        torchEmitter.coneAngle = 20.0f;  // Narrow flame
+        torchEmitter.coneHeight = 1.0f;
+        torchEmitter.coneDirection = {0.0f, 1.0f, 0.0f};  // Upward
+        torchEmitter.count = 8;
+        torchEmitter.frequency = 0.1f;
+        torchEmitter.startVelocity = {0.0f, 1.0f, 0.0f};
+        torchEmitter.velocityRandom = 1;
+        torchEmitter.minVelocity = {-0.2f, 0.5f, -0.2f};
+        torchEmitter.maxVelocity = {0.2f, 1.5f, 0.2f};
+        torchEmitter.startColor = {1.0f, 0.8f, 0.0f};
+        torchEmitter.endColor = {1.0f, 0.2f, 0.0f};
+        torchEmitter.colorFade = 1;
+        torchEmitter.alphaFade = 1;
+        torchEmitter.lifeTime = 2.0f;
+        torchParticles_->SetEmitterValue(torchEmitter);
         
-        // Smoke effect using box surface emitter
-        smokeParticles_ = std::make_unique<Particles>();
-        smokeParticles_->Initialize(dxCommon_, "smoke", 1);
+        // Water fountain using hemisphere emitter
+        fountainParticles_ = std::make_unique<Particles>();
+        fountainParticles_->Initialize(dxCommon_, "water", 2);
         
-        EmitterState smokeEmitter = {};
-        smokeEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::BOX_SURFACE);
-        smokeEmitter.translate = {0.0f, 1.0f, 0.0f};
-        smokeEmitter.size = {1.0f, 0.5f, 1.0f};
-        smokeEmitter.count = 3;
-        smokeEmitter.frequency = 0.2f;
-        smokeEmitter.startVelocity = {0.0f, 1.0f, 0.0f};
-        smokeEmitter.velocityRandom = 1;
-        smokeEmitter.minVelocity = {-0.5f, 0.5f, -0.5f};
-        smokeEmitter.maxVelocity = {0.5f, 2.0f, 0.5f};
-        smokeEmitter.startColor = {0.8f, 0.8f, 0.8f};
-        smokeEmitter.endColor = {0.3f, 0.3f, 0.3f};
-        smokeEmitter.colorFade = 1;
-        smokeEmitter.alphaFade = 1;
-        smokeEmitter.lifeTime = 4.0f;
-        smokeParticles_->SetEmitterValue(smokeEmitter);
+        EmitterState fountainEmitter = {};
+        fountainEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::HEMISPHERE);
+        fountainEmitter.translate = {0.0f, 0.0f, 0.0f};
+        fountainEmitter.radius = 0.5f;
+        fountainEmitter.hemisphereAngle = 60.0f;  // Narrow fountain spray
+        fountainEmitter.coneDirection = {0.0f, 1.0f, 0.0f};  // Upward
+        fountainEmitter.count = 15;
+        fountainEmitter.frequency = 0.05f;
+        fountainEmitter.startVelocity = {0.0f, 3.0f, 0.0f};
+        fountainEmitter.velocityRandom = 1;
+        fountainEmitter.minVelocity = {-1.0f, 2.0f, -1.0f};
+        fountainEmitter.maxVelocity = {1.0f, 4.0f, 1.0f};
+        fountainEmitter.startColor = {0.3f, 0.5f, 1.0f};
+        fountainEmitter.endColor = {0.1f, 0.3f, 0.8f};
+        fountainEmitter.colorFade = 1;
+        fountainEmitter.alphaFade = 1;
+        fountainEmitter.lifeTime = 3.0f;
+        fountainParticles_->SetEmitterValue(fountainEmitter);
         
-        // Explosion effect using ring emitter
-        explosionParticles_ = std::make_unique<Particles>();
-        explosionParticles_->Initialize(dxCommon_, "spark", 2);
+        // Flashlight beam using cone surface emitter
+        flashlightParticles_ = std::make_unique<Particles>();
+        flashlightParticles_->Initialize(dxCommon_, "dust", 1);
         
-        EmitterState explosionEmitter = {};
-        explosionEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::RING);
-        explosionEmitter.translate = {0.0f, 0.0f, 0.0f};
-        explosionEmitter.ringInnerRadius = 0.1f;
-        explosionEmitter.ringOuterRadius = 0.5f;
-        explosionEmitter.count = 20;
-        explosionEmitter.frequency = 10.0f; // Burst effect
-        explosionEmitter.velocityRandom = 1;
-        explosionEmitter.minVelocity = {-5.0f, -5.0f, -5.0f};
-        explosionEmitter.maxVelocity = {5.0f, 5.0f, 5.0f};
-        explosionEmitter.startColor = {1.0f, 1.0f, 0.0f};
-        explosionEmitter.endColor = {1.0f, 0.2f, 0.0f};
-        explosionEmitter.colorFade = 1;
-        explosionEmitter.alphaFade = 1;
-        explosionEmitter.lifeTime = 1.5f;
-        explosionParticles_->SetEmitterValue(explosionEmitter);
-        
-        // Portal effect using ring XY emitter
-        portalParticles_ = std::make_unique<Particles>();
-        portalParticles_->Initialize(dxCommon_, "magic", 1);
-        
-        EmitterState portalEmitter = {};
-        portalEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::RING_XY);
-        portalEmitter.translate = {0.0f, 0.0f, 0.0f};
-        portalEmitter.ringInnerRadius = 2.0f;
-        portalEmitter.ringOuterRadius = 2.5f;
-        portalEmitter.count = 10;
-        portalEmitter.frequency = 0.1f;
-        portalEmitter.startVelocity = {0.0f, 0.0f, 0.0f};
-        portalEmitter.startColor = {0.0f, 0.5f, 1.0f};
-        portalEmitter.endColor = {1.0f, 0.0f, 1.0f};
-        portalEmitter.colorFade = 1;
-        portalEmitter.alphaFade = 1;
-        portalEmitter.rotateMove = 1;
-        portalEmitter.startRotateVelocity = 1.0f;
-        portalEmitter.lifeTime = 3.0f;
-        portalParticles_->SetEmitterValue(portalEmitter);
-        
-        // Shield effect using ring YZ emitter
-        shieldParticles_ = std::make_unique<Particles>();
-        shieldParticles_->Initialize(dxCommon_, "energy", 1);
-        
-        EmitterState shieldEmitter = {};
-        shieldEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::RING_YZ);
-        shieldEmitter.translate = {0.0f, 0.0f, 0.0f};
-        shieldEmitter.ringInnerRadius = 1.5f;
-        shieldEmitter.ringOuterRadius = 2.0f;
-        shieldEmitter.count = 8;
-        shieldEmitter.frequency = 0.15f;
-        shieldEmitter.startVelocity = {0.0f, 0.0f, 0.0f};
-        shieldEmitter.startColor = {0.0f, 1.0f, 0.0f};
-        shieldEmitter.endColor = {1.0f, 1.0f, 0.0f};
-        shieldEmitter.colorFade = 1;
-        shieldEmitter.alphaFade = 1;
-        shieldEmitter.lifeTime = 2.5f;
-        shieldParticles_->SetEmitterValue(shieldEmitter);
+        EmitterState flashlightEmitter = {};
+        flashlightEmitter.shapeType = static_cast<uint32_t>(EmitterShapeType::CONE_SURFACE);
+        flashlightEmitter.translate = {0.0f, 1.0f, 0.0f};
+        flashlightEmitter.coneAngle = 30.0f;  // Flashlight beam angle
+        flashlightEmitter.coneHeight = 5.0f;  // Beam distance
+        flashlightEmitter.coneDirection = {0.0f, 0.0f, 1.0f};  // Forward
+        flashlightEmitter.count = 5;
+        flashlightEmitter.frequency = 0.2f;
+        flashlightEmitter.startVelocity = {0.0f, 0.0f, 0.0f};  // Static particles
+        flashlightEmitter.startColor = {1.0f, 1.0f, 0.8f};
+        flashlightEmitter.endColor = {0.8f, 0.8f, 0.6f};
+        flashlightEmitter.colorFade = 1;
+        flashlightEmitter.alphaFade = 1;
+        flashlightEmitter.lifeTime = 1.5f;
+        flashlightParticles_->SetEmitterValue(flashlightEmitter);
     }
     
     void Update() {
-        fireParticles_->Update();
-        smokeParticles_->Update();
-        explosionParticles_->Update();
-        portalParticles_->Update();
-        shieldParticles_->Update();
+        torchParticles_->Update();
+        fountainParticles_->Update();
+        flashlightParticles_->Update();
     }
     
     void Draw(Camera& camera) {
-        fireParticles_->Draw(camera);
-        smokeParticles_->Draw(camera);
-        explosionParticles_->Draw(camera);
-        portalParticles_->Draw(camera);
-        shieldParticles_->Draw(camera);
+        torchParticles_->Draw(camera);
+        fountainParticles_->Draw(camera);
+        flashlightParticles_->Draw(camera);
     }
     
     void DrawImGui() {
-        fireParticles_->DrawImGui("Fire Particles");
-        smokeParticles_->DrawImGui("Smoke Particles");
-        explosionParticles_->DrawImGui("Explosion Particles");
-        portalParticles_->DrawImGui("Portal Particles");
-        shieldParticles_->DrawImGui("Shield Particles");
+        torchParticles_->DrawImGui("Torch Particles");
+        fountainParticles_->DrawImGui("Fountain Particles");
+        flashlightParticles_->DrawImGui("Flashlight Particles");
     }
 };
 ```
@@ -239,6 +236,10 @@ When you call `DrawImGui()` on your particle system, you'll now see:
    - Box (Surface)
    - Ring (XY Plane)
    - Ring (YZ Plane)
+   - Cone
+   - Cone (Surface)
+   - Hemisphere
+   - Hemisphere (Surface)
 
 2. **Shape-specific parameters** that appear based on your selection:
    - **Point**: No additional parameters
@@ -246,12 +247,14 @@ When you call `DrawImGui()` on your particle system, you'll now see:
    - **Sphere**: Radius (with surface/volume indicator)
    - **Box/Box Surface**: Box Size (width, height, depth)
    - **Ring/Ring XY/Ring YZ**: Inner Radius, Outer Radius (with plane indicator)
+   - **Cone/Cone Surface**: Cone Angle (0-180Åã), Cone Height, Cone Direction
+   - **Hemisphere/Hemisphere Surface**: Radius, Hemisphere Angle (0-180Åã), Direction
 
 ## Effect Ideas
 
 ### Point Emitter
 - Magic spells casting from a wand tip
-- Bullet hit effects
+- Bullet hit effects  
 - Small focused explosions
 
 ### Line Emitter
@@ -299,49 +302,97 @@ When you call `DrawImGui()` on your particle system, you'll now see:
 - Vertical barrier effects
 - Wheel-like magical effects
 
+### Cone Emitter
+- Torch flames
+- Rocket exhaust
+- Spray effects
+- Directional explosions
+- Volcanic eruptions
+- Breath attacks
+
+### Cone Surface Emitter
+- Flashlight beams
+- Searchlight effects
+- Laser cone boundaries
+- Spotlight dust particles
+- Sound wave visualizations
+
+### Hemisphere Emitter
+- Water fountains
+- Dome shields
+- Umbrella-like effects
+- Directional area spells
+- Underground explosions
+
+### Hemisphere Surface Emitter
+- Dome force fields
+- Radar sweep effects
+- Hemisphere barriers
+- Protective domes
+- Half-sphere magical effects
+
 ## Advanced Usage Tips
 
-### Combining Multiple Ring Orientations
+### Directional Effects with Cones
 ```cpp
-// Create a complex 3D magical effect using all three ring orientations
-EmitterState ringXZ = {}; // Horizontal ring
-ringXZ.shapeType = static_cast<uint32_t>(EmitterShapeType::RING);
+// Create a directed flame thrower effect
+EmitterState flameThrower = {};
+flameThrower.shapeType = static_cast<uint32_t>(EmitterShapeType::CONE);
+flameThrower.coneAngle = 15.0f;  // Narrow stream
+flameThrower.coneHeight = 4.0f;  // Long range
+flameThrower.coneDirection = {1.0f, 0.0f, 0.0f};  // Right direction
 
-EmitterState ringXY = {}; // Vertical ring facing forward
-ringXY.shapeType = static_cast<uint32_t>(EmitterShapeType::RING_XY);
-
-EmitterState ringYZ = {}; // Vertical ring facing right
-ringYZ.shapeType = static_cast<uint32_t>(EmitterShapeType::RING_YZ);
-
-// Configure all three with the same center but different colors
-// This creates a complex 3D magical sphere effect
+// Create a wide spray effect
+EmitterState spray = {};
+spray.shapeType = static_cast<uint32_t>(EmitterShapeType::CONE);
+spray.coneAngle = 90.0f;  // Wide spray
+spray.coneHeight = 1.0f;  // Short range
 ```
 
-### Box vs Box Surface
+### Hemisphere Variations
 ```cpp
-// Volume box for dense smoke clouds
-EmitterState smokeVolume = {};
-smokeVolume.shapeType = static_cast<uint32_t>(EmitterShapeType::BOX);
+// Full hemisphere (180 degrees)
+EmitterState fullDome = {};
+fullDome.hemisphereAngle = 180.0f;
 
-// Surface box for building facade effects
-EmitterState buildingDamage = {};
-buildingDamage.shapeType = static_cast<uint32_t>(EmitterShapeType::BOX_SURFACE);
+// Quarter hemisphere (90 degrees)
+EmitterState quarterDome = {};
+quarterDome.hemisphereAngle = 90.0f;
+
+// Narrow directional spray (30 degrees)
+EmitterState directionalSpray = {};
+directionalSpray.hemisphereAngle = 30.0f;
+```
+
+### Combining Cone and Hemisphere
+```cpp
+// Rocket engine: Cone for main exhaust + Hemisphere for heat distortion
+EmitterState mainExhaust = {};
+mainExhaust.shapeType = static_cast<uint32_t>(EmitterShapeType::CONE);
+mainExhaust.coneAngle = 20.0f;
+
+EmitterState heatDistortion = {};  
+heatDistortion.shapeType = static_cast<uint32_t>(EmitterShapeType::HEMISPHERE);
+heatDistortion.hemisphereAngle = 60.0f;
 ```
 
 ## Performance Considerations
 
 - **Point emitters** are the most performance-friendly
-- **Box Surface and Ring emitters** require more calculations than their volume counterparts
-- **Ring XY/YZ emitters** have similar performance to the standard Ring emitter
+- **Cone and Hemisphere emitters** require trigonometric calculations (moderate cost)
+- **Surface variants** are slightly more expensive than volume variants due to additional surface selection logic
+- **Hemisphere emitters** are similar in cost to sphere emitters
+- **Cone emitters** have additional calculations for height-based radius scaling
 - Consider using fewer particles with larger textures for distant effects
 - Use appropriate max particle counts based on the effect type
 
 ## Tips
 
-1. **Combine multiple emitters** for complex effects (e.g., fire + smoke + sparks)
+1. **Combine multiple emitters** for complex effects (e.g., torch = cone flame + hemisphere heat shimmer)
 2. **Use different blend modes** for different visual effects
-3. **Animate emitter properties** over time for dynamic effects
-4. **Use velocity randomization** with shape emitters for more natural-looking effects
+3. **Animate emitter properties** over time for dynamic effects (rotating cone direction, changing hemisphere angle)
+4. **Use velocity randomization** with directional emitters for more natural-looking effects
 5. **Save and load configurations** using the JSON system for reusable effects
-6. **Experiment with ring orientations** to create complex 3D effects
-7. **Use box surface emitters** for architectural and structural effects
+6. **Experiment with angles** - small cone angles create focused beams, large angles create wide sprays
+7. **Use direction vectors** creatively - point cones sideways, downward, or at angles for varied effects
+8. **Combine surface and volume emitters** of the same shape for layered effects
