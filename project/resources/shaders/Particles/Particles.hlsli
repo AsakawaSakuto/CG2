@@ -38,6 +38,9 @@ struct Particle {
 #define EMITTER_SHAPE_SPHERE_SURFACE 3
 #define EMITTER_SHAPE_BOX 4
 #define EMITTER_SHAPE_RING 5
+#define EMITTER_SHAPE_BOX_SURFACE 6
+#define EMITTER_SHAPE_RING_XY 7
+#define EMITTER_SHAPE_RING_YZ 8
 
 struct EmitterSphere {
     float3 translate;
@@ -260,6 +263,51 @@ float3 GenerateBoxPosition(uint baseSeed, float3 center, float3 size)
     return center + float3(x * size.x, y * size.y, z * size.z);
 }
 
+// Box surface emitter - generates position only on box surface
+float3 GenerateBoxSurfacePosition(uint baseSeed, float3 center, float3 size)
+{
+    // Choose which face to spawn on (6 faces)
+    uint faceIndex = uint(RandomFloat(baseSeed + 3) * 6.0f);
+    
+    float x, y, z;
+    
+    switch (faceIndex)
+    {
+        case 0: // Front face (+Z)
+            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
+            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
+            z = size.z * 0.5f;
+            break;
+        case 1: // Back face (-Z)
+            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
+            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
+            z = -size.z * 0.5f;
+            break;
+        case 2: // Right face (+X)
+            x = size.x * 0.5f;
+            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
+            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
+            break;
+        case 3: // Left face (-X)
+            x = -size.x * 0.5f;
+            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
+            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
+            break;
+        case 4: // Top face (+Y)
+            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
+            y = size.y * 0.5f;
+            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
+            break;
+        default: // Bottom face (-Y)
+            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
+            y = -size.y * 0.5f;
+            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
+            break;
+    }
+    
+    return center + float3(x, y, z);
+}
+
 // Ring emitter - generates position on a ring (circle)
 float3 GenerateRingPosition(uint baseSeed, float3 center, float innerRadius, float outerRadius, float3 normal)
 {
@@ -278,6 +326,32 @@ float3 GenerateRingPosition(uint baseSeed, float3 center, float innerRadius, flo
         float3 forward = cross(normal, right);
         localPos = localPos.x * right + localPos.y * normal + localPos.z * forward;
     }
+
+    return center + localPos;
+}
+
+// RING_XY emitter - generates position on a ring in the XY plane
+float3 GenerateRingXYPosition(uint baseSeed, float3 center, float innerRadius, float outerRadius)
+{
+    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
+    float radiusLerp = RandomFloat(baseSeed + 1);
+    float radius = lerp(innerRadius, outerRadius, radiusLerp);
+
+    // Generate position in XY plane (Z = 0)
+    float3 localPos = float3(cos(angle) * radius, sin(angle) * radius, 0.0f);
+
+    return center + localPos;
+}
+
+// RING_YZ emitter - generates position on a ring in the YZ plane
+float3 GenerateRingYZPosition(uint baseSeed, float3 center, float innerRadius, float outerRadius)
+{
+    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
+    float radiusLerp = RandomFloat(baseSeed + 1);
+    float radius = lerp(innerRadius, outerRadius, radiusLerp);
+
+    // Generate position in YZ plane (X = 0)
+    float3 localPos = float3(0.0f, cos(angle) * radius, sin(angle) * radius);
 
     return center + localPos;
 }
@@ -304,6 +378,15 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
             
         case EMITTER_SHAPE_RING:
             return GenerateRingPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius, float3(0.0f, 1.0f, 0.0f));
+            
+        case EMITTER_SHAPE_BOX_SURFACE:
+            return GenerateBoxSurfacePosition(baseSeed, emitter.translate, emitter.size);
+            
+        case EMITTER_SHAPE_RING_XY:
+            return GenerateRingXYPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius);
+            
+        case EMITTER_SHAPE_RING_YZ:
+            return GenerateRingYZPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius);
             
         default:
             return GenerateSpherePositionCustom(baseSeed, emitter.translate, emitter.radius);

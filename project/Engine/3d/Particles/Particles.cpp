@@ -231,7 +231,17 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
 	
 	// Emitter Shape Selection
-	const char* shapeNames[] = { "Point", "Line", "Sphere (Volume)", "Sphere (Surface)", "Box", "Ring" };
+	const char* shapeNames[] = { 
+		"Point", 
+		"Line", 
+		"Sphere (Volume)", 
+		"Sphere (Surface)", 
+		"Box", 
+		"Ring", 
+		"Box (Surface)", 
+		"Ring (XY Plane)", 
+		"Ring (YZ Plane)" 
+	};
 	int currentShape = static_cast<int>(emitter_.shapeType);
 	if (ImGui::Combo("Emitter Shape", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
 		emitter_.shapeType = static_cast<uint32_t>(currentShape);
@@ -263,11 +273,38 @@ void Particles::DrawImGui(const char* objectName) {
 			
 		case EmitterShapeType::BOX:
 			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Volume - particles spawn inside box");
+			break;
+			
+		case EmitterShapeType::BOX_SURFACE:
+			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Surface only - particles spawn on box faces");
 			break;
 			
 		case EmitterShapeType::RING:
 			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Ring in XZ plane (horizontal)");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			break;
+			
+		case EmitterShapeType::RING_XY:
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Ring in XY plane (vertical facing forward)");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			break;
+			
+		case EmitterShapeType::RING_YZ:
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Ring in YZ plane (vertical facing right)");
 			// Ensure inner radius is not larger than outer radius
 			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;

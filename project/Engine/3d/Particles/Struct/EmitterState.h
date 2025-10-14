@@ -9,7 +9,10 @@ enum class EmitterShapeType : uint32_t {
 	SPHERE_VOLUME = 2,
 	SPHERE_SURFACE = 3,
 	BOX = 4,
-	RING = 5
+	RING = 5,
+	BOX_SURFACE = 6,
+	RING_XY = 7,
+	RING_YZ = 8
 };
 
 struct EmitterState {
