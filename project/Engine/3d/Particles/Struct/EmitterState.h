@@ -8,14 +8,14 @@ enum class EmitterShapeType : uint32_t {
 	LINE = 1,
 	SPHERE_VOLUME = 2,
 	SPHERE_SURFACE = 3,
-	BOX = 4,
-	RING = 5,
-	BOX_SURFACE = 6,
+	BOX_VOLUME = 4,
+	BOX_SURFACE = 5,
+	RING_XZ = 6,
 	RING_XY = 7,
 	RING_YZ = 8,
-	CONE = 9,
+	CONE_VOLUME = 9,
 	CONE_SURFACE = 10,
-	HEMISPHERE = 11,
+	HEMISPHERE_VOLUME = 11,
 	HEMISPHERE_SURFACE = 12
 };
 

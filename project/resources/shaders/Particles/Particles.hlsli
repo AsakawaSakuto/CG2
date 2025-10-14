@@ -36,14 +36,14 @@ struct Particle {
 #define EMITTER_SHAPE_LINE 1
 #define EMITTER_SHAPE_SPHERE_VOLUME 2
 #define EMITTER_SHAPE_SPHERE_SURFACE 3
-#define EMITTER_SHAPE_BOX 4
-#define EMITTER_SHAPE_RING 5
-#define EMITTER_SHAPE_BOX_SURFACE 6
+#define EMITTER_SHAPE_BOX_VOLUME 4
+#define EMITTER_SHAPE_BOX_SURFACE 5
+#define EMITTER_SHAPE_RING_XZ 6
 #define EMITTER_SHAPE_RING_XY 7
 #define EMITTER_SHAPE_RING_YZ 8
-#define EMITTER_SHAPE_CONE 9
+#define EMITTER_SHAPE_CONE_VOLUME 9
 #define EMITTER_SHAPE_CONE_SURFACE 10
-#define EMITTER_SHAPE_HEMISPHERE 11
+#define EMITTER_SHAPE_HEMISPHERE_VOLUME 11
 #define EMITTER_SHAPE_HEMISPHERE_SURFACE 12
 
 struct EmitterSphere {
@@ -579,10 +579,10 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
         case EMITTER_SHAPE_SPHERE_SURFACE:
             return GenerateSphereSurfacePosition(baseSeed, emitter.translate, emitter.radius);
             
-        case EMITTER_SHAPE_BOX:
+        case EMITTER_SHAPE_BOX_VOLUME:
             return GenerateBoxPosition(baseSeed, emitter.translate, emitter.size);
             
-        case EMITTER_SHAPE_RING:
+        case EMITTER_SHAPE_RING_XZ:
             return GenerateRingPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius, float3(0.0f, 1.0f, 0.0f));
             
         case EMITTER_SHAPE_BOX_SURFACE:
@@ -594,13 +594,13 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
         case EMITTER_SHAPE_RING_YZ:
             return GenerateRingYZPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius);
             
-        case EMITTER_SHAPE_CONE:
+        case EMITTER_SHAPE_CONE_VOLUME:
             return GenerateConePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.coneAngle, emitter.coneHeight);
             
         case EMITTER_SHAPE_CONE_SURFACE:
             return GenerateConeSurfacePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.coneAngle, emitter.coneHeight);
             
-        case EMITTER_SHAPE_HEMISPHERE:
+        case EMITTER_SHAPE_HEMISPHERE_VOLUME:
             return GenerateHemispherePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.radius, emitter.hemisphereAngle);
             
         case EMITTER_SHAPE_HEMISPHERE_SURFACE:

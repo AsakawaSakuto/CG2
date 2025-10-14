@@ -242,14 +242,14 @@ void Particles::DrawImGui(const char* objectName) {
 		"Line", 
 		"Sphere (Volume)", 
 		"Sphere (Surface)", 
-		"Box", 
-		"Ring", 
+		"Box (Volume)", 
 		"Box (Surface)", 
+		"Ring (XZ Plane)", 
 		"Ring (XY Plane)", 
 		"Ring (YZ Plane)",
-		"Cone",
+		"Cone (Volume)",
 		"Cone (Surface)",
-		"Hemisphere",
+		"Hemisphere (Volume)",
 		"Hemisphere (Surface)"
 	};
 	int currentShape = static_cast<int>(emitter_.shapeType);
@@ -287,7 +287,7 @@ void Particles::DrawImGui(const char* objectName) {
 			break;
 		}
 		
-		case EmitterShapeType::BOX:
+		case EmitterShapeType::BOX_VOLUME:
 		{
 			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Volume - particles spawn inside box");
@@ -301,7 +301,7 @@ void Particles::DrawImGui(const char* objectName) {
 			break;
 		}
 		
-		case EmitterShapeType::RING:
+		case EmitterShapeType::RING_XZ:
 		{
 			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
@@ -337,7 +337,7 @@ void Particles::DrawImGui(const char* objectName) {
 			break;
 		}
 		
-		case EmitterShapeType::CONE:
+		case EmitterShapeType::CONE_VOLUME:
 		{
 			ImGui::DragFloat("Cone Angle", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
 			ImGui::DragFloat("Cone Height", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
@@ -373,7 +373,7 @@ void Particles::DrawImGui(const char* objectName) {
 			break;
 		}
 		
-		case EmitterShapeType::HEMISPHERE:
+		case EmitterShapeType::HEMISPHERE_VOLUME:
 		{
 			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
 			ImGui::DragFloat("Hemisphere Angle", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
