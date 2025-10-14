@@ -26,7 +26,7 @@ protected:
     Input* input_ = nullptr;
 
     // Fade
-	SceneFade* sceneFade_ = nullptr;
+	unique_ptr<SceneFade> sceneFade_;
 
 	void DrawSceneName();
 
