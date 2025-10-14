@@ -227,7 +227,7 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Checkbox("UseEmitter", reinterpret_cast<bool*>(&emitter_.useEmitter));
 	ImGui::Checkbox("Emit", reinterpret_cast<bool*>(&emitter_.emit));
-	ImGui::DragInt("Count", reinterpret_cast<int*>(&emitter_.count), 1, 0, 10000);
+	ImGui::DragInt("Count", reinterpret_cast<int*>(&emitter_.count), 1, 0, kMaxParticles_);
 
 	ImGui::Separator();
 
