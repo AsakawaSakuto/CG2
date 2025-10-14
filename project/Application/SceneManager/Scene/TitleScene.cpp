@@ -19,8 +19,8 @@ void TitleScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	particle_->Initialize(&ctx_->dxCommon, "circle", 2);
-	particle_->LoadJson("temp");
+	particle_->Initialize(&ctx_->dxCommon, "star", 2);
+	particle_->LoadJson("oneStar");
 }
 
 void TitleScene::Update() {
@@ -30,6 +30,16 @@ void TitleScene::Update() {
 	}
 	if (sceneFade_->EndFadeIn()) {
 		ChangeScene(SCENE::GAME);
+	}
+
+	if (input_->TriggerKey(DIK_I)) { // P key
+		particle_->Play(false);
+	}
+	if (input_->TriggerKey(DIK_O)) { // P key
+		particle_->Play();
+	}
+	if (input_->TriggerKey(DIK_P)) { // P key
+		particle_->Stop();
 	}
 
 	sceneFade_->Update();
@@ -67,6 +77,8 @@ void TitleScene::Draw() {
 	///
 
 	particle_->DrawImGui("titleEffect");
+
+	ImGui::End();
 
 	DrawSceneName();
 

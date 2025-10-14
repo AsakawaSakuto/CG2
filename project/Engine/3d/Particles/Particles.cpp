@@ -176,6 +176,31 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
+	// Particle Control Section
+	ImGui::Text("PARTICLE CONTROL");
+
+	// 現在の再生状態を表示
+	ImGui::Text("Status: %s", isPlaying_ ? "Playing" : "Stopped");
+
+	// Play/Stop control buttons
+	if (ImGui::Button("Play (Loop)")) {
+		Play(true);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Play (Once)")) {
+		Play(false);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Stop")) {
+		Stop();
+	}
+
+	ImGui::Separator();
+
 	if (EmitterStateLoader::InputText("texture Name", texturePath_)) {
 		// 入力が変更されたらここに来る
 		printf("Generate Name Changed to: %s\n", texturePath_.c_str());
@@ -280,23 +305,17 @@ void Particles::DrawImGui(const char* objectName) {
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
 	}
 
-	ImGui::Spacing();
+	ImGui::SameLine();
 
 	if (ImGui::Button("Save to Json")) {
 		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
 		EmitterStateLoader::Save(jsonFilePath_, emitter_);
 	}
 
-	ImGui::Separator();
-	ImGui::Spacing();
-
-	if (EmitterStateLoader::InputText("Generate Name", generateName)) {
-		// 入力が変更されたらここに来る
-		printf("Generate Name Changed to: %s\n", generateName.c_str());
-	}
+	ImGui::SameLine();
 
 	if (ImGui::Button("Generate to Json")) {
-		EmitterStateLoader::SaveToCurrentDir(emitter_, generateName);
+		EmitterStateLoader::SaveToCurrentDir(emitter_, loadToSaveName_);
 	}
 
 	ImGui::Separator();
@@ -311,6 +330,11 @@ void Particles::DrawImGui(const char* objectName) {
 		// 初期化シェーダーを再実行してパーティクルをリセット
 		ResetAllParticles();
 	}
+
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	
 
 	ImGui::End();
 }
@@ -587,15 +611,15 @@ void Particles::UpdateEmitter() {
 	// このemitterSphereをCBufferとしてGPUへ転送
 	if (emitter_.useEmitter) {
 		emitter_.frequencyTime += kDeltaTime_;  // frequencyTimerをfrequencyTimeに修正
-		if (emitter_.frequency <= emitter_.frequencyTime) {
-			emitter_.frequencyTime = 0.0f;
-			emitter_.emit = true;
-		} else {
-			emitter_.emit = false;
-		}
-	} else {
-		emitter_.frequencyTime = 0.0f;
 	}
+
+	if (emitter_.frequency <= emitter_.frequencyTime) {
+		emitter_.frequencyTime = 0.0f;
+		emitter_.emit = true;
+	} else {
+		emitter_.emit = false;
+	}
+
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.translate += offset_;
 
