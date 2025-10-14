@@ -20,6 +20,12 @@ void TitleScene::Initialize() {
 
 	particle_->Initialize(&ctx_->dxCommon, "circle", 2);
 	particle_->LoadJson("temp");
+
+	// Text3Dの初期化
+	for (auto& text : text3D_) {
+		text = make_unique<Text3D>();
+		text->Initialize(&ctx_->dxCommon);
+	}
 }
 
 void TitleScene::Update() {
@@ -37,6 +43,12 @@ void TitleScene::Update() {
 
 	// カメラ切り替え&更新
 	CameraController();
+
+	// Text3Dの更新処理
+	for (auto& text : text3D_) {
+		text->MoveTextAnimation(0.0f, 10.0f, std::numbers::pi_v<float> * 2, 0.0f);
+		text->Update();
+	}
 }
 
 void TitleScene::Draw() {
@@ -47,6 +59,11 @@ void TitleScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	// 3Dテキストの描画処理
+	for (auto& text : text3D_) {
+		text->Draw(*useCamera_);
+	}
 
 	particle_->Draw(*useCamera_);
 

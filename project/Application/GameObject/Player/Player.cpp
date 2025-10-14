@@ -37,6 +37,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// 弾のゲージ
 	bulletGauge_ = 0;
+
+	// ゴールフラグ初期化
+	isGoal_ = false;
 }
 
 void Player::Update() {
@@ -109,6 +112,9 @@ void Player::Update() {
 	// プレイヤーの羽とトゲの当たり判定
 	CollisionWingThorn();
 
+	// 羽のクールダウンフレーム加算
+	WingCoolDownFramesAdd();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -124,7 +130,9 @@ void Player::Draw(Camera useCamera) {
 	}
 
 	// プレイヤーの羽の描画
-	playerWing_->Draw(useCamera);
+	if (!isStartCoolDown_) {
+		playerWing_->Draw(useCamera);
+	}
 }
 
 void Player::DrawImgui() {
@@ -140,6 +148,8 @@ void Player::DrawImgui() {
 	// 弾のステータス
 	DrawImGuiJsonStateBullet();
 }
+
+void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
 
 void Player::MovePlayerUpward() {
 	// 上昇
@@ -222,6 +232,7 @@ void Player::BulletCharge() {
 	// 2秒に一回ゲージをためる
 	if (num_ >= 120) {
 		bulletGauge_++;
+		(*bulletGaugeSprites_)[bulletGauge_ - 1].isActive = true;
 		num_ = 0;
 	}
 	///////////// 仮の処理 /////////////
@@ -253,6 +264,9 @@ void Player::BulletShot() {
 
 		// ゲージを減らす
 		--bulletGauge_;
+
+		// 描画用のフラグを下ろす
+		(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
 	}
 }
 
@@ -374,7 +388,7 @@ void Player::CollisionThorn() {
 			} else if (direction_ == Direction::UP) {
 
 				// シェイク用のフラグを立てる
-				if (!isShake_) {
+				if (!isShake_ && !isStartCoolDown_) {
 					isShake_ = true;
 				}
 
@@ -484,6 +498,10 @@ void Player::CollisionWingThorn() {
 			continue; // トゲがクールダウン中のときはスキップ
 		}
 
+		if (currentCoolDownFrames_ > 0) {
+			continue; // 羽がクールダウン中のときはスキップ
+		}
+
 		if (Collision::IsHit(thorn->GetCollisionAABB(), playerWing_->GetCollisionAABB()) && playerWing_->GetIsAlive()) {
 
 			// 羽とトゲの距離に応じてスコア加算
@@ -497,6 +515,9 @@ void Player::CollisionWingThorn() {
 			}
 
 			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
+
+			// 羽のクールダウン開始
+			isStartCoolDown_ = true;
 
 			break;
 		}
@@ -587,4 +608,15 @@ void Player::DrawImGuiJsonStateBullet() {
 	}
 
 	ImGui::End();
+}
+
+void Player::WingCoolDownFramesAdd() {
+	if (isStartCoolDown_) {
+		currentCoolDownFrames_++;
+	}
+
+	if (currentCoolDownFrames_ >= playerState_.maxCoolDownWing) {
+		isStartCoolDown_ = false;
+		currentCoolDownFrames_ = 0;
+	}
 }

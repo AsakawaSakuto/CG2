@@ -202,6 +202,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\2d\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
+    <ClCompile Include="Application\GameObject\Text3D\Text3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -290,6 +291,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />
     <ClInclude Include="Engine\System\Utility\Random\Random.h" />
     <ClInclude Include="Application\GameObject\State\JsonState.h" />
+    <ClInclude Include="Application\GameObject\Text3D\Text3D.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

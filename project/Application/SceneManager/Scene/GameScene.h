@@ -51,6 +51,12 @@ private:
 	std::vector<std::shared_ptr<Thorn>> thorns_;
 	std::vector<std::shared_ptr<Block>> blocks_;
 
+	// ゲージ用のスプライト(背景)
+	unique_ptr<Sprite> bulletGaugeSpriteBG_ = make_unique<Sprite>();
+
+	// ゲージ用のスプライト
+	std::array<BulletGaugeInfo, 5> bulletGaugeSprite_;
+
 	// UtilSystem
 	GameTimer gameTimer_;
 
@@ -63,4 +69,7 @@ private:
 
 	// プレイヤーがゴールしたかどうか
 	bool isGoal_ = false;
+
+	Vector2 testPos_ = {};
+	Vector2 testScale_ = {};
 };
