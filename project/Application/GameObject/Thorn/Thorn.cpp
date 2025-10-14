@@ -1,12 +1,13 @@
 #include "Thorn.h"
+#include <numbers>
 
 void Thorn::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "sphere.obj");
+	model_->Initialize(dxCommon_, "Enemy/Enemy/Enemy.obj");
 
 	transform_.scale = {0.5f, 0.5f, 0.5f};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
+	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 
 	// 当たり判定(AABB)

@@ -89,13 +89,13 @@ void Player::Update() {
 	StunRemoved();
 
 	// トゲとの当たり判定
-	ThornCollision();
+	CollisionThorn();
 
 	// ブロックとの当たり判定
-	BlockCollision();
+	CollisionBlock();
 
 	// 弾とトゲの当たり判定
-	BulletThornCollison();
+	CollisonBulletThorn();
 
 	// カメラシェイクの値を更新
 	UpdateCameraShake();
@@ -107,7 +107,7 @@ void Player::Update() {
 	TickThornCooldown();
 
 	// プレイヤーの羽とトゲの当たり判定
-	WingThornCollision();
+	CollisionWingThorn();
 
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
@@ -165,10 +165,18 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
 		// プレイヤーの進行方向を徐々に反対方向に
-		acceleration_.y *= -1;
+		//acceleration_.y *= -1;
 
 		// プレイヤーの進行状況
+		//direction_ = Direction::UP;
+
+		// ゴールフラグをたてる
+		isGoal_ = true;
+
+		// プレイヤーのステータス初期化
+		transform_.rotate.z = 0.0f;
 		direction_ = Direction::UP;
+		playerState_.cameraOffset = CAMERA_OFFSET_BOTTOM;
 	}
 }
 
@@ -346,7 +354,7 @@ void Player::Stun() {
 
 void Player::StunRemoved() { stunTimer_.Update(); }
 
-void Player::ThornCollision() {
+void Player::CollisionThorn() {
 	for (auto& thorn : thorns_) {
 		if (Collision::IsHit(thorn->GetCollitionSphere(), collisionSphere_) && thorn->GetIsAlive()) {
 			if (direction_ == Direction::DOWN) {
@@ -365,6 +373,11 @@ void Player::ThornCollision() {
 				break;
 			} else if (direction_ == Direction::UP) {
 
+				// シェイク用のフラグを立てる
+				if (!isShake_) {
+					isShake_ = true;
+				}
+
 				// 弾のゲージリセット
 				ResetBulletGauge();
 
@@ -376,7 +389,7 @@ void Player::ThornCollision() {
 	}
 }
 
-void Player::BlockCollision() {
+void Player::CollisionBlock() {
 	for (auto& block : blocks_) {
 		if (Collision::IsHit(block->GetCollitionSphere(), collisionSphere_) && block->GetIsAlive()) {
 			// シェイク用のフラグを立てる
@@ -394,7 +407,7 @@ void Player::BlockCollision() {
 	}
 }
 
-void Player::BulletThornCollison() {
+void Player::CollisonBulletThorn() {
 	for (auto& bullet : bullets_) {
 		for (auto& thorn : thorns_) {
 			if (!thorn->CanUpgradeBullet()) {
@@ -465,10 +478,10 @@ void Player::TickThornCooldown() {
 	}
 }
 
-void Player::WingThornCollision() {
+void Player::CollisionWingThorn() {
 	for (auto& thorn : thorns_) {
 		if (!thorn->CanUpgradeWing()) {
-			continue; // クールダウン中のトゲはスキップ
+			continue; // トゲがクールダウン中のときはスキップ
 		}
 
 		if (Collision::IsHit(thorn->GetCollisionAABB(), playerWing_->GetCollisionAABB()) && playerWing_->GetIsAlive()) {

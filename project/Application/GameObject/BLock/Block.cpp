@@ -2,10 +2,10 @@
 void Block::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "cube.obj");
+	model_->Initialize(dxCommon_, "Chocolate/Chocolate/Chocolate.obj");
 
 	transform_.scale = {0.5f, 0.5f, 0.5f};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
+	transform_.rotate = {std::numbers::pi_v<float> / 2.0f, 0.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 
 	// 当たり判定(AABB)
