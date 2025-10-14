@@ -14,6 +14,8 @@
 
 #include <cmath>
 #include <numbers>
+#include <unordered_map>
+#include <memory>
 
 #include"DirectXCommon.h"
 
@@ -97,6 +99,18 @@ public:
 	bool GetEnableFrustumCulling() const { return enableFrustumCulling_; }
 
 private:
+	// モデルジオメトリ共有キャッシュ
+	struct GeometryCache {
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;              // 共有VBV
+		Object3dModelData modelData;                            // 共有モデルデータ
+		std::string textureName;                                // 使用テクスチャ名
+		uint32_t textureIndex = 0;                              // テクスチャインデックス
+		float boundingRadius = 1.0f;                            // バウンディング半径
+	};
+	static std::unordered_map<std::string, std::shared_ptr<GeometryCache>> s_geometryCache_;
+
+private:
 	Matrix4x4 worldMatrix;
 	Camera camera_;
 
@@ -131,16 +145,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;     // GPUコマンドリスト
 
 	// 各種GPUリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;             // 頂点リソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;           // マテリアルリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;     // 行列リソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;   // ライトリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;             // 頂点リソース（共有可）
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;           // マテリアルリソース（インスタンス毎）
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;     // 行列リソース（インスタンス毎）
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;   // ライトリソース（インスタンス毎）
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 
 	// 各種リソースのCPU側ポインタ
-	Object3dVertexData* vertexData_ = nullptr;                   // 頂点データ
+	Object3dVertexData* vertexData_ = nullptr;                   // 頂点データ（初期化時のみ使用）
 	Object3dMaterial* materialData_ = nullptr;                   // マテリアルデータ
 	Object3dTransformationMatrix* transformationData_ = nullptr; // 行列データ
 	DirectionalLight* directionalLightData_ = nullptr;           // ライトデータ
