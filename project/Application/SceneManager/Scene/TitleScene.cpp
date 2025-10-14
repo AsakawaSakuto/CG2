@@ -32,12 +32,11 @@ void TitleScene::Update() {
 		ChangeScene(SCENE::GAME);
 	}
 
+	if (input_->TriggerKey(DIK_O)) { // P key
+		particle_->Play();
+	}
 	if (input_->TriggerKey(DIK_P)) { // P key
-		if (particle_->IsPlaying()) {
-			particle_->Stop();
-		} else {
-			particle_->Play();
-		}
+		particle_->Stop();
 	}
 
 	sceneFade_->Update();
