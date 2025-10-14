@@ -21,6 +21,9 @@ void TitleScene::Initialize() {
 
 	particle_->Initialize(&ctx_->dxCommon, "circle", 2);
 	particle_->LoadJson("temp");
+
+	particle2_->Initialize(&ctx_->dxCommon, "circle2", 2);
+	particle2_->LoadJson("temp");
 }
 
 void TitleScene::Update() {
@@ -35,6 +38,7 @@ void TitleScene::Update() {
 	sceneFade_->Update();
 
 	particle_->Update();
+	particle2_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -50,6 +54,7 @@ void TitleScene::Draw() {
 	///
 
 	particle_->Draw(*useCamera_);
+	particle2_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -67,6 +72,7 @@ void TitleScene::Draw() {
 	///
 
 	particle_->DrawImGui("titleEffect");
+	particle2_->DrawImGui("titleEffect2");
 
 	DrawSceneName();
 

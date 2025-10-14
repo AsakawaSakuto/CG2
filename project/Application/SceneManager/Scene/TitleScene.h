@@ -16,6 +16,7 @@ public:
 private:
 
 	unique_ptr<Particles> particle_ = make_unique<Particles>();
+	unique_ptr<Particles> particle2_ = make_unique<Particles>();
 
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
