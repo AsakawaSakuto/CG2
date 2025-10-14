@@ -595,7 +595,7 @@ void Particles::UpdateParticle() {
 void Particles::CreateEmitterResource() {
 
 	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_UPLOAD);
-	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(EmitterSphere));
+	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(EmitterState));
 
 	device_->CreateCommittedResource(
 		&heapProps,
@@ -624,7 +624,7 @@ void Particles::UpdateEmitter() {
 	emitter_.translate += offset_;
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
-	EmitterSphere* mappedEmitter = nullptr;
+	EmitterState* mappedEmitter = nullptr;
 	emitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter));
 	// ここで値をコピーまたは書き換え
 	*mappedEmitter = emitter_; // 構造体ごとコピー

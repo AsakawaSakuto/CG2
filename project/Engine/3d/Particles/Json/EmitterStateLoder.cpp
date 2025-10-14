@@ -35,7 +35,7 @@ namespace nlohmann {
 // =============================================================
 //                        Load
 // =============================================================
-EmitterSphere EmitterStateLoader::Load(const std::string& filePath) {
+EmitterState EmitterStateLoader::Load(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open EmitterStatus file: " + filePath);
@@ -44,7 +44,7 @@ EmitterSphere EmitterStateLoader::Load(const std::string& filePath) {
     json data;
     file >> data;
 
-    EmitterSphere state;
+    EmitterState state;
 
     // --- 基本設定 ---
     state.translate = data.value("translate", Vector3{ 0.0f, 0.0f, 0.0f });
@@ -105,7 +105,7 @@ EmitterSphere EmitterStateLoader::Load(const std::string& filePath) {
 // =============================================================
 //                        Save
 // =============================================================
-void EmitterStateLoader::Save(const std::string& filePath, const EmitterSphere& state) {
+void EmitterStateLoader::Save(const std::string& filePath, const EmitterState& state) {
     json data = {
         {"translate", state.translate},
         {"radius", state.radius},
@@ -166,7 +166,7 @@ void EmitterStateLoader::Save(const std::string& filePath, const EmitterSphere& 
 // =============================================================
 //               SaveToCurrentDir (自動出力版)
 // =============================================================
-void EmitterStateLoader::SaveToCurrentDir(const EmitterSphere& state, const std::string& ImGuiName) {
+void EmitterStateLoader::SaveToCurrentDir(const EmitterState& state, const std::string& ImGuiName) {
     try {
         fs::path currentDir = fs::current_path();
         fs::path outPath = currentDir / "Resources" / "Data" / "Particle" / (ImGuiName + ".json");

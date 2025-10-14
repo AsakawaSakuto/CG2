@@ -2,7 +2,7 @@
 #include"Vector3.h"
 #include"Vector2.h"
 
-struct EmitterSphere {
+struct EmitterState {
 	Vector3 translate;
 	float radius;
 	
