@@ -47,27 +47,27 @@ void TestScene::Update() {
 	// カメラ切り替え&更新
 	CameraController();
 
-	player_->Update();
+	//player_->Update();
 
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
-	UpdateCameraToPlayer();
+	//UpdateCameraToPlayer();
 
 	// 汎用機能の更新
 	gameTimer_.Update();
 
 	// トゲの更新処理
-	for (auto& thorn : thorns_) {
-		if (thorn->GetIsAlive()) {
-			thorn->Update();
-		}
-	}
+	//for (auto& thorn : thorns_) {
+	//	if (thorn->GetIsAlive()) {
+	//		thorn->Update();
+	//	}
+	//}
 
-	// ブロックの更新処理
-	for (auto& block : blocks_) {
-		if (block->GetIsAlive()) {
-			block->Update();
-		}
-	}
+	//// ブロックの更新処理
+	//for (auto& block : blocks_) {
+	//	if (block->GetIsAlive()) {
+	//		block->Update();
+	//	}
+	//}
 }
 
 void TestScene::Draw() {
@@ -79,21 +79,21 @@ void TestScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	player_->Draw(*useCamera_);
+	//player_->Draw(*useCamera_);
 
 	// トゲの描画処理
-	for (auto& thorn : thorns_) {
-		if (thorn->GetIsAlive()) {
-			thorn->Draw(*useCamera_);
-		}
-	}
+	//for (auto& thorn : thorns_) {
+	//	if (thorn->GetIsAlive()) {
+	//		thorn->Draw(*useCamera_);
+	//	}
+	//}
 
-	// ブロックの描画処理
-	for (auto& block : blocks_) {
-		if (block->GetIsAlive()) {
-			block->Draw(*useCamera_);
-		}
-	}
+	//// ブロックの描画処理
+	//for (auto& block : blocks_) {
+	//	if (block->GetIsAlive()) {
+	//		block->Draw(*useCamera_);
+	//	}
+	//}
 
 	///
 	/// ↑描画処理ここまで

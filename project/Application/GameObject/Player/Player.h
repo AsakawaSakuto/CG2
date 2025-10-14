@@ -9,6 +9,11 @@
 class Thorn;
 class Block;
 
+struct BulletGaugeInfo {
+	std::unique_ptr<Sprite> sprite;
+	bool isActive;
+};
+
 enum class Direction
 {
 	UP = 0,
@@ -36,11 +41,13 @@ public:
 	float GetStartLine() const { return START_LINE; }
 	float GetEndLine() const { return END_LINE; }
 	bool GetIsGoal() const { return isGoal_; }
+	int GetBulletGauge() const { return bulletGauge_; }
 
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
 	void SetBlocks(std::vector<std::shared_ptr<Block>>& blocks) { blocks_ = blocks; }
 	void SetIsGoal(bool isGoal) { isGoal_ = isGoal; }
+	void SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites);
 
 private:
 	// プレイヤーの上昇
@@ -127,6 +134,9 @@ private:
 	// ImGui弾
 	void DrawImGuiJsonStateBullet();
 
+	// 羽のクールダウンフレーム加算
+	void WingCoolDownFramesAdd();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -188,4 +198,13 @@ private:
 
 	// ゴールフラグ
 	bool isGoal_ = false;
+
+	// 現在のクールダウンフレーム
+	int currentCoolDownFrames_ = 0;
+
+	// クールダウンの開始フラグ
+	bool isStartCoolDown_ = false;
+
+	// 弾のゲージスプライト
+	std::array<BulletGaugeInfo, 5>* bulletGaugeSprites_ = nullptr;
 };

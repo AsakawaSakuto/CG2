@@ -60,6 +60,7 @@
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
     <ClCompile Include="Engine\System\PSOManager\PSOManager.cpp" />
+    <ClCompile Include="Application\GameObject\Text3D\Text3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="Engine\System\Utility\Random\Random.h" />
     <ClInclude Include="Application\GameObject\State\JsonState.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />
+    <ClInclude Include="Application\GameObject\Text3D\Text3D.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
   </ItemGroup>
   <ItemGroup>

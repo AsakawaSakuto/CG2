@@ -45,9 +45,30 @@ void GameScene::Initialize() {
 	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
+
+	// ゲージ用のスプライト(背景)の初期化
+	bulletGaugeSpriteBG_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+	bulletGaugeSpriteBG_->SetScale({4, 25});
+	bulletGaugeSpriteBG_->SetPosition({1200, 350});
+
+	//testPos_ = {1200, 400};
+	//testScale_ = {8, 40};
+
+	// 弾のゲージスプライト
+	for (int i = 0; i < bulletGaugeSprite_.size(); ++i) {
+		bulletGaugeSprite_[i].sprite = std::make_unique<Sprite>();
+		bulletGaugeSprite_[i].sprite->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+		bulletGaugeSprite_[i].sprite->SetScale({4, 5});
+		bulletGaugeSprite_[i].sprite->SetPosition({1200.0f, 532.0f - (88 * i)});
+		bulletGaugeSprite_[i].sprite->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+		bulletGaugeSprite_[i].isActive = false;
+	}
 }
 
 void GameScene::Update() {
+
+	/*bulletGaugeSpriteBG_->SetScale(testScale_);
+	bulletGaugeSpriteBG_->SetPosition(testPos_);*/
 
 	if (input_->TriggerKey(DIK_ESCAPE)) {
 		sceneFade_->StartFadeIn(1.0f);
@@ -61,6 +82,7 @@ void GameScene::Update() {
 
 	if (sceneFade_->EndFadeIn()) {
 		ChangeScene(goSceneNum_);
+		goSceneNum_ = 0;
 	}
 
 	sceneFade_->Update();
@@ -94,6 +116,16 @@ void GameScene::Update() {
 			block->Update();
 		}
 	}
+
+	// ゲージ用のスプライト(背景)の更新処理
+	bulletGaugeSpriteBG_->Update();
+
+	// ゲージの描画を実際の弾のゲージに対応させる
+	player_->SetBulletGaugeSprites(&bulletGaugeSprite_);
+
+	for (auto& gaugeInfo : bulletGaugeSprite_) {
+		gaugeInfo.sprite->Update();
+	}
 }
 
 void GameScene::Draw() {
@@ -105,8 +137,9 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	//sceneFade_->Draw();
+	// sceneFade_->Draw();
 
+	// プレイヤーの描画処理
 	player_->Draw(*useCamera_);
 
 	// トゲの描画処理
@@ -120,6 +153,15 @@ void GameScene::Draw() {
 	for (auto& block : blocks_) {
 		if (block->GetIsAlive()) {
 			block->Draw(*useCamera_);
+		}
+	}
+
+	// ゲージ用のスプライト(背景)の描画処理
+	bulletGaugeSpriteBG_->Draw();
+
+	for (auto& gaugeInfo : bulletGaugeSprite_) {
+		if (gaugeInfo.isActive) {
+			gaugeInfo.sprite->Draw();
 		}
 	}
 
@@ -140,6 +182,13 @@ void GameScene::Draw() {
 	player_->DrawImgui();
 
 	DrawSceneName();
+
+	/*ImGui::Begin("Test");
+	
+	ImGui::DragFloat2("TestPos", &testPos_.x, 1.0f);
+	ImGui::DragFloat2("TestScale", &testScale_.x, 1.0f);
+
+	ImGui::End();*/
 
 	///
 	/// ↑ImGuiここまで
