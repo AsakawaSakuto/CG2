@@ -236,9 +236,9 @@ void Particles::DrawImGui(const char* objectName) {
 		"Line", 
 		"Sphere (Volume)", 
 		"Sphere (Surface)", 
-		"Box", 
-		"Ring", 
+		"Box (Volume)", 
 		"Box (Surface)", 
+		"Ring (XZ Plane)", 
 		"Ring (XY Plane)", 
 		"Ring (YZ Plane)" 
 	};
@@ -271,7 +271,7 @@ void Particles::DrawImGui(const char* objectName) {
 			}
 			break;
 			
-		case EmitterShapeType::BOX:
+		case EmitterShapeType::BOX_VOLUME:
 			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Volume - particles spawn inside box");
 			break;
@@ -281,7 +281,7 @@ void Particles::DrawImGui(const char* objectName) {
 			ImGui::Text("Surface only - particles spawn on box faces");
 			break;
 			
-		case EmitterShapeType::RING:
+		case EmitterShapeType::RING_XZ:
 			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::Text("Ring in XZ plane (horizontal)");

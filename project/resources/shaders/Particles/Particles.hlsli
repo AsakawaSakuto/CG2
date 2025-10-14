@@ -36,9 +36,9 @@ struct Particle {
 #define EMITTER_SHAPE_LINE 1
 #define EMITTER_SHAPE_SPHERE_VOLUME 2
 #define EMITTER_SHAPE_SPHERE_SURFACE 3
-#define EMITTER_SHAPE_BOX 4
-#define EMITTER_SHAPE_RING 5
-#define EMITTER_SHAPE_BOX_SURFACE 6
+#define EMITTER_SHAPE_BOX_VOLUME 4
+#define EMITTER_SHAPE_BOX_SURFACE 5
+#define EMITTER_SHAPE_RING_XZ 6
 #define EMITTER_SHAPE_RING_XY 7
 #define EMITTER_SHAPE_RING_YZ 8
 
@@ -373,10 +373,10 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
         case EMITTER_SHAPE_SPHERE_SURFACE:
             return GenerateSphereSurfacePosition(baseSeed, emitter.translate, emitter.radius);
             
-        case EMITTER_SHAPE_BOX:
+        case EMITTER_SHAPE_BOX_VOLUME:
             return GenerateBoxPosition(baseSeed, emitter.translate, emitter.size);
             
-        case EMITTER_SHAPE_RING:
+        case EMITTER_SHAPE_RING_XZ:
             return GenerateRingPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius, float3(0.0f, 1.0f, 0.0f));
             
         case EMITTER_SHAPE_BOX_SURFACE:
