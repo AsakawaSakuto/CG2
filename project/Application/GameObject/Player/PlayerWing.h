@@ -15,10 +15,4 @@ public:
 private:
 	// 当たり判定更新(AABB)
 	void CollisionUpdate();
-
-	// 現在のクールダウンフレーム
-	int currentCoolDownFrame_ = 0;
-
-	// クールダウンの最大値
-	int coolDownMax_ = 60;
 };

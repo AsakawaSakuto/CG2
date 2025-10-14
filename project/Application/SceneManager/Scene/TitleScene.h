@@ -1,6 +1,8 @@
 #pragma once
 #include"Application/EngineSystem.h"
 #include"Application/SceneManager/IScene.h"
+#include "Application/GameObject/Text3D/Text3D.h"
+#include <array>
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -22,5 +24,8 @@ private:
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
 	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
-	void CameraController();                                           
+	void CameraController();     
+
+	// 3Dテキスト
+	std::array<std::unique_ptr<Text3D>, 5> text3D_;
 };
