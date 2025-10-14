@@ -30,6 +30,16 @@ namespace nlohmann {
             v.z = j.at(2).get<float>();
         }
     };
+
+    template <>
+    struct adl_serializer<EmitterShapeType> {
+        static void to_json(json& j, const EmitterShapeType& type) {
+            j = static_cast<uint32_t>(type);
+        }
+        static void from_json(const json& j, EmitterShapeType& type) {
+            type = static_cast<EmitterShapeType>(j.get<uint32_t>());
+        }
+    };
 }
 
 // =============================================================
@@ -97,7 +107,35 @@ EmitterState EmitterStateLoader::Load(const std::string& filePath) {
     state.lifeTime = data.value("lifeTime", 3.0f);
     state.lifeTimeRandom = data.value("lifeTimeRandom", 0u);
     state.minLifeTime = data.value("minLifeTime", 1.0f);
-    state.maxLifeTime = data.value("maxLifeTime", 5.0f);
+    state.maxLifeTime = data.value("maxLifeTime", 5.0f );
+
+    // --- 形状関連 ---
+    state.shapeType = data.value("shapeType", static_cast<uint32_t>(EmitterShapeType::POINT));
+    state.size = data.value("size", Vector3{ 1.0f, 1.0f, 1.0f });
+    
+    // Line shape
+    state.lineStart = data.value("lineStart", Vector3{ 0.0f, 0.0f, 0.0f });
+    state.lineLength = data.value("lineLength", 1.0f);
+    
+    // Ring shape
+    state.ringInnerRadius = data.value("ringInnerRadius", 0.5f);
+    state.ringOuterRadius = data.value("ringOuterRadius", 1.0f);
+    
+    // Cone and hemisphere shapes
+    state.coneAngle = data.value("coneAngle", 45.0f);
+    state.coneHeight = data.value("coneHeight", 1.0f);
+    state.coneDirection = data.value("coneDirection", Vector3{ 0.0f, 1.0f, 0.0f });
+    state.hemisphereAngle = data.value("hemisphereAngle", 90.0f);
+    
+    // Angle-based plane and ring shapes
+    state.planeNormal = data.value("planeNormal", Vector3{ 0.0f, 1.0f, 0.0f });
+    state.planeWidth = data.value("planeWidth", 1.0f);
+    state.planeHeight = data.value("planeHeight", 1.0f);
+    state.ringAngle = data.value("ringAngle", 0.0f);
+    state.ringNormal = data.value("ringNormal", Vector3{ 0.0f, 1.0f, 0.0f });
+    
+    // テクスチャパス
+    state.texturePath = data.value("texturePath", std::string(""));
 
     return state;
 }
@@ -152,7 +190,35 @@ void EmitterStateLoader::Save(const std::string& filePath, const EmitterState& s
         {"lifeTime", state.lifeTime},
         {"lifeTimeRandom", state.lifeTimeRandom},
         {"minLifeTime", state.minLifeTime},
-        {"maxLifeTime", state.maxLifeTime}
+        {"maxLifeTime", state.maxLifeTime},
+
+        // 形状関連
+        {"shapeType", state.shapeType},
+        {"size", state.size},
+        
+        // Line shape
+        {"lineStart", state.lineStart},
+        {"lineLength", state.lineLength},
+        
+        // Ring shape
+        {"ringInnerRadius", state.ringInnerRadius},
+        {"ringOuterRadius", state.ringOuterRadius},
+        
+        // Cone and hemisphere shapes
+        {"coneAngle", state.coneAngle},
+        {"coneHeight", state.coneHeight},
+        {"coneDirection", state.coneDirection},
+        {"hemisphereAngle", state.hemisphereAngle},
+        
+        // Angle-based plane and ring shapes
+        {"planeNormal", state.planeNormal},
+        {"planeWidth", state.planeWidth},
+        {"planeHeight", state.planeHeight},
+        {"ringAngle", state.ringAngle},
+        {"ringNormal", state.ringNormal},
+        
+        // テクスチャパス
+        {"texturePath", state.texturePath}
     };
 
     std::ofstream file(filePath);

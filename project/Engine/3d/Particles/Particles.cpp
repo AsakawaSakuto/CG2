@@ -583,6 +583,7 @@ void Particles::DrawImGui(const char* objectName) {
 	if (ImGui::Button("Load to Json")) {
 		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
+
 	}
 
 	ImGui::SameLine();

@@ -1,6 +1,7 @@
 #pragma once
 #include"Vector3.h"
 #include"Vector2.h"
+#include <string>
 
 // Emitter shape types (must match HLSL definitions)
 enum class EmitterShapeType : uint32_t {
@@ -117,4 +118,7 @@ struct EmitterState {
 	float planeHeight;      // Plane height
 	float ringAngle;        // Ring rotation angle around normal axis
 	Vector3 ringNormal;     // Ring normal vector (for RING_ANGLE types)
+	
+	// Texture path for particles
+	std::string texturePath;
 };
