@@ -109,9 +109,9 @@ private:
 	Camera camera_;
 
 	std::string jsonFilePath_;
-	std::string loadToSaveName_ = "emitterData";
+	std::string loadToSaveName_ = "temp";
 	std::string generateName = "emitterData";
-	std::string texturePath_ = "textureName";
+	std::string texturePath_ = "circle";
 
 	// パーティクルの再生状態
 	bool isPlaying_ = false;

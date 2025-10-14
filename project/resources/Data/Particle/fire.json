@@ -62,7 +62,7 @@
     "radius": 1.0,
     "rotateMove": 0,
     "rotateVelocityRandom": 0,
-    "scaleFade": 0,
+    "scaleFade": 1,
     "scaleRandom": 0,
     "startColor": [
         1.0,
