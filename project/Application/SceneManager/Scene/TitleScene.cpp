@@ -21,9 +21,6 @@ void TitleScene::Initialize() {
 
 	particle_->Initialize(&ctx_->dxCommon, "star", 2);
 	particle_->LoadJson("oneStar");
-
-	particle2_->Initialize(&ctx_->dxCommon, "circle2", 2);
-	particle2_->LoadJson("temp");
 }
 
 void TitleScene::Update() {
@@ -35,10 +32,17 @@ void TitleScene::Update() {
 		ChangeScene(SCENE::GAME);
 	}
 
+	if (input_->TriggerKey(DIK_P)) { // P key
+		if (particle_->IsPlaying()) {
+			particle_->Stop();
+		} else {
+			particle_->Play();
+		}
+	}
+
 	sceneFade_->Update();
 
 	particle_->Update();
-	particle2_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -54,7 +58,6 @@ void TitleScene::Draw() {
 	///
 
 	particle_->Draw(*useCamera_);
-	//particle2_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -72,7 +75,8 @@ void TitleScene::Draw() {
 	///
 
 	particle_->DrawImGui("titleEffect");
-	//particle2_->DrawImGui("titleEffect2");
+
+	ImGui::End();
 
 	DrawSceneName();
 

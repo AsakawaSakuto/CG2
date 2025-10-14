@@ -74,6 +74,23 @@ public:
 	//
 	void SetEmit(bool emit) { emitter_.emit = emit; }
 
+	// パーティクル生成開始
+	void Play() { 
+		emitter_.useEmitter = true; 
+		isPlaying_ = true;
+	}
+
+	// パーティクル生成停止
+	void Stop() { 
+		emitter_.useEmitter = false; 
+		emitter_.emit = false;
+		emitter_.frequencyTime = 0.0f;
+		isPlaying_ = false;
+	}
+
+	// パーティクルが再生中かどうか
+	bool IsPlaying() const { return isPlaying_; }
+
 	void LoadJson(const std::string& filePath) {
 		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_); };
@@ -88,6 +105,9 @@ private:
 	std::string loadToSaveName_ = "emitterData";
 	std::string generateName = "emitterData";
 	std::string texturePath_ = "textureName";
+
+	// パーティクルの再生状態
+	bool isPlaying_ = false;
 
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;
