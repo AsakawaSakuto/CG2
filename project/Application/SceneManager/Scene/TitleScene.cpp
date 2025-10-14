@@ -32,6 +32,9 @@ void TitleScene::Update() {
 		ChangeScene(SCENE::GAME);
 	}
 
+	if (input_->TriggerKey(DIK_I)) { // P key
+		particle_->Play(false);
+	}
 	if (input_->TriggerKey(DIK_O)) { // P key
 		particle_->Play();
 	}

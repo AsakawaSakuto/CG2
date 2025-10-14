@@ -75,9 +75,16 @@ public:
 	void SetEmit(bool emit) { emitter_.emit = emit; }
 
 	// パーティクル生成開始
-	void Play() { 
-		emitter_.useEmitter = true; 
-		isPlaying_ = true;
+	void Play(bool isLoop = true) { 
+		if (isLoop) {
+			emitter_.frequencyTime = emitter_.frequency;
+			emitter_.useEmitter = true;
+			isPlaying_ = true;
+		} else {
+			emitter_.frequencyTime = emitter_.frequency;
+			emitter_.useEmitter = false;
+			isPlaying_ = false;
+		}
 	}
 
 	// パーティクル生成停止

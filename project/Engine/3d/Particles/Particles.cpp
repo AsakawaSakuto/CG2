@@ -587,15 +587,15 @@ void Particles::UpdateEmitter() {
 	// このemitterSphereをCBufferとしてGPUへ転送
 	if (emitter_.useEmitter) {
 		emitter_.frequencyTime += kDeltaTime_;  // frequencyTimerをfrequencyTimeに修正
-		if (emitter_.frequency <= emitter_.frequencyTime) {
-			emitter_.frequencyTime = 0.0f;
-			emitter_.emit = true;
-		} else {
-			emitter_.emit = false;
-		}
-	} else {
-		emitter_.frequencyTime = 0.0f;
 	}
+
+	if (emitter_.frequency <= emitter_.frequencyTime) {
+		emitter_.frequencyTime = 0.0f;
+		emitter_.emit = true;
+	} else {
+		emitter_.emit = false;
+	}
+
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.translate += offset_;
 
