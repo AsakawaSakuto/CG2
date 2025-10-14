@@ -2,6 +2,16 @@
 #include"Vector3.h"
 #include"Vector2.h"
 
+// Emitter shape types (must match HLSL definitions)
+enum class EmitterShapeType : uint32_t {
+	POINT = 0,
+	LINE = 1,
+	SPHERE_VOLUME = 2,
+	SPHERE_SURFACE = 3,
+	BOX = 4,
+	RING = 5
+};
+
 struct EmitterState {
 	Vector3 translate;
 	float radius;
@@ -74,4 +84,15 @@ struct EmitterState {
 	uint32_t lifeTimeRandom;
 	float minLifeTime;
 	float maxLifeTime;
+	
+	// New fields for multi-shape support
+	uint32_t shapeType;  // EmitterShapeType
+	Vector3 size;        // For box: width, height, depth; For line: direction vector; For ring: inner radius, outer radius, 0
+	
+	Vector3 lineStart;   // For line emitter: start point
+	float lineLength;    // For line emitter: length
+	
+	float ringInnerRadius;  // For ring emitter
+	float ringOuterRadius;  // For ring emitter
+	float padNew[2];
 };

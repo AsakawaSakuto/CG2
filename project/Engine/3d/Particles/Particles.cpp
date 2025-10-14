@@ -77,6 +77,14 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.lifeTimeRandom = 0;
 	emitter_.minLifeTime = 1.0f;
 	emitter_.maxLifeTime = 5.0f;
+	
+	// Initialize new emitter shape fields
+	emitter_.shapeType = static_cast<uint32_t>(EmitterShapeType::SPHERE_VOLUME);
+	emitter_.size = { 1.0f, 1.0f, 1.0f };  // Default box size
+	emitter_.lineStart = { -1.0f, 0.0f, 0.0f };  // Default line start
+	emitter_.lineLength = 2.0f;  // Default line length
+	emitter_.ringInnerRadius = 0.5f;  // Default ring inner radius
+	emitter_.ringOuterRadius = 1.0f;  // Default ring outer radius
 
 	CreateEmitterResource();
 	CreateParticleResource();
@@ -221,7 +229,51 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Separator();
 
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
-	ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+	
+	// Emitter Shape Selection
+	const char* shapeNames[] = { "Point", "Line", "Sphere (Volume)", "Sphere (Surface)", "Box", "Ring" };
+	int currentShape = static_cast<int>(emitter_.shapeType);
+	if (ImGui::Combo("Emitter Shape", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
+		emitter_.shapeType = static_cast<uint32_t>(currentShape);
+	}
+	
+	// Shape-specific parameters
+	switch (static_cast<EmitterShapeType>(emitter_.shapeType))
+	{
+		case EmitterShapeType::POINT:
+			// Point emitter has no additional parameters
+			ImGui::Text("Point emitter - particles spawn at exact position");
+			break;
+			
+		case EmitterShapeType::LINE:
+			ImGui::DragFloat3("Line Start", &emitter_.lineStart.x, 0.01f);
+			ImGui::DragFloat3("Line Direction", &emitter_.size.x, 0.01f);
+			ImGui::DragFloat("Line Length", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
+			break;
+			
+		case EmitterShapeType::SPHERE_VOLUME:
+		case EmitterShapeType::SPHERE_SURFACE:
+			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			if (static_cast<EmitterShapeType>(emitter_.shapeType) == EmitterShapeType::SPHERE_SURFACE) {
+				ImGui::Text("Surface only - particles spawn on sphere surface");
+			} else {
+				ImGui::Text("Volume - particles spawn inside sphere");
+			}
+			break;
+			
+		case EmitterShapeType::BOX:
+			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+			break;
+			
+		case EmitterShapeType::RING:
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			break;
+	}
 
 	ImGui::Separator();
 
@@ -333,8 +385,6 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 	ImGui::Spacing();
-
-	
 
 	ImGui::End();
 }

@@ -59,7 +59,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
                         gParticles[particleIndex].color.b = gEmitter.startColor.b;
                     }
                     
-                    gParticles[particleIndex].translate = GenerateSpherePositionCustom(baseSeed + 5000, gEmitter.translate, gEmitter.radius);
+                    // Use the new universal position generator
+                    gParticles[particleIndex].translate = GenerateEmitterPosition(baseSeed + 5000, gEmitter);
                     
                     if (gEmitter.velocityRandom != 0)
                     {
