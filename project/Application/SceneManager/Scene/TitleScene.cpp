@@ -19,7 +19,7 @@ void TitleScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	particle_->Initialize(&ctx_->dxCommon, "circle", 2);
+	particle_->Initialize(&ctx_->dxCommon, "circle");
 	particle_->LoadJson("temp");
 
 	// Text3Dの初期化

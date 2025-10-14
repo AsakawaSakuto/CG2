@@ -36,45 +36,68 @@
 #include"Json/EmitterStateLoder.h"
 
 #pragma endregion
-// パーティクルクラス
+
+
+/// <summary>
+/// パーティクルクラス
+/// </summary>
 class Particles
 {
 public:
 
-	// 初期化・maxParticleに扱えるパーティクルの最大数を入れる(512の倍数)
-	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle);
+	/// <summary>
+	/// パーティクルの初期化
+	/// </summary>
+	/// <param name="dxCommon">dxCommonを渡す</param>
+	/// <param name="TextureName">使用するTextureのPathを入れる「デフォルトでCircle」</param>
+	/// <param name="maxParticle">整数値＊512粒のパーティクルを扱えるようになる</param>
+	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName = "resources/image/particle/circle.png", const uint32_t maxParticle = 1);
 
-	// 更新 パーティクルの動きや行列更新
+	/// <summary>
+	/// パーティクルの更新
+	/// </summary>
 	void Update();
 
-	// 描画処理
+	/// <summary>
+	/// パーティクルの描画
+	/// </summary>
+	/// <param name="useCamera">シーンで使用してるCameraを渡す</param>
 	void Draw(Camera& useCamera);
 
-	// ImGuiでのパラメータ表示
+	/// <summary>
+	/// ImGuiでパラメータを操作 「JsonFileの生成＋保存＋読み込みをできる」
+	/// </summary>
+	/// <param name="objectName">表示する名前を入力</param>
 	void DrawImGui(const char* objectName);
 
-	// テクスチャの設定（描画用）
+	/// <summary>
+	/// パーティクルに使用するTextureを変更する
+	/// </summary>
+	/// <param name="textureName">使用するTextureのPathを入れる</param>
 	void SetTexture(const std::string& textureName);
 
-	// ブレンドモードを変更
+	/// <summary>
+	/// ブレンドモードを設定する
+	/// </summary>
+	/// <param name="blendMode">BlendMode構造体から入れる</param>
 	void SetBlendMode(BlendMode blendMode) { blendMode_ = blendMode; }
 
-	// エミッタの値をセット
-	void SetEmitterValue(const EmitterState& emitter) { emitter_ = emitter; }
-
-	//
+	/// <summary>
+	/// Emitterの位置を設定する
+	/// </summary>
+	/// <param name="position">位置を入れる</param>
 	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
 
-	//
-	void UseEmitter(bool useEmitter) { emitter_.useEmitter = useEmitter; }
-
-	//
+	/// <summary>
+	/// EmitterのOffSet値を設定する
+	/// </summary>
+	/// <param name="offset">設定するOffSet値</param>
 	void SetOffSet(Vector3 offset) { offset_ = offset; }
 
-	//
-	void SetEmit(bool emit) { emitter_.emit = emit; }
-
-	// パーティクル生成開始
+	/// <summary>
+	/// パーティクルの生成開始
+	/// </summary>
+	/// <param name="isLoop">trueならループ生成、falseなら一回だけ生成</param>
 	void Play(bool isLoop = true) { 
 		if (isLoop) {
 			emitter_.frequencyTime = emitter_.frequency;
@@ -87,7 +110,9 @@ public:
 		}
 	}
 
-	// パーティクル生成停止
+	/// <summary>
+	/// パーティクルの生成停止
+	/// </summary>
 	void Stop() { 
 		emitter_.useEmitter = false; 
 		emitter_.emit = false;
@@ -95,9 +120,17 @@ public:
 		isPlaying_ = false;
 	}
 
-	// パーティクルが再生中かどうか
+	/// <summary>
+	/// パーティクルが生成中かどうかを判定する
+	/// </summary>
+	/// <returns>生成中の場合は true、そうでない場合は false を返す</returns>
 	bool IsPlaying() const { return isPlaying_; }
 
+	/// <summary>
+	/// JsonFileからEmitterの値を読み込む
+	/// </summary>
+	/// <param name="filePath">Resources->Data->Particle の中にあるJsonFileのPathを入れる「.jsonは不要」</param>
+	/// <param name="Pathの処理">"resources/Data/Particle/" + (filePath + ".json")</param>
 	void LoadJson(const std::string& filePath) {
 		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
@@ -115,6 +148,7 @@ public:
 		}
 	};
 private:
+
 	void ExecuteInitialization();
 
 	void ResetAllParticles();
@@ -263,13 +297,4 @@ private:
 
 	D3D12_RASTERIZER_DESC rasterizerDesc_;       // ラスタライザステート
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_;  // 深度ステンシルステート
-
-	// PSO・シグネチャ構築関連の関数
-	void CreatePSO();
-	void CreateRootSignature();
-	void InputLayoutSet();
-	void CompileShaders();
-	void BlendStateSet();
-	void RasiterzerStateSet();
-	void DepthStencilStateSet();
 };
