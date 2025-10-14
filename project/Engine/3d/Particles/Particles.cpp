@@ -86,6 +86,22 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureNa
 	emitter_.ringInnerRadius = 0.5f;  // Default ring inner radius
 	emitter_.ringOuterRadius = 1.0f;  // Default ring outer radius
 
+	// Initialize cone and hemisphere fields
+	emitter_.coneAngle = 45.0f;  // Default cone angle in degrees
+	emitter_.coneHeight = 2.0f;  // Default cone height
+	emitter_.coneDirection = { 0.0f, 1.0f, 0.0f };  // Default direction (up)
+	emitter_.hemisphereAngle = 180.0f;  // Default hemisphere angle (full hemisphere)
+
+	// Initialize angle-based plane and ring fields
+	emitter_.planeNormal = { 0.0f, 1.0f, 0.0f };  // Default plane normal (up)
+	emitter_.planeWidth = 2.0f;   // Default plane width
+	emitter_.planeHeight = 2.0f;  // Default plane height
+	emitter_.ringAngle = 0.0f;    // Default ring rotation angle
+	emitter_.ringNormal = { 0.0f, 1.0f, 0.0f };  // Default ring normal (up)
+
+	// Initialize texture path
+	emitter_.texturePath = TextureName;
+
 	CreateEmitterResource();
 	CreateParticleResource();
 	CreatePerViewResource();
@@ -184,12 +200,6 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Begin(objectName);
 
-	// Particle Control Section
-	ImGui::Text("PARTICLE CONTROL");
-
-	// 現在の再生状態を表示
-	ImGui::Text("Status: %s", isPlaying_ ? "Playing" : "Stopped");
-
 	// Play/Stop control buttons
 	if (ImGui::Button("Play (Loop)")) {
 		Play(true);
@@ -207,19 +217,60 @@ void Particles::DrawImGui(const char* objectName) {
 		Stop();
 	}
 
+	// 現在の再生状態を表示
+	ImGui::Text("Status: %s", isPlaying_ ? "Playing" : "Stopped");
+
 	ImGui::Separator();
 
-	if (EmitterStateLoader::InputText("texture Name", texturePath_)) {
+	if (EmitterStateLoader::InputText("File Name", loadToSaveName_)) {
 		// 入力が変更されたらここに来る
-		printf("Generate Name Changed to: %s\n", texturePath_.c_str());
+		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
+	}
+
+	if (ImGui::Button("Load to Json")) {
+		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
+		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
+
+		// JSONから読み込んだテクスチャパスを適用
+		if (!emitter_.texturePath.empty()) {
+			std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
+			if (textureName_ != newTextureName) {
+				textureName_ = newTextureName;
+				// テクスチャファイル読み込み
+				TextureManager::GetInstance()->LoadTexture(textureName_);
+				// 読み込んだテクスチャの番号を取得
+				textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+			}
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Save to Json")) {
+		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
+		EmitterStateLoader::Save(jsonFilePath_, emitter_);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Generate to Json")) {
+		EmitterStateLoader::SaveToCurrentDir(emitter_, loadToSaveName_);
+	}
+
+	ImGui::Separator();
+
+	if (EmitterStateLoader::InputText("texture Name", emitter_.texturePath)) {
+		// 入力が変更されたらここに来る
+		printf("Texture Name Changed to: %s\n", emitter_.texturePath.c_str());
 	}
 
 	if (ImGui::Button("Load Texture")) {
 		// すでに同じテクスチャなら処理をスキップ
-		if (textureName_ == texturePath_) {
+		std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
+		if (textureName_ == newTextureName) {
 			return;
 		}
-		textureName_ = "resources/image/particle/" + texturePath_ + ".png";
+		textureName_ = newTextureName;
 		// .objの参照しているテクスチャファイル読み込み
 		TextureManager::GetInstance()->LoadTexture(textureName_);
 		// 読み込んだテクスチャの番号を取得
@@ -231,7 +282,25 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
 	
 	// Emitter Shape Selection
-	const char* shapeNames[] = { "Point", "Line", "Sphere (Volume)", "Sphere (Surface)", "Box", "Ring" };
+	const char* shapeNames[] = { 
+		"Point", 
+		"Line", 
+		"Sphere (Volume)", 
+		"Sphere (Surface)", 
+		"Box (Volume)", 
+		"Box (Surface)", 
+		"Ring (XZ Plane)", 
+		"Ring (XY Plane)", 
+		"Ring (YZ Plane)",
+		"Cone (Volume)",
+		"Cone (Surface)",
+		"Hemisphere (Volume)",
+		"Hemisphere (Surface)",
+		"Plane (Angle Volume)",
+		"Plane (Angle Edges)",
+		"Ring (Angle Volume)",
+		"Ring (Angle Edge)"
+	};
 	int currentShape = static_cast<int>(emitter_.shapeType);
 	if (ImGui::Combo("Emitter Shape", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
 		emitter_.shapeType = static_cast<uint32_t>(currentShape);
@@ -241,18 +310,23 @@ void Particles::DrawImGui(const char* objectName) {
 	switch (static_cast<EmitterShapeType>(emitter_.shapeType))
 	{
 		case EmitterShapeType::POINT:
+		{
 			// Point emitter has no additional parameters
 			ImGui::Text("Point emitter - particles spawn at exact position");
 			break;
-			
+		}
+		
 		case EmitterShapeType::LINE:
+		{
 			ImGui::DragFloat3("Line Start", &emitter_.lineStart.x, 0.01f);
 			ImGui::DragFloat3("Line Direction", &emitter_.size.x, 0.01f);
 			ImGui::DragFloat("Line Length", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
 			break;
-			
+		}
+		
 		case EmitterShapeType::SPHERE_VOLUME:
 		case EmitterShapeType::SPHERE_SURFACE:
+		{
 			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
 			if (static_cast<EmitterShapeType>(emitter_.shapeType) == EmitterShapeType::SPHERE_SURFACE) {
 				ImGui::Text("Surface only - particles spawn on sphere surface");
@@ -260,19 +334,211 @@ void Particles::DrawImGui(const char* objectName) {
 				ImGui::Text("Volume - particles spawn inside sphere");
 			}
 			break;
-			
-		case EmitterShapeType::BOX:
+		}
+		
+		case EmitterShapeType::BOX_VOLUME:
+		{
 			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Volume - particles spawn inside box");
 			break;
-			
-		case EmitterShapeType::RING:
+		}
+		
+		case EmitterShapeType::BOX_SURFACE:
+		{
+			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Surface only - particles spawn on box faces");
+			break;
+		}
+		
+		case EmitterShapeType::RING_XZ:
+		{
 			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
 			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Ring in XZ plane (horizontal)");
 			// Ensure inner radius is not larger than outer radius
 			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
 			}
 			break;
+		}
+		
+		case EmitterShapeType::RING_XY:
+		{
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Ring in XY plane (vertical facing forward)");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::RING_YZ:
+		{
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("Ring in YZ plane (vertical facing right)");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::CONE_VOLUME:
+		{
+			ImGui::DragFloat("Cone Angle", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat("Cone Height", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Cone Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Volume - particles spawn inside cone");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                      emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                      emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::CONE_SURFACE:
+		{
+			ImGui::DragFloat("Cone Angle", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat("Cone Height", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Cone Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Surface only - particles spawn on cone surface");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::HEMISPHERE_VOLUME:
+		{
+			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			ImGui::DragFloat("Hemisphere Angle", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat3("Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Volume - particles spawn inside hemisphere");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::HEMISPHERE_SURFACE:
+		{
+			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			ImGui::DragFloat("Hemisphere Angle", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat3("Direction", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("Surface only - particles spawn on hemisphere surface");
+			// Normalize direction vector
+			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
+			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
+			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
+			if (dirLength > 0.001f) {
+				emitter_.coneDirection.x /= dirLength;
+				emitter_.coneDirection.y /= dirLength;
+				emitter_.coneDirection.z /= dirLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::PLANE_ANGLE:
+		{
+			ImGui::DragFloat("Plane Width", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat("Plane Height", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat3("Plane Normal", &emitter_.planeNormal.x, 0.01f);
+			ImGui::Text("Volume - particles spawn on plane surface");
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
+			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
+			                         emitter_.planeNormal.z * emitter_.planeNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.planeNormal.x /= normalLength;
+				emitter_.planeNormal.y /= normalLength;
+				emitter_.planeNormal.z /= normalLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::PLANE_ANGLE_EDGE:
+		{
+			ImGui::DragFloat("Plane Width", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat("Plane Height", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat3("Plane Normal", &emitter_.planeNormal.x, 0.01f);
+			ImGui::Text("Edges only - particles spawn on plane edges");
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
+			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
+			                         emitter_.planeNormal.z * emitter_.planeNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.planeNormal.x /= normalLength;
+				emitter_.planeNormal.y /= normalLength;
+				emitter_.planeNormal.z /= normalLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::RING_ANGLE:
+		{
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Ring Normal", &emitter_.ringNormal.x, 0.01f);
+			ImGui::DragFloat("Ring Angle", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
+			ImGui::Text("Volume - particles spawn in ring area");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.ringNormal.x * emitter_.ringNormal.x + 
+			                         emitter_.ringNormal.y * emitter_.ringNormal.y + 
+			                         emitter_.ringNormal.z * emitter_.ringNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.ringNormal.x /= normalLength;
+				emitter_.ringNormal.y /= normalLength;
+				emitter_.ringNormal.z /= normalLength;
+			}
+			break;
+		}
+		
+		case EmitterShapeType::RING_ANGLE_EDGE:
+		{
+			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("Ring Normal", &emitter_.ringNormal.x, 0.01f);
+			ImGui::DragFloat("Ring Angle", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
+			ImGui::Text("Edge only - particles spawn on ring circumference");
+			// Ensure inner radius is not larger than outer radius
+			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
+			}
+			// Normalize normal vector
+			float normalLength = sqrt(emitter_.ringNormal.x * emitter_.ringNormal.x + 
+			                         emitter_.ringNormal.y * emitter_.ringNormal.y + 
+			                         emitter_.ringNormal.z * emitter_.ringNormal.z);
+			if (normalLength > 0.001f) {
+				emitter_.ringNormal.x /= normalLength;
+				emitter_.ringNormal.y /= normalLength;
+				emitter_.ringNormal.z /= normalLength;
+			}
+			break;
+		}
 	}
 
 	ImGui::Separator();
@@ -343,31 +609,6 @@ void Particles::DrawImGui(const char* objectName) {
 	if (emitter_.lifeTimeRandom) {
 		ImGui::DragFloat("MinLifeTime", &emitter_.minLifeTime, 0.01f, 0.0f, 100.0f);
 		ImGui::DragFloat("MaxLifeTime", &emitter_.maxLifeTime, 0.01f, 0.0f, 100.0f);
-	}
-
-	ImGui::Separator();
-
-	if (EmitterStateLoader::InputText("File Name", loadToSaveName_)) {
-		// 入力が変更されたらここに来る
-		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
-	}
-
-	if (ImGui::Button("Load to Json")) {
-		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
-		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Save to Json")) {
-		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
-		EmitterStateLoader::Save(jsonFilePath_, emitter_);
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Generate to Json")) {
-		EmitterStateLoader::SaveToCurrentDir(emitter_, loadToSaveName_);
 	}
 
 	ImGui::Separator();

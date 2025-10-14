@@ -1,6 +1,7 @@
 #pragma once
 #include"Vector3.h"
 #include"Vector2.h"
+#include <string>
 
 // Emitter shape types (must match HLSL definitions)
 enum class EmitterShapeType : uint32_t {
@@ -8,8 +9,19 @@ enum class EmitterShapeType : uint32_t {
 	LINE = 1,
 	SPHERE_VOLUME = 2,
 	SPHERE_SURFACE = 3,
-	BOX = 4,
-	RING = 5
+	BOX_VOLUME = 4,
+	BOX_SURFACE = 5,
+	RING_XZ = 6,
+	RING_XY = 7,
+	RING_YZ = 8,
+	CONE_VOLUME = 9,
+	CONE_SURFACE = 10,
+	HEMISPHERE_VOLUME = 11,
+	HEMISPHERE_SURFACE = 12,
+	PLANE_ANGLE = 13,       // Rotatable plane (volume)
+	PLANE_ANGLE_EDGE = 14,  // Rotatable plane (edges only)
+	RING_ANGLE = 15,        // Rotatable ring (volume)
+	RING_ANGLE_EDGE = 16    // Rotatable ring (edge only)
 };
 
 struct EmitterState {
@@ -85,14 +97,28 @@ struct EmitterState {
 	float minLifeTime;
 	float maxLifeTime;
 	
-	// New fields for multi-shape support
-	uint32_t shapeType;  // EmitterShapeType
-	Vector3 size;        // For box: width, height, depth; For line: direction vector; For ring: inner radius, outer radius, 0
+	uint32_t shapeType;
+	Vector3 size;
 	
-	Vector3 lineStart;   // For line emitter: start point
-	float lineLength;    // For line emitter: length
+	Vector3 lineStart;
+	float lineLength;
 	
-	float ringInnerRadius;  // For ring emitter
-	float ringOuterRadius;  // For ring emitter
-	float padNew[2];
+	float ringInnerRadius;
+	float ringOuterRadius;
+	
+	// Fields for cone and hemisphere emitters
+	float coneAngle;        // Cone angle in degrees (0-180)
+	float coneHeight;       // Cone height
+	Vector3 coneDirection;  // Cone direction vector
+	float hemisphereAngle;  // Hemisphere angle in degrees (0-180)
+	
+	// Fields for angle-based plane and ring emitters
+	Vector3 planeNormal;    // Plane normal vector (for PLANE_ANGLE types)
+	float planeWidth;       // Plane width
+	float planeHeight;      // Plane height
+	float ringAngle;        // Ring rotation angle around normal axis
+	Vector3 ringNormal;     // Ring normal vector (for RING_ANGLE types)
+	
+	// Texture path for particles
+	std::string texturePath;
 };
