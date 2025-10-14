@@ -35,10 +35,12 @@ public:
 	Vector2 GetShakeAmount() const { return shakeAmount_; }
 	float GetStartLine() const { return START_LINE; }
 	float GetEndLine() const { return END_LINE; }
+	bool GetIsGoal() const { return isGoal_; }
 
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
 	void SetBlocks(std::vector<std::shared_ptr<Block>>& blocks) { blocks_ = blocks; }
+	void SetIsGoal(bool isGoal) { isGoal_ = isGoal; }
 
 private:
 	// プレイヤーの上昇
@@ -81,13 +83,13 @@ private:
 	void StunRemoved();
 
 	// トゲとの当たり判定
-	void ThornCollision();
+	void CollisionThorn();
 
 	// ブロックとの当たり判定
-	void BlockCollision();
+	void CollisionBlock();
 
 	// 弾とトゲの当たり判定
-	void BulletThornCollison();
+	void CollisonBulletThorn();
 
 	// カメラシェイクの数値を更新
 	void UpdateCameraShake();
@@ -105,7 +107,7 @@ private:
 	void TickThornCooldown();
 
 	// プレイヤーの羽とトゲの当たり判定
-	void WingThornCollision();
+	void CollisionWingThorn();
 
 	// 弾のゲージリセット
 	void ResetBulletGauge();
@@ -183,4 +185,7 @@ private:
 	const int kFarScore = 1;
 
 	float dis{};
+
+	// ゴールフラグ
+	bool isGoal_ = false;
 };
