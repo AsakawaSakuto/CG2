@@ -14,7 +14,8 @@ void TitleScene::Initialize() {
 	normalCamera_->SetPosition({ 0.0f,0.0f,-10.0f });
 	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
 	
-	sceneFade_ = new SceneFade();
+	// Create SceneFade
+	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
@@ -35,6 +36,16 @@ void TitleScene::Update() {
 	}
 	if (sceneFade_->EndFadeIn()) {
 		ChangeScene(SCENE::GAME);
+	}
+
+	if (input_->TriggerKey(DIK_I)) { // P key
+		particle_->Play(false);
+	}
+	if (input_->TriggerKey(DIK_O)) { // P key
+		particle_->Play();
+	}
+	if (input_->TriggerKey(DIK_P)) { // P key
+		particle_->Stop();
 	}
 
 	sceneFade_->Update();
@@ -83,6 +94,8 @@ void TitleScene::Draw() {
 	///
 
 	particle_->DrawImGui("titleEffect");
+
+	ImGui::End();
 
 	DrawSceneName();
 

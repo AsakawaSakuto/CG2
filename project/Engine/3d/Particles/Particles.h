@@ -74,6 +74,30 @@ public:
 	//
 	void SetEmit(bool emit) { emitter_.emit = emit; }
 
+	// パーティクル生成開始
+	void Play(bool isLoop = true) { 
+		if (isLoop) {
+			emitter_.frequencyTime = emitter_.frequency;
+			emitter_.useEmitter = true;
+			isPlaying_ = true;
+		} else {
+			emitter_.frequencyTime = emitter_.frequency;
+			emitter_.useEmitter = false;
+			isPlaying_ = false;
+		}
+	}
+
+	// パーティクル生成停止
+	void Stop() { 
+		emitter_.useEmitter = false; 
+		emitter_.emit = false;
+		emitter_.frequencyTime = 0.0f;
+		isPlaying_ = false;
+	}
+
+	// パーティクルが再生中かどうか
+	bool IsPlaying() const { return isPlaying_; }
+
 	void LoadJson(const std::string& filePath) {
 		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_); };
@@ -85,9 +109,12 @@ private:
 	Camera camera_;
 
 	std::string jsonFilePath_;
-	std::string loadToSaveName_ = "emitterData";
+	std::string loadToSaveName_ = "temp";
 	std::string generateName = "emitterData";
-	std::string texturePath_ = "textureName";
+	std::string texturePath_ = "circle";
+
+	// パーティクルの再生状態
+	bool isPlaying_ = false;
 
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;

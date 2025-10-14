@@ -11,6 +11,9 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 
+// 共有キャッシュの定義
+std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
+
 //"resources/uvChecker.png"
 
 void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
@@ -20,37 +23,64 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 	modelPath_ = "resources/model/" + modelPath;
 
-	modelData_ = LoadObject3dFile(modelPath_);
+	// まずキャッシュを探す
+	auto it = s_geometryCache_.find(modelPath_);
+	if (it == s_geometryCache_.end()) {
+		// 未ロードなので新規ロードしてキャッシュ
+		auto cache = std::make_shared<GeometryCache>();
 
-	// バウンディング半径を自動計算
-	float maxDistanceSquared = 0.0f;
-	for (const auto& vertex : modelData_.vertices) {
-		float distanceSquared = 
-			vertex.position.x * vertex.position.x +
-			vertex.position.y * vertex.position.y +
-			vertex.position.z * vertex.position.z;
-		maxDistanceSquared = std::max(maxDistanceSquared, distanceSquared);
+		cache->modelData = LoadObject3dFile(modelPath_);
+
+		// バウンディング半径を自動計算
+		float maxDistanceSquared = 0.0f;
+		for (const auto& vertex : cache->modelData.vertices) {
+			float distanceSquared =
+				vertex.position.x * vertex.position.x +
+				vertex.position.y * vertex.position.y +
+				vertex.position.z * vertex.position.z;
+			maxDistanceSquared = std::max(maxDistanceSquared, distanceSquared);
+		}
+		cache->boundingRadius = std::sqrt(maxDistanceSquared);
+		if (cache->boundingRadius < 0.1f) {
+			cache->boundingRadius = 1.0f;
+		}
+
+		cache->textureName = cache->modelData.material.textureFilePath;
+		// .objの参照しているテクスチャファイル読み込み
+		TextureManager::GetInstance()->LoadTexture(cache->textureName);
+		// 読み込んだテクスチャの番号を取得
+		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
+
+		// 頂点リソースをつくる（共有）
+		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * cache->modelData.vertices.size());
+		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress();
+		cache->vertexBufferView.SizeInBytes = UINT(sizeof(Object3dVertexData) * cache->modelData.vertices.size());
+		cache->vertexBufferView.StrideInBytes = sizeof(Object3dVertexData);
+		// 頂点データ書き込み（一時マップ）
+		Object3dVertexData* tmp = nullptr;
+		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
+		std::memcpy(tmp, cache->modelData.vertices.data(), sizeof(Object3dVertexData) * cache->modelData.vertices.size());
+		cache->vertexResource->Unmap(0, nullptr);
+
+		// キャッシュ登録
+		s_geometryCache_.emplace(modelPath_, cache);
+		it = s_geometryCache_.find(modelPath_);
 	}
-	boundingRadius_ = std::sqrt(maxDistanceSquared);
-	
-	// 最小値を保証（0の場合のフォールバック）
-	if (boundingRadius_ < 0.1f) {
-		boundingRadius_ = 1.0f;
-	}
 
-	textureName_ = modelData_.material.textureFilePath;
-
-	// .objの参照しているテクスチャファイル読み込み
-	TextureManager::GetInstance()->LoadTexture(textureName_);
-
-	// 読み込んだテクスチャの番号を取得
-	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+	// キャッシュからインスタンスへ設定
+	const auto& cache = it->second;
+	modelData_ = cache->modelData;
+	textureName_ = cache->textureName;
+	textureIndex_ = cache->textureIndex;
+	vertexResource_ = cache->vertexResource; // 共有
+	vertexBufferView_ = cache->vertexBufferView; // 共有
+	boundingRadius_ = cache->boundingRadius;
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 
 	direction_ = { 1.0f,-1.0f,1.0f };
 
-	CreateVertexResource();
+	// 以降はインスタンス専用のリソースのみ作成
 	CreateMaterialResource();
 	CreateTransformationResource();
 	CreateDirectionalLightResource();
@@ -329,6 +359,7 @@ void Model::DrawImGui(const char* objectName) {
 }
 
 void Model::CreateVertexResource() {
+	// 旧実装は共有キャッシュ導入により未使用（後方互換のため残すが呼ばれない想定）
 	// 頂点リソースをつくる
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * modelData_.vertices.size());
 	// リソースの先頭のアドレスから使う

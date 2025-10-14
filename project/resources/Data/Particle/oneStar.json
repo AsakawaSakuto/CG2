@@ -3,11 +3,11 @@
     "colorFade": 1,
     "colorRandom": 1,
     "count": 1,
-    "emit": 1,
+    "emit": 0,
     "endColor": [
         1.0,
-        0.38235294818878174,
-        0.0
+        1.0,
+        1.0
     ],
     "endRotateVelocity": -1.0,
     "endScale": [
@@ -19,11 +19,11 @@
         0.0,
         0.0
     ],
-    "frequency": 0.009999999776482582,
-    "frequencyTime": 0.0,
-    "isMove": 1,
+    "frequency": 5.0,
+    "frequencyTime": 1.1499996185302734,
+    "isMove": 0,
     "kMaxParticle": 1024,
-    "lifeTime": 3.0,
+    "lifeTime": 0.5,
     "lifeTimeRandom": 0,
     "maxColor": [
         1.0,
@@ -38,8 +38,8 @@
         1.5
     ],
     "maxVelocity": [
-        0.5,
-        5.0,
+        1.0,
+        1.0,
         0.0
     ],
     "minColor": [
@@ -55,24 +55,24 @@
         0.5
     ],
     "minVelocity": [
-        -0.5,
-        0.0,
+        -1.0,
+        -1.0,
         0.0
     ],
-    "radius": 1.0,
-    "rotateMove": 0,
+    "radius": 0.0,
+    "rotateMove": 1,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
     "startColor": [
+        0.9117647409439087,
         1.0,
-        0.0,
         0.0
     ],
     "startRotateVelocity": 1.0,
     "startScale": [
-        1.0,
-        1.0
+        10.0,
+        10.0
     ],
     "startVelocity": [
         0.0,

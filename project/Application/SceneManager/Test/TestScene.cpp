@@ -22,6 +22,10 @@ void TestScene::Initialize() {
 	// 汎用機能
 	gameTimer_.Start(2.0f, true);
 
+	// Clear
+	thorns_.clear();
+	blocks_.clear();
+
 	// オブジェクトの配置　上半分
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
 
