@@ -1,5 +1,5 @@
 #pragma once
-#include "EmitterSpfere.h"
+#include "EmitterState.h"
 #include <string>
 #include "externals/imgui/imgui.h"
 

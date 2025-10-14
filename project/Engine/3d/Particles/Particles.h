@@ -25,7 +25,7 @@
 #include "BlendMode.h"
 #include "PreView.h"
 #include "PreFrame.h"
-#include "EmitterSpfere.h"
+#include "EmitterState.h"
 
 #include "ParticleDescriptorAllocator.h"
 

@@ -21,7 +21,7 @@
 #include "Sprite.h"
 #include "Object3d.h"
 #include "Particles.h"
-#include "EmitterSpfere.h"
+#include "EmitterState.h"
 
 // Math
 #include "Vector2.h"
