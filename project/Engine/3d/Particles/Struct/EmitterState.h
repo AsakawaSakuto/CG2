@@ -85,14 +85,13 @@ struct EmitterState {
 	float minLifeTime;
 	float maxLifeTime;
 	
-	// New fields for multi-shape support
-	uint32_t shapeType;  // EmitterShapeType
-	Vector3 size;        // For box: width, height, depth; For line: direction vector; For ring: inner radius, outer radius, 0
+	uint32_t shapeType;
+	Vector3 size;
 	
-	Vector3 lineStart;   // For line emitter: start point
-	float lineLength;    // For line emitter: length
+	Vector3 lineStart;
+	float lineLength;
 	
-	float ringInnerRadius;  // For ring emitter
-	float ringOuterRadius;  // For ring emitter
+	float ringInnerRadius;
+	float ringOuterRadius;
 	float padNew[2];
 };
