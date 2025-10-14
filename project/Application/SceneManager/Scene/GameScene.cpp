@@ -2,6 +2,11 @@
 
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
+GameScene::~GameScene() {
+	thorns_.clear();
+	blocks_.clear();
+}
+
 void GameScene::Initialize() {
 	// inputSystemの初期化
 	gamePad_ = &ctx_->gamePad;
@@ -22,6 +27,10 @@ void GameScene::Initialize() {
 	// 汎用機能
 	gameTimer_.Start(2.0f, true);
 
+	// Clear
+	thorns_.clear();
+	blocks_.clear();
+
 	// オブジェクトの配置　上半分
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
 
@@ -32,7 +41,8 @@ void GameScene::Initialize() {
 	player_->SetThrons(thorns_);
 	player_->SetBlocks(blocks_);
 
-	sceneFade_ = new SceneFade();
+	// Create SceneFade
+	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 }

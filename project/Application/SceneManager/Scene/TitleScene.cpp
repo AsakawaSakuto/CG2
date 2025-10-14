@@ -14,7 +14,8 @@ void TitleScene::Initialize() {
 	normalCamera_->SetPosition({ 0.0f,0.0f,-10.0f });
 	normalCamera_->SetRotate({ 0.0f, 0.0f,0.0f });
 	
-	sceneFade_ = new SceneFade();
+	// Create SceneFade
+	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
