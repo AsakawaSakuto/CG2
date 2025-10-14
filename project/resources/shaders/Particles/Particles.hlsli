@@ -31,6 +31,14 @@ struct Particle {
     float pad7;
 };
 
+// Emitter shape types
+#define EMITTER_SHAPE_POINT 0
+#define EMITTER_SHAPE_LINE 1
+#define EMITTER_SHAPE_SPHERE_VOLUME 2
+#define EMITTER_SHAPE_SPHERE_SURFACE 3
+#define EMITTER_SHAPE_BOX 4
+#define EMITTER_SHAPE_RING 5
+
 struct EmitterSphere {
     float3 translate;
     float radius;
@@ -103,6 +111,17 @@ struct EmitterSphere {
     uint lifeTimeRandom;
     float minLifeTime;
     float maxLifeTime;
+    
+    // New fields for multi-shape support
+    uint shapeType;  // Emitter shape type
+    float3 size;     // For box: width, height, depth; For line: direction vector; For ring: inner radius, outer radius, 0
+    
+    float3 lineStart;  // For line emitter: start point
+    float lineLength;  // For line emitter: length
+    
+    float ringInnerRadius;  // For ring emitter
+    float ringOuterRadius;  // For ring emitter
+    float2 padNew;
 };
 
 struct PerView {
@@ -161,6 +180,20 @@ float RandomFloat(uint seed)
     return frac(Hash(seed) / 65536.0f);
 }
 
+// Point emitter - returns the exact center position
+float3 GeneratePointPosition(uint baseSeed, float3 center)
+{
+    return center;
+}
+
+// Line emitter - generates position along a line
+float3 GenerateLinePosition(uint baseSeed, float3 start, float3 direction, float length)
+{
+    float t = RandomFloat(baseSeed);
+    return start + normalize(direction) * length * t;
+}
+
+// Sphere volume emitter (original sphere function)
 float3 GenerateSpherePosition(uint baseSeed)
 {
     float u = RandomFloat(baseSeed + 0);
@@ -180,6 +213,7 @@ float3 GenerateSpherePosition(uint baseSeed)
     );
 }
 
+// Sphere volume emitter with custom center and radius
 float3 GenerateSpherePositionCustom(uint baseSeed, float3 center, float radius)
 {
     float u = RandomFloat(baseSeed + 0);
@@ -197,6 +231,83 @@ float3 GenerateSpherePositionCustom(uint baseSeed, float3 center, float radius)
     float r = radius * pow(w, 1.0f / 3.0f);
 
     return center + r * dir;
+}
+
+// Sphere surface emitter - generates position on sphere surface only
+float3 GenerateSphereSurfacePosition(uint baseSeed, float3 center, float radius)
+{
+    float u = RandomFloat(baseSeed + 0);
+    float v = RandomFloat(baseSeed + 1);
+
+    float theta = 2.0f * 3.14159265f * u;
+    float cosPhi = 1.0f - 2.0f * v;
+    float sinPhi = sqrt(max(0.0f, 1.0f - cosPhi * cosPhi));
+
+    float3 dir = float3(sinPhi * cos(theta),
+                        cosPhi,
+                        sinPhi * sin(theta));
+
+    return center + radius * dir;
+}
+
+// Box emitter - generates position within a box
+float3 GenerateBoxPosition(uint baseSeed, float3 center, float3 size)
+{
+    float x = RandomFloat(baseSeed + 0) - 0.5f;
+    float y = RandomFloat(baseSeed + 1) - 0.5f;
+    float z = RandomFloat(baseSeed + 2) - 0.5f;
+
+    return center + float3(x * size.x, y * size.y, z * size.z);
+}
+
+// Ring emitter - generates position on a ring (circle)
+float3 GenerateRingPosition(uint baseSeed, float3 center, float innerRadius, float outerRadius, float3 normal)
+{
+    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
+    float radiusLerp = RandomFloat(baseSeed + 1);
+    float radius = lerp(innerRadius, outerRadius, radiusLerp);
+
+    // Generate position in XZ plane first
+    float3 localPos = float3(cos(angle) * radius, 0.0f, sin(angle) * radius);
+    
+    // If normal is not (0,1,0), we need to rotate the ring
+    float3 up = float3(0.0f, 1.0f, 0.0f);
+    if (abs(dot(normal, up)) < 0.999f)
+    {
+        float3 right = normalize(cross(up, normal));
+        float3 forward = cross(normal, right);
+        localPos = localPos.x * right + localPos.y * normal + localPos.z * forward;
+    }
+
+    return center + localPos;
+}
+
+// Universal position generator based on emitter type
+float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
+{
+    switch (emitter.shapeType)
+    {
+        case EMITTER_SHAPE_POINT:
+            return GeneratePointPosition(baseSeed, emitter.translate);
+            
+        case EMITTER_SHAPE_LINE:
+            return GenerateLinePosition(baseSeed, emitter.lineStart, emitter.size, emitter.lineLength);
+            
+        case EMITTER_SHAPE_SPHERE_VOLUME:
+            return GenerateSpherePositionCustom(baseSeed, emitter.translate, emitter.radius);
+            
+        case EMITTER_SHAPE_SPHERE_SURFACE:
+            return GenerateSphereSurfacePosition(baseSeed, emitter.translate, emitter.radius);
+            
+        case EMITTER_SHAPE_BOX:
+            return GenerateBoxPosition(baseSeed, emitter.translate, emitter.size);
+            
+        case EMITTER_SHAPE_RING:
+            return GenerateRingPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius, float3(0.0f, 1.0f, 0.0f));
+            
+        default:
+            return GenerateSpherePositionCustom(baseSeed, emitter.translate, emitter.radius);
+    }
 }
 
 float RandomRange(uint seed, float minV, float maxV)

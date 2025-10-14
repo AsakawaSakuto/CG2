@@ -27,6 +27,7 @@ void TitleScene::Initialize() {
 		text = make_unique<Text3D>();
 		text->Initialize(&ctx_->dxCommon);
 	}
+
 }
 
 void TitleScene::Update() {
@@ -36,16 +37,6 @@ void TitleScene::Update() {
 	}
 	if (sceneFade_->EndFadeIn()) {
 		ChangeScene(SCENE::GAME);
-	}
-
-	if (input_->TriggerKey(DIK_I)) { // P key
-		particle_->Play(false);
-	}
-	if (input_->TriggerKey(DIK_O)) { // P key
-		particle_->Play();
-	}
-	if (input_->TriggerKey(DIK_P)) { // P key
-		particle_->Stop();
 	}
 
 	sceneFade_->Update();

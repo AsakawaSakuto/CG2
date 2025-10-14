@@ -25,7 +25,7 @@
 #include "BlendMode.h"
 #include "PreView.h"
 #include "PreFrame.h"
-#include "EmitterSpfere.h"
+#include "EmitterState.h"
 
 #include "ParticleDescriptorAllocator.h"
 
@@ -60,7 +60,7 @@ public:
 	void SetBlendMode(BlendMode blendMode) { blendMode_ = blendMode; }
 
 	// エミッタの値をセット
-	void SetEmitterValue(const EmitterSphere& emitter) { emitter_ = emitter; }
+	void SetEmitterValue(const EmitterState& emitter) { emitter_ = emitter; }
 
 	//
 	void SetEmitterPosition(const Vector3& position) { emitter_.translate = position; }
@@ -173,7 +173,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterRangeResource_;
-	EmitterSphere emitter_ = {};
+	EmitterState emitter_ = {};
 	void CreateEmitterResource();
 	void UpdateEmitter();
 
