@@ -26,7 +26,7 @@ int SceneManager::Run() {
     appContext_->winApp.Initialize(L"Engine");
     
     // exeのアイコン設定
-    appContext_->winApp.SetIconFromTexture("resources/image/uvChecker.png");
+    appContext_->winApp.SetIconFromTexture("resources/image/icon.png");
     
     appContext_->winApp.EnableResize(false);
     appContext_->dxCommon.Initialize(&appContext_->winApp);
