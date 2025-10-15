@@ -26,8 +26,21 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
             
             if (gEmitter.isMove != 0)
             {
-                gParticles[particleIndex].translate += gParticles[particleIndex].velocity * gPerFrame.deltaTime;
+                float3 delta = 0.0f;
+    
+                if (gEmitter.velocityRandom != 0)
+                {
+                    // ランダム速度で移動
+                    delta = gParticles[particleIndex].velocity * gPerFrame.deltaTime;
+                }
+                else
+                {
+                    delta = gParticles[particleIndex].velocity * gEmitter.normalVelocity * gPerFrame.deltaTime;
+                }
+
+                gParticles[particleIndex].translate += delta;
             }
+
             
             if (gEmitter.rotateMove != 0)
             {

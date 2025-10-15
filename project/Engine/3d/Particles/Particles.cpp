@@ -7,7 +7,7 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 
-void Particles::Initialize(DirectXCommon* dxCommon, const std::string& TextureName, const uint32_t maxParticle) {
+void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, const std::string& TextureName) {
 	// DX共通クラスからデバイス・コマンドリストを取得
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
@@ -555,9 +555,7 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Separator();
 
 	ImGui::Checkbox("EnableMove", reinterpret_cast<bool*>(&emitter_.isMove));
-	ImGui::DragFloat3("StartVelocity", &emitter_.startVelocity.x, 0.01f);
-	ImGui::DragFloat3("EndVelocity", &emitter_.endVelocity.x, 0.01f);
-
+	ImGui::DragFloat3("normalVelocity", &emitter_.normalVelocity.x, 0.01f);
 	ImGui::Checkbox("VelocityRandom", reinterpret_cast<bool*>(&emitter_.velocityRandom));
 	if (emitter_.velocityRandom) {
 		ImGui::DragFloat3("MinVelocity", &emitter_.minVelocity.x, 0.01f);

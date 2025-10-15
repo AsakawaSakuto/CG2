@@ -71,7 +71,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
                     }
                     else
                     {
-                        gParticles[particleIndex].velocity = gEmitter.startVelocity;
+                        gParticles[particleIndex].velocity = gParticles[particleIndex].translate - gEmitter.translate;
+                        gParticles[particleIndex].velocity = normalize(gParticles[particleIndex].velocity);
                     }
                     
                     if (gEmitter.rotateVelocityRandom != 0)
