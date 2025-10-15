@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "Application/GameObject/State/JsonState.h"
 
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
@@ -8,6 +9,9 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Initialize() {
+	// JSONからステータスを読み込み
+	gameSceneState_ = JsonState::Load<GameSceneState>("Resources/Data/gameSceneState.json");
+
 	// inputSystemの初期化
 	gamePad_ = &ctx_->gamePad;
 	input_ = &ctx_->input;
@@ -35,7 +39,7 @@ void GameScene::Initialize() {
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
 
 	// オブジェクトの配置　下半分
-	SpawnObjectsByMapChip2(1.0f, 0.0f);
+	SpawnObjectsByMapChip2(0.5f, 0.0f);
 
 	// プレイヤーに他のゲームオブジェクトの情報を渡す
 	player_->SetThrons(thorns_);
@@ -63,16 +67,28 @@ void GameScene::Initialize() {
 		bulletGaugeSprite_[i].sprite->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
 		bulletGaugeSprite_[i].isActive = false;
 	}
+
+	// 画面両端の幕のスプライト
+	for (int i = 0; i < curtainSprite_.size(); ++i) {
+		curtainSprite_[i] = std::make_unique<Sprite>();
+		curtainSprite_[i]->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+		curtainSprite_[i]->SetScale({20, 43});
+		curtainSprite_[i]->SetPosition({160.0f + (i * 940.0f), 344.0f});
+		curtainSprite_[i]->SetColor({0.4f, 0.4f, 0.4f, 1.0f});
+	}
 }
 
 void GameScene::Update() {
+	// プレイヤーから入力があるかどうか調べる
+	UpdateInput();
 
-	/*bulletGaugeSpriteBG_->SetScale(testScale_);
-	bulletGaugeSpriteBG_->SetPosition(testPos_);*/
+	// プレイヤーから一定時間入力がなかった場合の処理
+	NoInputTitleBack();
 
-	if (input_->TriggerKey(DIK_ESCAPE)) {
+	if (isBackToTitleScene_) {
 		sceneFade_->StartFadeIn(1.0f);
 		goSceneNum_ = SCENE::TITLE;
+		isBackToTitleScene_ = false;
 	}
 
 	if (player_->GetIsGoal() && goSceneNum_ == 0) {
@@ -123,8 +139,14 @@ void GameScene::Update() {
 	// ゲージの描画を実際の弾のゲージに対応させる
 	player_->SetBulletGaugeSprites(&bulletGaugeSprite_);
 
+	// 弾のゲージスプライト更新処理
 	for (auto& gaugeInfo : bulletGaugeSprite_) {
 		gaugeInfo.sprite->Update();
+	}
+
+	// 画面両端の幕のスプライト更新処理
+	for (auto& curtain : curtainSprite_) {
+		curtain->Update();
 	}
 }
 
@@ -159,10 +181,16 @@ void GameScene::Draw() {
 	// ゲージ用のスプライト(背景)の描画処理
 	bulletGaugeSpriteBG_->Draw();
 
+	// 弾のゲージスプライト描画処理
 	for (auto& gaugeInfo : bulletGaugeSprite_) {
 		if (gaugeInfo.isActive) {
 			gaugeInfo.sprite->Draw();
 		}
+	}
+
+	// 画面両端の幕のスプライト描画処理
+	for (auto& curtain : curtainSprite_) {
+		curtain->Draw();
 	}
 
 	///
@@ -182,6 +210,9 @@ void GameScene::Draw() {
 	player_->DrawImgui();
 
 	DrawSceneName();
+
+	// ゲームシーン上で管理しているステータスのImGui
+	GameSceneStateImGui();
 
 	/*ImGui::Begin("Test");
 	
@@ -217,7 +248,7 @@ void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				// トゲの描画処理
 				auto thorn = std::make_unique<Thorn>();
 				thorn->Initialize(&ctx_->dxCommon);
-				thorn->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
+				thorn->Spawn({static_cast<float>(x) * mag - 5.1f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				thorns_.push_back(std::move(thorn));
 			}
 
@@ -225,7 +256,7 @@ void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				// トゲの描画処理
 				auto block = std::make_unique<Block>();
 				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
+				block->Spawn({static_cast<float>(x) * mag - 5.1f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				blocks_.push_back(std::move(block));
 			}
 		}
@@ -242,7 +273,7 @@ void GameScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
 				// トゲの描画処理
 				auto thorn = std::make_unique<Thorn>();
 				thorn->Initialize(&ctx_->dxCommon);
-				thorn->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
+				thorn->Spawn({static_cast<float>(x) * mag - 5.5f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				thorns_.push_back(std::move(thorn));
 			}
 
@@ -250,11 +281,59 @@ void GameScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
 				// トゲの描画処理
 				auto block = std::make_unique<Block>();
 				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
+				block->Spawn({static_cast<float>(x) * mag - 5.5f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				blocks_.push_back(std::move(block));
 			}
 		}
 	}
+}
+
+void GameScene::UpdateInput() { 
+	// 入力検知
+	bool rightInput = input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D) || gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT); // 右入力
+	bool leftInput = input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) || gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT); // 左入力
+	bool shotInput = input_->PushKey(DIK_SPACE) || gamePad_->PushButton(gamePad_->A); // ショット入力
+
+	if (rightInput || leftInput || shotInput) {
+		isInput_ = true; // 入力があったらtrue
+	} else {
+		isInput_ = false; // 入力がなければfalse
+	}
+}
+
+void GameScene::NoInputTitleBack() {
+	if (isInput_) {
+		noInputTimer_ = 0; // 入力があったらリセット
+		return;
+	} else {
+		noInputTimer_ += 1.0f * deltaTime_; // タイマー加算
+
+		// 5秒間入力がなかった場合
+		if (noInputTimer_ >= gameSceneState_.maxNoInputTimer) {
+			isBackToTitleScene_ = true;
+			noInputTimer_ = 0;
+		}
+	}
+}
+
+void GameScene::GameSceneStateImGui() {
+	ImGui::Begin("GameScene State");
+
+	ImGui::Text("noInputTimer : %f", noInputTimer_);
+
+	nlohmann::json jsonState = gameSceneState_;
+
+	// JsonNo中身をImGuiで表示する
+	player_->DrawImGuiForJson(jsonState);
+
+	gameSceneState_ = jsonState.get<GameSceneState>();
+
+	// --- JSONへ保存ボタン ---
+	if (ImGui::Button("Save JSON")) {
+		JsonState::Save("Resources/Data/gameSceneState.json", gameSceneState_);
+	}
+
+	ImGui::End();
 }
 
 void GameScene::CameraController() {

@@ -6,6 +6,7 @@
 #include "Application/Map/Map.h"
 #include <Application/GameObject/Block/Block.h>
 #include <Application/GameObject/Thorn/Thorn.h>
+#include "Application/SceneManager/Scene/State/GameSceneState.h"
 
 using Microsoft::WRL::ComPtr;
 using std::make_unique;
@@ -27,6 +28,15 @@ private:
 	void SpawnObjectsByMapChip(float mag, float mapHeight);
 
 	void SpawnObjectsByMapChip2(float mag, float mapHeight);
+
+	// キーボードやパッドから入力があるかどうか調べる
+	void UpdateInput();
+
+	// プレイヤーから一定時間入力がなかった場合の処理
+	void NoInputTitleBack();
+
+	// ゲームシーンで管理しているステータスのImGui
+	void GameSceneStateImGui();
 
 private:
 	int goSceneNum_ = 0; // 0ならタイトル、1ならリザルト
@@ -58,6 +68,9 @@ private:
 	// ゲージ用のスプライト
 	std::array<BulletGaugeInfo, 5> bulletGaugeSprite_;
 
+	// 画面両端の幕のスプライト
+	std::array<std::unique_ptr<Sprite>, 2> curtainSprite_;
+
 	// UtilSystem
 	GameTimer gameTimer_;
 
@@ -73,4 +86,19 @@ private:
 
 	Vector2 testPos_ = {};
 	Vector2 testScale_ = {};
+
+	// プレイヤーから入力があるかどうかでフラグをたてる
+	bool isInput_ = false;
+
+	// どのくらいの時間入力が無かったかを記録する変数(秒)
+	float noInputTimer_ = 0.0f;
+
+	// ゲームシーンからタイトルに戻るまでの猶予時間(秒)
+	//float noInputTimerMax_ = 5.0f;
+
+	// タイトルシーンへの切り替えのフラグ
+	bool isBackToTitleScene_ = false;
+
+	// GameSceneState
+	GameSceneState gameSceneState_;
 };

@@ -151,6 +151,7 @@
     <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />
     <ClInclude Include="Application\GameObject\Text3D\Text3D.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
+    <ClInclude Include="Application\SceneManager\Scene\State\GameSceneState.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
