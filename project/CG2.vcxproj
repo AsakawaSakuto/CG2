@@ -226,6 +226,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SceneManager\SceneManager.h" />
     <ClInclude Include="Application\SceneManager\Scene\GameScene.h" />
     <ClInclude Include="Application\SceneManager\Scene\ResultScene.h" />
+    <ClInclude Include="Application\SceneManager\Scene\State\GameSceneState.h" />
     <ClInclude Include="Application\SceneManager\Scene\TitleScene.h" />
     <ClInclude Include="Application\SceneManager\Temp\TempScene.h" />
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />

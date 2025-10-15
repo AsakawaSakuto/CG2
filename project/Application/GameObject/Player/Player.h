@@ -33,6 +33,9 @@ public:
 	// ImGui表示
 	void DrawImgui();
 
+	// ImGui自動生成関数
+	void DrawImGuiForJson(nlohmann::json& json);
+
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
 	float CameraOffset() const { return playerState_.cameraOffset; }
@@ -126,7 +129,7 @@ private:
 	void ShowLabeledVector3(const char* label, float* vec);
 
 	// ImGui自動生成関数
-	void DrawImGuiForJson(nlohmann::json& json);
+	//void DrawImGuiForJson(nlohmann::json& json);
 
 	// ImGuiプレイヤー
 	void DrawImGuiJsonStatePlayer();
@@ -136,6 +139,9 @@ private:
 
 	// 羽のクールダウンフレーム加算
 	void WingCoolDownFramesAdd();
+
+	// プレイヤーの移動制限追加
+	void PlayerMoveLimit();
 
 private:
 	// プレイヤーのStateをJsonで管理

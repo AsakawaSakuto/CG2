@@ -4,7 +4,7 @@
 #include "Application/GameObject/Thorn/Thorn.h"
 #include <numbers>
 
-//#include "State/PlayerStateLoader.h"
+// #include "State/PlayerStateLoader.h"
 #include "Application/GameObject/State/JsonState.h"
 
 void Player::Initialize(DirectXCommon* dxCommon) {
@@ -14,7 +14,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	model_->Initialize(dxCommon_, "player/player.obj");
 
 	// JSONからステータスを読み込み
-	//state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");
+	// state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");
 	playerState_ = JsonState::Load<PlayerState>("Resources/Data/playerState.json");
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 
@@ -57,6 +57,9 @@ void Player::Update() {
 	if (isRightMove) {
 		transform_.translate.x += velocity_.x * deltaTime_;
 	}
+
+	// プレイヤーの移動制限
+	PlayerMoveLimit();
 
 	// プレイヤーの羽の位置をプレイヤーに合わせる
 	playerWing_->SetPosition(transform_.translate);
@@ -175,10 +178,10 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
 		// プレイヤーの進行方向を徐々に反対方向に
-		//acceleration_.y *= -1;
+		// acceleration_.y *= -1;
 
 		// プレイヤーの進行状況
-		//direction_ = Direction::UP;
+		// direction_ = Direction::UP;
 
 		// ゴールフラグをたてる
 		isGoal_ = true;
@@ -275,7 +278,7 @@ void Player::BulletUpdate() {
 	for (auto& bullet : bullets_) {
 		bullet->Update();
 	}
-	
+
 	float playerPosY = transform_.translate.y;
 
 	// 弾の削除
@@ -294,7 +297,7 @@ void Player::BulletUpdate() {
 void Player::PlayerImGui() {
 	// プレイヤーのImGui
 	ImGui::Begin("Player Control");
-	
+
 	// 座標
 	ShowLabeledVector3("Translate", &transform_.translate.x);
 
@@ -306,7 +309,7 @@ void Player::PlayerImGui() {
 
 	// 速度
 	ShowLabeledVector3("Velocity", &velocity_.x);
-	
+
 	// 弾のステータス
 	ImGui::Text("BulletGauge: %d", bulletGauge_);
 	ImGui::Text("Bullet Count: %d", static_cast<int>(bullets_.size()));
@@ -326,7 +329,7 @@ void Player::DrawImGuiJsonStatePlayer() {
 	ImGui::Begin("Player State");
 
 	nlohmann::json jsonState = playerState_;
-	
+
 	// JsonNo中身をImGuiで表示する
 	DrawImGuiForJson(jsonState);
 
@@ -394,6 +397,10 @@ void Player::CollisionThorn() {
 
 				// 弾のゲージリセット
 				ResetBulletGauge();
+
+				for (int i = 0; i < bulletGaugeSprites_->size(); ++i) {
+					(*bulletGaugeSprites_)[i].isActive = false;
+				}
 
 				// スタン
 				Stun();
@@ -618,5 +625,15 @@ void Player::WingCoolDownFramesAdd() {
 	if (currentCoolDownFrames_ >= playerState_.maxCoolDownWing) {
 		isStartCoolDown_ = false;
 		currentCoolDownFrames_ = 0;
+	}
+}
+
+void Player::PlayerMoveLimit() {
+	if (transform_.translate.x >= 4.5f) {
+		transform_.translate.x = 4.5f;
+	}
+
+	if (transform_.translate.x <= -4.5f) {
+		transform_.translate.x = -4.5f;
 	}
 }
