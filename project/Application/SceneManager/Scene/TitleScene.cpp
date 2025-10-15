@@ -86,8 +86,6 @@ void TitleScene::Draw() {
 
 	particle_->DrawImGui("titleEffect");
 
-	ImGui::End();
-
 	DrawSceneName();
 
 	///
