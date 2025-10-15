@@ -118,6 +118,9 @@ struct EmitterSphere {
     float3 maxVelocity;
     float pad18;
 
+    float3 normalVelocity;
+    float pad19;
+    
     float lifeTime;
     uint lifeTimeRandom;
     float minLifeTime;

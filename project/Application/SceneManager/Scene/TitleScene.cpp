@@ -19,8 +19,10 @@ void TitleScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	particle_->Initialize(&ctx_->dxCommon, "circle");
+	particle_->Initialize(&ctx_->dxCommon, 4);
 	particle_->LoadJson("temp");
+	
+	particle2_->Initialize(&ctx_->dxCommon, 4);
 
 	// Text3Dの初期化
 	for (auto& text : text3D_) {
@@ -42,6 +44,7 @@ void TitleScene::Update() {
 	sceneFade_->Update();
 
 	particle_->Update();
+	particle2_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -68,6 +71,7 @@ void TitleScene::Draw() {
 	}
 
 	particle_->Draw(*useCamera_);
+	particle2_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -85,6 +89,7 @@ void TitleScene::Draw() {
 	///
 
 	particle_->DrawImGui("titleEffect");
+	particle2_->DrawImGui("titleEffect2");
 
 	DrawSceneName();
 

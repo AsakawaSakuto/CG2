@@ -8,15 +8,15 @@
         1.0,
         0.0
     ],
-    "coneHeight": 1.0,
-    "count": 5,
+    "coneHeight": 2.0,
+    "count": 35,
     "emit": 1,
     "endColor": [
-        1.0,
         0.0,
-        0.0
+        1.0,
+        0.8235292434692383
     ],
-    "endRotateVelocity": -1.0,
+    "endRotateVelocity": 0.0,
     "endScale": [
         0.0,
         0.0
@@ -28,14 +28,14 @@
     ],
     "frequency": 0.009999999776482582,
     "frequencyTime": 0.0,
-    "hemisphereAngle": 90.0,
+    "hemisphereAngle": 180.0,
     "isMove": 1,
-    "kMaxParticle": 512,
-    "lifeTime": 2.5,
+    "kMaxParticle": 2048,
+    "lifeTime": 1.0,
     "lifeTimeRandom": 0,
-    "lineLength": 1.0,
+    "lineLength": 2.0,
     "lineStart": [
-        0.0,
+        -1.0,
         0.0,
         0.0
     ],
@@ -52,9 +52,9 @@
         1.5
     ],
     "maxVelocity": [
-        0.0,
-        2.0,
-        0.0
+        1.0,
+        1.0,
+        1.0
     ],
     "minColor": [
         0.0,
@@ -69,50 +69,50 @@
         0.5
     ],
     "minVelocity": [
-        0.0,
-        0.0,
-        0.0
-    ],
-    "normalVelocity": [
         -1.0,
-        0.9900000095367432,
+        -1.0,
         -1.0
     ],
-    "planeHeight": 1.0,
+    "normalVelocity": [
+        -3.0,
+        -3.0,
+        0.0
+    ],
+    "planeHeight": 2.0,
     "planeNormal": [
         0.0,
         1.0,
         0.0
     ],
-    "planeWidth": 1.0,
+    "planeWidth": 2.0,
     "radius": 5.0,
     "ringAngle": 0.0,
-    "ringInnerRadius": 5.0,
+    "ringInnerRadius": 3.0,
     "ringNormal": [
         0.0,
         1.0,
         0.0
     ],
-    "ringOuterRadius": 5.0,
+    "ringOuterRadius": 3.0,
     "rotateMove": 0,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 6,
+    "shapeType": 7,
     "size": [
         1.0,
         1.0,
         1.0
     ],
     "startColor": [
-        1.0,
-        0.11764705181121826,
-        0.0
-    ],
-    "startRotateVelocity": 1.0,
-    "startScale": [
-        1.0,
+        0.029411792755126953,
+        0.0,
         1.0
+    ],
+    "startRotateVelocity": 0.0,
+    "startScale": [
+        0.30000001192092896,
+        0.30000001192092896
     ],
     "startVelocity": [
         0.0,
@@ -126,5 +126,5 @@
         0.0
     ],
     "useEmitter": 1,
-    "velocityRandom": 1
+    "velocityRandom": 0
 }

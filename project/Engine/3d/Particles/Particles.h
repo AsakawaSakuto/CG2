@@ -51,7 +51,7 @@ public:
 	/// <param name="dxCommon">dxCommonを渡す</param>
 	/// <param name="TextureName">使用するTextureのPathを入れる「デフォルトでCircle」</param>
 	/// <param name="maxParticle">整数値＊512粒のパーティクルを扱えるようになる</param>
-	void Initialize(DirectXCommon* dxCommon, const std::string& TextureName = "resources/image/particle/circle.png", const uint32_t maxParticle = 1);
+	void Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle = 1, const std::string& TextureName = "circle");
 
 	/// <summary>
 	/// パーティクルの更新

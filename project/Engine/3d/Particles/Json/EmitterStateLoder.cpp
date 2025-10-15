@@ -102,6 +102,7 @@ EmitterState EmitterStateLoader::Load(const std::string& filePath) {
     state.velocityRandom = data.value("velocityRandom", 0u);
     state.minVelocity = data.value("minVelocity", Vector3{ -1.0f, -1.0f, -1.0f });
     state.maxVelocity = data.value("maxVelocity", Vector3{ 1.0f, 1.0f, 1.0f });
+    state.normalVelocity = data.value("normalVelocity", Vector3{ 1.0f, 1.0f, 1.0f });
 
     // --- 寿命関連 ---
     state.lifeTime = data.value("lifeTime", 3.0f);
@@ -186,6 +187,7 @@ void EmitterStateLoader::Save(const std::string& filePath, const EmitterState& s
         {"velocityRandom", state.velocityRandom},
         {"minVelocity", state.minVelocity},
         {"maxVelocity", state.maxVelocity},
+        {"normalVelocity", state.normalVelocity},
 
         {"lifeTime", state.lifeTime},
         {"lifeTimeRandom", state.lifeTimeRandom},

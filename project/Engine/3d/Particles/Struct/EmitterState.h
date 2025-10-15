@@ -97,6 +97,9 @@ struct EmitterState {
 	Vector3 maxVelocity;
 	float pad18;
 
+	Vector3 normalVelocity;
+	float pad19;
+
 	float lifeTime;
 	uint32_t lifeTimeRandom;
 	float minLifeTime;
