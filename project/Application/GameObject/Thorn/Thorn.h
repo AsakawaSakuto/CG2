@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/GameObject/GameObject.h"
+#include "Application/GameObject/Thorn/Particle/ThornParticle.h"
 
 enum class ThornType
 {
@@ -36,6 +37,10 @@ public:
 	void SetUpgradeCooldownBullet(int frames) { upgradeCooldownFramesBullet_ = frames; }
 	void SetUpgradeCooldownWing(int frames) { upgradeCooldownFramesWing_ = frames; }
 
+	void PlayParticle(uint32_t num) { particle_->Play(transform_.translate,num); }
+	void UpdateParticle() { particle_->Update(); }
+	void DrawParticle(Camera useCamera) { particle_->Draw(useCamera); }
+
 	// クールタイムの更新
 	void TickCooldown();
 
@@ -55,4 +60,6 @@ private:
 
 	// 羽のスコアアップクールタイム
 	int upgradeCooldownFramesWing_ = 0;
+
+	unique_ptr<ThornParticle> particle_ = make_unique<ThornParticle>();
 };

@@ -17,6 +17,8 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 
 	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 0.25f;
+
+	particle_->Initialize(dxCommon_);
 }
 
 void Thorn::Update() {

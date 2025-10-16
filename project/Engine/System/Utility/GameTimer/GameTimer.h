@@ -58,6 +58,10 @@ public:
     /// @return 進行状況（0.0=開始、1.0=完了）
     float GetProgress() const;
 
+    /// @brief タイマーの逆進行状況を取得（1.0～0.0）
+    /// @return 逆進行状況（1.0=開始、0.0=完了）
+    float GetReverseProgress() const;
+
     /// @brief --- EasingUtilを使用したイージング進行状況を取得 ---
     /// @param easingType イージングタイプ
     /// @return イージング適用済み進行状況

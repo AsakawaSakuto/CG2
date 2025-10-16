@@ -220,6 +220,7 @@ void GameScene::Update() {
 		if (thorn->GetIsAlive()) {
 			thorn->Update();
 		}
+		thorn->UpdateParticle();
 	}
 
 	// ブロックの更新処理
@@ -270,6 +271,7 @@ void GameScene::Draw() {
 		if (thorn->GetIsAlive()) {
 			thorn->Draw(*useCamera_);
 		}
+		thorn->DrawParticle(*useCamera_);
 	}
 
 	// ブロックの描画処理
