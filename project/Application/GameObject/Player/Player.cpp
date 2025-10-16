@@ -404,7 +404,9 @@ void Player::CollisionThorn() {
 				AddScore(thorn->GetScoreAmount());
 
 				// トゲを非アクティブにする
+				thorn->PlayParticle(5);
 				thorn->SetIsAlive(false);
+
 				break;
 			} else if (direction_ == Direction::UP) {
 

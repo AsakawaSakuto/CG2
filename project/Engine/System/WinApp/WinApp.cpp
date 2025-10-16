@@ -238,9 +238,9 @@ void WinApp::SetWindowIcon() {
         if (hIcon_) {
             SendMessage(hwnd_, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIcon_));
         }
-        if (hIconSmall_) {
+       /* if (hIconSmall_) {
             SendMessage(hwnd_, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIconSmall_));
-        }
+        }*/
     }
 }
 
