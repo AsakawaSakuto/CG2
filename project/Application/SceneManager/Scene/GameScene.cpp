@@ -77,12 +77,21 @@ void GameScene::Initialize() {
 		curtainSprite_[i]->SetColor({0.4f, 0.4f, 0.4f, 1.0f});
 	}
 
-	spriteNumber_->Initialize(&ctx_->dxCommon, "resources/image/number/3.png");
+	// カウントダウン用のスプライト集
+	for (int i = 0; i <= 9; ++i) {
+		spriteNumCollection_[i] = "resources/image/number/" + std::to_string(i) + ".png";
+	}
+
+	// カウントダウン用のスプライト初期化
+	spriteNumber_->Initialize(&ctx_->dxCommon, spriteNumCollection_[3]);
+	spriteNumber_->SetScale({2, 2});
+	spriteNumber_->SetPosition({640.0f, 360.0f});
+
 	//priteNumber_->SetPosition();
 	//spriteNumber_->SetScale();
 
 	// ゲームスタートタイマー
-	gameStartTimer_ = 0.0f;
+	gameStartTimer_ = gameSceneState_.maxGameStartTimer;
 
 	// 開始フラグ
 	isGameStart_ = false;
@@ -153,6 +162,14 @@ void GameScene::Update() {
 
 	// カメラ切り替え&更新
 	CameraController();
+
+	// カウントダウン用のスプライト更新
+	spriteNumber_->Update();
+
+	// カウントダウン用のスプライトの張り替え
+	if (gameStartTimer_ >= 1) {
+		spriteNumber_->SetTexture(spriteNumCollection_[static_cast<int>(gameStartTimer_)]);
+	}
 
 	// フラグが立つまで早期リターン
 	if (!isGameStart_) {
@@ -237,6 +254,11 @@ void GameScene::Draw() {
 	///
 
 	// sceneFade_->Draw();
+
+	// カウントダウン用のスプライト描画
+	if (gameStartTimer_ >= 1) {
+		spriteNumber_->Draw();
+	}
 
 	// プレイヤーの描画処理
 	player_->Draw(*useCamera_);
@@ -415,10 +437,10 @@ void GameScene::GameSceneStateImGui() {
 
 void GameScene::GameStartCount() { 
 	// カウントアップ
-	gameStartTimer_ += deltaTime_; 
+	gameStartTimer_ -= deltaTime_; 
 
 	// 一定の値に達したらフラグをたてる
-	if (gameStartTimer_ >= gameSceneState_.maxGameStartTimer) {
+	if (gameStartTimer_ <= 1) {
 		isGameStart_ = true;
 	}
 }

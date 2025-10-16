@@ -7,6 +7,9 @@ void TitleScene::Initialize() {
 	gamePad_ = &ctx_->gamePad;
 	input_ = &ctx_->input;
 
+	// Audioの初期化
+	//audio_->Initialize("project/resources/");
+
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
 	normalCamera_->SetPosition({0.0f, 0.0f, -10.0f});

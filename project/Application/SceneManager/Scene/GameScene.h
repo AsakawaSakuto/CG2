@@ -4,9 +4,9 @@
 
 #include "Application/GameObject/Player/Player.h"
 #include "Application/Map/Map.h"
+#include "Application/SceneManager/Scene/State/GameSceneState.h"
 #include <Application/GameObject/Block/Block.h>
 #include <Application/GameObject/Thorn/Thorn.h>
-#include "Application/SceneManager/Scene/State/GameSceneState.h"
 
 using Microsoft::WRL::ComPtr;
 using std::make_unique;
@@ -97,7 +97,7 @@ private:
 	float noInputTimer_ = 0.0f;
 
 	// ゲームシーンからタイトルに戻るまでの猶予時間(秒)
-	//float noInputTimerMax_ = 5.0f;
+	// float noInputTimerMax_ = 5.0f;
 
 	// タイトルシーンへの切り替えのフラグ
 	bool isBackToTitleScene_ = false;
@@ -111,6 +111,9 @@ private:
 	// ゲーム開始フラグ
 	bool isGameStart_ = false;
 
-	// スプライト
+	// 開始カウントダウンスプライト
 	unique_ptr<Sprite> spriteNumber_ = make_unique<Sprite>();
+
+	// カウントダウン用のスプライト集
+	std::array<std::string, 10> spriteNumCollection_;
 };

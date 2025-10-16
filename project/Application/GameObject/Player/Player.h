@@ -143,6 +143,12 @@ private:
 	// プレイヤーの移動制限追加
 	void PlayerMoveLimit();
 
+	// プレイヤーの当たり判定更新(AABB)
+	void UpdateCollisionAABB();
+
+	// プレイヤーがスタン時に回転する
+	void StunRotate();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -196,7 +202,7 @@ private:
 	int score_ = 0;
 
 	// 羽関連(スコア)
-	const float kNearThreshold = 1.9f;
+	const float kNearThreshold = 2.0f;
 	const int kNearScore = 1000;
 	const int kFarScore = 1;
 
