@@ -125,5 +125,9 @@ struct EmitterState {
 	float ringAngle;
 	Vector3 ringNormal;
 	
+	uint32_t useGravity;
+	float gravityY;
+	float accelerationY;
+
 	std::string texturePath;
 };
