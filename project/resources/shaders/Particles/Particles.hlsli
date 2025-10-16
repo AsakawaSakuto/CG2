@@ -148,6 +148,10 @@ struct EmitterSphere {
     float planeHeight;      // Plane height
     float ringAngle;        // Ring rotation angle around normal axis
     float3 ringNormal;      // Ring normal vector (for RING_ANGLE types)
+    
+    uint useGravity;
+    float gravityY;
+    float accelerationY;
 };
 
 struct PerView {
