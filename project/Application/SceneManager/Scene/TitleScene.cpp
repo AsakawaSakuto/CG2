@@ -51,6 +51,9 @@ void TitleScene::Initialize() {
 	spriteOption_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 	spriteOption_->SetPosition({650.0f, 600.0f});
 	spriteOption_->SetScale({20, 4});
+
+	// スクリーンの状態
+	currentScreen_ = Screen::FIRST;
 }
 
 void TitleScene::Update() {

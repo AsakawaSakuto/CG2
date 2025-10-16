@@ -1,10 +1,11 @@
 #pragma once
-#include"Application/EngineSystem.h"
-#include"Application/SceneManager/IScene.h"
+#include "Application/EngineSystem.h"
+#include "Application/SceneManager/IScene.h"
+#include <array>
 
 using Microsoft::WRL::ComPtr;
-using std::unique_ptr;
 using std::make_unique;
+using std::unique_ptr;
 
 class ResultScene : public IScene {
 public:
@@ -14,11 +15,39 @@ public:
 	void Draw() override;
 
 private:
-
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
 	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
 	void CameraController();
+
+	// 演出用にスコアを加算していく関数
+	void ScoreCountUpdate();
+
+	// スコアに合わせて画像を変更する
+	void SpriteScoreUpdate();
+
+	// 背景スプライト
+	unique_ptr<Sprite> spriteBG_ = make_unique<Sprite>();
+
+	// スコア表示スプライト
+	std::array<unique_ptr<Sprite>, 5> spriteScore_;
+
+	// カウントダウン用のスプライト集
+	std::array<std::string, 10> spriteNumCollection_;
+
+	// 演出用の加算スピード
+	const float COUNT_SPEED = 0.05f;
+
+	// 描画用のスコア
+	float drawScore_ = 0.0f;
+	
+	const float MAX_SCORE = 12340.0f;
+
+	// 桁数
+	std::array<int, 5> digits = {0};
+
+	Vector2 testPos_;
+	Vector2 testScale_;
 };

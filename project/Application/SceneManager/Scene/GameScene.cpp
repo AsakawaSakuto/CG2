@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "Application/GameObject/State/JsonState.h"
+#include "Application/SceneManager/SceneManager.h"
 
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
@@ -194,6 +195,7 @@ void GameScene::Update() {
 	}
 
 	if (sceneFade_->EndFadeIn()) {
+		
 		ChangeScene(goSceneNum_);
 		goSceneNum_ = 0;
 	}

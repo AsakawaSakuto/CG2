@@ -45,6 +45,7 @@ public:
 	float GetEndLine() const { return END_LINE; }
 	bool GetIsGoal() const { return isGoal_; }
 	int GetBulletGauge() const { return bulletGauge_; }
+	float GetScore() const { return score_; }
 
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
@@ -199,7 +200,7 @@ private:
 	Vector2 shakeAmount_ = {0.0f, 0.0f};
 
 	// スコア
-	int score_ = 0;
+	float score_ = 0;
 
 	// 羽関連(スコア)
 	const float kNearThreshold = 2.0f;

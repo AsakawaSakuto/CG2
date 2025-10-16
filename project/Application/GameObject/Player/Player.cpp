@@ -508,7 +508,7 @@ void Player::AddScore(int score) { score_ += score; }
 void Player::ScoreImGui() {
 	ImGui::Begin("Score");
 
-	ImGui::Text("TotalScore : %d", score_);
+	ImGui::Text("TotalScore : %f", score_);
 	ImGui::Text("distance : %f", dis);
 
 	ImGui::End();

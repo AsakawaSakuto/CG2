@@ -12,6 +12,8 @@ using Microsoft::WRL::ComPtr;
 using std::make_unique;
 using std::unique_ptr;
 
+class SceneManager;
+
 class GameScene : public IScene {
 public:
 	void SetAppContext(AppContext* ctx) override;
