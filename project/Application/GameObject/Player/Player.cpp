@@ -12,6 +12,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
 	model_->Initialize(dxCommon_, "player/player.obj");
+	model_->SetTexture("resources/image/uvChecker0.5.png");
 
 	// JSONからステータスを読み込み
 	// state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");

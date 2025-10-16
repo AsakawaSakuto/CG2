@@ -611,6 +611,12 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
+	ImGui::Checkbox("useGravity", reinterpret_cast<bool*>(&emitter_.useGravity));
+	ImGui::DragFloat("gravity", &emitter_.gravityY, 0.01f, 0.0f, 100.0f);
+	ImGui::DragFloat("acceleration", &emitter_.accelerationY, 0.01f, 0.0f, 100.0f);
+
+	ImGui::Separator();
+
 	// デバッグ情報表示
 	ImGui::Text("DEBUG INFO");
 	ImGui::Text("Max Particles: %u", kMaxParticles_);

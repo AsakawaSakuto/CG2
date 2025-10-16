@@ -144,13 +144,13 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application\GameObject\Collison\Collison.cpp" />
     <ClCompile Include="Application\GameObject\ExperiencePoints\ExperiencePoints.cpp" />
     <ClCompile Include="Application\GameObject\Player\Bullet.cpp" />
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameObject\Player\PlayerWing.cpp" />
     <ClCompile Include="Application\GameObject\Player\State\PlayerStateLoader.cpp" />
     <ClCompile Include="Application\GameObject\Temp\TempGameObject.cpp" />
+    <ClCompile Include="Application\GameObject\Thorn\Particle\ThornParticle.cpp" />
     <ClCompile Include="Application\GameObject\Thorn\Thorn.cpp" />
     <ClCompile Include="Application\GameUI\SceneFade\SceneFade.cpp" />
     <ClCompile Include="Application\GameUI\Temp\TempGameUI.cpp" />
@@ -207,7 +207,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
     <ClInclude Include="Application\EngineSystem.h" />
-    <ClInclude Include="Application\GameObject\Collison\Collison.h" />
     <ClInclude Include="Application\GameObject\ExperiencePoints\ExperiencePoints.h" />
     <ClInclude Include="Application\GameObject\GameObject.h" />
     <ClInclude Include="Application\GameObject\Player\Bullet.h" />
@@ -217,6 +216,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameObject\Player\State\playerState.h" />
     <ClInclude Include="Application\GameObject\Player\State\PlayerStateLoader.h" />
     <ClInclude Include="Application\GameObject\Temp\TempGameObject.h" />
+    <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
     <ClInclude Include="Application\GameObject\Thorn\Thorn.h" />
     <ClInclude Include="Application\GameUI\GameUI.h" />
     <ClInclude Include="Application\GameUI\SceneFade\SceneFade.h" />

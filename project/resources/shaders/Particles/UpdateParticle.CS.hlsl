@@ -40,11 +40,10 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
 
                 gParticles[particleIndex].translate += delta;
             }
-
             
             if (gEmitter.rotateMove != 0)
             {
-                // rotateVelocityはfloat型なので直接使用
+            // rotateVelocityはfloat型なので直接使用
                 float rotVel = gParticles[particleIndex].rotateVelocity;
                 gParticles[particleIndex].rotate.z += rotVel * gPerFrame.deltaTime;
             }

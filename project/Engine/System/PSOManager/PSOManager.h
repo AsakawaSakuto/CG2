@@ -35,6 +35,7 @@ enum class PSOType {
     Model_Solid_Normal,
     Model_Solid_Add,
     Model_Wireframe_Normal,
+    Model_Alpha_Normal, // 追加: 透明モデル用（深度書き込みOFF）
     
     // スプライト用
     Sprite_Normal,

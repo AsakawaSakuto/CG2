@@ -164,10 +164,16 @@ void Model::Draw(Camera& useCamera) {
 	// RootSignatureを設定
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());
 
-	// 描画モードに応じてPSOを取得・設定
-	auto pso = drawMode_ ? 
-		psoManager.GetPSO(PSOType::Model_Solid_Normal) : 
-		psoManager.GetPSO(PSOType::Model_Wireframe_Normal);
+	// 半透明フラグでPSO切替（深度書き込みOFFのNormalブレンド）
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
+	if (transparent_) {
+		pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
+	} else {
+		// 描画モードに応じてPSOを取得・設定
+		pso = drawMode_ ? 
+			psoManager.GetPSO(PSOType::Model_Solid_Normal) : 
+			psoManager.GetPSO(PSOType::Model_Wireframe_Normal);
+	}
 	commandList_->SetPipelineState(pso.Get());
 
 	// プリミティブトポロジーを設定
@@ -235,6 +241,7 @@ void Model::DrawImGui(const char* objectName) {
 	ImGui::DragFloat("uvRotate", &uvRotate_, 0.01f);
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
 	ImGui::Checkbox("DrawMode", &drawMode_);
+	ImGui::Checkbox("Transparent", &transparent_); // 透明描画フラグ
 	
 	if (ImGui::Button("mReset")) {
 		uvTranslate_ = { 0.0f,0.0f };

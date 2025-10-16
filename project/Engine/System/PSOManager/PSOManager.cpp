@@ -126,6 +126,14 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("Add");
             break;
+
+        case PSOType::Model_Alpha_Normal: // 追加: 透明モデル用
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("Normal"); // アルファブレンド
+            params.depthStencilState = CreateDepthStencilState("Particle"); // 深度書き込み無効
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull"); // 両面表示
+            break;
             
         case PSOType::Sprite_Normal:
             params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");

@@ -30,7 +30,7 @@
     "frequencyTime": 0.0,
     "hemisphereAngle": 180.0,
     "isMove": 1,
-    "kMaxParticle": 512,
+    "kMaxParticle": 2048,
     "lifeTime": 2.0,
     "lifeTimeRandom": 0,
     "lineLength": 2.0,
@@ -85,7 +85,7 @@
         0.0
     ],
     "planeWidth": 2.0,
-    "radius": 3.0,
+    "radius": 0.009999999776482582,
     "ringAngle": 0.0,
     "ringInnerRadius": 0.5,
     "ringNormal": [
@@ -98,7 +98,7 @@
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 0,
+    "shapeType": 3,
     "size": [
         1.0,
         1.0,
@@ -119,12 +119,12 @@
         0.0,
         0.0
     ],
-    "texturePath": "circle3",
+    "texturePath": "circle",
     "translate": [
         0.0,
         0.0,
         0.0
     ],
     "useEmitter": 1,
-    "velocityRandom": 1
+    "velocityRandom": 0
 }

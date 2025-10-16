@@ -109,6 +109,8 @@ public:
     ~AudioX() { Reset(); }
 
 private:
+	std::string filePath_{};
+
     Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
     UniqueMasteringVoice mastering_{ nullptr };
 

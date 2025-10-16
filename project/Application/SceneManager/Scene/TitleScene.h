@@ -39,6 +39,8 @@ private:
 	unique_ptr<Particles> particle_ = make_unique<Particles>();
 	unique_ptr<Particles> particle2_ = make_unique<Particles>();
 
+	unique_ptr<Model> model_ = make_unique<Model>();
+
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ

@@ -5,6 +5,8 @@
 #include <cassert>
 
 void AudioX::Initialize(const std::string& filePath) {
+    filePath_ = "resources/sound/" + filePath;
+
     HRESULT hr = XAudio2Create(&xAudio2_);
     assert(SUCCEEDED(hr) && "XAudio2Create failed");
 
