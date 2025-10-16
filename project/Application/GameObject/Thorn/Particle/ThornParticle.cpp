@@ -4,22 +4,30 @@ void ThornParticle::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_ = dxCommon;
 
-	for (auto& model : pModels_) {
-		model = std::make_unique<Model>();
-		model->Initialize(dxCommon_, "Candy/Candy.obj");
+	for (int i = 0; i < 10; i++) {
+		pModel_[i] = std::make_unique<Model>();
+		pModel_[i]->Initialize(dxCommon_, "Candy/Candy.obj");
 	}
 }
 
 void ThornParticle::Update() {
 
-	// 当たり判定用の球の中心を更新
-	collisionSphere_.center = transform_.translate;
-
-	// モデルに座標情報を反映
-	model_->SetTransform(transform_);
-	model_->Update();
+	for (int i = 0; i < 10; i++) {
+		pModel_[i]->Update();
+	}
 }
 
 void ThornParticle::Draw(Camera useCamera) {
-	model_->Draw(useCamera);
+	for (int i = 0; i < 10; i++) {
+		if (pIsAlive_[i]) {
+			pModel_[i]->Draw(useCamera);
+		}
+	}
+}
+
+void ThornParticle::Play() {
+	Random rand;
+	for (int i = 0; i < 10; i++) {
+		pVelocity_[i].x = rand.Float(-0.1f, 0.1f);
+	}
 }
