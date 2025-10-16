@@ -59,6 +59,9 @@ public:
 	// サイズを設定
 	void SetScale(Vector3 scale) { transform_.scale = scale; }
 
+    // 半透明描画を有効/無効
+    void SetTransparent(bool enable) { transparent_ = enable; }
+
 	// 色を設定
 	void SetColor(Vector4 color) { materialData_->color = color; }
 
@@ -128,6 +131,9 @@ private:
 
 	// 描画モード切り替え（ワイヤーフレームなど）
 	bool drawMode_ = true;
+
+	// 透明描画フラグ（PSO切り替え用）
+	bool transparent_ = false;
 
 	Vector2 uvScale_ = { 1.0f,1.0f };
 	Vector2 uvTranslate_ = { 0.0f,0.0f };

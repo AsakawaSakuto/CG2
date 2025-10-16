@@ -22,6 +22,9 @@ void TitleScene::Initialize() {
 
 	particle2_->Initialize(&ctx_->dxCommon, 4);
 
+	model_->Initialize(&ctx_->dxCommon, "cube.obj");
+	model_->SetTexture("resources/image/test.png");
+
 	// Text3Dの初期化
 	for (auto& text : text3D_) {
 		text = make_unique<Text3D>();
@@ -72,8 +75,10 @@ void TitleScene::Update() {
 
 	sceneFade_->Update();
 
+	model_->Update();
 	particle_->Update();
 	particle2_->Update();
+
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -110,6 +115,8 @@ void TitleScene::Draw() {
 		text->Draw(*useCamera_);
 	}
 
+
+	model_->Draw(*useCamera_);
 	particle_->Draw(*useCamera_);
 	particle2_->Draw(*useCamera_);
 
@@ -132,6 +139,8 @@ void TitleScene::Draw() {
 	particle2_->DrawImGui("titleEffect2");
 
 	DrawSceneName();
+
+	model_->DrawImGui("test");
 
 	ImGui::Begin("test");
 

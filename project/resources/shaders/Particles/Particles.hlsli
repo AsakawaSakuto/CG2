@@ -126,32 +126,25 @@ struct EmitterSphere {
     float minLifeTime;
     float maxLifeTime;
     
-    // New fields for multi-shape support
-    uint shapeType;  // Emitter shape type
-    float3 size;     // For box: width, height, depth; For line: direction vector; For ring: inner radius, outer radius, 0
+    uint shapeType;
+    float3 size;
     
-    float3 lineStart;  // For line emitter: start point
-    float lineLength;  // For line emitter: length
+    float3 lineStart;
+    float lineLength;
     
-    float ringInnerRadius;  // For ring emitter
-    float ringOuterRadius;  // For ring emitter
+    float ringInnerRadius;
+    float ringOuterRadius;
     
-    // New fields for cone and hemisphere emitters
-    float coneAngle;        // Cone angle in degrees (0-180)
-    float coneHeight;       // Cone height
-    float3 coneDirection;   // Cone direction vector
-    float hemisphereAngle;  // Hemisphere angle in degrees (0-180)
+    float coneAngle;
+    float coneHeight;
+    float3 coneDirection;
+    float hemisphereAngle;
     
-    // New fields for angle-based plane and ring emitters
-    float3 planeNormal;     // Plane normal vector (for PLANE_ANGLE types)
-    float planeWidth;       // Plane width
-    float planeHeight;      // Plane height
-    float ringAngle;        // Ring rotation angle around normal axis
-    float3 ringNormal;      // Ring normal vector (for RING_ANGLE types)
-    
-    uint useGravity;
-    float gravityY;
-    float accelerationY;
+    float3 planeNormal;
+    float planeWidth;
+    float planeHeight;
+    float ringAngle;
+    float3 ringNormal;
 };
 
 struct PerView {

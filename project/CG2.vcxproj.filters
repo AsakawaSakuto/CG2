@@ -9,7 +9,6 @@
     <FxCompile Include="resources\shaders\Sprite\Sprite.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application\GameObject\Collison\Collison.cpp" />
     <ClCompile Include="Application\GameObject\ExperiencePoints\ExperiencePoints.cpp" />
     <ClCompile Include="Application\GameObject\Player\Bullet.cpp" />
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
@@ -61,11 +60,11 @@
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
     <ClCompile Include="Engine\System\PSOManager\PSOManager.cpp" />
     <ClCompile Include="Application\GameObject\Text3D\Text3D.cpp" />
+    <ClCompile Include="Application\GameObject\Thorn\Particle\ThornParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
     <ClInclude Include="Application\EngineSystem.h" />
-    <ClInclude Include="Application\GameObject\Collison\Collison.h" />
     <ClInclude Include="Application\GameObject\ExperiencePoints\ExperiencePoints.h" />
     <ClInclude Include="Application\GameObject\GameObject.h" />
     <ClInclude Include="Application\GameObject\Player\Bullet.h" />
@@ -152,6 +151,7 @@
     <ClInclude Include="Application\GameObject\Text3D\Text3D.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
     <ClInclude Include="Application\SceneManager\Scene\State\GameSceneState.h" />
+    <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

@@ -1,12 +1,6 @@
 #pragma once
 #include "Application/EngineSystem.h"
 
-//struct InitializeContext
-//{
-//	Camera* camera = nullptr;
-//	DirectXCommon* dxCommon = nullptr;
-//};
-
 using std::unique_ptr;
 using std::make_unique;
 
