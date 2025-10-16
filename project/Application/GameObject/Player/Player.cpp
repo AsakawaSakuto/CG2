@@ -24,6 +24,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 1.0f;
 
+	// 当たり判定更新(AABB)
+	UpdateCollisionAABB();
+
 	// プレイヤーの羽の初期化
 	playerWing_->Initialize(dxCommon_);
 	playerWing_->SetPosition(transform_.translate);
@@ -43,6 +46,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// カメラのオフセット初期化
 	playerState_.cameraOffset = CAMERA_OFFSET_TOP;
+
+	// プレイヤーの方向初期化
+	direction_ = Direction::UP;
 }
 
 void Player::Update() {
@@ -121,6 +127,9 @@ void Player::Update() {
 	// 羽のクールダウンフレーム加算
 	WingCoolDownFramesAdd();
 
+	// 当たり判定更新(AABB)
+	UpdateCollisionAABB();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -128,7 +137,9 @@ void Player::Update() {
 
 void Player::Draw(Camera useCamera) {
 	// プレイヤー描画
-	model_->Draw(useCamera);
+	if (stunTimer_.GetCurrentFrame() % 2 == 0) {
+		model_->Draw(useCamera);
+	}
 
 	// 弾の描画
 	for (auto& bullet : bullets_) {
@@ -369,6 +380,9 @@ void Player::Stun() {
 
 		// 減速
 		SpeedDown(playerState_.speedDownStrengthThorn);
+
+		// 回転
+		StunRotate();
 	}
 }
 
@@ -376,9 +390,9 @@ void Player::StunRemoved() { stunTimer_.Update(); }
 
 void Player::CollisionThorn() {
 	for (auto& thorn : thorns_) {
-		if (Collision::IsHit(thorn->GetCollitionSphere(), collisionSphere_) && thorn->GetIsAlive()) {
+		if (Collision::IsHit(thorn->GetCollisionAABB(), collisionAABB_) && thorn->GetIsAlive()) {
 			if (direction_ == Direction::DOWN) {
-				;
+
 
 				// シェイク用のフラグを立てる
 				if (!isShake_) {
@@ -407,6 +421,9 @@ void Player::CollisionThorn() {
 
 				// スタン
 				Stun();
+
+				// 羽のクールダウン開始
+				isStartCoolDown_ = true;
 				break;
 			}
 		}
@@ -520,14 +537,19 @@ void Player::CollisionWingThorn() {
 
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, kNearScore); // 近距離スコア
+
+				///////////////// デバッグ用 /////////////////
+				thorn->GetModel()->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+				///////////////// デバッグ用 /////////////////
 			} else {
 				AddScoreByDistance(thorn, kFarScore); // 遠距離スコア
+
+				///////////////// デバッグ用 /////////////////
+				thorn->GetModel()->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+				///////////////// デバッグ用 /////////////////
 			}
 
 			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
-
-			// 羽のクールダウン開始
-			isStartCoolDown_ = true;
 
 			break;
 		}
@@ -639,4 +661,15 @@ void Player::PlayerMoveLimit() {
 	if (transform_.translate.x <= -4.5f) {
 		transform_.translate.x = -4.5f;
 	}
+}
+
+void Player::UpdateCollisionAABB() {
+	Vector3 t = transform_.translate;
+	collisionAABB_.max = {t.x + 0.3f, t.y + 1.0f, t.z + 1.0f};
+	collisionAABB_.min = {t.x - 0.3f, t.y - 1.0f, t.z - 1.0f};
+}
+
+void Player::StunRotate() { 
+	// 2回転
+	transform_.rotate.z += 4.0f * std::numbers::pi_v<float>; 
 }

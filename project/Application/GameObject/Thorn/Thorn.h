@@ -28,6 +28,7 @@ public:
 	bool CanUpgradeBullet() const { return upgradeCooldownFramesBullet_ <= 0; }
 	bool CanUpgradeWing() const { return upgradeCooldownFramesWing_ <= 0; }
 	Vector3 GetPosition() const { return transform_.translate; }
+	Model* GetModel() const { return model_.get(); }
 
 	// Setter
 	void SetPosition(Vector3 position) { transform_.translate = position; }

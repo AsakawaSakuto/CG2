@@ -1,6 +1,7 @@
 #pragma once
 #include"Application/AppContext.h"
 #include"Application/GameUI/SceneFade/SceneFade.h"
+#include"Audio.h"
 
 using std::unique_ptr;
 using std::make_unique;
@@ -27,6 +28,9 @@ protected:
 
     // Fade
 	unique_ptr<SceneFade> sceneFade_;
+
+    // Audio
+	unique_ptr<AudioX> audio_;
 
 	void DrawSceneName();
 
