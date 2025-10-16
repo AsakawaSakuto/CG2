@@ -76,9 +76,17 @@ void GameScene::Initialize() {
 		curtainSprite_[i]->SetPosition({160.0f + (i * 940.0f), 344.0f});
 		curtainSprite_[i]->SetColor({0.4f, 0.4f, 0.4f, 1.0f});
 	}
-}
 
-void GameScene::Update() {
+	spriteNumber_->Initialize(&ctx_->dxCommon, "resources/image/number/3.png");
+	//priteNumber_->SetPosition();
+	//spriteNumber_->SetScale();
+
+	// ゲームスタートタイマー
+	gameStartTimer_ = 0.0f;
+
+	// 開始フラグ
+	isGameStart_ = false;
+
 	// プレイヤーから入力があるかどうか調べる
 	UpdateInput();
 
@@ -108,8 +116,77 @@ void GameScene::Update() {
 		Initialize();
 	}
 
+	// プレイヤーの更新処理
+	player_->Update();
+
+	// トゲの更新処理
+	for (auto& thorn : thorns_) {
+		if (thorn->GetIsAlive()) {
+			thorn->Update();
+		}
+	}
+
+	// ブロックの更新処理
+	for (auto& block : blocks_) {
+		if (block->GetIsAlive()) {
+			block->Update();
+		}
+	}
+
+	// ゲージ用のスプライト(背景)の更新処理
+	bulletGaugeSpriteBG_->Update();
+
+	// 弾のゲージスプライト更新処理
+	for (auto& gaugeInfo : bulletGaugeSprite_) {
+		gaugeInfo.sprite->Update();
+	}
+
+	// 画面両端の幕のスプライト更新処理
+	for (auto& curtain : curtainSprite_) {
+		curtain->Update();
+	}
+}
+
+void GameScene::Update() {
+	// タイマーカウントダウン
+	GameStartCount();
+
 	// カメラ切り替え&更新
 	CameraController();
+
+	// フラグが立つまで早期リターン
+	if (!isGameStart_) {
+		return;
+	}
+
+	// プレイヤーから入力があるかどうか調べる
+	UpdateInput();
+
+	// プレイヤーから一定時間入力がなかった場合の処理
+	NoInputTitleBack();
+
+	if (isBackToTitleScene_) {
+		sceneFade_->StartFadeIn(1.0f);
+		goSceneNum_ = SCENE::TITLE;
+		isBackToTitleScene_ = false;
+	}
+
+	if (player_->GetIsGoal() && goSceneNum_ == 0) {
+		sceneFade_->StartFadeIn(1.0f);
+		goSceneNum_ = SCENE::RESULT;
+	}
+
+	if (sceneFade_->EndFadeIn()) {
+		ChangeScene(goSceneNum_);
+		goSceneNum_ = 0;
+	}
+
+	sceneFade_->Update();
+
+	// シーンのリセット
+	if (input_->TriggerKey(DIK_R)) {
+		Initialize();
+	}
 
 	player_->Update();
 
@@ -334,6 +411,16 @@ void GameScene::GameSceneStateImGui() {
 	}
 
 	ImGui::End();
+}
+
+void GameScene::GameStartCount() { 
+	// カウントアップ
+	gameStartTimer_ += deltaTime_; 
+
+	// 一定の値に達したらフラグをたてる
+	if (gameStartTimer_ >= gameSceneState_.maxGameStartTimer) {
+		isGameStart_ = true;
+	}
 }
 
 void GameScene::CameraController() {
