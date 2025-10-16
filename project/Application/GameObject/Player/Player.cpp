@@ -40,6 +40,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// ゴールフラグ初期化
 	isGoal_ = false;
+
+	// カメラのオフセット初期化
+	playerState_.cameraOffset = CAMERA_OFFSET_TOP;
 }
 
 void Player::Update() {

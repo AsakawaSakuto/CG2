@@ -4,6 +4,7 @@
 
 struct GameSceneState {
 	float maxNoInputTimer = 5.0f; // タイトルに戻るまでの猶予時間(秒)
+	float maxGameStartTimer = 3.0f; // ゲーム開始までの時間(秒)
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(GameSceneState, maxNoInputTimer);
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(GameSceneState, maxNoInputTimer, maxGameStartTimer);
 };

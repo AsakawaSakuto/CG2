@@ -38,6 +38,9 @@ private:
 	// ゲームシーンで管理しているステータスのImGui
 	void GameSceneStateImGui();
 
+	// ゲーム開始までのカウント処理
+	void GameStartCount();
+
 private:
 	int goSceneNum_ = 0; // 0ならタイトル、1ならリザルト
 
@@ -101,4 +104,13 @@ private:
 
 	// GameSceneState
 	GameSceneState gameSceneState_;
+
+	// ゲーム開始までのタイマー
+	float gameStartTimer_ = 0.0f;
+
+	// ゲーム開始フラグ
+	bool isGameStart_ = false;
+
+	// スプライト
+	unique_ptr<Sprite> spriteNumber_ = make_unique<Sprite>();
 };
