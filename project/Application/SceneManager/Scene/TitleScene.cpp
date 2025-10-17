@@ -53,7 +53,7 @@ void TitleScene::Initialize() {
 	spriteOption_->SetScale({20, 4});
 
 	// スクリーンの状態
-	currentScreen_ = Screen::FIRST;
+	currentScreen_ = Title::Screen::FIRST;
 }
 
 void TitleScene::Update() {
@@ -61,7 +61,7 @@ void TitleScene::Update() {
 	bool enterInput = input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(gamePad_->A);
 
 	// スプライトの更新
-	if (currentScreen_ == Screen::SECOND) {
+	if (currentScreen_ == Title::Screen::SECOND) {
 		// メニューの切り替え更新
 		UpdateMenu();
 
@@ -76,7 +76,7 @@ void TitleScene::Update() {
 	}
 
 	if (enterInput) {
-		currentScreen_ = Screen::SECOND; // スクリーンの切り替え
+		currentScreen_ = Title::Screen::SECOND; // スクリーンの切り替え
 	}
 
 	sceneFade_->Update();
@@ -109,7 +109,7 @@ void TitleScene::Draw() {
 	///
 
 	// スプライト描画
-	if (currentScreen_ == Screen::SECOND) {
+	if (currentScreen_ == Title::Screen::SECOND) {
 		spriteBG_->Draw();
 		spriteInGame_->Draw();
 		spriteTutorial_->Draw();
@@ -181,7 +181,7 @@ void TitleScene::UpdateMenu() {
 		}
 
 		if (enterInput) {
-			if (currentScreen_ == Screen::SECOND) {
+			if (currentScreen_ == Title::Screen::SECOND) {
 				sceneFade_->StartFadeIn(1.0f); // フェード
 			}
 		}

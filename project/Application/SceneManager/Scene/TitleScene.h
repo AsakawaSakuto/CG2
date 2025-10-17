@@ -1,27 +1,29 @@
 #pragma once
-#include"Application/EngineSystem.h"
-#include"Application/SceneManager/IScene.h"
+#include "Application/EngineSystem.h"
 #include "Application/GameObject/Text3D/Text3D.h"
+#include "Application/SceneManager/IScene.h"
 #include <array>
 
 // タイトル画面のモード
-enum class Screen
-{
+namespace Title {
+enum class Screen {
 	FIRST,
 	SECOND,
 };
+}
+
+//using Title::Screen;
 
 // タイトルのメニュー
-enum class Menu
-{
+enum class Menu {
 	IN_GAME,
 	TUTORIAL,
 	OPTION,
 };
 
 using Microsoft::WRL::ComPtr;
-using std::unique_ptr;
 using std::make_unique;
+using std::unique_ptr;
 
 class TitleScene : public IScene {
 public:
@@ -35,7 +37,6 @@ private:
 	void UpdateMenu();
 
 private:
-
 	unique_ptr<Particles> particle_ = make_unique<Particles>();
 	unique_ptr<Particles> particle2_ = make_unique<Particles>();
 
@@ -46,13 +47,13 @@ private:
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
 	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
-	void CameraController();     
+	void CameraController();
 
 	// 3Dテキスト
 	std::array<std::unique_ptr<Text3D>, 5> text3D_;
 
 	// タイトル画面のモード
-	Screen currentScreen_ = Screen::FIRST;
+	Title::Screen currentScreen_ = Title::Screen::FIRST;
 
 	// タイトルのメニュー
 	Menu currentMenu_ = Menu::IN_GAME;

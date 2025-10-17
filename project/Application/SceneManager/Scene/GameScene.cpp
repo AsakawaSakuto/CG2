@@ -83,6 +83,14 @@ void GameScene::Initialize() {
 		spriteNumCollection_[i] = "resources/image/number/" + std::to_string(i) + ".png";
 	}
 
+	// スコア用スプライト5桁分
+	for (int i = 0; i < spriteScore_.size(); ++i) {
+		spriteScore_[i] = make_unique<Sprite>();
+		spriteScore_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
+		spriteScore_[i]->SetPosition({100.0f + i * 16.0f, 400.0f});
+		spriteScore_[i]->SetScale({16.0f * deltaTime_, 16.0f * deltaTime_});
+	}
+
 	// カウントダウン用のスプライト初期化
 	spriteNumber_->Initialize(&ctx_->dxCommon, spriteNumCollection_[3]);
 	spriteNumber_->SetScale({2, 2});
@@ -195,7 +203,7 @@ void GameScene::Update() {
 	}
 
 	if (sceneFade_->EndFadeIn()) {
-		
+		ctx_->lastScore = player_->GetScore(); // スコアを保存
 		ChangeScene(goSceneNum_);
 		goSceneNum_ = 0;
 	}
@@ -244,6 +252,14 @@ void GameScene::Update() {
 	// 画面両端の幕のスプライト更新処理
 	for (auto& curtain : curtainSprite_) {
 		curtain->Update();
+	}
+
+	// 演出用にスコアを加算していく
+	SpriteScoreUpdate();                                        
+
+	// スコアスプライトの更新処理
+	for (int i = 0; i < spriteScore_.size(); ++i) {
+		spriteScore_[i]->Update();
 	}
 }
 
@@ -294,6 +310,11 @@ void GameScene::Draw() {
 	// 画面両端の幕のスプライト描画処理
 	for (auto& curtain : curtainSprite_) {
 		curtain->Draw();
+	}
+
+	// スコアスプライトの描画処理
+	for (int i = 0; i < spriteScore_.size(); ++i) {
+		spriteScore_[i]->Draw();
 	}
 
 	///
@@ -460,5 +481,19 @@ void GameScene::CameraController() {
 			normalCamera_->Update();
 			useCamera_ = normalCamera_.get();
 		}
+	}
+}
+
+void GameScene::SpriteScoreUpdate() {
+	int displayScore = static_cast<int>(player_->GetScore());
+
+	for (int i = 0; i < digits.size(); ++i) {
+		digits[digits.size() - 1 - i] = displayScore % 10;
+		displayScore /= 10;
+	}
+
+	for (int i = 0; i < spriteScore_.size(); ++i) {
+		int digit = digits[i];
+		spriteScore_[i]->SetTexture(spriteNumCollection_[digit]);
 	}
 }
