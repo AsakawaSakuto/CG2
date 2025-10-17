@@ -4,23 +4,6 @@
 #include "Application/SceneManager/IScene.h"
 #include <array>
 
-// タイトル画面のモード
-namespace Title {
-enum class Screen {
-	FIRST,
-	SECOND,
-};
-}
-
-//using Title::Screen;
-
-// タイトルのメニュー
-enum class Menu {
-	IN_GAME,
-	TUTORIAL,
-	OPTION,
-};
-
 using Microsoft::WRL::ComPtr;
 using std::make_unique;
 using std::unique_ptr;
@@ -34,8 +17,6 @@ public:
 	~TitleScene();
 
 private:
-	// メニューの状態切り替え(カーソルの更新)
-	void UpdateMenu();
 
 	// リソースクリーンアップメソッド
 	void CleanupResources();
@@ -43,9 +24,6 @@ private:
 private:
 	unique_ptr<Particles> particle_ = make_unique<Particles>();
 	unique_ptr<Particles> particle2_ = make_unique<Particles>();
-
-	unique_ptr<Model> model_ = make_unique<Model>();
-	unique_ptr<Model> o_ = make_unique<Model>();
 
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
@@ -57,24 +35,7 @@ private:
 
 	unique_ptr<Text3D> titleLogo_ = make_unique<Text3D>();
 
-	// タイトル画面のモード
-	Title::Screen currentScreen_ = Title::Screen::FIRST;
-
-	// タイトルのメニュー
-	Menu currentMenu_ = Menu::IN_GAME;
-
-	// 背景スプライト
-	unique_ptr<Sprite> spriteBG_ = make_unique<Sprite>();
-
-	// インゲーム遷移スプライト
-	unique_ptr<Sprite> spriteInGame_ = make_unique<Sprite>();
-
-	// チュートリアルスプライト
-	unique_ptr<Sprite> spriteTutorial_ = make_unique<Sprite>();
-
-	// オプションスプライト
-	unique_ptr<Sprite> spriteOption_ = make_unique<Sprite>();
-
-	Vector2 testPos_{};
-	Vector2 testScale_{};
+	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
 };

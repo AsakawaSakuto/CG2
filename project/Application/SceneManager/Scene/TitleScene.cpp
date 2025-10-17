@@ -14,20 +14,6 @@ void TitleScene::CleanupResources() {
 	if (particle2_) {
 		particle2_.reset();
 	}
-	
-	// スプライトのクリーンアップ
-	if (spriteBG_) {
-		spriteBG_.reset();
-	}
-	if (spriteInGame_) {
-		spriteInGame_.reset();
-	}
-	if (spriteTutorial_) {
-		spriteTutorial_.reset();
-	}
-	if (spriteOption_) {
-		spriteOption_.reset();
-	}
 }
 
 void TitleScene::Initialize() {
@@ -53,51 +39,15 @@ void TitleScene::Initialize() {
 
 	titleLogo_->Initialize(&ctx_->dxCommon);
 
-	o_->Initialize(&ctx_->dxCommon, "titleLogo/o.obj");
-
-	// スプライトの初期化
-	spriteBG_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	spriteBG_->SetPosition({600.0f, 340.0f});
-	spriteBG_->SetScale({76, 43});
-	spriteBG_->SetColor({0, 0, 0, 1});
-
-	spriteInGame_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	spriteInGame_->SetPosition({750, 400});
-	spriteInGame_->SetScale({20, 4});
-
-	spriteTutorial_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	spriteTutorial_->SetPosition({650.0f, 500.0f});
-	spriteTutorial_->SetScale({20, 4});
-
-	spriteOption_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	spriteOption_->SetPosition({650.0f, 600.0f});
-	spriteOption_->SetScale({20, 4});
-
-	// スクリーンの状態
-	currentScreen_ = Title::Screen::FIRST;
+	playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png");
+	optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png");
+	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png");
 }
 
 void TitleScene::Update() {
-	// 決定ボタン
-	bool enterInput = input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(gamePad_->A);
-
-	// スプライトの更新
-	if (currentScreen_ == Title::Screen::SECOND) {
-		// メニューの切り替え更新
-		UpdateMenu();
-
-		spriteBG_->Update();
-		spriteInGame_->Update();
-		spriteTutorial_->Update();
-		spriteOption_->Update();
-	}
 
 	if (sceneFade_->EndFadeIn()) {
 		ChangeScene(SCENE::GAME); // シーン切り替え
-	}
-
-	if (enterInput) {
-		currentScreen_ = Title::Screen::SECOND; // スクリーンの切り替え
 	}
 
 	sceneFade_->Update();
@@ -107,6 +57,9 @@ void TitleScene::Update() {
 	particle_->Update();
 	particle2_->Update();
 
+	playUI_->Update();
+	optionUI_->Update();
+	cursolUI_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -124,17 +77,13 @@ void TitleScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	// スプライト描画
-	if (currentScreen_ == Title::Screen::SECOND) {
-		spriteBG_->Draw();
-		spriteInGame_->Draw();
-		spriteTutorial_->Draw();
-		spriteOption_->Draw();
-	}
-
 	titleLogo_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
+
+	playUI_->Draw();
+	optionUI_->Draw();
+	cursolUI_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -151,9 +100,13 @@ void TitleScene::Draw() {
 
 	DrawSceneName();
 
-	titleLogo_->DrawImGui();
+	//titleLogo_->DrawImGui();
 
 	debugCamera_->DrawImgui();
+
+	playUI_->DrawImGui("play");
+	optionUI_->DrawImGui("option");
+	cursolUI_->DrawImGui("ya");
 
 	///
 	/// ↑ImGuiここまで
@@ -164,60 +117,6 @@ void TitleScene::Draw() {
 
 	// ここより下に描画処理を書かない
 	ctx_->dxCommon.PostDraw();
-}
-
-void TitleScene::UpdateMenu() {
-	bool upInput = input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || /*gamePad_->LeftStickY() >= 0.3f ||*/ gamePad_->TriggerButton(gamePad_->DPAD_UP);        // 上ボタン
-	bool downInput = input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || /*gamePad_->LeftStickY() <= -0.3f ||*/ gamePad_->TriggerButton(gamePad_->DPAD_DOWN); // 下ボタン
-	bool enterInput = input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(gamePad_->A);                                                                       // 決定ボタン
-
-	switch (currentMenu_) {
-	case Menu::IN_GAME:
-
-		if (downInput) {
-			currentMenu_ = Menu::TUTORIAL; // カーソルをチュートリアルへ
-			spriteTutorial_->SetPosition({750, 500});
-			spriteInGame_->SetPosition({650, 400});
-		}
-
-		if (enterInput) {
-			if (currentScreen_ == Title::Screen::SECOND) {
-				sceneFade_->StartFadeIn(1.0f); // フェード
-			}
-		}
-
-		break;
-	case Menu::TUTORIAL:
-
-		if (upInput) {
-			currentMenu_ = Menu::IN_GAME; // カーソルをインゲームへ
-			spriteInGame_->SetPosition({750, 400});
-			spriteTutorial_->SetPosition({650, 500});
-		}
-
-		if (downInput) {
-			currentMenu_ = Menu::OPTION; // カーソルをオプションへ
-			spriteOption_->SetPosition({750, 600});
-			spriteTutorial_->SetPosition({650, 500});
-		}
-
-		if (enterInput) {
-		}
-
-		break;
-	case Menu::OPTION:
-
-		if (upInput) {
-			currentMenu_ = Menu::TUTORIAL; // カーソルをチュートリアルへ
-			spriteTutorial_->SetPosition({750, 500});
-			spriteOption_->SetPosition({650, 600});
-		}
-
-		if (enterInput) {
-		}
-
-		break;
-	}
 }
 
 void TitleScene::CameraController() {
