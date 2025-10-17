@@ -1,6 +1,10 @@
 #include "ResultScene.h"
 
-void ResultScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
+void ResultScene::SetAppContext(AppContext* ctx) {
+	ctx_ = ctx;
+	// 切り替え後に初期化して描画用変数へコピー
+	lastScore_ = ctx_->lastScore;
+}
 
 void ResultScene::Initialize() {
 	// inputSystemの初期化
@@ -38,9 +42,36 @@ void ResultScene::Initialize() {
 
 	// 描画用のスコア
 	drawScore_ = 0.0f;
+
+	// 集めたお菓子の個数テキストスプライト
+	spriteCollectedSweets_->Initialize(&ctx_->dxCommon, "resources/image/UI/CollectedCandyCountUI.png");
+	spriteCollectedSweets_->SetPosition({300.0f, 200.0f});
+	spriteCollectedSweets_->SetScale({10.0f * deltaTime_, 10.0f * deltaTime_});
+
+	// お菓子降ってくる演出用モデル
+	for (int i = 0; i < sweetModels_.size(); ++i) {
+		sweetModels_[i] = make_unique<Model>();
+		sweetModels_[i]->Initialize(&ctx_->dxCommon, "Candy/Candy.obj");
+		sweetModels_[i]->SetTranslate({-500.0f, 0.0f});
+		sweetModels_[i]->SetScale({1, 1});
+	}
+
+	// 「リトライ」テキスト
+	spriteRetry_->Initialize(&ctx_->dxCommon, "resources/image/UI/RetryUI.png");
+	spriteRetry_->SetPosition({200.0f, 600.0f});
+	spriteRetry_->SetScale({1.0f, 1.0f});
+
+	// 「タイトルへ」テキスト
+	spriteBackToTitle_->Initialize(&ctx_->dxCommon, "resources/image/UI/BackToTitleUI.png");                                    
+	spriteRetry_->SetPosition({1080.0f, 600.0f});
+	spriteRetry_->SetScale({1.0f, 1.0f});
 }
 
 void ResultScene::Update() {
+	// 描画用のスコアが実施のスコアと同じになったら
+	if (drawScore_ == lastScore_) {
+		currentScreen_ = Result::Screen::SECOND;
+	}
 
 	if (input_->TriggerKey(DIK_SPACE)) {
 		sceneFade_->StartFadeIn(1.0f);
@@ -68,6 +99,20 @@ void ResultScene::Update() {
 
 	// スプライトの切り替え
 	SpriteScoreUpdate();
+
+	// 集めたお菓子の個数テキストスプライト更新
+	spriteCollectedSweets_->Update();
+
+	// お菓子降ってくる演出用モデル更新
+	for (int i = 0; i < sweetModels_.size(); ++i) {
+		sweetModels_[i]->Update();
+	}
+
+	// 「リトライ」テキスト更新
+	spriteRetry_->Update();
+
+	// 「タイトルへ」テキスト更新
+	spriteBackToTitle_->Update();
 }
 
 void ResultScene::Draw() {
@@ -87,7 +132,21 @@ void ResultScene::Draw() {
 		spriteScore_[i]->Draw();
 	}
 
+	// 集めたお菓子の個数テキストスプライト更新
+	spriteCollectedSweets_->Draw();
+
 	sceneFade_->Draw();
+
+	// お菓子降ってくる演出用モデル描画
+	for (int i = 0; i < sweetModels_.size(); ++i) {
+		sweetModels_[i]->Draw(*useCamera_);
+	}
+
+	// 「リトライ」テキスト描画
+	spriteRetry_->Draw();
+
+	// 「タイトルへ」テキスト描画
+	spriteBackToTitle_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -138,11 +197,11 @@ void ResultScene::CameraController() {
 
 void ResultScene::ScoreCountUpdate() {
 	// 加算
-	drawScore_ = drawScore_ + (MAX_SCORE - drawScore_) * COUNT_SPEED;
+	drawScore_ = drawScore_ + (lastScore_ - drawScore_) * COUNT_SPEED;
 
 	// 加算を打ち切り
-	if (std::abs(drawScore_ - MAX_SCORE) < 0.01f) {
-		drawScore_ = MAX_SCORE;
+	if (std::abs(drawScore_ - lastScore_) < 0.01f) {
+		drawScore_ = lastScore_;
 	}
 }
 

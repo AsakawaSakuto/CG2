@@ -11,8 +11,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_ = dxCommon;
 
-	model_->Initialize(dxCommon_, "player/player.obj");
-	model_->SetTexture("resources/image/uvChecker0.5.png");
+	model_->Initialize(dxCommon_, "Machine/Body.obj");
+	model_->SetTexture("resources/model/Machine/Machine.png");
 
 	// JSONからステータスを読み込み
 	// state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");
@@ -20,7 +20,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 
 	transform_.scale = {1.0f, 1.0f, 1.0f};
-	transform_.rotate = {0.0f, 0.0f, 0.0f};
+	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 1.0f;
@@ -165,6 +165,8 @@ void Player::DrawImgui() {
 
 	// 弾のステータス
 	DrawImGuiJsonStateBullet();
+
+	//playerWing_->WingImGui();
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }

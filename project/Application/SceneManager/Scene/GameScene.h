@@ -43,6 +43,9 @@ private:
 	// ゲーム開始までのカウント処理
 	void GameStartCount();
 
+	// 演出用にスコアを加算していく関数
+    void SpriteScoreUpdate();
+
 private:
 	int goSceneNum_ = 0; // 0ならタイトル、1ならリザルト
 
@@ -118,4 +121,10 @@ private:
 
 	// カウントダウン用のスプライト集
 	std::array<std::string, 10> spriteNumCollection_;
+
+	// 桁数
+	std::array<int, 5> digits = {0};
+
+	// スコア表示スプライト
+	std::array<unique_ptr<Sprite>, 5> spriteScore_;
 };
