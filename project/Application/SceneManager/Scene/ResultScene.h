@@ -23,6 +23,7 @@ public:
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
+	~ResultScene();
 
 private:
 	// Camera
@@ -37,6 +38,9 @@ private:
 
 	// スコアに合わせて画像を変更する
 	void SpriteScoreUpdate();
+
+	// リソースクリーンアップメソッド
+	void CleanupResources();
 
 	// 背景スプライト
 	unique_ptr<Sprite> spriteBG_ = make_unique<Sprite>();

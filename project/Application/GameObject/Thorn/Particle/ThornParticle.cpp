@@ -78,3 +78,21 @@ void ThornParticle::Play(Vector3 pos, uint32_t playNum) {
 	lifeTimer_.Start(2.5f, false);
 	alphaTimer_.Start(1.0f, false);
 }
+
+ThornParticle::~ThornParticle() {
+	Cleanup();
+}
+
+void ThornParticle::Cleanup() {
+	// 全パーティクルを非アクティブにする
+	for (int i = 0; i < 10; i++) {
+		pIsAlive_[i] = false;
+		if (pModel_[i]) {
+			pModel_[i].reset();
+		}
+	}
+
+	// タイマーをリセット
+	lifeTimer_.Reset();
+	alphaTimer_.Reset();
+}

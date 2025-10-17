@@ -2,17 +2,43 @@
 
 void TitleScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
+TitleScene::~TitleScene() {
+	CleanupResources();
+}
+
+void TitleScene::CleanupResources() {
+	// パーティクルシステムのクリーンアップ
+	if (particle_) {
+		particle_.reset();
+	}
+	if (particle2_) {
+		particle2_.reset();
+	}
+	
+	// スプライトのクリーンアップ
+	if (spriteBG_) {
+		spriteBG_.reset();
+	}
+	if (spriteInGame_) {
+		spriteInGame_.reset();
+	}
+	if (spriteTutorial_) {
+		spriteTutorial_.reset();
+	}
+	if (spriteOption_) {
+		spriteOption_.reset();
+	}
+}
+
 void TitleScene::Initialize() {
 	// inputSystemの初期化
 	gamePad_ = &ctx_->gamePad;
 	input_ = &ctx_->input;
 
-	// Audioの初期化
-	//audio_->Initialize("project/resources/");
-
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
-	normalCamera_->SetPosition({0.0f, 0.0f, -10.0f});
+	debugCamera_->SetPosition({ 0.0f, 0.0f, -15.0f });
+	normalCamera_->SetPosition({0.0f, 0.0f, -15.0f});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
 	// Create SceneFade
@@ -25,14 +51,9 @@ void TitleScene::Initialize() {
 
 	particle2_->Initialize(&ctx_->dxCommon, 4);
 
-	model_->Initialize(&ctx_->dxCommon, "cube.obj");
-	model_->SetTexture("resources/image/test.png");
+	titleLogo_->Initialize(&ctx_->dxCommon);
 
-	// Text3Dの初期化
-	for (auto& text : text3D_) {
-		text = make_unique<Text3D>();
-		text->Initialize(&ctx_->dxCommon);
-	}
+	o_->Initialize(&ctx_->dxCommon, "titleLogo/o.obj");
 
 	// スプライトの初期化
 	spriteBG_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
@@ -81,19 +102,14 @@ void TitleScene::Update() {
 
 	sceneFade_->Update();
 
-	model_->Update();
+	titleLogo_->Update();
+	
 	particle_->Update();
 	particle2_->Update();
 
 
 	// カメラ切り替え&更新
 	CameraController();
-
-	// Text3Dの更新処理
-	for (auto& text : text3D_) {
-		text->MoveTextAnimation(0.0f, 10.0f, std::numbers::pi_v<float> * 2, 0.0f);
-		text->Update();
-	}
 
 	/*spriteBG_->SetScale(testScale_);
 	spriteBG_->SetPosition(testPos_);*/
@@ -116,15 +132,7 @@ void TitleScene::Draw() {
 		spriteOption_->Draw();
 	}
 
-	// 3Dテキストの描画処理
-	for (auto& text : text3D_) {
-		text->Draw(*useCamera_);
-	}
-
-
-	model_->Draw(*useCamera_);
-	particle_->Draw(*useCamera_);
-	particle2_->Draw(*useCamera_);
+	titleLogo_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -141,19 +149,11 @@ void TitleScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	particle_->DrawImGui("titleEffect");
-	particle2_->DrawImGui("titleEffect2");
-
 	DrawSceneName();
 
-	model_->DrawImGui("test");
+	titleLogo_->DrawImGui();
 
-	ImGui::Begin("test");
-
-	ImGui::DragFloat2("Scale", &testScale_.x, 1.0f);
-	ImGui::DragFloat2("Pos", &testPos_.x, 1.0f);
-
-	ImGui::End();
+	debugCamera_->DrawImgui();
 
 	///
 	/// ↑ImGuiここまで
