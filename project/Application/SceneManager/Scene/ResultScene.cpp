@@ -159,3 +159,21 @@ void ResultScene::SpriteScoreUpdate() {
 		spriteScore_[i]->SetTexture(spriteNumCollection_[digit]);
 	}
 }
+
+ResultScene::~ResultScene() {
+	CleanupResources();
+}
+
+void ResultScene::CleanupResources() {
+	// 背景スプライトのクリーンアップ
+	if (spriteBG_) {
+		spriteBG_.reset();
+	}
+	
+	// スコアスプライトのクリーンアップ
+	for (auto& sprite : spriteScore_) {
+		if (sprite) {
+			sprite.reset();
+		}
+	}
+}

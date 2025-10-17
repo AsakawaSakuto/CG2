@@ -2,13 +2,53 @@
 
 void TitleScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
+TitleScene::~TitleScene() {
+	CleanupResources();
+}
+
+void TitleScene::CleanupResources() {
+	// パーティクルシステムのクリーンアップ
+	if (particle_) {
+		particle_.reset();
+	}
+	if (particle2_) {
+		particle2_.reset();
+	}
+	
+	// モデルのクリーンアップ
+	if (model_) {
+		model_.reset();
+	}
+	if (o_) {
+		o_.reset();
+	}
+	
+	// Text3Dのクリーンアップ
+	for (auto& text : text3D_) {
+		if (text) {
+			text.reset();
+		}
+	}
+	
+	// スプライトのクリーンアップ
+	if (spriteBG_) {
+		spriteBG_.reset();
+	}
+	if (spriteInGame_) {
+		spriteInGame_.reset();
+	}
+	if (spriteTutorial_) {
+		spriteTutorial_.reset();
+	}
+	if (spriteOption_) {
+		spriteOption_.reset();
+	}
+}
+
 void TitleScene::Initialize() {
 	// inputSystemの初期化
 	gamePad_ = &ctx_->gamePad;
 	input_ = &ctx_->input;
-
-	// Audioの初期化
-	//audio_->Initialize("project/resources/");
 
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);

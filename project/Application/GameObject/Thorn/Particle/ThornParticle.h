@@ -9,7 +9,11 @@ public:
 	void Update() override;
 	void Draw(Camera useCamera) override;
 	void Play(Vector3 pos, uint32_t playNum);
-	~ThornParticle() {}
+	~ThornParticle();
+	
+	// リソースクリーンアップ
+	void Cleanup();
+	
 private:
 	std::array<std::unique_ptr<Model>, 10> pModel_;
 	std::array<bool, 10> pIsAlive_ = { false };

@@ -29,10 +29,14 @@ public:
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
+	~TitleScene();
 
 private:
 	// メニューの状態切り替え(カーソルの更新)
 	void UpdateMenu();
+
+	// リソースクリーンアップメソッド
+	void CleanupResources();
 
 private:
 
