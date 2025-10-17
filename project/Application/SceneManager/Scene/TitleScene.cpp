@@ -28,6 +28,8 @@ void TitleScene::Initialize() {
 	model_->Initialize(&ctx_->dxCommon, "cube.obj");
 	model_->SetTexture("resources/image/test.png");
 
+	o_->Initialize(&ctx_->dxCommon, "titleLogo/o.obj");
+
 	// Text3Dの初期化
 	for (auto& text : text3D_) {
 		text = make_unique<Text3D>();
@@ -81,6 +83,8 @@ void TitleScene::Update() {
 
 	sceneFade_->Update();
 
+	o_->Update();
+
 	model_->Update();
 	particle_->Update();
 	particle2_->Update();
@@ -122,6 +126,7 @@ void TitleScene::Draw() {
 	}
 
 
+	o_->Draw(*useCamera_);
 	model_->Draw(*useCamera_);
 	particle_->Draw(*useCamera_);
 	particle2_->Draw(*useCamera_);
@@ -146,6 +151,7 @@ void TitleScene::Draw() {
 
 	DrawSceneName();
 
+	o_->DrawImGui("o");
 	model_->DrawImGui("test");
 
 	ImGui::Begin("test");
