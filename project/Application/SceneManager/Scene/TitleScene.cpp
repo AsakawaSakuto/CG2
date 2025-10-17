@@ -15,21 +15,6 @@ void TitleScene::CleanupResources() {
 		particle2_.reset();
 	}
 	
-	// モデルのクリーンアップ
-	if (model_) {
-		model_.reset();
-	}
-	if (o_) {
-		o_.reset();
-	}
-	
-	// Text3Dのクリーンアップ
-	for (auto& text : text3D_) {
-		if (text) {
-			text.reset();
-		}
-	}
-	
 	// スプライトのクリーンアップ
 	if (spriteBG_) {
 		spriteBG_.reset();
@@ -52,7 +37,8 @@ void TitleScene::Initialize() {
 
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
-	normalCamera_->SetPosition({0.0f, 0.0f, -10.0f});
+	debugCamera_->SetPosition({ 0.0f, 0.0f, -15.0f });
+	normalCamera_->SetPosition({0.0f, 0.0f, -15.0f});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
 	// Create SceneFade
@@ -65,16 +51,9 @@ void TitleScene::Initialize() {
 
 	particle2_->Initialize(&ctx_->dxCommon, 4);
 
-	model_->Initialize(&ctx_->dxCommon, "cube.obj");
-	model_->SetTexture("resources/image/test.png");
+	titleLogo_->Initialize(&ctx_->dxCommon);
 
 	o_->Initialize(&ctx_->dxCommon, "titleLogo/o.obj");
-
-	// Text3Dの初期化
-	for (auto& text : text3D_) {
-		text = make_unique<Text3D>();
-		text->Initialize(&ctx_->dxCommon);
-	}
 
 	// スプライトの初期化
 	spriteBG_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
@@ -123,21 +102,14 @@ void TitleScene::Update() {
 
 	sceneFade_->Update();
 
-	o_->Update();
-
-	model_->Update();
+	titleLogo_->Update();
+	
 	particle_->Update();
 	particle2_->Update();
 
 
 	// カメラ切り替え&更新
 	CameraController();
-
-	// Text3Dの更新処理
-	for (auto& text : text3D_) {
-		text->MoveTextAnimation(0.0f, 10.0f, std::numbers::pi_v<float> * 2, 0.0f);
-		text->Update();
-	}
 
 	/*spriteBG_->SetScale(testScale_);
 	spriteBG_->SetPosition(testPos_);*/
@@ -160,16 +132,7 @@ void TitleScene::Draw() {
 		spriteOption_->Draw();
 	}
 
-	// 3Dテキストの描画処理
-	for (auto& text : text3D_) {
-		text->Draw(*useCamera_);
-	}
-
-
-	o_->Draw(*useCamera_);
-	model_->Draw(*useCamera_);
-	particle_->Draw(*useCamera_);
-	particle2_->Draw(*useCamera_);
+	titleLogo_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -186,20 +149,11 @@ void TitleScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	particle_->DrawImGui("titleEffect");
-	particle2_->DrawImGui("titleEffect2");
-
 	DrawSceneName();
 
-	o_->DrawImGui("o");
-	model_->DrawImGui("test");
+	titleLogo_->DrawImGui();
 
-	ImGui::Begin("test");
-
-	ImGui::DragFloat2("Scale", &testScale_.x, 1.0f);
-	ImGui::DragFloat2("Pos", &testPos_.x, 1.0f);
-
-	ImGui::End();
+	debugCamera_->DrawImgui();
 
 	///
 	/// ↑ImGuiここまで

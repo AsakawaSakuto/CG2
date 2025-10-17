@@ -52,9 +52,10 @@ private:
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
 	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
 	void CameraController();     
+	
 
-	// 3Dテキスト
-	std::array<std::unique_ptr<Text3D>, 5> text3D_;
+
+	unique_ptr<Text3D> titleLogo_ = make_unique<Text3D>();
 
 	// タイトル画面のモード
 	Screen currentScreen_ = Screen::FIRST;
