@@ -9,4 +9,5 @@ struct AppContext {
 	DirectXCommon dxCommon;
 	Input input;
 	GamePad gamePad;
+	float lastScore = 0.0f;
 };

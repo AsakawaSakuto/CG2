@@ -3,6 +3,16 @@
 #include "Application/SceneManager/IScene.h"
 #include <array>
 
+// リザルト画面のモード
+namespace Result {
+	enum class Screen {
+		FIRST,
+		SECOND,
+	};
+}
+
+//using Result::Screen;
+
 using Microsoft::WRL::ComPtr;
 using std::make_unique;
 using std::unique_ptr;
@@ -42,12 +52,30 @@ private:
 
 	// 描画用のスコア
 	float drawScore_ = 0.0f;
+
+	// ゲームシーンから受け取るスコア
+	float lastScore_ = 0.0f;
 	
-	const float MAX_SCORE = 12340.0f;
+	//const float MAX_SCORE = 12340.0f;
 
 	// 桁数
 	std::array<int, 5> digits = {0};
 
 	Vector2 testPos_;
 	Vector2 testScale_;
+
+	// 集めたお菓子の個数テキストスプライト
+	unique_ptr<Sprite> spriteCollectedSweets_ = make_unique<Sprite>();
+
+	// お菓子降ってくる演出用モデル
+	std::array<unique_ptr<Model>, 50> sweetModels_;
+
+	// リザルト画面のモード
+	Result::Screen currentScreen_ = Result::Screen::FIRST;
+
+	// 「リトライ」テキスト
+	unique_ptr<Sprite> spriteRetry_ = make_unique<Sprite>();
+
+	// 「タイトルへ」テキスト
+	unique_ptr<Sprite> spriteBackToTitle_ = make_unique<Sprite>();
 };

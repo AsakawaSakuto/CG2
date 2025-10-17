@@ -12,7 +12,18 @@ public:
 	void SetPosition(Vector3 position) { transform_.translate = position; }
 	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }
 
+	void WingImGui();
+
 private:
 	// 当たり判定更新(AABB)
 	void CollisionUpdate();
+
+	// 腕のモデル
+	std::unique_ptr<Model> modelArmR01_;
+	std::unique_ptr<Model> modelArmR02_;
+	std::unique_ptr<Model> modelArmL01_;
+	std::unique_ptr<Model> modelArmL02_;
+
+	float testX_{};
+	float testY_{};
 };
