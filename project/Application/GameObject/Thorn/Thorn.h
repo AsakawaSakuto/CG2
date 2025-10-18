@@ -33,7 +33,7 @@ public:
 
 	// Setter
 	void SetPosition(Vector3 position) { transform_.translate = position; }
-	void SetThornType(ThornType type) { type_ = type; }
+	void SetThornType(ThornType type);
 	void SetUpgradeCooldownBullet(int frames) { upgradeCooldownFramesBullet_ = frames; }
 	void SetUpgradeCooldownWing(int frames) { upgradeCooldownFramesWing_ = frames; }
 
@@ -43,6 +43,15 @@ public:
 
 	// クールタイムの更新
 	void TickCooldown();
+
+private:
+	struct ScaleTween {
+		Vector3 startScale;
+		Vector3 targetScale;
+		float duration;
+		float elapsed;
+		bool active = false;
+	};
 
 private:
 	// トゲのレベルアップ
@@ -62,4 +71,7 @@ private:
 	int upgradeCooldownFramesWing_ = 0;
 
 	unique_ptr<ThornParticle> particle_ = make_unique<ThornParticle>();
+	
+	// スケールを変更時にイージングをかけるための変数
+	ScaleTween scaleTween_;
 };

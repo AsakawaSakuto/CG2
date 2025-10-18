@@ -25,6 +25,11 @@ void PlayerWing::Initialize(DirectXCommon* dxCommon) {
 	modelArmL01_->SetRotate({0.0f, 0.0f, 0.0f});
 	modelArmL02_->SetRotate({0.0f, 0.0f, std::numbers::pi_v<float> * 1.5f});
 
+	modelArmR01_->SetScale({2.0f, 2.0f, 2.0f});
+	modelArmR02_->SetScale({2.0f, 2.0f, 2.0f});
+	modelArmL01_->SetScale({2.0f, 2.0f, 2.0f});
+	modelArmL02_->SetScale({2.0f, 2.0f, 2.0f});
+
 	// 当たり判定更新(AABB)
 	CollisionUpdate();
 
@@ -42,10 +47,10 @@ void PlayerWing::Update() {
 	// model_->Update();
 
 	// 羽の中心点に応じて腕のモデルの位置を更新
-	modelArmR01_->SetTranslate({transform_.translate.x + 10.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
-	modelArmR02_->SetTranslate({transform_.translate.x + 40.0f * deltaTime_, transform_.translate.y - 3.0f * deltaTime_, transform_.translate.z});
-	modelArmL01_->SetTranslate({transform_.translate.x - 10.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
-	modelArmL02_->SetTranslate({transform_.translate.x - 40.0f * deltaTime_, transform_.translate.y - 3.0f * deltaTime_, transform_.translate.z});
+	modelArmR01_->SetTranslate({transform_.translate.x + 20.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
+	modelArmR02_->SetTranslate({transform_.translate.x + 80.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
+	modelArmL01_->SetTranslate({transform_.translate.x - 20.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
+	modelArmL02_->SetTranslate({transform_.translate.x - 80.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
 
 	// 腕のモデル更新
 	modelArmR01_->Update();

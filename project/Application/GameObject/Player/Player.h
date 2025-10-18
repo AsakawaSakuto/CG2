@@ -46,6 +46,8 @@ public:
 	bool GetIsGoal() const { return isGoal_; }
 	int GetBulletGauge() const { return bulletGauge_; }
 	float GetScore() const { return score_; }
+	int GetShotCount() const { return shotCount_; }
+	int GetStunCount() const { return stunCount_; }
 
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
@@ -220,4 +222,10 @@ private:
 
 	// 弾のゲージスプライト
 	std::array<BulletGaugeInfo, 5>* bulletGaugeSprites_ = nullptr;
+
+	// ショット数のカウント
+	int shotCount_ = 0;
+
+	// ショット数のカウント
+	int stunCount_ = 0;
 };

@@ -19,7 +19,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerState_ = JsonState::Load<PlayerState>("Resources/Data/playerState.json");
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 
-	transform_.scale = {1.0f, 1.0f, 1.0f};
+	transform_.scale = {2.0f, 2.0f, 2.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
@@ -287,6 +287,9 @@ void Player::BulletShot() {
 
 		// 描画用のフラグを下ろす
 		(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
+
+		// ショットカウント加算
+		shotCount_++;
 	}
 }
 
@@ -415,6 +418,9 @@ void Player::CollisionThorn() {
 				// シェイク用のフラグを立てる
 				if (!isShake_ && !isStartCoolDown_) {
 					isShake_ = true;
+
+					// スタンカウント加算
+					stunCount_++;
 				}
 
 				// 弾のゲージリセット
