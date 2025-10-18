@@ -8,6 +8,11 @@ using Microsoft::WRL::ComPtr;
 using std::make_unique;
 using std::unique_ptr;
 
+enum Menu {
+	PLAY,
+	OPTION,
+};
+
 class TitleScene : public IScene {
 public:
 	void SetAppContext(AppContext* ctx) override;
@@ -21,9 +26,9 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
+	void TitleLogoUiUpdate();
+	void MenuSelectUiUpdate();
 private:
-	unique_ptr<Particles> particle_ = make_unique<Particles>();
-	unique_ptr<Particles> particle2_ = make_unique<Particles>();
 
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
@@ -38,4 +43,11 @@ private:
 	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
+
+	float uiAlpha_ = 0.0f;
+
+	GameTimer titleTimer_;
+	GameTimer cursolTimer_;
+
+	Menu selectMenu_ = Menu::PLAY;
 };
