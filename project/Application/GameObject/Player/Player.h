@@ -49,6 +49,7 @@ public:
 	float GetScore() const { return score_; }
 	int GetShotCount() const { return shotCount_; }
 	int GetStunCount() const { return stunCount_; }
+	bool GetIsCameraSet() const { return isCameraSet_; }
 
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
@@ -153,6 +154,9 @@ private:
 	// プレイヤーがスタン時に回転する
 	void StunRotate();
 
+	// カメラの追従オンオフ切り替え
+	void UpdateCameraSetChange();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -232,4 +236,7 @@ private:
 
 	// クマ
 	std::unique_ptr<Bear> bear_ = std::make_unique<Bear>();
+
+	// プレイヤーにカメラが追従するかどうかのフラグ
+	bool isCameraSet_ = false;
 };
