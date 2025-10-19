@@ -50,6 +50,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// プレイヤーの方向初期化
 	direction_ = Direction::UP;
+
+	// クマ
+	bear_->Initialize(dxCommon_);
 }
 
 void Player::Update() {
@@ -134,6 +137,9 @@ void Player::Update() {
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
+
+	// クマ
+	bear_->Update();
 }
 
 void Player::Draw(Camera useCamera) {
@@ -151,6 +157,9 @@ void Player::Draw(Camera useCamera) {
 	if (!isStartCoolDown_) {
 		playerWing_->Draw(useCamera);
 	}
+
+	// クマ
+	bear_->Draw(useCamera);
 }
 
 void Player::DrawImgui() {

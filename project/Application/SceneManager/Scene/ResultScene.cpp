@@ -252,6 +252,41 @@ void ResultScene::CleanupResources() {
 			sprite.reset();
 		}
 	}
+	if (spriteShotCount_) {
+		spriteCollectedSweets_.reset();
+	}
+
+	if (spriteShotCount_) {
+		spriteRetry_.reset();
+	}
+
+	if (spriteShotCount_) {
+		spriteBackToTitle_.reset();
+	}
+
+	if (spriteShotCount_) {
+		spriteCursol_.reset();
+	}
+
+	if (spriteShotCount_) {
+		spriteStunCount_.reset();
+	}
+
+	if (spriteShotCount_) {
+		spriteShotCount_.reset();
+	}
+
+	for (auto& sprite : spriteShot_) {
+		if (sprite) {
+			sprite.reset();
+		}
+	}
+
+	for (auto& sprite : spriteStun_) {
+		if (sprite) {
+			sprite.reset();
+		}
+	}
 }
 
 void ResultScene::ScreenFirstUpdate() {

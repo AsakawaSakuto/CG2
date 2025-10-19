@@ -23,8 +23,8 @@ void TestScene::Initialize() {
 	gameTimer_.Start(2.0f, true);
 
 	// Clear
-	thorns_.clear();
-	blocks_.clear();
+	//thorns_.clear();
+	//blocks_.clear();
 
 	// オブジェクトの配置　上半分
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
@@ -33,8 +33,8 @@ void TestScene::Initialize() {
 	SpawnObjectsByMapChip2(1.0f, 0.0f);
 
 	// プレイヤーに他のゲームオブジェクトの情報を渡す
-	player_->SetThrons(thorns_);
-	player_->SetBlocks(blocks_);
+	//player_->SetThrons(thorns_);
+	//player_->SetBlocks(blocks_);
 }
 
 void TestScene::Update() {
@@ -141,7 +141,7 @@ void TestScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				auto thorn = std::make_unique<Thorn>();
 				thorn->Initialize(&ctx_->dxCommon);
 				thorn->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				thorns_.push_back(std::move(thorn));
+				//thorns_.push_back(std::move(thorn));
 			}
 
 			if (static_cast<TileType>(tile) == TileType::BLOCK) {
@@ -149,7 +149,7 @@ void TestScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				auto block = std::make_unique<Block>();
 				block->Initialize(&ctx_->dxCommon);
 				block->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				blocks_.push_back(std::move(block));
+				//blocks_.push_back(std::move(block));
 			}
 		}
 	}
@@ -166,7 +166,7 @@ void TestScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
 				auto thorn = std::make_unique<Thorn>();
 				thorn->Initialize(&ctx_->dxCommon);
 				thorn->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				thorns_.push_back(std::move(thorn));
+				//thorns_.push_back(std::move(thorn));
 			}
 
 			if (static_cast<TileType>(tile) == TileType::BLOCK) {
@@ -174,7 +174,7 @@ void TestScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
 				auto block = std::make_unique<Block>();
 				block->Initialize(&ctx_->dxCommon);
 				block->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				blocks_.push_back(std::move(block));
+				//blocks_.push_back(std::move(block));
 			}
 		}
 	}
