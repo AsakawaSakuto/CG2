@@ -152,6 +152,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\GameObject\Temp\TempGameObject.cpp" />
     <ClCompile Include="Application\GameObject\Thorn\Particle\ThornParticle.cpp" />
     <ClCompile Include="Application\GameObject\Thorn\Thorn.cpp" />
+    <ClCompile Include="Application\GameObject\TitleObject\TitleObject.cpp" />
     <ClCompile Include="Application\GameUI\SceneFade\SceneFade.cpp" />
     <ClCompile Include="Application\GameUI\Temp\TempGameUI.cpp" />
     <ClCompile Include="Application\Map\Map.cpp" />
@@ -219,6 +220,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameObject\Temp\TempGameObject.h" />
     <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
     <ClInclude Include="Application\GameObject\Thorn\Thorn.h" />
+    <ClInclude Include="Application\GameObject\TitleObject\TitleObject.h" />
     <ClInclude Include="Application\GameUI\GameUI.h" />
     <ClInclude Include="Application\GameUI\SceneFade\SceneFade.h" />
     <ClInclude Include="Application\GameUI\Temp\TempGameUI.h" />

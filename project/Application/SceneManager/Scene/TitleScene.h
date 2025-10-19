@@ -1,6 +1,7 @@
 #pragma once
 #include "Application/EngineSystem.h"
 #include "Application/GameObject/Text3D/Text3D.h"
+#include "Application/GameObject/TitleObject/TitleObject.h"
 #include "Application/SceneManager/IScene.h"
 #include <array>
 
@@ -57,6 +58,9 @@ private:
 	void CameraController();     
 
 	unique_ptr<Text3D> titleLogo_ = make_unique<Text3D>();
+	unique_ptr<TitleObject> titleObject_ = make_unique<TitleObject>();
+
+	unique_ptr<Model> cloud_ = make_unique<Model>();
 
 	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
