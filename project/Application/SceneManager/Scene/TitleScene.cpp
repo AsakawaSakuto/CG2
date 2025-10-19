@@ -85,6 +85,10 @@ void TitleScene::Update() {
 
 	if (sceneFade_->EndFadeIn()) {
 		ChangeScene(SCENE::GAME); // シーン切り替え
+		startGameSE_->Reset();
+		moveCursolSE_->Reset();
+		decideSE_->Reset();
+		titleSceneBGM_->Reset();
 	}
 
 	TitleLogoUpdate();
