@@ -13,6 +13,20 @@ enum Menu {
 	OPTION,
 };
 
+enum OptionMenu {
+	NONE,
+	FULLSCREEN,
+	SE,
+	BGM,
+	BACK,
+};
+
+enum SoundVolume {
+	DAI,
+	TYU,
+	SYOU,
+};
+
 class TitleScene : public IScene {
 public:
 	void SetAppContext(AppContext* ctx) override;
@@ -26,8 +40,9 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
-	void TitleLogoUiUpdate();
-	void MenuSelectUiUpdate();
+	void TitleLogoUpdate();
+	void SelectUIUpdate();
+	void OptionUIUpdate();
 private:
 
 	// Camera
@@ -44,10 +59,40 @@ private:
 	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
 
+	unique_ptr<Sprite> optionBG_ = make_unique<Sprite>();
+	unique_ptr<Sprite> optionCursolUI_ = make_unique<Sprite>();
+
+	unique_ptr<Sprite> fullScreenUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> onUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> offUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> seUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> bgmUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> daiUI_ = make_unique<Sprite>(); 
+	unique_ptr<Sprite> dai2UI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> tyuUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> tyu2UI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> syouUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> syou2UI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> backUI_ = make_unique<Sprite>();
+
 	float uiAlpha_ = 0.0f;
 
 	GameTimer titleTimer_;
 	GameTimer cursolTimer_;
+	GameTimer optionTimer_;
+	GameTimer optionCursolTimer_;
+
+	Vector2 optionBGScale_;
+	Vector2 optionCursolUIScale_;
+	Vector2 normalUIScale_;
+
+	float optionCursolStart_;
+	float optionCursolEnd_;
+
+	bool optionOpen_ = false;
 
 	Menu selectMenu_ = Menu::PLAY;
+	OptionMenu selectOptionMenu_ = OptionMenu::NONE;
+	SoundVolume seVolume_ = SoundVolume::TYU;
+	SoundVolume bgmVolume_ = SoundVolume::TYU;
 };

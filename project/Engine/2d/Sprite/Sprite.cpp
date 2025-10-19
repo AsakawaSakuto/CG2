@@ -8,7 +8,7 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 
-void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName) {
+void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position, Vector2 scale) {
 	//
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
@@ -21,10 +21,8 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName) {
 	// テクスチャからサイズを自動取得
 	size_ = TextureManager::GetInstance()->GetTextureSize(textureName_);
 
-	// PSOManager経由でPSOを取得するため、個別作成は削除
-	// CreatePSO(); ← これを削除
-
-	transform_.scale = { 1.f,1.f,1.f };
+	position_ = position;
+	transform_.scale = { scale.x,scale.y,1.f };
 	transform_.translate = { 0.f,0.f,0.f };
 
 	CreateVertexResource();
@@ -121,7 +119,7 @@ void Sprite::DrawImGui(const char* objectName) {
 
 	ImGui::Text("Transform");
 	ImGui::DragFloat2("translate", &position_.x, 1.f);
-	ImGui::DragFloat2("scale", &transform_.scale.x, 1.f);
+	ImGui::DragFloat2("scale", &transform_.scale.x, 0.01f);
 	ImGui::DragFloat("rotate", &transform_.rotate.z, 0.01f);
 
 	if (ImGui::Button("tReset")) {

@@ -152,6 +152,7 @@
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
     <ClInclude Include="Application\SceneManager\Scene\State\GameSceneState.h" />
     <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
+    <ClInclude Include="Engine\System\Audio\MasterVolume.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
