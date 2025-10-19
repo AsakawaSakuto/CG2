@@ -62,6 +62,7 @@
     <ClCompile Include="Application\GameObject\Text3D\Text3D.cpp" />
     <ClCompile Include="Application\GameObject\Thorn\Particle\ThornParticle.cpp" />
     <ClCompile Include="Application\GameObject\Player\Bear.cpp" />
+    <ClCompile Include="Application\GameObject\TitleObject\TitleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
     <ClInclude Include="Engine\System\Audio\MasterVolume.h" />
     <ClInclude Include="Application\GameObject\Player\Bear.h" />
+    <ClInclude Include="Application\GameObject\TitleObject\TitleObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

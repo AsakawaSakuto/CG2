@@ -34,6 +34,7 @@ void TitleScene::Initialize() {
 	sceneFade_->StartFadeOut(1.0f);
 
 	titleLogo_->Initialize(&ctx_->dxCommon);
+	titleObject_->Initialize(&ctx_->dxCommon);
 
 	uiAlpha_ = 0.0f;
 	titleTimer_.Reset();
@@ -71,7 +72,10 @@ void TitleScene::Initialize() {
 	moveCursolSE_->Initialize("resources/sound/moveCursolSE.mp3");
 	decideSE_->Initialize("resources/sound/DecideSE.mp3");
 	titleSceneBGM_->Initialize("resources/sound/titleSceneBGM.mp3");
-	titleSceneBGM_->PlayAudio(BGM_Volume, true);
+	//titleSceneBGM_->PlayAudio(BGM_Volume, true);
+
+	cloud_->Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
+	cloud_->SetTexture("resources/image/0.png");
 }
 
 void TitleScene::Update() {
@@ -100,7 +104,11 @@ void TitleScene::Update() {
 	optionCursolTimer_.Update();
 
 	sceneFade_->Update();
+
 	titleLogo_->Update();
+	titleObject_->Update();
+
+	cloud_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -116,6 +124,9 @@ void TitleScene::Draw() {
 	///
 
 	titleLogo_->Draw(*useCamera_);
+	titleObject_->Draw(*useCamera_);
+
+	//cloud_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -184,7 +195,11 @@ void TitleScene::Draw() {
 
 	debugCamera_->DrawImgui();
 
-	optionCursolUI_->DrawImGui("optionCursol");
+	//cloud_->DrawImGui("cloud");
+
+	titleObject_->DrawImGui();
+
+	//optionCursolUI_->DrawImGui("optionCursol");
 	//optionBG_->DrawImGui("optionBG");
 	//fullScreenUI_->DrawImGui("full");
 	//onUI_->DrawImGui("on");
@@ -232,6 +247,7 @@ void TitleScene::TitleLogoUpdate() {
 	// TitleLogoの演出が終了し、まだタイマーが開始されていない場合のみ開始
 	if (titleLogo_->IsEnd() && !titleTimer_.IsActive() && !titleTimer_.IsFinished()) {
 		titleTimer_.Start(1.0f, false);
+		titleObject_->PlayerStart();
 	}
 	// UIの透明度制御を修正
 	if (titleTimer_.IsActive()) {
