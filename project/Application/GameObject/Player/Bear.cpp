@@ -6,6 +6,7 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 
 	modelBearHead_ = std::make_unique<Model>();
 	modelBearHead_->Initialize(dxCommon_, "player/Head/Head.obj");
+	modelBearHead_->SetTexture("resources/model/player/Head/Player.png");
 
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
