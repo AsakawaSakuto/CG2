@@ -22,14 +22,14 @@ void AudioX::Initialize(const std::string& filePath) {
     pcmShared_ = std::make_shared<std::vector<BYTE>>(std::move(sd.pcm));
 }
 
-void AudioX::PlayAudio(bool loop) {
+void AudioX::PlayAudio(float volume, bool loop) {
     if (!xAudio2_ || !mastering_ || !pcmShared_ || pcmShared_->empty()) return;
 
     auto inst = std::make_unique<ClipInstance>();
     inst->pcm_ = pcmShared_;
     inst->wfex_ = wfex_;
     inst->loop_ = loop;
-    inst->Play(xAudio2_.Get());
+    inst->Play(xAudio2_.Get(), volume);
     actives_.push_back(std::move(inst));
 }
 
@@ -59,9 +59,9 @@ void AudioX::Reset() {
 }
 
 void AudioX::SetVolume(float volume) {
-    // // クランプ
+    // // クランプ（0.0f～1.0fの範囲）
     if (volume < 0.0f) volume = 0.0f;
-    if (volume > 2.0f) volume = 2.0f;
+    if (volume > 1.0f) volume = 1.0f;
     for (auto& a : actives_) {
         if (a && a->voice_) {
             a->voice_->SetVolume(volume);

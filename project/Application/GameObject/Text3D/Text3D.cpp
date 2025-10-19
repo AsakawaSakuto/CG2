@@ -20,14 +20,15 @@ void Text3D::Initialize(DirectXCommon* dxCommon) {
 	model_[9]->Initialize(dxCommon_, "TitleLogo/sa.obj");
 	model_[10]->Initialize(dxCommon_, "TitleLogo/i.obj");
 	model_[11]->Initialize(dxCommon_, "TitleLogo/da.obj");
+	model_[12]->Initialize(dxCommon_, "TitleLogo/-.obj");
 
 	// Transform配列を初期化
 	for (int i = 0; i < transform_.size(); i++) {
 		model_[i]->SetTexture("resources/image/0.png");
 		transform_[i].rotate = { 0.0f, 0.0f, 0.0f };
 
-		timer_[i].Start(0.25f + (i * 0.15f), false);
-		rotateTimer_[i].Start(0.25f + (i * 0.15f), false);
+		timer_[i].Start(1.5f + (i * 0.15f), false);
+		rotateTimer_[i].Start(1.5f + (i * 0.15f), false);
 	}
 
 	for (int i = 0; i < 7; i++) {
@@ -39,6 +40,7 @@ void Text3D::Initialize(DirectXCommon* dxCommon) {
 	}
 
 	transform_[11].scale = { 0.85f, 0.85f, 1.0f };
+	transform_[12].scale = { 1.0f, 1.0f, 1.0f };
 
 	// 各文字の最終位置を設定
 	transform_[0].translate = { -5.1f, 2.2f, 0.0f };
@@ -53,6 +55,7 @@ void Text3D::Initialize(DirectXCommon* dxCommon) {
 	transform_[9].translate = { -2.95f, 1.15f, 0.0f };
 	transform_[10].translate = { -1.9f, 1.15f, 0.0f };
 	transform_[11].translate = { -1.0f, 1.15f, 0.0f };
+	transform_[12].translate = { 20.0f, 1.15f, 0.0f };
 }
 
 void Text3D::Update() {
@@ -69,6 +72,7 @@ void Text3D::Update() {
 	transform_[9].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[9].GetProgress(), Easing::Type::EaseInOutBounce);
 	transform_[10].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[10].GetProgress(), Easing::Type::EaseInOutBounce);
 	transform_[11].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[11].GetProgress(), Easing::Type::EaseInOutBounce);
+	transform_[12].translate.x = Easing::Lerp(20.0f, 0.1f, timer_[11].GetProgress(), Easing::Type::EaseInOutBounce);
 
 	// 全タイマーの更新
 	for (int i = 0; i < timer_.size(); i++) {

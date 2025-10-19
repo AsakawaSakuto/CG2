@@ -19,7 +19,7 @@ class Sprite
 public:
 
 	// サイズを画像から自動取得する版
-	void Initialize(DirectXCommon* dxCommon, const std::string& fileName);
+	void Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position = { 0.0f,0.0f }, Vector2 scale = { 1.0f,1.0f });
 
 	void Update();
 

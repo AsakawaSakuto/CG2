@@ -4,26 +4,28 @@
 #include "Application/SceneManager/IScene.h"
 #include <array>
 
-// タイトル画面のモード
-namespace Title {
-enum class Screen {
-	FIRST,
-	SECOND,
-};
-}
-
-//using Title::Screen;
-
-// タイトルのメニュー
-enum class Menu {
-	IN_GAME,
-	TUTORIAL,
-	OPTION,
-};
-
 using Microsoft::WRL::ComPtr;
 using std::make_unique;
 using std::unique_ptr;
+
+enum Menu {
+	PLAY,
+	OPTION,
+};
+
+enum OptionMenu {
+	NONE,
+	FULLSCREEN,
+	SE,
+	BGM,
+	BACK,
+};
+
+enum SoundVolume {
+	DAI,
+	TYU,
+	SYOU,
+};
 
 class TitleScene : public IScene {
 public:
@@ -34,18 +36,17 @@ public:
 	~TitleScene();
 
 private:
-	// メニューの状態切り替え(カーソルの更新)
-	void UpdateMenu();
 
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
-private:
-	unique_ptr<Particles> particle_ = make_unique<Particles>();
-	unique_ptr<Particles> particle2_ = make_unique<Particles>();
+	void TitleLogoUpdate();
+	void SelectUIUpdate();
+	void OptionUIUpdate();
 
-	unique_ptr<Model> model_ = make_unique<Model>();
-	unique_ptr<Model> o_ = make_unique<Model>();
+	void SpriteUpdate();
+	void AudioUpdate();
+private:
 
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
@@ -57,24 +58,57 @@ private:
 
 	unique_ptr<Text3D> titleLogo_ = make_unique<Text3D>();
 
-	// タイトル画面のモード
-	Title::Screen currentScreen_ = Title::Screen::FIRST;
+	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
 
-	// タイトルのメニュー
-	Menu currentMenu_ = Menu::IN_GAME;
+	unique_ptr<Sprite> optionBG_ = make_unique<Sprite>();
+	unique_ptr<Sprite> optionCursolUI_ = make_unique<Sprite>();
 
-	// 背景スプライト
-	unique_ptr<Sprite> spriteBG_ = make_unique<Sprite>();
+	unique_ptr<Sprite> fullScreenUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> onUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> offUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> seUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> bgmUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> daiUI_ = make_unique<Sprite>(); 
+	unique_ptr<Sprite> dai2UI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> tyuUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> tyu2UI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> syouUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> syou2UI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> backUI_ = make_unique<Sprite>();
 
-	// インゲーム遷移スプライト
-	unique_ptr<Sprite> spriteInGame_ = make_unique<Sprite>();
+	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> moveCursolSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> decideSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> titleSceneBGM_ = make_unique<AudioX>();
 
-	// チュートリアルスプライト
-	unique_ptr<Sprite> spriteTutorial_ = make_unique<Sprite>();
+	float uiAlpha_ = 0.0f;
 
-	// オプションスプライト
-	unique_ptr<Sprite> spriteOption_ = make_unique<Sprite>();
+	GameTimer titleTimer_;
+	GameTimer cursolTimer_;
+	GameTimer optionTimer_;
+	GameTimer optionCursolTimer_;
 
-	Vector2 testPos_{};
-	Vector2 testScale_{};
+	Vector2 optionBGScale_;
+	Vector2 optionCursolUIScale_;
+	Vector2 normalUIScale_;
+
+	float optionCursolStart_;
+	float optionCursolEnd_;
+
+	bool optionOpen_ = false;
+
+	float daiVolumeSE_ = 1.0f;
+	float tyuVolumeSE_ = 0.5f;
+	float syouVolumeSE_ = 0.2f;
+
+	float daiVolumeBGM_ = 0.7f;
+	float tyuVolumeBGM_ = 0.3f;
+	float syouVolumeBGM_ = 0.1f;
+
+	Menu selectMenu_ = Menu::PLAY;
+	OptionMenu selectOptionMenu_ = OptionMenu::NONE;
+	SoundVolume seVolume_ = SoundVolume::TYU;
+	SoundVolume bgmVolume_ = SoundVolume::TYU;
 };

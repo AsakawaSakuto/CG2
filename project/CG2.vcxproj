@@ -242,6 +242,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3d\Particles\Struct\PreFrame.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\PreView.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
+    <ClInclude Include="Engine\System\Audio\MasterVolume.h" />
     <ClInclude Include="Engine\System\GamePad\GamePad.h" />
     <ClInclude Include="Engine\System\HeapManager\HeapManager.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />

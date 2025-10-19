@@ -40,12 +40,17 @@ public:
     UniqueSourceVoice voice_{ nullptr };
     bool loop_ = false;
 
-    // // 再生開始
-    void Play(IXAudio2* xa) {
+    // // 再生開始（volume範囲は0.0f～1.0f）
+    void Play(IXAudio2* xa, float volume = 1.0f) {
         IXAudio2SourceVoice* raw = nullptr;
         HRESULT hr = xa->CreateSourceVoice(&raw, &wfex_);
         assert(SUCCEEDED(hr));
         voice_.reset(raw);
+        
+        // // 音量設定（0.0f～1.0fの範囲にクランプ）
+        if (volume < 0.0f) volume = 0.0f;
+        if (volume > 1.0f) volume = 1.0f;
+        voice_->SetVolume(volume);
 
         XAUDIO2_BUFFER buf{};
         buf.pAudioData = pcm_->data();
@@ -85,8 +90,8 @@ public:
     // // filePath(.wav/.mp3)を読み込み（PCM16へ）。以後PlayAudioで再生。
     void Initialize(const std::string& filePath);
 
-    // // 再生。loop=trueで無限ループ。複数回呼ぶと同時再生可能。
-    void PlayAudio(bool loop = false);
+    // // 再生。loop=trueで無限ループ。複数回呼ぶと同時再生可能。volume範囲は0.0f～1.0f
+    void PlayAudio(float volume = 1.0f, bool loop = false);
 
     // // 毎フレーム呼ぶ。終了済みインスタンスの破棄を行う。
     void Update();
@@ -94,7 +99,7 @@ public:
     // // すべて停止して後始末
     void Reset();
 
-    // // 全インスタンスに音量を適用（0.0f～2.0f）
+    // // 全インスタンスに音量を適用（0.0f～1.0f）
     void SetVolume(float volume);
 
     // 再生中の全インスタンスを即時停止して破棄（PCMとXAudio2は残す）

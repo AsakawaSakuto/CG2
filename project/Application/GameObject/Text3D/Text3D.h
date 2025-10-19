@@ -10,11 +10,13 @@ public:
 
 	void DrawImGui();
 	~Text3D() {}
+
+	bool IsEnd() { return timer_[12].IsFinished(); }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 
-	std::array<std::unique_ptr<Model>, 12> model_;
-	std::array<Transform, 12> transform_;
-	std::array<GameTimer, 12> timer_;
-	std::array<GameTimer, 12> rotateTimer_;
+	std::array<std::unique_ptr<Model>, 13> model_;
+	std::array<Transform, 13> transform_;
+	std::array<GameTimer, 13> timer_;
+	std::array<GameTimer, 13> rotateTimer_;
 };
