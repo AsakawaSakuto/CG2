@@ -21,7 +21,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	transform_.scale = {2.0f, 2.0f, 2.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
-	transform_.translate = {0.0f, 0.0f, 0.0f};
+	transform_.translate = {0.0f, -10.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 1.0f;
 
@@ -53,6 +53,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// クマ
 	bear_->Initialize(dxCommon_);
+
+	// カメラ追従フラグ
+	isCameraSet_ = false;
 }
 
 void Player::Update() {
@@ -134,11 +137,15 @@ void Player::Update() {
 	// 当たり判定更新(AABB)
 	UpdateCollisionAABB();
 
+	// カメラの追従オンオフ切り替え
+	UpdateCameraSetChange();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
 
 	// クマ
+	bear_->SetTranslate(transform_.translate);
 	bear_->Update();
 }
 
@@ -174,6 +181,8 @@ void Player::DrawImgui() {
 
 	// 弾のステータス
 	DrawImGuiJsonStateBullet();
+
+	bear_->ImGuiUpdate();
 
 	//playerWing_->WingImGui();
 }
@@ -213,8 +222,8 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		isGoal_ = true;
 
 		// プレイヤーのステータス初期化
-		transform_.rotate.z = 0.0f;
-		direction_ = Direction::UP;
+		//transform_.rotate.z = 0.0f;
+		//direction_ = Direction::UP;
 		playerState_.cameraOffset = CAMERA_OFFSET_BOTTOM;
 	}
 }
@@ -247,9 +256,18 @@ void Player::RotateChange() {
 	if (std::abs(transform_.rotate.z - targetRotationZ) < 0.01f) {
 		transform_.rotate.z = targetRotationZ;
 	}
+
+	// クマのモデルも同時に回転
+	bear_->SetRotate(transform_.rotate);
+
+	// 方向に応じてクマのモデルの配置を変更
+    bear_->SetOffsetX((direction_ == Direction::DOWN) ? -0.2f : 0.2f);
 }
 
 void Player::BulletCharge() {
+	if (!isCameraSet_)
+		return;
+
 	// ゲージが最大値なら早期リターン
 	if (bulletGauge_ >= bulletState_.bulletGaugeMax) {
 		return;
@@ -692,4 +710,14 @@ void Player::UpdateCollisionAABB() {
 void Player::StunRotate() { 
 	// 2回転
 	transform_.rotate.z += 4.0f * std::numbers::pi_v<float>; 
+}
+
+void Player::UpdateCameraSetChange() {
+	if (transform_.translate.y >= CAMERA_OFFSET_BOTTOM && !isCameraSet_) {
+		isCameraSet_ = true;
+	}
+
+	if (transform_.translate.y <= START_LINE && isCameraSet_) {
+		isCameraSet_ = false;
+	}
 }

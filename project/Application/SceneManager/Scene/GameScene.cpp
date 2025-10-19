@@ -206,10 +206,10 @@ void GameScene::Update() {
 		Initialize();
 	}
 
-	player_->Update();
 
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
 	UpdateCameraToPlayer();
+	player_->Update();
 
 	// 汎用機能の更新
 	gameTimer_.Update();
@@ -302,7 +302,7 @@ void GameScene::Draw() {
 	// sceneFade_->Draw();
 
 	// カウントダウン用のスプライト描画
-	if (gameStartTimer_ >= 1) {
+	if (gameStartTimer_ >= 1 && player_->GetIsCameraSet()) {
 		spriteNumber_->Draw();
 	}
 
@@ -414,9 +414,11 @@ void GameScene::Draw() {
 }
 
 void GameScene::UpdateCameraToPlayer() {
-	// カメラの座標Yをプレイヤーの座標Yに合わせる
-	Vector3 pPos = player_->GetPosition();
-	normalCamera_->SetPosition({0.0f + player_->GetShakeAmount().x, pPos.y + player_->CameraOffset() + player_->GetShakeAmount().x, -30.0f});
+	if (player_->GetIsCameraSet()) {
+		// カメラの座標Yをプレイヤーの座標Yに合わせる
+		Vector3 pPos = player_->GetPosition();
+		normalCamera_->SetPosition({0.0f + player_->GetShakeAmount().x, pPos.y + player_->CameraOffset() + player_->GetShakeAmount().x, -30.0f});
+	}
 }
 
 void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
@@ -518,6 +520,9 @@ void GameScene::GameSceneStateImGui() {
 }
 
 void GameScene::GameStartCount() {
+	if (!player_->GetIsCameraSet())
+		return;
+
 	// カウントダウン
 	gameStartTimer_ -= deltaTime_;
 	if (gameStartTimer_ < 0.0f)
