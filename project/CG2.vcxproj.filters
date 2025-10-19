@@ -61,6 +61,7 @@
     <ClCompile Include="Engine\System\PSOManager\PSOManager.cpp" />
     <ClCompile Include="Application\GameObject\Text3D\Text3D.cpp" />
     <ClCompile Include="Application\GameObject\Thorn\Particle\ThornParticle.cpp" />
+    <ClCompile Include="Application\GameObject\Player\Bear.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
     <ClInclude Include="Application\SceneManager\Scene\State\GameSceneState.h" />
     <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
+    <ClInclude Include="Application\GameObject\Player\Bear.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

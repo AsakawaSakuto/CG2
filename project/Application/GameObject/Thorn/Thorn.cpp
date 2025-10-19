@@ -6,7 +6,7 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 
 	model_->Initialize(dxCommon_, "Enemy/Enemy/Enemy.obj");
 
-	transform_.scale = {0.5f, 0.5f, 0.5f};
+	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 
@@ -83,15 +83,15 @@ void Thorn::UpgradeThorn() {
 
 	switch (type_) {
 	case ThornType::MIN:
-		newScale = {0.5f, 0.5f, 0.5f};
+		newScale = {1.0f, 1.0f, 1.0f};
 		collisionSphere_.radius = 0.25f;
 		break;
 	case ThornType::MIDDLE:
-		newScale = {0.7f, 0.7f, 0.7f};
+		newScale = {1.25f, 1.25f, 1.25f};
 		collisionSphere_.radius = 0.35f;
 		break;
 	case ThornType::MAX:
-		newScale = {1.0f, 1.0f, 1.0f};
+		newScale = {1.5f, 1.5f, 1.5f};
 		collisionSphere_.radius = 0.5f;
 		break;
 	}

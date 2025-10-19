@@ -5,6 +5,7 @@
 #include "State/PlayerState.h"
 #include "PlayerWing.h"
 #include "State/BulletState.h"
+#include "Bear.h"
 
 class Thorn;
 class Block;
@@ -228,4 +229,7 @@ private:
 
 	// ショット数のカウント
 	int stunCount_ = 0;
+
+	// クマ
+	std::unique_ptr<Bear> bear_ = std::make_unique<Bear>();
 };

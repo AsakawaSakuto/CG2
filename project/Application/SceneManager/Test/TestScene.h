@@ -46,8 +46,8 @@ private:
 	unique_ptr<Model> model_ = make_unique<Model>();
 	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
 	unique_ptr<Player> player_ = make_unique<Player>();
-	std::vector<std::shared_ptr<Thorn>> thorns_;
-	std::vector<std::shared_ptr<Block>> blocks_;
+	/*std::vector<std::shared_ptr<Thorn>> thorns_;
+	std::vector<std::shared_ptr<Block>> blocks_;*/
 
 	// UtilSystem
 	GameTimer gameTimer_;
