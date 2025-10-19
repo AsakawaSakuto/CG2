@@ -43,6 +43,9 @@ private:
 	void TitleLogoUpdate();
 	void SelectUIUpdate();
 	void OptionUIUpdate();
+
+	void SpriteUpdate();
+	void AudioUpdate();
 private:
 
 	// Camera
@@ -75,6 +78,11 @@ private:
 	unique_ptr<Sprite> syou2UI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> backUI_ = make_unique<Sprite>();
 
+	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> moveCursolSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> decideSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> titleSceneBGM_ = make_unique<AudioX>();
+
 	float uiAlpha_ = 0.0f;
 
 	GameTimer titleTimer_;
@@ -90,6 +98,14 @@ private:
 	float optionCursolEnd_;
 
 	bool optionOpen_ = false;
+
+	float daiVolumeSE_ = 1.0f;
+	float tyuVolumeSE_ = 0.5f;
+	float syouVolumeSE_ = 0.2f;
+
+	float daiVolumeBGM_ = 0.7f;
+	float tyuVolumeBGM_ = 0.3f;
+	float syouVolumeBGM_ = 0.1f;
 
 	Menu selectMenu_ = Menu::PLAY;
 	OptionMenu selectOptionMenu_ = OptionMenu::NONE;

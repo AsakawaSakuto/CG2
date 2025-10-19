@@ -46,7 +46,7 @@ public:
         HRESULT hr = xa->CreateSourceVoice(&raw, &wfex_);
         assert(SUCCEEDED(hr));
         voice_.reset(raw);
-
+        
         // // 音量設定（0.0f～1.0fの範囲にクランプ）
         if (volume < 0.0f) volume = 0.0f;
         if (volume > 1.0f) volume = 1.0f;
@@ -91,7 +91,7 @@ public:
     void Initialize(const std::string& filePath);
 
     // // 再生。loop=trueで無限ループ。複数回呼ぶと同時再生可能。volume範囲は0.0f～1.0f
-    void PlayAudio(bool loop = false, float volume = 1.0f);
+    void PlayAudio(float volume = 1.0f, bool loop = false);
 
     // // 毎フレーム呼ぶ。終了済みインスタンスの破棄を行う。
     void Update();

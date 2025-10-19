@@ -22,7 +22,7 @@ void AudioX::Initialize(const std::string& filePath) {
     pcmShared_ = std::make_shared<std::vector<BYTE>>(std::move(sd.pcm));
 }
 
-void AudioX::PlayAudio(bool loop, float volume) {
+void AudioX::PlayAudio(float volume, bool loop) {
     if (!xAudio2_ || !mastering_ || !pcmShared_ || pcmShared_->empty()) return;
 
     auto inst = std::make_unique<ClipInstance>();
