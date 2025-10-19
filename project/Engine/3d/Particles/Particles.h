@@ -95,6 +95,12 @@ public:
 	void SetOffSet(Vector3 offset) { offset_ = offset; }
 
 	/// <summary>
+	/// 一回の生成で出すパーティクルの数を設定する
+	/// </summary>
+	/// <param name="count">出すパーティクルの数</param>
+	void SetSpawnCount(uint32_t count) { emitter_.count = count; }
+
+	/// <summary>
 	/// パーティクルの生成開始
 	/// </summary>
 	/// <param name="isLoop">trueならループ生成、falseなら一回だけ生成</param>

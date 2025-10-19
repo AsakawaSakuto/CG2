@@ -17,6 +17,69 @@ void TitleObject::Initialize(DirectXCommon* dxCommon) {
 	model_[9]->Initialize(dxCommon_, "player/Leg_L/Leg_L.obj");
 	model_[10]->Initialize(dxCommon_, "player/Leg_R/Leg_R.obj");
 
+	InitTransform();
+
+	ramuneParticle_->Initialize(dxCommon_,2);
+	ramuneParticle_->LoadJson("ramuneTitle");
+}
+
+void TitleObject::Update() {
+	// モデルに座標情報を反映
+
+	if (playerInTimer_.IsActive()) {
+		transform_[0].translate.y = Easing::Lerp(-10.0f, 0.0f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[1].translate.y = Easing::Lerp(-10.0f, 0.0f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[2].translate.y = Easing::Lerp(-10.0f, -0.06f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[3].translate.y = Easing::Lerp(-10.0f, 0.0f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[4].translate.y = Easing::Lerp(-10.0f, -0.06f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[5].translate.y = Easing::Lerp(-10.0f, 1.1f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[6].translate.y = Easing::Lerp(-10.0f, 0.23f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[7].translate.y = Easing::Lerp(-10.0f, 0.48f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[8].translate.y = Easing::Lerp(-10.0f, 0.45f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[9].translate.y = Easing::Lerp(-10.0f, -0.29f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[10].translate.y = Easing::Lerp(-10.0f, -0.03f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+	}
+
+	if (playerOutTimer_.IsActive()) {
+		transform_[0].translate.y = Easing::Lerp(0.0f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[1].translate.y = Easing::Lerp(0.0f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[2].translate.y = Easing::Lerp(-0.06f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[3].translate.y = Easing::Lerp(0.0f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[4].translate.y = Easing::Lerp(-0.06f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[5].translate.y = Easing::Lerp(1.1f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[6].translate.y = Easing::Lerp(0.23f, 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[7].translate.y = Easing::Lerp(0.48f, 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[8].translate.y = Easing::Lerp(0.45f, 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[9].translate.y = Easing::Lerp(-0.29f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[10].translate.y = Easing::Lerp(-0.03f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+	}
+
+	for (int i = 0; i < model_.size(); i++) {
+		model_[i]->SetTransform(transform_[i]);
+		model_[i]->Update();
+	}
+
+	playerInTimer_.Update();
+	playerOutTimer_.Update();
+
+	ramuneParticle_->SetEmitterPosition(transform_[0].translate);
+	ramuneParticle_->SetOffSet({ 0.0f,-1.5f,0.0f });
+	ramuneParticle_->Update();
+}
+
+void TitleObject::Draw(Camera& useCamera) {
+	for (int i = 0; i < model_.size(); i++) {
+		model_[i]->Draw(useCamera);
+	}
+
+	ramuneParticle_->Draw(useCamera);
+}
+
+void TitleObject::DrawImGui() {
+	ramuneParticle_->DrawImGui("Ramune");
+}
+
+void TitleObject::InitTransform() {
 	transform_[0].scale = { 3.0f,3.0f,3.0f };
 	transform_[0].rotate = { 0.0f,3.21f,0.0f };
 	transform_[0].translate = { 3.0f, -10.0f, 0.0f };
@@ -36,43 +99,28 @@ void TitleObject::Initialize(DirectXCommon* dxCommon) {
 	transform_[4].scale = { 3.0f,3.0f,5.0f };
 	transform_[4].rotate = { 0.0f,0.0f,1.57f };
 	transform_[4].translate = { 1.3f, -10.06f, 0.0f };
-}
 
-void TitleObject::Update() {
-	// モデルに座標情報を反映
+	transform_[5].scale = { 3.0f,3.0f,3.0f };
+	transform_[5].rotate = { 0.0f,3.37f,-0.42f };
+	transform_[5].translate = { 4.01f, -8.9f, 1.0f };
 
-	if (playerStartTimer_.IsActive()) {
-		transform_[0].translate.y = Easing::Lerp(-10.0f, 0.0f, playerStartTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[1].translate.y = Easing::Lerp(-10.0f, 0.0f, playerStartTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[2].translate.y = Easing::Lerp(-10.0f, -0.06f, playerStartTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[3].translate.y = Easing::Lerp(-10.0f, 0.0f, playerStartTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[4].translate.y = Easing::Lerp(-10.0f, -0.06f, playerStartTimer_.GetProgress(), Easing::Type::EaseOutBack);
-	}
+	transform_[6].scale = { 3.0f,3.0f,3.0f };
+	transform_[6].rotate = { 0.0f,3.2f,-0.49f };
+	transform_[6].translate = { 3.5f, -9.77f, 1.0f };
 
-	model_[0]->SetTransform(transform_[0]);
-	model_[1]->SetTransform(transform_[1]);
-	model_[2]->SetTransform(transform_[2]);
-	model_[3]->SetTransform(transform_[3]);
-	model_[4]->SetTransform(transform_[4]);
-	for (int i = 0; i < model_.size(); i++) {
-		//model_[i]->SetTransform(transform_[i]);
-		model_[i]->Update();
-	}
+	transform_[7].scale = { 3.0f,3.0f,3.0f };
+	transform_[7].rotate = { 0.0f,0.0f,-1.19f };
+	transform_[7].translate = { 3.42f, -9.52f, 1.0f };
 
-	playerStartTimer_.Update();
-}
+	transform_[8].scale = { 3.0f,3.0f,3.0f };
+	transform_[8].rotate = { 0.0f,0.0f,-1.22f };
+	transform_[8].translate = { 3.5f, -9.55f, -0.79f };
 
-void TitleObject::Draw(Camera& useCamera) {
-	for (int i = 0; i < model_.size(); i++) {
-		model_[i]->Draw(useCamera);
-	}
-}
+	transform_[9].scale = { 3.0f,3.0f,3.0f };
+	transform_[9].rotate = { 0.0f,0.0f,0.44f };
+	transform_[9].translate = { 3.78f, -10.29f, 1.0f };
 
-void TitleObject::DrawImGui() {
-	ImGui::Begin("TitleObject");
-	for (int i = 0; i < model_.size(); i++) {
-		std::string label = "Model " + std::to_string(i);
-		model_[i]->DrawImGui(label.c_str());
-	}
-	ImGui::End();
+	transform_[10].scale = { 3.0f,3.0f,3.0f };
+	transform_[10].rotate = { 0.0f,0.0f,-0.82f };
+	transform_[10].translate = { 2.79f, -10.03f, 0.0f };
 }

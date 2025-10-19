@@ -916,7 +916,7 @@ void Particles::UpdateEmitter() {
 	}
 
 	emitter_.kMaxParticle = kMaxParticles_;
-	emitter_.translate += offset_;
+	emitter_.translate = emitter_.translate + offset_;
 
 	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
 	EmitterState* mappedEmitter = nullptr;

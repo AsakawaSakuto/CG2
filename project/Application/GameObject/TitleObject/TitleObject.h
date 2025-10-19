@@ -10,13 +10,19 @@ public:
 
 	void DrawImGui();
 
-	void PlayerStart() { playerStartTimer_.Start(1.0f); }
+	void PlayerStart() { playerInTimer_.Start(1.0f); }
+	void PlayerEnd() { playerOutTimer_.Start(1.0f); ramuneParticle_->SetSpawnCount(30); }
 	~TitleObject() {}
 private:
+	void InitTransform();
+
 	DirectXCommon* dxCommon_ = nullptr;
 
-	GameTimer playerStartTimer_;
+	GameTimer playerInTimer_;
+	GameTimer playerOutTimer_;
 
 	std::array<std::unique_ptr<Model>, 11> model_;
-	std::array<Transform, 5> transform_;
+	std::array<Transform, 11> transform_;
+
+	std::unique_ptr<Particles> ramuneParticle_ = make_unique<Particles>();
 };
