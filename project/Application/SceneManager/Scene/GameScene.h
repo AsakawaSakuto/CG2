@@ -46,6 +46,23 @@ private:
 	// 演出用にスコアを加算していく関数
     void SpriteScoreUpdate();
 
+	// ルール説明用のスプライトアニメーション
+	void AnimationRuleSprite();
+
+	// プレイヤーの進行度スプライト移動処理
+	void UpdateProgressSprite();
+
+	// 終了テキストの更新
+	void UpdateEndText();
+
+private:
+	enum class RuleAnimState { 
+		Rising, 
+		Waiting, 
+		Falling, 
+		Done 
+	};
+
 private:
 	int goSceneNum_ = 0; // 0ならタイトル、1ならリザルト
 
@@ -92,8 +109,8 @@ private:
 	// プレイヤーがゴールしたかどうか
 	bool isGoal_ = false;
 
-	Vector2 testPos_ = {};
-	Vector2 testScale_ = {};
+	Vector2 testPos_[3] = {};
+	Vector2 testScale_[3] = {};
 
 	// プレイヤーから入力があるかどうかでフラグをたてる
 	bool isInput_ = false;
@@ -127,4 +144,46 @@ private:
 
 	// スコア表示スプライト
 	std::array<unique_ptr<Sprite>, 5> spriteScore_;
+
+	// 「スタート!」スプライト
+	unique_ptr<Sprite> spriteStart_ = make_unique<Sprite>();
+
+	// Startスプライト用アニメーション制御
+	bool showStart_ = false;
+	float startAnimTimer_ = 0.0f;
+	float startAnimDuration_ = 1.0f;
+	Vector2 startAnimStartScale_ = {0.5f, 0.5f};
+	Vector2 startAnimEndScale_ = {1.5f, 1.5f};
+	float startAnimStartAlpha_ = 1.0f;
+	float startAnimEndAlpha_ = 0.0f;
+
+	// ルール説明用のスプライト
+
+	// ルール説明用のスプライトアニメーション制御
+	unique_ptr<Sprite> spriteRule_ = make_unique<Sprite>();
+	float timerSpriteRule_ = 0.0f;
+	float ruleDuration_ = 2.0f;
+	float ruleWaitDuration_ = 0.5f;
+	float ruleStartPosY_ = -100.0f;
+	float ruleEndPosY_ = 100.0f;
+	RuleAnimState ruleState_ = RuleAnimState::Rising;
+	bool ruleLoop_ = false;
+
+	// ゲーム終了時に表示するスプライト
+	unique_ptr<Sprite> spriteGameEnd_ = make_unique<Sprite>();
+
+	// 進行度ゲージスプライト
+	unique_ptr<Sprite> spriteProgressLine_ = make_unique<Sprite>();
+	unique_ptr<Sprite> spriteProgressPlayer_ = make_unique<Sprite>();
+	unique_ptr<Sprite> spriteProgressGoal_ = make_unique<Sprite>();
+
+	// ゲーム終了フラグ
+	bool isActiveEndText_ = false;
+	int timerEndText_ = 0;
+
+	// スコアの背景
+	unique_ptr<Sprite> spriteCandyScore_ = make_unique<Sprite>();
+
+	// 弾のゲージラムネ
+	unique_ptr<Sprite> spriteChargeUI_ = make_unique<Sprite>();
 };

@@ -19,7 +19,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerState_ = JsonState::Load<PlayerState>("Resources/Data/playerState.json");
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 
-	transform_.scale = {1.0f, 1.0f, 1.0f};
+	transform_.scale = {2.0f, 2.0f, 2.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
@@ -50,6 +50,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// プレイヤーの方向初期化
 	direction_ = Direction::UP;
+
+	// クマ
+	bear_->Initialize(dxCommon_);
 }
 
 void Player::Update() {
@@ -134,6 +137,9 @@ void Player::Update() {
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
+
+	// クマ
+	bear_->Update();
 }
 
 void Player::Draw(Camera useCamera) {
@@ -151,6 +157,9 @@ void Player::Draw(Camera useCamera) {
 	if (!isStartCoolDown_) {
 		playerWing_->Draw(useCamera);
 	}
+
+	// クマ
+	bear_->Draw(useCamera);
 }
 
 void Player::DrawImgui() {
@@ -287,6 +296,9 @@ void Player::BulletShot() {
 
 		// 描画用のフラグを下ろす
 		(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
+
+		// ショットカウント加算
+		shotCount_++;
 	}
 }
 
@@ -415,6 +427,9 @@ void Player::CollisionThorn() {
 				// シェイク用のフラグを立てる
 				if (!isShake_ && !isStartCoolDown_) {
 					isShake_ = true;
+
+					// スタンカウント加算
+					stunCount_++;
 				}
 
 				// 弾のゲージリセット

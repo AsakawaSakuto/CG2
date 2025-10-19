@@ -56,8 +56,8 @@ void GameScene::Initialize() {
 	bulletGaugeSpriteBG_->SetScale({4, 25});
 	bulletGaugeSpriteBG_->SetPosition({1200, 350});
 
-	//testPos_ = {1200, 400};
-	//testScale_ = {8, 40};
+	// testPos_ = {1200, 400};
+	// testScale_ = {8, 40};
 
 	// 弾のゲージスプライト
 	for (int i = 0; i < bulletGaugeSprite_.size(); ++i) {
@@ -75,29 +75,26 @@ void GameScene::Initialize() {
 		curtainSprite_[i]->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 		curtainSprite_[i]->SetScale({20, 43});
 		curtainSprite_[i]->SetPosition({160.0f + (i * 940.0f), 344.0f});
-		curtainSprite_[i]->SetColor({0.4f, 0.4f, 0.4f, 1.0f});
+		curtainSprite_[i]->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
 	}
 
 	// カウントダウン用のスプライト集
 	for (int i = 0; i <= 9; ++i) {
-		spriteNumCollection_[i] = "resources/image/number/" + std::to_string(i) + ".png";
+		spriteNumCollection_[i] = "resources/image/UI/Number" + std::to_string(i) + "UI.png";
 	}
 
 	// スコア用スプライト5桁分
 	for (int i = 0; i < spriteScore_.size(); ++i) {
 		spriteScore_[i] = make_unique<Sprite>();
 		spriteScore_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
-		spriteScore_[i]->SetPosition({100.0f + i * 16.0f, 400.0f});
-		spriteScore_[i]->SetScale({16.0f * deltaTime_, 16.0f * deltaTime_});
+		spriteScore_[i]->SetPosition({100.0f + i * 32.0f, 400.0f});
+		spriteScore_[i]->SetScale({32.0f * deltaTime_, 32.0f * deltaTime_});
 	}
 
 	// カウントダウン用のスプライト初期化
 	spriteNumber_->Initialize(&ctx_->dxCommon, spriteNumCollection_[3]);
-	spriteNumber_->SetScale({2, 2});
+	spriteNumber_->SetScale({1, 1});
 	spriteNumber_->SetPosition({640.0f, 360.0f});
-
-	//priteNumber_->SetPosition();
-	//spriteNumber_->SetScale();
 
 	// ゲームスタートタイマー
 	gameStartTimer_ = gameSceneState_.maxGameStartTimer;
@@ -105,64 +102,51 @@ void GameScene::Initialize() {
 	// 開始フラグ
 	isGameStart_ = false;
 
-	// プレイヤーから入力があるかどうか調べる
-	UpdateInput();
+	// 「スタート!」スプライト初期化
+	spriteStart_->Initialize(&ctx_->dxCommon, "resources/image/UI/StartUI.png");
+	spriteStart_->SetScale({1, 1});
+	spriteStart_->SetPosition({640.0f, 360.0f});
+	spriteStart_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
 
-	// プレイヤーから一定時間入力がなかった場合の処理
-	NoInputTitleBack();
+	// ルール説明用のスプライト
+	spriteRule_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+	spriteRule_->SetPosition({640.0f, -100.0f});
+	spriteRule_->SetScale({20, 4});
 
-	if (isBackToTitleScene_) {
-		sceneFade_->StartFadeIn(1.0f);
-		goSceneNum_ = SCENE::TITLE;
-		isBackToTitleScene_ = false;
-	}
+	// ゲーム終了時に表示するスプライト
+	spriteGameEnd_->Initialize(&ctx_->dxCommon, "resources/image/UI/FinishUI.png");
+	spriteGameEnd_->SetPosition({640.0f, 360.0f});
+	spriteGameEnd_->SetScale({1, 1});
 
-	if (player_->GetIsGoal() && goSceneNum_ == 0) {
-		sceneFade_->StartFadeIn(1.0f);
-		goSceneNum_ = SCENE::RESULT;
-	}
+	// 進行度ゲージスプライト
+	spriteProgressLine_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+	spriteProgressLine_->SetScale({2.0f, 32.0f});
+	spriteProgressLine_->SetPosition({988.0f, 360.0f});
 
-	if (sceneFade_->EndFadeIn()) {
-		ChangeScene(goSceneNum_);
-		goSceneNum_ = 0;
-	}
+	spriteProgressPlayer_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+	spriteProgressPlayer_->SetScale({3.0f, 2.0f});
+	spriteProgressPlayer_->SetPosition({988.0f, 360.0f});
+	spriteProgressPlayer_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 
-	sceneFade_->Update();
+	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+	spriteProgressGoal_->SetScale({2.0f, 2.0f});
+	spriteProgressGoal_->SetPosition({988.0f, 670.0f});
 
-	// シーンのリセット
-	if (input_->TriggerKey(DIK_R)) {
-		Initialize();
-	}
+	// ゲーム終了フラグ
+	isActiveEndText_ = false;
 
-	// プレイヤーの更新処理
-	player_->Update();
+	// 入力が無い時間をカウント
+	noInputTimer_ = 0.0f;
 
-	// トゲの更新処理
-	for (auto& thorn : thorns_) {
-		if (thorn->GetIsAlive()) {
-			thorn->Update();
-		}
-	}
+	// スコア表示の後ろに配置するスプライト
+	spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountUI.png");
+	spriteCandyScore_->SetPosition({210.0f, 450.0f});
+	spriteCandyScore_->SetScale({1,1});
 
-	// ブロックの更新処理
-	for (auto& block : blocks_) {
-		if (block->GetIsAlive()) {
-			block->Update();
-		}
-	}
-
-	// ゲージ用のスプライト(背景)の更新処理
-	bulletGaugeSpriteBG_->Update();
-
-	// 弾のゲージスプライト更新処理
-	for (auto& gaugeInfo : bulletGaugeSprite_) {
-		gaugeInfo.sprite->Update();
-	}
-
-	// 画面両端の幕のスプライト更新処理
-	for (auto& curtain : curtainSprite_) {
-		curtain->Update();
-	}
+	// 弾のゲージラムネUI
+	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
+	spriteChargeUI_->SetPosition({1200.0f, 450.0f});
+	spriteChargeUI_->SetScale({1, 1});
 }
 
 void GameScene::Update() {
@@ -181,9 +165,9 @@ void GameScene::Update() {
 	}
 
 	// フラグが立つまで早期リターン
-	if (!isGameStart_) {
-		return;
-	}
+	/*if (!isGameStart_) {
+	    return;
+	}*/
 
 	// プレイヤーから入力があるかどうか調べる
 	UpdateInput();
@@ -198,12 +182,19 @@ void GameScene::Update() {
 	}
 
 	if (player_->GetIsGoal() && goSceneNum_ == 0) {
-		sceneFade_->StartFadeIn(1.0f);
+		sceneFade_->StartFadeIn(2.0f);
 		goSceneNum_ = SCENE::RESULT;
+		isActiveEndText_ = true; // 終了テキスト表示フラグオン
 	}
+
+	// 終了テキストの更新
+	UpdateEndText();
 
 	if (sceneFade_->EndFadeIn()) {
 		ctx_->lastScore = player_->GetScore(); // スコアを保存
+		ctx_->lastShotCount = player_->GetShotCount(); // ショット数を保存
+		ctx_->lastStunCount = player_->GetStunCount(); // スタン数を保存
+
 		ChangeScene(goSceneNum_);
 		goSceneNum_ = 0;
 	}
@@ -255,12 +246,48 @@ void GameScene::Update() {
 	}
 
 	// 演出用にスコアを加算していく
-	SpriteScoreUpdate();                                        
+	SpriteScoreUpdate();
 
 	// スコアスプライトの更新処理
 	for (int i = 0; i < spriteScore_.size(); ++i) {
 		spriteScore_[i]->Update();
 	}
+
+	// 「スタート!」スプライトの更新処理
+	if (showStart_) {
+		spriteStart_->Update();
+	}
+
+	AnimationRuleSprite();
+
+	// ルール説明用のスプライト更新
+	spriteRule_->Update();
+
+	/*spriteProgressLine_->SetScale(testScale_[0]);
+	spriteProgressLine_->SetPosition(testPos_[0]);
+
+	spriteProgressPlayer_->SetScale(testScale_[1]);
+	spriteProgressPlayer_->SetPosition(testPos_[1]);
+
+	spriteProgressGoal_->SetScale(testScale_[2]);
+	spriteProgressGoal_->SetPosition(testPos_[2]);*/
+
+	// 進行度ゲージ更新
+	UpdateProgressSprite();
+
+	// 進行度ゲージスプライト更新
+	spriteProgressLine_->Update();
+	spriteProgressPlayer_->Update();
+	spriteProgressGoal_->Update();
+
+	// ゲーム終了時に表示するスプライト更新
+	spriteGameEnd_->Update();
+
+	// スコア表示の後ろに配置するスプライト更新
+	spriteCandyScore_->Update();
+
+	// ラムネゲージ
+	spriteChargeUI_->Update();
 }
 
 void GameScene::Draw() {
@@ -297,6 +324,11 @@ void GameScene::Draw() {
 		}
 	}
 
+	// 画面両端の幕のスプライト描画処理
+	for (auto& curtain : curtainSprite_) {
+		curtain->Draw();
+	}
+
 	// ゲージ用のスプライト(背景)の描画処理
 	bulletGaugeSpriteBG_->Draw();
 
@@ -307,15 +339,34 @@ void GameScene::Draw() {
 		}
 	}
 
-	// 画面両端の幕のスプライト描画処理
-	for (auto& curtain : curtainSprite_) {
-		curtain->Draw();
-	}
+	// スコア表示の後ろに配置するスプライト描画
+	spriteCandyScore_->Draw();
 
 	// スコアスプライトの描画処理
 	for (int i = 0; i < spriteScore_.size(); ++i) {
 		spriteScore_[i]->Draw();
 	}
+
+	// 「スタート!」スプライトの描画処理
+	if (showStart_) {
+		spriteStart_->Draw();
+	}
+
+	// ルール説明用のスプライト描画
+	spriteRule_->Draw();
+
+	// 進行度ゲージスプライト描画
+	spriteProgressLine_->Draw();
+	spriteProgressPlayer_->Draw();
+	spriteProgressGoal_->Draw();
+
+	// ゲーム終了時に表示するスプライト描画
+	if (isActiveEndText_) {
+		spriteGameEnd_->Draw();
+	}
+
+	// ラムネゲージ
+	//spriteChargeUI_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -338,12 +389,18 @@ void GameScene::Draw() {
 	// ゲームシーン上で管理しているステータスのImGui
 	GameSceneStateImGui();
 
-	/*ImGui::Begin("Test");
-	
-	ImGui::DragFloat2("TestPos", &testPos_.x, 1.0f);
-	ImGui::DragFloat2("TestScale", &testScale_.x, 1.0f);
+	ImGui::Begin("Test");
 
-	ImGui::End();*/
+	ImGui::DragFloat2("TestPos0", &testPos_[0].x, 1.0f);
+	ImGui::DragFloat2("TestScale0", &testScale_[0].x, 1.0f);
+
+	ImGui::DragFloat2("TestPos1", &testPos_[1].x, 1.0f);
+	ImGui::DragFloat2("TestScale1", &testScale_[1].x, 1.0f);
+
+	ImGui::DragFloat2("TestPos2", &testPos_[2].x, 1.0f);
+	ImGui::DragFloat2("TestScale2", &testScale_[2].x, 1.0f);
+
+	ImGui::End();
 
 	///
 	/// ↑ImGuiここまで
@@ -412,11 +469,11 @@ void GameScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
 	}
 }
 
-void GameScene::UpdateInput() { 
+void GameScene::UpdateInput() {
 	// 入力検知
 	bool rightInput = input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D) || gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT); // 右入力
-	bool leftInput = input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) || gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT); // 左入力
-	bool shotInput = input_->PushKey(DIK_SPACE) || gamePad_->PushButton(gamePad_->A); // ショット入力
+	bool leftInput = input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) || gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT);   // 左入力
+	bool shotInput = input_->PushKey(DIK_SPACE) || gamePad_->PushButton(gamePad_->A);                                                                       // ショット入力
 
 	if (rightInput || leftInput || shotInput) {
 		isInput_ = true; // 入力があったらtrue
@@ -460,13 +517,77 @@ void GameScene::GameSceneStateImGui() {
 	ImGui::End();
 }
 
-void GameScene::GameStartCount() { 
-	// カウントアップ
-	gameStartTimer_ -= deltaTime_; 
+void GameScene::GameStartCount() {
+	// カウントダウン
+	gameStartTimer_ -= deltaTime_;
+	if (gameStartTimer_ < 0.0f)
+		gameStartTimer_ = 0.0f;
 
-	// 一定の値に達したらフラグをたてる
-	if (gameStartTimer_ <= 1) {
-		isGameStart_ = true;
+	// 表示する数字の算出
+	int displayNumber = static_cast<int>(std::clamp(static_cast<int>(std::ceil(gameStartTimer_)), 0, 9));
+
+	// 前フレームの表示と変わったらリセットするための静的保持変数
+	static int prevDisplayNumber = -1;
+	const Vector2 startScale = {0.5f, 0.5f};
+	const Vector2 endScale = {1.5f, 1.5f};
+	const float startAlpha = 1.0f;
+	const float endAlpha = 0.0f;
+	const float duration = 1.0f;
+
+	// 表示が切り替わった瞬間はスケールと透明度をリセット
+	if (displayNumber != prevDisplayNumber) {
+		// 切り替え時にテクスチャも切り替える
+		if (displayNumber >= 0 && displayNumber <= 9) {
+			spriteNumber_->SetTexture(spriteNumCollection_[displayNumber]);
+		}
+		spriteNumber_->SetScale(startScale);
+		spriteNumber_->SetColor({1.0f, 1.0f, 1.0f, startAlpha});
+		prevDisplayNumber = displayNumber;
+	}
+
+	// 表示が1以上のときのみアニメーション
+	if (displayNumber >= 1) {
+		// 現在の数値区間内での進捗を変換
+		float frac = gameStartTimer_ - std::floor(gameStartTimer_);
+		float progress = 1.0f - frac;
+
+		// イージングを適用
+		float eased = Easing::Apply(std::clamp(progress / duration, 0.0f, 1.0f), Easing::Type::EaseOutCubic);
+
+		// スケールと透明度を補間して設定
+		Vector2 newScale = {std::lerp(startScale.x, endScale.x, eased), std::lerp(startScale.y, endScale.y, eased)};
+		float newAlpha = std::lerp(startAlpha, endAlpha, eased);
+
+		spriteNumber_->SetScale(newScale);
+		spriteNumber_->SetColor({1.0f, 1.0f, 1.0f, newAlpha});
+	}
+
+	// カウントが0になった瞬間に「スタート!」スプライトのイージングを開始
+	if (displayNumber == 1 && !showStart_) {
+		showStart_ = true;
+		startAnimTimer_ = 0.0f;
+		// リセット状態にして表示開始
+		spriteStart_->SetScale(startAnimStartScale_);
+		spriteStart_->SetColor({1.0f, 1.0f, 1.0f, startAnimStartAlpha_});
+	}
+
+	// 「スタート!」スプライトのイージング処理
+	if (showStart_) {
+		startAnimTimer_ += deltaTime_;
+		float t = std::clamp(startAnimTimer_ / startAnimDuration_, 0.0f, 1.0f);
+		float eased = Easing::Apply(t, Easing::Type::EaseOutCubic);
+
+		Vector2 newScale = {std::lerp(startAnimStartScale_.x, startAnimEndScale_.x, eased), std::lerp(startAnimStartScale_.y, startAnimEndScale_.y, eased)};
+		float newAlpha = std::lerp(startAnimStartAlpha_, startAnimEndAlpha_, eased);
+
+		spriteStart_->SetScale(newScale);
+		spriteStart_->SetColor({1.0f, 1.0f, 1.0f, newAlpha});
+
+		// アニメーション終了時の処理
+		if (t >= 1.0f) {
+			showStart_ = false;
+			isGameStart_ = true;
+		}
 	}
 }
 
@@ -495,5 +616,97 @@ void GameScene::SpriteScoreUpdate() {
 	for (int i = 0; i < spriteScore_.size(); ++i) {
 		int digit = digits[i];
 		spriteScore_[i]->SetTexture(spriteNumCollection_[digit]);
+	}
+}
+
+void GameScene::AnimationRuleSprite() {
+	timerSpriteRule_ += deltaTime_;
+
+	switch (ruleState_) {
+	case RuleAnimState::Rising: {
+		float t = std::clamp(timerSpriteRule_ / ruleDuration_, 0.0f, 1.0f);
+		float eased = Easing::Apply(t, Easing::Type::EaseOutCubic);
+		float posY = std::lerp(ruleStartPosY_, ruleEndPosY_, eased);
+		spriteRule_->SetPosition({640.0f, posY});
+
+		if (t >= 1.0f) {
+			// 到達したら待機へ移行
+			ruleState_ = RuleAnimState::Waiting;
+			timerSpriteRule_ = 0.0f;
+		}
+		break;
+	}
+	case RuleAnimState::Waiting: {
+		// そのまま指定秒だけ待つ
+		if (timerSpriteRule_ >= ruleWaitDuration_) {
+			ruleState_ = RuleAnimState::Falling;
+			timerSpriteRule_ = 0.0f;
+		}
+		// 待機中は位置を終了位置に固定
+		spriteRule_->SetPosition({640.0f, ruleEndPosY_});
+		break;
+	}
+	case RuleAnimState::Falling: {
+		float t = std::clamp(timerSpriteRule_ / ruleDuration_, 0.0f, 1.0f);
+		float eased = Easing::Apply(t, Easing::Type::EaseInCubic);
+		float posY = std::lerp(ruleEndPosY_, ruleStartPosY_, eased);
+		spriteRule_->SetPosition({640.0f, posY});
+
+		if (t >= 1.0f) {
+			// 終了処理
+			if (ruleLoop_) {
+				ruleState_ = RuleAnimState::Rising;
+			} else {
+				ruleState_ = RuleAnimState::Done;
+			}
+			timerSpriteRule_ = 0.0f;
+		}
+		break;
+	}
+	case RuleAnimState::Done: {
+		// 完了後は位置を開始位置に固定
+		spriteRule_->SetPosition({640.0f, ruleStartPosY_});
+		break;
+	}
+	}
+}
+
+void GameScene::UpdateProgressSprite() {
+	// ラインの位置と表示高さを取得
+	Vector2 linePos = spriteProgressLine_->GetPosition();
+	Vector2 lineSize = {32.0f, 540.0f};
+	float halfHeight = lineSize.y * 0.5f;
+	float topY = linePos.y + halfHeight;
+	float bottomY = linePos.y - halfHeight;
+
+	// プレイヤーのY座標を取得
+	float playerY = player_->GetPosition().y;
+
+	// プレイヤーのスタート/エンドライン
+	float startLine = player_->GetEndLine();
+	float endLine = player_->GetStartLine();
+
+	float t = 0.0f;
+	if (endLine != startLine) {
+		t = (playerY - startLine) / (endLine - startLine);
+	}
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	float mappedY = std::lerp(bottomY, topY, t);
+
+	// プレイヤーの進行度スプライトのXはラインと合わせ、Yをマッピング結果にする
+	spriteProgressPlayer_->SetPosition({linePos.x, mappedY});
+}
+
+void GameScene::UpdateEndText() {
+	// 点滅用にタイマーを回す
+	if (isActiveEndText_) {
+		timerEndText_++;
+	}
+
+	if (timerEndText_ % 6 == 0) {
+		spriteGameEnd_->SetColor({1.0f, 0.0f, 0.0f, 0.5f});
+	} else {
+		spriteGameEnd_->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
 	}
 }
