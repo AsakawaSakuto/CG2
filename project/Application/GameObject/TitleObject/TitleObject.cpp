@@ -24,34 +24,52 @@ void TitleObject::Initialize(DirectXCommon* dxCommon) {
 }
 
 void TitleObject::Update() {
-	// モデルに座標情報を反映
+	// ふわふわアニメーション用の時間更新
+	floatTime_ += 1.0f / 60.0f; // 60FPS想定
+	float floatOffset = sinf(floatTime_ * floatSpeed_) * floatAmplitude_;
 
+	// モデルに座標情報を反映
 	if (playerInTimer_.IsActive()) {
-		transform_[0].translate.y = Easing::Lerp(-10.0f, 0.0f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[1].translate.y = Easing::Lerp(-10.0f, 0.0f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[2].translate.y = Easing::Lerp(-10.0f, -0.06f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[3].translate.y = Easing::Lerp(-10.0f, 0.0f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[4].translate.y = Easing::Lerp(-10.0f, -0.06f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[5].translate.y = Easing::Lerp(-10.0f, 1.1f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[6].translate.y = Easing::Lerp(-10.0f, 0.23f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[7].translate.y = Easing::Lerp(-10.0f, 0.48f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[8].translate.y = Easing::Lerp(-10.0f, 0.45f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[9].translate.y = Easing::Lerp(-10.0f, -0.29f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
-		transform_[10].translate.y = Easing::Lerp(-10.0f, -0.03f, playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[0].translate.y = Easing::Lerp(-10.0f, 0.0f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[1].translate.y = Easing::Lerp(-10.0f, 0.0f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[2].translate.y = Easing::Lerp(-10.0f, -0.06f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[3].translate.y = Easing::Lerp(-10.0f, 0.0f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[4].translate.y = Easing::Lerp(-10.0f, -0.06f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[5].translate.y = Easing::Lerp(-10.0f, 1.1f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[6].translate.y = Easing::Lerp(-10.0f, 0.23f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[7].translate.y = Easing::Lerp(-10.0f, 0.48f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[8].translate.y = Easing::Lerp(-10.0f, 0.45f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[9].translate.y = Easing::Lerp(-10.0f, -0.29f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		transform_[10].translate.y = Easing::Lerp(-10.0f, -0.03f , playerInTimer_.GetProgress(), Easing::Type::EaseOutBack);
 	}
 
 	if (playerOutTimer_.IsActive()) {
-		transform_[0].translate.y = Easing::Lerp(0.0f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[1].translate.y = Easing::Lerp(0.0f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[2].translate.y = Easing::Lerp(-0.06f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[3].translate.y = Easing::Lerp(0.0f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[4].translate.y = Easing::Lerp(-0.06f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[5].translate.y = Easing::Lerp(1.1f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[0].translate.y = Easing::Lerp(0.0f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[1].translate.y = Easing::Lerp(0.0f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[2].translate.y = Easing::Lerp(-0.06f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[3].translate.y = Easing::Lerp(0.0f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[4].translate.y = Easing::Lerp(-0.06f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[5].translate.y = Easing::Lerp(1.1f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
 		transform_[6].translate.y = Easing::Lerp(0.23f, 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[7].translate.y = Easing::Lerp(0.48f, 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[8].translate.y = Easing::Lerp(0.45f, 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[9].translate.y = Easing::Lerp(-0.29f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
-		transform_[10].translate.y = Easing::Lerp(-0.03f, 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[7].translate.y = Easing::Lerp(0.48f , 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[8].translate.y = Easing::Lerp(0.45f , 10.0f,playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[9].translate.y = Easing::Lerp(-0.29f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+		transform_[10].translate.y = Easing::Lerp(-0.03f , 10.0f, playerOutTimer_.GetProgress(), Easing::Type::EaseInBack);
+	}
+
+	if (playerInTimer_.IsFinished() && !playerOutTimer_.IsActive() && !playerOutTimer_.IsFinished()) {
+		// アニメーションが完了した後の通常状態でもふわふわ
+		transform_[0].translate.y = 0.0f + floatOffset;
+		transform_[1].translate.y = 0.0f + floatOffset;
+		transform_[2].translate.y = -0.06f + floatOffset;
+		transform_[3].translate.y = 0.0f + floatOffset;
+		transform_[4].translate.y = -0.06f + floatOffset;
+		transform_[5].translate.y = 1.1f + floatOffset;
+		transform_[6].translate.y = 0.23f + floatOffset;
+		transform_[7].translate.y = 0.48f + floatOffset;
+		transform_[8].translate.y = 0.45f + floatOffset;
+		transform_[9].translate.y = -0.29f + floatOffset;
+		transform_[10].translate.y = -0.03f + floatOffset;
 	}
 
 	for (int i = 0; i < model_.size(); i++) {

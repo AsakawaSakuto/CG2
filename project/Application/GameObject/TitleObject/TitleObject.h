@@ -25,4 +25,9 @@ private:
 	std::array<Transform, 11> transform_;
 
 	std::unique_ptr<Particles> ramuneParticle_ = make_unique<Particles>();
+
+	// ふわふわアニメーション用
+	float floatTime_ = 0.0f;
+	float floatAmplitude_ = -0.3f; // 上下の振幅
+	float floatSpeed_ = 2.0f;      // 浮遊速度
 };

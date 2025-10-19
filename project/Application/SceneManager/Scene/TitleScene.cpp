@@ -82,7 +82,7 @@ void TitleScene::Update() {
 	
 	if (selectMenu_ == PLAY) {
 		if (input_->TriggerKey(DIK_SPACE) && titleTimer_.IsFinished() ) {
-			sceneFade_->StartFadeIn(1.0f);
+			sceneFade_->StartFadeIn(2.0f);
 			titleObject_->PlayerEnd();
 			startGameSE_->PlayAudio(SE_Volume);
 		}
