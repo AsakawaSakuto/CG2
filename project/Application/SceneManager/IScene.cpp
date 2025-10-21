@@ -4,6 +4,10 @@ int IScene::sceneNo = TITLE;
 
 int IScene::GetSceneNo() { return sceneNo; }
 
+void IScene::Quit() {
+	PostQuitMessage(0);
+}
+
 void IScene::DrawSceneName() {
 	ImGui::SetNextWindowPos(ImVec2(0, 0));     // 左上に固定
 	ImGui::SetNextWindowSize(ImVec2(100, 50)); // 任意のサイズ

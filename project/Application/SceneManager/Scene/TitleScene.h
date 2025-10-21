@@ -12,6 +12,7 @@ using std::unique_ptr;
 enum Menu {
 	PLAY,
 	OPTION,
+	QUIT,
 };
 
 enum OptionMenu {
@@ -77,6 +78,7 @@ private:
 
 	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> quitUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
 
 	unique_ptr<Sprite> optionBG_ = make_unique<Sprite>();
@@ -118,6 +120,8 @@ private:
 	GameTimer optionTimer_;
 	GameTimer optionCursolTimer_;
 
+	float startCursolY_;
+	float endCursolY_;
 	Vector2 optionBGScale_;
 	Vector2 optionCursolUIScale_;
 	Vector2 normalUIScale_;

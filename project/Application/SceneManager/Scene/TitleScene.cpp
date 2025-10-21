@@ -98,6 +98,12 @@ void TitleScene::Update() {
 		}
 	}
 
+	if (selectMenu_ == QUIT) {
+		if ((input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) && titleTimer_.IsFinished() && !pushStart_) {
+			Quit();
+		}
+	}
+
 	if (sceneFade_->EndFadeIn()) {
 		ChangeScene(SCENE::GAME); // シーン切り替え
 		startGameSE_->Reset();
@@ -162,6 +168,7 @@ void TitleScene::Draw() {
 	// UIの描画
 	playUI_->Draw();
 	optionUI_->Draw();
+	quitUI_->Draw();
 	cursolUI_->Draw();
 
 	optionBG_->Draw();
@@ -246,6 +253,7 @@ void TitleScene::Draw() {
 	parenthesesUI5_->DrawImGui("pare5");
 	parenthesesUI6_->DrawImGui("pare6");*/
 
+
 	debugCamera_->DrawImgui();
 
 	//cloud_->DrawImGui("cloud");
@@ -273,9 +281,10 @@ void TitleScene::Draw() {
 	//syou2UI_->DrawImGui("syou2");
 	//backUI_->DrawImGui("back");
 
-	//playUI_->DrawImGui("play");
-	//optionUI_->DrawImGui("option");
-	//cursolUI_->DrawImGui("ya");
+	playUI_->DrawImGui("play");
+	optionUI_->DrawImGui("option");
+	quitUI_->DrawImGui("quit");
+	cursolUI_->DrawImGui("ya");
 
 	///
 	/// ↑ImGuiここまで
@@ -328,6 +337,7 @@ void TitleScene::TitleLogoUpdate() {
 	// UIの色を設定（RGB値は1.0を維持し、アルファのみ変更）
 	playUI_->SetColor({ 1.0f, 1.0f, 1.0f, uiAlpha_ });
 	optionUI_->SetColor({ 1.0f, 1.0f, 1.0f, uiAlpha_ });
+	quitUI_->SetColor({ 1.0f, 1.0f, 1.0f, uiAlpha_ });
 	cursolUI_->SetColor({ 1.0f, 1.0f, 1.0f, uiAlpha_ });
 }
 
@@ -338,6 +348,8 @@ void TitleScene::SelectUIUpdate() {
 			if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
 				selectMenu_ = OPTION;
 				cursolTimer_.Start(0.25f, false);
+				startCursolY_ = 386.0f;
+				endCursolY_ = 487.0f;
 
 				moveCursolSE_->PlayAudio(SE_Volume);
 			}
@@ -345,6 +357,24 @@ void TitleScene::SelectUIUpdate() {
 			if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
 				selectMenu_ = PLAY;
 				cursolTimer_.Start(0.25f, false);
+				startCursolY_ = 487.0f;
+				endCursolY_ = 386.0f;
+
+				moveCursolSE_->PlayAudio(SE_Volume);
+			} else if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
+				selectMenu_ = QUIT;
+				cursolTimer_.Start(0.25f, false);
+				startCursolY_ = 487.0f;
+				endCursolY_ = 584.0f;
+
+				moveCursolSE_->PlayAudio(SE_Volume);
+			}
+		} else if (selectMenu_ == QUIT) {
+			if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
+				selectMenu_ = OPTION;
+				cursolTimer_.Start(0.25f, false);
+				startCursolY_ = 584.0f;
+				endCursolY_ = 487.0f;
 
 				moveCursolSE_->PlayAudio(SE_Volume);
 			}
@@ -356,19 +386,24 @@ void TitleScene::SelectUIUpdate() {
 		// タイマーがアクティブな場合
 		if (selectMenu_ == PLAY) {
 			// OPTIONからPLAYへの移動
-			float y = Easing::Lerp(563.0f, 446.0f, cursolTimer_.GetProgress(), Easing::Type::EaseInOutQuint);
+			float y = Easing::Lerp(startCursolY_, endCursolY_, cursolTimer_.GetProgress(), Easing::Type::EaseInOutQuint);
 			cursolUI_->SetPosition({ 210.0f, y });
 		} else if (selectMenu_ == OPTION) {
 			// PLAYからOPTIONへの移動
-			float y = Easing::Lerp(446.0f, 563.0f, cursolTimer_.GetProgress(), Easing::Type::EaseInOutQuint);
+			float y = Easing::Lerp(startCursolY_, endCursolY_, cursolTimer_.GetProgress(), Easing::Type::EaseInOutQuint);
+			cursolUI_->SetPosition({ 210.0f, y });
+		} else if (selectMenu_ == QUIT) {
+			float y = Easing::Lerp(startCursolY_, endCursolY_, cursolTimer_.GetProgress(), Easing::Type::EaseInOutQuint);
 			cursolUI_->SetPosition({ 210.0f, y });
 		}
 	} else {
 		// タイマーが非アクティブな場合
 		if (selectMenu_ == PLAY) {
-			cursolUI_->SetPosition({ 210.0f, 446.0f });
+			cursolUI_->SetPosition({ 210.0f, 384.0f });
 		} else if (selectMenu_ == OPTION) {
-			cursolUI_->SetPosition({ 210.0f, 563.0f });
+			cursolUI_->SetPosition({ 210.0f, 488.0f });
+		} else if (selectMenu_ == QUIT) {
+			cursolUI_->SetPosition({ 210.0f, 581.0f });
 		}
 	}
 }
@@ -799,6 +834,7 @@ void TitleScene::SpriteUpdate() {
 	playUI_->Update();
 	optionUI_->Update();
 	cursolUI_->Update();
+	quitUI_->Update();
 
 	optionBG_->Update();
 	uiBoxUI_->Update();
@@ -842,14 +878,17 @@ void TitleScene::AudioUpdate() {
 }
 
 void TitleScene::InitSptite() {
-	playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png", { 340.0f,445.0f }, { 0.6f,0.6f });
-	playUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // アルファを1.0に変更
+	playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png", { 342.0f,384.0f }, { 0.6f,0.6f });
+	playUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png", { 390.0f,565.0f }, { 0.6f,0.6f });
-	optionUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // アルファを1.0に変更
+	optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png", { 390.0f,488.0f }, { 0.6f,0.6f });
+	optionUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,446.0f }, { 0.3f,0.3f });
-	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // アルファを1.0に変更
+	quitUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/quitUI.png", { 347.0f,581.0f }, { 0.6f,0.6f });
+	quitUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
+	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,386.0f }, { 0.3f,0.3f });
+	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBG.png", { 604.0f,340.0f }, { 0.0f,0.0f });
 	optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.85f });
