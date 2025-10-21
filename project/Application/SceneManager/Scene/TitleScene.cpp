@@ -90,7 +90,7 @@ void TitleScene::Initialize() {
 void TitleScene::Update() {
 	
 	if (selectMenu_ == PLAY) {
-		if (input_->TriggerKey(DIK_SPACE) && titleTimer_.IsFinished() && !pushStart_) {
+		if ((input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) && titleTimer_.IsFinished() && !pushStart_) {
 			sceneFade_->StartFadeIn(2.0f);
 			titleObject_->PlayerEnd();
 			startGameSE_->PlayAudio(SE_Volume);
@@ -311,32 +311,38 @@ void TitleScene::TitleLogoUpdate() {
 		titleObject_->PlayerStart();
 		titleParticle_->Play();
 	}
-	// UIの透明度制御を修正
+	
+	// UIの透明度制御を修正 - フェードイン効果の実装
+	float targetAlpha = 1.0f;
 	if (titleTimer_.IsActive()) {
 		// タイマーが動作中の場合、進行度に応じて透明度を上げる（0.0 → 1.0）
 		uiAlpha_ = titleTimer_.GetProgress();
 	} else if (titleTimer_.IsFinished()) {
 		// タイマーが完了している場合は完全に不透明
 		uiAlpha_ = 1.0f;
+	} else {
+		// タイマーが開始されていない場合は透明
+		uiAlpha_ = 0.0f;
 	}
 
-	playUI_->SetColor({ 1.0f,1.0f,1.0f,uiAlpha_ });
-	optionUI_->SetColor({ 1.0f,1.0f,1.0f,uiAlpha_ });
-	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,uiAlpha_ });
+	// UIの色を設定（RGB値は1.0を維持し、アルファのみ変更）
+	playUI_->SetColor({ 1.0f, 1.0f, 1.0f, uiAlpha_ });
+	optionUI_->SetColor({ 1.0f, 1.0f, 1.0f, uiAlpha_ });
+	cursolUI_->SetColor({ 1.0f, 1.0f, 1.0f, uiAlpha_ });
 }
 
 void TitleScene::SelectUIUpdate() {
 	// メニュー選択処理
 	if (!cursolTimer_.IsActive() && titleTimer_.IsFinished() && selectOptionMenu_ == OptionMenu::NONE) {
 		if (selectMenu_ == PLAY) {
-			if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
+			if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
 				selectMenu_ = OPTION;
 				cursolTimer_.Start(0.25f, false);
 
 				moveCursolSE_->PlayAudio(SE_Volume);
 			}
 		} else if (selectMenu_ == OPTION) {
-			if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
+			if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
 				selectMenu_ = PLAY;
 				cursolTimer_.Start(0.25f, false);
 
@@ -369,7 +375,7 @@ void TitleScene::SelectUIUpdate() {
 
 void TitleScene::OptionUIUpdate() {
 	if (selectMenu_ == Menu::OPTION && selectOptionMenu_ == OptionMenu::NONE) {
-		if (input_->TriggerKey(DIK_SPACE) && titleTimer_.IsFinished() && !optionTimer_.IsActive()) {
+		if ((input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) && titleTimer_.IsFinished() && !optionTimer_.IsActive()) {
 			optionTimer_.Start(0.5f, false);
 			optionOpen_ = true;
 			selectOptionMenu_ = OptionMenu::FULLSCREEN;
@@ -379,7 +385,7 @@ void TitleScene::OptionUIUpdate() {
 		}
 	}
 
-	if (selectOptionMenu_ == OptionMenu::BACK && input_->TriggerKey(DIK_SPACE) && !optionTimer_.IsActive()) {
+	if (selectOptionMenu_ == OptionMenu::BACK && (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) && !optionTimer_.IsActive()) {
 		optionTimer_.Start(0.5f, false);
 		optionOpen_ = false;
 		selectOptionMenu_ = OptionMenu::NONE;
@@ -400,7 +406,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 151.0f });
 		}
 
-		if (!optionTimer_.IsActive() && input_->TriggerKey(DIK_SPACE) || input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_LEFT)) {
+		if (!optionTimer_.IsActive() && (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) || input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_LEFT) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 			if (!ctx_->winApp.IsFullscreen()) {
 				ctx_->winApp.EnterBorderlessFullscreen();
 			} else {
@@ -410,7 +416,7 @@ void TitleScene::OptionUIUpdate() {
 			decideSE_->PlayAudio(SE_Volume);
 		}
 
-		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
+		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
 			selectOptionMenu_ = OptionMenu::SE;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -429,7 +435,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 237.0f });
 		}
 
-		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
+		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
 			selectOptionMenu_ = OptionMenu::FULLSCREEN;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -439,7 +445,7 @@ void TitleScene::OptionUIUpdate() {
 			moveCursolSE_->PlayAudio(SE_Volume);
 		}
 
-		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
+		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
 			selectOptionMenu_ = OptionMenu::BGM;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -452,19 +458,19 @@ void TitleScene::OptionUIUpdate() {
 		switch (seVolume_)
 		{
 		case DAI:
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				seVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				seVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				seVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -473,19 +479,19 @@ void TitleScene::OptionUIUpdate() {
 			SE_Volume = daiVolumeSE_;
 			break;
 		case TYU:
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				seVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				seVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				seVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -494,19 +500,19 @@ void TitleScene::OptionUIUpdate() {
 			SE_Volume = tyuVolumeSE_;
 			break;
 		case SYOU:
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				seVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				seVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				seVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -526,7 +532,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 321.0f });
 		}
 
-		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
+		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
 			selectOptionMenu_ = OptionMenu::SE;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -536,7 +542,7 @@ void TitleScene::OptionUIUpdate() {
 			moveCursolSE_->PlayAudio(SE_Volume);
 		}
 
-		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
+		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
 			selectOptionMenu_ = OptionMenu::BACK;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -549,19 +555,19 @@ void TitleScene::OptionUIUpdate() {
 		switch (bgmVolume_)
 		{
 		case DAI:
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				bgmVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -570,19 +576,19 @@ void TitleScene::OptionUIUpdate() {
 			BGM_Volume = daiVolumeBGM_;
 			break;
 		case TYU:
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				bgmVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				bgmVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -591,19 +597,19 @@ void TitleScene::OptionUIUpdate() {
 			BGM_Volume = tyuVolumeBGM_;
 			break;
 		case SYOU:
-			if (input_->TriggerKey(DIK_SPACE)) {
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				bgmVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				bgmVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				bgmVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -623,7 +629,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 402.0f });
 		}
 
-		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
+		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
 			selectOptionMenu_ = OptionMenu::BGM;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -730,7 +736,7 @@ void TitleScene::CloudUpdate() {
 			}
 		}
 		// 次の雲生成のためにタイマーを再開始
-		cloudTimer_.Start(1.0f, false);  // 間隔を少し長くして確認しやすくする
+		cloudTimer_.Start(2.5f, false);  // 間隔を少し長くして確認しやすくする
 	}
 
 	// 雲の更新処理
@@ -818,7 +824,7 @@ void TitleScene::SpriteUpdate() {
 	parenthesesUI6_->Update();
 
 	float bearRotate = OptionBearUI_->GetRotate();
-	bearRotate += 1.0f * deltaTime_;
+	bearRotate -= 1.0f * deltaTime_;
 	OptionBearUI_->SetRotate(bearRotate);
 	OptionBearUI_->Update();
 }
@@ -837,13 +843,13 @@ void TitleScene::AudioUpdate() {
 
 void TitleScene::InitSptite() {
 	playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png", { 340.0f,445.0f }, { 0.6f,0.6f });
-	playUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	playUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // アルファを1.0に変更
 
 	optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png", { 390.0f,565.0f }, { 0.6f,0.6f });
-	optionUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	optionUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // アルファを1.0に変更
 
 	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,446.0f }, { 0.3f,0.3f });
-	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // アルファを1.0に変更
 
 	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBG.png", { 604.0f,340.0f }, { 0.0f,0.0f });
 	optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.85f });

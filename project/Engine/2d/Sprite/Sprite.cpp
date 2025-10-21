@@ -91,7 +91,7 @@ void Sprite::Draw() {
 	// PSOManagerからRootSignatureとPSOを取得
 	auto& psoManager = PSOManager::GetInstance();
 	auto rootSignature = psoManager.GetRootSignature("Object3D");
-	auto pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
+	auto pso = psoManager.GetPSO(PSOType::Model_Solid_Normal); // Sprite専用PSOを使用
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());

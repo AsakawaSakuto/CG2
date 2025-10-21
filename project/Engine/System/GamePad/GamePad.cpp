@@ -1,6 +1,7 @@
 #include "GamePad.h"
 #include <algorithm>
 #include <cstring> // memset
+#include <cmath>   // sqrt
 
 // // スティックの -32768..32767 を -1..1 に正規化（デッドゾーン反映）
 float GamePad::NormalizeStick(short v, float deadzone) {
@@ -14,18 +15,49 @@ float GamePad::NormalizeStick(short v, float deadzone) {
     return sign * nv;
 }
 
+// スティックがアクティブ（デッドゾーンを超えて倒されている）状態かを判定
+bool GamePad::IsStickActive(float x, float y) const {
+    float magnitude = sqrtf(x * x + y * y);
+    return magnitude > kStickActiveThreshold;
+}
+
+// 方向別スティック状態判定
+bool GamePad::IsStickDirection(float x, float y, DownStick direction) const {
+    switch (direction) {
+    case ALL_STICK:
+        return IsStickActive(x, y);
+    case UP_STICK:
+        return y > kStickDirectionThreshold;
+    case DOWN_STICK:
+        return y < -kStickDirectionThreshold;
+    case LEFT_STICK:
+        return x < -kStickDirectionThreshold;
+    case RIGHT_STICK:
+        return x > kStickDirectionThreshold;
+    default:
+        return false;
+    }
+}
+
 void GamePad::Initialize(DWORD padIndex) {
     padIndex_ = padIndex;
     connected_ = false;
     std::memset(buttons_, 0, sizeof(buttons_));
     std::memset(buttonsPrev_, 0, sizeof(buttonsPrev_));
     leftStickX_ = leftStickY_ = rightStickX_ = rightStickY_ = 0.0f;
+    leftStickXPrev_ = leftStickYPrev_ = rightStickXPrev_ = rightStickYPrev_ = 0.0f;
     leftTrigger_ = rightTrigger_ = 0.0f;
 }
 
 void GamePad::Update() {
     // 前フレームを保存
     std::memcpy(buttonsPrev_, buttons_, sizeof(buttons_));
+    
+    // スティックの前フレーム値を保存
+    leftStickXPrev_ = leftStickX_;
+    leftStickYPrev_ = leftStickY_;
+    rightStickXPrev_ = rightStickX_;
+    rightStickYPrev_ = rightStickY_;
 
     XINPUT_STATE xi{};
     DWORD dw = XInputGetState(padIndex_, &xi);
@@ -52,12 +84,12 @@ void GamePad::Update() {
         buttons_[R] = (b & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0;
         buttons_[BACK] = (b & XINPUT_GAMEPAD_BACK) != 0;
         buttons_[START] = (b & XINPUT_GAMEPAD_START) != 0;
-        buttons_[LS] = (b & XINPUT_GAMEPAD_LEFT_THUMB) != 0;
-        buttons_[RS] = (b & XINPUT_GAMEPAD_RIGHT_THUMB) != 0;
-        buttons_[DPAD_UP] = (b & XINPUT_GAMEPAD_DPAD_UP) != 0;
-        buttons_[DPAD_DOWN] = (b & XINPUT_GAMEPAD_DPAD_DOWN) != 0;
-        buttons_[DPAD_LEFT] = (b & XINPUT_GAMEPAD_DPAD_LEFT) != 0;
-        buttons_[DPAD_RIGHT] = (b & XINPUT_GAMEPAD_DPAD_RIGHT) != 0;
+        buttons_[L_STICK] = (b & XINPUT_GAMEPAD_LEFT_THUMB) != 0;
+        buttons_[R_STICK] = (b & XINPUT_GAMEPAD_RIGHT_THUMB) != 0;
+        buttons_[UP_BOTTON] = (b & XINPUT_GAMEPAD_DPAD_UP) != 0;
+        buttons_[DOWN_BOTTON] = (b & XINPUT_GAMEPAD_DPAD_DOWN) != 0;
+        buttons_[LEFT_BOTTON] = (b & XINPUT_GAMEPAD_DPAD_LEFT) != 0;
+        buttons_[RIGHT_BOTTON] = (b & XINPUT_GAMEPAD_DPAD_RIGHT) != 0;
 
         if (isVib_) {
             XINPUT_VIBRATION vib{};
@@ -101,6 +133,58 @@ bool GamePad::ReleaseButton(int button) const {
     // 立ち下がり（今false && 前true）
     if (button < 0 || button >= BUTTON_COUNT) return false;
     return !buttons_[button] && buttonsPrev_[button];
+}
+
+// 左スティックが倒された瞬間
+bool GamePad::TriggerLeftStick() const {
+    bool currentActive = IsStickActive(leftStickX_, leftStickY_);
+    bool prevActive = IsStickActive(leftStickXPrev_, leftStickYPrev_);
+    return currentActive && !prevActive;
+}
+
+// 左スティックが中央に戻った瞬間
+bool GamePad::ReleaseLeftStick() const {
+    bool currentActive = IsStickActive(leftStickX_, leftStickY_);
+    bool prevActive = IsStickActive(leftStickXPrev_, leftStickYPrev_);
+    return !currentActive && prevActive;
+}
+
+// 右スティックが倒された瞬間
+bool GamePad::TriggerRightStick() const {
+    bool currentActive = IsStickActive(rightStickX_, rightStickY_);
+    bool prevActive = IsStickActive(rightStickXPrev_, rightStickYPrev_);
+    return currentActive && !prevActive;
+}
+
+// 右スティックが中央に戻った瞬間
+bool GamePad::ReleaseRightStick() const {
+    bool currentActive = IsStickActive(rightStickX_, rightStickY_);
+    bool prevActive = IsStickActive(rightStickXPrev_, rightStickYPrev_);
+    return !currentActive && prevActive;
+}
+
+// 左スティックの方向別瞬間判定
+bool GamePad::TriggerLeftStick(DownStick direction) const {
+    bool currentDirection = IsStickDirection(leftStickX_, leftStickY_, direction);
+    bool prevDirection = IsStickDirection(leftStickXPrev_, leftStickYPrev_, direction);
+    return currentDirection && !prevDirection;
+}
+
+// 右スティックの方向別瞬間判定
+bool GamePad::TriggerRightStick(DownStick direction) const {
+    bool currentDirection = IsStickDirection(rightStickX_, rightStickY_, direction);
+    bool prevDirection = IsStickDirection(rightStickXPrev_, rightStickYPrev_, direction);
+    return currentDirection && !prevDirection;
+}
+
+// 左スティックの方向別押下中判定
+bool GamePad::PushLeftStick(DownStick direction) const {
+    return IsStickDirection(leftStickX_, leftStickY_, direction);
+}
+
+// 右スティックの方向別押下中判定
+bool GamePad::PushRightStick(DownStick direction) const {
+    return IsStickDirection(rightStickX_, rightStickY_, direction);
 }
 
 void GamePad::SetVibration(float left01, float right01, float Time) {
