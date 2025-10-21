@@ -85,7 +85,7 @@ void TitleObject::Update() {
 	}
 
 	for (int i = 0; i < model_.size(); i++) {
-		model_[i]->SetTransform(transform_[i]);
+		//model_[i]->SetTransform(transform_[i]);
 		//model_[i]->SetTranslate(transform_[i].translate);
 		model_[i]->Update();
 	}
@@ -113,7 +113,12 @@ void TitleObject::DrawImGui() {
 	//model_[2]->DrawImGui("2");
 	//model_[3]->DrawImGui("3");
 	//model_[4]->DrawImGui("4");
-	//model_[8]->DrawImGui("8");
+	model_[5]->DrawImGui("5");
+	model_[6]->DrawImGui("6");
+	model_[7]->DrawImGui("7");
+	model_[8]->DrawImGui("8");
+	model_[9]->DrawImGui("9");
+	model_[10]->DrawImGui("10");
 }
 
 void TitleObject::InitTransform() {
@@ -137,27 +142,27 @@ void TitleObject::InitTransform() {
 	transform_[4].rotate = { 0.0f,0.0f,1.57f };
 	transform_[4].translate = { 1.3f, -10.06f, 0.0f };
 
-	transform_[5].scale = { 3.0f,3.0f,3.0f };
+	transform_[5].scale = { 2.5f,2.5f,2.5f };
 	transform_[5].rotate = { 0.0f,3.37f,-0.42f };
 	transform_[5].translate = { 4.01f, -8.9f, 1.0f };
 
-	transform_[6].scale = { 3.0f,3.0f,3.0f };
+	transform_[6].scale = { 2.5f,2.5f,2.5f };
 	transform_[6].rotate = { 0.0f,3.2f,-0.49f };
 	transform_[6].translate = { 3.5f, -9.77f, 1.0f };
 
-	transform_[7].scale = { 3.0f,3.0f,3.0f };
+	transform_[7].scale = { 2.5f,2.5f,2.5f };
 	transform_[7].rotate = { 0.0f,0.0f,-1.19f };
 	transform_[7].translate = { 3.42f, -9.52f, 1.0f };
 
-	transform_[8].scale = { 3.0f,3.0f,3.0f };
+	transform_[8].scale = { 2.5f,2.5f,2.5f };
 	transform_[8].rotate = { 0.0f,0.0f,-1.22f };
 	transform_[8].translate = { 3.5f, -9.55f, -0.79f };
 
-	transform_[9].scale = { 3.0f,3.0f,3.0f };
+	transform_[9].scale = { 2.5f,2.5f,2.5f };
 	transform_[9].rotate = { 0.0f,0.0f,0.44f };
 	transform_[9].translate = { 3.78f, -10.29f, 1.0f };
 
-	transform_[10].scale = { 3.0f,3.0f,3.0f };
+	transform_[10].scale = { 2.5f,2.5f,2.5f };
 	transform_[10].rotate = { 0.0f,0.0f,-0.82f };
 	transform_[10].translate = { 2.79f, -10.03f, 0.0f };
 }

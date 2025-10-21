@@ -473,8 +473,8 @@ void GameScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
 
 void GameScene::UpdateInput() {
 	// 入力検知
-	bool rightInput = input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D) || gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT); // 右入力
-	bool leftInput = input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) || gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT);   // 左入力
+	bool rightInput = input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D) || gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON); // 右入力
+	bool leftInput = input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) || gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->LEFT_BOTTON);   // 左入力
 	bool shotInput = input_->PushKey(DIK_SPACE) || gamePad_->PushButton(gamePad_->A);                                                                       // ショット入力
 
 	if (rightInput || leftInput || shotInput) {

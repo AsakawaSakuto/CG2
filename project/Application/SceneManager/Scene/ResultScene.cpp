@@ -396,8 +396,8 @@ void ResultScene::ScreenSecondDraw() {
 }
 
 void ResultScene::UpdateMenu() {
-	bool rightInput = input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || /*gamePad_->LeftStickY() >= 0.3f ||*/ gamePad_->TriggerButton(gamePad_->DPAD_RIGHT); // 上ボタン
-	bool leftInput = input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_A) || /*gamePad_->LeftStickY() <= -0.3f ||*/ gamePad_->TriggerButton(gamePad_->DPAD_LEFT);      // 下ボタン
+	bool rightInput = input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || /*gamePad_->LeftStickY() >= 0.3f ||*/ gamePad_->TriggerButton(gamePad_->RIGHT_BOTTON); // 上ボタン
+	bool leftInput = input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_A) || /*gamePad_->LeftStickY() <= -0.3f ||*/ gamePad_->TriggerButton(gamePad_->LEFT_BOTTON);      // 下ボタン
 	bool enterInput = input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(gamePad_->A);                                                                             // 決定ボタン
 
 	// メニュー切り替え

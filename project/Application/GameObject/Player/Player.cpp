@@ -63,8 +63,8 @@ void Player::Update() {
 	// 当たり判定用の球の中心を更新
 	collisionSphere_.center = transform_.translate;
 
-	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
-	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
+	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->LEFT_BOTTON) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
+	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
 
 	if (isLeftMove) {
 		transform_.translate.x -= velocity_.x * deltaTime_;
