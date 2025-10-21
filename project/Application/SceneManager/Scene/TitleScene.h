@@ -70,6 +70,11 @@ private:
 	std::array<bool, 10>cloudIsActive_ = { false };
 	GameTimer cloudTimer_;
 
+	std::array<unique_ptr<Model>, 10> cloudLine_;
+	std::array<Transform, 10> cloudLineTramsform_;
+	std::array<bool, 10>cloudLineIsActive_ = { false };
+	GameTimer cloudLineTimer_;
+
 	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();

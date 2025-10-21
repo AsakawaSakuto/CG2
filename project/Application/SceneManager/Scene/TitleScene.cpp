@@ -42,6 +42,7 @@ void TitleScene::Initialize() {
 
 	// cloudTimer_の初期化を追加
 	cloudTimer_.Reset();
+	cloudLineTimer_.Reset();
 
 	SE_Volume = tyuVolumeSE_;
 	BGM_Volume = tyuVolumeBGM_;
@@ -64,6 +65,16 @@ void TitleScene::Initialize() {
 		cloudTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
 		cloudTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
 	}
+
+	for (int i = 0; i < cloud_.size(); i++) {
+		cloudLine_[i] = make_unique<Model>();
+		cloudLine_[i]->Initialize(&ctx_->dxCommon, "Cloud/LineI.obj");
+		cloudLine_[i]->SetTexture("resources/image/0.png");
+		cloudLineIsActive_[i] = false;
+		cloudLineTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };  // スケールを大きく
+		cloudLineTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
+		cloudLineTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
+	}
 }
 
 void TitleScene::Update() {
@@ -85,8 +96,8 @@ void TitleScene::Update() {
 		titleSceneBGM_->Reset();
 	}
 
-	CloudUpdate();
 	TitleLogoUpdate();
+	CloudUpdate();
 	SelectUIUpdate();
 	OptionUIUpdate();
 
@@ -97,7 +108,9 @@ void TitleScene::Update() {
 	cursolTimer_.Update();
 	optionTimer_.Update();
 	optionCursolTimer_.Update();
+
 	cloudTimer_.Update();
+	cloudLineTimer_.Update();
 
 	sceneFade_->Update();
 
@@ -123,6 +136,12 @@ void TitleScene::Draw() {
 	for (int i = 0; i < cloud_.size(); i++) {
 		//if (cloudIsActive_[i]) {
 			cloud_[i]->Draw(*useCamera_);
+		//}
+	}
+
+	for (int i = 0; i < cloudLine_.size(); i++) {
+		//if (cloudLineIsActive_[i]) {
+		cloudLine_[i]->Draw(*useCamera_);
 		//}
 	}
 
@@ -266,6 +285,7 @@ void TitleScene::TitleLogoUpdate() {
 	if (titleLogo_->IsEnd() && !titleTimer_.IsActive() && !titleTimer_.IsFinished()) {
 		titleTimer_.Start(1.0f, false);
 		cloudTimer_.Start(1.0f, false);
+		cloudLineTimer_.Start(0.5f, false);
 		titleObject_->PlayerStart();
 	}
 	// UIの透明度制御を修正
@@ -708,6 +728,42 @@ void TitleScene::CloudUpdate() {
 		cloud_[i]->Update();
 	}
 
+	// 雲の生成処理を修正
+	if (cloudLineTimer_.IsFinished()) {
+		// 雲生成処理
+		for (int i = 0; i < cloudLine_.size(); i++) {
+			if (!cloudLineIsActive_[i]) {
+				cloudLineIsActive_[i] = true;
+				// X座標をランダムに設定
+				cloudLineTramsform_[i].translate.x = random_.Float(-10.0f, 10.0f);
+				// Y座標を画面上部に設定
+				cloudLineTramsform_[i].translate.y = 7.5f;
+				// Z座標をランダムに設定（奥行き）
+				cloudLineTramsform_[i].translate.z = random_.Float(-3.0f, 10.0f);
+				break;
+			}
+		}
+		// 次の雲生成のためにタイマーを再開始
+		cloudLineTimer_.Start(0.5f, false);  // 間隔を少し長くして確認しやすくする
+	}
+
+	// 雲の更新処理
+	for (int i = 0; i < cloudLine_.size(); i++) {
+		if (cloudLineIsActive_[i]) {
+			// 雲を下に移動
+			cloudLineTramsform_[i].translate.y -= 10.0f * deltaTime_;
+			//cloudTramsform_[i].translate.x -= 3.0f * deltaTime_;
+
+			// 画面下部まで来たら非アクティブにする
+			if (cloudLineTramsform_[i].translate.y < -7.0f) {
+				cloudLineIsActive_[i] = false;
+			}
+		}
+		// 雲の色と透明度を設定
+		cloudLine_[i]->SetColor({ 1.0f, 1.0f, 1.0f, 0.5f });
+		cloudLine_[i]->SetTransform(cloudLineTramsform_[i]);
+		cloudLine_[i]->Update();
+	}
 }
 
 void TitleScene::SpriteUpdate() {

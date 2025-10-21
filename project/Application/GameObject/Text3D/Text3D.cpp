@@ -28,7 +28,6 @@ void Text3D::Initialize(DirectXCommon* dxCommon) {
 		transform_[i].rotate = { 0.0f, 0.0f, 0.0f };
 
 		timer_[i].Start(1.5f + (i * 0.15f), false);
-		rotateTimer_[i].Start(1.5f + (i * 0.15f), false);
 	}
 
 	for (int i = 0; i < 7; i++) {
@@ -60,30 +59,159 @@ void Text3D::Initialize(DirectXCommon* dxCommon) {
 
 void Text3D::Update() {
 	// 位置のアニメーション（各タイマーの進行度を使用）
-	transform_[0].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[0].GetProgress(),Easing::Type::EaseInOutBounce);
-	transform_[1].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[1].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[2].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[2].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[3].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[3].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[4].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[4].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[5].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[5].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[6].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[6].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[7].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[7].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[8].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[8].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[9].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[9].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[10].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[10].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[11].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[11].GetProgress(), Easing::Type::EaseInOutBounce);
-	transform_[12].translate.x = Easing::Lerp(20.0f, 0.1f, timer_[11].GetProgress(), Easing::Type::EaseInOutBounce);
+	// バウンスアニメーション中でない場合のみ、通常の位置アニメーションを適用
+	if (!muniTimer_[0].IsActive()) {
+		transform_[0].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[0].GetProgress(),Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[1].IsActive()) {
+		transform_[1].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[1].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[2].IsActive()) {
+		transform_[2].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[2].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[3].IsActive()) {
+		transform_[3].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[3].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[4].IsActive()) {
+		transform_[4].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[4].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[5].IsActive()) {
+		transform_[5].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[5].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[6].IsActive()) {
+		transform_[6].translate.y = Easing::Lerp(10.0f, 2.2f, timer_[6].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[7].IsActive()) {
+		transform_[7].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[7].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[8].IsActive()) {
+		transform_[8].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[8].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[9].IsActive()) {
+		transform_[9].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[9].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[10].IsActive()) {
+		transform_[10].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[10].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	if (!muniTimer_[11].IsActive()) {
+		transform_[11].translate.y = Easing::Lerp(10.0f, 1.15f, timer_[11].GetProgress(), Easing::Type::EaseInOutBounce);
+	}
+	
+	transform_[12].translate.x = Easing::Lerp(20.0f, 0.1f, timer_[12].GetProgress(), Easing::Type::EaseInOutBounce);
+
+	// muniStartTimerの開始条件（1回だけ実行するように）
+	if (timer_[12].IsFinished() && !muniStartTimer_.IsActive() && !muniStartTimer_.IsFinished()) {
+		muniStartTimer_.Start(5.0f, false); // 待機時間を短縮
+	}
+
+	// 最初のmuniTimerを開始
+	if (muniStartTimer_.IsFinished() && !muniTimer_[0].IsActive() && !muniTimer_[0].IsFinished()) {
+		muniTimer_[0].Start(0.6f, false);
+	}
+
+	// 連続してmuniTimerを開始（波のように重複させる）
+	for (int i = 1; i < muniTimer_.size(); i++) {
+		// 前の文字が開始してから0.1秒後に次の文字を開始（重複して動く）
+		if (muniTimer_[i - 1].IsActive() && muniTimer_[i - 1].GetProgress() >= 0.15f && !muniTimer_[i].IsActive() && !muniTimer_[i].IsFinished()) {
+			muniTimer_[i].Start(0.6f, false);
+		}
+	}
+
+	// スケールアニメーション → 位置バウンスアニメーションに変更
+	for (int i = 0; i < 7; i++) {
+		if (muniTimer_[i].IsActive()) {
+			float progress = muniTimer_[i].GetProgress();
+			// バウンス効果: 上に浮いてから元の位置に戻る
+			float bounceHeight = 0.5f; // バウンスの高さ
+			float baseY = 2.2f; // 元のY位置
+			
+			if (progress <= 0.3f) {
+				// 最初の30%: 上昇
+				transform_[i].translate.y = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
+			} else {
+				// 残りの70%: バウンスしながら落下
+				float fallProgress = (progress - 0.3f) / 0.7f;
+				transform_[i].translate.y = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
+			}
+		}
+	}
+
+	for (int i = 7; i < 11; i++) {
+		if (muniTimer_[i].IsActive()) {
+			float progress = muniTimer_[i].GetProgress();
+			// バウンス効果: 上に浮いてから元の位置に戻る
+			float bounceHeight = 0.5f; // バウンスの高さ
+			float baseY = 1.15f; // 元のY位置
+			
+			if (progress <= 0.3f) {
+				// 最初の30%: 上昇
+				transform_[i].translate.y = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
+			} else {
+				// 残りの70%: バウンスしながら落下
+				float fallProgress = (progress - 0.3f) / 0.7f;
+				transform_[i].translate.y = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
+			}
+		}
+	}
+
+	if (muniTimer_[11].IsActive()) {
+		float progress = muniTimer_[11].GetProgress();
+		// バウンス効果: 上に浮いてから元の位置に戻る
+		float bounceHeight = 0.5f; // バウンスの高さ
+		float baseY = 1.15f; // 元のY位置
+		
+		if (progress <= 0.3f) {
+			// 最初の30%: 上昇
+			transform_[11].translate.y = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
+		} else {
+			// 残りの70%: バウンスしながら落下
+			float fallProgress = (progress - 0.3f) / 0.7f;
+			transform_[11].translate.y = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
+		}
+	}
+
+	if (muniTimer_[12].IsActive()) {
+		float progress = muniTimer_[12].GetProgress();
+		// バウンス効果: 上に浮いてから元の位置に戻る
+		float bounceHeight = 0.5f; // バウンスの高さ
+		float baseY = 0.1f; // 元のY位置
+		
+		if (progress <= 0.3f) {
+			// 最初の30%: 上昇
+			transform_[12].translate.x = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
+		} else {
+			// 残りの70%: バウンスしながら落下
+			float fallProgress = (progress - 0.3f) / 0.7f;
+			transform_[12].translate.x = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
+		}
+	}
+
+	// 全ての文字のバウンスが終了したら、再びループを開始
+	bool allFinished = true;
+	for (int i = 0; i < muniTimer_.size(); i++) {
+		if (muniTimer_[i].IsActive() || !muniTimer_[i].IsFinished()) {
+			allFinished = false;
+			break;
+		}
+	}
+	
+	// 全て終了したら、少し待ってから再開
+	if (allFinished && muniStartTimer_.IsFinished()) {
+		// タイマーをリセットして再開準備
+		muniStartTimer_.Start(5.0f, false); // 1秒待機してから再開
+		for (int i = 0; i < muniTimer_.size(); i++) {
+			muniTimer_[i].Reset(); // タイマーをリセット
+		}
+	}
 
 	// 全タイマーの更新
 	for (int i = 0; i < timer_.size(); i++) {
 		timer_[i].Update();
-		rotateTimer_[i].Update();
+		muniTimer_[i].Update();
 	}
+	muniStartTimer_.Update();
 
 	for (int i = 0; i < model_.size(); i++) {
-		// 全ての文字が同じ回転進行度を使用して、最終的にrotate.yを0にする
-		//transform_[i].rotate.y = Easing::Lerp(6.45f, 0.0f,rotateTimer_[i].GetProgress());
-
 		model_[i]->SetTransform(transform_[i]);
 		model_[i]->Update();
 	}
@@ -122,6 +250,21 @@ void Text3D::DrawImGui(){
 		ImGui::DragFloat3(label.c_str(), &transform_[i].scale.x, 0.01f);
 	}
 
+	ImGui::End();
+
+	// Debug window for timers
+	ImGui::Begin("Timer Debug");
+	
+	ImGui::Text("Main Timer 12 Finished: %s", timer_[12].IsFinished() ? "true" : "false");
+	ImGui::Text("Muni Start Timer Active: %s", muniStartTimer_.IsActive() ? "true" : "false");
+	ImGui::Text("Muni Start Timer Finished: %s", muniStartTimer_.IsFinished() ? "true" : "false");
+	
+	for (int i = 0; i < muniTimer_.size(); i++) {
+		ImGui::Text("MuniTimer[%d] Active: %s, Progress: %.3f", i, 
+			muniTimer_[i].IsActive() ? "true" : "false", 
+			muniTimer_[i].GetProgress());
+	}
+	
 	ImGui::End();
 
 }
