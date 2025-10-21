@@ -4,7 +4,6 @@
 #include "Application/GameObject/Thorn/Thorn.h"
 #include <numbers>
 
-// #include "State/PlayerStateLoader.h"
 #include "Application/GameObject/State/JsonState.h"
 
 void Player::Initialize(DirectXCommon* dxCommon) {
@@ -13,9 +12,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	model_->Initialize(dxCommon_, "Machine/Body.obj");
 	model_->SetTexture("resources/model/Machine/Machine.png");
+	model_->SetColor({0.4f, 0.7f, 0.9f, 1.0f});
 
 	// JSONからステータスを読み込み
-	// state_ = PlayerStateLoader::Load("Resources/Data/playerState.json");
 	playerState_ = JsonState::Load<PlayerState>("Resources/Data/playerState.json");
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 
@@ -23,7 +22,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {0.0f, -10.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
-	collisionSphere_.radius = 1.0f;
+	collisionSphere_.radius = 0.8f;
 
 	// 当たり判定更新(AABB)
 	UpdateCollisionAABB();
@@ -33,8 +32,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerWing_->SetPosition(transform_.translate);
 
 	// 速度関連初期化
-	acceleration_ = {0.0f, 1.5f, 0.0f};
-	velocity_ = {7.0f, 0.0f};
+	acceleration_ = {30.0f, 2.0f, 0.0f};
+	velocity_ = {0.0f, 0.0f};
 
 	// スコア
 	score_ = 0;
@@ -63,25 +62,11 @@ void Player::Update() {
 	// 当たり判定用の球の中心を更新
 	collisionSphere_.center = transform_.translate;
 
-	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
-	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
-
-	if (isLeftMove) {
-		transform_.translate.x -= velocity_.x * deltaTime_;
-	}
-
-	if (isRightMove) {
-		transform_.translate.x += velocity_.x * deltaTime_;
-	}
+	// 左右移動
+	UpdatePlayerHorizontalMove();
 
 	// プレイヤーの移動制限
 	PlayerMoveLimit();
-
-	// プレイヤーの羽の位置をプレイヤーに合わせる
-	playerWing_->SetPosition(transform_.translate);
-
-	// プレイヤーの羽の更新
-	playerWing_->Update();
 
 	// プレイヤーの上昇
 	MovePlayerUpward();
@@ -144,6 +129,12 @@ void Player::Update() {
 	model_->SetTransform(transform_);
 	model_->Update();
 
+	// プレイヤーの羽の位置をプレイヤーに合わせる
+	playerWing_->SetPosition(transform_.translate);
+
+	// プレイヤーの羽の更新
+	playerWing_->Update();
+
 	// クマ
 	bear_->SetTranslate(transform_.translate);
 	bear_->Update();
@@ -182,9 +173,8 @@ void Player::DrawImgui() {
 	// 弾のステータス
 	DrawImGuiJsonStateBullet();
 
+	// クマのモデルのImGui
 	bear_->ImGuiUpdate();
-
-	//playerWing_->WingImGui();
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -197,7 +187,7 @@ void Player::MovePlayerUpward() {
 
 void Player::ClampPlayerVelocity() {
 	// プレイヤーの速度を一定の値に収める
-	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed, playerState_.maxSpeed);
+	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed - (speedAdd_ * bulletGauge_), playerState_.maxSpeed + (speedAdd_ * bulletGauge_));
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
@@ -208,22 +198,17 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 		// プレイヤーの進行状況
 		direction_ = Direction::DOWN;
+
+		// 反転時の無駄な時間を減らす弾の処理
+		velocity_.y = 2.0f;
 	}
 
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
-		// プレイヤーの進行方向を徐々に反対方向に
-		// acceleration_.y *= -1;
-
-		// プレイヤーの進行状況
-		// direction_ = Direction::UP;
-
 		// ゴールフラグをたてる
 		isGoal_ = true;
 
-		// プレイヤーのステータス初期化
-		//transform_.rotate.z = 0.0f;
-		//direction_ = Direction::UP;
+		// カメラのオフセット変更
 		playerState_.cameraOffset = CAMERA_OFFSET_BOTTOM;
 	}
 }
@@ -261,7 +246,7 @@ void Player::RotateChange() {
 	bear_->SetRotate(transform_.rotate);
 
 	// 方向に応じてクマのモデルの配置を変更
-    bear_->SetOffsetX((direction_ == Direction::DOWN) ? -0.2f : 0.2f);
+	bear_->SetOffsetX((direction_ == Direction::DOWN) ? -0.2f : 0.2f);
 }
 
 void Player::BulletCharge() {
@@ -273,7 +258,6 @@ void Player::BulletCharge() {
 		return;
 	}
 
-	///////////// 仮の処理 /////////////
 	num_++;
 
 	// 2秒に一回ゲージをためる
@@ -282,7 +266,6 @@ void Player::BulletCharge() {
 		(*bulletGaugeSprites_)[bulletGauge_ - 1].isActive = true;
 		num_ = 0;
 	}
-	///////////// 仮の処理 /////////////
 }
 
 void Player::BulletShot() {
@@ -390,17 +373,6 @@ void Player::DrawImGuiJsonStatePlayer() {
 	ImGui::End();
 }
 
-void Player::BulletImGui() {
-	// 弾のImGui
-	ImGui::Begin("Bullet");
-
-	/*if (!bullets_.empty()) {
-	    ImGui::DragFloat3("Translate", &bullets_[0]->GetTransform().translate.x, 0.01f);
-	}*/
-
-	ImGui::End();
-}
-
 void Player::SpeedDown(float speedDpwnStrength) {
 	// 減速
 	velocity_.y += (direction_ == Direction::UP ? -speedDpwnStrength : speedDpwnStrength);
@@ -425,7 +397,6 @@ void Player::CollisionThorn() {
 	for (auto& thorn : thorns_) {
 		if (Collision::IsHit(thorn->GetCollisionAABB(), collisionAABB_) && thorn->GetIsAlive()) {
 			if (direction_ == Direction::DOWN) {
-
 
 				// シェイク用のフラグを立てる
 				if (!isShake_) {
@@ -470,7 +441,7 @@ void Player::CollisionThorn() {
 
 void Player::CollisionBlock() {
 	for (auto& block : blocks_) {
-		if (Collision::IsHit(block->GetCollitionSphere(), collisionSphere_) && block->GetIsAlive()) {
+		if (Collision::IsHit(block->GetCollisionSphere(), collisionSphere_) && block->GetIsAlive()) {
 			// シェイク用のフラグを立てる
 			if (!isShake_) {
 				isShake_ = true;
@@ -493,7 +464,7 @@ void Player::CollisonBulletThorn() {
 				continue; // クールダウン中のトゲはスキップ
 			}
 
-			if (Collision::IsHit(bullet->GetCollitionSphere(), thorn->GetCollitionSphere())) {
+			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
 				switch (thorn->GetThornType()) {
 				case ThornType::MIN:
 					thorn->SetThornType(ThornType::MIDDLE);
@@ -572,6 +543,9 @@ void Player::CollisionWingThorn() {
 			// 羽とトゲの距離に応じてスコア加算
 			Vector3 hitPos = thorn->GetPosition();
 			dis = (hitPos - transform_.translate).Length(); // 3Dベクトルの距離
+
+			// トゲの回転
+			thorn->SetIsRotate(true);
 
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, kNearScore); // 近距離スコア
@@ -703,13 +677,13 @@ void Player::PlayerMoveLimit() {
 
 void Player::UpdateCollisionAABB() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x + 0.3f, t.y + 1.0f, t.z + 1.0f};
-	collisionAABB_.min = {t.x - 0.3f, t.y - 1.0f, t.z - 1.0f};
+	collisionAABB_.max = {t.x + 0.1f, t.y + 1.0f, t.z + 1.0f};
+	collisionAABB_.min = {t.x - 0.1f, t.y - 1.0f, t.z - 1.0f};
 }
 
-void Player::StunRotate() { 
+void Player::StunRotate() {
 	// 2回転
-	transform_.rotate.z += 4.0f * std::numbers::pi_v<float>; 
+	transform_.rotate.z += 4.0f * std::numbers::pi_v<float>;
 }
 
 void Player::UpdateCameraSetChange() {
@@ -720,4 +694,47 @@ void Player::UpdateCameraSetChange() {
 	if (transform_.translate.y <= START_LINE && isCameraSet_) {
 		isCameraSet_ = false;
 	}
+}
+
+void Player::UpdatePlayerHorizontalMove() {
+	if (!isCameraSet_)
+		return;
+
+	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
+	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
+
+	const float accelerationFactor = 2.5f; // 反対方向への加速用の定数
+	const float attenuationFactor = 2.0f;  // 減速倍率
+	const float kMaxSpeed = 7.0f;          // 最高速度
+
+	float accelerationX = 0.0f;
+
+	// 入力方向に応じて加速度を切り替える
+	if (isLeftMove) {
+		accelerationX = -acceleration_.x;
+	}
+	if (isRightMove) {
+		accelerationX = acceleration_.x;
+	}
+
+	// 反対方向への加速する
+	if ((accelerationX < 0 && velocity_.x > 0) || (accelerationX > 0 && velocity_.x < 0)) {
+		accelerationX *= accelerationFactor;
+	}
+
+	// 入力なしなら減速する
+	if (!isLeftMove && !isRightMove) {
+		if (std::abs(velocity_.x) < 0.01f) {
+			velocity_.x = 0.0f;
+		} else {
+			// xの絶対値にyの符号が付いた値を返す関数
+			accelerationX = -std::copysign(acceleration_.x * attenuationFactor, velocity_.x);
+		}
+	}
+
+	// 最大速度を制限
+	velocity_.x = std::clamp(velocity_.x + accelerationX * deltaTime_, -kMaxSpeed, kMaxSpeed);
+
+	// 移動
+	transform_.translate.x += velocity_.x * deltaTime_;
 }

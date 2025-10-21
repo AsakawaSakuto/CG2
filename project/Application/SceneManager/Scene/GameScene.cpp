@@ -36,11 +36,8 @@ void GameScene::Initialize() {
 	thorns_.clear();
 	blocks_.clear();
 
-	// オブジェクトの配置　上半分
+	// オブジェクトの配置
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
-
-	// オブジェクトの配置　下半分
-	SpawnObjectsByMapChip2(0.5f, 0.0f);
 
 	// プレイヤーに他のゲームオブジェクトの情報を渡す
 	player_->SetThrons(thorns_);
@@ -55,9 +52,6 @@ void GameScene::Initialize() {
 	bulletGaugeSpriteBG_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 	bulletGaugeSpriteBG_->SetScale({4, 25});
 	bulletGaugeSpriteBG_->SetPosition({1200, 350});
-
-	// testPos_ = {1200, 400};
-	// testScale_ = {8, 40};
 
 	// 弾のゲージスプライト
 	for (int i = 0; i < bulletGaugeSprite_.size(); ++i) {
@@ -85,10 +79,10 @@ void GameScene::Initialize() {
 
 	// スコア用スプライト5桁分
 	for (int i = 0; i < spriteScore_.size(); ++i) {
-		spriteScore_[i] = make_unique<Sprite>();
-		spriteScore_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
-		spriteScore_[i]->SetPosition({100.0f + i * 32.0f, 400.0f});
-		spriteScore_[i]->SetScale({32.0f * deltaTime_, 32.0f * deltaTime_});
+		spriteScore_[i] = make_unique<SpriteRender>();
+		spriteScore_[i]->sprite.Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
+		spriteScore_[i]->sprite.SetPosition({100.0f + i * 32.0f, 400.0f});
+		spriteScore_[i]->sprite.SetScale({32.0f * deltaTime_, 32.0f * deltaTime_});
 	}
 
 	// カウントダウン用のスプライト初期化
@@ -141,12 +135,41 @@ void GameScene::Initialize() {
 	// スコア表示の後ろに配置するスプライト
 	spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountUI.png");
 	spriteCandyScore_->SetPosition({210.0f, 450.0f});
-	spriteCandyScore_->SetScale({1,1});
+	spriteCandyScore_->SetScale({1, 1});
 
 	// 弾のゲージラムネUI
 	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
 	spriteChargeUI_->SetPosition({1200.0f, 450.0f});
 	spriteChargeUI_->SetScale({1, 1});
+
+	// 山のモデル初期化
+	for (int i = 0; i < static_cast<int>(modelMountain_.size()); ++i) {
+		modelMountain_[i] = make_unique<Model>();
+		modelMountain_[i]->Initialize(&ctx_->dxCommon, "Mountain/Mountain.obj");
+		modelMountain_[i]->SetColor({0.0f, 0.7f, 0.4f, 1.0f});
+	}
+
+	modelMountain_[0]->SetTranslate({-3.9f, -6.8f, 8.0f});
+	modelMountain_[0]->SetScale({5.4f, 6.6f, 6.0f});
+	modelMountain_[1]->SetTranslate({0, -8.8f, 22.0f});
+	modelMountain_[1]->SetScale({8.6f, 14.0f, 6.9f});
+	modelMountain_[2]->SetTranslate({3.2f, -6.8f, 8.0f});
+	modelMountain_[2]->SetScale({6.6f, 4.6f, 5.0f});
+
+	/////////////////////////////////////////////////
+	for (int i = 0; i < 3; ++i) {
+		testPos_[i] = modelMountain_[i]->GetTranslate();
+		testScale_[i] = modelMountain_[i]->GetScale();
+	}
+	/////////////////////////////////////////////////
+
+	// 一定の時間入力がなかった時に減算されるタイマースプライト
+	for (int i = 0; i < static_cast<int>(spriteNoInputCountDown_.size()); ++i) {
+		spriteNoInputCountDown_[i] = make_unique<Sprite>();
+		spriteNoInputCountDown_[i]->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+		spriteNoInputCountDown_[i]->SetPosition({1200.0f, 32.0f});
+		spriteNoInputCountDown_[i]->SetScale({1, 1});
+	}
 }
 
 void GameScene::Update() {
@@ -164,16 +187,11 @@ void GameScene::Update() {
 		spriteNumber_->SetTexture(spriteNumCollection_[static_cast<int>(gameStartTimer_)]);
 	}
 
-	// フラグが立つまで早期リターン
-	/*if (!isGameStart_) {
-	    return;
-	}*/
-
 	// プレイヤーから入力があるかどうか調べる
 	UpdateInput();
 
 	// プレイヤーから一定時間入力がなかった場合の処理
-	NoInputTitleBack();
+	//NoInputTitleBack();
 
 	if (isBackToTitleScene_) {
 		sceneFade_->StartFadeIn(1.0f);
@@ -191,7 +209,7 @@ void GameScene::Update() {
 	UpdateEndText();
 
 	if (sceneFade_->EndFadeIn()) {
-		ctx_->lastScore = player_->GetScore(); // スコアを保存
+		ctx_->lastScore = player_->GetScore();         // スコアを保存
 		ctx_->lastShotCount = player_->GetShotCount(); // ショット数を保存
 		ctx_->lastStunCount = player_->GetStunCount(); // スタン数を保存
 
@@ -206,9 +224,10 @@ void GameScene::Update() {
 		Initialize();
 	}
 
-
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
 	UpdateCameraToPlayer();
+
+	// プレイヤーの更新
 	player_->Update();
 
 	// 汎用機能の更新
@@ -220,13 +239,6 @@ void GameScene::Update() {
 			thorn->Update();
 		}
 		thorn->UpdateParticle();
-	}
-
-	// ブロックの更新処理
-	for (auto& block : blocks_) {
-		if (block->GetIsAlive()) {
-			block->Update();
-		}
 	}
 
 	// ゲージ用のスプライト(背景)の更新処理
@@ -249,8 +261,8 @@ void GameScene::Update() {
 	SpriteScoreUpdate();
 
 	// スコアスプライトの更新処理
-	for (int i = 0; i < spriteScore_.size(); ++i) {
-		spriteScore_[i]->Update();
+	for (int i = 0; i < static_cast<int>(spriteScore_.size()); ++i) {
+		spriteScore_[i]->sprite.Update();
 	}
 
 	// 「スタート!」スプライトの更新処理
@@ -262,15 +274,6 @@ void GameScene::Update() {
 
 	// ルール説明用のスプライト更新
 	spriteRule_->Update();
-
-	/*spriteProgressLine_->SetScale(testScale_[0]);
-	spriteProgressLine_->SetPosition(testPos_[0]);
-
-	spriteProgressPlayer_->SetScale(testScale_[1]);
-	spriteProgressPlayer_->SetPosition(testPos_[1]);
-
-	spriteProgressGoal_->SetScale(testScale_[2]);
-	spriteProgressGoal_->SetPosition(testPos_[2]);*/
 
 	// 進行度ゲージ更新
 	UpdateProgressSprite();
@@ -288,6 +291,18 @@ void GameScene::Update() {
 
 	// ラムネゲージ
 	spriteChargeUI_->Update();
+
+	// 山のモデル更新
+	for (int i = 0; i < 3; ++i) { //////////////// 仮 //////////////
+		/*modelMountain_[i]->SetTranslate({testPos_[i]});
+		modelMountain_[i]->SetScale(testScale_[i]);*/
+		modelMountain_[i]->Update();
+	}
+
+	// 入力なし　カウントダウン　スプライト 更新
+	for (auto& sprite : spriteNoInputCountDown_) {
+		sprite->Update();
+	}
 }
 
 void GameScene::Draw() {
@@ -299,10 +314,8 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	// sceneFade_->Draw();
-
 	// カウントダウン用のスプライト描画
-	if (gameStartTimer_ >= 1 && player_->GetIsCameraSet()) {
+	if (gameStartTimer_ >= 1 && gameStartTimer_ < 4.0f && player_->GetIsCameraSet()) {
 		spriteNumber_->Draw();
 	}
 
@@ -315,18 +328,6 @@ void GameScene::Draw() {
 			thorn->Draw(*useCamera_);
 		}
 		thorn->DrawParticle(*useCamera_);
-	}
-
-	// ブロックの描画処理
-	for (auto& block : blocks_) {
-		if (block->GetIsAlive()) {
-			block->Draw(*useCamera_);
-		}
-	}
-
-	// 画面両端の幕のスプライト描画処理
-	for (auto& curtain : curtainSprite_) {
-		curtain->Draw();
 	}
 
 	// ゲージ用のスプライト(背景)の描画処理
@@ -343,8 +344,10 @@ void GameScene::Draw() {
 	spriteCandyScore_->Draw();
 
 	// スコアスプライトの描画処理
-	for (int i = 0; i < spriteScore_.size(); ++i) {
-		spriteScore_[i]->Draw();
+	for (int i = 0; i < static_cast<int>(spriteScore_.size()); ++i) {
+		if (spriteScore_[i]->isDraw) {
+			spriteScore_[i]->sprite.Draw();
+		}
 	}
 
 	// 「スタート!」スプライトの描画処理
@@ -366,7 +369,22 @@ void GameScene::Draw() {
 	}
 
 	// ラムネゲージ
-	//spriteChargeUI_->Draw();
+	// spriteChargeUI_->Draw();
+
+	// 山のモデル描画
+	for (auto& model : modelMountain_) {
+		model->Draw(*useCamera_);
+	}
+
+	// 画面両端の幕のスプライト描画処理
+	for (auto& curtain : curtainSprite_) {
+		curtain->Draw();
+	}
+
+	// 入力なし　カウントダウン　スプライト 描画
+	for (auto& sprite : spriteNoInputCountDown_) {
+		sprite->Draw();
+	}
 
 	///
 	/// ↑描画処理ここまで
@@ -389,18 +407,29 @@ void GameScene::Draw() {
 	// ゲームシーン上で管理しているステータスのImGui
 	GameSceneStateImGui();
 
+	//////////////////////////////////////////////////////////////////////////////////////
 	ImGui::Begin("Test");
 
-	ImGui::DragFloat2("TestPos0", &testPos_[0].x, 1.0f);
-	ImGui::DragFloat2("TestScale0", &testScale_[0].x, 1.0f);
+	const char* partNames[] = {"1", "2", "3"};
 
-	ImGui::DragFloat2("TestPos1", &testPos_[1].x, 1.0f);
-	ImGui::DragFloat2("TestScale1", &testScale_[1].x, 1.0f);
+	for (int i = 0; i < 3; ++i) {
+		if (ImGui::CollapsingHeader(partNames[i], ImGuiTreeNodeFlags_DefaultOpen)) {
+			ImGui::PushID(i); // 適切なIDスコープを設定
 
-	ImGui::DragFloat2("TestPos2", &testPos_[2].x, 1.0f);
-	ImGui::DragFloat2("TestScale2", &testScale_[2].x, 1.0f);
+			ImGui::Text("Position");
+			ImGui::DragFloat3("ModelPos", &testPos_[i].x, 0.1f);
+
+			ImGui::Text("Scale");
+			ImGui::DragFloat3("ModelScale", &testScale_[i].x, 0.1f);
+
+			ImGui::Separator(); // 区切り線で視認性アップ
+
+			ImGui::PopID();
+		}
+	}
 
 	ImGui::End();
+	//////////////////////////////////////////////////////////////////////////////////////
 
 	///
 	/// ↑ImGuiここまで
@@ -440,31 +469,6 @@ void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				auto block = std::make_unique<Block>();
 				block->Initialize(&ctx_->dxCommon);
 				block->Spawn({static_cast<float>(x) * mag - 5.1f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				blocks_.push_back(std::move(block));
-			}
-		}
-	}
-}
-
-void GameScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
-	for (int y = 0; y < map_->GetRowCount2(); ++y) {
-		for (int x = 0; x < map_->GetColumnCount2(); ++x) {
-			int tile = map_->GetMapData2(y, x);
-
-			// タイルごとの描画処理
-			if (static_cast<TileType>(tile) == TileType::THORN) {
-				// トゲの描画処理
-				auto thorn = std::make_unique<Thorn>();
-				thorn->Initialize(&ctx_->dxCommon);
-				thorn->Spawn({static_cast<float>(x) * mag - 5.5f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				thorns_.push_back(std::move(thorn));
-			}
-
-			if (static_cast<TileType>(tile) == TileType::BLOCK) {
-				// トゲの描画処理
-				auto block = std::make_unique<Block>();
-				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 5.5f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				blocks_.push_back(std::move(block));
 			}
 		}
@@ -617,10 +621,31 @@ void GameScene::SpriteScoreUpdate() {
 		digits[digits.size() - 1 - i] = displayScore % 10;
 		displayScore /= 10;
 	}
+	
+	// 先頭を探索
+	int firstNonZeroIndex = 0;
+	while (firstNonZeroIndex < digits.size() - 1 && digits[firstNonZeroIndex] == 0) {
+		++firstNonZeroIndex;
+	}
 
+	int visibleDigits = digits.size() - firstNonZeroIndex;
+	float digitWidth = 32.0f;
+	float totalWidth = digitWidth * visibleDigits;
+	float startX = 100.0f + ((digitWidth * digits.size()) - totalWidth) / 2.0f;
+
+	// 先頭のゼロを除く
 	for (int i = 0; i < spriteScore_.size(); ++i) {
-		int digit = digits[i];
-		spriteScore_[i]->SetTexture(spriteNumCollection_[digit]);
+		if (i < firstNonZeroIndex) {
+			spriteScore_[i]->isDraw = false;
+		} else {
+			int digit = digits[i];
+			spriteScore_[i]->sprite.SetTexture(spriteNumCollection_[digit]);
+			spriteScore_[i]->isDraw = true;
+
+			// 中央詰めにする
+			float x = startX + (i - firstNonZeroIndex) * digitWidth;
+			spriteScore_[i]->sprite.SetPosition({x, 400.0f});
+		}
 	}
 }
 

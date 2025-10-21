@@ -7,21 +7,27 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 	// クマのモデル初期化
 	modelBearHead_->Initialize(dxCommon_, "player/Head/Head.obj");
 	modelBearHead_->SetTexture("resources/model/player/Head/Player.png");
+	modelBearHead_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
 
 	modelBearBody_->Initialize(dxCommon_, "player/Body/Body.obj");
 	modelBearBody_->SetTexture("resources/model/player/Body/Player.png");
+	modelBearBody_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
 
 	modelBearArmR_->Initialize(dxCommon_, "player/Arm_R/Arm_R.obj");
 	modelBearArmR_->SetTexture("resources/model/player/Arm_R/Player.png");
+	modelBearArmR_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
 
 	modelBearArmL_->Initialize(dxCommon_, "player/Arm_L/Arm_L.obj");
 	modelBearArmL_->SetTexture("resources/model/player/Arm_L/Player.png");
+	modelBearArmL_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
 
 	modelBearLegR_->Initialize(dxCommon_, "player/Leg_R/Leg_R.obj");
 	modelBearLegR_->SetTexture("resources/model/player/Leg_R/Player.png");
+	modelBearLegR_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
 
 	modelBearLegL_->Initialize(dxCommon_, "player/Leg_L/Leg_L.obj");
 	modelBearLegL_->SetTexture("resources/model/player/Leg_L/Player.png");
+	modelBearLegL_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
 
 	// 根のTransform
 	transform_.scale = {1.5f, 1.5f, 1.5f};
@@ -39,8 +45,8 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 	};
 
 	localTransform_[1] = {
-	    {0.0f, 0.0f, 0.0f},
-	    {0.0f, 0.0f, -0.4f},
+	    {0.0f,     0.0f, 0.0f },
+	    {0.0f,     0.0f, -0.4f},
 	    {offsetX_, 0.2f, 0.4f },
 	};
 
@@ -51,9 +57,9 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 	};
 
 	localTransform_[3] = {
-	    {0.0f,  0.0f, 0.0f},
+	    {0.0f,  0.0f, 0.0f },
 	    {0.0f,  0.0f, -1.2f},
-	    {-0.1f, 0.1f, 0.5f},
+	    {-0.1f, 0.1f, 0.5f },
 	};
 
 	localTransform_[4] = {
@@ -79,6 +85,9 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 
 void Bear::Update() {
 	localTransform_[1].translate = {offsetX_, 0.2f, 0.4f};
+
+	// クマのモデルのアニメーション
+	BearAnimation();
 
 	// 親
 	modelBearBody_->SetTranslate(transform_.translate + localTransform_[1].translate);
@@ -162,4 +171,16 @@ void Bear::ImGuiUpdate() {
 	}
 
 	ImGui::End();
+}
+
+void Bear::BearAnimation() {
+	// 折り返し地点
+	const float kMaxRotateZ = 0.39f;
+
+	localTransform_[1].rotate.z += rotateSpeed_ * deltaTime_;
+
+	// 反転処理
+	if (std::abs(localTransform_[1].rotate.z) >= kMaxRotateZ) {
+		rotateSpeed_ *= -1.0f;
+	}
 }

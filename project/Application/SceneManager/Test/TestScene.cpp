@@ -22,19 +22,8 @@ void TestScene::Initialize() {
 	// 汎用機能
 	gameTimer_.Start(2.0f, true);
 
-	// Clear
-	//thorns_.clear();
-	//blocks_.clear();
-
 	// オブジェクトの配置　上半分
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
-
-	// オブジェクトの配置　下半分
-	SpawnObjectsByMapChip2(1.0f, 0.0f);
-
-	// プレイヤーに他のゲームオブジェクトの情報を渡す
-	//player_->SetThrons(thorns_);
-	//player_->SetBlocks(blocks_);
 }
 
 void TestScene::Update() {
@@ -47,27 +36,8 @@ void TestScene::Update() {
 	// カメラ切り替え&更新
 	CameraController();
 
-	//player_->Update();
-
-	// カメラの座標Yをプレイヤーの座標Yに合わせる
-	//UpdateCameraToPlayer();
-
 	// 汎用機能の更新
 	gameTimer_.Update();
-
-	// トゲの更新処理
-	//for (auto& thorn : thorns_) {
-	//	if (thorn->GetIsAlive()) {
-	//		thorn->Update();
-	//	}
-	//}
-
-	//// ブロックの更新処理
-	//for (auto& block : blocks_) {
-	//	if (block->GetIsAlive()) {
-	//		block->Update();
-	//	}
-	//}
 }
 
 void TestScene::Draw() {
@@ -78,22 +48,6 @@ void TestScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
-
-	//player_->Draw(*useCamera_);
-
-	// トゲの描画処理
-	//for (auto& thorn : thorns_) {
-	//	if (thorn->GetIsAlive()) {
-	//		thorn->Draw(*useCamera_);
-	//	}
-	//}
-
-	//// ブロックの描画処理
-	//for (auto& block : blocks_) {
-	//	if (block->GetIsAlive()) {
-	//		block->Draw(*useCamera_);
-	//	}
-	//}
 
 	///
 	/// ↑描画処理ここまで
@@ -134,31 +88,6 @@ void TestScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 	for (int y = 0; y < map_->GetRowCount(); ++y) {
 		for (int x = 0; x < map_->GetColumnCount(); ++x) {
 			int tile = map_->GetMapData(y, x);
-
-			// タイルごとの描画処理
-			if (static_cast<TileType>(tile) == TileType::THORN) {
-				// トゲの描画処理
-				auto thorn = std::make_unique<Thorn>();
-				thorn->Initialize(&ctx_->dxCommon);
-				thorn->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				//thorns_.push_back(std::move(thorn));
-			}
-
-			if (static_cast<TileType>(tile) == TileType::BLOCK) {
-				// トゲの描画処理
-				auto block = std::make_unique<Block>();
-				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				//blocks_.push_back(std::move(block));
-			}
-		}
-	}
-}
-
-void TestScene::SpawnObjectsByMapChip2(float mag, float mapHeight) {
-	for (int y = 0; y < map_->GetRowCount2(); ++y) {
-		for (int x = 0; x < map_->GetColumnCount2(); ++x) {
-			int tile = map_->GetMapData2(y, x);
 
 			// タイルごとの描画処理
 			if (static_cast<TileType>(tile) == TileType::THORN) {
