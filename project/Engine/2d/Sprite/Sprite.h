@@ -37,11 +37,15 @@ public:
 
 	void SetColor(const Vector4& Color) { materialData_->color = Color; }
 
+	void SetRotate(float rotate) { transform_.rotate.z = rotate; }
+
 	Vector2& GetPosition() { return position_; }
 
 	Vector2& GetSize() { return size_; }
 
 	Vector4& GetColor() { return materialData_->color; }
+
+	float GetRotate() { return transform_.rotate.z; }
 
 	void SetTexture(const std::string& textureName);
 

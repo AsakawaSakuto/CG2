@@ -40,51 +40,40 @@ void TitleScene::Initialize() {
 	titleTimer_.Reset();
 	cursolTimer_.Reset();
 
-	playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png", { 340.0f,445.0f }, { 0.6f,0.6f });
-	playUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	// cloudTimer_の初期化を追加
+	cloudTimer_.Reset();
 
-	optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png",{ 390.0f,565.0f }, { 0.6f,0.6f });
-	optionUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	SE_Volume = tyuVolumeSE_;
+	BGM_Volume = tyuVolumeBGM_;
 
-	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,446.0f }, { 0.3f,0.3f });
-	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
-
-	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBG.png", { 604.0f,340.0f }, { 0.0f,0.0f });
-	optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.8f });
-
-	optionCursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 150.0f,156.0f }, { 0.0f,0.0f });
-	optionCursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-
-	fullScreenUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/fullscreenModeUI.png", { 791.0f,151.0f }, { 0.4f,0.4f });
-	onUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/onUI.png", { 1068.0f,151.0f }, { 0.4f,0.4f });
-	offUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/offUI.png", { 1070.0f,151.0f }, { 0.4f,0.4f });
-	seUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/seUI.png", { 656.0f,237.0f }, { 0.4f,0.4f });
-	bgmUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/bgmUI.png", { 670.0f,323.0f }, { 0.4f,0.4f });
-	daiUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,235.0f }, { 0.4f,0.4f });
-	dai2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,321.0f }, { 0.4f,0.4f });
-	tyuUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,235.0f }, { 0.4f,0.4f });
-	tyu2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,321.0f }, { 0.4f,0.4f });
-	syouUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,236.0f }, { 0.4f,0.4f });
-	syou2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,321.0f }, { 0.4f,0.4f });
-	backUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/backUI.png", { 674.0f,403.0f }, { 0.4f,0.4f });
+	InitSptite();
 
 	startGameSE_->Initialize("resources/sound/startGameSE.mp3");
 	moveCursolSE_->Initialize("resources/sound/moveCursolSE.mp3");
 	decideSE_->Initialize("resources/sound/DecideSE.mp3");
 	titleSceneBGM_->Initialize("resources/sound/titleSceneBGM.mp3");
-	//titleSceneBGM_->PlayAudio(BGM_Volume, true);
+	titleSceneBGM_->PlayAudio(BGM_Volume, true);
 
-	cloud_->Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
-	cloud_->SetTexture("resources/image/0.png");
+	// 雲の初期化
+	for (int i = 0; i < cloud_.size(); i++) {
+		cloud_[i] = make_unique<Model>();	
+		cloud_[i]->Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
+		cloud_[i]->SetTexture("resources/image/0.png");
+		cloudIsActive_[i] = false;
+		cloudTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };  // スケールを大きく
+		cloudTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
+		cloudTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
+	}
 }
 
 void TitleScene::Update() {
 	
 	if (selectMenu_ == PLAY) {
-		if (input_->TriggerKey(DIK_SPACE) && titleTimer_.IsFinished() ) {
+		if (input_->TriggerKey(DIK_SPACE) && titleTimer_.IsFinished() && !pushStart_) {
 			sceneFade_->StartFadeIn(2.0f);
 			titleObject_->PlayerEnd();
 			startGameSE_->PlayAudio(SE_Volume);
+			pushStart_ = true;
 		}
 	}
 
@@ -96,6 +85,7 @@ void TitleScene::Update() {
 		titleSceneBGM_->Reset();
 	}
 
+	CloudUpdate();
 	TitleLogoUpdate();
 	SelectUIUpdate();
 	OptionUIUpdate();
@@ -107,13 +97,12 @@ void TitleScene::Update() {
 	cursolTimer_.Update();
 	optionTimer_.Update();
 	optionCursolTimer_.Update();
+	cloudTimer_.Update();
 
 	sceneFade_->Update();
 
 	titleLogo_->Update();
 	titleObject_->Update();
-
-	cloud_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -131,9 +120,11 @@ void TitleScene::Draw() {
 	titleLogo_->Draw(*useCamera_);
 	titleObject_->Draw(*useCamera_);
 
-	//cloud_->Draw(*useCamera_);
-
-	sceneFade_->Draw();
+	for (int i = 0; i < cloud_.size(); i++) {
+		//if (cloudIsActive_[i]) {
+			cloud_[i]->Draw(*useCamera_);
+		//}
+	}
 
 	// UIの描画
 	playUI_->Draw();
@@ -141,8 +132,18 @@ void TitleScene::Draw() {
 	cursolUI_->Draw();
 
 	optionBG_->Draw();
+	uiBoxUI_->Draw();
 	optionCursolUI_->Draw();
 	fullScreenUI_->Draw();
+
+	OptionBearUI_->Draw();
+
+	parenthesesUI1_->Draw();
+	parenthesesUI2_->Draw();
+	parenthesesUI3_->Draw();
+	parenthesesUI4_->Draw();
+	parenthesesUI5_->Draw();
+	parenthesesUI6_->Draw();
 
 	if (!ctx_->winApp.IsFullscreen()) {
 		offUI_->Draw();
@@ -181,6 +182,8 @@ void TitleScene::Draw() {
 
 	backUI_->Draw();
 
+	sceneFade_->Draw();
+
 	///
 	/// ↑描画処理ここまで
 	///
@@ -197,6 +200,16 @@ void TitleScene::Draw() {
 	DrawSceneName();
 
 	//titleLogo_->DrawImGui();
+
+	//OptionBearUI_->DrawImGui("bear");
+	uiBoxUI_->DrawImGui("uiBox");
+
+	/*parenthesesUI1_->DrawImGui("pare1");
+	parenthesesUI2_->DrawImGui("pare2");
+	parenthesesUI3_->DrawImGui("pare3");
+	parenthesesUI4_->DrawImGui("pare4");
+	parenthesesUI5_->DrawImGui("pare5");
+	parenthesesUI6_->DrawImGui("pare6");*/
 
 	debugCamera_->DrawImgui();
 
@@ -252,6 +265,7 @@ void TitleScene::TitleLogoUpdate() {
 	// TitleLogoの演出が終了し、まだタイマーが開始されていない場合のみ開始
 	if (titleLogo_->IsEnd() && !titleTimer_.IsActive() && !titleTimer_.IsFinished()) {
 		titleTimer_.Start(1.0f, false);
+		cloudTimer_.Start(1.0f, false);
 		titleObject_->PlayerStart();
 	}
 	// UIの透明度制御を修正
@@ -589,6 +603,12 @@ void TitleScene::OptionUIUpdate() {
 
 			optionCursolUIScale_.x = Easing::Lerp(0.0f, 0.2f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
 			optionCursolUIScale_.y = Easing::Lerp(0.0f, 0.2f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
+
+			parenthesesUIScale_.x = Easing::Lerp(0.0f, 0.25f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
+			parenthesesUIScale_.y = Easing::Lerp(0.0f, 0.25f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
+
+			OptionBearUI_->SetScale({ Easing::Lerp(0.0f, 0.6f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) ,Easing::Lerp(0.0f, 0.6f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) });
+			uiBoxUI_->SetScale({ Easing::Lerp(0.0f, 0.85f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) ,Easing::Lerp(0.0f, 0.75f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) });
 		} else {
 			optionBGScale_.x = Easing::Lerp(65.0f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
 			optionBGScale_.y = Easing::Lerp(35.0f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
@@ -598,6 +618,12 @@ void TitleScene::OptionUIUpdate() {
 
 			optionCursolUIScale_.x = Easing::Lerp(0.2f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
 			optionCursolUIScale_.y = Easing::Lerp(0.2f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
+
+			parenthesesUIScale_.x = Easing::Lerp(0.25f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
+			parenthesesUIScale_.y = Easing::Lerp(0.25f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
+
+			OptionBearUI_->SetScale({ Easing::Lerp(0.6f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack) ,Easing::Lerp(0.6f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack) });
+			uiBoxUI_->SetScale({ Easing::Lerp(0.85f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack) ,Easing::Lerp(0.75f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack) });
 		}
 	} else {
 		// タイマーが非アクティブな場合の適切なスケール設定
@@ -606,11 +632,17 @@ void TitleScene::OptionUIUpdate() {
 			optionBGScale_ = { 65.0f, 35.0f };
 			normalUIScale_ = { 0.4f,0.4f };
 			optionCursolUIScale_ = { 0.2f,0.2f };
+			parenthesesUIScale_ = { 0.25f,0.25f };
+			OptionBearUI_->SetScale({ 0.6f,0.6f });
+			uiBoxUI_->SetScale({ 0.85f,0.75f });
 		} else {
 			// クローズ状態で完了：0サイズに設定
 			optionBGScale_ = { 0.0f, 0.0f };
 			normalUIScale_ = { 0.0f, 0.0f }; 
 			optionCursolUIScale_ = { 0.0f,0.0f };
+			parenthesesUIScale_ = { 0.0f,0.0f };
+			OptionBearUI_->SetScale({ 0.0f,0.0f });
+			uiBoxUI_->SetScale({ 0.0f,0.0f });
 		}
 	}
 
@@ -628,6 +660,54 @@ void TitleScene::OptionUIUpdate() {
 	syou2UI_->SetScale(normalUIScale_);
 	backUI_->SetScale(normalUIScale_);
 	optionCursolUI_->SetScale(optionCursolUIScale_);
+
+	parenthesesUI1_->SetScale(parenthesesUIScale_);
+	parenthesesUI2_->SetScale(parenthesesUIScale_);
+	parenthesesUI3_->SetScale(parenthesesUIScale_);
+	parenthesesUI4_->SetScale(parenthesesUIScale_);
+	parenthesesUI5_->SetScale(parenthesesUIScale_);
+	parenthesesUI6_->SetScale(parenthesesUIScale_);
+}
+
+void TitleScene::CloudUpdate() {
+
+	// 雲の生成処理を修正
+	if (cloudTimer_.IsFinished()) {
+		// 雲生成処理
+		for (int i = 0; i < cloud_.size(); i++) {
+			if (!cloudIsActive_[i]) {
+				cloudIsActive_[i] = true;
+				// X座標をランダムに設定
+				cloudTramsform_[i].translate.x = random_.Float(-10.0f, 10.0f);
+				// Y座標を画面上部に設定
+				cloudTramsform_[i].translate.y = 7.5f;
+				// Z座標をランダムに設定（奥行き）
+				cloudTramsform_[i].translate.z = random_.Float(-3.0f, 10.0f);
+				break;
+			}
+		}
+		// 次の雲生成のためにタイマーを再開始
+		cloudTimer_.Start(1.0f, false);  // 間隔を少し長くして確認しやすくする
+	}
+
+	// 雲の更新処理
+	for (int i = 0; i < cloud_.size(); i++) {
+		if (cloudIsActive_[i]) {
+			// 雲を下に移動
+			cloudTramsform_[i].translate.y -= 2.0f * deltaTime_;
+			//cloudTramsform_[i].translate.x -= 3.0f * deltaTime_;
+
+			// 画面下部まで来たら非アクティブにする
+			if (cloudTramsform_[i].translate.y < -7.0f) {
+				cloudIsActive_[i] = false;
+			}
+		}
+		// 雲の色と透明度を設定
+		cloud_[i]->SetColor({ 1.0f, 1.0f, 1.0f, 0.5f });
+		cloud_[i]->SetTransform(cloudTramsform_[i]);
+		cloud_[i]->Update();
+	}
+
 }
 
 void TitleScene::SpriteUpdate() {
@@ -636,6 +716,7 @@ void TitleScene::SpriteUpdate() {
 	cursolUI_->Update();
 
 	optionBG_->Update();
+	uiBoxUI_->Update();
 	optionCursolUI_->Update();
 	fullScreenUI_->Update();
 	onUI_->Update();
@@ -649,6 +730,18 @@ void TitleScene::SpriteUpdate() {
 	syouUI_->Update();
 	syou2UI_->Update();
 	backUI_->Update();
+
+	parenthesesUI1_->Update();
+	parenthesesUI2_->Update();
+	parenthesesUI3_->Update();
+	parenthesesUI4_->Update();
+	parenthesesUI5_->Update();
+	parenthesesUI6_->Update();
+
+	float bearRotate = OptionBearUI_->GetRotate();
+	bearRotate += 1.0f * deltaTime_;
+	OptionBearUI_->SetRotate(bearRotate);
+	OptionBearUI_->Update();
 }
 
 void TitleScene::AudioUpdate() {
@@ -661,4 +754,46 @@ void TitleScene::AudioUpdate() {
 	moveCursolSE_->Update();
 	decideSE_->Update();
 	titleSceneBGM_->Update();
+}
+
+void TitleScene::InitSptite() {
+	playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png", { 340.0f,445.0f }, { 0.6f,0.6f });
+	playUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+
+	optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png", { 390.0f,565.0f }, { 0.6f,0.6f });
+	optionUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+
+	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,446.0f }, { 0.3f,0.3f });
+	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+
+	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBG.png", { 604.0f,340.0f }, { 0.0f,0.0f });
+	optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.85f });
+
+	optionCursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 150.0f,156.0f }, { 0.0f,0.0f });
+	optionCursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
+	fullScreenUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/fullscreenModeUI.png", { 791.0f,151.0f }, { 0.4f,0.4f });
+	onUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/onUI.png", { 1068.0f,151.0f }, { 0.4f,0.4f });
+	offUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/offUI.png", { 1070.0f,151.0f }, { 0.4f,0.4f });
+	seUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/seUI.png", { 656.0f,237.0f }, { 0.4f,0.4f });
+	bgmUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/bgmUI.png", { 670.0f,323.0f }, { 0.4f,0.4f });
+	daiUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,235.0f }, { 0.4f,0.4f });
+	dai2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,321.0f }, { 0.4f,0.4f });
+	tyuUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,235.0f }, { 0.4f,0.4f });
+	tyu2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,321.0f }, { 0.4f,0.4f });
+	syouUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,236.0f }, { 0.4f,0.4f });
+	syou2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,321.0f }, { 0.4f,0.4f });
+	backUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/backUI.png", { 674.0f,403.0f }, { 0.4f,0.4f });
+	OptionBearUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBearUI.png", { 320.0f,350.0f }, { 0.6f,0.6f });
+	uiBoxUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/uiBoxUI.png", { 860.0f,350.0f }, { 0.0f,0.0f });
+	uiBoxUI_->SetColor({ 0.5f,0.5f,0.5f,0.5f });
+	parenthesesUI1_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,151.0f });
+	parenthesesUI2_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,151.0f });
+	parenthesesUI3_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,234.0f });
+	parenthesesUI4_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,234.0f });
+	parenthesesUI5_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,323.0f });
+	parenthesesUI6_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,323.0f });
+	parenthesesUI2_->SetRotate(3.16f);
+	parenthesesUI4_->SetRotate(3.16f);
+	parenthesesUI6_->SetRotate(3.16f);
 }

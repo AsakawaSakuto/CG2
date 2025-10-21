@@ -38,6 +38,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Ve
 
 	pointLightResource_ = CreateBufferResource(device_.Get(), sizeof(PointLight));
 	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData_));
+	pointLightData_->useLight = 0;
 	pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	pointLightData_->position = { 0.0f,5.0f,0.0f };
 	pointLightData_->intensity = 1.0f;
@@ -46,6 +47,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Ve
 
 	spotLightResource_ = CreateBufferResource(device_.Get(), sizeof(SpotLight));
 	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
+	spotLightData_->useLight = 0;
 	spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	spotLightData_->position = { 2.0f,1.25f,0.0f };
 	spotLightData_->distance = 7.0f;
@@ -240,6 +242,7 @@ void Sprite::CreateDirectionalLightResource() {
 	//
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	// 初期化（資料に基づく）
+	directionalLightData_->useLight = 0;
 	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
 	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
 	directionalLightData_->intensity = 1.0f;                        // 光の強さ

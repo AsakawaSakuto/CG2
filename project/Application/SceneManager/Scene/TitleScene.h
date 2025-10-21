@@ -41,6 +41,9 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
+	void InitSptite();
+
+	void CloudUpdate();
 	void TitleLogoUpdate();
 	void SelectUIUpdate();
 	void OptionUIUpdate();
@@ -55,12 +58,17 @@ private:
 	unique_ptr<DebugCamera> debugCamera_ = make_unique<DebugCamera>(); // デバッグカメラ
 	bool useDebugCamera_ = true;                                       // デバッグカメラ使用フラグ
 
+	bool pushStart_ = false;
+
 	void CameraController();     
 
 	unique_ptr<Text3D> titleLogo_ = make_unique<Text3D>();
 	unique_ptr<TitleObject> titleObject_ = make_unique<TitleObject>();
 
-	unique_ptr<Model> cloud_ = make_unique<Model>();
+	std::array<unique_ptr<Model>,10> cloud_;
+	std::array<Transform, 10> cloudTramsform_;
+	std::array<bool, 10>cloudIsActive_ = { false };
+	GameTimer cloudTimer_;
 
 	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> optionUI_ = make_unique<Sprite>();
@@ -81,6 +89,15 @@ private:
 	unique_ptr<Sprite> syouUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> syou2UI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> backUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> OptionBearUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> uiBoxUI_ = make_unique<Sprite>();
+
+	unique_ptr<Sprite> parenthesesUI1_ = make_unique<Sprite>();
+	unique_ptr<Sprite> parenthesesUI2_ = make_unique<Sprite>();
+	unique_ptr<Sprite> parenthesesUI3_ = make_unique<Sprite>();
+	unique_ptr<Sprite> parenthesesUI4_ = make_unique<Sprite>();
+	unique_ptr<Sprite> parenthesesUI5_ = make_unique<Sprite>();
+	unique_ptr<Sprite> parenthesesUI6_ = make_unique<Sprite>();
 
 	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> moveCursolSE_ = make_unique<AudioX>();
@@ -97,6 +114,7 @@ private:
 	Vector2 optionBGScale_;
 	Vector2 optionCursolUIScale_;
 	Vector2 normalUIScale_;
+	Vector2 parenthesesUIScale_;
 
 	float optionCursolStart_;
 	float optionCursolEnd_;
@@ -107,12 +125,14 @@ private:
 	float tyuVolumeSE_ = 0.5f;
 	float syouVolumeSE_ = 0.2f;
 
-	float daiVolumeBGM_ = 0.7f;
-	float tyuVolumeBGM_ = 0.3f;
-	float syouVolumeBGM_ = 0.1f;
+	float daiVolumeBGM_ = 0.3f;
+	float tyuVolumeBGM_ = 0.1f;
+	float syouVolumeBGM_ = 0.05f;
 
 	Menu selectMenu_ = Menu::PLAY;
 	OptionMenu selectOptionMenu_ = OptionMenu::NONE;
 	SoundVolume seVolume_ = SoundVolume::TYU;
 	SoundVolume bgmVolume_ = SoundVolume::TYU;
+
+	Random random_;
 };
