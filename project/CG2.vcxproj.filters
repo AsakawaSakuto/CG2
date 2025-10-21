@@ -64,6 +64,7 @@
     <ClCompile Include="Application\GameObject\Player\Bear.cpp" />
     <ClCompile Include="Application\GameObject\TitleObject\TitleObject.cpp" />
     <ClCompile Include="Engine\System\DirectXCommon\ExeColor.cpp" />
+    <ClCompile Include="Engine\System\Audio\MasterVolume.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Application\GameObject\Player\Bear.h" />
     <ClInclude Include="Application\GameObject\TitleObject\TitleObject.h" />
     <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
+    <ClInclude Include="Application\Score\ScoreList.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

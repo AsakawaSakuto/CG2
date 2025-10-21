@@ -170,6 +170,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\System\Audio\Audio.cpp" />
     <ClCompile Include="Engine\System\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\System\Audio\MasterVolume.cpp" />
     <ClCompile Include="Engine\System\DirectXCommon\ExeColor.cpp" />
     <ClCompile Include="Engine\System\GamePad\GamePad.cpp" />
     <ClCompile Include="Engine\System\HeapManager\HeapManager.cpp" />
@@ -236,6 +237,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
     <ClInclude Include="Application\GameObject\BLock\Block.h" />
     <ClInclude Include="Application\GameObject\Player\Bear.h" />
+    <ClInclude Include="Application\Score\ScoreList.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterStateLoder.h" />
     <ClInclude Include="Engine\3d\Particles\ParticleDescriptorAllocator.h" />
