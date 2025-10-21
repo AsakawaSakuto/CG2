@@ -2,6 +2,7 @@
 #include<cassert>
 
 #include "ParticleDescriptorAllocator.h" 
+#include "Engine/System/DirectXCommon/ExeColor.h"
 
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../PSOManager/PSOManager.h"
@@ -333,7 +334,8 @@ void DirectXCommon::PreDraw() {
     // 指定した色で画面全体をクリアする
     // 0.1f, 0.25f, 0.5f, 1.0f
     // 0.0f, 0.0f, 0.0f, 1.0f 
-    float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f }; // 青っぽい色、RGBAの順
+    // 0.627f, 0.847f, 0.937f, 1.0f
+    float clearColor[] = { ExeColor.x, ExeColor.y, ExeColor.z, ExeColor.w }; // 青っぽい色、RGBAの順
     commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
 
     // 描画用のDescriptorHeapの設定 02_03

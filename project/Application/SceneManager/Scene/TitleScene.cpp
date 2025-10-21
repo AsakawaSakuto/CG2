@@ -1,6 +1,8 @@
 #include "TitleScene.h"
 #include "MasterVolume.h"
 
+#include "Engine/System/DirectXCommon/ExeColor.h"
+
 void TitleScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
 TitleScene::~TitleScene() {
@@ -28,6 +30,8 @@ void TitleScene::Initialize() {
 	normalCamera_->SetPosition({0.0f, 0.0f, -15.0f});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
+	useDebugCamera_ = false;
+
 	// Create SceneFade
 	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
@@ -54,6 +58,10 @@ void TitleScene::Initialize() {
 	decideSE_->Initialize("resources/sound/DecideSE.mp3");
 	titleSceneBGM_->Initialize("resources/sound/titleSceneBGM.mp3");
 	titleSceneBGM_->PlayAudio(BGM_Volume, true);
+
+	titleParticle_->Initialize(&ctx_->dxCommon, 2);
+	titleParticle_->LoadJson("candy");
+	titleParticle_->Stop();
 
 	// 雲の初期化
 	for (int i = 0; i < cloud_.size(); i++) {
@@ -117,6 +125,8 @@ void TitleScene::Update() {
 	titleLogo_->Update();
 	titleObject_->Update();
 
+	titleParticle_->Update();
+
 	// カメラ切り替え&更新
 	CameraController();
 }
@@ -132,6 +142,8 @@ void TitleScene::Draw() {
 
 	titleLogo_->Draw(*useCamera_);
 	titleObject_->Draw(*useCamera_);
+
+	titleParticle_->Draw(*useCamera_);
 
 	for (int i = 0; i < cloud_.size(); i++) {
 		//if (cloudIsActive_[i]) {
@@ -221,7 +233,9 @@ void TitleScene::Draw() {
 	//titleLogo_->DrawImGui();
 
 	//OptionBearUI_->DrawImGui("bear");
-	uiBoxUI_->DrawImGui("uiBox");
+	//uiBoxUI_->DrawImGui("uiBox");
+
+	titleParticle_->DrawImGui("titleParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");
@@ -235,6 +249,12 @@ void TitleScene::Draw() {
 	//cloud_->DrawImGui("cloud");
 
 	titleObject_->DrawImGui();
+
+	ImGui::Begin("exe");
+
+	ImGui::ColorEdit4("color", &ExeColor.x);
+
+	ImGui::End();
 
 	//optionCursolUI_->DrawImGui("optionCursol");
 	//optionBG_->DrawImGui("optionBG");
@@ -287,6 +307,7 @@ void TitleScene::TitleLogoUpdate() {
 		cloudTimer_.Start(1.0f, false);
 		cloudLineTimer_.Start(0.5f, false);
 		titleObject_->PlayerStart();
+		titleParticle_->Play();
 	}
 	// UIの透明度制御を修正
 	if (titleTimer_.IsActive()) {
@@ -306,14 +327,14 @@ void TitleScene::SelectUIUpdate() {
 	// メニュー選択処理
 	if (!cursolTimer_.IsActive() && titleTimer_.IsFinished() && selectOptionMenu_ == OptionMenu::NONE) {
 		if (selectMenu_ == PLAY) {
-			if (input_->TriggerKey(DIK_DOWN)) {
+			if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
 				selectMenu_ = OPTION;
 				cursolTimer_.Start(0.25f, false);
 
 				moveCursolSE_->PlayAudio(SE_Volume);
 			}
 		} else if (selectMenu_ == OPTION) {
-			if (input_->TriggerKey(DIK_UP)) {
+			if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
 				selectMenu_ = PLAY;
 				cursolTimer_.Start(0.25f, false);
 
@@ -377,7 +398,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 151.0f });
 		}
 
-		if (!optionTimer_.IsActive() && input_->TriggerKey(DIK_SPACE)) {
+		if (!optionTimer_.IsActive() && input_->TriggerKey(DIK_SPACE) || input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_LEFT)) {
 			if (!ctx_->winApp.IsFullscreen()) {
 				ctx_->winApp.EnterBorderlessFullscreen();
 			} else {
@@ -387,7 +408,7 @@ void TitleScene::OptionUIUpdate() {
 			decideSE_->PlayAudio(SE_Volume);
 		}
 
-		if (input_->TriggerKey(DIK_DOWN)) {
+		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
 			selectOptionMenu_ = OptionMenu::SE;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -406,7 +427,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 237.0f });
 		}
 
-		if (input_->TriggerKey(DIK_UP)) {
+		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
 			selectOptionMenu_ = OptionMenu::FULLSCREEN;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -416,7 +437,7 @@ void TitleScene::OptionUIUpdate() {
 			moveCursolSE_->PlayAudio(SE_Volume);
 		}
 
-		if (input_->TriggerKey(DIK_DOWN)) {
+		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
 			selectOptionMenu_ = OptionMenu::BGM;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -435,13 +456,13 @@ void TitleScene::OptionUIUpdate() {
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
 				seVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
 				seVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -456,13 +477,13 @@ void TitleScene::OptionUIUpdate() {
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
 				seVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
 				seVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -477,13 +498,13 @@ void TitleScene::OptionUIUpdate() {
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
 				seVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
 				seVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -503,7 +524,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 321.0f });
 		}
 
-		if (input_->TriggerKey(DIK_UP)) {
+		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
 			selectOptionMenu_ = OptionMenu::SE;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -513,7 +534,7 @@ void TitleScene::OptionUIUpdate() {
 			moveCursolSE_->PlayAudio(SE_Volume);
 		}
 
-		if (input_->TriggerKey(DIK_DOWN)) {
+		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S)) {
 			selectOptionMenu_ = OptionMenu::BACK;
 			optionCursolTimer_.Start(0.25f, false);
 
@@ -532,13 +553,13 @@ void TitleScene::OptionUIUpdate() {
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
 				bgmVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -553,13 +574,13 @@ void TitleScene::OptionUIUpdate() {
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
 				bgmVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -574,13 +595,13 @@ void TitleScene::OptionUIUpdate() {
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_RIGHT)) {
+			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D)) {
 				bgmVolume_ = SoundVolume::TYU;
 
 				decideSE_->PlayAudio(SE_Volume);
 			}
 
-			if (input_->TriggerKey(DIK_LEFT)) {
+			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A)) {
 				bgmVolume_ = SoundVolume::DAI;
 
 				decideSE_->PlayAudio(SE_Volume);
@@ -600,7 +621,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 402.0f });
 		}
 
-		if (input_->TriggerKey(DIK_UP)) {
+		if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W)) {
 			selectOptionMenu_ = OptionMenu::BGM;
 			optionCursolTimer_.Start(0.25f, false);
 

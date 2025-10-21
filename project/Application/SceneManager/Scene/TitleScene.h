@@ -109,6 +109,8 @@ private:
 	unique_ptr<AudioX> decideSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> titleSceneBGM_ = make_unique<AudioX>();
 
+	unique_ptr<Particles> titleParticle_ = make_unique<Particles>();
+
 	float uiAlpha_ = 0.0f;
 
 	GameTimer titleTimer_;
