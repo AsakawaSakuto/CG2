@@ -211,6 +211,20 @@ void Text3D::Update() {
 	}
 	muniStartTimer_.Update();
 
+	model_[0]->SetColor(okasiColor_);
+	model_[1]->SetColor(okasiColor_);
+	model_[2]->SetColor(okasiColor_);
+	model_[3]->SetColor(atumeteColor_);
+	model_[4]->SetColor(atumeteColor_);
+	model_[5]->SetColor(atumeteColor_);
+	model_[6]->SetColor(atumeteColor_);
+	model_[7]->SetColor(kumaColor_);
+	model_[8]->SetColor(kumaColor_);
+	model_[9]->SetColor(saidaColor_);
+	model_[10]->SetColor(saidaColor_);
+	model_[11]->SetColor(saidaColor_);
+	model_[12]->SetColor(saidaColor_);
+
 	for (int i = 0; i < model_.size(); i++) {
 		model_[i]->SetTransform(transform_[i]);
 		model_[i]->Update();
@@ -227,44 +241,10 @@ void Text3D::DrawImGui(){
 
 	ImGui::Begin("titleLogo");
 
-	for (int i = 0; i < transform_.size(); i++) {
-		std::string label = "Transform " + std::to_string(i);
-		ImGui::DragFloat3(label.c_str(), &transform_[i].translate.x, 0.01f);
-	}
+	ImGui::ColorEdit4("okasi", &okasiColor_.x);
+	ImGui::ColorEdit4("atumete", &atumeteColor_.x);
+	ImGui::ColorEdit4("kuma", &kumaColor_.x);
+	ImGui::ColorEdit4("saida", &saidaColor_.x);
 
 	ImGui::End();
-
-	ImGui::Begin("titleLogo2");
-
-	for (int i = 0; i < transform_.size(); i++) {
-		std::string label = "rotate" + std::to_string(i);
-		ImGui::DragFloat3(label.c_str(), &transform_[i].rotate.x, 0.01f);
-	}
-
-	ImGui::End();
-
-	ImGui::Begin("titleLogo3");
-
-	for (int i = 0; i < transform_.size(); i++) {
-		std::string label = "scale" + std::to_string(i);
-		ImGui::DragFloat3(label.c_str(), &transform_[i].scale.x, 0.01f);
-	}
-
-	ImGui::End();
-
-	// Debug window for timers
-	ImGui::Begin("Timer Debug");
-	
-	ImGui::Text("Main Timer 12 Finished: %s", timer_[12].IsFinished() ? "true" : "false");
-	ImGui::Text("Muni Start Timer Active: %s", muniStartTimer_.IsActive() ? "true" : "false");
-	ImGui::Text("Muni Start Timer Finished: %s", muniStartTimer_.IsFinished() ? "true" : "false");
-	
-	for (int i = 0; i < muniTimer_.size(); i++) {
-		ImGui::Text("MuniTimer[%d] Active: %s, Progress: %.3f", i, 
-			muniTimer_[i].IsActive() ? "true" : "false", 
-			muniTimer_[i].GetProgress());
-	}
-	
-	ImGui::End();
-
 }
