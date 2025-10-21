@@ -6,6 +6,7 @@
 #include "PlayerWing.h"
 #include "State/BulletState.h"
 #include "Bear.h"
+#include "Application/Score/ScoreList.h"
 
 class Thorn;
 class Block;
@@ -35,7 +36,7 @@ public:
 	void DrawImgui();
 
 	// ImGui自動生成関数
-	void DrawImGuiForJson(nlohmann::json& json);
+	void DrawImGuiForJson(nlohmann::json& json, float changeFloat);
 
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
@@ -110,10 +111,7 @@ private:
 	void WingStateUpdate();
 
 	// スコア加算
-	void AddScore(int score);
-
-	// スコアのImGui
-	void ScoreImGui();
+	void AddScore(float score);
 
 	// トゲのクールダウン更新
 	void TickThornCooldown();
@@ -125,7 +123,7 @@ private:
 	void ResetBulletGauge();
 
 	// プレイヤーとの距離に応じて加算するスコアを変化させる
-	void AddScoreByDistance(std::shared_ptr<Thorn>& thorn, int scoreAmount);
+	void AddScoreByDistance(std::shared_ptr<Thorn>& thorn, float scoreAmount);
 
 	// デバッグ用のベクトル表示
 	void ShowLabeledVector3(const char* label, float* vec);
@@ -157,10 +155,17 @@ private:
 	// プレイヤーの左右移動
 	void UpdatePlayerHorizontalMove();
 
+	// オーディオの更新
+	void AudioUpdate();
+
+	// ImGuiスコア
+	void DrawImGuiJsonStateScore();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
 	BulletState bulletState_;
+	ScoreList scoreList_;
 
 	Input* input_ = nullptr;
 	GamePad* gamePad_ = nullptr;
@@ -242,4 +247,11 @@ private:
 
 	// 弾の数に応じてプレイヤーのスピードを加算するための変数
 	float speedAdd_ = 2.0f;
+
+	// 加算するスコア
+	
+
+	// SE
+	unique_ptr<AudioX> shotSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> playerDamageSE_ = make_unique<AudioX>();
 };

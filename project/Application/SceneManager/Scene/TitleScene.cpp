@@ -53,10 +53,12 @@ void TitleScene::Initialize() {
 
 	InitSptite();
 
-	startGameSE_->Initialize("resources/sound/startGameSE.mp3");
-	moveCursolSE_->Initialize("resources/sound/moveCursolSE.mp3");
-	decideSE_->Initialize("resources/sound/DecideSE.mp3");
-	titleSceneBGM_->Initialize("resources/sound/titleSceneBGM.mp3");
+	pushStart_ = false;
+
+	startGameSE_->Initialize("resources/sound/SE/Title/startGameSE.mp3");
+	moveCursolSE_->Initialize("resources/sound/SE/Title/moveCursolSE.mp3");
+	decideSE_->Initialize("resources/sound/SE/Title/DecideSE.mp3");
+	titleSceneBGM_->Initialize("resources/sound/BGM/TitleBGM.mp3");
 	titleSceneBGM_->PlayAudio(BGM_Volume, true);
 
 	titleParticle_->Initialize(&ctx_->dxCommon, 2);
