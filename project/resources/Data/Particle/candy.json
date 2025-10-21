@@ -10,7 +10,7 @@
     ],
     "coneHeight": 2.0,
     "count": 1,
-    "emit": 0,
+    "emit": 1,
     "endColor": [
         0.47058820724487305,
         0.47058820724487305,
@@ -26,8 +26,8 @@
         0.0,
         0.0
     ],
-    "frequency": 0.5,
-    "frequencyTime": 0.01666666753590107,
+    "frequency": 0.75,
+    "frequencyTime": 0.0,
     "hemisphereAngle": 180.0,
     "isMove": 1,
     "kMaxParticle": 1024,
@@ -111,8 +111,8 @@
     ],
     "startRotateVelocity": 1.5,
     "startScale": [
-        1.0,
-        1.0
+        1.5,
+        1.5
     ],
     "startVelocity": [
         0.0,
