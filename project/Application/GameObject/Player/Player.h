@@ -85,9 +85,6 @@ private:
 	// プレイヤーのImGui
 	void PlayerImGui();
 
-	// 弾のImGui
-	void BulletImGui();
-
 	// 減速
 	void SpeedDown(float speedDpwnStrength);
 
@@ -157,6 +154,9 @@ private:
 	// カメラの追従オンオフ切り替え
 	void UpdateCameraSetChange();
 
+	// プレイヤーの左右移動
+	void UpdatePlayerHorizontalMove();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -195,8 +195,8 @@ private:
 	std::unique_ptr<PlayerWing> playerWing_ = std::make_unique<PlayerWing>();
 
 	// スタートライン、最終ライン
-	const float START_LINE = -100.0f;
-	const float END_LINE = 100.0f;
+	const float START_LINE = -10.0f;
+	const float END_LINE = 200.0f;
 
 	// カメラオフセット
 	const float CAMERA_OFFSET_TOP = 4.0f;
@@ -210,9 +210,9 @@ private:
 	float score_ = 0;
 
 	// 羽関連(スコア)
-	const float kNearThreshold = 2.0f;
-	const int kNearScore = 1000;
-	const int kFarScore = 1;
+	const float kNearThreshold = 1.8f;
+	const int kNearScore = 200;
+	const int kFarScore = 100;
 
 	float dis{};
 
@@ -239,4 +239,7 @@ private:
 
 	// プレイヤーにカメラが追従するかどうかのフラグ
 	bool isCameraSet_ = false;
+
+	// 弾の数に応じてプレイヤーのスピードを加算するための変数
+	float speedAdd_ = 2.0f;
 };

@@ -16,6 +16,9 @@ public:
 	void ImGuiUpdate();
 
 private:
+	void BearAnimation();
+
+private:
 	std::unique_ptr<Model> modelBearHead_ = std::make_unique<Model>();
 	std::unique_ptr<Model> modelBearBody_ = std::make_unique<Model>();
 	std::unique_ptr<Model> modelBearArmR_ = std::make_unique<Model>();
@@ -26,6 +29,9 @@ private:
 	// ローカルTransform
 	Transform localTransform_[6];
 
-	// オフセット
+	// オフセット　自機の反転時にクマのモデルがずれてしまうので対策
 	float offsetX_;
+
+	// クマのモデル回転スピード
+	float rotateSpeed_ = 1.0f;
 };
