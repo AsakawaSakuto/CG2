@@ -8,6 +8,9 @@ public:
 	void Draw(Camera useCamera) override;
 	~PlayerWing() {}
 
+	// Getter
+	Vector3 GetTranslate() { return transform_.translate; }
+
 	// Setter
 	void SetPosition(Vector3 position) { transform_.translate = position; }
 	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }

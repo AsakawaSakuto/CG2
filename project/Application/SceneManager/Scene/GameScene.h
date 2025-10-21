@@ -29,8 +29,6 @@ private:
 	// マップチップに基づいてオブジェクトを配置する
 	void SpawnObjectsByMapChip(float mag, float mapHeight);
 
-	void SpawnObjectsByMapChip2(float mag, float mapHeight);
-
 	// キーボードやパッドから入力があるかどうか調べる
 	void UpdateInput();
 
@@ -61,6 +59,12 @@ private:
 		Waiting, 
 		Falling, 
 		Done 
+	};
+
+	struct SpriteRender
+	{
+		Sprite sprite;
+		bool isDraw;
 	};
 
 private:
@@ -109,8 +113,8 @@ private:
 	// プレイヤーがゴールしたかどうか
 	bool isGoal_ = false;
 
-	Vector2 testPos_[3] = {};
-	Vector2 testScale_[3] = {};
+	Vector3 testPos_[3] = {};
+	Vector3 testScale_[3] = {};
 
 	// プレイヤーから入力があるかどうかでフラグをたてる
 	bool isInput_ = false;
@@ -143,7 +147,7 @@ private:
 	std::array<int, 5> digits = {0};
 
 	// スコア表示スプライト
-	std::array<unique_ptr<Sprite>, 5> spriteScore_;
+	std::array<unique_ptr<SpriteRender>, 5> spriteScore_;
 
 	// 「スタート!」スプライト
 	unique_ptr<Sprite> spriteStart_ = make_unique<Sprite>();
@@ -186,4 +190,11 @@ private:
 
 	// 弾のゲージラムネ
 	unique_ptr<Sprite> spriteChargeUI_ = make_unique<Sprite>();
+
+	// 山のモデル
+	std::array<unique_ptr<Model>, 3> modelMountain_;
+
+	// 一定の時間入力がなかった時に減算されるタイマースプライト
+	std::array<unique_ptr<Sprite>, 2> spriteNoInputCountDown_;
+	
 };

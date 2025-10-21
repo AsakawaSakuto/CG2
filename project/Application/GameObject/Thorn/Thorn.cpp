@@ -5,6 +5,7 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
 	model_->Initialize(dxCommon_, "Enemy/Enemy/Enemy.obj");
+	model_->SetColor({1.0f, 0.2f, 0.6f, 1.0f});
 
 	transform_.scale = {1.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float> / 2.0f, 0.0f};
@@ -19,6 +20,9 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 	collisionSphere_.radius = 0.25f;
 
 	particle_->Initialize(dxCommon_);
+
+	// 回転フラグ
+	isRotate_ = false;
 }
 
 void Thorn::Update() {
@@ -41,6 +45,8 @@ void Thorn::Update() {
 		}
 	}
 
+	// 回転の更新
+	UpdateRotate();
 
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -75,6 +81,15 @@ void Thorn::Spawn(Vector3 position) {
 void Thorn::TickCooldown() {
 	if (upgradeCooldownFramesBullet_ > 0) {
 		--upgradeCooldownFramesBullet_;
+	}
+}
+
+void Thorn::UpdateRotate() {
+	if (isRotate_) {
+		transform_.rotate.y += 4.0f * deltaTime_;
+
+		// 1回転したら範囲内に収める
+		transform_.rotate.y = std::clamp(transform_.rotate.y, 0.0f, 2.5f * std::numbers::pi_v<float>);
 	}
 }
 

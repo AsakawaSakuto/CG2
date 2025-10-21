@@ -36,6 +36,7 @@ public:
 	void SetThornType(ThornType type);
 	void SetUpgradeCooldownBullet(int frames) { upgradeCooldownFramesBullet_ = frames; }
 	void SetUpgradeCooldownWing(int frames) { upgradeCooldownFramesWing_ = frames; }
+	void SetIsRotate(bool isRotate) { isRotate_ = isRotate; }
 
 	void PlayParticle(uint32_t num) { particle_->Play(transform_.translate,num); }
 	void UpdateParticle() { particle_->Update(); }
@@ -57,6 +58,9 @@ private:
 	// トゲのレベルアップ
 	void UpgradeThorn();
 
+	// モデルの回転
+	void UpdateRotate();
+
 private:
 	// トゲのタイプ
 	ThornType type_ = ThornType::MIN;
@@ -74,4 +78,7 @@ private:
 	
 	// スケールを変更時にイージングをかけるための変数
 	ScaleTween scaleTween_;
+
+	// 回転のフラグ
+	bool isRotate_;
 };

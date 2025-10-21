@@ -30,19 +30,9 @@ public:
 	// 列数を取得
 	int GetColumnCount() const { return mapData1_.empty() ? 0 : static_cast<int>(mapData1_[0].size()); }
 
-	// タイルタイプ取得
-	int GetMapData2(int row, int col) const;
-
-	// 行数を取得
-	int GetRowCount2() const { return static_cast<int>(mapData2_.size()); }
-
-	// 列数を取得
-	int GetColumnCount2() const { return mapData2_.empty() ? 0 : static_cast<int>(mapData2_[0].size()); }
-
 private:
 	// マップデータ
 	std::vector<std::vector<int>> mapData1_;
-	std::vector<std::vector<int>> mapData2_;
 
 	// マップチップのサイズ
 	const int tileSize_ = 1;

@@ -4,6 +4,7 @@ void Bullet::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 
 	model_->Initialize(dxCommon_, "PlayerBullet/PlayerBullet.obj");
+	model_->SetColor({0.4f, 0.6f, 0.9f, 1.0f});
 
 	transform_.scale = { 1.0f, 1.0f, 1.0f };
 	transform_.rotate = { 0.0f, 0.0f, 0.0f };
