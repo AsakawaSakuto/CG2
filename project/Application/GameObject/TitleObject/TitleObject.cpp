@@ -19,6 +19,10 @@ void TitleObject::Initialize(DirectXCommon* dxCommon) {
 
 	InitTransform();
 
+	for (int i = 0; i < model_.size(); i++) {
+		model_[i]->SetTransform(transform_[i]);
+	}
+
 	ramuneParticle_->Initialize(dxCommon_,2);
 	ramuneParticle_->LoadJson("ramuneTitle");
 }
@@ -72,8 +76,17 @@ void TitleObject::Update() {
 		transform_[10].translate.y = -0.03f + floatOffset;
 	}
 
+	if (playerStart_) {
+		transform_[8].rotate.z = -1.57f;
+	} else {
+		floatTimeZ_ += 1.0f / 120.0f;
+		float floatRz = 0.5f * sinf(2.0f * 3.14159265f * floatTimeZ_) + 1.05f;
+		transform_[8].rotate.z = floatRz;
+	}
+
 	for (int i = 0; i < model_.size(); i++) {
 		model_[i]->SetTransform(transform_[i]);
+		//model_[i]->SetTranslate(transform_[i].translate);
 		model_[i]->Update();
 	}
 
@@ -95,6 +108,12 @@ void TitleObject::Draw(Camera& useCamera) {
 
 void TitleObject::DrawImGui() {
 	ramuneParticle_->DrawImGui("Ramune");
+
+	//model_[1]->DrawImGui("1");
+	//model_[2]->DrawImGui("2");
+	//model_[3]->DrawImGui("3");
+	//model_[4]->DrawImGui("4");
+	//model_[8]->DrawImGui("8");
 }
 
 void TitleObject::InitTransform() {

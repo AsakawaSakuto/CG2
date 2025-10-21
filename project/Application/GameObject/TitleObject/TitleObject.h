@@ -11,7 +11,7 @@ public:
 	void DrawImGui();
 
 	void PlayerStart() { playerInTimer_.Start(1.0f); }
-	void PlayerEnd() { playerOutTimer_.Start(1.0f); ramuneParticle_->SetSpawnCount(30); }
+	void PlayerEnd() { playerOutTimer_.Start(1.0f); ramuneParticle_->SetSpawnCount(30);  playerStart_ = true; }
 	~TitleObject() {}
 private:
 	void InitTransform();
@@ -28,6 +28,9 @@ private:
 
 	// ふわふわアニメーション用
 	float floatTime_ = 0.0f;
+	float floatTimeZ_ = 0.0f;
 	float floatAmplitude_ = -0.3f; // 上下の振幅
 	float floatSpeed_ = 2.0f;      // 浮遊速度
+
+	bool playerStart_ = false;
 };

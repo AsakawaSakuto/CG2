@@ -272,35 +272,4 @@ private:
 
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-
-	// PSO作成に使う設定構造体
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_;
-
-	// 作成済みPSO
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> useGraphicsPipelineState_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateNone_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateNormal_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateAdd_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateSubtract_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateMultily_;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateScreen_;
-
-	// 頂点入力レイアウト情報
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3];
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_;
-
-	// シェーダバイナリ（コンパイル済み）
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
-
-	// 各種ステート設定
-	D3D12_BLEND_DESC blendDescNone_;
-	D3D12_BLEND_DESC blendDescNormal_;
-	D3D12_BLEND_DESC blendDescAdd_;
-	D3D12_BLEND_DESC blendDescSubtract_;
-	D3D12_BLEND_DESC blendDescMultily_;
-	D3D12_BLEND_DESC blendDescScreen_;
-
-	D3D12_RASTERIZER_DESC rasterizerDesc_;       // ラスタライザステート
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_;  // 深度ステンシルステート
 };

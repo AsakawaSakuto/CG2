@@ -262,7 +262,6 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\ResourceData\DirectionalLight.h" />
     <ClInclude Include="Engine\System\DirectXCommon\DirectXCommon.h" />
     <ClInclude Include="Engine\System\Utility\Easing\Easing.h" />
-    <ClInclude Include="Engine\System\Utility\GameTimer\DeltaTime.h" />
     <ClInclude Include="Engine\System\Utility\GameTimer\GameTimer.h" />
     <ClInclude Include="Engine\System\Utility\Math\AABB.h" />
     <ClInclude Include="Engine\System\Utility\Math\Plane.h" />

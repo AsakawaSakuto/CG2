@@ -18,5 +18,7 @@ private:
 	std::array<std::unique_ptr<Model>, 13> model_;
 	std::array<Transform, 13> transform_;
 	std::array<GameTimer, 13> timer_;
-	std::array<GameTimer, 13> rotateTimer_;
+
+	GameTimer muniStartTimer_;
+	std::array<GameTimer, 13> muniTimer_;
 };
