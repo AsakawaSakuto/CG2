@@ -21,4 +21,9 @@ private:
 
 	GameTimer muniStartTimer_;
 	std::array<GameTimer, 13> muniTimer_;
+
+	Vector4 okasiColor_ = { 1.000f, 0.482f, 0.953f, 1.000f };
+	Vector4 atumeteColor_ = { 0.706f, 1.000f, 0.471f, 1.000f };
+	Vector4 kumaColor_ = { 1.000f, 0.678f, 0.451f, 1.000f };
+	Vector4 saidaColor_ = { 0.475f, 1.000f, 0.969f, 1.000f };
 };
