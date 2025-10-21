@@ -710,8 +710,8 @@ void Player::UpdatePlayerHorizontalMove() {
 	if (!isCameraSet_)
 		return;
 
-	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->DPAD_LEFT) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
-	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->DPAD_RIGHT) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
+	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->LEFT_BOTTON) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
+	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
 
 	const float accelerationFactor = 2.5f; // 反対方向への加速用の定数
 	const float attenuationFactor = 2.0f;  // 減速倍率
