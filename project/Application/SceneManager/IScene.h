@@ -42,4 +42,5 @@ public:
     virtual void Draw() = 0;
     virtual ~IScene() {}
     int GetSceneNo();
+    void Quit();
 };
