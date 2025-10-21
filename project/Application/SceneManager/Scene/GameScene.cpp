@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "Application/GameObject/State/JsonState.h"
 #include "Application/SceneManager/SceneManager.h"
+#include "Engine/System/Audio/MasterVolume.h"
 
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
@@ -103,9 +104,9 @@ void GameScene::Initialize() {
 	spriteStart_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
 
 	// ルール説明用のスプライト
-	spriteRule_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+	spriteRule_->Initialize(&ctx_->dxCommon, "resources/image/UI/GameRuleUI.png");
 	spriteRule_->SetPosition({640.0f, -100.0f});
-	spriteRule_->SetScale({20, 4});
+	spriteRule_->SetScale({1, 1});
 
 	// ゲーム終了時に表示するスプライト
 	spriteGameEnd_->Initialize(&ctx_->dxCommon, "resources/image/UI/FinishUI.png");
@@ -170,6 +171,22 @@ void GameScene::Initialize() {
 		spriteNoInputCountDown_[i]->SetPosition({1200.0f, 32.0f});
 		spriteNoInputCountDown_[i]->SetScale({1, 1});
 	}
+
+	// SE
+	shotSE_->Initialize("resources/sound/SE/Title/startGameSE.mp3");
+
+	// ○○個突破!スプライト
+	spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
+	spriteSnackCountOver_->SetPosition({640.0f, -100.0f});
+	spriteSnackCountOver_->SetScale({0.25f, 0.25f});
+
+	// ○○個突破　スコア数　スプライト
+	for (int i = 0; i < spriteScoreCountOver_.size(); ++i) {
+		spriteScoreCountOver_[i] = make_unique<Sprite>();
+		spriteScoreCountOver_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
+		spriteScoreCountOver_[i]->SetPosition({100.0f + i * 32.0f, -100.0f});
+		spriteScoreCountOver_[i]->SetScale({32.0f * deltaTime_, 32.0f * deltaTime_});
+	}
 }
 
 void GameScene::Update() {
@@ -203,6 +220,9 @@ void GameScene::Update() {
 		sceneFade_->StartFadeIn(2.0f);
 		goSceneNum_ = SCENE::RESULT;
 		isActiveEndText_ = true; // 終了テキスト表示フラグオン
+
+		// SEの解放
+		shotSE_->Reset();
 	}
 
 	// 終了テキストの更新
@@ -275,6 +295,9 @@ void GameScene::Update() {
 	// ルール説明用のスプライト更新
 	spriteRule_->Update();
 
+	// ○○個突破!スプライト更新
+	spriteSnackCountOver_->Update();
+
 	// 進行度ゲージ更新
 	UpdateProgressSprite();
 
@@ -303,6 +326,24 @@ void GameScene::Update() {
 	for (auto& sprite : spriteNoInputCountDown_) {
 		sprite->Update();
 	}
+
+	// オーディオ更新
+	AudioUpdate();
+
+	float currentScore = player_->GetScore();
+
+	// 1000の倍数を突破したかチェック
+	int lastThreshold = static_cast<int>(lastScoreChecked_ / 1000.0f);
+	int currentThreshold = static_cast<int>(currentScore / 1000.0f);
+
+	if (currentThreshold > lastThreshold) {
+		StartSnackOverAnimation(); // アニメーション開始
+	}
+
+	lastScoreChecked_ = currentScore;
+
+	// アニメーション関数
+	AnimationSpriteSnackOver();
 }
 
 void GameScene::Draw() {
@@ -314,11 +355,6 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	// カウントダウン用のスプライト描画
-	if (gameStartTimer_ >= 1 && gameStartTimer_ < 4.0f && player_->GetIsCameraSet()) {
-		spriteNumber_->Draw();
-	}
-
 	// プレイヤーの描画処理
 	player_->Draw(*useCamera_);
 
@@ -328,6 +364,19 @@ void GameScene::Draw() {
 			thorn->Draw(*useCamera_);
 		}
 		thorn->DrawParticle(*useCamera_);
+	}
+
+	// ラムネゲージ
+	// spriteChargeUI_->Draw();
+
+	// 山のモデル描画
+	for (auto& model : modelMountain_) {
+		model->Draw(*useCamera_);
+	}
+
+	// 画面両端の幕のスプライト描画処理
+	for (auto& curtain : curtainSprite_) {
+		curtain->Draw();
 	}
 
 	// ゲージ用のスプライト(背景)の描画処理
@@ -350,40 +399,35 @@ void GameScene::Draw() {
 		}
 	}
 
-	// 「スタート!」スプライトの描画処理
-	if (showStart_) {
-		spriteStart_->Draw();
-	}
-
 	// ルール説明用のスプライト描画
 	spriteRule_->Draw();
+
+	// ○○個突破!スプライト更新
+	spriteSnackCountOver_->Draw();
 
 	// 進行度ゲージスプライト描画
 	spriteProgressLine_->Draw();
 	spriteProgressPlayer_->Draw();
 	spriteProgressGoal_->Draw();
 
-	// ゲーム終了時に表示するスプライト描画
-	if (isActiveEndText_) {
-		spriteGameEnd_->Draw();
-	}
-
-	// ラムネゲージ
-	// spriteChargeUI_->Draw();
-
-	// 山のモデル描画
-	for (auto& model : modelMountain_) {
-		model->Draw(*useCamera_);
-	}
-
-	// 画面両端の幕のスプライト描画処理
-	for (auto& curtain : curtainSprite_) {
-		curtain->Draw();
-	}
-
 	// 入力なし　カウントダウン　スプライト 描画
 	for (auto& sprite : spriteNoInputCountDown_) {
 		sprite->Draw();
+	}
+
+	// カウントダウン用のスプライト描画
+	if (gameStartTimer_ >= 1 && gameStartTimer_ < 4.0f && player_->GetIsCameraSet()) {
+		spriteNumber_->Draw();
+	}
+
+	// 「スタート!」スプライトの描画処理
+	if (showStart_) {
+		spriteStart_->Draw();
+	}
+
+	// ゲーム終了時に表示するスプライト描画
+	if (isActiveEndText_) {
+		spriteGameEnd_->Draw();
 	}
 
 	///
@@ -511,7 +555,7 @@ void GameScene::GameSceneStateImGui() {
 	nlohmann::json jsonState = gameSceneState_;
 
 	// JsonNo中身をImGuiで表示する
-	player_->DrawImGuiForJson(jsonState);
+	player_->DrawImGuiForJson(jsonState, 0.01f);
 
 	gameSceneState_ = jsonState.get<GameSceneState>();
 
@@ -617,6 +661,9 @@ void GameScene::CameraController() {
 void GameScene::SpriteScoreUpdate() {
 	int displayScore = static_cast<int>(player_->GetScore());
 
+	if (displayScore < 0.0f)
+		return;
+
 	for (int i = 0; i < digits.size(); ++i) {
 		digits[digits.size() - 1 - i] = displayScore % 10;
 		displayScore /= 10;
@@ -628,7 +675,7 @@ void GameScene::SpriteScoreUpdate() {
 		++firstNonZeroIndex;
 	}
 
-	int visibleDigits = digits.size() - firstNonZeroIndex;
+	int visibleDigits = static_cast<int>(digits.size()) - firstNonZeroIndex;
 	float digitWidth = 32.0f;
 	float totalWidth = digitWidth * visibleDigits;
 	float startX = 100.0f + ((digitWidth * digits.size()) - totalWidth) / 2.0f;
@@ -739,4 +786,67 @@ void GameScene::UpdateEndText() {
 	} else {
 		spriteGameEnd_->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
 	}
+}
+
+void GameScene::AudioUpdate() {
+	shotSE_->SetVolume(SE_Volume);
+
+	shotSE_->Update();
+}
+
+void GameScene::AnimationSpriteSnackOver() { 
+	timerSnackCountOver_ += deltaTime_;
+
+	switch (snackCountOverAnimationState_) {
+	case RuleAnimState::Rising: {
+		float t = std::clamp(timerSnackCountOver_ / ruleDuration_, 0.0f, 1.0f);
+		float eased = Easing::Apply(t, Easing::Type::EaseOutCubic);
+		float posY = std::lerp(ruleStartPosY_, ruleEndPosY_, eased);
+		spriteSnackCountOver_->SetPosition({640.0f, posY});
+
+		if (t >= 1.0f) {
+			// 到達したら待機へ移行
+			snackCountOverAnimationState_ = RuleAnimState::Waiting;
+			timerSnackCountOver_ = 0.0f;
+		}
+		break;
+	}
+	case RuleAnimState::Waiting: {
+		// そのまま指定秒だけ待つ
+		if (timerSnackCountOver_ >= ruleWaitDuration_) {
+			snackCountOverAnimationState_ = RuleAnimState::Falling;
+			timerSnackCountOver_ = 0.0f;
+		}
+		// 待機中は位置を終了位置に固定
+		spriteSnackCountOver_->SetPosition({640.0f, ruleEndPosY_});
+		break;
+	}
+	case RuleAnimState::Falling: {
+		float t = std::clamp(timerSnackCountOver_ / ruleDuration_, 0.0f, 1.0f);
+		float eased = Easing::Apply(t, Easing::Type::EaseInCubic);
+		float posY = std::lerp(ruleEndPosY_, ruleStartPosY_, eased);
+		spriteSnackCountOver_->SetPosition({640.0f, posY});
+
+		if (t >= 1.0f) {
+			// 終了処理
+			if (ruleLoop_) {
+				snackCountOverAnimationState_ = RuleAnimState::Rising;
+			} else {
+				snackCountOverAnimationState_ = RuleAnimState::Done;
+			}
+			timerSnackCountOver_ = 0.0f;
+		}
+		break;
+	}
+	case RuleAnimState::Done: {
+		// 完了後は位置を開始位置に固定
+		spriteSnackCountOver_->SetPosition({640.0f, ruleStartPosY_});
+		break;
+	}
+	}
+}
+
+void GameScene::StartSnackOverAnimation() {
+	snackCountOverAnimationState_ = RuleAnimState::Rising;
+	timerSnackCountOver_ = 0.0f;
 }

@@ -1,4 +1,4 @@
 {
     "maxGameStartTimer": 4.0,
-    "maxNoInputTimer": 60.0
+    "maxNoInputTimer": 30.0
 }

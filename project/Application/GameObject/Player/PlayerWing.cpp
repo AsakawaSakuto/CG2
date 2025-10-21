@@ -30,10 +30,10 @@ void PlayerWing::Initialize(DirectXCommon* dxCommon) {
 	modelArmL01_->SetScale({2.0f, 2.0f, 2.0f});
 	modelArmL02_->SetScale({2.0f, 2.0f, 2.0f});
 
-	modelArmR01_->SetColor({0.9f, 0.6f, 0.4f, 1.0f});
-	modelArmR02_->SetColor({0.9f, 0.6f, 0.4f, 1.0f});
-	modelArmL01_->SetColor({0.9f, 0.6f, 0.4f, 1.0f}); 
-	modelArmL02_->SetColor({0.9f, 0.6f, 0.4f, 1.0f});
+	modelArmR01_->SetColor({0.6f, 0.6f, 0.4f, 1.0f});
+	modelArmR02_->SetColor({0.6f, 0.6f, 0.4f, 1.0f});
+	modelArmL01_->SetColor({0.6f, 0.6f, 0.4f, 1.0f}); 
+	modelArmL02_->SetColor({0.6f, 0.6f, 0.4f, 1.0f});
 
 	// 当たり判定更新(AABB)
 	CollisionUpdate();

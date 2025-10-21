@@ -53,6 +53,15 @@ private:
 	// 終了テキストの更新
 	void UpdateEndText();
 
+	// オーディオの更新
+	void AudioUpdate();
+
+	// ○○個突破!アニメーション
+	void AnimationSpriteSnackOver();
+
+	// アニメーション開始関数
+	void StartSnackOverAnimation();
+
 private:
 	enum class RuleAnimState { 
 		Rising, 
@@ -197,4 +206,21 @@ private:
 	// 一定の時間入力がなかった時に減算されるタイマースプライト
 	std::array<unique_ptr<Sprite>, 2> spriteNoInputCountDown_;
 	
+	// SE
+	unique_ptr<AudioX> shotSE_ = make_unique<AudioX>();
+
+	// ○○個突破 スプライト
+	unique_ptr<Sprite> spriteSnackCountOver_ = make_unique<Sprite>();
+
+	// 前回チェックしたスコア
+	float lastScoreChecked_ = 0.0f;
+
+	// アニメーションの状態
+	RuleAnimState snackCountOverAnimationState_ = RuleAnimState::Done ;
+
+	// アニメーション用タイマー
+	float timerSnackCountOver_ = 0.0f;
+
+	// ○○個突破 スコア数
+	std::array<unique_ptr<Sprite>, 4> spriteScoreCountOver_;
 };

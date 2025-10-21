@@ -5,6 +5,7 @@
 #include <numbers>
 
 #include "Application/GameObject/State/JsonState.h"
+#include "Engine/System/Audio/MasterVolume.h"
 
 void Player::Initialize(DirectXCommon* dxCommon) {
 
@@ -17,6 +18,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// JSONからステータスを読み込み
 	playerState_ = JsonState::Load<PlayerState>("Resources/Data/playerState.json");
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
+	scoreList_ = JsonState::Load<ScoreList>("resources/Data/scoreList.json");
 
 	transform_.scale = {2.0f, 2.0f, 2.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
@@ -55,6 +57,10 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// カメラ追従フラグ
 	isCameraSet_ = false;
+
+	// SE
+	shotSE_->Initialize("resources/sound/SE/InGame/ShotSE.mp3");
+	playerDamageSE_->Initialize("resources/sound/SE/InGame/PlayerDamageSE.mp3");
 }
 
 void Player::Update() {
@@ -148,6 +154,9 @@ void Player::Update() {
 	// クマ
 	bear_->SetTranslate(transform_.translate);
 	bear_->Update();
+
+	// オーディオの更新
+	AudioUpdate();
 }
 
 void Player::Draw(Camera useCamera) {
@@ -174,9 +183,6 @@ void Player::DrawImgui() {
 	// プレイヤーのImGui
 	PlayerImGui();
 
-	// スコアのImgui
-	ScoreImGui();
-
 	// プレイヤーのステータス
 	DrawImGuiJsonStatePlayer();
 
@@ -185,6 +191,9 @@ void Player::DrawImgui() {
 
 	// クマのモデルのImGui
 	bear_->ImGuiUpdate();
+
+	// スコアのImGui
+	DrawImGuiJsonStateScore();
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -220,6 +229,10 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 		// カメラのオフセット変更
 		playerState_.cameraOffset = CAMERA_OFFSET_BOTTOM;
+
+		// SEの解放
+		shotSE_->Reset();
+		playerDamageSE_->Reset();
 	}
 }
 
@@ -310,6 +323,9 @@ void Player::BulletShot() {
 
 		// ショットカウント加算
 		shotCount_++;
+
+		// SEの再生
+		shotSE_->PlayAudio(SE_Volume);
 	}
 }
 
@@ -371,7 +387,7 @@ void Player::DrawImGuiJsonStatePlayer() {
 	nlohmann::json jsonState = playerState_;
 
 	// JsonNo中身をImGuiで表示する
-	DrawImGuiForJson(jsonState);
+	DrawImGuiForJson(jsonState, 0.01f);
 
 	playerState_ = jsonState.get<PlayerState>();
 
@@ -398,6 +414,12 @@ void Player::Stun() {
 
 		// 回転
 		StunRotate();
+
+		// スコア減算
+		AddScore(scoreList_.stunAmount);
+
+		// SE再生
+		playerDamageSE_->PlayAudio(SE_Volume);
 	}
 }
 
@@ -414,7 +436,7 @@ void Player::CollisionThorn() {
 				}
 
 				// スコア加算
-				AddScore(thorn->GetScoreAmount());
+				AddScore(scoreList_.enemyHitAmount);
 
 				// トゲを非アクティブにする
 				thorn->PlayParticle(5);
@@ -475,6 +497,8 @@ void Player::CollisonBulletThorn() {
 			}
 
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
+				// スコア加算
+				AddScore(scoreList_.shotHitAmount);
 				switch (thorn->GetThornType()) {
 				case ThornType::MIN:
 					thorn->SetThornType(ThornType::MIDDLE);
@@ -521,16 +545,7 @@ void Player::WingStateUpdate() {
 	}
 }
 
-void Player::AddScore(int score) { score_ += score; }
-
-void Player::ScoreImGui() {
-	ImGui::Begin("Score");
-
-	ImGui::Text("TotalScore : %f", score_);
-	ImGui::Text("distance : %f", dis);
-
-	ImGui::End();
-}
+void Player::AddScore(float score) { score_ += score; }
 
 void Player::TickThornCooldown() {
 	for (auto& thorn : thorns_) {
@@ -558,13 +573,13 @@ void Player::CollisionWingThorn() {
 			thorn->SetIsRotate(true);
 
 			if (dis < kNearThreshold) {
-				AddScoreByDistance(thorn, kNearScore); // 近距離スコア
+				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
 
 				///////////////// デバッグ用 /////////////////
 				thorn->GetModel()->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 				///////////////// デバッグ用 /////////////////
 			} else {
-				AddScoreByDistance(thorn, kFarScore); // 遠距離スコア
+				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
 
 				///////////////// デバッグ用 /////////////////
 				thorn->GetModel()->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
@@ -580,7 +595,7 @@ void Player::CollisionWingThorn() {
 
 void Player::ResetBulletGauge() { bulletGauge_ = 0; }
 
-void Player::AddScoreByDistance(std::shared_ptr<Thorn>& thorn, int scoreAmount) {
+void Player::AddScoreByDistance(std::shared_ptr<Thorn>& thorn, float scoreAmount) {
 	switch (thorn->GetThornType()) {
 	case ThornType::MIN:
 		AddScore(scoreAmount); // 等倍
@@ -617,11 +632,11 @@ void Player::ShowLabeledVector3(const char* label, float* vec) {
 	ImGui::PopID();
 }
 
-void Player::DrawImGuiForJson(nlohmann::json& json) {
+void Player::DrawImGuiForJson(nlohmann::json& json, float changeFloat) {
 	for (auto& [key, value] : json.items()) {
 		if (value.is_number_float()) {
 			float val = value.get<float>();
-			if (ImGui::DragFloat(key.c_str(), &val, 0.01f))
+			if (ImGui::DragFloat(key.c_str(), &val, changeFloat))
 				value = val;
 		} else if (value.is_number_integer()) {
 			int val = value.get<int>();
@@ -635,7 +650,7 @@ void Player::DrawImGuiForJson(nlohmann::json& json) {
 				value = std::string(buf);
 		} else if (value.is_object()) {
 			if (ImGui::TreeNode(key.c_str())) {
-				DrawImGuiForJson(value);
+				DrawImGuiForJson(value, changeFloat);
 				ImGui::TreePop();
 			}
 		} else if (value.is_boolean()) {
@@ -652,7 +667,7 @@ void Player::DrawImGuiJsonStateBullet() {
 	nlohmann::json jsonState = bulletState_;
 
 	// JsonNo中身をImGuiで表示する
-	DrawImGuiForJson(jsonState);
+	DrawImGuiForJson(jsonState, 0.01f);
 
 	bulletState_ = jsonState.get<BulletState>();
 
@@ -747,4 +762,28 @@ void Player::UpdatePlayerHorizontalMove() {
 
 	// 移動
 	transform_.translate.x += velocity_.x * deltaTime_;
+}
+
+void Player::AudioUpdate() {
+	shotSE_->SetVolume(SE_Volume);
+
+	shotSE_->Update();
+}
+
+void Player::DrawImGuiJsonStateScore() {
+	ImGui::Begin("Score List");
+
+	nlohmann::json jsonState = scoreList_;
+
+	// JsonNo中身をImGuiで表示する
+	DrawImGuiForJson(jsonState, 1.0f);
+
+	scoreList_ = jsonState.get<ScoreList>();
+
+	// --- JSONへ保存ボタン ---
+	if (ImGui::Button("Save JSON")) {
+		JsonState::Save("Resources/Data/scoreList.json", scoreList_);
+	}
+
+	ImGui::End();
 }
