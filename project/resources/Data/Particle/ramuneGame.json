@@ -1,7 +1,7 @@
 {
-    "alphaFade": 0,
-    "colorFade": 0,
-    "colorRandom": 1,
+    "alphaFade": 1,
+    "colorFade": 1,
+    "colorRandom": 0,
     "coneAngle": 45.0,
     "coneDirection": [
         0.0,
@@ -9,30 +9,30 @@
         0.0
     ],
     "coneHeight": 2.0,
-    "count": 1,
-    "emit": 0,
+    "count": 5,
+    "emit": 1,
     "endColor": [
-        0.47058820724487305,
-        0.47058820724487305,
-        0.47058820724487305
+        1.0,
+        1.0,
+        1.0
     ],
-    "endRotateVelocity": -1.5,
+    "endRotateVelocity": 0.0,
     "endScale": [
-        0.5,
-        0.5
+        0.0,
+        0.0
     ],
     "endVelocity": [
         0.0,
         0.0,
         0.0
     ],
-    "frequency": 0.550000011920929,
-    "frequencyTime": 0.4833335280418396,
+    "frequency": 0.009999999776482582,
+    "frequencyTime": 0.0,
     "hemisphereAngle": 180.0,
     "isMove": 1,
     "kMaxParticle": 1024,
-    "lifeTime": 2.0,
-    "lifeTimeRandom": 1,
+    "lifeTime": 0.30000001192092896,
+    "lifeTimeRandom": 0,
     "lineLength": 2.0,
     "lineStart": [
         -1.0,
@@ -44,7 +44,7 @@
         1.0,
         1.0
     ],
-    "maxLifeTime": 3.0,
+    "maxLifeTime": 5.0,
     "maxRotateVelocity": 1.0,
     "maxScale": [
         1.5,
@@ -52,16 +52,16 @@
         1.5
     ],
     "maxVelocity": [
-        1.0,
-        -5.0,
+        0.0,
+        -3.5,
         0.0
     ],
     "minColor": [
-        0.7843137383460999,
-        0.7843137383460999,
-        0.7843137383460999
+        0.0,
+        0.0,
+        0.0
     ],
-    "minLifeTime": 1.5,
+    "minLifeTime": 1.0,
     "minRotateVelocity": -1.0,
     "minScale": [
         0.5,
@@ -69,8 +69,8 @@
         0.5
     ],
     "minVelocity": [
+        0.0,
         -1.0,
-        -5.0,
         0.0
     ],
     "normalVelocity": [
@@ -87,43 +87,43 @@
     "planeWidth": 2.0,
     "radius": 1.0,
     "ringAngle": 0.0,
-    "ringInnerRadius": 0.5,
+    "ringInnerRadius": 0.0,
     "ringNormal": [
         0.0,
         1.0,
         0.0
     ],
-    "ringOuterRadius": 1.0,
-    "rotateMove": 1,
+    "ringOuterRadius": 0.2199999988079071,
+    "rotateMove": 0,
     "rotateVelocityRandom": 0,
-    "scaleFade": 0,
+    "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 4,
+    "shapeType": 6,
     "size": [
-        13.0,
-        0.009999999776482582,
+        1.0,
+        1.0,
         1.0
     ],
     "startColor": [
-        0.47058820724487305,
-        0.47058820724487305,
-        0.47058820724487305
+        0.0,
+        0.7941176891326904,
+        1.0
     ],
-    "startRotateVelocity": 1.5,
+    "startRotateVelocity": 0.0,
     "startScale": [
-        1.1100000143051147,
-        1.1100000143051147
+        0.30000001192092896,
+        0.30000001192092896
     ],
     "startVelocity": [
         0.0,
         0.0,
         0.0
     ],
-    "texturePath": "candy",
+    "texturePath": "circle",
     "translate": [
-        0.0,
-        4.0,
-        3.0
+        1.3208283185958862,
+        265.1448059082031,
+        0.0
     ],
     "useEmitter": 1,
     "velocityRandom": 1

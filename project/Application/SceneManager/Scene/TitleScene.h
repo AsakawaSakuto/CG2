@@ -119,6 +119,7 @@ private:
 	GameTimer cursolTimer_;
 	GameTimer optionTimer_;
 	GameTimer optionCursolTimer_;
+	GameTimer fullScreenTimer_;
 
 	float startCursolY_;
 	float endCursolY_;

@@ -22,11 +22,21 @@ void Text3D::Initialize(DirectXCommon* dxCommon) {
 	model_[11]->Initialize(dxCommon_, "TitleLogo/da.obj");
 	model_[12]->Initialize(dxCommon_, "TitleLogo/-.obj");
 
+	// すべてのタイマーを確実にリセット
+	for (int i = 0; i < timer_.size(); i++) {
+		timer_[i].Reset();
+	}
+	muniStartTimer_.Reset();
+	for (int i = 0; i < muniTimer_.size(); i++) {
+		muniTimer_[i].Reset();
+	}
+
 	// Transform配列を初期化
 	for (int i = 0; i < transform_.size(); i++) {
 		model_[i]->SetTexture("resources/image/0.png");
 		transform_[i].rotate = { 0.0f, 0.0f, 0.0f };
 
+		// タイマーを開始（リセット後に開始）
 		timer_[i].Start(1.5f + (i * 0.15f), false);
 	}
 
