@@ -251,7 +251,7 @@ void TitleScene::Draw() {
 	//OptionBearUI_->DrawImGui("bear");
 	//uiBoxUI_->DrawImGui("uiBox");
 
-	titleParticle_->DrawImGui("titleParticle");
+	//titleParticle_->DrawImGui("titleParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");
