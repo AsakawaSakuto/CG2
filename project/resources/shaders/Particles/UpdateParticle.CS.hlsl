@@ -39,6 +39,9 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
                 }
 
                 gParticles[particleIndex].translate += delta;
+            } else {
+                // エミッタ自体の移動に追従
+                gParticles[particleIndex].translate = gEmitter.translate;
             }
             
             if (gEmitter.rotateMove != 0)

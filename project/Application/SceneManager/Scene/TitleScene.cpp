@@ -129,6 +129,7 @@ void TitleScene::Update() {
 	cursolTimer_.Update();
 	optionTimer_.Update();
 	optionCursolTimer_.Update();
+	fullScreenTimer_.Update();
 
 	cloudTimer_.Update();
 	cloudLineTimer_.Update();
@@ -138,6 +139,7 @@ void TitleScene::Update() {
 	titleLogo_->Update();
 	titleObject_->Update();
 
+	titleParticle_->SetBlendMode(BlendMode::kBlendModeNone);
 	titleParticle_->Update();
 
 	// カメラ切り替え&更新
@@ -249,7 +251,7 @@ void TitleScene::Draw() {
 	//OptionBearUI_->DrawImGui("bear");
 	//uiBoxUI_->DrawImGui("uiBox");
 
-	//titleParticle_->DrawImGui("titleParticle");
+	titleParticle_->DrawImGui("titleParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");
@@ -446,12 +448,14 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 151.0f });
 		}
 
-		if (!optionTimer_.IsActive() && (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) || input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_LEFT) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
+		if (!fullScreenTimer_.IsActive() && !optionTimer_.IsActive() && (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) || input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_LEFT) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 			if (!ctx_->winApp.IsFullscreen()) {
 				ctx_->winApp.EnterBorderlessFullscreen();
 			} else {
 				ctx_->winApp.ExitBorderlessFullscreen();
 			}
+
+			fullScreenTimer_.Start(0.5f, false);
 
 			decideSE_->PlayAudio(SE_Volume);
 		}

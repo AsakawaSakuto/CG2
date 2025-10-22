@@ -17,6 +17,7 @@ public:
     AABB GetCollisionAABB() { return collisionAABB_; }
 	bool GetIsAlive() const { return isAlive_; }
 	void SetIsAlive(bool isAlive) { isAlive_ = isAlive; }
+	Vector3 GetPosition() const { return transform_.translate; }
 protected:
     unique_ptr<Model> model_ = make_unique<Model>();
 	DirectXCommon* dxCommon_ = nullptr;

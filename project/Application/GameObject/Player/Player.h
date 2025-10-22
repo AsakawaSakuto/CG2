@@ -259,6 +259,8 @@ private:
 	std::unique_ptr<Particles> ramuneParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> ramuneWhiteParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> kasokuParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> smorkParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> bulletChargeParticle_ = std::make_unique<Particles>();
 	float ramuneOffsetY_ = -1.0f;
 	float kasokuOffsetY_ = 12.0f;
 };

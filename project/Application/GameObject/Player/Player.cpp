@@ -73,6 +73,13 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	kasokuParticle_->LoadJson("kasoku");
 	kasokuParticle_->Play();
 
+	smorkParticle_->Initialize(dxCommon_);
+	smorkParticle_->LoadJson("enemydie");
+	smorkParticle_->Stop();
+
+	bulletChargeParticle_->Initialize(dxCommon_);
+	bulletChargeParticle_->LoadJson("shotCharge");
+
 	ramuneOffsetY_ = -1.0f;
 }
 
@@ -187,6 +194,8 @@ void Player::Update() {
 			kasokuParticle_->SetSpawnTime(99.0f);
 			kasokuParticle_->SetEmitVelocity({ 0.0f,-10.0f,0.0f });
 		}
+
+		bulletChargeParticle_->SetOffSet({ 0.0f,1.11f,-0.75f });
 	} else if(direction_ == Direction::DOWN) {
 		kasokuOffsetY_ = -12.0f;
 		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
@@ -201,11 +210,18 @@ void Player::Update() {
 			kasokuParticle_->SetSpawnTime(99.0f);
 			kasokuParticle_->SetEmitVelocity({ 0.0f,10.0f,0.0f });
 		}
+
+		bulletChargeParticle_->SetOffSet({ 0.0f,-1.11f,-0.75f });
 	}
 
 	kasokuParticle_->SetOffSet({ 0.0f,kasokuOffsetY_ ,0.0f });
 	kasokuParticle_->SetEmitterPosition(transform_.translate);
 	kasokuParticle_->Update();
+
+	smorkParticle_->Update();
+
+	bulletChargeParticle_->SetEmitterPosition(transform_.translate);
+	bulletChargeParticle_->Update();
 
 	// オーディオの更新
 	AudioUpdate();
@@ -233,6 +249,8 @@ void Player::Draw(Camera useCamera) {
 	ramuneParticle_->Draw(useCamera);
 	ramuneWhiteParticle_->Draw(useCamera);
 	kasokuParticle_->Draw(useCamera);
+	smorkParticle_->Draw(useCamera);
+	bulletChargeParticle_->Draw(useCamera);
 }
 
 void Player::DrawImgui() {
@@ -346,6 +364,8 @@ void Player::BulletCharge() {
 		bulletGauge_++;
 		(*bulletGaugeSprites_)[bulletGauge_ - 1].isActive = true;
 		num_ = 0;
+
+		bulletChargeParticle_->Play(false);
 	}
 }
 
@@ -442,6 +462,8 @@ void Player::PlayerImGui() {
 	//ramuneParticle_->DrawImGui("ramuneP");
 	//ramuneWhiteParticle_->DrawImGui("ramunePW");
 	kasokuParticle_->DrawImGui("kasoku");
+	smorkParticle_->DrawImGui("enemyDie");
+	bulletChargeParticle_->DrawImGui("shot");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -510,6 +532,8 @@ void Player::CollisionThorn() {
 				// トゲを非アクティブにする
 				thorn->PlayParticle(5);
 				thorn->SetIsAlive(false);
+				smorkParticle_->SetEmitterPosition(thorn->GetPosition());
+				smorkParticle_->Play(false);
 
 				break;
 			} else if (direction_ == Direction::UP) {
@@ -647,12 +671,16 @@ void Player::CollisionWingThorn() {
 				///////////////// デバッグ用 /////////////////
 				thorn->GetModel()->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 				///////////////// デバッグ用 /////////////////
+
+				thorn->PlayParticle(3);
 			} else {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
 
 				///////////////// デバッグ用 /////////////////
 				thorn->GetModel()->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 				///////////////// デバッグ用 /////////////////
+
+				thorn->PlayParticle(1);
 			}
 
 			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
