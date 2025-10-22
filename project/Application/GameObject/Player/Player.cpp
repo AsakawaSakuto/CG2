@@ -61,6 +61,19 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// SE
 	shotSE_->Initialize("resources/sound/SE/InGame/ShotSE.mp3");
 	playerDamageSE_->Initialize("resources/sound/SE/InGame/PlayerDamageSE.mp3");
+
+	//
+	ramuneParticle_->Initialize(dxCommon_, 2);
+	ramuneParticle_->LoadJson("ramuneGame");
+
+	ramuneWhiteParticle_->Initialize(dxCommon_, 2);
+	ramuneWhiteParticle_->LoadJson("ramuneWhiteGame");
+
+	kasokuParticle_->Initialize(dxCommon_);
+	kasokuParticle_->LoadJson("kasoku");
+	kasokuParticle_->Play();
+
+	ramuneOffsetY_ = -1.0f;
 }
 
 void Player::Update() {
@@ -68,16 +81,6 @@ void Player::Update() {
 	// 当たり判定用の球の中心を更新
 	collisionSphere_.center = transform_.translate;
 
-	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->LEFT_BOTTON) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
-	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
-
-	if (isLeftMove) {
-		transform_.translate.x -= velocity_.x * deltaTime_;
-	}
-
-	if (isRightMove) {
-		transform_.translate.x += velocity_.x * deltaTime_;
-	}
 	// 左右移動
 	UpdatePlayerHorizontalMove();
 
@@ -155,6 +158,55 @@ void Player::Update() {
 	bear_->SetTranslate(transform_.translate);
 	bear_->Update();
 
+	//
+
+	if (stunTimer_.IsFinished()) {
+		ramuneParticle_->Play();
+		ramuneWhiteParticle_->Play();
+	}
+
+	ramuneParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
+	ramuneParticle_->SetEmitterPosition(transform_.translate);
+	ramuneParticle_->Update();
+
+	ramuneWhiteParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
+	ramuneWhiteParticle_->SetEmitterPosition(transform_.translate);
+	ramuneWhiteParticle_->Update();
+
+	if (direction_ == Direction::UP) {
+		kasokuOffsetY_ = 12.0f;
+		if (       velocity_.y >= 12.0f && velocity_.y <= 14.0f) {
+			kasokuParticle_->SetSpawnTime(0.1f);
+		} else if (velocity_.y >= 14.0f && velocity_.y <= 16.0f) {
+			kasokuParticle_->SetSpawnTime(0.075f);
+		} else if (velocity_.y >= 16.0f && velocity_.y <= 18.0f) {
+			kasokuParticle_->SetSpawnTime(0.05f);
+		} else if (velocity_.y >= 18.0f && velocity_.y <= 20.0f) {
+			kasokuParticle_->SetSpawnTime(0.025f);
+		} else {
+			kasokuParticle_->SetSpawnTime(99.0f);
+			kasokuParticle_->SetEmitVelocity({ 0.0f,-10.0f,0.0f });
+		}
+	} else if(direction_ == Direction::DOWN) {
+		kasokuOffsetY_ = -12.0f;
+		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
+			kasokuParticle_->SetSpawnTime(0.1f);
+		} else if (velocity_.y >= -16.0f && velocity_.y <= -14.0f) {
+			kasokuParticle_->SetSpawnTime(0.075f);
+		} else if (velocity_.y >= -18.0f && velocity_.y <= -16.0f) {
+			kasokuParticle_->SetSpawnTime(0.05f);
+		} else if (velocity_.y >= -20.0f && velocity_.y <= -18.0f) {
+			kasokuParticle_->SetSpawnTime(0.025f);
+		} else {
+			kasokuParticle_->SetSpawnTime(99.0f);
+			kasokuParticle_->SetEmitVelocity({ 0.0f,10.0f,0.0f });
+		}
+	}
+
+	kasokuParticle_->SetOffSet({ 0.0f,kasokuOffsetY_ ,0.0f });
+	kasokuParticle_->SetEmitterPosition(transform_.translate);
+	kasokuParticle_->Update();
+
 	// オーディオの更新
 	AudioUpdate();
 }
@@ -177,6 +229,10 @@ void Player::Draw(Camera useCamera) {
 
 	// クマ
 	bear_->Draw(useCamera);
+
+	ramuneParticle_->Draw(useCamera);
+	ramuneWhiteParticle_->Draw(useCamera);
+	kasokuParticle_->Draw(useCamera);
 }
 
 void Player::DrawImgui() {
@@ -220,6 +276,8 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 		// 反転時の無駄な時間を減らす弾の処理
 		velocity_.y = 2.0f;
+
+		ramuneOffsetY_ = 1.0f;
 	}
 
 	// プレイヤーが最低地点に到達したとき
@@ -379,6 +437,11 @@ void Player::PlayerImGui() {
 	}
 
 	ImGui::End();
+	
+	// パーティクルのImGui
+	//ramuneParticle_->DrawImGui("ramuneP");
+	//ramuneWhiteParticle_->DrawImGui("ramunePW");
+	kasokuParticle_->DrawImGui("kasoku");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -420,10 +483,16 @@ void Player::Stun() {
 
 		// SE再生
 		playerDamageSE_->PlayAudio(SE_Volume);
+
+		// パーティクル停止
+		ramuneParticle_->Stop();
+		ramuneWhiteParticle_->Stop();
 	}
 }
 
-void Player::StunRemoved() { stunTimer_.Update(); }
+void Player::StunRemoved() { 
+	stunTimer_.Update(); 
+}
 
 void Player::CollisionThorn() {
 	for (auto& thorn : thorns_) {

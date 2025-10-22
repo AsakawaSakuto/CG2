@@ -280,6 +280,8 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Separator();
 
 	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
+
+	ImGui::DragFloat3("OffSet", &offset_.x, 0.01f);
 	
 	// Emitter Shape Selection
 	const char* shapeNames[] = { 

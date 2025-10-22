@@ -254,4 +254,11 @@ private:
 	// SE
 	unique_ptr<AudioX> shotSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> playerDamageSE_ = make_unique<AudioX>();
+
+	// ramuneから出るパーティクル
+	std::unique_ptr<Particles> ramuneParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> ramuneWhiteParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> kasokuParticle_ = std::make_unique<Particles>();
+	float ramuneOffsetY_ = -1.0f;
+	float kasokuOffsetY_ = 12.0f;
 };

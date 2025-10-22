@@ -100,6 +100,13 @@ public:
 	/// <param name="count">出すパーティクルの数</param>
 	void SetSpawnCount(uint32_t count) { emitter_.count = count; }
 
+	void SetSpawnTime(float time) { emitter_.frequency = time; }
+
+	void SetEmitVelocity(Vector3 velocity) { 
+		emitter_.minVelocity = velocity;
+		emitter_.maxVelocity = velocity;
+	}
+
 	/// <summary>
 	/// パーティクルの生成開始
 	/// </summary>
@@ -140,7 +147,7 @@ public:
 	void LoadJson(const std::string& filePath) {
 		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
-		
+		loadToSaveName_ = filePath;
 		// JSONから読み込んだテクスチャパスを適用
 		if (!emitter_.texturePath.empty()) {
 			std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";

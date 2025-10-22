@@ -37,7 +37,12 @@ void TitleScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
+	titleLogo_.reset();
+	titleLogo_ = make_unique<Text3D>();
 	titleLogo_->Initialize(&ctx_->dxCommon);
+
+	titleObject_.reset();
+	titleObject_ = make_unique<TitleObject>();
 	titleObject_->Initialize(&ctx_->dxCommon);
 
 	uiAlpha_ = 0.0f;
@@ -237,14 +242,14 @@ void TitleScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	DrawSceneName();
+	//DrawSceneName();
 
 	//titleLogo_->DrawImGui();
 
 	//OptionBearUI_->DrawImGui("bear");
 	//uiBoxUI_->DrawImGui("uiBox");
 
-	titleParticle_->DrawImGui("titleParticle");
+	//titleParticle_->DrawImGui("titleParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");
@@ -254,17 +259,17 @@ void TitleScene::Draw() {
 	parenthesesUI6_->DrawImGui("pare6");*/
 
 
-	debugCamera_->DrawImgui();
+	//debugCamera_->DrawImgui();
 
 	//cloud_->DrawImGui("cloud");
 
-	titleObject_->DrawImGui();
+	//titleObject_->DrawImGui();
 
-	ImGui::Begin("exe");
+	//ImGui::Begin("exe");
 
-	ImGui::ColorEdit4("color", &ExeColor.x);
+	//ImGui::ColorEdit4("color", &ExeColor.x);
 
-	ImGui::End();
+	//ImGui::End();
 
 	//optionCursolUI_->DrawImGui("optionCursol");
 	//optionBG_->DrawImGui("optionBG");
@@ -281,17 +286,17 @@ void TitleScene::Draw() {
 	//syou2UI_->DrawImGui("syou2");
 	//backUI_->DrawImGui("back");
 
-	playUI_->DrawImGui("play");
-	optionUI_->DrawImGui("option");
-	quitUI_->DrawImGui("quit");
-	cursolUI_->DrawImGui("ya");
+	//playUI_->DrawImGui("play");
+	//optionUI_->DrawImGui("option");
+	//quitUI_->DrawImGui("quit");
+	//cursolUI_->DrawImGui("ya");
 
 	///
 	/// ↑ImGuiここまで
 	///
 
 	// Imguiの内部コマンドを生成する
-ImGui::Render();
+	ImGui::Render();
 
 	// ここより下に描画処理を書かない
 	ctx_->dxCommon.PostDraw();
@@ -343,7 +348,7 @@ void TitleScene::TitleLogoUpdate() {
 
 void TitleScene::SelectUIUpdate() {
 	// メニュー選択処理
-	if (!cursolTimer_.IsActive() && titleTimer_.IsFinished() && selectOptionMenu_ == OptionMenu::NONE) {
+	if (/*!cursolTimer_.IsActive() && */titleTimer_.IsFinished() && selectOptionMenu_ == OptionMenu::NONE) {
 		if (selectMenu_ == PLAY) {
 			if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
 				selectMenu_ = OPTION;

@@ -239,11 +239,6 @@ void GameScene::Update() {
 
 	sceneFade_->Update();
 
-	// シーンのリセット
-	if (input_->TriggerKey(DIK_R)) {
-		Initialize();
-	}
-
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
 	UpdateCameraToPlayer();
 
@@ -442,6 +437,8 @@ void GameScene::Draw() {
 	///
 	/// ↓ImGuiここから
 	///
+
+	useCamera_->DrawImgui();
 
 	// プレイヤーのImGui
 	player_->DrawImgui();
