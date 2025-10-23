@@ -100,9 +100,6 @@ private:
 	std::vector<std::shared_ptr<Thorn>> thorns_;
 	std::vector<std::shared_ptr<Block>> blocks_;
 
-	// ゲージ用のスプライト(背景)
-	unique_ptr<Sprite> bulletGaugeSpriteBG_ = make_unique<Sprite>();
-
 	// ゲージ用のスプライト
 	std::array<BulletGaugeInfo, 5> bulletGaugeSprite_;
 
@@ -223,4 +220,7 @@ private:
 
 	// ○○個突破 スコア数
 	std::array<unique_ptr<Sprite>, 4> spriteScoreCountOver_;
+
+	// ○○個突破 スコア数 座標
+	Vector2 spriteScoreCountOverPos_ = {150.0f, -100.0f};
 };

@@ -245,15 +245,11 @@ private:
 	// プレイヤーにカメラが追従するかどうかのフラグ
 	bool isCameraSet_ = false;
 
-	// 弾の数に応じてプレイヤーのスピードを加算するための変数
-	float speedAdd_ = 2.0f;
-
-	// 加算するスコア
-	
-
 	// SE
 	unique_ptr<AudioX> shotSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> playerDamageSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> DestroyEnemySE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> ClearSE_ = make_unique<AudioX>();
 
 	// ramuneから出るパーティクル
 	std::unique_ptr<Particles> ramuneParticle_ = std::make_unique<Particles>();
@@ -263,4 +259,7 @@ private:
 	std::unique_ptr<Particles> bulletChargeParticle_ = std::make_unique<Particles>();
 	float ramuneOffsetY_ = -1.0f;
 	float kasokuOffsetY_ = 12.0f;
+
+	// 衝突時ゲージの減少量
+	
 };

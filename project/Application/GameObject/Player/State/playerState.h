@@ -10,6 +10,7 @@ struct PlayerState {
 	float speedDownStrengthBullet = 1.0f; // スタン時の減速の強さ弾を撃った時
 	float shakeStrength = 0.5f;           // スタン時の画面揺れの強さ
 	int maxCoolDownWing = 60;             // プレイヤー被弾時のクールダウン
+	int bullet = 60;             // プレイヤー被弾時のクールダウン
 
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(PlayerState, maxSpeed, cameraOffset, stunDuration, speedDownStrengthThorn, speedDownStrengthBullet, shakeStrength, maxCoolDownWing);
 };

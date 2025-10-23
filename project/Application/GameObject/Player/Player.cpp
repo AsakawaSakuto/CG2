@@ -61,6 +61,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// SE
 	shotSE_->Initialize("resources/sound/SE/InGame/ShotSE.mp3");
 	playerDamageSE_->Initialize("resources/sound/SE/InGame/PlayerDamageSE.mp3");
+	DestroyEnemySE_->Initialize("resources/sound/SE/InGame/DestroyEnemySE.mp3");
+	ClearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
 
 	//
 	ramuneParticle_->Initialize(dxCommon_, 2);
@@ -239,9 +241,9 @@ void Player::Draw(Camera useCamera) {
 	}
 
 	// プレイヤーの羽の描画
-	if (!isStartCoolDown_) {
+	//if (!isStartCoolDown_) {
 		playerWing_->Draw(useCamera);
-	}
+	//}
 
 	// クマ
 	bear_->Draw(useCamera);
@@ -279,8 +281,16 @@ void Player::MovePlayerUpward() {
 }
 
 void Player::ClampPlayerVelocity() {
-	// プレイヤーの速度を一定の値に収める
-	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed - (speedAdd_ * bulletGauge_), playerState_.maxSpeed + (speedAdd_ * bulletGauge_));
+	float speedAdd = 0.0f;
+
+	// 弾の数に応じてプレイヤーの最高速度を変更
+	if (bulletGauge_ <= 2) {
+		speedAdd = 2.0f * bulletGauge_;
+	} else {
+		speedAdd = 2.0f * 2 + 1.0f * (bulletGauge_ - 2);
+	}
+
+	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed - speedAdd, playerState_.maxSpeed + speedAdd);
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
@@ -309,6 +319,8 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		// SEの解放
 		shotSE_->Reset();
 		playerDamageSE_->Reset();
+		DestroyEnemySE_->Reset();
+		ClearSE_->Reset();
 	}
 }
 
@@ -535,6 +547,9 @@ void Player::CollisionThorn() {
 				smorkParticle_->SetEmitterPosition(thorn->GetPosition());
 				smorkParticle_->Play(false);
 
+				// SE再生
+				DestroyEnemySE_->PlayAudio(SE_Volume);
+
 				break;
 			} else if (direction_ == Direction::UP) {
 
@@ -544,13 +559,17 @@ void Player::CollisionThorn() {
 
 					// スタンカウント加算
 					stunCount_++;
-				}
 
-				// 弾のゲージリセット
-				ResetBulletGauge();
+					// 弾のゲージを減らす
+					if (bulletGauge_ >= 0) {
+						bulletGauge_ -= 1;
 
-				for (int i = 0; i < bulletGaugeSprites_->size(); ++i) {
-					(*bulletGaugeSprites_)[i].isActive = false;
+						// ゲージを増加させるためのタイマーをリセット
+						num_ = 0;
+					}
+
+					// スプライト変更用
+					(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
 				}
 
 				// スタン
@@ -590,6 +609,14 @@ void Player::CollisonBulletThorn() {
 			}
 
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
+				// トゲの回転
+				thorn->SetIsRotate(true);
+
+				// パーティクル
+				thorn->PlayParticle(5);
+				smorkParticle_->SetEmitterPosition(thorn->GetPosition());
+				smorkParticle_->Play(false);
+
 				// スコア加算
 				AddScore(scoreList_.shotHitAmount);
 				switch (thorn->GetThornType()) {
@@ -669,7 +696,7 @@ void Player::CollisionWingThorn() {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
 
 				///////////////// デバッグ用 /////////////////
-				thorn->GetModel()->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+				//thorn->GetModel()->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 				///////////////// デバッグ用 /////////////////
 
 				thorn->PlayParticle(3);
@@ -677,7 +704,7 @@ void Player::CollisionWingThorn() {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
 
 				///////////////// デバッグ用 /////////////////
-				thorn->GetModel()->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+				//thorn->GetModel()->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 				///////////////// デバッグ用 /////////////////
 
 				thorn->PlayParticle(1);
@@ -788,12 +815,12 @@ void Player::WingCoolDownFramesAdd() {
 }
 
 void Player::PlayerMoveLimit() {
-	if (transform_.translate.x >= 4.5f) {
-		transform_.translate.x = 4.5f;
+	if (transform_.translate.x >= 5.5f) {
+		transform_.translate.x = 5.5f;
 	}
 
-	if (transform_.translate.x <= -4.5f) {
-		transform_.translate.x = -4.5f;
+	if (transform_.translate.x <= -5.5f) {
+		transform_.translate.x = -5.5f;
 	}
 }
 

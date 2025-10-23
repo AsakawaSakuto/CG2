@@ -102,11 +102,11 @@ void Thorn::UpgradeThorn() {
 		collisionSphere_.radius = 0.25f;
 		break;
 	case ThornType::MIDDLE:
-		newScale = {1.25f, 1.25f, 1.25f};
+		newScale = {2.5f, 2.5f, 2.5f};
 		collisionSphere_.radius = 0.35f;
 		break;
 	case ThornType::MAX:
-		newScale = {1.5f, 1.5f, 1.5f};
+		newScale = {3.5f, 3.5f, 3.5f};
 		collisionSphere_.radius = 0.5f;
 		break;
 	}

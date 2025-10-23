@@ -49,18 +49,13 @@ void GameScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	// ゲージ用のスプライト(背景)の初期化
-	bulletGaugeSpriteBG_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	bulletGaugeSpriteBG_->SetScale({4, 25});
-	bulletGaugeSpriteBG_->SetPosition({1200, 350});
-
 	// 弾のゲージスプライト
 	for (int i = 0; i < bulletGaugeSprite_.size(); ++i) {
 		bulletGaugeSprite_[i].sprite = std::make_unique<Sprite>();
 		bulletGaugeSprite_[i].sprite->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-		bulletGaugeSprite_[i].sprite->SetScale({4, 5});
-		bulletGaugeSprite_[i].sprite->SetPosition({1200.0f, 532.0f - (88 * i)});
-		bulletGaugeSprite_[i].sprite->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+		bulletGaugeSprite_[i].sprite->SetScale({2.0, 2.5f});
+		bulletGaugeSprite_[i].sprite->SetPosition({1148.0f, 548.0f - (44.0f * i)});
+		bulletGaugeSprite_[i].sprite->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 		bulletGaugeSprite_[i].isActive = false;
 	}
 
@@ -106,7 +101,7 @@ void GameScene::Initialize() {
 	// ルール説明用のスプライト
 	spriteRule_->Initialize(&ctx_->dxCommon, "resources/image/UI/GameRuleUI.png");
 	spriteRule_->SetPosition({640.0f, -100.0f});
-	spriteRule_->SetScale({1, 1});
+	spriteRule_->SetScale({0.25f, 0.25f});
 
 	// ゲーム終了時に表示するスプライト
 	spriteGameEnd_->Initialize(&ctx_->dxCommon, "resources/image/UI/FinishUI.png");
@@ -118,10 +113,9 @@ void GameScene::Initialize() {
 	spriteProgressLine_->SetScale({2.0f, 32.0f});
 	spriteProgressLine_->SetPosition({988.0f, 360.0f});
 
-	spriteProgressPlayer_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	spriteProgressPlayer_->SetScale({3.0f, 2.0f});
+	spriteProgressPlayer_->Initialize(&ctx_->dxCommon, "resources/image/Icon.png");
+	spriteProgressPlayer_->SetScale({2.0f, 2.0f});
 	spriteProgressPlayer_->SetPosition({988.0f, 360.0f});
-	spriteProgressPlayer_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 
 	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 	spriteProgressGoal_->SetScale({2.0f, 2.0f});
@@ -140,7 +134,7 @@ void GameScene::Initialize() {
 
 	// 弾のゲージラムネUI
 	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
-	spriteChargeUI_->SetPosition({1200.0f, 450.0f});
+	spriteChargeUI_->SetPosition({1150.0f, 450.0f});
 	spriteChargeUI_->SetScale({1, 1});
 
 	// 山のモデル初期化
@@ -175,9 +169,11 @@ void GameScene::Initialize() {
 	// SE
 	shotSE_->Initialize("resources/sound/SE/Title/startGameSE.mp3");
 
+
 	// ○○個突破!スプライト
 	spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
-	spriteSnackCountOver_->SetPosition({640.0f, -100.0f});
+	spriteScoreCountOverPos_ = {150.0f, -100.0f};
+	spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
 	spriteSnackCountOver_->SetScale({0.25f, 0.25f});
 
 	// ○○個突破　スコア数　スプライト
@@ -221,6 +217,9 @@ void GameScene::Update() {
 		goSceneNum_ = SCENE::RESULT;
 		isActiveEndText_ = true; // 終了テキスト表示フラグオン
 
+		// ○○個突破スプライトの座標初期化
+		spriteScoreCountOverPos_ = {150.0f, -100.0f};
+
 		// SEの解放
 		shotSE_->Reset();
 	}
@@ -255,9 +254,6 @@ void GameScene::Update() {
 		}
 		thorn->UpdateParticle();
 	}
-
-	// ゲージ用のスプライト(背景)の更新処理
-	bulletGaugeSpriteBG_->Update();
 
 	// ゲージの描画を実際の弾のゲージに対応させる
 	player_->SetBulletGaugeSprites(&bulletGaugeSprite_);
@@ -365,17 +361,17 @@ void GameScene::Draw() {
 	// spriteChargeUI_->Draw();
 
 	// 山のモデル描画
-	for (auto& model : modelMountain_) {
+	/*for (auto& model : modelMountain_) {
 		model->Draw(*useCamera_);
-	}
+	}*/
 
 	// 画面両端の幕のスプライト描画処理
 	for (auto& curtain : curtainSprite_) {
 		curtain->Draw();
 	}
 
-	// ゲージ用のスプライト(背景)の描画処理
-	bulletGaugeSpriteBG_->Draw();
+	// ラムネゲージ
+	spriteChargeUI_->Draw();
 
 	// 弾のゲージスプライト描画処理
 	for (auto& gaugeInfo : bulletGaugeSprite_) {
@@ -799,7 +795,8 @@ void GameScene::AnimationSpriteSnackOver() {
 		float t = std::clamp(timerSnackCountOver_ / ruleDuration_, 0.0f, 1.0f);
 		float eased = Easing::Apply(t, Easing::Type::EaseOutCubic);
 		float posY = std::lerp(ruleStartPosY_, ruleEndPosY_, eased);
-		spriteSnackCountOver_->SetPosition({640.0f, posY});
+		spriteScoreCountOverPos_.y = posY;
+		spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
 
 		if (t >= 1.0f) {
 			// 到達したら待機へ移行
@@ -815,14 +812,16 @@ void GameScene::AnimationSpriteSnackOver() {
 			timerSnackCountOver_ = 0.0f;
 		}
 		// 待機中は位置を終了位置に固定
-		spriteSnackCountOver_->SetPosition({640.0f, ruleEndPosY_});
+		spriteScoreCountOverPos_.y = ruleEndPosY_;
+		spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
 		break;
 	}
 	case RuleAnimState::Falling: {
 		float t = std::clamp(timerSnackCountOver_ / ruleDuration_, 0.0f, 1.0f);
 		float eased = Easing::Apply(t, Easing::Type::EaseInCubic);
 		float posY = std::lerp(ruleEndPosY_, ruleStartPosY_, eased);
-		spriteSnackCountOver_->SetPosition({640.0f, posY});
+		spriteScoreCountOverPos_.y = posY;
+		spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
 
 		if (t >= 1.0f) {
 			// 終了処理
@@ -837,7 +836,8 @@ void GameScene::AnimationSpriteSnackOver() {
 	}
 	case RuleAnimState::Done: {
 		// 完了後は位置を開始位置に固定
-		spriteSnackCountOver_->SetPosition({640.0f, ruleStartPosY_});
+		spriteScoreCountOverPos_.y = ruleStartPosY_;
+		spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
 		break;
 	}
 	}
