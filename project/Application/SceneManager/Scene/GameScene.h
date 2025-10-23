@@ -205,6 +205,8 @@ private:
 	
 	// SE
 	unique_ptr<AudioX> shotSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> countDownSE_ = make_unique<AudioX>();
 
 	// ○○個突破 スプライト
 	unique_ptr<Sprite> spriteSnackCountOver_ = make_unique<Sprite>();

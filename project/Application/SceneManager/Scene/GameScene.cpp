@@ -168,7 +168,8 @@ void GameScene::Initialize() {
 
 	// SE
 	shotSE_->Initialize("resources/sound/SE/Title/startGameSE.mp3");
-
+	startGameSE_->Initialize("resources/sound/SE/InGame/StartGameSE.mp3");
+	countDownSE_->Initialize("resources/sound/SE/InGame/CountDownSE.mp3");
 
 	// ○○個突破!スプライト
 	spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
@@ -222,6 +223,8 @@ void GameScene::Update() {
 
 		// SEの解放
 		shotSE_->Reset();
+		startGameSE_->Reset();
+		countDownSE_->Reset();
 	}
 
 	// 終了テキストの更新
@@ -394,7 +397,7 @@ void GameScene::Draw() {
 	spriteRule_->Draw();
 
 	// ○○個突破!スプライト更新
-	spriteSnackCountOver_->Draw();
+	//spriteSnackCountOver_->Draw();
 
 	// 進行度ゲージスプライト描画
 	spriteProgressLine_->Draw();
@@ -402,9 +405,9 @@ void GameScene::Draw() {
 	spriteProgressGoal_->Draw();
 
 	// 入力なし　カウントダウン　スプライト 描画
-	for (auto& sprite : spriteNoInputCountDown_) {
+	/*for (auto& sprite : spriteNoInputCountDown_) {
 		sprite->Draw();
-	}
+	}*/
 
 	// カウントダウン用のスプライト描画
 	if (gameStartTimer_ >= 1 && gameStartTimer_ < 4.0f && player_->GetIsCameraSet()) {
@@ -434,38 +437,38 @@ void GameScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	useCamera_->DrawImgui();
+	//useCamera_->DrawImgui();
 
 	// プレイヤーのImGui
-	player_->DrawImgui();
+	//player_->DrawImgui();
 
-	DrawSceneName();
+	//DrawSceneName();
 
 	// ゲームシーン上で管理しているステータスのImGui
-	GameSceneStateImGui();
+	//GameSceneStateImGui();
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	ImGui::Begin("Test");
+	//ImGui::Begin("Test");
 
-	const char* partNames[] = {"1", "2", "3"};
+	//const char* partNames[] = {"1", "2", "3"};
 
-	for (int i = 0; i < 3; ++i) {
-		if (ImGui::CollapsingHeader(partNames[i], ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::PushID(i); // 適切なIDスコープを設定
+	//for (int i = 0; i < 3; ++i) {
+	//	if (ImGui::CollapsingHeader(partNames[i], ImGuiTreeNodeFlags_DefaultOpen)) {
+	//		ImGui::PushID(i); // 適切なIDスコープを設定
 
-			ImGui::Text("Position");
-			ImGui::DragFloat3("ModelPos", &testPos_[i].x, 0.1f);
+	//		ImGui::Text("Position");
+	//		ImGui::DragFloat3("ModelPos", &testPos_[i].x, 0.1f);
 
-			ImGui::Text("Scale");
-			ImGui::DragFloat3("ModelScale", &testScale_[i].x, 0.1f);
+	//		ImGui::Text("Scale");
+	//		ImGui::DragFloat3("ModelScale", &testScale_[i].x, 0.1f);
 
-			ImGui::Separator(); // 区切り線で視認性アップ
+	//		ImGui::Separator(); // 区切り線で視認性アップ
 
-			ImGui::PopID();
-		}
-	}
+	//		ImGui::PopID();
+	//	}
+	//}
 
-	ImGui::End();
+	//ImGui::End();
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	///
@@ -589,6 +592,11 @@ void GameScene::GameStartCount() {
 		spriteNumber_->SetScale(startScale);
 		spriteNumber_->SetColor({1.0f, 1.0f, 1.0f, startAlpha});
 		prevDisplayNumber = displayNumber;
+
+		if (displayNumber >= 1) {
+			// SE再生
+			countDownSE_->PlayAudio(SE_Volume);
+		}
 	}
 
 	// 表示が1以上のときのみアニメーション
@@ -615,6 +623,9 @@ void GameScene::GameStartCount() {
 		// リセット状態にして表示開始
 		spriteStart_->SetScale(startAnimStartScale_);
 		spriteStart_->SetColor({1.0f, 1.0f, 1.0f, startAnimStartAlpha_});
+
+		// SE再生
+		startGameSE_->PlayAudio(SE_Volume);
 	}
 
 	// 「スタート!」スプライトのイージング処理

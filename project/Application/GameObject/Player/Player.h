@@ -250,6 +250,7 @@ private:
 	unique_ptr<AudioX> playerDamageSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> DestroyEnemySE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> ClearSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> gaugeChargeSE_ = make_unique<AudioX>();
 
 	// ramuneから出るパーティクル
 	std::unique_ptr<Particles> ramuneParticle_ = std::make_unique<Particles>();

@@ -88,6 +88,6 @@ void PlayerWing::WingImGui() {
 
 void PlayerWing::CollisionUpdate() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x + 1.0f, t.y + 0.5f, t.z + 0.5f};
-	collisionAABB_.min = {t.x - 1.0f, t.y - 0.5f, t.z - 0.5f};
+	collisionAABB_.max = {t.x + 1.1f, t.y + 0.5f, t.z + 0.5f};
+	collisionAABB_.min = {t.x - 1.1f, t.y - 0.5f, t.z - 0.5f};
 }
