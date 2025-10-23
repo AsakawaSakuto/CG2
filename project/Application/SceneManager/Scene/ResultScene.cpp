@@ -112,6 +112,8 @@ void ResultScene::Initialize() {
 		spriteStun_[i]->SetPosition({700.0f + i * 60.0f, 170.0f});
 		spriteStun_[i]->SetScale({1, 1});
 	}
+
+	nextUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PushAToContinueUI.png", { 1020.0f,655.0f }, { 0.3f,0.3f });
 }
 
 void ResultScene::Update() {
@@ -130,6 +132,8 @@ void ResultScene::Update() {
 
 	// 背景スプライトの更新処理
 	spriteBG_->Update();
+
+	nextUI_->Update();
 
 	// 描画用のスコアが実施のスコアと同じになったら
 	if (isScreenChange_ && inputEnter) {
@@ -155,13 +159,13 @@ void ResultScene::Draw() {
 	// 背景スプライトの描画処理
 	spriteBG_->Draw();
 
-	sceneFade_->Draw();
-
 	// 1枚目のスクリーンの描画
 	ScreenFirstDraw();
 
 	// 1枚目のスクリーンの描画
 	ScreenSecondDraw();
+
+	sceneFade_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -187,6 +191,8 @@ void ResultScene::Draw() {
 	ImGui::DragFloat2("TestScale1", &testScale_[1].x, 0.1f);
 
 	ImGui::End();
+
+	nextUI_->DrawImGui("next");
 
 	///
 	/// ↑ImGuiここまで
@@ -363,6 +369,8 @@ void ResultScene::ScreenFirstDraw() {
 		for (int i = 0; i < sweetModels_.size(); ++i) {
 			sweetModels_[i]->Draw(*useCamera_);
 		}
+
+		nextUI_->Draw();
 	}
 }
 
