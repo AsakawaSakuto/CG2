@@ -236,10 +236,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		ramuneOffsetY_ = 1.0f;
 
 		stateChangeParticle_->Play();
-	}
-
-	if (velocity_.y <= -1.0f && stateChangeParticle_->IsPlaying()) {
-		stateChangeParticle_->Stop();
+		stateChangeTimer_.Start(2.0f, false);
 	}
 
 	// プレイヤーが最低地点に到達したとき
@@ -436,6 +433,7 @@ void Player::PlayerImGui() {
 	//bulletShotParticle_->DrawImGui("bulletShot");
 	//bulletDieParticle_->DrawImGui("bulletDie");
 	stateChangeParticle_->DrawImGui("stateChange");
+	fallParticle_->DrawImGui("fall");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -914,6 +912,12 @@ void Player::InitParticle() {
 	stateChangeParticle_->Initialize(dxCommon_);
 	stateChangeParticle_->LoadJson("stateChange");
 	stateChangeParticle_->Stop();
+
+	fallParticle_->Initialize(dxCommon_, 4);
+	fallParticle_->LoadJson("fall");
+	fallParticle_->Stop();
+
+	stateChangeTimer_.Reset();
 }
 
 void Player::UpdateParticle() {
@@ -990,6 +994,17 @@ void Player::UpdateParticle() {
 
 	stateChangeParticle_->SetEmitterPosition(transform_.translate);
 	stateChangeParticle_->Update();
+
+	fallParticle_->SetEmitterPosition(transform_.translate);
+	fallParticle_->SetOffSet({ 0.0,-0.75f,0.0f });
+	fallParticle_->Update();
+
+	
+	if (stateChangeTimer_.IsFinished()) {
+	    stateChangeParticle_->Stop();
+	    fallParticle_->Play();
+	}
+	stateChangeTimer_.Update();
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -1002,4 +1017,5 @@ void Player::DrawParticle(Camera useCamera) {
 	bulletShotParticle_->Draw(useCamera);
 	bulletDieParticle_->Draw(useCamera);
 	stateChangeParticle_->Draw(useCamera);
+	fallParticle_->Draw(useCamera);
 }
