@@ -111,8 +111,8 @@
     ],
     "startRotateVelocity": 1.0,
     "startScale": [
-        1.0,
-        1.0
+        2.0,
+        2.0
     ],
     "startVelocity": [
         0.0,

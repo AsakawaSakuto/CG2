@@ -437,38 +437,38 @@ void GameScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	//useCamera_->DrawImgui();
+	useCamera_->DrawImgui();
 
 	// プレイヤーのImGui
-	//player_->DrawImgui();
+	player_->DrawImgui();
 
 	DrawSceneName();
 
 	// ゲームシーン上で管理しているステータスのImGui
-	//GameSceneStateImGui();
+	GameSceneStateImGui();
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	//ImGui::Begin("Test");
+	ImGui::Begin("Test");
 
-	//const char* partNames[] = {"1", "2", "3"};
+	const char* partNames[] = {"1", "2", "3"};
 
-	//for (int i = 0; i < 3; ++i) {
-	//	if (ImGui::CollapsingHeader(partNames[i], ImGuiTreeNodeFlags_DefaultOpen)) {
-	//		ImGui::PushID(i); // 適切なIDスコープを設定
+	for (int i = 0; i < 3; ++i) {
+		if (ImGui::CollapsingHeader(partNames[i], ImGuiTreeNodeFlags_DefaultOpen)) {
+			ImGui::PushID(i); // 適切なIDスコープを設定
 
-	//		ImGui::Text("Position");
-	//		ImGui::DragFloat3("ModelPos", &testPos_[i].x, 0.1f);
+			ImGui::Text("Position");
+			ImGui::DragFloat3("ModelPos", &testPos_[i].x, 0.1f);
 
-	//		ImGui::Text("Scale");
-	//		ImGui::DragFloat3("ModelScale", &testScale_[i].x, 0.1f);
+			ImGui::Text("Scale");
+			ImGui::DragFloat3("ModelScale", &testScale_[i].x, 0.1f);
 
-	//		ImGui::Separator(); // 区切り線で視認性アップ
+			ImGui::Separator(); // 区切り線で視認性アップ
 
-	//		ImGui::PopID();
-	//	}
-	//}
+			ImGui::PopID();
+		}
+	}
 
-	//ImGui::End();
+	ImGui::End();
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	///

@@ -19,5 +19,5 @@ private:
 
 	DirectXCommon* dxCommon_ = nullptr;
 	Camera camera_;
-	std::array<unique_ptr<Particles>,8> stunParticle_;
+	std::array<unique_ptr<Particles>,4> stunParticle_;
 };

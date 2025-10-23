@@ -6,16 +6,14 @@ void StunP::Initialize(DirectXCommon* dxCommon) {
 		stunParticle_[i] = std::make_unique<Particles>();
 		stunParticle_[i]->Initialize(dxCommon_);
 		stunParticle_[i]->LoadJson("stun");
+		stunParticle_[i]->SetBlendMode(kBlendModeNormal);
 		stunParticle_[i]->Stop();
 	}
-	stunParticle_[0]->SetEmitVelocity({ 5.0f,0.0f,0.0f });
-	stunParticle_[1]->SetEmitVelocity({ -5.0f,0.0f,0.0f });
-	stunParticle_[2]->SetEmitVelocity({ 0.0f,5.0f,0.0f });
-	stunParticle_[3]->SetEmitVelocity({ 0.0f,-5.0f,0.0f });
-	stunParticle_[4]->SetEmitVelocity({ 5.0f,5.0f,0.0f });
-	stunParticle_[5]->SetEmitVelocity({ -5.0f,5.0f,0.0f });
-	stunParticle_[6]->SetEmitVelocity({ 5.0f,-5.0f,0.0f });
-	stunParticle_[7]->SetEmitVelocity({ -5.0f,-5.0f,0.0f });
+
+	stunParticle_[0]->SetEmitVelocity({ 5.0f,5.0f,0.0f });
+	stunParticle_[1]->SetEmitVelocity({ -5.0f,5.0f,0.0f });
+	stunParticle_[2]->SetEmitVelocity({ 5.0f,-5.0f,0.0f });
+	stunParticle_[3]->SetEmitVelocity({ -5.0f,-5.0f,0.0f });
 }
 
 void StunP::Update() {

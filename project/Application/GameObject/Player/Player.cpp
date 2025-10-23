@@ -66,27 +66,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	ClearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
 	gaugeChargeSE_->Initialize("resources/sound/SE/InGame/GaugeChargeSE.mp3");
 
-	//
-	ramuneParticle_->Initialize(dxCommon_, 2);
-	ramuneParticle_->LoadJson("ramuneGame");
-
-	ramuneWhiteParticle_->Initialize(dxCommon_, 2);
-	ramuneWhiteParticle_->LoadJson("ramuneWhiteGame");
-
-	kasokuParticle_->Initialize(dxCommon_);
-	kasokuParticle_->LoadJson("kasoku");
-	kasokuParticle_->Play();
-
-	smorkParticle_->Initialize(dxCommon_);
-	smorkParticle_->LoadJson("enemydie");
-	smorkParticle_->Stop();
-
-	bulletChargeParticle_->Initialize(dxCommon_);
-	bulletChargeParticle_->LoadJson("shotCharge");
-
-	ramuneOffsetY_ = -1.0f;
-
-	stunParticle_->Initialize(dxCommon_);
+	InitParticle();
 }
 
 void Player::Update() {
@@ -101,7 +81,9 @@ void Player::Update() {
 	PlayerMoveLimit();
 
 	// プレイヤーの上昇
-	MovePlayerUpward();
+	if (playerIsMove_) {
+		MovePlayerUpward();
+	}
 
 	// プレイヤーの速度を一定の値に収める
 	ClampPlayerVelocity();
@@ -173,63 +155,7 @@ void Player::Update() {
 
 	//
 
-	if (stunTimer_.IsFinished()) {
-		ramuneParticle_->Play();
-		ramuneWhiteParticle_->Play();
-	}
-
-	ramuneParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
-	ramuneParticle_->SetEmitterPosition(transform_.translate);
-	ramuneParticle_->Update();
-
-	ramuneWhiteParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
-	ramuneWhiteParticle_->SetEmitterPosition(transform_.translate);
-	ramuneWhiteParticle_->Update();
-
-	if (direction_ == Direction::UP) {
-		kasokuOffsetY_ = 12.0f;
-		if (       velocity_.y >= 12.0f && velocity_.y <= 14.0f) {
-			kasokuParticle_->SetSpawnTime(0.1f);
-		} else if (velocity_.y >= 14.0f && velocity_.y <= 16.0f) {
-			kasokuParticle_->SetSpawnTime(0.075f);
-		} else if (velocity_.y >= 16.0f && velocity_.y <= 18.0f) {
-			kasokuParticle_->SetSpawnTime(0.05f);
-		} else if (velocity_.y >= 18.0f && velocity_.y <= 20.0f) {
-			kasokuParticle_->SetSpawnTime(0.025f);
-		} else {
-			kasokuParticle_->SetSpawnTime(99.0f);
-			kasokuParticle_->SetEmitVelocity({ 0.0f,-10.0f,0.0f });
-		}
-
-		bulletChargeParticle_->SetOffSet({ 0.0f,1.11f,-0.75f });
-	} else if(direction_ == Direction::DOWN) {
-		kasokuOffsetY_ = -12.0f;
-		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
-			kasokuParticle_->SetSpawnTime(0.1f);
-		} else if (velocity_.y >= -16.0f && velocity_.y <= -14.0f) {
-			kasokuParticle_->SetSpawnTime(0.075f);
-		} else if (velocity_.y >= -18.0f && velocity_.y <= -16.0f) {
-			kasokuParticle_->SetSpawnTime(0.05f);
-		} else if (velocity_.y >= -20.0f && velocity_.y <= -18.0f) {
-			kasokuParticle_->SetSpawnTime(0.025f);
-		} else {
-			kasokuParticle_->SetSpawnTime(99.0f);
-			kasokuParticle_->SetEmitVelocity({ 0.0f,10.0f,0.0f });
-		}
-
-		bulletChargeParticle_->SetOffSet({ 0.0f,-1.11f,-0.75f });
-	}
-
-	kasokuParticle_->SetOffSet({ 0.0f,kasokuOffsetY_ ,0.0f });
-	kasokuParticle_->SetEmitterPosition(transform_.translate);
-	kasokuParticle_->Update();
-
-	smorkParticle_->Update();
-
-	bulletChargeParticle_->SetEmitterPosition(transform_.translate);
-	bulletChargeParticle_->Update();
-
-	stunParticle_->Update();
+	UpdateParticle();
 
 	// オーディオの更新
 	AudioUpdate();
@@ -254,12 +180,7 @@ void Player::Draw(Camera useCamera) {
 	// クマ
 	bear_->Draw(useCamera);
 
-	ramuneParticle_->Draw(useCamera);
-	ramuneWhiteParticle_->Draw(useCamera);
-	kasokuParticle_->Draw(useCamera);
-	smorkParticle_->Draw(useCamera);
-	bulletChargeParticle_->Draw(useCamera);
-	stunParticle_->Draw(useCamera);
+	DrawParticle(useCamera);
 }
 
 void Player::DrawImgui() {
@@ -479,14 +400,18 @@ void Player::PlayerImGui() {
 		bulletGauge_ = 0;
 	}
 
+	ImGui::Checkbox("Player Move", &playerIsMove_);
+
 	ImGui::End();
 	
+
 	// パーティクルのImGui
 	//ramuneParticle_->DrawImGui("ramuneP");
 	//ramuneWhiteParticle_->DrawImGui("ramunePW");
-	kasokuParticle_->DrawImGui("kasoku");
-	smorkParticle_->DrawImGui("enemyDie");
-	bulletChargeParticle_->DrawImGui("shot");
+	//kasokuParticle_->DrawImGui("kasoku");
+	//smorkParticle_->DrawImGui("enemyDie");
+	//bulletChargeParticle_->DrawImGui("shot");
+	bulletShotParticle_->DrawImGui("bulletShot");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -931,4 +856,103 @@ void Player::DrawImGuiJsonStateScore() {
 	}
 
 	ImGui::End();
+}
+
+void Player::InitParticle() {
+	//
+	ramuneParticle_->Initialize(dxCommon_, 2);
+	ramuneParticle_->LoadJson("ramuneGame");
+
+	ramuneWhiteParticle_->Initialize(dxCommon_, 2);
+	ramuneWhiteParticle_->LoadJson("ramuneWhiteGame");
+
+	kasokuParticle_->Initialize(dxCommon_);
+	kasokuParticle_->LoadJson("kasoku");
+	kasokuParticle_->Play();
+
+	smorkParticle_->Initialize(dxCommon_);
+	smorkParticle_->LoadJson("enemydie");
+	smorkParticle_->Stop();
+
+	bulletChargeParticle_->Initialize(dxCommon_);
+	bulletChargeParticle_->LoadJson("shotCharge");
+
+	bulletShotParticle_->Initialize(dxCommon_);
+
+	ramuneOffsetY_ = -1.0f;
+
+	stunParticle_->Initialize(dxCommon_);
+}
+
+void Player::UpdateParticle() {
+	if (stunTimer_.IsFinished()) {
+		ramuneParticle_->Play();
+		ramuneWhiteParticle_->Play();
+	}
+
+	ramuneParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
+	ramuneParticle_->SetEmitterPosition(transform_.translate);
+	ramuneParticle_->Update();
+
+	ramuneWhiteParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
+	ramuneWhiteParticle_->SetEmitterPosition(transform_.translate);
+	ramuneWhiteParticle_->Update();
+
+	if (direction_ == Direction::UP) {
+		kasokuOffsetY_ = 12.0f;
+		if (velocity_.y >= 12.0f && velocity_.y <= 14.0f) {
+			kasokuParticle_->SetSpawnTime(0.1f);
+		}else if (velocity_.y >= 14.0f && velocity_.y <= 16.0f) {
+			kasokuParticle_->SetSpawnTime(0.075f);
+		}else if (velocity_.y >= 16.0f && velocity_.y <= 18.0f) {
+			kasokuParticle_->SetSpawnTime(0.05f);
+		}else if (velocity_.y >= 18.0f && velocity_.y <= 20.0f) {
+			kasokuParticle_->SetSpawnTime(0.025f);
+		}else {
+			kasokuParticle_->SetSpawnTime(99.0f);
+			kasokuParticle_->SetEmitVelocity({ 0.0f,-10.0f,0.0f });
+		}
+
+		bulletChargeParticle_->SetOffSet({ 0.0f,1.11f,-0.75f });
+	}else if (direction_ == Direction::DOWN) {
+		kasokuOffsetY_ = -12.0f;
+		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
+			kasokuParticle_->SetSpawnTime(0.1f);
+		}else if (velocity_.y >= -16.0f && velocity_.y <= -14.0f) {
+			kasokuParticle_->SetSpawnTime(0.075f);
+		}else if (velocity_.y >= -18.0f && velocity_.y <= -16.0f) {
+			kasokuParticle_->SetSpawnTime(0.05f);
+		}else if (velocity_.y >= -20.0f && velocity_.y <= -18.0f) {
+			kasokuParticle_->SetSpawnTime(0.025f);
+		}else {
+			kasokuParticle_->SetSpawnTime(99.0f);
+			kasokuParticle_->SetEmitVelocity({ 0.0f,10.0f,0.0f });
+		}
+
+		bulletChargeParticle_->SetOffSet({ 0.0f,-1.11f,-0.75f });
+	}
+
+	kasokuParticle_->SetOffSet({ 0.0f,kasokuOffsetY_ ,0.0f });
+	kasokuParticle_->SetEmitterPosition(transform_.translate);
+	kasokuParticle_->Update();
+
+	smorkParticle_->Update();
+
+	bulletChargeParticle_->SetEmitterPosition(transform_.translate);
+	bulletChargeParticle_->Update();
+
+	stunParticle_->Update();
+
+	bulletShotParticle_->SetEmitterPosition(transform_.translate);
+	bulletShotParticle_->Update();
+}
+
+void Player::DrawParticle(Camera useCamera) {
+	ramuneParticle_->Draw(useCamera);
+	ramuneWhiteParticle_->Draw(useCamera);
+	kasokuParticle_->Draw(useCamera);
+	smorkParticle_->Draw(useCamera);
+	bulletChargeParticle_->Draw(useCamera);
+	stunParticle_->Draw(useCamera);
+	bulletShotParticle_->Draw(useCamera);
 }

@@ -162,6 +162,11 @@ private:
 	// ImGuiスコア
 	void DrawImGuiJsonStateScore();
 
+	void InitParticle();
+
+	void UpdateParticle();
+
+	void DrawParticle(Camera useCamera);
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -259,10 +264,10 @@ private:
 	std::unique_ptr<Particles> kasokuParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> smorkParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> bulletChargeParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> bulletShotParticle_ = std::make_unique<Particles>();
 	float ramuneOffsetY_ = -1.0f;
 	float kasokuOffsetY_ = 12.0f;
 	std::unique_ptr<StunP> stunParticle_ = std::make_unique<StunP>();
 
-	// 衝突時ゲージの減少量
-	
+	bool playerIsMove_ = true;
 };
