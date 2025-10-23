@@ -574,11 +574,11 @@ void Player::CollisionThorn() {
 					}
 
 					// 弾のゲージをセット
-					SetBulletGauge(-1);
+					//SetBulletGauge(-1);
 
-					for (int i = 0; i < bulletGaugeSprites_->size(); ++i) {
-						(*bulletGaugeSprites_)[i].isActive = false;
-					}
+					//for (int i = 0; i < bulletGaugeSprites_->size(); ++i) {
+						(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
+					//}
 
 					// スタン
 					Stun();
