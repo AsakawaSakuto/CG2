@@ -113,6 +113,8 @@ private:
 
 	unique_ptr<Particles> titleParticle_ = make_unique<Particles>();
 
+	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
+
 	float uiAlpha_ = 0.0f;
 
 	GameTimer titleTimer_;

@@ -70,6 +70,9 @@ void TitleScene::Initialize() {
 	titleParticle_->LoadJson("candy");
 	titleParticle_->Stop();
 
+	testParticle_->Initialize(&ctx_->dxCommon, 1);
+	testParticle_->LoadJson("GoalParticle");
+
 	// 雲の初期化
 	for (int i = 0; i < cloud_.size(); i++) {
 		cloud_[i] = make_unique<Model>();	
@@ -142,6 +145,9 @@ void TitleScene::Update() {
 	titleParticle_->SetBlendMode(BlendMode::kBlendModeNone);
 	titleParticle_->Update();
 
+	testParticle_->SetBlendMode(BlendMode::kBlendModeNone);
+	testParticle_->Update();
+
 	// カメラ切り替え&更新
 	CameraController();
 }
@@ -159,6 +165,7 @@ void TitleScene::Draw() {
 	titleObject_->Draw(*useCamera_);
 
 	titleParticle_->Draw(*useCamera_);
+	//testParticle_->Draw(*useCamera_);
 
 	for (int i = 0; i < cloud_.size(); i++) {
 		//if (cloudIsActive_[i]) {
@@ -252,6 +259,8 @@ void TitleScene::Draw() {
 	//uiBoxUI_->DrawImGui("uiBox");
 
 	//titleParticle_->DrawImGui("titleParticle");
+
+	//testParticle_->DrawImGui("testParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");
@@ -448,7 +457,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolUI_->SetPosition({ 590.0f, 151.0f });
 		}
 
-		if (!fullScreenTimer_.IsActive() && !optionTimer_.IsActive() && (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) || input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_LEFT) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
+		if (!fullScreenTimer_.IsActive() && !optionTimer_.IsActive() && (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A) || input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_D) || input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_LEFT) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK))) {
 			if (!ctx_->winApp.IsFullscreen()) {
 				ctx_->winApp.EnterBorderlessFullscreen();
 			} else {
@@ -899,7 +908,7 @@ void TitleScene::InitSptite() {
 	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,386.0f }, { 0.3f,0.3f });
 	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBG.png", { 604.0f,340.0f }, { 0.0f,0.0f });
+	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/UIBoxUI.png", { 604.0f,340.0f }, { 0.0f,0.0f });
 	optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.85f });
 
 	optionCursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 150.0f,156.0f }, { 0.0f,0.0f });
