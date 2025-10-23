@@ -119,8 +119,8 @@ private:
 	// プレイヤーの羽とトゲの当たり判定
 	void CollisionWingThorn();
 
-	// 弾のゲージリセット
-	void ResetBulletGauge();
+	// 弾のゲージをセット
+	void SetBulletGauge(int point);
 
 	// プレイヤーとの距離に応じて加算するスコアを変化させる
 	void AddScoreByDistance(std::shared_ptr<Thorn>& thorn, float scoreAmount);
@@ -201,11 +201,11 @@ private:
 
 	// スタートライン、最終ライン
 	const float START_LINE = -10.0f;
-	const float END_LINE = 200.0f;
+	const float END_LINE = 400.0f;
 
 	// カメラオフセット
-	const float CAMERA_OFFSET_TOP = 4.0f;
-	const float CAMERA_OFFSET_BOTTOM = -4.0f;
+	const float CAMERA_OFFSET_TOP = 5.0f;
+	const float CAMERA_OFFSET_BOTTOM = -5.0f;
 
 	// シェイク関連
 	bool isShake_ = false;
