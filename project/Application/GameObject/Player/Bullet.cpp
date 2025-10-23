@@ -44,3 +44,11 @@ void Bullet::Spawn(Vector3 position, float velocity) {
 		velocity_ = velocity;
 	}
 }
+
+void Bullet::Destroy() {
+	if (isAlive_ && onDestroyCallback_) {
+		// コールバックを実行（位置情報を渡す）
+		onDestroyCallback_(transform_.translate);
+	}
+	isAlive_ = false;
+}

@@ -234,6 +234,12 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		velocity_.y = 2.0f;
 
 		ramuneOffsetY_ = 1.0f;
+
+		stateChangeParticle_->Play();
+	}
+
+	if (velocity_.y <= -1.0f && stateChangeParticle_->IsPlaying()) {
+		stateChangeParticle_->Stop();
 	}
 
 	// プレイヤーが最低地点に到達したとき
@@ -306,11 +312,10 @@ void Player::BulletCharge() {
 		(*bulletGaugeSprites_)[bulletGauge_ - 1].isActive = true;
 		num_ = 0;
 
-		bulletChargeParticle_->Play(false);
-
 		// SE再生
 		gaugeChargeSE_->PlayAudio(SE_Volume);
 	}
+
 }
 
 void Player::BulletShot() {
@@ -324,6 +329,13 @@ void Player::BulletShot() {
 		// 弾の生成
 		auto bullet = std::make_unique<Bullet>();
 		bullet->Initialize(dxCommon_);
+
+		// 弾が消える際のコールバックを設定
+		bullet->SetOnDestroyCallback([this](Vector3 position) {
+			// 弾が消えた位置でパーティクルを再生
+			bulletDieParticle_->SetEmitterPosition(position);
+			bulletDieParticle_->Play(false);
+		});
 
 		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
 		if (direction_ == Direction::UP) {
@@ -369,8 +381,14 @@ void Player::BulletUpdate() {
 		        bullets_.begin(), bullets_.end(),
 		        [playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
 			        float y = bullet->GetTransform().translate.y;
-					Vector3 emitPos = bullet->GetTransform().translate;
-			        return y > playerPosY + 11.0f || y < playerPosY - 11.0f; // 画面外に出たら削除
+			        bool shouldDelete = y > playerPosY + 11.0f || y < playerPosY - 11.0f; // 画面外に出たら削除
+			        
+			        if (shouldDelete) {
+			        	// 削除前にDestroy()を呼び出してパーティクルを再生
+			        	bullet->Destroy();
+			        }
+			        
+			        return shouldDelete;
 		        }),
 		    bullets_.end());
 	}
@@ -410,13 +428,14 @@ void Player::PlayerImGui() {
 	
 
 	// パーティクルのImGui
-	//ramuneParticle_->DrawImGui("ramuneP");
+	ramuneParticle_->DrawImGui("ramuneP");
 	//ramuneWhiteParticle_->DrawImGui("ramunePW");
 	//kasokuParticle_->DrawImGui("kasoku");
 	//smorkParticle_->DrawImGui("enemyDie");
 	//bulletChargeParticle_->DrawImGui("shot");
-	bulletShotParticle_->DrawImGui("bulletShot");
-	bulletDieParticle_->DrawImGui("bulletDie");
+	//bulletShotParticle_->DrawImGui("bulletShot");
+	//bulletDieParticle_->DrawImGui("bulletDie");
+	stateChangeParticle_->DrawImGui("stateChange");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -891,6 +910,10 @@ void Player::InitParticle() {
 	ramuneOffsetY_ = -1.0f;
 
 	stunParticle_->Initialize(dxCommon_);
+
+	stateChangeParticle_->Initialize(dxCommon_);
+	stateChangeParticle_->LoadJson("stateChange");
+	stateChangeParticle_->Stop();
 }
 
 void Player::UpdateParticle() {
@@ -964,6 +987,9 @@ void Player::UpdateParticle() {
 	bulletShotParticle_->Update();
 
 	bulletDieParticle_->Update();
+
+	stateChangeParticle_->SetEmitterPosition(transform_.translate);
+	stateChangeParticle_->Update();
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -975,4 +1001,5 @@ void Player::DrawParticle(Camera useCamera) {
 	stunParticle_->Draw(useCamera);
 	bulletShotParticle_->Draw(useCamera);
 	bulletDieParticle_->Draw(useCamera);
+	stateChangeParticle_->Draw(useCamera);
 }
