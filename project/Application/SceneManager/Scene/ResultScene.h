@@ -122,6 +122,8 @@ private:
 	// 「ショット回数」スプライト
 	unique_ptr<Sprite> spriteShotCount_ = make_unique<Sprite>();
 	
+	unique_ptr<Sprite> nextUI_ = make_unique<Sprite>();
+
 	// スクリーン切り替えフラグ
 	bool isScreenChange_ = false;
 

@@ -697,8 +697,8 @@ void TitleScene::OptionUIUpdate() {
 	// オプションBGのスケール制御
 	if (optionTimer_.IsActive()) {
 		if (optionOpen_) {
-			optionBGScale_.x = Easing::Lerp(0.0f, 65.0f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
-			optionBGScale_.y = Easing::Lerp(0.0f, 35.0f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
+			optionBGScale_.x = Easing::Lerp(0.0f, 1.55f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
+			optionBGScale_.y = Easing::Lerp(0.0f, 0.85f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
 
 			normalUIScale_.x = Easing::Lerp(0.0f, 0.4f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
 			normalUIScale_.y = Easing::Lerp(0.0f, 0.4f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack);
@@ -712,8 +712,8 @@ void TitleScene::OptionUIUpdate() {
 			OptionBearUI_->SetScale({ Easing::Lerp(0.0f, 0.6f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) ,Easing::Lerp(0.0f, 0.6f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) });
 			uiBoxUI_->SetScale({ Easing::Lerp(0.0f, 0.85f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) ,Easing::Lerp(0.0f, 0.75f, optionTimer_.GetProgress(), Easing::Type::EaseOutBack) });
 		} else {
-			optionBGScale_.x = Easing::Lerp(65.0f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
-			optionBGScale_.y = Easing::Lerp(35.0f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
+			optionBGScale_.x = Easing::Lerp(1.55f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
+			optionBGScale_.y = Easing::Lerp(0.85f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
 
 			normalUIScale_.x = Easing::Lerp(0.4f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
 			normalUIScale_.y = Easing::Lerp(0.4f, 0.0f, optionTimer_.GetProgress(), Easing::Type::EaseInBack);
@@ -731,7 +731,7 @@ void TitleScene::OptionUIUpdate() {
 		// タイマーが非アクティブな場合の適切なスケール設定
 		if (optionOpen_) {
 			// オープン状態で完了：最大サイズに設定
-			optionBGScale_ = { 65.0f, 35.0f };
+		    optionBGScale_ = { 1.55f, 0.85f };
 			normalUIScale_ = { 0.4f,0.4f };
 			optionCursolUIScale_ = { 0.2f,0.2f };
 			parenthesesUIScale_ = { 0.25f,0.25f };
@@ -908,7 +908,7 @@ void TitleScene::InitSptite() {
 	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,386.0f }, { 0.3f,0.3f });
 	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/UIBoxUI.png", { 604.0f,340.0f }, { 0.0f,0.0f });
+	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/UIBoxUI.png", { 640.0f,355.0f }, { 0.0f,0.0f });
 	optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.85f });
 
 	optionCursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 150.0f,156.0f }, { 0.0f,0.0f });
