@@ -70,6 +70,9 @@ void TitleScene::Initialize() {
 	titleParticle_->LoadJson("candy");
 	titleParticle_->Stop();
 
+	testParticle_->Initialize(&ctx_->dxCommon, 1);
+	testParticle_->LoadJson("GoalParticle");
+
 	// 雲の初期化
 	for (int i = 0; i < cloud_.size(); i++) {
 		cloud_[i] = make_unique<Model>();	
@@ -142,6 +145,9 @@ void TitleScene::Update() {
 	titleParticle_->SetBlendMode(BlendMode::kBlendModeNone);
 	titleParticle_->Update();
 
+	testParticle_->SetBlendMode(BlendMode::kBlendModeNone);
+	testParticle_->Update();
+
 	// カメラ切り替え&更新
 	CameraController();
 }
@@ -159,6 +165,7 @@ void TitleScene::Draw() {
 	titleObject_->Draw(*useCamera_);
 
 	titleParticle_->Draw(*useCamera_);
+	//testParticle_->Draw(*useCamera_);
 
 	for (int i = 0; i < cloud_.size(); i++) {
 		//if (cloudIsActive_[i]) {
@@ -252,6 +259,8 @@ void TitleScene::Draw() {
 	//uiBoxUI_->DrawImGui("uiBox");
 
 	//titleParticle_->DrawImGui("titleParticle");
+
+	//testParticle_->DrawImGui("testParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");
