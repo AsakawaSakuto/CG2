@@ -34,7 +34,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerWing_->SetPosition(transform_.translate);
 
 	// 速度関連初期化
-	acceleration_ = {30.0f, 2.0f, 0.0f};
+	acceleration_ = {20.0f, 2.0f, 0.0f};
 	velocity_ = {0.0f, 0.0f};
 
 	// スコア
@@ -568,16 +568,20 @@ void Player::CollisionThorn() {
 						num_ = 0;
 					}
 
-					// スプライト変更用
-					(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
+					// 弾のゲージをセット
+					SetBulletGauge(-1);
+
+					for (int i = 0; i < bulletGaugeSprites_->size(); ++i) {
+						(*bulletGaugeSprites_)[i].isActive = false;
+					}
+
+					// スタン
+					Stun();
+
+					// 羽のクールダウン開始
+					isStartCoolDown_ = true;
+					break;
 				}
-
-				// スタン
-				Stun();
-
-				// 羽のクールダウン開始
-				isStartCoolDown_ = true;
-				break;
 			}
 		}
 	}
@@ -717,7 +721,11 @@ void Player::CollisionWingThorn() {
 	}
 }
 
-void Player::ResetBulletGauge() { bulletGauge_ = 0; }
+void Player::SetBulletGauge(int point) { 
+	bulletGauge_ +=point;
+	if (bulletGauge_ < 0) { bulletGauge_ = 0; }
+	if (bulletGauge_ > bulletState_.bulletGaugeMax) { bulletGauge_ = bulletState_.bulletGaugeMax; }
+}
 
 void Player::AddScoreByDistance(std::shared_ptr<Thorn>& thorn, float scoreAmount) {
 	switch (thorn->GetThornType()) {
@@ -826,8 +834,8 @@ void Player::PlayerMoveLimit() {
 
 void Player::UpdateCollisionAABB() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x + 0.1f, t.y + 1.0f, t.z + 1.0f};
-	collisionAABB_.min = {t.x - 0.1f, t.y - 1.0f, t.z - 1.0f};
+	collisionAABB_.max = {t.x - 0.4f, t.y + 1.0f, t.z + 1.0f};
+	collisionAABB_.min = {t.x + 0.1f, t.y - 1.0f, t.z - 1.0f};
 }
 
 void Player::StunRotate() {
@@ -853,8 +861,8 @@ void Player::UpdatePlayerHorizontalMove() {
 	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
 
 	const float accelerationFactor = 2.5f; // 反対方向への加速用の定数
-	const float attenuationFactor = 2.0f;  // 減速倍率
-	const float kMaxSpeed = 7.0f;          // 最高速度
+	const float attenuationFactor = 2.2f;  // 減速倍率
+	const float kMaxSpeed = 8.0f;          // 最高速度
 
 	float accelerationX = 0.0f;
 
@@ -873,7 +881,7 @@ void Player::UpdatePlayerHorizontalMove() {
 
 	// 入力なしなら減速する
 	if (!isLeftMove && !isRightMove) {
-		if (std::abs(velocity_.x) < 0.01f) {
+		if (std::abs(velocity_.x) < acceleration_.x) {
 			velocity_.x = 0.0f;
 		} else {
 			// xの絶対値にyの符号が付いた値を返す関数
