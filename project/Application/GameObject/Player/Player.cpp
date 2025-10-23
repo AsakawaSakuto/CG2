@@ -34,7 +34,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerWing_->SetPosition(transform_.translate);
 
 	// 速度関連初期化
-	acceleration_ = {20.0f, 2.0f, 0.0f};
+	acceleration_ = {30.0f, 2.0f, 0.0f};
 	velocity_ = {0.0f, 0.0f};
 
 	// スコア
@@ -63,6 +63,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerDamageSE_->Initialize("resources/sound/SE/InGame/PlayerDamageSE.mp3");
 	DestroyEnemySE_->Initialize("resources/sound/SE/InGame/DestroyEnemySE.mp3");
 	ClearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
+	gaugeChargeSE_->Initialize("resources/sound/SE/InGame/GaugeChargeSE.mp3");
 
 	//
 	ramuneParticle_->Initialize(dxCommon_, 2);
@@ -321,6 +322,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		playerDamageSE_->Reset();
 		DestroyEnemySE_->Reset();
 		ClearSE_->Reset();
+		gaugeChargeSE_->Reset();
 	}
 }
 
@@ -378,6 +380,9 @@ void Player::BulletCharge() {
 		num_ = 0;
 
 		bulletChargeParticle_->Play(false);
+
+		// SE再生
+		gaugeChargeSE_->PlayAudio(SE_Volume);
 	}
 }
 
@@ -834,8 +839,8 @@ void Player::PlayerMoveLimit() {
 
 void Player::UpdateCollisionAABB() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x - 0.4f, t.y + 1.0f, t.z + 1.0f};
-	collisionAABB_.min = {t.x + 0.1f, t.y - 1.0f, t.z - 1.0f};
+	collisionAABB_.max = {t.x - 0.4f, t.y + 0.2f, t.z + 0.5f};
+	collisionAABB_.min = {t.x + 0.1f, t.y - 0.2f, t.z - 0.5f};
 }
 
 void Player::StunRotate() {
@@ -860,8 +865,8 @@ void Player::UpdatePlayerHorizontalMove() {
 	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->LEFT_BOTTON) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
 	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
 
-	const float accelerationFactor = 2.5f; // 反対方向への加速用の定数
-	const float attenuationFactor = 2.2f;  // 減速倍率
+	const float accelerationFactor = 2.0f; // 反対方向への加速用の定数
+	const float attenuationFactor = 1.5f;  // 減速倍率
 	const float kMaxSpeed = 8.0f;          // 最高速度
 
 	float accelerationX = 0.0f;
@@ -881,7 +886,7 @@ void Player::UpdatePlayerHorizontalMove() {
 
 	// 入力なしなら減速する
 	if (!isLeftMove && !isRightMove) {
-		if (std::abs(velocity_.x) < acceleration_.x) {
+		if (std::abs(velocity_.x) < acceleration_.x * deltaTime_) {
 			velocity_.x = 0.0f;
 		} else {
 			// xの絶対値にyの符号が付いた値を返す関数
