@@ -14,6 +14,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	model_->Initialize(dxCommon_, "Machine/Body.obj");
 	model_->SetTexture("resources/model/Machine/Machine.png");
 	model_->SetColor({0.4f, 0.7f, 0.9f, 1.0f});
+	model_->SetUpdateFrustumCulling(false);
 
 	// JSONからステータスを読み込み
 	playerState_ = JsonState::Load<PlayerState>("Resources/Data/playerState.json");

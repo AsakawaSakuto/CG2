@@ -8,26 +8,32 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 	modelBearHead_->Initialize(dxCommon_, "player/Head/Head.obj");
 	modelBearHead_->SetTexture("resources/model/player/Head/Player.png");
 	modelBearHead_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
+	modelBearHead_->SetUpdateFrustumCulling(false);
 
 	modelBearBody_->Initialize(dxCommon_, "player/Body/Body.obj");
 	modelBearBody_->SetTexture("resources/model/player/Body/Player.png");
 	modelBearBody_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
+	modelBearBody_->SetUpdateFrustumCulling(false);
 
 	modelBearArmR_->Initialize(dxCommon_, "player/Arm_R/Arm_R.obj");
 	modelBearArmR_->SetTexture("resources/model/player/Arm_R/Player.png");
 	modelBearArmR_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
+	modelBearArmR_->SetUpdateFrustumCulling(false);
 
 	modelBearArmL_->Initialize(dxCommon_, "player/Arm_L/Arm_L.obj");
 	modelBearArmL_->SetTexture("resources/model/player/Arm_L/Player.png");
 	modelBearArmL_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
+	modelBearArmL_->SetUpdateFrustumCulling(false);
 
 	modelBearLegR_->Initialize(dxCommon_, "player/Leg_R/Leg_R.obj");
 	modelBearLegR_->SetTexture("resources/model/player/Leg_R/Player.png");
 	modelBearLegR_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
+	modelBearLegR_->SetUpdateFrustumCulling(false);
 
 	modelBearLegL_->Initialize(dxCommon_, "player/Leg_L/Leg_L.obj");
 	modelBearLegL_->SetTexture("resources/model/player/Leg_L/Player.png");
 	modelBearLegL_->SetColor({0.9f, 0.7f, 0.4f, 1.0f});
+	modelBearLegL_->SetUpdateFrustumCulling(false);
 
 	// 根のTransform
 	transform_.scale = {1.5f, 1.5f, 1.5f};
