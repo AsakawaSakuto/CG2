@@ -348,6 +348,9 @@ void Player::BulletShot() {
 
 		// SEの再生
 		shotSE_->PlayAudio(SE_Volume);
+
+		//
+		bulletShotParticle_->Play(false);
 	}
 }
 
@@ -366,6 +369,7 @@ void Player::BulletUpdate() {
 		        bullets_.begin(), bullets_.end(),
 		        [playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
 			        float y = bullet->GetTransform().translate.y;
+					Vector3 emitPos = bullet->GetTransform().translate;
 			        return y > playerPosY + 11.0f || y < playerPosY - 11.0f; // 画面外に出たら削除
 		        }),
 		    bullets_.end());
@@ -412,6 +416,7 @@ void Player::PlayerImGui() {
 	//smorkParticle_->DrawImGui("enemyDie");
 	//bulletChargeParticle_->DrawImGui("shot");
 	bulletShotParticle_->DrawImGui("bulletShot");
+	bulletDieParticle_->DrawImGui("bulletDie");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -878,6 +883,10 @@ void Player::InitParticle() {
 	bulletChargeParticle_->LoadJson("shotCharge");
 
 	bulletShotParticle_->Initialize(dxCommon_);
+	bulletShotParticle_->LoadJson("bulletShot");
+
+	bulletDieParticle_->Initialize(dxCommon_);
+	bulletDieParticle_->LoadJson("bulletDie");
 
 	ramuneOffsetY_ = -1.0f;
 
@@ -943,8 +952,18 @@ void Player::UpdateParticle() {
 
 	stunParticle_->Update();
 
+	if (direction_ == Direction::UP) {
+		bulletShotParticle_->SetOffSet({ 0.0f,0.75f,0.0f });
+		bulletShotParticle_->SetEmitVelocityY(15.0f);
+	}
+	else if (direction_ == Direction::DOWN) {
+		bulletShotParticle_->SetOffSet({ 0.0f,-0.75f,0.0f });
+		bulletShotParticle_->SetEmitVelocityY(-15.0f);
+	}
 	bulletShotParticle_->SetEmitterPosition(transform_.translate);
 	bulletShotParticle_->Update();
+
+	bulletDieParticle_->Update();
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -955,4 +974,5 @@ void Player::DrawParticle(Camera useCamera) {
 	bulletChargeParticle_->Draw(useCamera);
 	stunParticle_->Draw(useCamera);
 	bulletShotParticle_->Draw(useCamera);
+	bulletDieParticle_->Draw(useCamera);
 }
