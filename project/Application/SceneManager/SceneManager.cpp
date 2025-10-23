@@ -23,7 +23,7 @@ int SceneManager::Run() {
     appContext_ = std::make_unique<AppContext>();
 
     // 各種初期化
-    appContext_->winApp.Initialize(L"Engine");
+    appContext_->winApp.Initialize(L"2105_おかしあつめてクマサイダー");
     
     // exeのアイコン設定
     appContext_->winApp.SetIconFromTexture("resources/image/icon.png");

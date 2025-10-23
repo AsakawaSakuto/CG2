@@ -180,7 +180,7 @@ void ResultScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	DrawSceneName();
+	/*DrawSceneName();
 
 	ImGui::Begin("Test");
 
@@ -192,7 +192,7 @@ void ResultScene::Draw() {
 
 	ImGui::End();
 
-	nextUI_->DrawImGui("next");
+	nextUI_->DrawImGui("next");*/
 
 	///
 	/// ↑ImGuiここまで
