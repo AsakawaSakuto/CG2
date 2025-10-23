@@ -91,6 +91,18 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 void Model::Update() {
 
+	if (useUpdateFrustumCulling_) {
+		Vector3 worldPosition = GetWorldPosition();
+		// スケールを考慮したバウンディング半径を計算
+		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
+		float adjustedRadius = boundingRadius_ * maxScale;
+
+		// カメラのフラスタム内にない場合は描画をスキップ
+		if (!camera_.IsInFrustum(worldPosition, adjustedRadius)) {
+			return; // 描画をスキップ
+		}
+	}
+
 	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
 
 	// 行列の内容を更新
@@ -143,7 +155,7 @@ void Model::Draw(Camera& useCamera) {
 	camera_ = useCamera;
 
 	// フラスタムカリングのチェック
-	if (enableFrustumCulling_) {
+	if (useDrawFrustumCulling_) {
 		Vector3 worldPosition = GetWorldPosition();
 		// スケールを考慮したバウンディング半径を計算
 		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
@@ -253,7 +265,7 @@ void Model::DrawImGui(const char* objectName) {
 	ImGui::Separator();
 
 	ImGui::Text("Culling");
-	ImGui::Checkbox("Enable Frustum Culling", &enableFrustumCulling_);
+	ImGui::Checkbox("Enable Frustum Culling", &useDrawFrustumCulling_);
 	ImGui::DragFloat("Bounding Radius", &boundingRadius_, 0.1f, 0.1f, 100.0f);
 	
 	ImGui::Separator();

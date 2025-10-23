@@ -98,10 +98,15 @@ public:
 	// フラスタムカリング関連
 	void SetBoundingRadius(float radius) { boundingRadius_ = radius; }
 	float GetBoundingRadius() const { return boundingRadius_; }
-	void SetEnableFrustumCulling(bool enable) { enableFrustumCulling_ = enable; }
-	bool GetEnableFrustumCulling() const { return enableFrustumCulling_; }
+
+	void SetDrawFrustumCulling(bool enable) { useDrawFrustumCulling_ = enable; }
+	bool GetDrawFrustumCulling() const { return useDrawFrustumCulling_; }
+
+	void SetUpdateFrustumCulling(bool enable) { useUpdateFrustumCulling_ = enable; }
+	bool GetUpdateFrustumCulling() const { return useUpdateFrustumCulling_; }
 
 private:
+
 	// モデルジオメトリ共有キャッシュ
 	struct GeometryCache {
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
@@ -141,7 +146,8 @@ private:
 
 	// フラスタムカリング関連
 	float boundingRadius_ = 1.0f; // オブジェクトのバウンディング半径
-	bool enableFrustumCulling_ = true; // フラスタムカリング有効/無効
+	bool useDrawFrustumCulling_ = true; // フラスタムカリング有効/無効
+	bool useUpdateFrustumCulling_ = true;
 
 	//-----------------------------------------------------------//
 

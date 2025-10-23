@@ -7,6 +7,7 @@ void ThornParticle::Initialize(DirectXCommon* dxCommon) {
 	for (int i = 0; i < 10; i++) {
 		pModel_[i] = std::make_unique<Model>();
 		pModel_[i]->Initialize(dxCommon_, "Candy/Candy.obj");
+		pModel_[i]->SetUpdateFrustumCulling(false);
 
 		pTransform_[i].scale = { baseScale_,baseScale_,baseScale_ };
 		pTransform_[i].rotate = { 0.0f,0.0f,0.0f };
@@ -17,6 +18,10 @@ void ThornParticle::Initialize(DirectXCommon* dxCommon) {
 void ThornParticle::Update() {
 
 	for (int i = 0; i < 10; i++) {
+		if (!pIsAlive_[i]) {
+			return;
+		}
+
 		pTransform_[i].translate += pVelocity_[i];
 
 		pTransform_[i].rotate.x += pRotateVelocity_[i].x;

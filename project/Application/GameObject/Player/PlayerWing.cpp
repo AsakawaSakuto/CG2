@@ -16,6 +16,11 @@ void PlayerWing::Initialize(DirectXCommon* dxCommon) {
 	modelArmL01_->Initialize(dxCommon_, "Machine/ArmL_01.obj");
 	modelArmL02_->Initialize(dxCommon_, "Machine/ArmL_02.obj");
 
+	modelArmR01_->SetUpdateFrustumCulling(false);
+	modelArmR02_->SetUpdateFrustumCulling(false);
+	modelArmL01_->SetUpdateFrustumCulling(false);
+	modelArmL02_->SetUpdateFrustumCulling(false);
+
 	transform_.scale = {2.0f, 1.0f, 1.0f};
 	transform_.rotate = {0.0f, 0.0f, 0.0f};
 	transform_.translate = {0.0f, 0.0f, 0.0f};

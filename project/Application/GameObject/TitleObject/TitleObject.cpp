@@ -21,6 +21,7 @@ void TitleObject::Initialize(DirectXCommon* dxCommon) {
 
 	for (int i = 0; i < model_.size(); i++) {
 		model_[i]->SetTransform(transform_[i]);
+		model_[i]->SetUpdateFrustumCulling(false);
 	}
 
 	ramuneParticle_->Initialize(dxCommon_,2);

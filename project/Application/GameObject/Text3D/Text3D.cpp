@@ -34,6 +34,7 @@ void Text3D::Initialize(DirectXCommon* dxCommon) {
 	// Transform配列を初期化
 	for (int i = 0; i < transform_.size(); i++) {
 		model_[i]->SetTexture("resources/image/0.png");
+		model_[i]->SetUpdateFrustumCulling(false);
 		transform_[i].rotate = { 0.0f, 0.0f, 0.0f };
 
 		// タイマーを開始（リセット後に開始）

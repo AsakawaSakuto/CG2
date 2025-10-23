@@ -442,7 +442,7 @@ void GameScene::Draw() {
 	// プレイヤーのImGui
 	//player_->DrawImgui();
 
-	//DrawSceneName();
+	DrawSceneName();
 
 	// ゲームシーン上で管理しているステータスのImGui
 	//GameSceneStateImGui();
