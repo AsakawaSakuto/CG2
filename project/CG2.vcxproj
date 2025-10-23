@@ -146,6 +146,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\GameObject\ExperiencePoints\ExperiencePoints.cpp" />
     <ClCompile Include="Application\GameObject\Player\Bullet.cpp" />
+    <ClCompile Include="Application\GameObject\Player\Particle\stunP.cpp" />
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameObject\Player\PlayerWing.cpp" />
     <ClCompile Include="Application\GameObject\Player\State\PlayerStateLoader.cpp" />
@@ -214,6 +215,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameObject\ExperiencePoints\ExperiencePoints.h" />
     <ClInclude Include="Application\GameObject\GameObject.h" />
     <ClInclude Include="Application\GameObject\Player\Bullet.h" />
+    <ClInclude Include="Application\GameObject\Player\Particle\stunP.h" />
     <ClInclude Include="Application\GameObject\Player\Player.h" />
     <ClInclude Include="Application\GameObject\Player\PlayerWing.h" />
     <ClInclude Include="Application\GameObject\Player\State\BulletState.h" />

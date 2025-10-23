@@ -85,6 +85,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	bulletChargeParticle_->LoadJson("shotCharge");
 
 	ramuneOffsetY_ = -1.0f;
+
+	stunParticle_->Initialize(dxCommon_);
 }
 
 void Player::Update() {
@@ -227,6 +229,8 @@ void Player::Update() {
 	bulletChargeParticle_->SetEmitterPosition(transform_.translate);
 	bulletChargeParticle_->Update();
 
+	stunParticle_->Update();
+
 	// オーディオの更新
 	AudioUpdate();
 }
@@ -255,6 +259,7 @@ void Player::Draw(Camera useCamera) {
 	kasokuParticle_->Draw(useCamera);
 	smorkParticle_->Draw(useCamera);
 	bulletChargeParticle_->Draw(useCamera);
+	stunParticle_->Draw(useCamera);
 }
 
 void Player::DrawImgui() {
@@ -527,6 +532,8 @@ void Player::Stun() {
 		// パーティクル停止
 		ramuneParticle_->Stop();
 		ramuneWhiteParticle_->Stop();
+
+		stunParticle_->Play(transform_.translate);
 	}
 }
 
