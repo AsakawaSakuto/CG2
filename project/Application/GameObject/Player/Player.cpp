@@ -440,9 +440,9 @@ void Player::PlayerImGui() {
 	//bulletDieParticle_->DrawImGui("bulletDie");
 	//stateChangeParticle_->DrawImGui("stateChange");
 	//fallParticle_->DrawImGui("fall");
-	//armHitParticle1_->DrawImGui("armHit1");
+	//arrticle1_->DrawImGui("armHit1");
 	//armHitParticle2_->DrawImGui("armHit2");
-	//armHitParticle3_->DrawImGui("armHit3");
+	armHitParticle3_->DrawImGui("armHit3");
 	//goalParticle_->DrawImGui("goal");
 }
 
@@ -666,11 +666,11 @@ void Player::CollisionWingThorn() {
 			// トゲの回転
 			thorn->SetIsRotate(true);
 
-			armHitParticle1_->SetEmitterPosition(thorn->GetPosition());
+			armHitParticle1_->SetEmitterPosition({ thorn->GetPosition().x,thorn->GetPosition().y,thorn->GetPosition().z - 1.0f });
 			armHitParticle1_->Play(false);
-			armHitParticle2_->SetEmitterPosition(thorn->GetPosition());
+			armHitParticle2_->SetEmitterPosition({ thorn->GetPosition().x,thorn->GetPosition().y,thorn->GetPosition().z - 1.0f });
 			armHitParticle2_->Play(false);
-			armHitParticle3_->SetEmitterPosition(thorn->GetPosition());
+			armHitParticle3_->SetEmitterPosition({ thorn->GetPosition().x,thorn->GetPosition().y,thorn->GetPosition().z - 1.0f });
 			armHitParticle3_->Play(false);
 
 			if (dis < kNearThreshold) {
