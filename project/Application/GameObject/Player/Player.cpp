@@ -434,6 +434,9 @@ void Player::PlayerImGui() {
 	//bulletDieParticle_->DrawImGui("bulletDie");
 	stateChangeParticle_->DrawImGui("stateChange");
 	fallParticle_->DrawImGui("fall");
+	armHitParticle1_->DrawImGui("armHit1");
+	armHitParticle2_->DrawImGui("armHit2");
+	armHitParticle3_->DrawImGui("armHit3");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -655,6 +658,13 @@ void Player::CollisionWingThorn() {
 
 			// トゲの回転
 			thorn->SetIsRotate(true);
+
+			armHitParticle1_->SetEmitterPosition(thorn->GetPosition());
+			armHitParticle1_->Play(false);
+			armHitParticle2_->SetEmitterPosition(thorn->GetPosition());
+			armHitParticle2_->Play(false);
+			armHitParticle3_->SetEmitterPosition(thorn->GetPosition());
+			armHitParticle3_->Play(false);
 
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
@@ -918,8 +928,17 @@ void Player::InitParticle() {
 	fallParticle_->Stop();
 
 	stateChangeTimer_.Reset();
-}
 
+	armHitParticle1_->Initialize(dxCommon_);
+	armHitParticle1_->LoadJson("armHit1");
+	armHitParticle1_->Stop();
+	armHitParticle2_->Initialize(dxCommon_);
+	armHitParticle2_->LoadJson("armHit2");
+	armHitParticle2_->Stop();
+	armHitParticle3_->Initialize(dxCommon_);
+	armHitParticle3_->LoadJson("armHit3");
+	armHitParticle3_->Stop();
+}
 void Player::UpdateParticle() {
 	if (stunTimer_.IsFinished()) {
 		ramuneParticle_->Play();
@@ -1005,6 +1024,10 @@ void Player::UpdateParticle() {
 	    fallParticle_->Play();
 	}
 	stateChangeTimer_.Update();
+
+	armHitParticle1_->Update();
+	armHitParticle2_->Update();
+	armHitParticle3_->Update();
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -1018,4 +1041,7 @@ void Player::DrawParticle(Camera useCamera) {
 	bulletDieParticle_->Draw(useCamera);
 	stateChangeParticle_->Draw(useCamera);
 	fallParticle_->Draw(useCamera);
+	armHitParticle1_->Draw(useCamera);
+	armHitParticle2_->Draw(useCamera);
+	armHitParticle3_->Draw(useCamera);
 }

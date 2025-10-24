@@ -1,7 +1,7 @@
 {
-    "alphaFade": 0,
+    "alphaFade": 1,
     "blendMode": 2,
-    "colorFade": 0,
+    "colorFade": 1,
     "colorRandom": 0,
     "coneAngle": 45.0,
     "coneDirection": [
@@ -13,14 +13,14 @@
     "count": 1,
     "emit": 0,
     "endColor": [
+        0.9411765336990356,
         1.0,
-        0.0,
         0.0
     ],
-    "endRotateVelocity": 0.0,
+    "endRotateVelocity": -1.0,
     "endScale": [
-        0.0,
-        0.0
+        2.5,
+        2.5
     ],
     "endVelocity": [
         0.0,
@@ -30,9 +30,9 @@
     "frequency": 1.0,
     "frequencyTime": 0.0,
     "hemisphereAngle": 180.0,
-    "isMove": 1,
+    "isMove": 0,
     "kMaxParticle": 512,
-    "lifeTime": 2.0,
+    "lifeTime": 0.25,
     "lifeTimeRandom": 0,
     "lineLength": 2.0,
     "lineStart": [
@@ -75,8 +75,8 @@
         -1.0
     ],
     "normalVelocity": [
-        1.0,
-        1.0,
+        0.0,
+        0.0,
         0.0
     ],
     "planeHeight": 2.0,
@@ -88,18 +88,18 @@
     "planeWidth": 2.0,
     "radius": 1.0,
     "ringAngle": 0.0,
-    "ringInnerRadius": 0.009999999776482582,
+    "ringInnerRadius": 0.5,
     "ringNormal": [
         0.0,
         1.0,
         0.0
     ],
-    "ringOuterRadius": 0.009999999776482582,
-    "rotateMove": 0,
+    "ringOuterRadius": 1.0,
+    "rotateMove": 1,
     "rotateVelocityRandom": 0,
-    "scaleFade": 0,
+    "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 7,
+    "shapeType": 0,
     "size": [
         1.0,
         1.0,
@@ -110,21 +110,21 @@
         1.0,
         1.0
     ],
-    "startRotateVelocity": 0.0,
+    "startRotateVelocity": 1.0,
     "startScale": [
-        1.0,
-        1.0
+        0.5,
+        0.5
     ],
     "startVelocity": [
         0.0,
         0.0,
         0.0
     ],
-    "texturePath": "star3",
+    "texturePath": "harfCircle",
     "translate": [
-        1.9000000953674316,
-        120.0,
-        -25602.75
+        4.789999961853027,
+        54.130001068115234,
+        -1313.3900146484375
     ],
     "useEmitter": 0,
     "velocityRandom": 0

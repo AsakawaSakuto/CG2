@@ -349,9 +349,6 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	// プレイヤーの描画処理
-	player_->Draw(*useCamera_);
-
 	// トゲの描画処理
 	for (auto& thorn : thorns_) {
 		if (thorn->GetIsAlive()) {
@@ -359,6 +356,9 @@ void GameScene::Draw() {
 		}
 		thorn->DrawParticle(*useCamera_);
 	}
+
+	// プレイヤーの描画処理
+	player_->Draw(*useCamera_);
 
 	// ラムネゲージ
 	// spriteChargeUI_->Draw();
