@@ -2,6 +2,7 @@
 #include"Vector3.h"
 #include"Vector2.h"
 #include <string>
+#include"BlendMode.h"
 
 /// <summary>
 /// Emitterの形状タイプ
@@ -130,4 +131,5 @@ struct EmitterState {
 	float accelerationY;
 
 	std::string texturePath;
+	BlendMode blendMode = kBlendModeAdd; // BlendModeフィールドを追加
 };

@@ -1,5 +1,6 @@
 {
     "alphaFade": 1,
+    "blendMode": 2,
     "colorFade": 1,
     "colorRandom": 0,
     "coneAngle": 45.0,
@@ -9,14 +10,14 @@
         0.0
     ],
     "coneHeight": 2.0,
-    "count": 5,
-    "emit": 1,
+    "count": 3,
+    "emit": 0,
     "endColor": [
+        0.8529411554336548,
         1.0,
-        1.0,
-        1.0
+        0.0
     ],
-    "endRotateVelocity": 0.0,
+    "endRotateVelocity": -3.0,
     "endScale": [
         0.0,
         0.0
@@ -26,12 +27,12 @@
         0.0,
         0.0
     ],
-    "frequency": 0.009999999776482582,
+    "frequency": 1.0,
     "frequencyTime": 0.0,
     "hemisphereAngle": 180.0,
     "isMove": 1,
-    "kMaxParticle": 1024,
-    "lifeTime": 0.30000001192092896,
+    "kMaxParticle": 512,
+    "lifeTime": 1.0,
     "lifeTimeRandom": 0,
     "lineLength": 2.0,
     "lineStart": [
@@ -52,9 +53,9 @@
         1.5
     ],
     "maxVelocity": [
-        5.0,
-        -3.5,
-        0.0
+        1.0,
+        1.0,
+        1.0
     ],
     "minColor": [
         0.0,
@@ -69,13 +70,13 @@
         0.5
     ],
     "minVelocity": [
-        -5.0,
         -1.0,
-        0.0
+        -1.0,
+        -1.0
     ],
     "normalVelocity": [
-        0.0,
-        0.0,
+        5.0,
+        5.0,
         0.0
     ],
     "planeHeight": 2.0,
@@ -87,44 +88,44 @@
     "planeWidth": 2.0,
     "radius": 1.0,
     "ringAngle": 0.0,
-    "ringInnerRadius": 0.0,
+    "ringInnerRadius": 0.009999999776482582,
     "ringNormal": [
         0.0,
         1.0,
         0.0
     ],
-    "ringOuterRadius": 0.2199999988079071,
-    "rotateMove": 0,
+    "ringOuterRadius": 0.009999999776482582,
+    "rotateMove": 1,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 6,
+    "shapeType": 7,
     "size": [
         1.0,
         1.0,
         1.0
     ],
     "startColor": [
-        0.0,
-        0.7941176891326904,
-        1.0
+        1.0,
+        1.0,
+        0.0
     ],
-    "startRotateVelocity": 0.0,
+    "startRotateVelocity": 3.0,
     "startScale": [
-        0.30000001192092896,
-        0.30000001192092896
+        2.0,
+        2.0
     ],
     "startVelocity": [
         0.0,
         0.0,
         0.0
     ],
-    "texturePath": "circle",
+    "texturePath": "star3",
     "translate": [
-        -0.02500137872993946,
-        61.98518371582031,
+        -1.0999999046325684,
+        395.0,
         0.0
     ],
-    "useEmitter": 1,
-    "velocityRandom": 1
+    "useEmitter": 0,
+    "velocityRandom": 0
 }

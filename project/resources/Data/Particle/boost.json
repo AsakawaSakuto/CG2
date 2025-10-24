@@ -1,5 +1,6 @@
 {
     "alphaFade": 1,
+    "blendMode": 1,
     "colorFade": 1,
     "colorRandom": 0,
     "coneAngle": 45.0,
@@ -9,12 +10,12 @@
         0.0
     ],
     "coneHeight": 2.0,
-    "count": 5,
+    "count": 12,
     "emit": 1,
     "endColor": [
         1.0,
-        1.0,
-        1.0
+        0.0,
+        0.0
     ],
     "endRotateVelocity": 0.0,
     "endScale": [
@@ -30,8 +31,8 @@
     "frequencyTime": 0.0,
     "hemisphereAngle": 180.0,
     "isMove": 1,
-    "kMaxParticle": 1024,
-    "lifeTime": 0.30000001192092896,
+    "kMaxParticle": 512,
+    "lifeTime": 0.5,
     "lifeTimeRandom": 0,
     "lineLength": 2.0,
     "lineStart": [
@@ -53,7 +54,7 @@
     ],
     "maxVelocity": [
         5.0,
-        -3.5,
+        -1.0,
         0.0
     ],
     "minColor": [
@@ -93,37 +94,37 @@
         1.0,
         0.0
     ],
-    "ringOuterRadius": 0.2199999988079071,
+    "ringOuterRadius": 0.30000001192092896,
     "rotateMove": 0,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 6,
+    "shapeType": 7,
     "size": [
         1.0,
         1.0,
         1.0
     ],
     "startColor": [
-        0.0,
-        0.7941176891326904,
-        1.0
+        1.0,
+        0.23529410362243652,
+        0.0
     ],
     "startRotateVelocity": 0.0,
     "startScale": [
-        0.30000001192092896,
-        0.30000001192092896
+        0.5,
+        0.5
     ],
     "startVelocity": [
         0.0,
         0.0,
         0.0
     ],
-    "texturePath": "circle",
+    "texturePath": "smork2",
     "translate": [
-        -0.02500137872993946,
-        61.98518371582031,
-        0.0
+        -0.24166691303253174,
+        267.7112121582031,
+        -0.7799999713897705
     ],
     "useEmitter": 1,
     "velocityRandom": 1

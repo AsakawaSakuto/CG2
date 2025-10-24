@@ -40,6 +40,16 @@ namespace nlohmann {
             type = static_cast<EmitterShapeType>(j.get<uint32_t>());
         }
     };
+
+    template <>
+    struct adl_serializer<BlendMode> {
+        static void to_json(json& j, const BlendMode& mode) {
+            j = static_cast<int>(mode);
+        }
+        static void from_json(const json& j, BlendMode& mode) {
+            mode = static_cast<BlendMode>(j.get<int>());
+        }
+    };
 }
 
 // =============================================================
@@ -138,6 +148,9 @@ EmitterState EmitterStateLoader::Load(const std::string& filePath) {
     // テクスチャパス
     state.texturePath = data.value("texturePath", std::string(""));
 
+    // BlendMode
+    state.blendMode = data.value("blendMode", kBlendModeAdd);
+
     return state;
 }
 
@@ -220,7 +233,10 @@ void EmitterStateLoader::Save(const std::string& filePath, const EmitterState& s
         {"ringNormal", state.ringNormal},
         
         // テクスチャパス
-        {"texturePath", state.texturePath}
+        {"texturePath", state.texturePath},
+        
+        // BlendMode
+        {"blendMode", state.blendMode}
     };
 
     std::ofstream file(filePath);

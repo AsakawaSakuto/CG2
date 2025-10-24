@@ -145,7 +145,7 @@ void TitleScene::Update() {
 	titleParticle_->SetBlendMode(BlendMode::kBlendModeNone);
 	titleParticle_->Update();
 
-	testParticle_->SetBlendMode(BlendMode::kBlendModeNone);
+	testParticle_->SetBlendMode(BlendMode::kBlendModeNormal);
 	testParticle_->Update();
 
 	// カメラ切り替え&更新
@@ -165,7 +165,7 @@ void TitleScene::Draw() {
 	titleObject_->Draw(*useCamera_);
 
 	titleParticle_->Draw(*useCamera_);
-	//testParticle_->Draw(*useCamera_);
+	testParticle_->Draw(*useCamera_);
 
 	for (int i = 0; i < cloud_.size(); i++) {
 		//if (cloudIsActive_[i]) {
@@ -260,7 +260,7 @@ void TitleScene::Draw() {
 
 	//titleParticle_->DrawImGui("titleParticle");
 
-	//testParticle_->DrawImGui("testParticle");
+	testParticle_->DrawImGui("testParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");

@@ -101,6 +101,9 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 
 	// Initialize texture path
 	emitter_.texturePath = TextureName;
+	
+	// Initialize blend mode
+	emitter_.blendMode = kBlendModeAdd;
 
 	CreateEmitterResource();
 	CreateParticleResource();
@@ -222,6 +225,23 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
+	// BlendMode選択コンボボックスを追加
+	const char* blendModeNames[] = {
+		"None",
+		"Normal", 
+		"Add",
+		"Subtract",
+		"Multiply",
+		"Screen"
+	};
+	int currentBlendMode = static_cast<int>(emitter_.blendMode);
+	if (ImGui::Combo("Blend Mode", &currentBlendMode, blendModeNames, IM_ARRAYSIZE(blendModeNames))) {
+		emitter_.blendMode = static_cast<BlendMode>(currentBlendMode);
+		blendMode_ = emitter_.blendMode; // 内部のblendMode_も更新
+	}
+
+	ImGui::Separator();
+
 	if (EmitterStateLoader::InputText("File Name", loadToSaveName_)) {
 		// 入力が変更されたらここに来る
 		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
@@ -230,6 +250,9 @@ void Particles::DrawImGui(const char* objectName) {
 	if (ImGui::Button("Load to Json")) {
 		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
+		
+		// JSONから読み込んだBlendModeを内部変数にも反映
+		blendMode_ = emitter_.blendMode;
 
 		// JSONから読み込んだテクスチャパスを適用
 		if (!emitter_.texturePath.empty()) {

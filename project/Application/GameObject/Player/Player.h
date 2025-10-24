@@ -7,6 +7,7 @@
 #include "State/BulletState.h"
 #include "Bear.h"
 #include "Application/Score/ScoreList.h"
+#include "Application/GameObject/Player/Particle/stunP.h"
 
 class Thorn;
 class Block;
@@ -161,6 +162,11 @@ private:
 	// ImGuiスコア
 	void DrawImGuiJsonStateScore();
 
+	void InitParticle();
+
+	void UpdateParticle();
+
+	void DrawParticle(Camera useCamera);
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -258,9 +264,18 @@ private:
 	std::unique_ptr<Particles> kasokuParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> smorkParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> bulletChargeParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> bulletShotParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> bulletDieParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> stateChangeParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> fallParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> armHitParticle1_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> armHitParticle2_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> armHitParticle3_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> goalParticle1_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> goalParticle2_ = std::make_unique<Particles>();
 	float ramuneOffsetY_ = -1.0f;
 	float kasokuOffsetY_ = 12.0f;
-
-	// 衝突時ゲージの減少量
-	
+	std::unique_ptr<StunP> stunParticle_ = std::make_unique<StunP>();
+	GameTimer stateChangeTimer_;
+	bool playerIsMove_ = true;
 };

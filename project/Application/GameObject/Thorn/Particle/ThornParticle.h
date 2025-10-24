@@ -26,4 +26,7 @@ private:
 	float baseScale_ = 0.2f;
 	float gravity_ = -0.125f;
 	float acceleration_ = 0.0f;
+
+	Vector3 colorRGB_;
+	Random rand_;
 };

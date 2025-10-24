@@ -107,6 +107,11 @@ public:
 		emitter_.maxVelocity = velocity;
 	}
 
+	void SetEmitVelocityY(float velocityY) {
+		emitter_.minVelocity.y = velocityY;
+		emitter_.maxVelocity.y = velocityY;
+	}
+
 	/// <summary>
 	/// パーティクルの生成開始
 	/// </summary>
@@ -148,6 +153,10 @@ public:
 		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
 		loadToSaveName_ = filePath;
+		
+		// JSONから読み込んだBlendModeを内部変数にも反映
+		blendMode_ = emitter_.blendMode;
+		
 		// JSONから読み込んだテクスチャパスを適用
 		if (!emitter_.texturePath.empty()) {
 			std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";

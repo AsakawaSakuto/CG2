@@ -1,22 +1,22 @@
 {
     "alphaFade": 1,
-    "colorFade": 1,
+    "colorFade": 0,
     "colorRandom": 0,
     "coneAngle": 45.0,
     "coneDirection": [
-        0.0,
-        1.0,
-        0.0
+        -0.02531253546476364,
+        0.9996616244316101,
+        -0.0059898593463003635
     ],
     "coneHeight": 2.0,
-    "count": 5,
-    "emit": 1,
+    "count": 1,
+    "emit": 0,
     "endColor": [
         1.0,
-        1.0,
-        1.0
+        0.0,
+        0.0
     ],
-    "endRotateVelocity": 0.0,
+    "endRotateVelocity": -1.0,
     "endScale": [
         0.0,
         0.0
@@ -28,10 +28,10 @@
     ],
     "frequency": 0.009999999776482582,
     "frequencyTime": 0.0,
-    "hemisphereAngle": 180.0,
-    "isMove": 1,
-    "kMaxParticle": 1024,
-    "lifeTime": 0.30000001192092896,
+    "hemisphereAngle": 90.0,
+    "isMove": 0,
+    "kMaxParticle": 512,
+    "lifeTime": 1.0,
     "lifeTimeRandom": 0,
     "lineLength": 2.0,
     "lineStart": [
@@ -53,7 +53,7 @@
     ],
     "maxVelocity": [
         5.0,
-        -3.5,
+        5.0,
         0.0
     ],
     "minColor": [
@@ -69,8 +69,8 @@
         0.5
     ],
     "minVelocity": [
-        -5.0,
-        -1.0,
+        5.0,
+        5.0,
         0.0
     ],
     "normalVelocity": [
@@ -78,14 +78,14 @@
         0.0,
         0.0
     ],
-    "planeHeight": 2.0,
+    "planeHeight": 3.609999895095825,
     "planeNormal": [
-        0.0,
-        1.0,
-        0.0
+        0.08036184310913086,
+        0.5634726285934448,
+        0.8222169280052185
     ],
-    "planeWidth": 2.0,
-    "radius": 1.0,
+    "planeWidth": 2.9200000762939453,
+    "radius": 5.539999961853027,
     "ringAngle": 0.0,
     "ringInnerRadius": 0.0,
     "ringNormal": [
@@ -93,38 +93,38 @@
         1.0,
         0.0
     ],
-    "ringOuterRadius": 0.2199999988079071,
-    "rotateMove": 0,
+    "ringOuterRadius": 0.009999999776482582,
+    "rotateMove": 1,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 6,
+    "shapeType": 0,
     "size": [
         1.0,
         1.0,
         1.0
     ],
     "startColor": [
+        1.0,
         0.0,
-        0.7941176891326904,
-        1.0
+        0.0
     ],
-    "startRotateVelocity": 0.0,
+    "startRotateVelocity": 1.0,
     "startScale": [
-        0.30000001192092896,
-        0.30000001192092896
+        1.0,
+        1.0
     ],
     "startVelocity": [
         0.0,
         0.0,
         0.0
     ],
-    "texturePath": "circle",
+    "texturePath": "closs2",
     "translate": [
-        -0.02500137872993946,
-        61.98518371582031,
+        0.0,
+        0.0,
         0.0
     ],
-    "useEmitter": 1,
-    "velocityRandom": 1
+    "useEmitter": 0,
+    "velocityRandom": 0
 }
