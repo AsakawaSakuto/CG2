@@ -46,7 +46,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		}
 
 		cache->textureName = cache->modelData.material.textureFilePath;
-		// .objの参照しているテクスチャファイル読み込み
+		// .objの参照しているテクスチャファイル読み込み（初回のみ）
 		TextureManager::GetInstance()->LoadTexture(cache->textureName);
 		// 読み込んだテクスチャの番号を取得
 		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
@@ -66,6 +66,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		s_geometryCache_.emplace(modelPath_, cache);
 		it = s_geometryCache_.find(modelPath_);
 	}
+	// else の場合：キャッシュヒット = モデル読み込みスキップ成功
 
 	// キャッシュからインスタンスへ設定
 	const auto& cache = it->second;
