@@ -112,8 +112,8 @@
     ],
     "startRotateVelocity": 3.0,
     "startScale": [
-        2.0,
-        2.0
+        1.0,
+        1.0
     ],
     "startVelocity": [
         0.0,
@@ -124,7 +124,7 @@
     "translate": [
         -1.0999999046325684,
         395.0,
-        0.0
+        -1.0
     ],
     "useEmitter": 0,
     "velocityRandom": 0
