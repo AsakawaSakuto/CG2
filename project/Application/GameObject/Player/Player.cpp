@@ -241,8 +241,14 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
-		// ゴールフラグをたてる
-		isGoal_ = true;
+		if (!isGoal_) {
+			goalParticle1_->SetEmitterPosition({ 5.0f,-22.5f,0.0f });
+			goalParticle1_->Play(false);
+			goalParticle2_->SetEmitterPosition({ -5.0f,-22.5f,0.0f });
+			goalParticle2_->Play(false);
+		    // ゴールフラグをたてる
+			isGoal_ = true;
+		}
 
 		// カメラのオフセット変更
 		playerState_.cameraOffset = CAMERA_OFFSET_BOTTOM;
@@ -432,11 +438,12 @@ void Player::PlayerImGui() {
 	//bulletChargeParticle_->DrawImGui("shot");
 	//bulletShotParticle_->DrawImGui("bulletShot");
 	//bulletDieParticle_->DrawImGui("bulletDie");
-	stateChangeParticle_->DrawImGui("stateChange");
-	fallParticle_->DrawImGui("fall");
-	armHitParticle1_->DrawImGui("armHit1");
-	armHitParticle2_->DrawImGui("armHit2");
-	armHitParticle3_->DrawImGui("armHit3");
+	//stateChangeParticle_->DrawImGui("stateChange");
+	//fallParticle_->DrawImGui("fall");
+	//armHitParticle1_->DrawImGui("armHit1");
+	//armHitParticle2_->DrawImGui("armHit2");
+	//armHitParticle3_->DrawImGui("armHit3");
+	//goalParticle_->DrawImGui("goal");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -938,6 +945,14 @@ void Player::InitParticle() {
 	armHitParticle3_->Initialize(dxCommon_);
 	armHitParticle3_->LoadJson("armHit3");
 	armHitParticle3_->Stop();
+
+	goalParticle1_->Initialize(dxCommon_);
+	goalParticle1_->LoadJson("goal");
+	goalParticle1_->Stop();
+
+	goalParticle2_->Initialize(dxCommon_);
+	goalParticle2_->LoadJson("goal");
+	goalParticle2_->Stop();
 }
 void Player::UpdateParticle() {
 	if (stunTimer_.IsFinished()) {
@@ -1028,6 +1043,9 @@ void Player::UpdateParticle() {
 	armHitParticle1_->Update();
 	armHitParticle2_->Update();
 	armHitParticle3_->Update();
+	
+	goalParticle1_->Update();
+	goalParticle2_->Update();
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -1044,4 +1062,6 @@ void Player::DrawParticle(Camera useCamera) {
 	armHitParticle1_->Draw(useCamera);
 	armHitParticle2_->Draw(useCamera);
 	armHitParticle3_->Draw(useCamera);
+	goalParticle1_->Draw(useCamera);
+	goalParticle2_->Draw(useCamera);
 }
