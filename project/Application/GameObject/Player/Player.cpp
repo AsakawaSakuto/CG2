@@ -35,7 +35,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerWing_->SetPosition(transform_.translate);
 
 	// 速度関連初期化
-	acceleration_ = {30.0f, 2.0f, 0.0f};
+	acceleration_ = {35.0f, 2.0f, 0.0f};
 	velocity_ = {0.0f, 0.0f};
 
 	// スコア
@@ -837,9 +837,9 @@ void Player::UpdatePlayerHorizontalMove() {
 	bool isLeftMove = gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->LEFT_BOTTON) || input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A);
 	bool isRightMove = gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D);
 
-	const float accelerationFactor = 2.0f; // 反対方向への加速用の定数
+	const float accelerationFactor = 2.5f; // 反対方向への加速用の定数
 	const float attenuationFactor = 1.5f;  // 減速倍率
-	const float kMaxSpeed = 8.0f;          // 最高速度
+	const float kMaxSpeed = 10.0f;          // 最高速度
 
 	float accelerationX = 0.0f;
 
