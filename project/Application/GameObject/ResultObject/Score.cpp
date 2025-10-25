@@ -8,28 +8,51 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	InitScoreModel();
 	InitRankModel();
 	InitPlayerModel();
+
+	pushAsusumu_->Initialize(dxCommon_, "resources/image/UI/ContinueAUI.png", { 1155.0f,666.0f }, { 0.3f,0.3f });
+	pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 }
 
 void Score::Update() {
+
+	switch (screenType_)
+	{
+	case Score::ScreenType::SCORE:
+
+		ScoreIn();
+		pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,rankAndPlayerEasingTimer_.GetProgress() });
+
+		break;
+
+	case Score::ScreenType::RANKING:
+
+		ScoreOut();
+		pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetReverseProgress()});
+
+		if (input_->TriggerKey(DIK_SPACE)) {
+			goTitle_ = true;
+		}
+
+		break;
+	}
+
 	for (int i = 0; i < textModel_.size(); ++i) {
-		textModel_[i]->SetTransform(textTransform_[i]);
 		textModel_[i]->Update();
 	}
 
 	for (int i = 0; i < scoreModel_.size(); ++i) {
-		scoreModel_[i]->SetTransform(scoreTransform_[i]);
 		scoreModel_[i]->Update();
 	}
-
+	
 	for (int i = 0; i < rankModel_.size(); ++i) {
-		rankModel_[i]->SetTransform(rankTransform_[i]);
 		rankModel_[i]->Update();
 	}
 
-	playerModel_->SetTransform(playerTransform_);
 	playerModel_->Update();
-	machineModel_->SetTransform(machineTransform_);
+
 	machineModel_->Update();
+
+	pushAsusumu_->Update();
 }
 
 void Score::Draw(Camera camera) {
@@ -47,9 +70,14 @@ void Score::Draw(Camera camera) {
 
 	playerModel_->Draw(camera);
 	machineModel_->Draw(camera);
+
+	pushAsusumu_->Draw();
 }
 
 void Score::DrawImGui() {
+
+	pushAsusumu_->DrawImGui("pushAsusumu");
+
 	ImGui::Begin("text");
 
 	ImGui::DragFloat3("t0", &textTransform_[0].translate.x,0.01f);
@@ -107,6 +135,7 @@ void Score::InitTextModel() {
 	textModel_[7]->Initialize(dxCommon_, "resultLogo/ha.obj");
 	for (int i = 0; i < textModel_.size(); ++i) {
 		textModel_[i]->SetTexture("resources/image/0.png");
+		textModel_[i]->SetUpdateFrustumCulling(false);
 	}
 
 	for (int i = 0; i < textTransform_.size(); i++) {
@@ -121,6 +150,15 @@ void Score::InitTextModel() {
 	textTransform_[5].translate = { -3.91f,4.5f,0.0f };
 	textTransform_[6].translate = { -3.22f,4.5f,0.0f };
 	textTransform_[7].translate = { -2.72f,4.5f,0.0f };
+
+	textEasingTimer_[0].Start(1.2f, false);
+	textEasingTimer_[1].Start(1.4f, false);
+	textEasingTimer_[2].Start(1.6f, false);
+	textEasingTimer_[3].Start(1.8f, false);
+	textEasingTimer_[4].Start(2.0f, false);
+	textEasingTimer_[5].Start(2.2f, false);
+	textEasingTimer_[6].Start(2.4f, false);
+	textEasingTimer_[7].Start(2.6f, false);
 }
 
 void Score::InitScoreModel() {
@@ -137,17 +175,19 @@ void Score::InitScoreModel() {
 		std::string modelPath = "number/" + std::to_string(digits[i]) + ".obj";
 		scoreModel_[i]->Initialize(dxCommon_, modelPath);
 		scoreModel_[i]->SetTexture("resources/image/0.png");
+		scoreModel_[i]->SetUpdateFrustumCulling(false);
+		scoreModel_[i]->SetDrawFrustumCulling(false);
 	}
 
 	for (int i = 0; i < scoreTransform_.size(); i++) {
 		scoreTransform_[i].scale = { 1.5f,1.5f,0.5f };
 		scoreTransform_[i].rotate = { 0.0f,0.0f,0.0f };
 	}
-	scoreTransform_[0].translate = { 3.72f,4.75f,0.0f };
-	scoreTransform_[1].translate = { 2.36f,4.75f,0.0f };
-	scoreTransform_[2].translate = { 0.96f,4.75f,0.0f };
-	scoreTransform_[3].translate = { -0.23f,4.75f,0.0f };
-	scoreTransform_[4].translate = { -1.5f,4.75f,0.0f };
+	scoreTransform_[0].translate = { 4.15f,14.75f,0.0f };
+	scoreTransform_[1].translate = { 2.71f,14.75f,0.0f };
+	scoreTransform_[2].translate = { 1.3f,14.75f,0.0f };
+	scoreTransform_[3].translate = { -0.1f,14.75f,0.0f };
+	scoreTransform_[4].translate = { -1.5f,14.75f,0.0f };
 }
 
 void Score::InitRankModel() {
@@ -160,23 +200,168 @@ void Score::InitRankModel() {
 	rankModel_[0]->SetTexture("resources/image/0.png");
 	rankModel_[1]->SetTexture("resources/image/0.png");
 
+	rankModel_[0]->SetUpdateFrustumCulling(false);
+	rankModel_[1]->SetUpdateFrustumCulling(false);
+
 	rankTransform_[0].scale = { 2.5f,3.0f,0.5f };
 	rankTransform_[1].scale = { 1.0f,1.0f,0.5f };
 	rankTransform_[0].rotate = { 0.0f,-0.55f,0.0f };
 	rankTransform_[1].rotate = { 0.0f,-0.55f,0.0f };
-	rankTransform_[0].translate = { -5.65f,0.3f,0.0f };
-	rankTransform_[1].translate = { -3.18f,-0.74f,1.8f };
+	rankTransform_[0].translate = { -15.65f,0.3f,0.0f };
+	rankTransform_[1].translate = { -13.18f,-0.74f,1.8f };
 }
 
 void Score::InitPlayerModel() {
 	playerModel_ = make_unique<Model>();
 	playerModel_->Initialize(dxCommon_, "resultLogo/player.obj");
-	playerTransform_.translate = { 4.4f,1.01f,1.16f };
+	playerModel_->SetUpdateFrustumCulling(false);
+	playerTransform_.translate = { -14.4f,1.01f,1.16f };
 	playerTransform_.rotate = { 1.35f,3.36f,0.65f };
 	playerTransform_.scale = { 3.5f,3.5f,3.5f };
+
 	machineModel_ = make_unique<Model>();
 	machineModel_->Initialize(dxCommon_, "resultLogo/machine.obj");
-	machineTransform_.translate = { 3.85f,0.67f,-0.06f };
+	machineModel_->SetUpdateFrustumCulling(false);
+	machineTransform_.translate = { 13.85f,0.67f,-0.06f };
 	machineTransform_.rotate = { 1.5f,3.02f,1.11f };
 	machineTransform_.scale = { 3.5f,3.5f,3.5f };
+}
+
+void Score::ScoreIn() {
+	for (int i = 0; i < textModel_.size(); ++i) {
+		textTransform_[i].translate.y = Easing::Lerp(
+			textStartY_,
+			textEndY_,
+			textEasingTimer_[i].GetProgress(),
+			Easing::Type::EaseInOutBounce
+		);
+		textEasingTimer_[i].Update();
+		textModel_[i]->SetTransform(textTransform_[i]);
+	}
+
+	if (textEasingTimer_[7].IsActive()) {
+		scoreEasingTimer_[0].Start(1.0f, false);
+		scoreEasingTimer_[1].Start(1.5f, false);
+		scoreEasingTimer_[2].Start(2.0f, false);
+		scoreEasingTimer_[3].Start(2.5f, false);
+		scoreEasingTimer_[4].Start(3.0f, false);
+	}
+
+	for (int i = 0; i < scoreModel_.size(); ++i) {
+		scoreTransform_[i].translate.y = Easing::Lerp(
+			scoreStartY_,
+			scoreEndY_,
+			scoreEasingTimer_[i].GetProgress(),
+			Easing::Type::EaseInOutElastic
+		);
+		scoreEasingTimer_[i].Update();
+		scoreModel_[i]->SetTransform(scoreTransform_[i]);
+	}
+
+	if (scoreEasingTimer_[4].IsActive()) {
+		rankAndPlayerEasingTimer_.Start(1.0f, false);
+	}
+
+	rankTransform_[0].translate.x = Easing::Lerp(
+		rankStartX_,
+		rankEndX_,
+		rankAndPlayerEasingTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+
+	rankTransform_[1].translate.x = Easing::Lerp(
+		rankTextStartX_,
+		rankTextEndX_,
+		rankAndPlayerEasingTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+
+	for (int i = 0; i < rankModel_.size(); ++i) {
+		rankModel_[i]->SetTransform(rankTransform_[i]);
+	}
+
+	playerTransform_.translate.x = Easing::Lerp(
+		playerStartX_,
+		playerEndX_,
+		rankAndPlayerEasingTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+	playerModel_->SetTransform(playerTransform_);
+
+	machineTransform_.translate.x = Easing::Lerp(
+		machineStartX_,
+		machineEndX_,
+		rankAndPlayerEasingTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+	machineModel_->SetTransform(machineTransform_);
+
+	rankAndPlayerEasingTimer_.Update();
+
+	if (rankAndPlayerEasingTimer_.IsFinished()) {
+		if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+			screenType_ = ScreenType::RANKING;
+			scoreOutTimer_.Start(1.0f, false);
+		}
+	}
+}
+
+void Score::ScoreOut() {
+	for (int i = 0; i < textModel_.size(); ++i) {
+		textTransform_[i].translate.y = Easing::Lerp(
+			textEndY_,
+			textStartY_,
+			scoreOutTimer_.GetProgress(),
+			Easing::Type::EaseInOutBounce
+		);
+		textEasingTimer_[i].Update();
+		textModel_[i]->SetTransform(textTransform_[i]);
+	}
+
+	for (int i = 0; i < scoreModel_.size(); ++i) {
+		scoreTransform_[i].translate.y = Easing::Lerp(
+			scoreEndY_,
+			scoreStartY_,
+			scoreOutTimer_.GetProgress(),
+			Easing::Type::EaseInOutElastic
+		);
+		scoreEasingTimer_[i].Update();
+		scoreModel_[i]->SetTransform(scoreTransform_[i]);
+	}
+
+	rankTransform_[0].translate.x = Easing::Lerp(
+		rankEndX_,
+		rankStartX_,
+		scoreOutTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+
+	rankTransform_[1].translate.x = Easing::Lerp(
+		rankTextEndX_,
+		rankTextStartX_,
+		scoreOutTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+
+	for (int i = 0; i < rankModel_.size(); ++i) {
+		rankModel_[i]->SetTransform(rankTransform_[i]);
+	}
+
+	playerTransform_.translate.x = Easing::Lerp(
+		playerEndX_,
+		playerStartX_,
+		scoreOutTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+	playerModel_->SetTransform(playerTransform_);
+
+	machineTransform_.translate.x = Easing::Lerp(
+		machineEndX_,
+		machineStartX_,
+		scoreOutTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack
+	);
+	machineModel_->SetTransform(machineTransform_);
+
+	scoreOutTimer_.Update();
 }
