@@ -260,7 +260,7 @@ void TitleScene::Draw() {
 
 	//titleParticle_->DrawImGui("titleParticle");
 
-	testParticle_->DrawImGui("testParticle");
+	//testParticle_->DrawImGui("testParticle");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");

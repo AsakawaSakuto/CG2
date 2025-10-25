@@ -31,6 +31,8 @@ private:
 	void InitScoreModel();
 	void InitRankModel();
 	void InitPlayerModel();
+	void InitSprite();
+	void InitRanking();
 
 	void ScoreIn();
 	void ScoreOut();
@@ -46,9 +48,33 @@ private:
 	};
 
 private:
+	int nowScore_ = 0;
+	int score1st_ = 65432;
+	int score2nd_ = 54321;
+	int score3rd_ = 43210;
+
+	float rankingStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.5f };
+	float rankingEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.5f };
+	float nowStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.59f };
+	float nowEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.59f };
+
+	std::array<GameTimer, 6> rankingInTimer_;
+
+	std::array<unique_ptr<Model>, 6> score1stModel_;
+	std::array<Transform, 6> score1stTransform_;
+	std::array<unique_ptr<Model>, 6> score2ndModel_;
+	std::array<Transform, 6> score2ndTransform_;
+	std::array<unique_ptr<Model>, 6> score3rdModel_;
+	std::array<Transform, 6> score3rdTransform_;
+	std::array<unique_ptr<Model>, 6> nowScoreModel_;
+	std::array<Transform, 6> nowScoreTransform_;
+
 	ScreenType screenType_ = ScreenType::SCORE;
 
 	unique_ptr<Sprite> pushAsusumu_ = make_unique<Sprite>();
+	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> retryUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
 
 	DirectXCommon* dxCommon_ = nullptr;
 	std::array<unique_ptr<Model>,8> textModel_;
