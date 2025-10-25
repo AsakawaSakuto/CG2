@@ -24,7 +24,7 @@ void ResultScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	score_->Initialize(&ctx_->dxCommon);
+	score_->Initialize(&ctx_->dxCommon, 98765.0f);
 }
 
 void ResultScene::Update() {
