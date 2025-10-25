@@ -12,9 +12,9 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 	transform_.translate = {0.0f, 0.0f, 0.0f};
 
 	// 当たり判定(AABB)
-	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x + 1.0f, t.y + 1.0f, t.z + 1.0f};
-	collisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
+	Vector3 position = transform_.translate;
+	collisionAABB_.max = {position.x + 1.0f, position.y + 1.0f, position.z + 1.0f};
+	collisionAABB_.min = {position.x - 1.0f, position.y - 1.0f, position.z - 1.0f};
 
 	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 0.25f;
@@ -23,27 +23,48 @@ void Thorn::Initialize(DirectXCommon* dxCommon) {
 
 	// 回転フラグ
 	isRotate_ = false;
+
+	// 揺れフラグ
+	isShaking_ = false;
 }
 
 void Thorn::Update() {
 	if (!isAlive_)
 		return;
 
-	// トゲのサイズを更新
-	//UpgradeThorn();
-
 	if (scaleTween_.active) {
-		scaleTween_.elapsed += 1.7f * deltaTime_;
+		scaleTween_.elapsed += 1.5f * deltaTime_;
 		float t = std::min(scaleTween_.elapsed / scaleTween_.duration, 1.0f);
 
 		transform_.scale.x = Easing::Lerp(scaleTween_.startScale.x, scaleTween_.targetScale.x, t, Easing::Type::EaseInElastic);
 		transform_.scale.y = Easing::Lerp(scaleTween_.startScale.y, scaleTween_.targetScale.y, t, Easing::Type::EaseInElastic);
 		transform_.scale.z = Easing::Lerp(scaleTween_.startScale.z, scaleTween_.targetScale.z, t, Easing::Type::EaseInElastic);
 
+		Vector3 position = transform_.translate;
+		collisionAABB_.max = {position.x + transform_.scale.x / 1.6f, position.y + transform_.scale.y / 1.6f, position.z + transform_.scale.z / 1.6f};
+		collisionAABB_.min = {position.x - transform_.scale.x / 1.6f, position.y - transform_.scale.y / 1.6f, position.z - transform_.scale.z / 1.6f};
+
 		if (t >= 1.0f) {
 			scaleTween_.active = false;
 		}
 	}
+
+	// 座標揺れの更新
+	if (isShaking_) {
+		shakeElapsed_ += deltaTime_;
+		float t = std::min(shakeElapsed_ / shakeDuration_, 1.0f);
+
+		// 揺れ
+		float offsetX = std::sin(t * 32.0f) * shakeAmplitude_ * (1.0f - t);
+
+		transform_.translate.x = basePosition_.x + offsetX;
+
+		if (t >= 1.0f) {
+			isShaking_ = false;
+			transform_.translate.x = basePosition_.x;
+		}
+	}
+
 
 	// 回転の更新
 	UpdateRotate();
@@ -75,6 +96,9 @@ void Thorn::Spawn(Vector3 position) {
 		Vector3 t = transform_.translate;
 		collisionAABB_.max = {t.x + 1.0f, t.y + 1.0f, t.z + 1.0f};
 		collisionAABB_.min = {t.x - 1.0f, t.y - 1.0f, t.z - 1.0f};
+
+		// ベースのポジションを記録
+		basePosition_ = t;
 	}
 }
 
@@ -85,12 +109,17 @@ void Thorn::TickCooldown() {
 }
 
 void Thorn::UpdateRotate() {
+
+	///////////////////////////////////////////Z軸回転で徐々に収束する//////////////////////////////////////////////
+
 	if (isRotate_) {
-		transform_.rotate.y += 4.0f * deltaTime_;
+		transform_.rotate.z += 4.0f * deltaTime_;
 
 		// 1回転したら範囲内に収める
-		transform_.rotate.y = std::clamp(transform_.rotate.y, 0.0f, 2.5f * std::numbers::pi_v<float>);
+		transform_.rotate.z = std::clamp(transform_.rotate.z, 0.0f, 2.5f * std::numbers::pi_v<float>);
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 void Thorn::UpgradeThorn() {
@@ -113,7 +142,7 @@ void Thorn::UpgradeThorn() {
 
 	scaleTween_.startScale = transform_.scale;
 	scaleTween_.targetScale = newScale;
-	scaleTween_.duration = 0.6f;
+	scaleTween_.duration = 0.4f;
 	scaleTween_.elapsed = 0.0f;
 	scaleTween_.active = true;
 }

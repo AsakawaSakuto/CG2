@@ -116,7 +116,7 @@ void Player::Update() {
 	CollisionBlock();
 
 	// 弾とトゲの当たり判定
-	CollisonBulletThorn();
+	CollisionBulletThorn();
 
 	// カメラシェイクの値を更新
 	UpdateCameraShake();
@@ -173,9 +173,7 @@ void Player::Draw(Camera useCamera) {
 	}
 
 	// プレイヤーの羽の描画
-	//if (!isStartCoolDown_) {
-		playerWing_->Draw(useCamera);
-	//}
+	playerWing_->Draw(useCamera);
 
 	// クマ
 	bear_->Draw(useCamera);
@@ -242,11 +240,11 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
 		if (!isGoal_) {
-			goalParticle1_->SetEmitterPosition({ 5.0f,-22.5f,0.0f });
+			goalParticle1_->SetEmitterPosition({5.0f, -22.5f, 0.0f});
 			goalParticle1_->Play(false);
-			goalParticle2_->SetEmitterPosition({ -5.0f,-22.5f,0.0f });
+			goalParticle2_->SetEmitterPosition({-5.0f, -22.5f, 0.0f});
 			goalParticle2_->Play(false);
-		    // ゴールフラグをたてる
+			// ゴールフラグをたてる
 			isGoal_ = true;
 		}
 
@@ -317,8 +315,9 @@ void Player::BulletCharge() {
 
 		// SE再生
 		gaugeChargeSE_->PlayAudio(SE_Volume);
-	}
 
+		bulletChargeParticle_->Play();
+	}
 }
 
 void Player::BulletShot() {
@@ -328,7 +327,7 @@ void Player::BulletShot() {
 
 	bool isShot = gamePad_->TriggerButton(gamePad_->A) || input_->TriggerKey(DIK_SPACE);
 
-	if (isShot) {
+	if (isShot && !stunTimer_.IsActive()) { // スタン中に弾は撃てない
 		// 弾の生成
 		auto bullet = std::make_unique<Bullet>();
 		bullet->Initialize(dxCommon_);
@@ -349,9 +348,6 @@ void Player::BulletShot() {
 
 		bullets_.push_back(std::move(bullet));
 
-		// プレイヤー減速
-		SpeedDown(playerState_.speedDownStrengthBullet);
-
 		// ゲージを減らす
 		--bulletGauge_;
 
@@ -360,6 +356,9 @@ void Player::BulletShot() {
 
 		// ショットカウント加算
 		shotCount_++;
+
+		// タイマーのリセット
+		num_ = 0;
 
 		// SEの再生
 		shotSE_->PlayAudio(SE_Volume);
@@ -385,12 +384,12 @@ void Player::BulletUpdate() {
 		        [playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
 			        float y = bullet->GetTransform().translate.y;
 			        bool shouldDelete = y > playerPosY + 11.0f || y < playerPosY - 11.0f; // 画面外に出たら削除
-			        
+
 			        if (shouldDelete) {
-			        	// 削除前にDestroy()を呼び出してパーティクルを再生
-			        	bullet->Destroy();
+				        // 削除前にDestroy()を呼び出してパーティクルを再生
+				        bullet->Destroy();
 			        }
-			        
+
 			        return shouldDelete;
 		        }),
 		    bullets_.end());
@@ -428,22 +427,21 @@ void Player::PlayerImGui() {
 	ImGui::Checkbox("Player Move", &playerIsMove_);
 
 	ImGui::End();
-	
 
 	// パーティクルのImGui
 	ramuneParticle_->DrawImGui("ramuneP");
-	//ramuneWhiteParticle_->DrawImGui("ramunePW");
-	//kasokuParticle_->DrawImGui("kasoku");
-	//smorkParticle_->DrawImGui("enemyDie");
-	//bulletChargeParticle_->DrawImGui("shot");
-	//bulletShotParticle_->DrawImGui("bulletShot");
-	//bulletDieParticle_->DrawImGui("bulletDie");
-	//stateChangeParticle_->DrawImGui("stateChange");
-	//fallParticle_->DrawImGui("fall");
-	//arrticle1_->DrawImGui("armHit1");
-	//armHitParticle2_->DrawImGui("armHit2");
+	// ramuneWhiteParticle_->DrawImGui("ramunePW");
+	// kasokuParticle_->DrawImGui("kasoku");
+	// smorkParticle_->DrawImGui("enemyDie");
+	// bulletChargeParticle_->DrawImGui("shot");
+	// bulletShotParticle_->DrawImGui("bulletShot");
+	// bulletDieParticle_->DrawImGui("bulletDie");
+	// stateChangeParticle_->DrawImGui("stateChange");
+	// fallParticle_->DrawImGui("fall");
+	// arrticle1_->DrawImGui("armHit1");
+	// armHitParticle2_->DrawImGui("armHit2");
 	armHitParticle3_->DrawImGui("armHit3");
-	//goalParticle_->DrawImGui("goal");
+	// goalParticle_->DrawImGui("goal");
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -494,9 +492,7 @@ void Player::Stun() {
 	}
 }
 
-void Player::StunRemoved() { 
-	stunTimer_.Update(); 
-}
+void Player::StunRemoved() { stunTimer_.Update(); }
 
 void Player::CollisionThorn() {
 	for (auto& thorn : thorns_) {
@@ -539,11 +535,9 @@ void Player::CollisionThorn() {
 					}
 
 					// 弾のゲージをセット
-					//SetBulletGauge(-1);
+					// SetBulletGauge(-1);
 
-					//for (int i = 0; i < bulletGaugeSprites_->size(); ++i) {
-						(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
-					//}
+					(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
 
 					// スタン
 					Stun();
@@ -575,7 +569,7 @@ void Player::CollisionBlock() {
 	}
 }
 
-void Player::CollisonBulletThorn() {
+void Player::CollisionBulletThorn() {
 	for (auto& bullet : bullets_) {
 		for (auto& thorn : thorns_) {
 			if (!thorn->CanUpgradeBullet()) {
@@ -583,8 +577,6 @@ void Player::CollisonBulletThorn() {
 			}
 
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
-				// トゲの回転
-				thorn->SetIsRotate(true);
 
 				// パーティクル
 				thorn->PlayParticle(5);
@@ -666,28 +658,21 @@ void Player::CollisionWingThorn() {
 			// トゲの回転
 			thorn->SetIsRotate(true);
 
-			armHitParticle1_->SetEmitterPosition({ thorn->GetPosition().x,thorn->GetPosition().y,thorn->GetPosition().z - 1.0f });
+			// トゲの揺れ
+			thorn->SetIsShaking(true);
+
+			armHitParticle1_->SetEmitterPosition({thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f});
 			armHitParticle1_->Play(false);
-			armHitParticle2_->SetEmitterPosition({ thorn->GetPosition().x,thorn->GetPosition().y,thorn->GetPosition().z - 1.0f });
+			armHitParticle2_->SetEmitterPosition({thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f});
 			armHitParticle2_->Play(false);
-			armHitParticle3_->SetEmitterPosition({ thorn->GetPosition().x,thorn->GetPosition().y,thorn->GetPosition().z - 1.0f });
+			armHitParticle3_->SetEmitterPosition({thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f});
 			armHitParticle3_->Play(false);
 
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
-
-				///////////////// デバッグ用 /////////////////
-				//thorn->GetModel()->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
-				///////////////// デバッグ用 /////////////////
-
 				thorn->PlayParticle(3);
 			} else {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
-
-				///////////////// デバッグ用 /////////////////
-				//thorn->GetModel()->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
-				///////////////// デバッグ用 /////////////////
-
 				thorn->PlayParticle(1);
 			}
 
@@ -698,10 +683,14 @@ void Player::CollisionWingThorn() {
 	}
 }
 
-void Player::SetBulletGauge(int point) { 
-	bulletGauge_ +=point;
-	if (bulletGauge_ < 0) { bulletGauge_ = 0; }
-	if (bulletGauge_ > bulletState_.bulletGaugeMax) { bulletGauge_ = bulletState_.bulletGaugeMax; }
+void Player::SetBulletGauge(int point) {
+	bulletGauge_ += point;
+	if (bulletGauge_ < 0) {
+		bulletGauge_ = 0;
+	}
+	if (bulletGauge_ > bulletState_.bulletGaugeMax) {
+		bulletGauge_ = bulletState_.bulletGaugeMax;
+	}
 }
 
 void Player::AddScoreByDistance(std::shared_ptr<Thorn>& thorn, float scoreAmount) {
@@ -800,12 +789,12 @@ void Player::WingCoolDownFramesAdd() {
 }
 
 void Player::PlayerMoveLimit() {
-	if (transform_.translate.x >= 5.5f) {
-		transform_.translate.x = 5.5f;
+	if (transform_.translate.x >= 8.0f) {
+		transform_.translate.x = 8.0f;
 	}
 
-	if (transform_.translate.x <= -5.5f) {
-		transform_.translate.x = -5.5f;
+	if (transform_.translate.x <= -8.0f) {
+		transform_.translate.x = -8.0f;
 	}
 }
 
@@ -839,7 +828,7 @@ void Player::UpdatePlayerHorizontalMove() {
 
 	const float accelerationFactor = 2.5f; // 反対方向への加速用の定数
 	const float attenuationFactor = 1.5f;  // 減速倍率
-	const float kMaxSpeed = 10.0f;          // 最高速度
+	const float kMaxSpeed = 10.0f;         // 最高速度
 
 	float accelerationX = 0.0f;
 
@@ -960,11 +949,11 @@ void Player::UpdateParticle() {
 		ramuneWhiteParticle_->Play();
 	}
 
-	ramuneParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
+	ramuneParticle_->SetOffSet({0.0f, ramuneOffsetY_, 0.0f});
 	ramuneParticle_->SetEmitterPosition(transform_.translate);
 	ramuneParticle_->Update();
 
-	ramuneWhiteParticle_->SetOffSet({ 0.0f,ramuneOffsetY_ ,0.0f });
+	ramuneWhiteParticle_->SetOffSet({0.0f, ramuneOffsetY_, 0.0f});
 	ramuneWhiteParticle_->SetEmitterPosition(transform_.translate);
 	ramuneWhiteParticle_->Update();
 
@@ -972,37 +961,37 @@ void Player::UpdateParticle() {
 		kasokuOffsetY_ = 12.0f;
 		if (velocity_.y >= 12.0f && velocity_.y <= 14.0f) {
 			kasokuParticle_->SetSpawnTime(0.1f);
-		}else if (velocity_.y >= 14.0f && velocity_.y <= 16.0f) {
+		} else if (velocity_.y >= 14.0f && velocity_.y <= 16.0f) {
 			kasokuParticle_->SetSpawnTime(0.075f);
-		}else if (velocity_.y >= 16.0f && velocity_.y <= 18.0f) {
+		} else if (velocity_.y >= 16.0f && velocity_.y <= 18.0f) {
 			kasokuParticle_->SetSpawnTime(0.05f);
-		}else if (velocity_.y >= 18.0f && velocity_.y <= 20.0f) {
+		} else if (velocity_.y >= 18.0f && velocity_.y <= 20.0f) {
 			kasokuParticle_->SetSpawnTime(0.025f);
-		}else {
+		} else {
 			kasokuParticle_->SetSpawnTime(99.0f);
-			kasokuParticle_->SetEmitVelocity({ 0.0f,-10.0f,0.0f });
+			kasokuParticle_->SetEmitVelocity({0.0f, -10.0f, 0.0f});
 		}
 
-		bulletChargeParticle_->SetOffSet({ 0.0f,1.11f,-0.75f });
-	}else if (direction_ == Direction::DOWN) {
+		bulletChargeParticle_->SetOffSet({0.0f, 1.11f, -0.75f});
+	} else if (direction_ == Direction::DOWN) {
 		kasokuOffsetY_ = -12.0f;
 		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
 			kasokuParticle_->SetSpawnTime(0.1f);
-		}else if (velocity_.y >= -16.0f && velocity_.y <= -14.0f) {
+		} else if (velocity_.y >= -16.0f && velocity_.y <= -14.0f) {
 			kasokuParticle_->SetSpawnTime(0.075f);
-		}else if (velocity_.y >= -18.0f && velocity_.y <= -16.0f) {
+		} else if (velocity_.y >= -18.0f && velocity_.y <= -16.0f) {
 			kasokuParticle_->SetSpawnTime(0.05f);
-		}else if (velocity_.y >= -20.0f && velocity_.y <= -18.0f) {
+		} else if (velocity_.y >= -20.0f && velocity_.y <= -18.0f) {
 			kasokuParticle_->SetSpawnTime(0.025f);
-		}else {
+		} else {
 			kasokuParticle_->SetSpawnTime(99.0f);
-			kasokuParticle_->SetEmitVelocity({ 0.0f,10.0f,0.0f });
+			kasokuParticle_->SetEmitVelocity({0.0f, 10.0f, 0.0f});
 		}
 
-		bulletChargeParticle_->SetOffSet({ 0.0f,-1.11f,-0.75f });
+		bulletChargeParticle_->SetOffSet({0.0f, -1.11f, -0.75f});
 	}
 
-	kasokuParticle_->SetOffSet({ 0.0f,kasokuOffsetY_ ,0.0f });
+	kasokuParticle_->SetOffSet({0.0f, kasokuOffsetY_, 0.0f});
 	kasokuParticle_->SetEmitterPosition(transform_.translate);
 	kasokuParticle_->Update();
 
@@ -1014,11 +1003,10 @@ void Player::UpdateParticle() {
 	stunParticle_->Update();
 
 	if (direction_ == Direction::UP) {
-		bulletShotParticle_->SetOffSet({ 0.0f,0.75f,0.0f });
+		bulletShotParticle_->SetOffSet({0.0f, 0.75f, 0.0f});
 		bulletShotParticle_->SetEmitVelocityY(15.0f);
-	}
-	else if (direction_ == Direction::DOWN) {
-		bulletShotParticle_->SetOffSet({ 0.0f,-0.75f,0.0f });
+	} else if (direction_ == Direction::DOWN) {
+		bulletShotParticle_->SetOffSet({0.0f, -0.75f, 0.0f});
 		bulletShotParticle_->SetEmitVelocityY(-15.0f);
 	}
 	bulletShotParticle_->SetEmitterPosition(transform_.translate);
@@ -1030,20 +1018,19 @@ void Player::UpdateParticle() {
 	stateChangeParticle_->Update();
 
 	fallParticle_->SetEmitterPosition(transform_.translate);
-	fallParticle_->SetOffSet({ 0.0,-0.75f,0.0f });
+	fallParticle_->SetOffSet({0.0, -0.75f, 0.0f});
 	fallParticle_->Update();
 
-	
 	if (stateChangeTimer_.IsFinished()) {
-	    stateChangeParticle_->Stop();
-	    fallParticle_->Play();
+		stateChangeParticle_->Stop();
+		fallParticle_->Play();
 	}
 	stateChangeTimer_.Update();
 
 	armHitParticle1_->Update();
 	armHitParticle2_->Update();
 	armHitParticle3_->Update();
-	
+
 	goalParticle1_->Update();
 	goalParticle2_->Update();
 }
