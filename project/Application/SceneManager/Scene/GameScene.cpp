@@ -18,9 +18,12 @@ void GameScene::Initialize() {
 	gamePad_ = &ctx_->gamePad;
 	input_ = &ctx_->input;
 
+	// カメラのZ座標
+	cameraPosisionZ_ = -50.0f;
+
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
-	normalCamera_->SetPosition({0.0f, 0.0f, -30.0f});
+	normalCamera_->SetPosition({0.0f, 0.0f, cameraPosisionZ_});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
 	player_->Initialize(&ctx_->dxCommon);
@@ -109,17 +112,17 @@ void GameScene::Initialize() {
 	spriteGameEnd_->SetScale({1, 1});
 
 	// 進行度ゲージスプライト
-	spriteProgressLine_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	spriteProgressLine_->SetScale({2.0f, 32.0f});
-	spriteProgressLine_->SetPosition({988.0f, 360.0f});
+	spriteProgressLine_->Initialize(&ctx_->dxCommon, "resources/image/UI/altitudeGaugeUI.png");
+	spriteProgressLine_->SetScale({0.4f, 0.3f});
+	spriteProgressLine_->SetPosition({1032.0f, 360.0f});
 
-	spriteProgressPlayer_->Initialize(&ctx_->dxCommon, "resources/image/Icon.png");
-	spriteProgressPlayer_->SetScale({2.0f, 2.0f});
+	spriteProgressPlayer_->Initialize(&ctx_->dxCommon, "resources/image/UI/bearUI.png");
+	spriteProgressPlayer_->SetScale({0.25f, 0.25f});
 	spriteProgressPlayer_->SetPosition({988.0f, 360.0f});
 
-	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-	spriteProgressGoal_->SetScale({2.0f, 2.0f});
-	spriteProgressGoal_->SetPosition({988.0f, 670.0f});
+	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/UI/flagUI.png");
+	spriteProgressGoal_->SetScale({0.5f, 0.5f});
+	spriteProgressGoal_->SetPosition({1032.0f, 670.0f});
 
 	// ゲーム終了フラグ
 	isActiveEndText_ = false;
@@ -136,6 +139,12 @@ void GameScene::Initialize() {
 	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
 	spriteChargeUI_->SetPosition({1150.0f, 450.0f});
 	spriteChargeUI_->SetScale({1, 1});
+
+	// ラムネの波紋
+	spriteChargeUIEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
+	spriteChargeUIEffect_->SetPosition({1150.0f, 450.0f});
+	chargeEffectSize_ = 1.0f;
+	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
 
 	// 山のモデル初期化
 	for (int i = 0; i < static_cast<int>(modelMountain_.size()); ++i) {
@@ -184,6 +193,21 @@ void GameScene::Initialize() {
 		spriteScoreCountOver_[i]->SetPosition({100.0f + i * 32.0f, -100.0f});
 		spriteScoreCountOver_[i]->SetScale({32.0f * deltaTime_, 32.0f * deltaTime_});
 	}
+
+	// push スプライト
+	spritePush_->Initialize(&ctx_->dxCommon, "resources/image/UI/PushButton01UI.png");
+	spritePush_->SetPosition({1148.0f, 640.0f});
+	spritePush_->SetScale({0.1f, 0.1f});
+
+	// 腕 スプライト
+	spriteArm_->Initialize(&ctx_->dxCommon, "resources/image/UI/armUI.png");
+	spriteArm_->SetPosition({410.0f, 75.0f});
+	spriteArm_->SetScale({0.25f, 0.25f});
+
+	// ピニャータ スプライト
+	spriteThorn_->Initialize(&ctx_->dxCommon, "resources/image/UI/enemyUI.png");
+	spriteThorn_->SetPosition({600.0f, 85.0f});
+	spriteThorn_->SetScale({0.25f, 0.25f});
 }
 
 void GameScene::Update() {
@@ -205,7 +229,7 @@ void GameScene::Update() {
 	UpdateInput();
 
 	// プレイヤーから一定時間入力がなかった場合の処理
-	//NoInputTitleBack();
+	// NoInputTitleBack();
 
 	if (isBackToTitleScene_) {
 		sceneFade_->StartFadeIn(1.0f);
@@ -295,6 +319,12 @@ void GameScene::Update() {
 	// 進行度ゲージ更新
 	UpdateProgressSprite();
 
+	// クマのスプライト回転
+	UpdateSpriteRotation();
+
+	// ラムネの波紋
+	UpdateSpriteChargeEffect();
+
 	// 進行度ゲージスプライト更新
 	spriteProgressLine_->Update();
 	spriteProgressPlayer_->Update();
@@ -308,6 +338,7 @@ void GameScene::Update() {
 
 	// ラムネゲージ
 	spriteChargeUI_->Update();
+	spriteChargeUIEffect_->Update();
 
 	// 山のモデル更新
 	for (int i = 0; i < 3; ++i) { //////////////// 仮 //////////////
@@ -338,6 +369,18 @@ void GameScene::Update() {
 
 	// アニメーション関数
 	AnimationSpriteSnackOver();
+
+	// push スプライト
+	spritePush_->Update();
+
+	// push スプライトの切り替え
+	PushSpriteChange();
+
+	// 腕 スプライト
+	spriteArm_->Update();
+
+	// ピニャータ スプライト
+	spriteThorn_->Update();
 }
 
 void GameScene::Draw() {
@@ -365,7 +408,7 @@ void GameScene::Draw() {
 
 	// 山のモデル描画
 	/*for (auto& model : modelMountain_) {
-		model->Draw(*useCamera_);
+	    model->Draw(*useCamera_);
 	}*/
 
 	// 画面両端の幕のスプライト描画処理
@@ -375,12 +418,18 @@ void GameScene::Draw() {
 
 	// ラムネゲージ
 	spriteChargeUI_->Draw();
+	spriteChargeUIEffect_->Draw();
 
 	// 弾のゲージスプライト描画処理
 	for (auto& gaugeInfo : bulletGaugeSprite_) {
 		if (gaugeInfo.isActive) {
 			gaugeInfo.sprite->Draw();
 		}
+	}
+
+	// push スプライト
+	if (player_->GetBulletGauge() > 0) { // 弾の数が1以上の時だけ描画する
+		spritePush_->Draw();
 	}
 
 	// スコア表示の後ろに配置するスプライト描画
@@ -396,17 +445,23 @@ void GameScene::Draw() {
 	// ルール説明用のスプライト描画
 	spriteRule_->Draw();
 
+	// 腕 スプライト
+	//spriteArm_->Draw();
+
+	// ピニャータ スプライト
+	//spriteThorn_->Draw();
+
 	// ○○個突破!スプライト更新
-	//spriteSnackCountOver_->Draw();
+	spriteSnackCountOver_->Draw();
 
 	// 進行度ゲージスプライト描画
 	spriteProgressLine_->Draw();
-	spriteProgressPlayer_->Draw();
 	spriteProgressGoal_->Draw();
+	spriteProgressPlayer_->Draw();
 
 	// 入力なし　カウントダウン　スプライト 描画
 	/*for (auto& sprite : spriteNoInputCountDown_) {
-		sprite->Draw();
+	    sprite->Draw();
 	}*/
 
 	// カウントダウン用のスプライト描画
@@ -428,6 +483,7 @@ void GameScene::Draw() {
 	/// ↑描画処理ここまで
 	///
 
+#ifdef DEVELOP_BUILD
 	// フレームの先頭でImguiにここからフレームが始まる旨を告げる
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -446,6 +502,9 @@ void GameScene::Draw() {
 
 	// ゲームシーン上で管理しているステータスのImGui
 	GameSceneStateImGui();
+
+	// カメラのImGui
+	CameraStateImGui();
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	ImGui::Begin("Test");
@@ -478,6 +537,8 @@ void GameScene::Draw() {
 	// Imguiの内部コマンドを生成する
 	ImGui::Render();
 
+#endif //  DEVELOP_BUILD
+
 	// ここより下に描画処理を書かない
 	ctx_->dxCommon.PostDraw();
 }
@@ -486,7 +547,7 @@ void GameScene::UpdateCameraToPlayer() {
 	if (player_->GetIsCameraSet()) {
 		// カメラの座標Yをプレイヤーの座標Yに合わせる
 		Vector3 pPos = player_->GetPosition();
-		normalCamera_->SetPosition({0.0f + player_->GetShakeAmount().x, pPos.y + player_->CameraOffset() + player_->GetShakeAmount().x, -30.0f});
+		normalCamera_->SetPosition({0.0f + player_->GetShakeAmount().x, pPos.y + player_->CameraOffset() + player_->GetShakeAmount().y, cameraPosisionZ_});
 	}
 }
 
@@ -500,7 +561,7 @@ void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				// トゲの描画処理
 				auto thorn = std::make_unique<Thorn>();
 				thorn->Initialize(&ctx_->dxCommon);
-				thorn->Spawn({static_cast<float>(x) * mag - 5.1f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
+				thorn->Spawn({static_cast<float>(x) * mag - 6.7f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				thorns_.push_back(std::move(thorn));
 			}
 
@@ -508,7 +569,7 @@ void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				// トゲの描画処理
 				auto block = std::make_unique<Block>();
 				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 5.1f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
+				block->Spawn({static_cast<float>(x) * mag - 6.7f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				blocks_.push_back(std::move(block));
 			}
 		}
@@ -519,7 +580,7 @@ void GameScene::UpdateInput() {
 	// 入力検知
 	bool rightInput = input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D) || gamePad_->LeftStickX() >= 0.3f || gamePad_->PushButton(gamePad_->RIGHT_BOTTON); // 右入力
 	bool leftInput = input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) || gamePad_->LeftStickX() <= -0.3f || gamePad_->PushButton(gamePad_->LEFT_BOTTON);   // 左入力
-	bool shotInput = input_->PushKey(DIK_SPACE) || gamePad_->PushButton(gamePad_->A);                                                                       // ショット入力
+	bool shotInput = input_->PushKey(DIK_SPACE) || gamePad_->PushButton(gamePad_->A);                                                                         // ショット入力
 
 	if (rightInput || leftInput || shotInput) {
 		isInput_ = true; // 入力があったらtrue
@@ -672,7 +733,7 @@ void GameScene::SpriteScoreUpdate() {
 		digits[digits.size() - 1 - i] = displayScore % 10;
 		displayScore /= 10;
 	}
-	
+
 	// 先頭を探索
 	int firstNonZeroIndex = 0;
 	while (firstNonZeroIndex < digits.size() - 1 && digits[firstNonZeroIndex] == 0) {
@@ -776,7 +837,7 @@ void GameScene::UpdateProgressSprite() {
 	float mappedY = std::lerp(bottomY, topY, t);
 
 	// プレイヤーの進行度スプライトのXはラインと合わせ、Yをマッピング結果にする
-	spriteProgressPlayer_->SetPosition({linePos.x, mappedY});
+	spriteProgressPlayer_->SetPosition({linePos.x - 4.0f, mappedY});
 }
 
 void GameScene::UpdateEndText() {
@@ -798,7 +859,7 @@ void GameScene::AudioUpdate() {
 	shotSE_->Update();
 }
 
-void GameScene::AnimationSpriteSnackOver() { 
+void GameScene::AnimationSpriteSnackOver() {
 	timerSnackCountOver_ += deltaTime_;
 
 	switch (snackCountOverAnimationState_) {
@@ -857,4 +918,58 @@ void GameScene::AnimationSpriteSnackOver() {
 void GameScene::StartSnackOverAnimation() {
 	snackCountOverAnimationState_ = RuleAnimState::Rising;
 	timerSnackCountOver_ = 0.0f;
+}
+
+void GameScene::CameraStateImGui() {
+	ImGui::Begin("Camera State");
+
+	ImGui::DragFloat("PositionZ", &cameraPosisionZ_, 0.01f);
+
+	ImGui::DragFloat2("positionArm", &spriteArm_->GetPosition().x);
+	ImGui::DragFloat2("positionThorn", &spriteThorn_->GetPosition().x);
+
+	ImGui::End();
+}
+
+void GameScene::PushSpriteChange() {
+	pushSpriteTimer_++;
+
+	if ((pushSpriteTimer_ / 8) % 2 == 0) {
+		spritePush_->SetTexture("resources/image/UI/PushButton01UI.png");
+	} else {
+		spritePush_->SetTexture("resources/image/UI/PushButton02UI.png");
+	}
+}
+
+void GameScene::UpdateSpriteRotation() {
+	float maxTiltRad = std::numbers::pi_v<float> / 6.0f;
+	float speed = 0.05f;
+
+	float angleRad = std::sin(frameCount_ * speed) * maxTiltRad;
+
+	// 角度を適用
+	spriteProgressPlayer_->SetRotate(angleRad);
+	frameCount_++;
+}
+
+void GameScene::UpdateSpriteChargeEffect() {
+	// 弾の数に応じてサイズの変更速度を変える
+	float changeSpeed = 0.0f;
+	int gauge = player_->GetBulletGauge();
+
+	if (gauge >= 1 && gauge <= 5) {
+		changeSpeed = gaugeSizeSpeeds[gauge - 1];
+	}
+
+	// サイズと透明度を変更
+	chargeEffectAlpha_ -= 0.05f;
+	chargeEffectSize_ += changeSpeed;
+
+	if (chargeEffectAlpha_ <= 0.0f) {
+		chargeEffectAlpha_ = 1.0f;
+		chargeEffectSize_ = 1.0f;
+	}
+
+	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
+	spriteChargeUIEffect_->SetColor({1.0f, 1.0f, 1.0f, chargeEffectAlpha_});
 }

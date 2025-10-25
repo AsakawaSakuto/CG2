@@ -103,7 +103,7 @@ private:
 	void CollisionBlock();
 
 	// 弾とトゲの当たり判定
-	void CollisonBulletThorn();
+	void CollisionBulletThorn();
 
 	// カメラシェイクの数値を更新
 	void UpdateCameraShake();
@@ -192,9 +192,8 @@ private:
 	std::list<std::unique_ptr<Bullet>> bullets_{};
 
 	// スタン関連
-	bool isStun_ = false;
-
 	GameTimer stunTimer_;
+	float flickerTimer_ = 0.0f;
 
 	// トゲ
 	std::vector<std::shared_ptr<Thorn>> thorns_;

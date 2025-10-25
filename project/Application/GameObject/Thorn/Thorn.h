@@ -2,8 +2,7 @@
 #include "Application/GameObject/GameObject.h"
 #include "Application/GameObject/Thorn/Particle/ThornParticle.h"
 
-enum class ThornType
-{
+enum class ThornType {
 	MIN = 0,
 	MIDDLE = 1,
 	MAX = 2,
@@ -37,8 +36,9 @@ public:
 	void SetUpgradeCooldownBullet(int frames) { upgradeCooldownFramesBullet_ = frames; }
 	void SetUpgradeCooldownWing(int frames) { upgradeCooldownFramesWing_ = frames; }
 	void SetIsRotate(bool isRotate) { isRotate_ = isRotate; }
+	void SetIsShaking(bool isShaking) { isShaking_ = isShaking; }
 
-	void PlayParticle(uint32_t num) { particle_->Play(transform_.translate,num); }
+	void PlayParticle(uint32_t num) { particle_->Play(transform_.translate, num); }
 	void UpdateParticle() { particle_->Update(); }
 	void DrawParticle(Camera useCamera) { particle_->Draw(useCamera); }
 
@@ -75,10 +75,17 @@ private:
 	int upgradeCooldownFramesWing_ = 0;
 
 	unique_ptr<ThornParticle> particle_ = make_unique<ThornParticle>();
-	
+
 	// スケールを変更時にイージングをかけるための変数
 	ScaleTween scaleTween_;
 
 	// 回転のフラグ
 	bool isRotate_;
+
+	// 左右に揺れる処理関連の変数
+	float shakeElapsed_ = 0.0f;
+	float shakeDuration_ = 1.5f;  // 揺れ時間
+	float shakeAmplitude_ = 0.3f; // 揺れの最大幅
+	bool isShaking_ = false;
+	Vector3 basePosition_; // 揺れ前の基準位置
 };
