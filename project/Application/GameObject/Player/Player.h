@@ -272,6 +272,7 @@ private:
 	std::unique_ptr<Particles> armHitParticle3_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> goalParticle1_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> goalParticle2_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> getScoreParticle_ = std::make_unique<Particles>();
 	float ramuneOffsetY_ = -1.0f;
 	float kasokuOffsetY_ = 12.0f;
 	std::unique_ptr<StunP> stunParticle_ = std::make_unique<StunP>();

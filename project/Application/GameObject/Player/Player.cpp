@@ -508,7 +508,7 @@ void Player::CollisionThorn() {
 				AddScore(scoreList_.enemyHitAmount);
 
 				// トゲを非アクティブにする
-				thorn->PlayParticle(5);
+				thorn->PlayParticle(3);
 				thorn->SetIsAlive(false);
 				smorkParticle_->SetEmitterPosition(thorn->GetPosition());
 				smorkParticle_->Play(false);
@@ -579,7 +579,7 @@ void Player::CollisionBulletThorn() {
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
 
 				// パーティクル
-				thorn->PlayParticle(5);
+				thorn->PlayParticle(2);
 				smorkParticle_->SetEmitterPosition(thorn->GetPosition());
 				smorkParticle_->Play(false);
 
@@ -670,7 +670,7 @@ void Player::CollisionWingThorn() {
 
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
-				thorn->PlayParticle(3);
+				thorn->PlayParticle(2);
 			} else {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
 				thorn->PlayParticle(1);
@@ -942,6 +942,9 @@ void Player::InitParticle() {
 	goalParticle2_->Initialize(dxCommon_);
 	goalParticle2_->LoadJson("goal");
 	goalParticle2_->Stop();
+
+	getScoreParticle_->Initialize(dxCommon_);
+	getScoreParticle_->LoadJson("getScore");
 }
 void Player::UpdateParticle() {
 	if (stunTimer_.IsFinished()) {

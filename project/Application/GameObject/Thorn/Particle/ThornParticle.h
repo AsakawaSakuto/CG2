@@ -15,12 +15,13 @@ public:
 	void Cleanup();
 	
 private:
-	std::array<std::unique_ptr<Model>, 10> pModel_;
-	std::array<bool, 10> pIsAlive_ = { false };
-	std::array<Transform, 10> pTransform_ = {};
-	std::array<Vector3, 10> pVelocity_ = {};
-	std::array<Vector3, 10> pRotateVelocity_ = {};
-	GameTimer lifeTimer_ = {};
+	
+	std::array<std::unique_ptr<Model>, 5> pModel_;
+	std::array<bool, 5> pIsAlive_ = { false };
+	std::array<Transform, 5> pTransform_ = {};
+	std::array<Vector3, 5> pVelocity_ = {};
+	std::array<Vector3, 5> pRotateVelocity_ = {};
+	GameTimer lifeTimer_[5] = {};
 	GameTimer alphaTimer_ = {};
 
 	float baseScale_ = 0.2f;
