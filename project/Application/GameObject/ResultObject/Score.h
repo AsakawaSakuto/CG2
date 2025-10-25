@@ -19,6 +19,7 @@ public:
 	}
 
 	bool GoTitle() { return goTitle_; }
+	bool GoResult() { return goResult_; }
 
 private:
 	bool goTitle_ = false;
@@ -80,13 +81,21 @@ private:
 	std::array<unique_ptr<Model>,8> textModel_;
 	std::array<unique_ptr<Model>, 5> scoreModel_;
 	std::array<unique_ptr<Model>, 2> rankModel_;
-	unique_ptr<Model> playerModel_;
-	unique_ptr<Model> machineModel_;
 	std::array<Transform, 8> textTransform_;
 	std::array<Transform, 5> scoreTransform_;
 	std::array<Transform, 2> rankTransform_;
+
+	unique_ptr<Model> playerModel_;
+	unique_ptr<Model> machineModel_;
+	unique_ptr<Model> player2Model_;
+	unique_ptr<Model> player2ArmModel_;
+	unique_ptr<Model> machine2Model_;
+
 	Transform playerTransform_;
 	Transform machineTransform_;
+	Transform player2Transform_;
+	Transform player2ArmTransform_;
+	Transform machine2Transform_;
 
 	float score_ = 0.0f;
 	float scoreStartY_ = 14.75f;

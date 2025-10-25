@@ -64,6 +64,27 @@ void Score::Update() {
 			);
 		}
 
+		player2Transform_.translate.x = Easing::Lerp(
+			-14.58f,
+			-4.58f,
+			rankingInTimer_[5].GetProgress(),
+			Easing::Type::EaseInOutBack
+		);
+
+		player2ArmTransform_.translate.x = Easing::Lerp(
+			-14.46f,
+			-4.46f,
+			rankingInTimer_[5].GetProgress(),
+			Easing::Type::EaseInOutBack
+		);
+
+		machine2Transform_.translate.x = Easing::Lerp(
+			-13.8f,
+			-3.8f,
+			rankingInTimer_[5].GetProgress(),
+			Easing::Type::EaseInOutBack
+		);
+
 		for (int i = 0; i < score1stModel_.size(); i++) {
 			score1stModel_[i]->SetTransform(score1stTransform_[i]);
 		}
@@ -117,8 +138,14 @@ void Score::Update() {
 	}
 
 	playerModel_->Update();
-
 	machineModel_->Update();
+
+	player2Model_->SetTransform(player2Transform_);
+	player2ArmModel_->SetTransform(player2ArmTransform_);
+	machine2Model_->SetTransform(machine2Transform_);
+	player2Model_->Update();
+	player2ArmModel_->Update();
+	machine2Model_->Update();
 
 	pushAsusumu_->Update();
 	titleUI_->Update();
@@ -157,6 +184,9 @@ void Score::Draw(Camera camera) {
 
 	playerModel_->Draw(camera);
 	machineModel_->Draw(camera);
+	player2Model_->Draw(camera);
+	player2ArmModel_->Draw(camera);
+	machine2Model_->Draw(camera);
 
 	pushAsusumu_->Draw();
 	titleUI_->Draw();
@@ -212,6 +242,20 @@ void Score::DrawImGui() {
 	titleUI_->DrawImGui("title");
 	retryUI_->DrawImGui("retry");
 	cursolUI_->DrawImGui("curcol");
+
+	ImGui::Begin("p2");
+
+	ImGui::DragFloat3("Pt", &player2Transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("Pr", &player2Transform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("Ps", &player2Transform_.scale.x, 0.01f);
+	ImGui::DragFloat3("PtA", &player2ArmTransform_.translate.x, 0.01f);
+	ImGui::DragFloat3("PrA", &player2ArmTransform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("PsA", &player2ArmTransform_.scale.x, 0.01f);
+	ImGui::DragFloat3("Mt", &machine2Transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("Mr", &machine2Transform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("Ms", &machine2Transform_.scale.x, 0.01f);
+
+	ImGui::End();
 
 	/*ImGui::Begin("1st");
 
@@ -379,6 +423,27 @@ void Score::InitPlayerModel() {
 	machineTransform_.translate = { 13.85f,0.67f,-0.06f };
 	machineTransform_.rotate = { 1.5f,3.02f,1.11f };
 	machineTransform_.scale = { 3.5f,3.5f,3.5f };
+
+	player2Model_ = make_unique<Model>();
+	player2Model_->Initialize(dxCommon_, "resultLogo/player2.obj");
+	player2Model_->SetUpdateFrustumCulling(false);
+	player2Transform_.translate = { -14.58f ,3.5f ,-0.3f };
+	player2Transform_.rotate = { 1.58f ,1.95f ,0.03f };
+	player2Transform_.scale = { 3.5f,3.5f,3.5f };
+
+	player2ArmModel_ = make_unique<Model>();
+	player2ArmModel_->Initialize(dxCommon_, "resultLogo/player2Arm.obj");
+	player2ArmModel_->SetUpdateFrustumCulling(false);
+	player2ArmTransform_.translate = { -14.46f ,3.74f ,0.1f };
+	player2ArmTransform_.rotate = { 2.41f ,3.78f ,-5.06f };
+	player2ArmTransform_.scale = { 3.5f,3.5f,3.5f };
+
+	machine2Model_ = make_unique<Model>();
+	machine2Model_->Initialize(dxCommon_, "resultLogo/machine2.obj");
+	machine2Model_->SetUpdateFrustumCulling(false);
+	machine2Transform_.translate = { -13.8f ,2.39f ,0.0f };
+	machine2Transform_.rotate = { 0.0f ,3.1f ,0.0f };
+	machine2Transform_.scale = { 3.5f,3.5f,3.5f };
 }
 
 void Score::ScoreIn() {
@@ -528,9 +593,9 @@ void Score::ScoreOut() {
 void Score::InitSprite() {
 	pushAsusumu_->Initialize(dxCommon_, "resources/image/UI/ContinueAUI.png", { 1155.0f,666.0f }, { 0.3f,0.3f });
 	pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
-	titleUI_->Initialize(dxCommon_, "resources/image/UI/BackToTitleUI.png", { 256.0f,500.0f }, { 0.3f,0.3f });
-	retryUI_->Initialize(dxCommon_, "resources/image/UI/retryUI.png", { 260.0f,600.0f }, { 0.3f,0.3f });
-	cursolUI_->Initialize(dxCommon_, "resources/image/UI/Cursol.png", { 85.0f,500.0f }, { 0.3f,0.3f });
+	titleUI_->Initialize(dxCommon_, "resources/image/UI/BackToTitleUI.png", { 350.0f,500.0f }, { 0.3f,0.3f });
+	retryUI_->Initialize(dxCommon_, "resources/image/UI/retryUI.png", { 355.0f,600.0f }, { 0.3f,0.3f });
+	cursolUI_->Initialize(dxCommon_, "resources/image/UI/Cursol.png", { 180.0f,500.0f }, { 0.3f,0.3f });
 }
 
 void Score::InitRanking() {
