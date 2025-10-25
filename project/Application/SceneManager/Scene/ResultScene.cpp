@@ -16,17 +16,22 @@ void ResultScene::Initialize() {
 
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
-	normalCamera_->SetPosition({0.0f, 0.0f, -10.0f});
+	normalCamera_->SetPosition({0.0f, 2.0f, -20.0f});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
 	// Create SceneFade
 	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
+
+	score_->Initialize(&ctx_->dxCommon);
 }
 
 void ResultScene::Update() {
-	
+
+	score_->Update();
+
+	CameraController();
 }
 
 void ResultScene::Draw() {
@@ -38,7 +43,7 @@ void ResultScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-
+	score_->Draw(*useCamera_);
 
 	sceneFade_->Draw();
 
@@ -54,6 +59,10 @@ void ResultScene::Draw() {
 	///
 	/// ↓ImGuiここから
 	///
+
+	debugCamera_->DrawImgui();
+
+	score_->DrawImGui();
 
 	DrawSceneName();
 

@@ -150,6 +150,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameObject\Player\PlayerWing.cpp" />
     <ClCompile Include="Application\GameObject\Player\State\PlayerStateLoader.cpp" />
+    <ClCompile Include="Application\GameObject\ResultObject\Score.cpp" />
     <ClCompile Include="Application\GameObject\Temp\TempGameObject.cpp" />
     <ClCompile Include="Application\GameObject\Thorn\Particle\ThornParticle.cpp" />
     <ClCompile Include="Application\GameObject\Thorn\Thorn.cpp" />
@@ -221,6 +222,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameObject\Player\State\BulletState.h" />
     <ClInclude Include="Application\GameObject\Player\State\playerState.h" />
     <ClInclude Include="Application\GameObject\Player\State\PlayerStateLoader.h" />
+    <ClInclude Include="Application\GameObject\ResultObject\Score.h" />
     <ClInclude Include="Application\GameObject\Temp\TempGameObject.h" />
     <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
     <ClInclude Include="Application\GameObject\Thorn\Thorn.h" />

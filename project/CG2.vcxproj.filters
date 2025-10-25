@@ -66,6 +66,7 @@
     <ClCompile Include="Engine\System\DirectXCommon\ExeColor.cpp" />
     <ClCompile Include="Engine\System\Audio\MasterVolume.cpp" />
     <ClCompile Include="Application\GameObject\Player\Particle\stunP.cpp" />
+    <ClCompile Include="Application\GameObject\ResultObject\Score.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
     <ClInclude Include="Application\Score\ScoreList.h" />
     <ClInclude Include="Application\GameObject\Player\Particle\stunP.h" />
+    <ClInclude Include="Application\GameObject\ResultObject\Score.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
