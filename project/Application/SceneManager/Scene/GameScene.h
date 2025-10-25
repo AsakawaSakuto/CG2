@@ -62,6 +62,18 @@ private:
 	// アニメーション開始関数
 	void StartSnackOverAnimation();
 
+	// カメラの調整ImGui
+	void CameraStateImGui();
+
+	// Pushスプライト切り替え
+	void PushSpriteChange();
+
+	// クマのスプライトの回転
+	void UpdateSpriteRotation();
+
+	// ラムネの波紋
+	void UpdateSpriteChargeEffect();
+
 private:
 	enum class RuleAnimState { 
 		Rising, 
@@ -197,6 +209,12 @@ private:
 	// 弾のゲージラムネ
 	unique_ptr<Sprite> spriteChargeUI_ = make_unique<Sprite>();
 
+	// ラムネの波紋
+	unique_ptr<Sprite> spriteChargeUIEffect_ = make_unique<Sprite>();
+	float chargeEffectSize_ = 1.0f; // サイズ
+	float chargeEffectAlpha_ = 1.0f; // 透明度
+	std::array<float, 5> gaugeSizeSpeeds = {0.0025f, 0.005f, 0.01f, 0.02f, 0.04f}; // サイズの変化スピード
+
 	// 山のモデル
 	std::array<unique_ptr<Model>, 3> modelMountain_;
 
@@ -225,4 +243,22 @@ private:
 
 	// ○○個突破 スコア数 座標
 	Vector2 spriteScoreCountOverPos_ = {150.0f, -100.0f};
+
+	// カメラのZ座標
+	float cameraPosisionZ_ = -30.0f;
+
+	// push スプライト
+	unique_ptr<Sprite> spritePush_ = make_unique<Sprite>();
+
+	// pushスプライト切り替え用のタイマー
+	int pushSpriteTimer_ = 0;
+
+	// 腕 スプライト
+	unique_ptr<Sprite> spriteArm_ = make_unique<Sprite>();
+
+	// ピニャータ スプライト
+	unique_ptr<Sprite> spriteThorn_ = make_unique<Sprite>();
+
+	// クマのスプライト回転用の変数
+	float frameCount_ = 0.0f;
 };
