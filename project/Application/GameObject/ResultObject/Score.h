@@ -1,5 +1,8 @@
 #pragma once
 #include <array>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "Application/EngineSystem.h"
 
 class Score
@@ -20,6 +23,9 @@ public:
 
 	bool GoTitle() { return goTitle_; }
 	bool GoResult() { return goResult_; }
+	
+	// シーンを抜ける際に呼び出すメソッド
+	void SaveRankingData();
 
 private:
 	bool goTitle_ = false;
@@ -34,6 +40,10 @@ private:
 	void InitPlayerModel();
 	void InitSprite();
 	void InitRanking();
+	
+	// JSON関連のメソッド
+	void LoadRankingData();
+	void SortRankingScores();
 
 	void ScoreIn();
 	void ScoreOut();
@@ -61,9 +71,13 @@ private:
 
 private:
 	int nowScore_ = 0;
-	int score1st_ = 65432;
-	int score2nd_ = 54321;
-	int score3rd_ = 43210;
+
+	int score1st_ = 0;
+	int score2nd_ = 0;
+	int score3rd_ = 0;
+	
+	// JSONファイルのパス
+	const std::string rankingJsonPath_ = "resources/engineResources/test.json";
 
 	float rankingStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.5f };
 	float rankingEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.5f };

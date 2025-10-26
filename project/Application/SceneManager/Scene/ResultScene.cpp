@@ -1,7 +1,10 @@
 #include "ResultScene.h"
 
 ResultScene::~ResultScene() {
-
+	// シーンを抜ける際にランキングデータを保存
+	if (score_) {
+		score_->SaveRankingData();
+	}
 }
 
 void ResultScene::SetAppContext(AppContext* ctx) {

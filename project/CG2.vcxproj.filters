@@ -170,6 +170,7 @@
     <None Include="resources\shaders\Particles\Particles.hlsli" />
     <None Include="resources\shaders\Sprite\Sprite.hlsli" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
+    <None Include="resources\json\ranking.json" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
