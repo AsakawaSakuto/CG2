@@ -1,4 +1,8 @@
 #include "Score.h"
+#include <algorithm>
+#include <filesystem>
+#include <sstream>
+#include <iomanip>
 
 void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	dxCommon_ = dxCommon;
@@ -12,6 +16,10 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	nextScene_ = NextScene::TITLE;
 
 	floatTimeCount_ = 0.0f;
+
+	// JSONファイルからランキングデータを読み込み、現在のスコアを含めてソート
+	LoadRankingData();
+	SortRankingScores();
 
 	ramuneParticle_->Initialize(dxCommon_);
 	ramuneParticle_->LoadJson("RamuneResult1");
@@ -756,10 +764,11 @@ void Score::InitSprite() {
 
 void Score::InitRanking() {
 	std::array<int, 5> digits = { 0, 0, 0, 0, 0 };
+	int tempScore1st = score1st_; // 一時変数を使用
 
 	for (int i = 0; i < 5; ++i) {
-		digits[i] = score1st_ % 10;
-		score1st_ /= 10;
+		digits[i] = tempScore1st % 10;
+		tempScore1st /= 10;
 	}
 
 	for (int i = 0; i < 5; ++i) {
@@ -791,10 +800,11 @@ void Score::InitRanking() {
 	// -------------------------------------------------------------------------//
 
 	std::array<int, 5> digits2 = { 0, 0, 0, 0, 0 };
+	int tempScore2nd = score2nd_; // 一時変数を使用
 
 	for (int i = 0; i < 5; ++i) {
-		digits2[i] = score2nd_ % 10;
-		score2nd_ /= 10;
+		digits2[i] = tempScore2nd % 10;
+		tempScore2nd /= 10;
 	}
 
 	for (int i = 0; i < 5; ++i) {
@@ -826,10 +836,11 @@ void Score::InitRanking() {
 	// -------------------------------------------------------------------------//
 
 	std::array<int, 5> digits3 = { 0, 0, 0, 0, 0 };
+	int tempScore3rd = score3rd_; // 一時変数を使用
 
 	for (int i = 0; i < 5; ++i) {
-		digits3[i] = score3rd_ % 10;
-		score3rd_ /= 10;
+		digits3[i] = tempScore3rd % 10;
+		tempScore3rd /= 10;
 	}
 
 	for (int i = 0; i < 5; ++i) {
@@ -857,4 +868,92 @@ void Score::InitRanking() {
 	score3rdTransform_[3].translate = { 14.46f,1.55f,0.0f };
 	score3rdTransform_[4].translate = { 13.5f, 1.55f,0.0f };
 	score3rdTransform_[5].translate = { 11.5f, 1.55f,0.0f };
+}
+
+void Score::LoadRankingData() {
+	// デフォルトのランキングデータ
+	//score1st_ = 30000;
+	//score2nd_ = 20000;
+	//score3rd_ = 10000;
+	
+	try {
+		std::ifstream file(rankingJsonPath_);
+		if (file.is_open()) {
+			std::string line;
+			while (std::getline(file, line)) {
+				// 簡単なJSON解析（score1st, score2nd, score3rdのみ）
+				if (line.find("\"score1st\"") != std::string::npos) {
+					size_t colonPos = line.find(':');
+					if (colonPos != std::string::npos) {
+						std::string valueStr = line.substr(colonPos + 1);
+						// 数値以外の文字を除去
+						valueStr.erase(std::remove_if(valueStr.begin(), valueStr.end(), 
+							[](char c) { return !std::isdigit(c) && c != '-'; }), valueStr.end());
+						if (!valueStr.empty()) {
+							score1st_ = std::stoi(valueStr);
+						}
+					}
+				}
+				else if (line.find("\"score2nd\"") != std::string::npos) {
+					size_t colonPos = line.find(':');
+					if (colonPos != std::string::npos) {
+						std::string valueStr = line.substr(colonPos + 1);
+						valueStr.erase(std::remove_if(valueStr.begin(), valueStr.end(), 
+							[](char c) { return !std::isdigit(c) && c != '-'; }), valueStr.end());
+						if (!valueStr.empty()) {
+							score2nd_ = std::stoi(valueStr);
+						}
+					}
+				}
+				else if (line.find("\"score3rd\"") != std::string::npos) {
+					size_t colonPos = line.find(':');
+					if (colonPos != std::string::npos) {
+						std::string valueStr = line.substr(colonPos + 1);
+						valueStr.erase(std::remove_if(valueStr.begin(), valueStr.end(), 
+							[](char c) { return !std::isdigit(c) && c != '-'; }), valueStr.end());
+						if (!valueStr.empty()) {
+							score3rd_ = std::stoi(valueStr);
+						}
+					}
+				}
+			}
+			file.close();
+		}
+	} catch (const std::exception&) {
+		// ファイルが存在しない場合や読み込みエラーの場合はデフォルト値を使用
+	}
+}
+
+void Score::SortRankingScores() {
+	// 現在のスコアを含めた4つのスコアを配列に格納
+	std::array<int, 4> scores = { score1st_, score2nd_, score3rd_, nowScore_ };
+	
+	// 降順にソート
+	std::sort(scores.begin(), scores.end(), std::greater<int>());
+	
+	// ソート結果を各スコアに代入
+	score1st_ = scores[0];
+	score2nd_ = scores[1];
+	score3rd_ = scores[2];
+	// 4位のスコアは保存しない（上位3つのみ保存）
+}
+
+void Score::SaveRankingData() {
+	try {
+		// ディレクトリが存在しない場合は作成
+		std::filesystem::path jsonPath(rankingJsonPath_);
+		std::filesystem::create_directories(jsonPath.parent_path());
+		
+		std::ofstream file(rankingJsonPath_);
+		if (file.is_open()) {
+			file << "{\n";
+			file << "    \"score1st\": " << score1st_ << ",\n";
+			file << "    \"score2nd\": " << score2nd_ << ",\n";
+			file << "    \"score3rd\": " << score3rd_ << "\n";
+			file << "}\n";
+			file.close();
+		}
+	} catch (const std::exception&) {
+		// エラーログを出力したい場合はここに追加
+	}
 }
