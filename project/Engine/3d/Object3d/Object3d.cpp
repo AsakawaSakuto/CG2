@@ -403,7 +403,7 @@ void Model::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = true;
 	materialData_->uvTransform = MakeIdentityMatrix();
-	materialData_->shininess = 1000.0f;
+	materialData_->shininess = 5000.0f;
 }
 
 void Model::CreateTransformationResource() {

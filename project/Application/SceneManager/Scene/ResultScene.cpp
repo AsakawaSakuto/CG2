@@ -24,7 +24,7 @@ void ResultScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
-	score_->Initialize(&ctx_->dxCommon, 0.0f);
+	score_->Initialize(&ctx_->dxCommon, ctx_->lastScore);
 	score_->SetInput(&ctx_->input, &ctx_->gamePad);
 }
 

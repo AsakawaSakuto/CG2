@@ -48,6 +48,17 @@ private:
 		RESULT,
 	};
 
+	enum class Rank {
+		S,
+		A,
+		B,
+		C,
+	};
+
+	float floatTimeCount_ = 0.0f;
+	float floatAmplitude_ = -0.3f; // 上下の振幅
+	float floatSpeed_ = 2.0f;      // 浮遊速度
+
 private:
 	int nowScore_ = 0;
 	int score1st_ = 65432;
@@ -59,8 +70,6 @@ private:
 	float nowStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.59f };
 	float nowEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.59f };
 
-	std::array<GameTimer, 6> rankingInTimer_;
-
 	std::array<unique_ptr<Model>, 6> score1stModel_;
 	std::array<Transform, 6> score1stTransform_;
 	std::array<unique_ptr<Model>, 6> score2ndModel_;
@@ -71,6 +80,7 @@ private:
 	std::array<Transform, 6> nowScoreTransform_;
 
 	ScreenType screenType_ = ScreenType::SCORE;
+	Rank rank_ = Rank::S;
 
 	unique_ptr<Sprite> pushAsusumu_ = make_unique<Sprite>();
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
@@ -114,6 +124,24 @@ private:
 
 	std::array<GameTimer, 8> textEasingTimer_;
 	std::array<GameTimer, 5> scoreEasingTimer_;
+	std::array<GameTimer, 6> rankingInTimer_;
 	GameTimer rankAndPlayerEasingTimer_;
 	GameTimer scoreOutTimer_;
+
+	Vector4 rankColor_[4] = {
+	{0.255f, 0.839f, 0.153f, 1.0f}, // 緑
+	{0.173f, 0.365f, 0.835f, 1.0f}, // 青
+	{0.820f, 0.137f, 0.137f, 1.0f}, // 赤
+	{0.898f, 0.898f, 0.161f, 1.0f}  // 黄
+	};
+	
+	Vector4 rankingColor_[4] = {
+	{ 1.0f, 0.949f, 0.161f, 1.0f },   // 1st
+	{ 0.647f, 0.647f, 0.647f, 1.0f }, // 2nd
+    { 0.961f, 0.427f, 0.235f, 1.0f }, // 3rd
+	{ 1.0f, 1.0f, 1.0f, 1.0f }        // Now
+	};
+
+	unique_ptr<Particles> ramuneParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> ramuneParticle2_ = make_unique<Particles>();
 };
