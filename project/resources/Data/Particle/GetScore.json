@@ -1,6 +1,6 @@
 {
-    "alphaFade": 0,
-    "blendMode": 2,
+    "alphaFade": 1,
+    "blendMode": 0,
     "colorFade": 0,
     "colorRandom": 0,
     "coneAngle": 45.0,
@@ -14,13 +14,13 @@
     "emit": 0,
     "endColor": [
         1.0,
-        0.0,
-        0.0
+        1.0,
+        1.0
     ],
     "endRotateVelocity": -1.0,
     "endScale": [
-        0.5,
-        0.5
+        1.0,
+        1.0
     ],
     "endVelocity": [
         0.0,
@@ -32,7 +32,7 @@
     "hemisphereAngle": 90.0,
     "isMove": 1,
     "kMaxParticle": 512,
-    "lifeTime": 0.5,
+    "lifeTime": 1.0,
     "lifeTimeRandom": 0,
     "lineLength": 2.0,
     "lineStart": [
@@ -53,8 +53,8 @@
         1.5
     ],
     "maxVelocity": [
-        0.0,
-        10.0,
+        1.0,
+        30.0,
         0.0
     ],
     "minColor": [
@@ -70,8 +70,8 @@
         0.5
     ],
     "minVelocity": [
-        0.0,
-        10.0,
+        -1.0,
+        20.0,
         0.0
     ],
     "normalVelocity": [
@@ -97,7 +97,7 @@
     "ringOuterRadius": 0.009999999776482582,
     "rotateMove": 0,
     "rotateVelocityRandom": 0,
-    "scaleFade": 0,
+    "scaleFade": 1,
     "scaleRandom": 0,
     "shapeType": 0,
     "size": [
@@ -112,8 +112,8 @@
     ],
     "startRotateVelocity": 1.0,
     "startScale": [
-        1.0,
-        1.0
+        3.0,
+        3.0
     ],
     "startVelocity": [
         0.0,

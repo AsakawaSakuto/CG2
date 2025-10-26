@@ -78,6 +78,7 @@ void TitleScene::Initialize() {
 		cloud_[i] = make_unique<Model>();	
 		cloud_[i]->Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
 		cloud_[i]->SetTexture("resources/image/0.png");
+		cloud_[i]->SetUpdateFrustumCulling(false);
 		cloudIsActive_[i] = false;
 		cloudTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };  // スケールを大きく
 		cloudTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
@@ -88,6 +89,7 @@ void TitleScene::Initialize() {
 		cloudLine_[i] = make_unique<Model>();
 		cloudLine_[i]->Initialize(&ctx_->dxCommon, "Cloud/LineI.obj");
 		cloudLine_[i]->SetTexture("resources/image/0.png");
+		cloudLine_[i]->SetUpdateFrustumCulling(false);
 		cloudLineIsActive_[i] = false;
 		cloudLineTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };  // スケールを大きく
 		cloudLineTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };

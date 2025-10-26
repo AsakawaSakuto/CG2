@@ -383,7 +383,7 @@ void Player::BulletUpdate() {
 		        bullets_.begin(), bullets_.end(),
 		        [playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
 			        float y = bullet->GetTransform().translate.y;
-			        bool shouldDelete = y > playerPosY + 11.0f || y < playerPosY - 11.0f; // 画面外に出たら削除
+			        bool shouldDelete = y > playerPosY + 16.0f || y < playerPosY - 16.0f; // 画面外に出たら削除
 
 			        if (shouldDelete) {
 				        // 削除前にDestroy()を呼び出してパーティクルを再生
@@ -437,9 +437,8 @@ void Player::PlayerImGui() {
 	// bulletShotParticle_->DrawImGui("bulletShot");
 	// bulletDieParticle_->DrawImGui("bulletDie");
 	// stateChangeParticle_->DrawImGui("stateChange");
-	// fallParticle_->DrawImGui("fall");
-	// arrticle1_->DrawImGui("armHit1");
-	// armHitParticle2_->DrawImGui("armHit2");
+	// fallParticle_->DrawImGui("armHit1");
+	// arrticle1_->DrawImGui("armHit2");
 	armHitParticle3_->DrawImGui("armHit3");
 	// goalParticle_->DrawImGui("goal");
 }
@@ -1036,6 +1035,42 @@ void Player::UpdateParticle() {
 
 	goalParticle1_->Update();
 	goalParticle2_->Update();
+
+	for (auto& thorn : thorns_) {
+		for (int i = 0; i < 5; i++) {
+			if (thorn->GetLifeTimerFinish(i)) {
+				getScoreParticle_->SetEmitterPosition(thorn->GetTranslate(i));
+				getScoreParticle_->Play(false);
+			}
+
+			if (thorn->GetLifeTimerActive(i)) {
+				Vector3 thornPos = thorn->GetTranslate(i);
+				float playerY = transform_.translate.y;
+				
+				switch (direction_)
+				{
+				case Direction::UP:
+					if (thornPos.y < playerY -6.0f) {
+						getScoreParticle_->SetEmitterPosition(thornPos);
+						getScoreParticle_->SetStartColor(thorn->GetColor(i));
+						getScoreParticle_->Play(false);
+						thorn->ParticleReset(i);
+					}
+					break;
+				case Direction::DOWN:
+					if (thornPos.y < playerY - 16.0f) {
+						getScoreParticle_->SetEmitterPosition(thornPos);
+						getScoreParticle_->SetStartColor(thorn->GetColor(i));
+						getScoreParticle_->Play(false);
+						thorn->ParticleReset(i);
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	getScoreParticle_->Update();
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -1054,4 +1089,5 @@ void Player::DrawParticle(Camera useCamera) {
 	armHitParticle3_->Draw(useCamera);
 	goalParticle1_->Draw(useCamera);
 	goalParticle2_->Draw(useCamera);
+	getScoreParticle_->Draw(useCamera);
 }

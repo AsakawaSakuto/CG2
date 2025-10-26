@@ -19,7 +19,7 @@ void ThornParticle::Update() {
 
 	for (int i = 0; i < 5; i++) {
 		if (!pIsAlive_[i]) {
-			return;
+			continue; // returnではなくcontinueに変更
 		}
 
 		pTransform_[i].translate += pVelocity_[i];
@@ -33,7 +33,7 @@ void ThornParticle::Update() {
 
 		pModel_[i]->SetTransform(pTransform_[i]);
 
-		pModel_[i]->SetColor({ colorRGB_.x, colorRGB_.y, colorRGB_.z, alphaTimer_.GetReverseProgress() });
+		pModel_[i]->SetColor({ colorRGB_.x,colorRGB_.y,colorRGB_.z,1.0f });
 
 		pModel_[i]->Update();
 
@@ -79,7 +79,7 @@ void ThornParticle::Play(Vector3 pos, uint32_t playNum) {
 
 		acceleration_ = 0.0f;
 
-		lifeTimer_[i].Start(2.0f, false);
+		lifeTimer_[i].Start(5.0f, false);
 	}
 	alphaTimer_.Start(1.0f, false);
 }
