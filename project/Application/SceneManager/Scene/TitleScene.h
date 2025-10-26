@@ -135,9 +135,9 @@ private:
 
 	bool optionOpen_ = false;
 
-	float daiVolumeSE_ = 1.0f;
-	float tyuVolumeSE_ = 0.5f;
-	float syouVolumeSE_ = 0.2f;
+	float daiVolumeSE_ = 0.2f;
+	float tyuVolumeSE_ = 0.1f;
+	float syouVolumeSE_ = 0.05f;
 
 	float daiVolumeBGM_ = 0.3f;
 	float tyuVolumeBGM_ = 0.1f;

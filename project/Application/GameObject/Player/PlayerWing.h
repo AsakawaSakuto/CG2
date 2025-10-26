@@ -24,8 +24,12 @@ private:
 	// 腕のモデル
 	std::unique_ptr<Model> modelArmR01_;
 	std::unique_ptr<Model> modelArmR02_;
+	std::unique_ptr<Model> modelArmR03_;
+	std::unique_ptr<Model> modelArmR04_;
 	std::unique_ptr<Model> modelArmL01_;
 	std::unique_ptr<Model> modelArmL02_;
+	std::unique_ptr<Model> modelArmL03_;
+	std::unique_ptr<Model> modelArmL04_;
 
 	float testX_{};
 	float testY_{};

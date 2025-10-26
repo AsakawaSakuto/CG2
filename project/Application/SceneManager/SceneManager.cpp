@@ -100,5 +100,8 @@ int SceneManager::Run() {
     appContext_->winApp.Finalize();
     CoUninitialize();
 
+    // 振動のリセット
+    appContext_->gamePad.SetVibration(0.0f, 0.0f, 0.0f);
+
     return 0;
 }

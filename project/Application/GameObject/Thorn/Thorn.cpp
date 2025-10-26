@@ -113,10 +113,10 @@ void Thorn::UpdateRotate() {
 	///////////////////////////////////////////Z軸回転で徐々に収束する//////////////////////////////////////////////
 
 	if (isRotate_) {
-		transform_.rotate.z += 4.0f * deltaTime_;
+		transform_.rotate.z += 12.0f * deltaTime_;
 
 		// 1回転したら範囲内に収める
-		transform_.rotate.z = std::clamp(transform_.rotate.z, 0.0f, 2.5f * std::numbers::pi_v<float>);
+		transform_.rotate.z = std::clamp(transform_.rotate.z, 0.0f, 2.0f * std::numbers::pi_v<float>);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////

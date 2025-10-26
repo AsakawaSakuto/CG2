@@ -56,6 +56,9 @@ private:
 	// オーディオの更新
 	void AudioUpdate();
 
+	// ○○個突破スコアの更新
+	void UpdateSpriteScoreOver();
+
 	// ○○個突破!アニメーション
 	void AnimationSpriteSnackOver();
 
@@ -73,6 +76,15 @@ private:
 
 	// ラムネの波紋
 	void UpdateSpriteChargeEffect();
+
+	// スコアの背景波紋
+	void UpdateSpriteCandyEffect();
+
+	// SEの解放
+	void ResetSE();
+
+	// スコア増加時のアニメーション
+	void ScoreUpAnimation();
 
 private:
 	enum class RuleAnimState { 
@@ -131,9 +143,6 @@ private:
 	// プレイヤーがゴールしたかどうか
 	bool isGoal_ = false;
 
-	Vector3 testPos_[3] = {};
-	Vector3 testScale_[3] = {};
-
 	// プレイヤーから入力があるかどうかでフラグをたてる
 	bool isInput_ = false;
 
@@ -179,8 +188,6 @@ private:
 	float startAnimStartAlpha_ = 1.0f;
 	float startAnimEndAlpha_ = 0.0f;
 
-	// ルール説明用のスプライト
-
 	// ルール説明用のスプライトアニメーション制御
 	unique_ptr<Sprite> spriteRule_ = make_unique<Sprite>();
 	float timerSpriteRule_ = 0.0f;
@@ -198,6 +205,7 @@ private:
 	unique_ptr<Sprite> spriteProgressLine_ = make_unique<Sprite>();
 	unique_ptr<Sprite> spriteProgressPlayer_ = make_unique<Sprite>();
 	unique_ptr<Sprite> spriteProgressGoal_ = make_unique<Sprite>();
+	unique_ptr<Sprite> spriteProgressMountaion_ = make_unique<Sprite>();
 
 	// ゲーム終了フラグ
 	bool isActiveEndText_ = false;
@@ -205,6 +213,12 @@ private:
 
 	// スコアの背景
 	unique_ptr<Sprite> spriteCandyScore_ = make_unique<Sprite>();
+
+	// スコアの背景波紋
+	unique_ptr<Sprite> spriteCandyEffect_ = make_unique<Sprite>();
+	float candyEffectSize_ = 1.0f;                                                // サイズ
+	float candyEffectAlpha_ = 1.0f;                                               // 透明度
+	std::array<float, 5> candySizeSpeeds = {0.0025f, 0.005f, 0.01f, 0.02f, 0.04f}; // サイズの変化スピード
 
 	// 弾のゲージラムネ
 	unique_ptr<Sprite> spriteChargeUI_ = make_unique<Sprite>();
@@ -222,9 +236,13 @@ private:
 	std::array<unique_ptr<Sprite>, 2> spriteNoInputCountDown_;
 	
 	// SE
-	unique_ptr<AudioX> shotSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> countDownSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> clearSE_ = make_unique<AudioX>();
+
+	// BGM
+	unique_ptr<AudioX> gameSceneBGM01_ = make_unique<AudioX>();
+	unique_ptr<AudioX> gameSceneBGM02_ = make_unique<AudioX>();
 
 	// ○○個突破 スプライト
 	unique_ptr<Sprite> spriteSnackCountOver_ = make_unique<Sprite>();
@@ -239,10 +257,19 @@ private:
 	float timerSnackCountOver_ = 0.0f;
 
 	// ○○個突破 スコア数
-	std::array<unique_ptr<Sprite>, 4> spriteScoreCountOver_;
+	std::array<unique_ptr<Sprite>, 5> spriteScoreCountOver_;
 
 	// ○○個突破 スコア数 座標
-	Vector2 spriteScoreCountOverPos_ = {150.0f, -100.0f};
+	Vector2 spriteScoreCountOverPos_ = {-600.0f, 640.0f};
+
+	// ○○個突破　1000の倍数
+	float nextMilestone_ = 0;
+
+	// ○○個突破 イージング用
+	const float kScoreOverStartPosX_ = -600.0f;
+	const float kScoreOverMiddlePosX_ = 640.0f;
+	const float kScoreOverEndPosX_ = 1880.0f;
+	const float kScoreOverWaitDuration_ = 0.1f;
 
 	// カメラのZ座標
 	float cameraPosisionZ_ = -30.0f;
@@ -261,4 +288,8 @@ private:
 
 	// クマのスプライト回転用の変数
 	float frameCount_ = 0.0f;
+
+	// スコア増加時のアニメーション用変数
+	float scoreUpTimer_ = 0.0f;
+	float scoreUpDuration_ = 0.2f;
 };
