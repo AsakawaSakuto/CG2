@@ -80,12 +80,16 @@ private:
 	std::array<Transform, 6> nowScoreTransform_;
 
 	ScreenType screenType_ = ScreenType::SCORE;
+	NextScene nextScene_ = NextScene::TITLE;
 	Rank rank_ = Rank::S;
 
 	unique_ptr<Sprite> pushAsusumu_ = make_unique<Sprite>();
 	unique_ptr<Sprite> titleUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> retryUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
+
+	float cursolStartY_ = 500.0f;
+	float cursolEndY_ = 600.0f;
 
 	DirectXCommon* dxCommon_ = nullptr;
 	std::array<unique_ptr<Model>,8> textModel_;
@@ -127,6 +131,7 @@ private:
 	std::array<GameTimer, 6> rankingInTimer_;
 	GameTimer rankAndPlayerEasingTimer_;
 	GameTimer scoreOutTimer_;
+	GameTimer cursolMoveTimer_;
 
 	Vector4 rankColor_[4] = {
 	{0.255f, 0.839f, 0.153f, 1.0f}, // 緑
@@ -144,4 +149,5 @@ private:
 
 	unique_ptr<Particles> ramuneParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> ramuneParticle2_ = make_unique<Particles>();
+	unique_ptr<Particles> sRankParticle_ = make_unique<Particles>();
 };

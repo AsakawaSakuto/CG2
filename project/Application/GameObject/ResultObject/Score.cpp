@@ -9,12 +9,23 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 
 	screenType_ = ScreenType::SCORE;
 
+	nextScene_ = NextScene::TITLE;
+
 	floatTimeCount_ = 0.0f;
 
 	ramuneParticle_->Initialize(dxCommon_);
 	ramuneParticle_->LoadJson("RamuneResult1");
+
 	ramuneParticle2_->Initialize(dxCommon_);
 	ramuneParticle2_->LoadJson("RamuneResult2");
+
+	sRankParticle_->Initialize(dxCommon_);
+	sRankParticle_->LoadJson("SRank");
+	if (rank_== Rank::S) {
+		sRankParticle_->Play();
+	} else {
+		sRankParticle_->Stop();
+	}
 
 	for (int i = 0; i < textEasingTimer_.size(); i++) {
 		textEasingTimer_[i].Reset();
@@ -63,10 +74,10 @@ void Score::Update() {
 	case Score::ScreenType::RANKING:
 
 		ScoreOut();
-		pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetReverseProgress()});
-		titleUI_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetProgress() });
-		retryUI_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetProgress() });
-		cursolUI_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetProgress() });
+		pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetReverseProgress()});
+		titleUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
+		retryUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
+		cursolUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
 
 		for (int i = 0; i < 6; i++) {
 			score1stTransform_[i].translate.x = Easing::Lerp(
@@ -131,8 +142,58 @@ void Score::Update() {
 			score3rdModel_[i]->SetTransform(score3rdTransform_[i]);
 		}
 
-		if (input_->TriggerKey(DIK_SPACE)) {
-			goTitle_ = true;
+		switch (nextScene_)
+		{
+		case Score::NextScene::TITLE:
+
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+				goTitle_ = true;
+			}
+
+			if (!cursolMoveTimer_.IsActive() && input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON)) {
+				nextScene_ = NextScene::RESULT;
+				cursolMoveTimer_.Start(0.25f);
+				cursolStartY_ = 500.0f;
+				cursolEndY_ = 600.0f;
+			}
+
+			if (cursolMoveTimer_.IsActive()) {
+				cursolUI_->SetPosition({ 180.0f,Easing::Lerp(
+					cursolStartY_,
+					cursolEndY_,
+					cursolMoveTimer_.GetProgress(),
+					Easing::Type::EaseInOutQuint
+				) });
+			} else {
+				cursolUI_->SetPosition({ 180.0f,500.0f });
+			}
+
+			break;
+		case Score::NextScene::RESULT:
+
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+				goResult_ = true;
+			}
+
+			if (!cursolMoveTimer_.IsActive() && input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON)) {
+				nextScene_ = NextScene::TITLE;
+				cursolMoveTimer_.Start(0.25f);
+				cursolStartY_ = 600.0f;
+				cursolEndY_ = 500.0f;
+			}
+
+			if (cursolMoveTimer_.IsActive()) {
+				cursolUI_->SetPosition({ 180.0f,Easing::Lerp(
+					cursolStartY_,
+					cursolEndY_,
+					cursolMoveTimer_.GetProgress(),
+					Easing::Type::EaseInOutQuint
+				) });
+			} else {
+				cursolUI_->SetPosition({ 180.0f,600.0f });
+			}
+
+			break;
 		}
 
 		break;
@@ -197,6 +258,12 @@ void Score::Update() {
 	ramuneParticle2_->SetEmitterPosition(player2Transform_.translate);
 	ramuneParticle2_->SetOffSet({ -0.8f,-1.1f,0.0f });
 	ramuneParticle2_->Update();
+
+	sRankParticle_->SetEmitterPosition(rankTransform_[0].translate);
+	sRankParticle_->SetOffSet({ 0.2f,0.1f,-1.0f });
+	sRankParticle_->Update();
+
+	cursolMoveTimer_.Update();
 }
 
 void Score::Draw(Camera camera) {
@@ -248,6 +315,7 @@ void Score::Draw(Camera camera) {
 
 	ramuneParticle_->Draw(camera);
 	ramuneParticle2_->Draw(camera);
+	sRankParticle_->Draw(camera);
 
 	pushAsusumu_->Draw();
 	titleUI_->Draw();
@@ -257,8 +325,10 @@ void Score::Draw(Camera camera) {
 
 void Score::DrawImGui() {
 
-	ramuneParticle_->DrawImGui("ramuneParticle");
-	ramuneParticle2_->DrawImGui("ramuneParticle2");
+	//ramuneParticle_->DrawImGui("ramuneParticle");
+	//ramuneParticle2_->DrawImGui("ramuneParticle2");
+
+	//sRankParticle_->DrawImGui("sRankParticle");
 
 	//pushAsusumu_->DrawImGui("pushAsusumu");
 
@@ -303,11 +373,11 @@ void Score::DrawImGui() {
 	//
 	//ImGui::End();
 
-	titleUI_->DrawImGui("title");
-	retryUI_->DrawImGui("retry");
-	cursolUI_->DrawImGui("curcol");
+	//titleUI_->DrawImGui("title");
+	//retryUI_->DrawImGui("retry");
+	//cursolUI_->DrawImGui("curcol");
 
-	ImGui::Begin("p2");
+	/*ImGui::Begin("p2");
 
 	ImGui::DragFloat3("Pt", &player2Transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("Pr", &player2Transform_.rotate.x, 0.01f);
@@ -319,7 +389,7 @@ void Score::DrawImGui() {
 	ImGui::DragFloat3("Mr", &machine2Transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("Ms", &machine2Transform_.scale.x, 0.01f);
 
-	ImGui::End();
+	ImGui::End();*/
 
 	/*ImGui::Begin("1st");
 

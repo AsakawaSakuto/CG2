@@ -34,6 +34,10 @@ void ResultScene::Update() {
 		ChangeScene(TITLE);
 	}
 
+	if (score_->GoResult()) {
+		ChangeScene(GAME);
+	}
+
 	score_->Update();
 
 	CameraController();
