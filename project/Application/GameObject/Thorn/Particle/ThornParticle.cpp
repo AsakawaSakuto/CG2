@@ -6,9 +6,16 @@ void ThornParticle::Initialize(DirectXCommon* dxCommon) {
 
 	for (int i = 0; i < 5; i++) {
 		pModel_[i] = std::make_unique<Model>();
-		pModel_[i]->Initialize(dxCommon_, "Candy/Candy.obj");
-		pModel_[i]->SetUpdateFrustumCulling(false);
+	}
 
+	pModel_[0]->Initialize(dxCommon_, "Candy/Candy.obj");
+	pModel_[1]->Initialize(dxCommon_, "Lolipop/Lolipop.obj");
+	pModel_[2]->Initialize(dxCommon_, "Cookie/Cookie.obj");
+	pModel_[3]->Initialize(dxCommon_, "Candy/Candy.obj");
+	pModel_[4]->Initialize(dxCommon_, "Lolipop/Lolipop.obj");
+
+	for (int i = 0; i < 5; i++) {
+		pModel_[i]->SetUpdateFrustumCulling(false);
 		pTransform_[i].scale = { baseScale_,baseScale_,baseScale_ };
 		pTransform_[i].rotate = { 0.0f,0.0f,0.0f };
 		pTransform_[i].translate = { 0.0f,0.0f,0.0f };

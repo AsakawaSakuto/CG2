@@ -49,7 +49,7 @@ private:
 	GameTimer lifeTimer_[5] = {};
 	GameTimer alphaTimer_ = {};
 
-	float baseScale_ = 0.3f;
+	float baseScale_ = 0.25f;
 	float gravity_ = -0.125f;
 	float acceleration_ = 0.0f;
 
