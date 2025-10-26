@@ -1086,6 +1086,9 @@ void Player::UpdateParticle() {
 		}
 	}
 
+	if (direction_ == Direction::DOWN) {
+		getScoreParticle_->SetEmitVelocityY(3.0f);
+	}
 	getScoreParticle_->Update();
 }
 
