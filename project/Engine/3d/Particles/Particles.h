@@ -112,6 +112,10 @@ public:
 		emitter_.maxVelocity.y = velocityY;
 	}
 
+	void SetStartColor(Vector3 startColor) {
+		emitter_.startColor = startColor;
+	}
+
 	/// <summary>
 	/// パーティクルの生成開始
 	/// </summary>

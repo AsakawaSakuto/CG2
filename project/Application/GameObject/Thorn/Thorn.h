@@ -42,6 +42,30 @@ public:
 	void UpdateParticle() { particle_->Update(); }
 	void DrawParticle(Camera useCamera) { particle_->Draw(useCamera); }
 
+	Vector3 GetColor(int index) const {
+		assert(index >= 0 && index < 5); // 範囲外チェック（任意）
+		return particle_->GetColor(index);
+	}
+
+	Vector3 GetTranslate(int index) const {
+		assert(index >= 0 && index < 5); // 範囲外チェック（任意）
+		return particle_->GetTranslate(index);
+	}
+
+	bool GetLifeTimerFinish(int index) const {
+		assert(index >= 0 && index < 5); // 範囲外チェック（任意）
+		return  particle_->GetLifeTimerFinish(index);
+	}
+
+	bool GetLifeTimerActive(int index) const {
+		assert(index >= 0 && index < 5); // 範囲外チェック（任意）
+		return  particle_->GetLifeTimerActive(index);
+	}
+
+	void ParticleReset(int index) {
+		particle_->ParticleReset(index);
+	}
+
 	// クールタイムの更新
 	void TickCooldown();
 

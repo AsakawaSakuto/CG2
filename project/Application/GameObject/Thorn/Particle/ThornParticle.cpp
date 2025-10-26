@@ -4,7 +4,7 @@ void ThornParticle::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_ = dxCommon;
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		pModel_[i] = std::make_unique<Model>();
 		pModel_[i]->Initialize(dxCommon_, "Candy/Candy.obj");
 		pModel_[i]->SetUpdateFrustumCulling(false);
@@ -17,9 +17,9 @@ void ThornParticle::Initialize(DirectXCommon* dxCommon) {
 
 void ThornParticle::Update() {
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		if (!pIsAlive_[i]) {
-			return;
+			continue; // returnではなくcontinueに変更
 		}
 
 		pTransform_[i].translate += pVelocity_[i];
@@ -28,34 +28,29 @@ void ThornParticle::Update() {
 		pTransform_[i].rotate.y += pRotateVelocity_[i].y;
 		pTransform_[i].rotate.z += pRotateVelocity_[i].z;
 
-		if (lifeTimer_.IsActive()) {
-			pTransform_[i].scale.x = baseScale_ * lifeTimer_.GetReverseProgress();
-			pTransform_[i].scale.y = baseScale_ * lifeTimer_.GetReverseProgress();
-			pTransform_[i].scale.z = baseScale_ * lifeTimer_.GetReverseProgress();
-		}
-
 		acceleration_ += gravity_ * deltaTime_;
 		pVelocity_[i].y += acceleration_ * deltaTime_;
 
 		pModel_[i]->SetTransform(pTransform_[i]);
 
-		pModel_[i]->SetColor({ colorRGB_.x, colorRGB_.y, colorRGB_.z, alphaTimer_.GetReverseProgress() });
+		pModel_[i]->SetColor({ colorRGB_.x,colorRGB_.y,colorRGB_.z,1.0f });
 
 		pModel_[i]->Update();
 
-		if (lifeTimer_.IsFinished()) {
+		if (lifeTimer_[i].IsFinished()) {
 			pIsAlive_[i] = false;
 			pTransform_[i].scale = { 0.0f ,0.0f ,0.0f };
-			lifeTimer_.Reset();
+			lifeTimer_[i].Reset();
 		}
+
+		lifeTimer_[i].Update();
 	}
 
-	lifeTimer_.Update();
 	alphaTimer_.Update();
 }
 
 void ThornParticle::Draw(Camera useCamera) {
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		if (pIsAlive_[i]) {
 			pModel_[i]->Draw(useCamera);
 		}
@@ -83,9 +78,9 @@ void ThornParticle::Play(Vector3 pos, uint32_t playNum) {
 		pIsAlive_[i] = true;
 
 		acceleration_ = 0.0f;
-	}
 
-	lifeTimer_.Start(2.5f, false);
+		lifeTimer_[i].Start(5.0f, false);
+	}
 	alphaTimer_.Start(1.0f, false);
 }
 
@@ -95,14 +90,14 @@ ThornParticle::~ThornParticle() {
 
 void ThornParticle::Cleanup() {
 	// 全パーティクルを非アクティブにする
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		pIsAlive_[i] = false;
 		if (pModel_[i]) {
 			pModel_[i].reset();
 		}
+		lifeTimer_[i].Reset();
 	}
 
 	// タイマーをリセット
-	lifeTimer_.Reset();
 	alphaTimer_.Reset();
 }
