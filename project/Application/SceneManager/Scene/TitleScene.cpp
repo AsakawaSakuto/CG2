@@ -95,6 +95,9 @@ void TitleScene::Initialize() {
 		cloudLineTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
 		cloudLineTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
 	}
+
+	// 振動の終了
+	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
 }
 
 void TitleScene::Update() {

@@ -21,7 +21,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 	scoreList_ = JsonState::Load<ScoreList>("resources/Data/scoreList.json");
 
-	transform_.scale = {2.0f, 2.0f, 2.0f};
+	transform_.scale = {4.0f, 4.0f, 4.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {0.0f, -10.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
@@ -63,10 +63,14 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	shotSE_->Initialize("resources/sound/SE/InGame/ShotSE.mp3");
 	playerDamageSE_->Initialize("resources/sound/SE/InGame/PlayerDamageSE.mp3");
 	DestroyEnemySE_->Initialize("resources/sound/SE/InGame/DestroyEnemySE.mp3");
-	ClearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
 	gaugeChargeSE_->Initialize("resources/sound/SE/InGame/GaugeChargeSE.mp3");
+	getItemSE_->Initialize("resources/sound/SE/InGame/GetItemSE.mp3");
 
 	InitParticle();
+
+	// 点滅用変数
+	isFlicker_ = false;
+	currentFlickFrames_ = 0;
 }
 
 void Player::Update() {
@@ -112,9 +116,6 @@ void Player::Update() {
 	// トゲとの当たり判定
 	CollisionThorn();
 
-	// ブロックとの当たり判定
-	CollisionBlock();
-
 	// 弾とトゲの当たり判定
 	CollisionBulletThorn();
 
@@ -139,6 +140,12 @@ void Player::Update() {
 	// カメラの追従オンオフ切り替え
 	UpdateCameraSetChange();
 
+	// プレイヤーの点滅
+	UpdateFlicker();
+
+	// 下降時にプレイヤーを回転させる
+	DownMoveRotate();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -159,11 +166,14 @@ void Player::Update() {
 
 	// オーディオの更新
 	AudioUpdate();
+
+	// スコアの比較
+	ComparisonScore();
 }
 
 void Player::Draw(Camera useCamera) {
 	// プレイヤー描画
-	if (stunTimer_.GetCurrentFrame() % 2 == 0) {
+	if (currentFlickFrames_ % 2 == 0) {
 		model_->Draw(useCamera);
 	}
 
@@ -173,10 +183,14 @@ void Player::Draw(Camera useCamera) {
 	}
 
 	// プレイヤーの羽の描画
-	playerWing_->Draw(useCamera);
+	if (currentFlickFrames_ % 2 == 0) {
+		playerWing_->Draw(useCamera);
+	}
 
 	// クマ
-	bear_->Draw(useCamera);
+	if (currentFlickFrames_ % 2 == 0) {
+		bear_->Draw(useCamera);
+	}
 
 	DrawParticle(useCamera);
 }
@@ -207,16 +221,12 @@ void Player::MovePlayerUpward() {
 }
 
 void Player::ClampPlayerVelocity() {
-	float speedAdd = 0.0f;
-
 	// 弾の数に応じてプレイヤーの最高速度を変更
-	if (bulletGauge_ <= 2) {
-		speedAdd = 2.0f * bulletGauge_;
-	} else {
-		speedAdd = 2.0f * 2 + 1.0f * (bulletGauge_ - 2);
+	if (bulletGauge_ >= 0 && bulletGauge_ < playerMaxSpeeds_.size()) {
+		playerState_.maxSpeed = playerMaxSpeeds_[bulletGauge_];
 	}
 
-	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed - speedAdd, playerState_.maxSpeed + speedAdd);
+	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed, playerState_.maxSpeed );
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
@@ -255,8 +265,8 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		shotSE_->Reset();
 		playerDamageSE_->Reset();
 		DestroyEnemySE_->Reset();
-		ClearSE_->Reset();
 		gaugeChargeSE_->Reset();
+		getItemSE_->Reset();
 	}
 }
 
@@ -441,6 +451,12 @@ void Player::PlayerImGui() {
 	// arrticle1_->DrawImGui("armHit2");
 	armHitParticle3_->DrawImGui("armHit3");
 	// goalParticle_->DrawImGui("goal");
+
+	ImGui::Begin("WingThornDistance");
+
+	ImGui::DragFloat("kNearThreshold", &kNearThreshold, 0.01f);
+
+	ImGui::End();
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -500,11 +516,14 @@ void Player::CollisionThorn() {
 
 				// シェイク用のフラグを立てる
 				if (!isShake_) {
-					isShake_ = true;
+					StartCameraShake(ShakeType::AttackEnemy);
 				}
 
 				// スコア加算
 				AddScore(scoreList_.enemyHitAmount);
+
+				// ゲームパッドの振動
+				gamePad_->SetVibration(0.05f, 0.05f, 0.1f);
 
 				// トゲを非アクティブにする
 				thorn->PlayParticle(3);
@@ -519,8 +538,8 @@ void Player::CollisionThorn() {
 			} else if (direction_ == Direction::UP) {
 
 				// シェイク用のフラグを立てる
-				if (!isShake_ && !isStartCoolDown_) {
-					isShake_ = true;
+				if (!isShake_ && !isStartCoolDown_ && !stunTimer_.IsActive()) {
+					StartCameraShake(ShakeType::HitByEnemy);
 
 					// スタンカウント加算
 					stunCount_++;
@@ -533,9 +552,18 @@ void Player::CollisionThorn() {
 						num_ = 0;
 					}
 
+					// 点滅用のフラグを立てる
+					if (!isFlicker_) {
+						isFlicker_ = true;
+					}
+
+					// ゲームパッドの振動
+					gamePad_->SetVibration(0.25f, 0.25f, 0.5f);
+
 					// 弾のゲージをセット
 					// SetBulletGauge(-1);
 
+					// 弾のゲージスプライトの表示切替
 					(*bulletGaugeSprites_)[bulletGauge_].isActive = false;
 
 					// スタン
@@ -546,24 +574,6 @@ void Player::CollisionThorn() {
 					break;
 				}
 			}
-		}
-	}
-}
-
-void Player::CollisionBlock() {
-	for (auto& block : blocks_) {
-		if (Collision::IsHit(block->GetCollisionSphere(), collisionSphere_) && block->GetIsAlive()) {
-			// シェイク用のフラグを立てる
-			if (!isShake_) {
-				isShake_ = true;
-			}
-
-			// ブロックを非アクティブにする
-			block->SetIsAlive(false);
-
-			// スコア加算
-			AddScore(block->GetScoreAmount());
-			break;
 		}
 	}
 }
@@ -602,23 +612,19 @@ void Player::CollisionBulletThorn() {
 }
 
 void Player::UpdateCameraShake() {
-	float shakeDecayRate_ = 2.0f; // 揺れの減衰速度
+	if (!isShake_)
+		return;
 
-	if (isShake_) {
-		playerState_.shakeStrength -= shakeDecayRate_ * deltaTime_;
-		playerState_.shakeStrength -= shakeDecayRate_ * deltaTime_;
+	shakeTimer_ -= deltaTime_;
+	playerState_.shakeStrength -= shakeDecayRate_ * deltaTime_;
+	playerState_.shakeStrength = std::max(0.0f, playerState_.shakeStrength);
 
-		playerState_.shakeStrength = std::max(0.0f, playerState_.shakeStrength);
-		playerState_.shakeStrength = std::max(0.0f, playerState_.shakeStrength);
+	shakeAmount_.x = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * playerState_.shakeStrength;
+	shakeAmount_.y = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * playerState_.shakeStrength;
 
-		shakeAmount_.x = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * playerState_.shakeStrength;
-		shakeAmount_.y = (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * playerState_.shakeStrength;
-
-		if (playerState_.shakeStrength <= 0.01f) {
-			isShake_ = false;
-			shakeAmount_ = {0.0f, 0.0f};
-			playerState_.shakeStrength = 0.5f;
-		}
+	if (shakeTimer_ <= 0.0f || playerState_.shakeStrength <= 0.01f) {
+		isShake_ = false;
+		shakeAmount_ = {0.0f, 0.0f};
 	}
 }
 
@@ -676,6 +682,9 @@ void Player::CollisionWingThorn() {
 			}
 
 			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
+
+			// SE再生
+			getItemSE_->PlayAudio(SE_Volume);
 
 			break;
 		}
@@ -788,19 +797,19 @@ void Player::WingCoolDownFramesAdd() {
 }
 
 void Player::PlayerMoveLimit() {
-	if (transform_.translate.x >= 8.0f) {
-		transform_.translate.x = 8.0f;
+	if (transform_.translate.x >= moveLimitPosX_) {
+		transform_.translate.x = moveLimitPosX_;
 	}
 
-	if (transform_.translate.x <= -8.0f) {
-		transform_.translate.x = -8.0f;
+	if (transform_.translate.x <= -moveLimitPosX_) {
+		transform_.translate.x = -moveLimitPosX_;
 	}
 }
 
 void Player::UpdateCollisionAABB() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x - 0.4f, t.y + 0.2f, t.z + 0.5f};
-	collisionAABB_.min = {t.x + 0.1f, t.y - 0.2f, t.z - 0.5f};
+	collisionAABB_.max = {t.x - 0.8f, t.y + 0.4f, t.z + 1.0f};
+	collisionAABB_.min = {t.x + 0.2f, t.y - 0.4f, t.z - 1.0f};
 }
 
 void Player::StunRotate() {
@@ -863,8 +872,16 @@ void Player::UpdatePlayerHorizontalMove() {
 
 void Player::AudioUpdate() {
 	shotSE_->SetVolume(SE_Volume);
+	playerDamageSE_->SetVolume(SE_Volume);
+	DestroyEnemySE_->SetVolume(SE_Volume);
+	gaugeChargeSE_->SetVolume(SE_Volume);
+	getItemSE_->SetVolume(SE_Volume);
 
 	shotSE_->Update();
+	playerDamageSE_->Update();
+	DestroyEnemySE_->Update();
+	gaugeChargeSE_->Update();
+	getItemSE_->Update();
 }
 
 void Player::DrawImGuiJsonStateScore() {
@@ -1046,11 +1063,10 @@ void Player::UpdateParticle() {
 			if (thorn->GetLifeTimerActive(i)) {
 				Vector3 thornPos = thorn->GetTranslate(i);
 				float playerY = transform_.translate.y;
-				
-				switch (direction_)
-				{
+
+				switch (direction_) {
 				case Direction::UP:
-					if (thornPos.y < playerY -6.0f) {
+					if (thornPos.y < playerY - 6.0f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
 						getScoreParticle_->Play(false);
@@ -1090,4 +1106,43 @@ void Player::DrawParticle(Camera useCamera) {
 	goalParticle1_->Draw(useCamera);
 	goalParticle2_->Draw(useCamera);
 	getScoreParticle_->Draw(useCamera);
+}
+
+void Player::UpdateFlicker() {
+	if (isFlicker_) {
+		currentFlickFrames_++;
+
+		// 60フレーム経過したらタイマーを0に初期化
+		if (currentFlickFrames_ >= kMaxFrameFlick) {
+			currentFlickFrames_ = 0;
+			isFlicker_ = false;
+		}
+	}
+}
+
+void Player::StartCameraShake(ShakeType type) {
+	auto it = kShakePresets.find(type);
+	if (it != kShakePresets.end()) {
+		const auto& params = it->second;
+		playerState_.shakeStrength = params.strength;
+		shakeTimer_ = params.duration;
+		shakeDecayRate_ = params.decayRate;
+		isShake_ = true;
+	}
+}
+
+void Player::DownMoveRotate() {
+	if (direction_ == Direction::DOWN) {
+		transform_.rotate.y += 12.0f * deltaTime_;
+	}
+}
+
+void Player::ComparisonScore() {
+	if (score_ > preScore_) {
+		// アニメーションフラグを立てる
+		isScoreUpAnimation_ = true;
+
+		// スコアを記録
+		preScore_ = score_;
+	}
 }

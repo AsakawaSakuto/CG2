@@ -1,13 +1,13 @@
 #pragma once
 #include "Application/GameObject/GameObject.h"
+#include "Application/GameObject/Player/Particle/stunP.h"
+#include "Application/Score/ScoreList.h"
+#include "Bear.h"
 #include "Bullet.h"
-#include <vector>
-#include "State/PlayerState.h"
 #include "PlayerWing.h"
 #include "State/BulletState.h"
-#include "Bear.h"
-#include "Application/Score/ScoreList.h"
-#include "Application/GameObject/Player/Particle/stunP.h"
+#include "State/PlayerState.h"
+#include <vector>
 
 class Thorn;
 class Block;
@@ -17,10 +17,20 @@ struct BulletGaugeInfo {
 	bool isActive;
 };
 
-enum class Direction
-{
+struct CameraShakeParams {
+	float strength;
+	float duration;
+	float decayRate;
+};
+
+enum class Direction {
 	UP = 0,
 	DOWN = 1,
+};
+
+enum class ShakeType {
+	HitByEnemy,  // 被弾時
+	AttackEnemy, // 敵に攻撃を与えた時
 };
 
 class Player : public GameObject {
@@ -52,12 +62,14 @@ public:
 	int GetShotCount() const { return shotCount_; }
 	int GetStunCount() const { return stunCount_; }
 	bool GetIsCameraSet() const { return isCameraSet_; }
+	bool GetIsScoreUpAnimation() const { return isScoreUpAnimation_; }
 
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
 	void SetBlocks(std::vector<std::shared_ptr<Block>>& blocks) { blocks_ = blocks; }
 	void SetIsGoal(bool isGoal) { isGoal_ = isGoal; }
 	void SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites);
+	void SetIsScoreUpAnimation(bool isScoreUpAnimation) { isScoreUpAnimation_ = isScoreUpAnimation; }
 
 private:
 	// プレイヤーの上昇
@@ -99,9 +111,6 @@ private:
 	// トゲとの当たり判定
 	void CollisionThorn();
 
-	// ブロックとの当たり判定
-	void CollisionBlock();
-
 	// 弾とトゲの当たり判定
 	void CollisionBulletThorn();
 
@@ -130,7 +139,7 @@ private:
 	void ShowLabeledVector3(const char* label, float* vec);
 
 	// ImGui自動生成関数
-	//void DrawImGuiForJson(nlohmann::json& json);
+	// void DrawImGuiForJson(nlohmann::json& json);
 
 	// ImGuiプレイヤー
 	void DrawImGuiJsonStatePlayer();
@@ -167,6 +176,19 @@ private:
 	void UpdateParticle();
 
 	void DrawParticle(Camera useCamera);
+
+	// 点滅用の更新
+	void UpdateFlicker();
+
+	// シェイクの開始関数
+	void StartCameraShake(ShakeType type);
+
+	// 下降時の回転処理
+	void DownMoveRotate();
+
+	// 前のフレームよりスコアが増えていたらアニメーションする
+	void ComparisonScore();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -193,7 +215,6 @@ private:
 
 	// スタン関連
 	GameTimer stunTimer_;
-	float flickerTimer_ = 0.0f;
 
 	// トゲ
 	std::vector<std::shared_ptr<Thorn>> thorns_;
@@ -220,9 +241,7 @@ private:
 	float score_ = 0;
 
 	// 羽関連(スコア)
-	const float kNearThreshold = 1.8f;
-	const int kNearScore = 200;
-	const int kFarScore = 100;
+	float kNearThreshold = 2.3f;
 
 	float dis{};
 
@@ -250,12 +269,17 @@ private:
 	// プレイヤーにカメラが追従するかどうかのフラグ
 	bool isCameraSet_ = false;
 
+	// 点滅用の変数・定数
+	bool isFlicker_ = false;
+	int currentFlickFrames_ = 0;
+	const int kMaxFrameFlick = 60;
+
 	// SE
 	unique_ptr<AudioX> shotSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> playerDamageSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> DestroyEnemySE_ = make_unique<AudioX>();
-	unique_ptr<AudioX> ClearSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> gaugeChargeSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> getItemSE_ = make_unique<AudioX>();
 
 	// ramuneから出るパーティクル
 	std::unique_ptr<Particles> ramuneParticle_ = std::make_unique<Particles>();
@@ -278,4 +302,26 @@ private:
 	std::unique_ptr<StunP> stunParticle_ = std::make_unique<StunP>();
 	GameTimer stateChangeTimer_;
 	bool playerIsMove_ = true;
+
+	// シェイクの種類
+	const std::unordered_map<ShakeType, CameraShakeParams> kShakePresets = {
+	    {ShakeType::HitByEnemy,  {1.5f, 0.3f, 5.0f}},
+        {ShakeType::AttackEnemy, {0.4f, 0.2f, 3.0f}}
+    };
+
+	// シェイク用の変数
+	float shakeTimer_ = 0.0f;
+	float shakeDecayRate_ = 0.0f;
+
+	// 弾数に応じたプレイヤーの最高速度
+	std::array<const float, 6> playerMaxSpeeds_ = {8.0f, 10.0f, 12.0f, 14.0f, 15.0f, 16.0f};
+
+	// プレイヤーの移動制限用の変数
+	const float moveLimitPosX_ = 9.0f;
+
+	// スコア増加時のアニメーション用変数
+	bool isScoreUpAnimation_ = false;
+
+	// 前フレームのスコア
+	float preScore_ = 0.0f;
 };
