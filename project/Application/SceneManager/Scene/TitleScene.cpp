@@ -71,7 +71,7 @@ void TitleScene::Initialize() {
 	titleParticle_->Stop();
 
 	testParticle_->Initialize(&ctx_->dxCommon, 1);
-	testParticle_->LoadJson("GoalParticle");
+	testParticle_->LoadJson("getScore");
 
 	// 雲の初期化
 	for (int i = 0; i < cloud_.size(); i++) {

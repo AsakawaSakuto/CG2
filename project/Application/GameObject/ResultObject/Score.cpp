@@ -7,6 +7,42 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	goTitle_ = false;
 	goResult_ = false;
 
+	screenType_ = ScreenType::SCORE;
+
+	nextScene_ = NextScene::TITLE;
+
+	floatTimeCount_ = 0.0f;
+
+	ramuneParticle_->Initialize(dxCommon_);
+	ramuneParticle_->LoadJson("RamuneResult1");
+
+	ramuneParticle2_->Initialize(dxCommon_);
+	ramuneParticle2_->LoadJson("RamuneResult2");
+
+	sRankParticle_->Initialize(dxCommon_);
+	sRankParticle_->LoadJson("SRank");
+	if (rank_== Rank::S) {
+		sRankParticle_->Play();
+	} else {
+		sRankParticle_->Stop();
+	}
+
+	for (int i = 0; i < textEasingTimer_.size(); i++) {
+		textEasingTimer_[i].Reset();
+	}
+
+	for (int i = 0; i < scoreEasingTimer_.size(); i++) {
+		scoreEasingTimer_[i].Reset();
+	}
+
+	for (int i = 0; i < rankingInTimer_.size(); i++) {
+		rankingInTimer_[i].Reset();
+	}
+
+	rankAndPlayerEasingTimer_.Reset();
+
+	scoreOutTimer_.Reset();
+
 	InitTextModel();
 	InitScoreModel();
 	InitRankModel();
@@ -16,6 +52,15 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 }
 
 void Score::Update() {
+
+	floatTimeCount_ += deltaTime_;
+	float floatOffset = sinf(floatTimeCount_ * floatSpeed_) * floatAmplitude_;
+
+	playerTransform_.translate.y = 1.01f + floatOffset;
+	machineTransform_.translate.y = 0.67f + floatOffset;
+	player2Transform_.translate.y = 3.5f + floatOffset;
+	player2ArmTransform_.translate.y = 3.78f + floatOffset;
+	machine2Transform_.translate.y = 2.39f + floatOffset;
 
 	switch (screenType_)
 	{
@@ -29,10 +74,10 @@ void Score::Update() {
 	case Score::ScreenType::RANKING:
 
 		ScoreOut();
-		pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetReverseProgress()});
-		titleUI_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetProgress() });
-		retryUI_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetProgress() });
-		cursolUI_->SetColor({ 1.0f,1.0f,1.0f,scoreOutTimer_.GetProgress() });
+		pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetReverseProgress()});
+		titleUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
+		retryUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
+		cursolUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
 
 		for (int i = 0; i < 6; i++) {
 			score1stTransform_[i].translate.x = Easing::Lerp(
@@ -97,8 +142,58 @@ void Score::Update() {
 			score3rdModel_[i]->SetTransform(score3rdTransform_[i]);
 		}
 
-		if (input_->TriggerKey(DIK_SPACE)) {
-			goTitle_ = true;
+		switch (nextScene_)
+		{
+		case Score::NextScene::TITLE:
+
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+				goTitle_ = true;
+			}
+
+			if (!cursolMoveTimer_.IsActive() && input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON)) {
+				nextScene_ = NextScene::RESULT;
+				cursolMoveTimer_.Start(0.25f);
+				cursolStartY_ = 500.0f;
+				cursolEndY_ = 600.0f;
+			}
+
+			if (cursolMoveTimer_.IsActive()) {
+				cursolUI_->SetPosition({ 180.0f,Easing::Lerp(
+					cursolStartY_,
+					cursolEndY_,
+					cursolMoveTimer_.GetProgress(),
+					Easing::Type::EaseInOutQuint
+				) });
+			} else {
+				cursolUI_->SetPosition({ 180.0f,500.0f });
+			}
+
+			break;
+		case Score::NextScene::RESULT:
+
+			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+				goResult_ = true;
+			}
+
+			if (!cursolMoveTimer_.IsActive() && input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON)) {
+				nextScene_ = NextScene::TITLE;
+				cursolMoveTimer_.Start(0.25f);
+				cursolStartY_ = 600.0f;
+				cursolEndY_ = 500.0f;
+			}
+
+			if (cursolMoveTimer_.IsActive()) {
+				cursolUI_->SetPosition({ 180.0f,Easing::Lerp(
+					cursolStartY_,
+					cursolEndY_,
+					cursolMoveTimer_.GetProgress(),
+					Easing::Type::EaseInOutQuint
+				) });
+			} else {
+				cursolUI_->SetPosition({ 180.0f,600.0f });
+			}
+
+			break;
 		}
 
 		break;
@@ -117,14 +212,17 @@ void Score::Update() {
 	}
 
 	for (int i = 0; i < score1stModel_.size(); i++) {
+		score1stModel_[i]->SetColor(rankingColor_[0]);
 		score1stModel_[i]->Update();
 	}
 
 	for (int i = 0; i < score2ndModel_.size(); i++) {
+		score2ndModel_[i]->SetColor(rankingColor_[1]);
 		score2ndModel_[i]->Update();
 	}
 
 	for (int i = 0; i < score3rdModel_.size(); i++) {
+		score3rdModel_[i]->SetColor(rankingColor_[2]);
 		score3rdModel_[i]->Update();
 	}
 
@@ -134,6 +232,7 @@ void Score::Update() {
 
 	for (int i = 0; i < nowScoreModel_.size(); i++) {
 		nowScoreModel_[i]->SetTransform(nowScoreTransform_[i]);
+		nowScoreModel_[i]->SetColor(rankingColor_[3]);
 		nowScoreModel_[i]->Update();
 	}
 
@@ -151,9 +250,54 @@ void Score::Update() {
 	titleUI_->Update();
 	retryUI_->Update();
 	cursolUI_->Update();
+
+	ramuneParticle_->SetEmitterPosition(playerTransform_.translate);
+	ramuneParticle_->SetOffSet({ 1.4f,-1.18f,0.0f });
+	ramuneParticle_->Update();
+
+	ramuneParticle2_->SetEmitterPosition(player2Transform_.translate);
+	ramuneParticle2_->SetOffSet({ -0.8f,-1.1f,0.0f });
+	ramuneParticle2_->Update();
+
+	sRankParticle_->SetEmitterPosition(rankTransform_[0].translate);
+	sRankParticle_->SetOffSet({ 0.2f,0.1f,-1.0f });
+	sRankParticle_->Update();
+
+	cursolMoveTimer_.Update();
 }
 
 void Score::Draw(Camera camera) {
+
+	switch (screenType_)
+	{
+	case Score::ScreenType::SCORE:
+
+		break;
+	case Score::ScreenType::RANKING:
+
+		for (int i = 0; i < score1stModel_.size(); i++) {
+			score1stModel_[i]->Draw(camera);
+		}
+
+		for (int i = 0; i < score2ndModel_.size(); i++) {
+			score2ndModel_[i]->Draw(camera);
+		}
+
+		for (int i = 0; i < score3rdModel_.size(); i++) {
+			score3rdModel_[i]->Draw(camera);
+		}
+
+		for (int i = 0; i < nowScoreModel_.size(); i++) {
+			nowScoreModel_[i]->Draw(camera);
+		}
+
+		player2Model_->Draw(camera);
+		player2ArmModel_->Draw(camera);
+		machine2Model_->Draw(camera);
+
+		break;
+	}
+
 	for (int i = 0; i < textModel_.size(); ++i) {
 		textModel_[i]->Draw(camera);
 	}
@@ -166,27 +310,12 @@ void Score::Draw(Camera camera) {
 		rankModel_[i]->Draw(camera);
 	}
 
-	for (int i = 0; i < score1stModel_.size(); i++) {
-		score1stModel_[i]->Draw(camera);
-	}
-
-	for (int i = 0; i < score2ndModel_.size(); i++) {
-		score2ndModel_[i]->Draw(camera);
-	}
-
-	for (int i = 0; i < score3rdModel_.size(); i++) {
-		score3rdModel_[i]->Draw(camera);
-	}
-
-	for (int i = 0; i < nowScoreModel_.size(); i++) {
-		nowScoreModel_[i]->Draw(camera);
-	}
-
 	playerModel_->Draw(camera);
 	machineModel_->Draw(camera);
-	player2Model_->Draw(camera);
-	player2ArmModel_->Draw(camera);
-	machine2Model_->Draw(camera);
+
+	ramuneParticle_->Draw(camera);
+	ramuneParticle2_->Draw(camera);
+	sRankParticle_->Draw(camera);
 
 	pushAsusumu_->Draw();
 	titleUI_->Draw();
@@ -195,6 +324,11 @@ void Score::Draw(Camera camera) {
 }
 
 void Score::DrawImGui() {
+
+	//ramuneParticle_->DrawImGui("ramuneParticle");
+	//ramuneParticle2_->DrawImGui("ramuneParticle2");
+
+	//sRankParticle_->DrawImGui("sRankParticle");
 
 	//pushAsusumu_->DrawImGui("pushAsusumu");
 
@@ -239,11 +373,11 @@ void Score::DrawImGui() {
 	//
 	//ImGui::End();
 
-	titleUI_->DrawImGui("title");
-	retryUI_->DrawImGui("retry");
-	cursolUI_->DrawImGui("curcol");
+	//titleUI_->DrawImGui("title");
+	//retryUI_->DrawImGui("retry");
+	//cursolUI_->DrawImGui("curcol");
 
-	ImGui::Begin("p2");
+	/*ImGui::Begin("p2");
 
 	ImGui::DragFloat3("Pt", &player2Transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("Pr", &player2Transform_.rotate.x, 0.01f);
@@ -255,7 +389,7 @@ void Score::DrawImGui() {
 	ImGui::DragFloat3("Mr", &machine2Transform_.rotate.x, 0.01f);
 	ImGui::DragFloat3("Ms", &machine2Transform_.scale.x, 0.01f);
 
-	ImGui::End();
+	ImGui::End();*/
 
 	/*ImGui::Begin("1st");
 
@@ -392,7 +526,26 @@ void Score::InitRankModel() {
 	rankModel_[0] = make_unique<Model>();
 	rankModel_[1] = make_unique<Model>();
 
-	rankModel_[0]->Initialize(dxCommon_, "rank/s.obj");
+	switch (rank_)
+	{
+	case Score::Rank::S:
+		rankModel_[0]->Initialize(dxCommon_, "rank/s.obj");
+		rankModel_[0]->SetColor(rankColor_[3]);
+		break;
+	case Score::Rank::A:
+		rankModel_[0]->Initialize(dxCommon_, "rank/a.obj");
+		rankModel_[0]->SetColor(rankColor_[2]);
+		break;
+	case Score::Rank::B:
+		rankModel_[0]->Initialize(dxCommon_, "rank/b.obj");
+		rankModel_[0]->SetColor(rankColor_[1]);
+		break;
+	case Score::Rank::C:
+		rankModel_[0]->Initialize(dxCommon_, "rank/c.obj");
+		rankModel_[0]->SetColor(rankColor_[0]);
+		break;
+	}
+	
 	rankModel_[1]->Initialize(dxCommon_, "rank/rank.obj");
 
 	rankModel_[0]->SetTexture("resources/image/0.png");
@@ -596,6 +749,9 @@ void Score::InitSprite() {
 	titleUI_->Initialize(dxCommon_, "resources/image/UI/BackToTitleUI.png", { 350.0f,500.0f }, { 0.3f,0.3f });
 	retryUI_->Initialize(dxCommon_, "resources/image/UI/retryUI.png", { 355.0f,600.0f }, { 0.3f,0.3f });
 	cursolUI_->Initialize(dxCommon_, "resources/image/UI/Cursol.png", { 180.0f,500.0f }, { 0.3f,0.3f });
+	titleUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	retryUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 }
 
 void Score::InitRanking() {
