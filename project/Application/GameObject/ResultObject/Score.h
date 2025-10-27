@@ -147,6 +147,11 @@ private:
 	GameTimer scoreOutTimer_;
 	GameTimer cursolMoveTimer_;
 
+	// ★追加：テキストのバウンスアニメーション用タイマー
+	GameTimer textBounceStartTimer_;
+	std::array<GameTimer, 8> textBounceTimer_;
+	std::array<float, 8> textBaseY_; // 各テキストの基準Y座標を保存
+
 	Vector4 rankColor_[4] = {
 	{0.255f, 0.839f, 0.153f, 1.0f}, // 緑
 	{0.173f, 0.365f, 0.835f, 1.0f}, // 青

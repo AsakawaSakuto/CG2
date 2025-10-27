@@ -65,6 +65,12 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 
 	scoreOutTimer_.Reset();
 
+	// バウンスアニメーション用タイマーをリセット
+	textBounceStartTimer_.Reset();
+	for (int i = 0; i < textBounceTimer_.size(); i++) {
+		textBounceTimer_[i].Reset();
+	}
+
 	InitTextModel();
 	InitScoreModel();
 	InitRankModel();
@@ -346,9 +352,20 @@ void Score::Draw(Camera camera) {
 			score3rdModel_[i]->Draw(camera);
 		}
 
-		for (int i = 0; i < nowScoreModel_.size(); i++) {
-			nowScoreModel_[i]->Draw(camera);
+		nowScoreModel_[5]->Draw(camera);
+		if (nowScore_ >= 10000) {
+			nowScoreModel_[4]->Draw(camera);
 		}
+		if (nowScore_ >= 1000) {
+			nowScoreModel_[3]->Draw(camera);
+		}
+		if (nowScore_ >= 100) {
+			nowScoreModel_[2]->Draw(camera);
+		}
+		if (nowScore_ >= 10) {
+			nowScoreModel_[1]->Draw(camera);
+		}
+		nowScoreModel_[0]->Draw(camera);
 
 		player2Model_->Draw(camera);
 		player2ArmModel_->Draw(camera);
@@ -361,8 +378,18 @@ void Score::Draw(Camera camera) {
 		textModel_[i]->Draw(camera);
 	}
 
-	for (int i = 0; i < scoreModel_.size(); ++i) {
-		scoreModel_[i]->Draw(camera);
+	scoreModel_[0]->Draw(camera);
+	if (nowScore_ >= 10) {
+		scoreModel_[1]->Draw(camera);
+	}
+	if (nowScore_ >= 100) {
+		scoreModel_[2]->Draw(camera);
+	}
+	if (nowScore_ >= 1000) {
+		scoreModel_[3]->Draw(camera);
+	}
+	if (nowScore_ >= 10000) {
+		scoreModel_[4]->Draw(camera);
 	}
 
 	for (int i = 0; i < rankModel_.size(); ++i) {
@@ -542,14 +569,14 @@ void Score::InitTextModel() {
 	textTransform_[6].translate = { -3.22f,4.5f,0.0f };
 	textTransform_[7].translate = { -2.72f,4.5f,0.0f };
 
-	textEasingTimer_[0].Start(1.2f, false);
-	textEasingTimer_[1].Start(1.4f, false);
-	textEasingTimer_[2].Start(1.6f, false);
-	textEasingTimer_[3].Start(1.8f, false);
-	textEasingTimer_[4].Start(2.0f, false);
-	textEasingTimer_[5].Start(2.2f, false);
-	textEasingTimer_[6].Start(2.4f, false);
-	textEasingTimer_[7].Start(2.6f, false);
+	// ★追加：各テキストの基準Y座標を保存
+	for (int i = 0; i < textBaseY_.size(); i++) {
+		textBaseY_[i] = textEndY_; // 4.5f
+	}
+
+	for (int i = 0; i < textEasingTimer_.size(); i++) {
+		textEasingTimer_[i].Start(1.0f + 0.2f * i, false);
+	}
 }
 
 void Score::InitScoreModel() {
@@ -635,6 +662,8 @@ void Score::InitRankModel() {
 	
 	rankModel_[1]->Initialize(dxCommon_, "rank/rank.obj");
 
+	rankModel_[1]->SetColor({ 0.75f,0.75f,0.75f,1.0f });
+
 	rankModel_[0]->SetTexture("resources/image/0.png");
 	rankModel_[1]->SetTexture("resources/image/0.png");
 
@@ -687,16 +716,87 @@ void Score::InitPlayerModel() {
 }
 
 void Score::ScoreIn() {
+	// バウンスアニメーション中でない場合のみ、通常の位置アニメーションを適用
 	for (int i = 0; i < textModel_.size(); ++i) {
-		textTransform_[i].translate.y = Easing::Lerp(
-			textStartY_,
-			textEndY_,
-			textEasingTimer_[i].GetProgress(),
-			Easing::Type::EaseInOutBounce
-		);
+		if (!textBounceTimer_[i].IsActive()) {
+			textTransform_[i].translate.y = Easing::Lerp(
+				textStartY_,
+				textEndY_,
+				textEasingTimer_[i].GetProgress(),
+				Easing::Type::EaseInOutBounce
+			);
+		}
 		textEasingTimer_[i].Update();
 		textModel_[i]->SetTransform(textTransform_[i]);
 	}
+
+	// ★追加：テキストのInアニメーションが全て完了したらバウンスアニメーション開始
+	bool allTextAnimationFinished = true;
+	for (int i = 0; i < textEasingTimer_.size(); i++) {
+		if (!textEasingTimer_[i].IsFinished()) {
+			allTextAnimationFinished = false;
+			break;
+		}
+	}
+
+	// バウンスアニメーション開始条件（1回だけ実行するように）
+	if (allTextAnimationFinished && !textBounceStartTimer_.IsActive() && !textBounceStartTimer_.IsFinished()) {
+		textBounceStartTimer_.Start(2.0f, false); // 2秒待機してからバウンス開始
+	}
+
+	// 最初のテキストのバウンスを開始
+	if (textBounceStartTimer_.IsFinished() && !textBounceTimer_[0].IsActive() && !textBounceTimer_[0].IsFinished()) {
+		textBounceTimer_[0].Start(0.6f, false);
+	}
+
+	// 連続してバウンスタイマーを開始（波のように重複させる）
+	for (int i = 1; i < textBounceTimer_.size(); i++) {
+		// 前の文字が開始してから0.1秒後に次の文字を開始（重複して動く）
+		if (textBounceTimer_[i - 1].IsActive() && textBounceTimer_[i - 1].GetProgress() >= 0.15f && !textBounceTimer_[i].IsActive() && !textBounceTimer_[i].IsFinished()) {
+			textBounceTimer_[i].Start(0.6f, false);
+		}
+	}
+
+	// バウンスアニメーション実行
+	for (int i = 0; i < textModel_.size(); ++i) {
+		if (textBounceTimer_[i].IsActive()) {
+			float progress = textBounceTimer_[i].GetProgress();
+			// バウンス効果: 上に浮いてから元の位置に戻る
+			float bounceHeight = 0.5f; // バウンスの高さ
+			float baseY = textBaseY_[i]; // 元のY位置
+			
+			if (progress <= 0.3f) {
+				// 最初の30%: 上昇
+				textTransform_[i].translate.y = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
+			} else {
+				// 残りの70%: バウンスしながら落下
+				float fallProgress = (progress - 0.3f) / 0.7f;
+				textTransform_[i].translate.y = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
+			}
+			textModel_[i]->SetTransform(textTransform_[i]);
+		}
+		textBounceTimer_[i].Update();
+	}
+
+	// 全てのテキストのバウンスが終了したら、再びループを開始
+	bool allBounceFinished = true;
+	for (int i = 0; i < textBounceTimer_.size(); i++) {
+		if (textBounceTimer_[i].IsActive() || !textBounceTimer_[i].IsFinished()) {
+			allBounceFinished = false;
+			break;
+		}
+	}
+	
+	// 全て終了したら、少し待ってから再開
+	if (allBounceFinished && textBounceStartTimer_.IsFinished()) {
+		// タイマーをリセットして再開準備
+		textBounceStartTimer_.Start(3.0f, false); // 3秒待機してから再開
+		for (int i = 0; i < textBounceTimer_.size(); i++) {
+			textBounceTimer_[i].Reset(); // タイマーをリセット
+		}
+	}
+
+	textBounceStartTimer_.Update();
 
 	if (textEasingTimer_[7].IsActive()) {
 		scoreEasingTimer_[0].Start(1.0f, false);
