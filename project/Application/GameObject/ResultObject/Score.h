@@ -80,9 +80,9 @@ private:
 	const std::string rankingJsonPath_ = "resources/engineResources/test.json";
 
 	float rankingStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.5f };
-	float rankingEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.5f };
+	float rankingEndX_[6] = { 6.5f,5.5f,4.5f,3.5f,2.5f,0.7f };
 	float nowStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.59f };
-	float nowEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.59f };
+	float nowEndX_[6] = { 6.5f,5.5f,4.5f,3.5f,2.5f,0.7f };
 
 	std::array<unique_ptr<Model>, 6> score1stModel_;
 	std::array<Transform, 6> score1stTransform_;
@@ -127,7 +127,7 @@ private:
 
 	float score_ = 0.0f;
 	float scoreStartY_ = 14.75f;
-	float scoreEndY_ = 4.75f;
+	float scoreEndY_ = 5.0f;
 	float textStartY_ = 10.0f;
 	float textEndY_ = 4.5f;
 

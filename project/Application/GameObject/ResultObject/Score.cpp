@@ -437,24 +437,24 @@ void Score::DrawImGui() {
 
 	//pushAsusumu_->DrawImGui("pushAsusumu");
 
-	//ImGui::Begin("text");
+	ImGui::Begin("text");
 
-	//ImGui::DragFloat3("t0", &textTransform_[0].translate.x,0.01f);
-	//ImGui::DragFloat3("t1", &textTransform_[1].translate.x,0.01f);
-	//ImGui::DragFloat3("t2", &textTransform_[2].translate.x,0.01f);
-	//ImGui::DragFloat3("t3", &textTransform_[3].translate.x,0.01f);
-	//ImGui::DragFloat3("t4", &textTransform_[4].translate.x,0.01f);
-	//ImGui::DragFloat3("t5", &textTransform_[5].translate.x,0.01f);
-	//ImGui::DragFloat3("t6", &textTransform_[6].translate.x,0.01f);
-	//ImGui::DragFloat3("t7", &textTransform_[7].translate.x,0.01f);
+	/*ImGui::DragFloat3("t0", &textTransform_[0].translate.x,0.01f);
+	ImGui::DragFloat3("t1", &textTransform_[1].translate.x,0.01f);
+	ImGui::DragFloat3("t2", &textTransform_[2].translate.x,0.01f);
+	ImGui::DragFloat3("t3", &textTransform_[3].translate.x,0.01f);
+	ImGui::DragFloat3("t4", &textTransform_[4].translate.x,0.01f);
+	ImGui::DragFloat3("t5", &textTransform_[5].translate.x,0.01f);
+	ImGui::DragFloat3("t6", &textTransform_[6].translate.x,0.01f);
+	ImGui::DragFloat3("t7", &textTransform_[7].translate.x,0.01f);*/
 
-	//ImGui::Separator();
-	//ImGui::Text("Score Digits");
-	//ImGui::DragFloat3("s0", &scoreTransform_[0].translate.x,0.01f);
-	//ImGui::DragFloat3("s1", &scoreTransform_[1].translate.x,0.01f);
-	//ImGui::DragFloat3("s2", &scoreTransform_[2].translate.x,0.01f);
-	//ImGui::DragFloat3("s3", &scoreTransform_[3].translate.x,0.01f);
-	//ImGui::DragFloat3("s4", &scoreTransform_[4].translate.x,0.01f);
+	ImGui::Separator();
+	ImGui::Text("Score Digits");
+	ImGui::DragFloat3("s0", &scoreTransform_[0].translate.x,0.01f);
+	ImGui::DragFloat3("s1", &scoreTransform_[1].translate.x,0.01f);
+	ImGui::DragFloat3("s2", &scoreTransform_[2].translate.x,0.01f);
+	ImGui::DragFloat3("s3", &scoreTransform_[3].translate.x,0.01f);
+	ImGui::DragFloat3("s4", &scoreTransform_[4].translate.x,0.01f);
 
 	//ImGui::Separator();
 	//ImGui::Text("rank Digits");
@@ -463,9 +463,9 @@ void Score::DrawImGui() {
 	//ImGui::DragFloat3("rr0", &rankTransform_[0].rotate.x, 0.01f);
 	//ImGui::DragFloat3("rr1", &rankTransform_[1].rotate.x, 0.01f);
 	//ImGui::DragFloat3("rs0", &rankTransform_[0].scale.x, 0.01f);
-	//ImGui::DragFloat3("rs1", &rankTransform_[1].scale.x, 0.01f);//
+	//ImGui::DragFloat3("rs1", &rankTransform_[1].scale.x, 0.01f);
 
-	//ImGui::End();
+	ImGui::End();
 
 	//ImGui::Begin("playerTranslate");
 	//
@@ -601,10 +601,10 @@ void Score::InitScoreModel() {
 		scoreTransform_[i].scale = { 1.5f,1.5f,0.5f };
 		scoreTransform_[i].rotate = { 0.0f,0.0f,0.0f };
 	}
-	scoreTransform_[0].translate = { 4.15f,14.75f,0.0f };
-	scoreTransform_[1].translate = { 2.71f,14.75f,0.0f };
-	scoreTransform_[2].translate = { 1.3f,14.75f,0.0f };
-	scoreTransform_[3].translate = { -0.1f,14.75f,0.0f };
+	scoreTransform_[0].translate = { 3.7f,14.75f,0.0f };
+	scoreTransform_[1].translate = { 2.4f,14.75f,0.0f };
+	scoreTransform_[2].translate = { 1.1f,14.75f,0.0f };
+	scoreTransform_[3].translate = { -0.2f,14.75f,0.0f };
 	scoreTransform_[4].translate = { -1.5f,14.75f,0.0f };
 
 	//------------------------------------------------------------//
@@ -805,7 +805,7 @@ void Score::ScoreIn() {
 		scoreEasingTimer_[3].Start(2.5f, false);
 		scoreEasingTimer_[4].Start(3.0f, false);
 	}
-
+	
 	for (int i = 0; i < scoreModel_.size(); ++i) {
 		scoreTransform_[i].translate.y = Easing::Lerp(
 			scoreStartY_,
@@ -971,12 +971,12 @@ void Score::InitRanking() {
 	}
 	score1stTransform_[5].scale = { 1.5f,1.5f,0.5f };
 
-	score1stTransform_[0].translate = { 17.24f,4.85f,0.0f };
-	score1stTransform_[1].translate = { 16.34f,4.85f,0.0f };
-	score1stTransform_[2].translate = { 15.35f,4.85f,0.0f };
-	score1stTransform_[3].translate = { 14.46f,4.85f,0.0f };
-	score1stTransform_[4].translate = { 13.5f, 4.85f,0.0f };
-	score1stTransform_[5].translate = { 11.5f, 4.85f,0.0f };
+	score1stTransform_[0].translate = { 17.24f,5.1f,0.0f };
+	score1stTransform_[1].translate = { 16.34f,5.1f,0.0f };
+	score1stTransform_[2].translate = { 15.35f,5.1f,0.0f };
+	score1stTransform_[3].translate = { 14.46f,5.1f,0.0f };
+	score1stTransform_[4].translate = { 13.5f, 5.1f,0.0f };
+	score1stTransform_[5].translate = { 11.5f, 5.1f,0.0f };
 
 	// -------------------------------------------------------------------------//
 
@@ -1007,12 +1007,12 @@ void Score::InitRanking() {
 	}
 	score2ndTransform_[5].scale = { 1.5f,1.5f,0.5f };
 
-	score2ndTransform_[0].translate = { 17.24f,3.18f,0.0f };
-	score2ndTransform_[1].translate = { 16.34f,3.18f,0.0f };
-	score2ndTransform_[2].translate = { 15.35f,3.18f,0.0f };
-	score2ndTransform_[3].translate = { 14.46f,3.18f,0.0f };
-	score2ndTransform_[4].translate = { 13.5f, 3.18f,0.0f };
-	score2ndTransform_[5].translate = { 11.5f, 3.18f,0.0f };
+	score2ndTransform_[0].translate = { 17.24f,3.25f,0.0f };
+	score2ndTransform_[1].translate = { 16.34f,3.25f,0.0f };
+	score2ndTransform_[2].translate = { 15.35f,3.25f,0.0f };
+	score2ndTransform_[3].translate = { 14.46f,3.25f,0.0f };
+	score2ndTransform_[4].translate = { 13.5f, 3.25f,0.0f };
+	score2ndTransform_[5].translate = { 11.5f, 3.25f,0.0f };
 
 	// -------------------------------------------------------------------------//
 
@@ -1043,12 +1043,12 @@ void Score::InitRanking() {
 	}
 	score3rdTransform_[5].scale = { 1.5f,1.5f,0.5f };
 
-	score3rdTransform_[0].translate = { 17.24f,1.55f,0.0f };
-	score3rdTransform_[1].translate = { 16.34f,1.55f,0.0f };
-	score3rdTransform_[2].translate = { 15.35f,1.55f,0.0f };
-	score3rdTransform_[3].translate = { 14.46f,1.55f,0.0f };
-	score3rdTransform_[4].translate = { 13.5f, 1.55f,0.0f };
-	score3rdTransform_[5].translate = { 11.5f, 1.55f,0.0f };
+	score3rdTransform_[0].translate = { 17.24f,1.62f,0.0f };
+	score3rdTransform_[1].translate = { 16.34f,1.62f,0.0f };
+	score3rdTransform_[2].translate = { 15.35f,1.62f,0.0f };
+	score3rdTransform_[3].translate = { 14.46f,1.62f,0.0f };
+	score3rdTransform_[4].translate = { 13.5f, 1.62f,0.0f };
+	score3rdTransform_[5].translate = { 11.5f, 1.62f,0.0f };
 }
 
 void Score::LoadRankingData() {
