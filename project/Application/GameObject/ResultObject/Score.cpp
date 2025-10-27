@@ -1003,6 +1003,8 @@ void Score::ScoreIn() {
 			
 			kazeParticle_->Play();
 
+			fallCandyParticle_->LoadJson("fallcandy2");
+
 			for (int i = 0; i < rankingInTimer_.size(); i++) {
 				rankingInTimer_[i].Start(2.2f - i * 0.2f, false);
 			}
