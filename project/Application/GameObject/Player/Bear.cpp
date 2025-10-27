@@ -36,7 +36,7 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 	modelBearLegL_->SetUpdateFrustumCulling(false);
 
 	// 根のTransform
-	transform_.scale = {1.5f, 1.5f, 1.5f};
+	transform_.scale = {3.0f, 3.0f, 3.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {640.0f, 360.0f, -1.0f};
 

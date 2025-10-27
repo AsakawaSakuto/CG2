@@ -227,7 +227,7 @@ private:
 
 	// スタートライン、最終ライン
 	const float START_LINE = -10.0f;
-	const float END_LINE = 400.0f;
+	const float END_LINE = 460.0f;
 
 	// カメラオフセット
 	const float CAMERA_OFFSET_TOP = 5.0f;

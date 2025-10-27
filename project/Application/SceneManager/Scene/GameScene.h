@@ -42,7 +42,7 @@ private:
 	void GameStartCount();
 
 	// 演出用にスコアを加算していく関数
-    void SpriteScoreUpdate();
+	void SpriteScoreUpdate();
 
 	// ルール説明用のスプライトアニメーション
 	void AnimationRuleSprite();
@@ -86,18 +86,23 @@ private:
 	// スコア増加時のアニメーション
 	void ScoreUpAnimation();
 
-private:
-	enum class RuleAnimState { 
-		Rising, 
-		Waiting, 
-		Falling, 
-		Done 
-	};
+	// ルール説明用のスプライト回転更新
+	void UpdateRuleSprite();
 
-	struct SpriteRender
-	{
+	// 二つの値からランダムに値を返す
+	float RandomFloat(float min, float max);
+
+private:
+	enum class RuleAnimState { Rising, Waiting, Falling, Done };
+
+	struct SpriteRender {
 		Sprite sprite;
 		bool isDraw;
+	};
+
+	enum class RuleSpriteState {
+		RIGHT,
+		LEFT,
 	};
 
 private:
@@ -216,8 +221,8 @@ private:
 
 	// スコアの背景波紋
 	unique_ptr<Sprite> spriteCandyEffect_ = make_unique<Sprite>();
-	float candyEffectSize_ = 1.0f;                                                // サイズ
-	float candyEffectAlpha_ = 1.0f;                                               // 透明度
+	float candyEffectSize_ = 1.0f;                                                 // サイズ
+	float candyEffectAlpha_ = 1.0f;                                                // 透明度
 	std::array<float, 5> candySizeSpeeds = {0.0025f, 0.005f, 0.01f, 0.02f, 0.04f}; // サイズの変化スピード
 
 	// 弾のゲージラムネ
@@ -225,16 +230,16 @@ private:
 
 	// ラムネの波紋
 	unique_ptr<Sprite> spriteChargeUIEffect_ = make_unique<Sprite>();
-	float chargeEffectSize_ = 1.0f; // サイズ
-	float chargeEffectAlpha_ = 1.0f; // 透明度
-	std::array<float, 5> gaugeSizeSpeeds = {0.0025f, 0.005f, 0.01f, 0.02f, 0.04f}; // サイズの変化スピード
+	float chargeEffectSize_ = 1.0f;                                              // サイズ
+	float chargeEffectAlpha_ = 1.0f;                                             // 透明度
+	std::array<float, 5> gaugeSizeSpeeds = {0.005f, 0.01f, 0.02f, 0.04f, 0.08f}; // サイズの変化スピード
 
 	// 山のモデル
 	std::array<unique_ptr<Model>, 3> modelMountain_;
 
 	// 一定の時間入力がなかった時に減算されるタイマースプライト
 	std::array<unique_ptr<Sprite>, 2> spriteNoInputCountDown_;
-	
+
 	// SE
 	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> countDownSE_ = make_unique<AudioX>();
@@ -251,7 +256,7 @@ private:
 	float lastScoreChecked_ = 0.0f;
 
 	// アニメーションの状態
-	RuleAnimState snackCountOverAnimationState_ = RuleAnimState::Done ;
+	RuleAnimState snackCountOverAnimationState_ = RuleAnimState::Done;
 
 	// アニメーション用タイマー
 	float timerSnackCountOver_ = 0.0f;
@@ -292,4 +297,13 @@ private:
 	// スコア増加時のアニメーション用変数
 	float scoreUpTimer_ = 0.0f;
 	float scoreUpDuration_ = 0.2f;
+
+	// ルール説明用のスプライト角度
+	float rotateRuleSprite_ = 0.0f;
+
+	// 回転更新用タイマー
+	int rotateRuleTimer_ = 0;
+
+	// ルール説明用のスプライト状態
+	RuleSpriteState currentRuleSpriteState_ = RuleSpriteState::RIGHT;
 };
