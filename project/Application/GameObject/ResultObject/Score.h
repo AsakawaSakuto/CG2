@@ -176,7 +176,7 @@ private:
 
 	unique_ptr<Model> backGround_ = make_unique<Model>();
 	Transform backGroundTransform_;
-	Vector3 backGroundStartColor_ = { 0.212f, 0.722f, 1.000f };
+	Vector3 backGroundStartColor_ = { 0.0f,0.0f,0.0f };
 	Vector3 backGroundEndColor_ = { 0.0353f, 0.0353f, 0.0627f };
 	Vector3 backGroundColor_ = {};
 };
