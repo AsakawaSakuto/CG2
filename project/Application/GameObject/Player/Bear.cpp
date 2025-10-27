@@ -36,7 +36,7 @@ void Bear::Initialize(DirectXCommon* dxCommon) {
 	modelBearLegL_->SetUpdateFrustumCulling(false);
 
 	// 根のTransform
-	transform_.scale = {3.0f, 3.0f, 3.0f};
+	transform_.scale = {2.0f, 2.0f, 2.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {640.0f, 360.0f, -1.0f};
 
@@ -181,12 +181,12 @@ void Bear::ImGuiUpdate() {
 
 void Bear::BearAnimation() {
 	// 折り返し地点
-	const float kMaxRotateZ = 0.39f;
+	const float kMaxRotateZ = 0.3f;
 
-	localTransform_[1].rotate.z += rotateSpeed_ * deltaTime_;
+	localTransform_[0].rotate.z += rotateSpeed_;
 
 	// 反転処理
-	if (std::abs(localTransform_[1].rotate.z) >= kMaxRotateZ) {
+	if (std::abs(localTransform_[0].rotate.z) >= kMaxRotateZ) {
 		rotateSpeed_ *= -1.0f;
 	}
 }

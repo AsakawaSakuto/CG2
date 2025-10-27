@@ -21,7 +21,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 	scoreList_ = JsonState::Load<ScoreList>("resources/Data/scoreList.json");
 
-	transform_.scale = {4.0f, 4.0f, 4.0f};
+	transform_.scale = {3.0f, 3.0f, 3.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {0.0f, -10.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
@@ -71,6 +71,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// 点滅用変数
 	isFlicker_ = false;
 	currentFlickFrames_ = 0;
+
+	// カウントダウンが0になったかどうか
+	isCountDownZero_ = false;
 }
 
 void Player::Update() {
@@ -93,7 +96,7 @@ void Player::Update() {
 	ClampPlayerVelocity();
 
 	// プレイヤーの反転処理
-	ReverseIfAboveLimit(START_LINE, END_LINE);
+	ReverseIfAboveLimit(GAME_END_LINE, END_LINE);
 
 	// カメラのオフセット変更(補間)
 	CameraOffsetChange();
@@ -142,9 +145,6 @@ void Player::Update() {
 
 	// プレイヤーの点滅
 	UpdateFlicker();
-
-	// 下降時にプレイヤーを回転させる
-	DownMoveRotate();
 
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
@@ -210,6 +210,9 @@ void Player::DrawImgui() {
 
 	// スコアのImGui
 	DrawImGuiJsonStateScore();
+
+	// 羽のImGui
+	playerWing_->WingImGui();
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -307,7 +310,7 @@ void Player::RotateChange() {
 }
 
 void Player::BulletCharge() {
-	if (!isCameraSet_)
+	if (!isCountDownZero_)
 		return;
 
 	// ゲージが最大値なら早期リターン
@@ -331,7 +334,7 @@ void Player::BulletCharge() {
 }
 
 void Player::BulletShot() {
-	if (bulletGauge_ <= 0) {
+	if (bulletGauge_ <= 0 || !isCountDownZero_) {
 		return;
 	}
 
@@ -1128,12 +1131,6 @@ void Player::StartCameraShake(ShakeType type) {
 		shakeTimer_ = params.duration;
 		shakeDecayRate_ = params.decayRate;
 		isShake_ = true;
-	}
-}
-
-void Player::DownMoveRotate() {
-	if (direction_ == Direction::DOWN) {
-		transform_.rotate.y += 12.0f * deltaTime_;
 	}
 }
 

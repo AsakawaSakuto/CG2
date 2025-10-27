@@ -19,7 +19,7 @@ void GameScene::Initialize() {
 	input_ = &ctx_->input;
 
 	// カメラのZ座標
-	cameraPosisionZ_ = -50.0f;
+	cameraPosisionZ_ = -38.0f;
 
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
@@ -68,10 +68,9 @@ void GameScene::Initialize() {
 	// 画面両端の幕のスプライト
 	for (int i = 0; i < curtainSprite_.size(); ++i) {
 		curtainSprite_[i] = std::make_unique<Sprite>();
-		curtainSprite_[i]->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-		curtainSprite_[i]->SetScale({20, 43});
-		curtainSprite_[i]->SetPosition({160.0f + (i * 940.0f), 344.0f});
-		curtainSprite_[i]->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
+		curtainSprite_[i]->Initialize(&ctx_->dxCommon, "resources/image/UI/SidePanelUI.png");
+		curtainSprite_[i]->SetScale({0.5f, 0.5f});
+		curtainSprite_[i]->SetPosition({-62.0f + (i * 1404.0f), 620.0f});
 	}
 
 	// カウントダウン用のスプライト集
@@ -141,22 +140,24 @@ void GameScene::Initialize() {
 	spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
 	spriteCandyScore_->SetPosition({160.0f, 400.0f});
 	spriteCandyScore_->SetScale({0.5f, 0.5f});
+	spriteCandyScore_->SetColor({0.8f, 0.1f, 0.4, 1.0f});
 
 	// スコアの背景波紋
 	spriteCandyEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
 	spriteCandyEffect_->SetPosition(spriteCandyScore_->GetPosition());
 	candyEffectSize_ = 0.5f;
 	spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
+	spriteCandyEffect_->SetColor({0.8f, 0.1f, 0.4, 1.0f});
 
 	// 弾のゲージラムネUI
-	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
+	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
 	spriteChargeUI_->SetPosition({1070.0f, 350.0f});
-	spriteChargeUI_->SetScale({1, 1});
+	spriteChargeUI_->SetScale({0.4f, 0.4f});
 
 	// ラムネの波紋
-	spriteChargeUIEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
+	spriteChargeUIEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
 	spriteChargeUIEffect_->SetPosition(spriteChargeUI_->GetPosition());
-	chargeEffectSize_ = 1.0f;
+	chargeEffectSize_ = 0.4f;
 	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
 
 	// 山のモデル初期化
@@ -558,6 +559,9 @@ void GameScene::Draw() {
 	ImGui::DragFloat3("goal", &spriteProgressGoal_->GetPosition().x, 1.0f);
 	ImGui::DragFloat3("chargeBGUI", &spriteChargeUI_->GetPosition().x, 1.0f);
 	ImGui::DragFloat3("spriteCandyScore", &spriteCandyScore_->GetPosition().x, 1.0f);
+	ImGui::DragFloat2("curtainSpritePos1", &curtainSprite_[0]->GetPosition().x, 1.0f);
+	ImGui::DragFloat2("curtainSpritePos2", &curtainSprite_[1]->GetPosition().x, 1.0f);
+	ImGui::ColorPicker4("curtainSpritePos2", &spriteCandyScore_->GetColor().x);
 
 	ImGui::End();
 
@@ -710,6 +714,7 @@ void GameScene::GameStartCount() {
 
 	// カウントが0になった瞬間に「スタート!」スプライトのイージングを開始
 	if (displayNumber == 1 && !showStart_) {
+		player_->SetIsCountDownZero(true);
 		showStart_ = true;
 		startAnimTimer_ = 0.0f;
 		// リセット状態にして表示開始
@@ -1063,12 +1068,12 @@ void GameScene::UpdateSpriteChargeEffect() {
 	}
 
 	// サイズと透明度を変更
-	chargeEffectAlpha_ -= 0.05f;
+	chargeEffectAlpha_ -= changeSpeed;
 	chargeEffectSize_ += changeSpeed;
 
 	if (chargeEffectAlpha_ <= 0.0f) {
 		chargeEffectAlpha_ = 1.0f;
-		chargeEffectSize_ = 1.0f;
+		chargeEffectSize_ = 0.4f;
 	}
 
 	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
@@ -1101,7 +1106,7 @@ void GameScene::UpdateSpriteCandyEffect() {
 	}
 
 	spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
-	spriteCandyEffect_->SetColor({1.0f, 1.0f, 1.0f, candyEffectAlpha_});
+	spriteCandyEffect_->SetColor({spriteCandyEffect_->GetColor().x, spriteCandyEffect_->GetColor().y, spriteCandyEffect_->GetColor().z, candyEffectAlpha_});
 }
 
 void GameScene::ResetSE() {
@@ -1121,7 +1126,7 @@ void GameScene::ScoreUpAnimation() {
 
 		Vector2 scale;
 		const float kStartScale = 0.4f;
-		const float kEndScale = 1.0f;
+		const float kEndScale = 0.8f;
 
 		scale.x = Lerp(kStartScale, kEndScale, eased);
 		scale.y = Lerp(kStartScale, kEndScale, eased);
@@ -1140,8 +1145,8 @@ void GameScene::ScoreUpAnimation() {
 
 void GameScene::UpdateRuleSprite() {
 	// 回転
-	spriteArm_->SetRotate(RandomFloat(-std::numbers::pi_v<float> / 4.0f, std::numbers::pi_v<float> / 4.0f));
-	spriteThorn_->SetRotate(RandomFloat(-std::numbers::pi_v<float> / 4.0f, std::numbers::pi_v<float> / 4.0f));
+	spriteArm_->SetRotate(RandomFloat(-std::numbers::pi_v<float> / 6.0f, std::numbers::pi_v<float> / 6.0f));
+	spriteThorn_->SetRotate(RandomFloat(-std::numbers::pi_v<float> / 6.0f, std::numbers::pi_v<float> / 6.0f));
 
 	// 座標
 	float randPos = RandomFloat(-1.0f, 1.0f);

@@ -56,14 +56,14 @@ void PlayerWing::Initialize(DirectXCommon* dxCommon) {
 	modelArmL03_->SetRotate({0.0f, 0.0f, 0.0f});
 	modelArmL04_->SetRotate({0.0f, 0.0f, std::numbers::pi_v<float> * 1.5f});
 
-	modelArmR01_->SetScale({2.0f, 2.0f, 2.0f});
-	modelArmR02_->SetScale({2.0f, 2.0f, 2.0f});
-	modelArmR03_->SetScale({2.0f, 2.0f, 2.0f});
-	modelArmR04_->SetScale({2.0f, 2.0f, 2.0f});
-	modelArmL01_->SetScale({2.0f, 2.0f, 2.0f});
-	modelArmL02_->SetScale({2.0f, 2.0f, 2.0f});
-	modelArmL03_->SetScale({2.0f, 2.0f, 2.0f});
-	modelArmL04_->SetScale({2.0f, 2.0f, 2.0f});
+	modelArmR01_->SetScale({1.5f, 1.5f, 1.5f});
+	modelArmR02_->SetScale({1.5f, 1.5f, 1.5f});
+	modelArmR03_->SetScale({1.5f, 1.5f, 1.5f});
+	modelArmR04_->SetScale({1.5f, 1.5f, 1.5f});
+	modelArmL01_->SetScale({1.5f, 1.5f, 1.5f});
+	modelArmL02_->SetScale({1.5f, 1.5f, 1.5f});
+	modelArmL03_->SetScale({1.5f, 1.5f, 1.5f});
+	modelArmL04_->SetScale({1.5f, 1.5f, 1.5f});
 
 	// 当たり判定更新(AABB)
 	CollisionUpdate();
@@ -82,14 +82,14 @@ void PlayerWing::Update() {
 	// model_->Update();
 
 	// 羽の中心点に応じて腕のモデルの位置を更新
-	modelArmR01_->SetTranslate({transform_.translate.x + 35.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
-	modelArmR02_->SetTranslate({transform_.translate.x + 95.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
-	modelArmR03_->SetTranslate({transform_.translate.x + 110.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
-	modelArmR04_->SetTranslate({transform_.translate.x + 170.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
-	modelArmL01_->SetTranslate({transform_.translate.x - 35.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
-	modelArmL02_->SetTranslate({transform_.translate.x - 95.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
-	modelArmL03_->SetTranslate({transform_.translate.x - 110.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
-	modelArmL04_->SetTranslate({transform_.translate.x - 170.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
+	modelArmR01_->SetTranslate({transform_.translate.x + 25.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
+	modelArmR02_->SetTranslate({transform_.translate.x + 75.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
+	modelArmR03_->SetTranslate({transform_.translate.x + 85.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
+	modelArmR04_->SetTranslate({transform_.translate.x + 130.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
+	modelArmL01_->SetTranslate({transform_.translate.x - 25.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
+	modelArmL02_->SetTranslate({transform_.translate.x - 75.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
+	modelArmL03_->SetTranslate({transform_.translate.x - 85.0f * deltaTime_, transform_.translate.y, transform_.translate.z});
+	modelArmL04_->SetTranslate({transform_.translate.x - 130.0f * deltaTime_, transform_.translate.y - 6.0f * deltaTime_, transform_.translate.z});
 
 	// 腕のモデル更新
 	modelArmR01_->Update();
@@ -125,11 +125,31 @@ void PlayerWing::WingImGui() {
 	ImGui::DragFloat("TestX", &testX_, 0.1f);
 	ImGui::DragFloat("TestY", &testY_, 0.1f);
 
+	ImGui::DragFloat3("ArmR1position", &modelArmR01_->GetTranslate().x, 1.0f);
+	ImGui::DragFloat3("ArmR2position", &modelArmR02_->GetTranslate().x, 1.0f);
+	ImGui::DragFloat3("ArmR3position", &modelArmR03_->GetTranslate().x, 1.0f);
+	ImGui::DragFloat3("ArmR4position", &modelArmR04_->GetTranslate().x, 1.0f);
+
+	ImGui::DragFloat3("ArmL1position", &modelArmL01_->GetTranslate().x, 1.0f);
+	ImGui::DragFloat3("ArmL2position", &modelArmL02_->GetTranslate().x, 1.0f);
+	ImGui::DragFloat3("ArmL3position", &modelArmL03_->GetTranslate().x, 1.0f);
+	ImGui::DragFloat3("ArmL4position", &modelArmL04_->GetTranslate().x, 1.0f);
+
+	ImGui::DragFloat3("ArmR1Scale", &modelArmR01_->GetScale().x, 0.01f);
+	ImGui::DragFloat3("ArmR2Scale", &modelArmR02_->GetScale().x, 0.01f);
+	ImGui::DragFloat3("ArmR3Scale", &modelArmR03_->GetScale().x, 0.01f);
+	ImGui::DragFloat3("ArmR4Scale", &modelArmR04_->GetScale().x, 0.01f);
+
+	ImGui::DragFloat3("ArmL1Scale", &modelArmL01_->GetScale().x, 0.01f);
+	ImGui::DragFloat3("ArmL2Scale", &modelArmL02_->GetScale().x, 0.01f);
+	ImGui::DragFloat3("ArmL3Scale", &modelArmL03_->GetScale().x, 0.01f);
+	ImGui::DragFloat3("ArmL4Scale", &modelArmL04_->GetScale().x, 0.01f);
+
 	ImGui::End();
 }
 
 void PlayerWing::CollisionUpdate() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x + 2.2f, t.y + 0.5f, t.z + 0.5f};
-	collisionAABB_.min = {t.x - 2.2f, t.y - 0.5f, t.z - 0.5f};
+	collisionAABB_.max = {t.x + 2.0f, t.y + 0.5f, t.z + 0.5f};
+	collisionAABB_.min = {t.x - 2.0f, t.y - 0.5f, t.z - 0.5f};
 }

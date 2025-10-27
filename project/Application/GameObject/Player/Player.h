@@ -70,6 +70,7 @@ public:
 	void SetIsGoal(bool isGoal) { isGoal_ = isGoal; }
 	void SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites);
 	void SetIsScoreUpAnimation(bool isScoreUpAnimation) { isScoreUpAnimation_ = isScoreUpAnimation; }
+	void SetIsCountDownZero(bool isCountDownZero) { isCountDownZero_ = isCountDownZero; }
 
 private:
 	// プレイヤーの上昇
@@ -183,9 +184,6 @@ private:
 	// シェイクの開始関数
 	void StartCameraShake(ShakeType type);
 
-	// 下降時の回転処理
-	void DownMoveRotate();
-
 	// 前のフレームよりスコアが増えていたらアニメーションする
 	void ComparisonScore();
 
@@ -227,7 +225,10 @@ private:
 
 	// スタートライン、最終ライン
 	const float START_LINE = -10.0f;
-	const float END_LINE = 460.0f;
+	const float END_LINE = 440.0f;
+
+	// ゲーム終了用のライン
+	const float GAME_END_LINE = 20.0f;
 
 	// カメラオフセット
 	const float CAMERA_OFFSET_TOP = 5.0f;
@@ -241,7 +242,7 @@ private:
 	float score_ = 0;
 
 	// 羽関連(スコア)
-	float kNearThreshold = 2.3f;
+	float kNearThreshold = 2.0f;
 
 	float dis{};
 
@@ -317,11 +318,14 @@ private:
 	std::array<const float, 6> playerMaxSpeeds_ = {8.0f, 10.0f, 12.0f, 14.0f, 15.0f, 16.0f};
 
 	// プレイヤーの移動制限用の変数
-	const float moveLimitPosX_ = 9.0f;
+	const float moveLimitPosX_ = 7.0f;
 
 	// スコア増加時のアニメーション用変数
 	bool isScoreUpAnimation_ = false;
 
 	// 前フレームのスコア
 	float preScore_ = 0.0f;
+
+	// カウントダウンが0になったかどうか
+	bool isCountDownZero_ = false;
 };

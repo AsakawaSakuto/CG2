@@ -33,5 +33,5 @@ private:
 	float offsetX_;
 
 	// クマのモデル回転スピード
-	float rotateSpeed_ = 1.0f;
+	float rotateSpeed_ = 0.01f;
 };

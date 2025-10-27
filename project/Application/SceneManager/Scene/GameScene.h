@@ -232,7 +232,7 @@ private:
 	unique_ptr<Sprite> spriteChargeUIEffect_ = make_unique<Sprite>();
 	float chargeEffectSize_ = 1.0f;                                              // サイズ
 	float chargeEffectAlpha_ = 1.0f;                                             // 透明度
-	std::array<float, 5> gaugeSizeSpeeds = {0.005f, 0.01f, 0.02f, 0.04f, 0.08f}; // サイズの変化スピード
+	std::array<float, 5> gaugeSizeSpeeds = {0.02f, 0.03f, 0.04f, 0.05f, 0.06f}; // サイズの変化スピード
 
 	// 山のモデル
 	std::array<unique_ptr<Model>, 3> modelMountain_;
