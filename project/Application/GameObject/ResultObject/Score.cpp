@@ -29,6 +29,20 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 
 	sRankParticle_->Initialize(dxCommon_);
 	sRankParticle_->LoadJson("SRank");
+
+	oneParticle_->Initialize(dxCommon_);
+	oneParticle_->LoadJson("1stkirakira");
+
+	twoParticle_->Initialize(dxCommon_);
+	twoParticle_->LoadJson("2ndkirakira");
+
+	threeParticle_->Initialize(dxCommon_);
+	threeParticle_->LoadJson("3rdkirakira");
+
+	kazeParticle_->Initialize(dxCommon_);
+	kazeParticle_->LoadJson("resultKaze");
+	kazeParticle_->Stop();
+
 	if (rank_== Rank::S) {
 		sRankParticle_->Play();
 	} else {
@@ -57,6 +71,15 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	InitPlayerModel();
 	InitRanking();
 	InitSprite();
+
+	backGround_->Initialize(dxCommon_, "plane.obj");
+	backGround_->SetTexture("resources/image/0.png");
+	backGround_->SetUpdateFrustumCulling(false);
+	backGround_->SetColorVector3(backGroundStartColor_);
+	backGroundTransform_.scale = { 14.62f,8.5f,1.0f };
+	backGroundTransform_.rotate = { 0.0f,0.0f,0.0f };
+	backGroundTransform_.translate = { 0.0f,2.0f,14.85f };
+	backGround_->SetTransform(backGroundTransform_);
 }
 
 void Score::Update() {
@@ -271,10 +294,38 @@ void Score::Update() {
 	sRankParticle_->SetOffSet({ 0.2f,0.1f,-1.0f });
 	sRankParticle_->Update();
 
+	kazeParticle_->Update();
+
+	oneParticle_->SetEmitterPosition(score1stTransform_[5].translate);
+	oneParticle_->SetOffSet({ 0.0f,0.0f,-1.0f });
+	oneParticle_->Update();
+
+	twoParticle_->SetEmitterPosition(score2ndTransform_[5].translate);
+	twoParticle_->SetOffSet({ 0.0f,0.0f,-1.0f });
+	twoParticle_->Update();
+
+	threeParticle_->SetEmitterPosition(score3rdTransform_[5].translate);
+	threeParticle_->SetOffSet({ 0.0f,0.0f,-1.0f });
+	threeParticle_->Update();
+
 	cursolMoveTimer_.Update();
+
+	if (rankingInTimer_[5].IsActive()) {
+		backGround_->SetColorVector3({
+		Easing::LerpVector3(
+			backGroundStartColor_,
+			backGroundEndColor_,
+			rankingInTimer_[5].GetProgress(),
+			Easing::Type::Linear
+		) }
+		);
+	}
+	backGround_->Update();
 }
 
 void Score::Draw(Camera camera) {
+
+	backGround_->Draw(camera);
 
 	switch (screenType_)
 	{
@@ -324,6 +375,10 @@ void Score::Draw(Camera camera) {
 	ramuneParticle_->Draw(camera);
 	ramuneParticle2_->Draw(camera);
 	sRankParticle_->Draw(camera);
+	kazeParticle_->Draw(camera);
+	oneParticle_->Draw(camera);
+	twoParticle_->Draw(camera);
+	threeParticle_->Draw(camera);
 
 	pushAsusumu_->Draw();
 	titleUI_->Draw();
@@ -332,6 +387,21 @@ void Score::Draw(Camera camera) {
 }
 
 void Score::DrawImGui() {
+
+	ImGui::Begin("GB_ColorFade");
+
+	ImGui::ColorEdit3("start", &backGroundStartColor_.x);
+	ImGui::ColorEdit3("end", &backGroundEndColor_.x);
+
+	ImGui::End();
+
+	kazeParticle_->DrawImGui("starParticle");
+	
+	//oneParticle_->DrawImGui("oneParticle");
+	//twoParticle_->DrawImGui("wtoParticle");
+	//threeParticle_->DrawImGui("threeParticle");
+
+	//backGround_->DrawImGui("back");
 
 	//ramuneParticle_->DrawImGui("ramuneParticle");
 	//ramuneParticle2_->DrawImGui("ramuneParticle2");
@@ -445,6 +515,15 @@ void Score::InitTextModel() {
 	textModel_[5]->Initialize(dxCommon_, "resultLogo/ka.obj");
 	textModel_[6]->Initialize(dxCommon_, "resultLogo/si.obj");
 	textModel_[7]->Initialize(dxCommon_, "resultLogo/ha.obj");
+
+	for (int i = 0; i < 4; i++) {
+		textModel_[i]->SetColor({0.706f, 1.000f, 0.471f, 1.000f});
+	}
+
+	for (int i = 4; i < 8; i++) {
+		textModel_[i]->SetColor({ 1.000f, 0.482f, 0.953f, 1.000f });
+	}
+
 	for (int i = 0; i < textModel_.size(); ++i) {
 		textModel_[i]->SetTexture("resources/image/0.png");
 		textModel_[i]->SetUpdateFrustumCulling(false);
@@ -683,8 +762,10 @@ void Score::ScoreIn() {
 			screenType_ = ScreenType::RANKING;
 			scoreOutTimer_.Start(1.0f, false);
 			
+			kazeParticle_->Play();
+
 			for (int i = 0; i < rankingInTimer_.size(); i++) {
-				rankingInTimer_[i].Start(3.0f - i * 0.3f, false);
+				rankingInTimer_[i].Start(2.2f - i * 0.2f, false);
 			}
 		}
 	}

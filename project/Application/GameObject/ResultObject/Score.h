@@ -164,4 +164,14 @@ private:
 	unique_ptr<Particles> ramuneParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> ramuneParticle2_ = make_unique<Particles>();
 	unique_ptr<Particles> sRankParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> kazeParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> oneParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> twoParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> threeParticle_ = make_unique<Particles>();
+
+	unique_ptr<Model> backGround_ = make_unique<Model>();
+	Transform backGroundTransform_;
+	Vector3 backGroundStartColor_ = { 0.212f, 0.722f, 1.000f };
+	Vector3 backGroundEndColor_ = { 0.0353f, 0.0353f, 0.0627f };
+	Vector3 backGroundColor_ = {};
 };

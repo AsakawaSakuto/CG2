@@ -65,6 +65,8 @@ public:
 	// 色を設定
 	void SetColor(Vector4 color) { materialData_->color = color; }
 
+	void SetColorVector3(Vector3 color) { materialData_->color.x = color.x; materialData_->color.y = color.y; materialData_->color.z = color.z; }
+
 	// 座標を取得（参照）
 	Vector3& GetTranslate() { return transform_.translate; }
 
