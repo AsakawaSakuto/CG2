@@ -152,6 +152,16 @@ private:
 	std::array<GameTimer, 8> textBounceTimer_;
 	std::array<float, 8> textBaseY_; // 各テキストの基準Y座標を保存
 
+	// ★追加：スコアのバウンスアニメーション用タイマー
+	GameTimer scoreBounceStartTimer_;
+	std::array<GameTimer, 5> scoreBounceTimer_;
+	std::array<float, 5> scoreBaseY_; // 各スコアの基準Y座標を保存
+
+	// ★追加：nowScoreランキング画面でのバウンスアニメーション用タイマー
+	GameTimer nowScoreBounceStartTimer_;
+	std::array<GameTimer, 5> nowScoreBounceTimer_;
+	std::array<float, 5> nowScoreBaseY_; // 各nowScoreの基準Y座標を保存
+
 	Vector4 rankColor_[4] = {
 	{0.255f, 0.839f, 0.153f, 1.0f}, // 緑
 	{0.173f, 0.365f, 0.835f, 1.0f}, // 青
@@ -173,6 +183,12 @@ private:
 	unique_ptr<Particles> oneParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> twoParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> threeParticle_ = make_unique<Particles>();
+
+	unique_ptr<Particles> fallCandyParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> shotCandyParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> shotCandy2Particle_ = make_unique<Particles>();
+
+	bool isCandyShot_ = false;
 
 	unique_ptr<Model> backGround_ = make_unique<Model>();
 	Transform backGroundTransform_;
