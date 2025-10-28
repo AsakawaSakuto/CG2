@@ -71,7 +71,7 @@ void TitleScene::Initialize() {
 	titleParticle_->Stop();
 
 	testParticle_->Initialize(&ctx_->dxCommon, 1);
-	testParticle_->LoadJson("getScore");
+	testParticle_->LoadJson("bulletmove");
 
 	// 雲の初期化
 	for (int i = 0; i < cloud_.size(); i++) {
@@ -153,10 +153,8 @@ void TitleScene::Update() {
 	titleLogo_->Update();
 	titleObject_->Update();
 
-	titleParticle_->SetBlendMode(BlendMode::kBlendModeNone);
 	titleParticle_->Update();
 
-	testParticle_->SetBlendMode(BlendMode::kBlendModeNormal);
 	testParticle_->Update();
 
 	maskBox_->Update();

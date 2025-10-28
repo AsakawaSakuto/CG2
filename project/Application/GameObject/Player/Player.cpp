@@ -271,7 +271,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		// 反転時の無駄な時間を減らす弾の処理
 		velocity_.y = 2.0f;
 
-		ramuneOffsetY_ = 1.0f;
+		ramuneOffsetY_ = 1.5f;
 
 		stateChangeParticle_->Play();
 		stateChangeTimer_.Start(2.0f, false);
@@ -414,6 +414,25 @@ void Player::BulletUpdate() {
 		bullet->Update();
 	}
 
+	// 生きている弾にBulletMoveParticleをセット
+	int activeParticleIndex = 0;
+	
+	// 全てのBulletMoveParticleを一旦停止
+	for (int i = 0; i < 5; ++i) {
+		bulletMoveParticles_[i]->Stop();
+	}
+
+	// 生きている弾の位置にBulletMoveParticleのEmitterPosをセット
+	for (auto& bullet : bullets_) {
+		if (bullet->GetIsAlive() && activeParticleIndex < 5) {
+			bulletMoveParticles_[activeParticleIndex]->SetEmitterPosition(bullet->GetTransform().translate);
+			if (!bulletMoveParticles_[activeParticleIndex]->IsPlaying()) {
+				bulletMoveParticles_[activeParticleIndex]->Play();
+			}
+			activeParticleIndex++;
+		}
+	}
+
 	float playerPosY = transform_.translate.y;
 
 	// 弾の削除
@@ -470,7 +489,9 @@ void Player::PlayerImGui() {
 
 	// パーティクルのImGui
 	ramuneParticle_->DrawImGui("ramuneP");
-	// ramuneWhiteParticle_->DrawImGui("ramunePW");
+	ramuneWhiteParticle_->DrawImGui("ramunePW");
+	fallParticle_->DrawImGui("fall");
+	bulletChargeParticle_->DrawImGui("bulletCharge");
 	// kasokuParticle_->DrawImGui("kasoku");
 	// smorkParticle_->DrawImGui("enemyDie");
 	// bulletChargeParticle_->DrawImGui("shot");
@@ -972,7 +993,7 @@ void Player::InitParticle() {
 	bulletDieParticle_->Initialize(dxCommon_);
 	bulletDieParticle_->LoadJson("bulletDie");
 
-	ramuneOffsetY_ = -1.0f;
+	ramuneOffsetY_ = -1.5f;
 
 	stunParticle_->Initialize(dxCommon_);
 
@@ -1006,7 +1027,14 @@ void Player::InitParticle() {
 
 	getScoreParticle_->Initialize(dxCommon_);
 	getScoreParticle_->LoadJson("getScore");
+
+	for (int i = 0; i < 5; ++i) {
+		bulletMoveParticles_[i] = make_unique<Particles>();
+		bulletMoveParticles_[i]->Initialize(dxCommon_);
+		bulletMoveParticles_[i]->LoadJson("bulletMove");
+	}
 }
+
 void Player::UpdateParticle() {
 	if (stunTimer_.IsFinished()) {
 		ramuneParticle_->Play();
@@ -1036,7 +1064,7 @@ void Player::UpdateParticle() {
 			kasokuParticle_->SetEmitVelocity({0.0f, -10.0f, 0.0f});
 		}
 
-		bulletChargeParticle_->SetOffSet({0.0f, 1.11f, -0.75f});
+		bulletChargeParticle_->SetOffSet({0.0f, 1.65f, -0.75f});
 	} else if (direction_ == PlayerDirection::DOWN) {
 		kasokuOffsetY_ = -12.0f;
 		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
@@ -1052,7 +1080,7 @@ void Player::UpdateParticle() {
 			kasokuParticle_->SetEmitVelocity({0.0f, 10.0f, 0.0f});
 		}
 
-		bulletChargeParticle_->SetOffSet({0.0f, -1.11f, -0.75f});
+		bulletChargeParticle_->SetOffSet({0.0f, -1.65f, -0.75f});
 	}
 
 	kasokuParticle_->SetOffSet({0.0f, kasokuOffsetY_, 0.0f});
@@ -1082,7 +1110,7 @@ void Player::UpdateParticle() {
 	stateChangeParticle_->Update();
 
 	fallParticle_->SetEmitterPosition(transform_.translate);
-	fallParticle_->SetOffSet({0.0, -0.75f, 0.0f});
+	fallParticle_->SetOffSet({0.0, -1.25f, 0.0f});
 	fallParticle_->Update();
 
 	if (stateChangeTimer_.IsFinished()) {
@@ -1111,7 +1139,7 @@ void Player::UpdateParticle() {
 
 				switch (direction_) {
 				case PlayerDirection::UP:
-					if (thornPos.y < playerY - 6.0f) {
+					if (thornPos.y < playerY - 3.75f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
 						getScoreParticle_->Play(false);
@@ -1119,7 +1147,7 @@ void Player::UpdateParticle() {
 					}
 					break;
 				case PlayerDirection::DOWN:
-					if (thornPos.y < playerY - 16.0f) {
+					if (thornPos.y < playerY - 13.75f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
 						getScoreParticle_->Play(false);
@@ -1135,6 +1163,11 @@ void Player::UpdateParticle() {
 		getScoreParticle_->SetEmitVelocityY(3.0f);
 	}
 	getScoreParticle_->Update();
+
+	// BulletMoveParticleの配列を更新
+	for (int i = 0; i < 5; ++i) {
+		bulletMoveParticles_[i]->Update();
+	}
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -1146,6 +1179,12 @@ void Player::DrawParticle(Camera useCamera) {
 	stunParticle_->Draw(useCamera);
 	bulletShotParticle_->Draw(useCamera);
 	bulletDieParticle_->Draw(useCamera);
+	
+	// BulletMoveParticleの配列を描画
+	for (int i = 0; i < 5; ++i) {
+		bulletMoveParticles_[i]->Draw(useCamera);
+	}
+	
 	stateChangeParticle_->Draw(useCamera);
 	fallParticle_->Draw(useCamera);
 	armHitParticle1_->Draw(useCamera);
