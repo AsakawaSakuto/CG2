@@ -340,4 +340,7 @@ private:
 
 	// 数字スプライト集
 	std::array<std::string, 10> spriteNumCollection_;
+
+	// 弾の溜まる速度
+	const int chrageSpeed_ = 60;
 };
