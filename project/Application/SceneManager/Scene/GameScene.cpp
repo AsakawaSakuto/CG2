@@ -317,10 +317,20 @@ void GameScene::Initialize() {
 	ore_->Initialize(&ctx_->dxCommon, "ore.obj");
 	ore_->SetUpdateFrustumCulling(false);
 	ore_->SetUseLight(false);
-	oreTransform_.translate = { 5.37f,452.47f,1.0f };
+	oreTransform_.translate = { 4.5f,450.5f,1.0f };
 	oreTransform_.rotate = { -0.33f,-0.47f,0.66f };
 	oreTransform_.scale = { 3.0f,3.0f,3.0f };
 	ore_->SetTransform(oreTransform_);
+
+	srarArea1_->Initialize(&ctx_->dxCommon);
+	srarArea2_->Initialize(&ctx_->dxCommon);
+	srarArea3_->Initialize(&ctx_->dxCommon);
+	srarArea4_->Initialize(&ctx_->dxCommon);
+
+	srarArea1_->LoadJson("starArea1");
+	srarArea2_->LoadJson("starArea2");
+	srarArea3_->LoadJson("starArea3");
+	srarArea4_->LoadJson("starArea4");
 }
 
 void GameScene::Update() {
@@ -575,6 +585,11 @@ void GameScene::Update() {
 	loadingPlayer_->Update();
 
 	ore_->Update();
+
+	srarArea1_->Update();
+	srarArea2_->Update();
+	srarArea3_->Update();
+	srarArea4_->Update();
 }
 
 void GameScene::Draw() {
@@ -695,6 +710,11 @@ void GameScene::Draw() {
 
 	ore_->Draw(*useCamera_);
 
+	srarArea1_->Draw(*useCamera_);
+	srarArea2_->Draw(*useCamera_);
+	srarArea3_->Draw(*useCamera_);
+	srarArea4_->Draw(*useCamera_);
+
 	///
 	/// ↑描画処理ここまで
 	///
@@ -737,6 +757,11 @@ void GameScene::Draw() {
 	ImGui::End();
 
 	ore_->DrawImGui("ore");
+
+	srarArea1_->DrawImGui("1");
+	srarArea2_->DrawImGui("2");
+	srarArea3_->DrawImGui("3");
+	srarArea4_->DrawImGui("4");
 
 	///
 	/// ↑ImGuiここまで

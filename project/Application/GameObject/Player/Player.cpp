@@ -1142,6 +1142,7 @@ void Player::UpdateParticle() {
 	bulletShotParticle_->SetEmitterPosition(transform_.translate);
 	bulletShotParticle_->Update();
 
+	bulletDieParticle_->SetOffSet({ 0.0f,0.0f,-5.0f });
 	bulletDieParticle_->Update();
 
 	stateChangeParticle_->SetEmitterPosition(transform_.translate);

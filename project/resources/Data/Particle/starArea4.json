@@ -1,0 +1,131 @@
+{
+    "alphaFade": 1,
+    "blendMode": 2,
+    "colorFade": 0,
+    "colorRandom": 0,
+    "coneAngle": 45.0,
+    "coneDirection": [
+        0.0,
+        1.0,
+        0.0
+    ],
+    "coneHeight": 2.0,
+    "count": 1,
+    "emit": 0,
+    "endColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "endRotateVelocity": 0.0,
+    "endScale": [
+        0.0,
+        0.0
+    ],
+    "endVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "frequency": 0.5,
+    "frequencyTime": 0.4666668474674225,
+    "hemisphereAngle": 180.0,
+    "isMove": 1,
+    "kMaxParticle": 512,
+    "lifeTime": 1.0,
+    "lifeTimeRandom": 0,
+    "lineLength": 2.0,
+    "lineStart": [
+        -1.0,
+        0.0,
+        0.0
+    ],
+    "maxColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "maxLifeTime": 5.0,
+    "maxRotateVelocity": 1.0,
+    "maxScale": [
+        1.5,
+        1.5,
+        1.5
+    ],
+    "maxVelocity": [
+        1.0,
+        1.0,
+        0.0
+    ],
+    "minColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "minLifeTime": 1.0,
+    "minRotateVelocity": -1.0,
+    "minScale": [
+        0.5,
+        0.5,
+        0.5
+    ],
+    "minVelocity": [
+        -1.0,
+        -1.0,
+        0.0
+    ],
+    "normalVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "planeHeight": 2.0,
+    "planeNormal": [
+        0.0,
+        1.0,
+        0.0
+    ],
+    "planeWidth": 2.0,
+    "radius": 1.0,
+    "ringAngle": 0.0,
+    "ringInnerRadius": 0.5,
+    "ringNormal": [
+        0.0,
+        1.0,
+        0.0
+    ],
+    "ringOuterRadius": 1.0,
+    "rotateMove": 0,
+    "rotateVelocityRandom": 0,
+    "scaleFade": 1,
+    "scaleRandom": 0,
+    "shapeType": 4,
+    "size": [
+        13.0,
+        16.0,
+        0.0
+    ],
+    "startColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "startRotateVelocity": 0.0,
+    "startScale": [
+        1.0,
+        1.0
+    ],
+    "startVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "texturePath": "circle",
+    "translate": [
+        0.0,
+        400.0,
+        0.0
+    ],
+    "useEmitter": 1,
+    "velocityRandom": 1
+}

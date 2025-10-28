@@ -357,4 +357,9 @@ private:
 
 	unique_ptr<Model> ore_ = make_unique<Model>();
 	Transform oreTransform_;
+
+	unique_ptr<Particles> srarArea1_ = make_unique<Particles>();
+	unique_ptr<Particles> srarArea2_ = make_unique<Particles>();
+	unique_ptr<Particles> srarArea3_ = make_unique<Particles>();
+	unique_ptr<Particles> srarArea4_ = make_unique<Particles>();
 };
