@@ -7,7 +7,6 @@ void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
 GameScene::~GameScene() {
 	thorns_.clear();
-	blocks_.clear();
 }
 
 void GameScene::Initialize() {
@@ -38,14 +37,12 @@ void GameScene::Initialize() {
 
 	// Clear
 	thorns_.clear();
-	blocks_.clear();
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
 
 	// プレイヤーに他のゲームオブジェクトの情報を渡す
 	player_->SetThrons(thorns_);
-	player_->SetBlocks(blocks_);
 
 	// Create SceneFade
 	sceneFade_ = std::make_unique<SceneFade>();
@@ -124,11 +121,11 @@ void GameScene::Initialize() {
 	spriteProgressPlayer_->SetScale({0.25f, 0.25f});
 	spriteProgressPlayer_->SetPosition({988.0f, 360.0f});
 
-	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/UI/flagUI.png");
+	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/UI/flagUI02.png");
 	spriteProgressGoal_->SetScale({0.5f, 0.5f});
 	spriteProgressGoal_->SetPosition({1230.0f, 680.0f});
 
-	spriteProgressMountaion_->Initialize(&ctx_->dxCommon, "resources/image/UI/mountainTopUI.png");
+	spriteProgressMountaion_->Initialize(&ctx_->dxCommon, "resources/image/UI/mountainTopUI02.png");
 	spriteProgressMountaion_->SetScale({0.25f, 0.25f});
 	spriteProgressMountaion_->SetPosition({1225.0f, 50.0f});
 
@@ -232,10 +229,51 @@ void GameScene::Initialize() {
 	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
 
 	// 地面モデル
-	modelGround_->Initialize(&ctx_->dxCommon, "Ground/Ground.obj");
+	modelGround_->Initialize(&ctx_->dxCommon, "Ground/Ground5.obj");
 	modelGround_->SetTexture("resources/model/Ground/Ground2.png");
 	modelGround_->SetTranslate({0.0f, -250.0f, 1400.0f});
-	modelGround_->SetScale({40.0f, 56.0f, 50.0f});
+	modelGround_->SetScale({40.0f, 40.0f, 40.0f});
+
+	// 曇モデル
+	for (int i = 0; i < clouds_.size(); ++i) {
+		clouds_[i] = make_unique<MoveModel>();
+		clouds_[i]->model.Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
+		clouds_[i]->model.SetTexture("resources/image/0.png");
+		clouds_[i]->model.SetScale({2.0f, 1.0f, 1.0f});
+		clouds_[i]->model.SetColor({1.0f, 1.0f, 1.0f, 0.3f});
+		clouds_[i]->direction = Direction::RIGHT;
+
+		// 初期座標Y
+		const float MIN_POS_Y = 150.0f;
+		const float MAX_POS_Y = 400.0f;
+
+		std::random_device rd;
+		std::mt19937 eng(rd());
+		std::uniform_real_distribution<float> distr(MIN_POS_Y, MAX_POS_Y);
+
+		// 初期座標X
+		const float MIN_POS_X = -7.0f;
+		const float MAX_POS_X = 7.0f;
+
+		std::random_device rd2;
+		std::mt19937 eng2(rd2());
+		std::uniform_real_distribution<float> distr2(MIN_POS_X, MAX_POS_X);
+
+		// 雲の進む向きを決める
+		if (GetRandomDirection()) {
+			clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
+			clouds_[i]->direction = Direction::LEFT;
+		} else {
+			clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
+			clouds_[i]->direction = Direction::RIGHT;
+		}
+	}
+
+	// 雲のモデル座標リセットフラグ
+	isCloudPosReset_ = false;
+
+	// スコア加算時に使用するタイマー
+	scoreUpTimer_ = 0.0f;
 }
 
 void GameScene::Update() {
@@ -299,6 +337,12 @@ void GameScene::Update() {
 
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
 	UpdateCameraToPlayer();
+
+	// 曇モデル座標リセット
+	if (player_->GetDirection() == PlayerDirection::DOWN && !isCloudPosReset_) {
+		ResetCloudPos();
+		isCloudPosReset_ = true;
+	}
 
 	// プレイヤーの更新
 	player_->Update();
@@ -435,6 +479,14 @@ void GameScene::Update() {
 
 	// 地面モデル
 	modelGround_->Update();
+
+	// 雲モデル移動更新
+	UpdateCloudModel();
+
+	// 雲モデル
+	for (auto& cloud : clouds_) {
+		cloud->model.Update();
+	}
 }
 
 void GameScene::Draw() {
@@ -461,6 +513,11 @@ void GameScene::Draw() {
 
 	// 地面モデル
 	modelGround_->Draw(*useCamera_);
+
+	// 雲モデル
+	for (auto& cloud : clouds_) {
+		cloud->model.Draw(*useCamera_);
+	}
 
 	// 画面両端の幕のスプライト描画処理
 	for (auto& curtain : curtainSprite_) {
@@ -614,14 +671,6 @@ void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				thorn->Initialize(&ctx_->dxCommon);
 				thorn->Spawn({static_cast<float>(x) * mag - 6.7f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				thorns_.push_back(std::move(thorn));
-			}
-
-			if (static_cast<TileType>(tile) == TileType::BLOCK) {
-				// トゲの描画処理
-				auto block = std::make_unique<Block>();
-				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 6.7f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				blocks_.push_back(std::move(block));
 			}
 		}
 	}
@@ -1160,14 +1209,22 @@ void GameScene::ScoreUpAnimation() {
 }
 
 void GameScene::UpdateRuleSprite() {
-	// 回転
-	spriteArm_->SetRotate(RandomFloat(-std::numbers::pi_v<float> / 6.0f, std::numbers::pi_v<float> / 6.0f));
-	spriteThorn_->SetRotate(RandomFloat(-std::numbers::pi_v<float> / 6.0f, std::numbers::pi_v<float> / 6.0f));
+	static float time = 0.0f;
+	time += deltaTime_;
 
-	// 座標
-	float randPos = RandomFloat(-1.0f, 1.0f);
-	spriteArm_->SetPosition({spriteArm_->GetPosition().x + randPos, spriteArm_->GetPosition().y + randPos});
-	spriteThorn_->SetPosition({spriteThorn_->GetPosition().x + randPos, spriteThorn_->GetPosition().y + randPos});
+	float amplitude = std::numbers::pi_v<float> / 12.0f; // 揺れ幅
+	float frequency = 32.0f;                             // 揺れの速さ
+
+	float angle = std::sin(time * frequency) * amplitude;
+
+	// 回転
+	spriteArm_->SetRotate(angle);
+	spriteThorn_->SetRotate(-angle);
+
+	// スケール
+	float scale = 0.25f + std::sin(time * frequency) * 0.05f;
+	spriteArm_->SetScale({scale, scale});
+	spriteThorn_->SetScale({scale, scale});
 }
 
 float GameScene::RandomFloat(float min, float max) {
@@ -1176,4 +1233,41 @@ float GameScene::RandomFloat(float min, float max) {
 	std::uniform_real_distribution<float> dist(min, max);
 
 	return dist(rng);
+}
+
+void GameScene::UpdateCloudModel() {
+	if (player_->GetPosition().y < 150.0f)
+		return;
+
+	for (auto& model : clouds_) {
+		// 雲の移動
+		if (model->direction == Direction::LEFT) {
+			model->model.GetTranslate().x -= 0.01f;
+		} else {
+			model->model.GetTranslate().x += 0.01f;
+		}
+	}
+}
+
+int GameScene::GetRandomDirection() {
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	static std::uniform_int_distribution<int> dist(0, 1);
+
+	return dist(gen);
+}
+
+void GameScene::ResetCloudPos() {
+	for (int i = 0; i < clouds_.size(); ++i) {
+		// 初期座標X
+		const float MIN_POS_X = -7.0f;
+		const float MAX_POS_X = 7.0f;
+
+		std::random_device rd2;
+		std::mt19937 eng2(rd2());
+		std::uniform_real_distribution<float> distr2(MIN_POS_X, MAX_POS_X);
+
+		// 座標リセット
+		clouds_[i]->model.SetTranslate({distr2(eng2), clouds_[i]->model.GetTranslate().y, 10.0f});
+	}
 }

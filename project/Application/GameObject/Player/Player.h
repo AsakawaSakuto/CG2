@@ -23,7 +23,7 @@ struct CameraShakeParams {
 	float decayRate;
 };
 
-enum class Direction {
+enum class PlayerDirection {
 	UP = 0,
 	DOWN = 1,
 };
@@ -52,7 +52,7 @@ public:
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
 	float CameraOffset() const { return playerState_.cameraOffset; }
-	Direction GetDirection() const { return direction_; }
+	PlayerDirection GetDirection() const { return direction_; }
 	Vector2 GetShakeAmount() const { return shakeAmount_; }
 	float GetStartLine() const { return START_LINE; }
 	float GetEndLine() const { return END_LINE; }
@@ -207,7 +207,7 @@ private:
 	Vector3 velocity_{};
 
 	// プレイヤーの進行方向
-	Direction direction_ = Direction::UP;
+	PlayerDirection direction_ = PlayerDirection::UP;
 
 	// 弾のゲージ
 	int bulletGauge_ = 0;

@@ -1,6 +1,5 @@
 #define NOMINMAX
 #include "Application/GameObject/Player/Player.h"
-#include "Application/GameObject/Block/Block.h"
 #include "Application/GameObject/Thorn/Thorn.h"
 #include <numbers>
 
@@ -51,7 +50,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerState_.cameraOffset = CAMERA_OFFSET_TOP;
 
 	// プレイヤーの方向初期化
-	direction_ = Direction::UP;
+	direction_ = PlayerDirection::UP;
 
 	// クマ
 	bear_->Initialize(dxCommon_);
@@ -79,6 +78,12 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	for (int i = 0; i <= 9; ++i) {
 		spriteNumCollection_[i] = "resources/image/UI/Number" + std::to_string(i) + "UI.png";
 	}
+
+	// スコアアップアニメーションのフラグ
+	isScoreUpAnimation_ = false;
+
+	// 前フレームのスコア
+	preScore_ = 0;
 }
 
 void Player::Update() {
@@ -256,12 +261,12 @@ void Player::ClampPlayerVelocity() {
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最高地点に到達したとき
-	if (transform_.translate.y >= maxHeight && direction_ == Direction::UP) {
+	if (transform_.translate.y >= maxHeight && direction_ == PlayerDirection::UP) {
 		// プレイヤーの進行方向を徐々に反対方向に
 		acceleration_.y *= -1;
 
 		// プレイヤーの進行状況
-		direction_ = Direction::DOWN;
+		direction_ = PlayerDirection::DOWN;
 
 		// 反転時の無駄な時間を減らす弾の処理
 		velocity_.y = 2.0f;
@@ -273,7 +278,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	}
 
 	// プレイヤーが最低地点に到達したとき
-	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
+	if (transform_.translate.y <= minHeight && direction_ == PlayerDirection::DOWN) {
 		if (!isGoal_) {
 			goalParticle1_->SetEmitterPosition({5.0f, -22.5f, 0.0f});
 			goalParticle1_->Play(false);
@@ -297,10 +302,10 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 void Player::CameraOffsetChange() {
 	// 方向に応じて目標オフセットを決定
-	float targetOffset = (direction_ == Direction::UP) ? CAMERA_OFFSET_TOP : CAMERA_OFFSET_BOTTOM;
+	float targetOffset = (direction_ == PlayerDirection::UP) ? CAMERA_OFFSET_TOP : CAMERA_OFFSET_BOTTOM;
 
 	// velocityの符号が反転したかチェック
-	bool velocityFlipped = (direction_ == Direction::UP && velocity_.y > 0.0f) || (direction_ == Direction::DOWN && velocity_.y < 0.0f);
+	bool velocityFlipped = (direction_ == PlayerDirection::UP && velocity_.y > 0.0f) || (direction_ == PlayerDirection::DOWN && velocity_.y < 0.0f);
 
 	// 徐々にオフセットを目標値に近づける
 	if (velocityFlipped) {
@@ -312,7 +317,7 @@ void Player::CameraOffsetChange() {
 
 void Player::RotateChange() {
 	// 目標回転角
-	float targetRotationZ = (direction_ == Direction::UP) ? 0.0f : std::numbers::pi_v<float>;
+	float targetRotationZ = (direction_ == PlayerDirection::UP) ? 0.0f : std::numbers::pi_v<float>;
 
 	// 補間係数
 	const float smoothing = 0.1f;
@@ -328,7 +333,7 @@ void Player::RotateChange() {
 	bear_->SetRotate(transform_.rotate);
 
 	// 方向に応じてクマのモデルの配置を変更
-	bear_->SetOffsetX((direction_ == Direction::DOWN) ? -0.2f : 0.2f);
+	bear_->SetOffsetX((direction_ == PlayerDirection::DOWN) ? -0.2f : 0.2f);
 }
 
 void Player::BulletCharge() {
@@ -375,7 +380,7 @@ void Player::BulletShot() {
 		});
 
 		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
-		if (direction_ == Direction::UP) {
+		if (direction_ == PlayerDirection::UP) {
 			bullet->Spawn(transform_.translate, bulletState_.maxSpeed);
 		} else {
 			bullet->Spawn(transform_.translate, -bulletState_.maxSpeed);
@@ -504,7 +509,7 @@ void Player::DrawImGuiJsonStatePlayer() {
 
 void Player::SpeedDown(float speedDpwnStrength) {
 	// 減速
-	velocity_.y += (direction_ == Direction::UP ? -speedDpwnStrength : speedDpwnStrength);
+	velocity_.y += (direction_ == PlayerDirection::UP ? -speedDpwnStrength : speedDpwnStrength);
 }
 
 void Player::Stun() {
@@ -537,7 +542,7 @@ void Player::StunRemoved() { stunTimer_.Update(); }
 void Player::CollisionThorn() {
 	for (auto& thorn : thorns_) {
 		if (Collision::IsHit(thorn->GetCollisionAABB(), collisionAABB_) && thorn->GetIsAlive()) {
-			if (direction_ == Direction::DOWN) {
+			if (direction_ == PlayerDirection::DOWN) {
 
 				// シェイク用のフラグを立てる
 				if (!isShake_) {
@@ -563,7 +568,7 @@ void Player::CollisionThorn() {
 				DestroyEnemySE_->PlayAudio(SE_Volume);
 
 				break;
-			} else if (direction_ == Direction::UP) {
+			} else if (direction_ == PlayerDirection::UP) {
 
 				// シェイク用のフラグを立てる
 				if (!isShake_ && !isStartCoolDown_ && !stunTimer_.IsActive()) {
@@ -661,9 +666,9 @@ void Player::UpdateCameraShake() {
 }
 
 void Player::WingStateUpdate() {
-	if (direction_ == Direction::UP) {
+	if (direction_ == PlayerDirection::UP) {
 		playerWing_->SetIsAlive(true);
-	} else if (direction_ == Direction::DOWN) {
+	} else if (direction_ == PlayerDirection::DOWN) {
 		playerWing_->SetIsAlive(false);
 	}
 }
@@ -862,7 +867,7 @@ void Player::UpdateCameraSetChange() {
 		isCameraSet_ = true;
 	}
 
-	if (transform_.translate.y <= START_LINE && isCameraSet_) {
+	if (transform_.translate.y <= GAME_END_LINE && isCameraSet_ && direction_ == PlayerDirection::DOWN) {
 		isCameraSet_ = false;
 	}
 }
@@ -1016,7 +1021,7 @@ void Player::UpdateParticle() {
 	ramuneWhiteParticle_->SetEmitterPosition(transform_.translate);
 	ramuneWhiteParticle_->Update();
 
-	if (direction_ == Direction::UP) {
+	if (direction_ == PlayerDirection::UP) {
 		kasokuOffsetY_ = 12.0f;
 		if (velocity_.y >= 12.0f && velocity_.y <= 14.0f) {
 			kasokuParticle_->SetSpawnTime(0.1f);
@@ -1032,7 +1037,7 @@ void Player::UpdateParticle() {
 		}
 
 		bulletChargeParticle_->SetOffSet({0.0f, 1.11f, -0.75f});
-	} else if (direction_ == Direction::DOWN) {
+	} else if (direction_ == PlayerDirection::DOWN) {
 		kasokuOffsetY_ = -12.0f;
 		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
 			kasokuParticle_->SetSpawnTime(0.1f);
@@ -1061,10 +1066,10 @@ void Player::UpdateParticle() {
 
 	stunParticle_->Update();
 
-	if (direction_ == Direction::UP) {
+	if (direction_ == PlayerDirection::UP) {
 		bulletShotParticle_->SetOffSet({0.0f, 0.75f, 0.0f});
 		bulletShotParticle_->SetEmitVelocityY(15.0f);
-	} else if (direction_ == Direction::DOWN) {
+	} else if (direction_ == PlayerDirection::DOWN) {
 		bulletShotParticle_->SetOffSet({0.0f, -0.75f, 0.0f});
 		bulletShotParticle_->SetEmitVelocityY(-15.0f);
 	}
@@ -1105,7 +1110,7 @@ void Player::UpdateParticle() {
 				float playerY = transform_.translate.y;
 
 				switch (direction_) {
-				case Direction::UP:
+				case PlayerDirection::UP:
 					if (thornPos.y < playerY - 6.0f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
@@ -1113,7 +1118,7 @@ void Player::UpdateParticle() {
 						thorn->ParticleReset(i);
 					}
 					break;
-				case Direction::DOWN:
+				case PlayerDirection::DOWN:
 					if (thornPos.y < playerY - 16.0f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));

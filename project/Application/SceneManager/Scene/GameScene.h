@@ -5,7 +5,6 @@
 #include "Application/GameObject/Player/Player.h"
 #include "Application/Map/Map.h"
 #include "Application/SceneManager/Scene/State/GameSceneState.h"
-#include <Application/GameObject/Block/Block.h>
 #include <Application/GameObject/Thorn/Thorn.h>
 
 using Microsoft::WRL::ComPtr;
@@ -92,17 +91,36 @@ private:
 	// 二つの値からランダムに値を返す
 	float RandomFloat(float min, float max);
 
+	// 雲のモデルの挙動
+	void UpdateCloudModel();
+
+	// Directionをランダムに返す
+	int GetRandomDirection();
+
+	// 雲の座標リセット
+	void ResetCloudPos();
+
 private:
 	enum class RuleAnimState { Rising, Waiting, Falling, Done };
+
+	enum class RuleSpriteState {
+		RIGHT,
+		LEFT,
+	};
+
+	enum Direction {
+		RIGHT,
+		LEFT,
+	};
 
 	struct SpriteRender {
 		Sprite sprite;
 		bool isDraw;
 	};
 
-	enum class RuleSpriteState {
-		RIGHT,
-		LEFT,
+	struct MoveModel {
+		Model model;
+		Direction direction;
 	};
 
 private:
@@ -127,7 +145,6 @@ private:
 	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
 	unique_ptr<Player> player_ = make_unique<Player>();
 	std::vector<std::shared_ptr<Thorn>> thorns_;
-	std::vector<std::shared_ptr<Block>> blocks_;
 
 	// ゲージ用のスプライト
 	std::array<BulletGaugeInfo, 5> bulletGaugeSprite_;
@@ -153,9 +170,6 @@ private:
 
 	// どのくらいの時間入力が無かったかを記録する変数(秒)
 	float noInputTimer_ = 0.0f;
-
-	// ゲームシーンからタイトルに戻るまでの猶予時間(秒)
-	// float noInputTimerMax_ = 5.0f;
 
 	// タイトルシーンへの切り替えのフラグ
 	bool isBackToTitleScene_ = false;
@@ -230,8 +244,8 @@ private:
 
 	// ラムネの波紋
 	unique_ptr<Sprite> spriteChargeUIEffect_ = make_unique<Sprite>();
-	float chargeEffectSize_ = 1.0f;                                              // サイズ
-	float chargeEffectAlpha_ = 1.0f;                                             // 透明度
+	float chargeEffectSize_ = 1.0f;                                             // サイズ
+	float chargeEffectAlpha_ = 1.0f;                                            // 透明度
 	std::array<float, 5> gaugeSizeSpeeds = {0.02f, 0.03f, 0.04f, 0.05f, 0.06f}; // サイズの変化スピード
 
 	// 山のモデル
@@ -309,4 +323,10 @@ private:
 
 	// 地面モデル
 	unique_ptr<Model> modelGround_ = make_unique<Model>();
+
+	// 曇
+	std::array<std::unique_ptr<MoveModel>, 30> clouds_;
+
+	// 雲のモデルリセットフラグ
+	bool isCloudPosReset_ = false;
 };
