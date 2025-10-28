@@ -7,7 +7,6 @@ void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
 GameScene::~GameScene() {
 	thorns_.clear();
-	blocks_.clear();
 }
 
 void GameScene::Initialize() {
@@ -19,7 +18,7 @@ void GameScene::Initialize() {
 	input_ = &ctx_->input;
 
 	// カメラのZ座標
-	cameraPosisionZ_ = -50.0f;
+	cameraPosisionZ_ = -38.0f;
 
 	// カメラの初期化
 	debugCamera_->SetInput(&ctx_->input);
@@ -38,14 +37,12 @@ void GameScene::Initialize() {
 
 	// Clear
 	thorns_.clear();
-	blocks_.clear();
 
 	// オブジェクトの配置
 	SpawnObjectsByMapChip(1.0f, player_->GetEndLine());
 
 	// プレイヤーに他のゲームオブジェクトの情報を渡す
 	player_->SetThrons(thorns_);
-	player_->SetBlocks(blocks_);
 
 	// Create SceneFade
 	sceneFade_ = std::make_unique<SceneFade>();
@@ -57,21 +54,22 @@ void GameScene::Initialize() {
 		bulletGaugeSprite_[i].sprite = std::make_unique<Sprite>();
 		bulletGaugeSprite_[i].sprite->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 		bulletGaugeSprite_[i].sprite->SetScale({2.0, 2.5f});
-		bulletGaugeSprite_[i].sprite->SetPosition({1068.0f, 548.0f - (44.0f * i)});
+		bulletGaugeSprite_[i].sprite->SetPosition({1070.0f, 480.0f - (44.0f * i)});
 		bulletGaugeSprite_[i].sprite->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 		bulletGaugeSprite_[i].isActive = false;
 	}
 
-	bulletGaugeSprite_[0].sprite->SetTexture("resources/image/UI/bulletGaugeEdge.png");
+	bulletGaugeSprite_[0].sprite->SetTexture("resources/image/UI/bulletGaugeEdgeBottom.png");
+	bulletGaugeSprite_[0].sprite->SetScale({2.0f, 2.5f});
 	bulletGaugeSprite_[4].sprite->SetTexture("resources/image/UI/bulletGaugeEdge.png");
+	bulletGaugeSprite_[4].sprite->SetScale({2.0f, 2.5f});
 
 	// 画面両端の幕のスプライト
 	for (int i = 0; i < curtainSprite_.size(); ++i) {
 		curtainSprite_[i] = std::make_unique<Sprite>();
-		curtainSprite_[i]->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-		curtainSprite_[i]->SetScale({20, 43});
-		curtainSprite_[i]->SetPosition({160.0f + (i * 940.0f), 344.0f});
-		curtainSprite_[i]->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
+		curtainSprite_[i]->Initialize(&ctx_->dxCommon, "resources/image/UI/SidePanelUI.png");
+		curtainSprite_[i]->SetScale({0.5f, 0.5f});
+		curtainSprite_[i]->SetPosition({-62.0f + (i * 1404.0f), 620.0f});
 	}
 
 	// カウントダウン用のスプライト集
@@ -84,7 +82,7 @@ void GameScene::Initialize() {
 		spriteScore_[i] = make_unique<SpriteRender>();
 		spriteScore_[i]->sprite.Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
 		spriteScore_[i]->sprite.SetPosition({100.0f + i * 32.0f, 400.0f});
-		spriteScore_[i]->sprite.SetScale({0.5f, 0.5f});
+		spriteScore_[i]->sprite.SetScale({0.5f, 0.4f});
 	}
 
 	// カウントダウン用のスプライト初期化
@@ -123,11 +121,11 @@ void GameScene::Initialize() {
 	spriteProgressPlayer_->SetScale({0.25f, 0.25f});
 	spriteProgressPlayer_->SetPosition({988.0f, 360.0f});
 
-	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/UI/flagUI.png");
+	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/UI/flagUI02.png");
 	spriteProgressGoal_->SetScale({0.5f, 0.5f});
 	spriteProgressGoal_->SetPosition({1230.0f, 680.0f});
 
-	spriteProgressMountaion_->Initialize(&ctx_->dxCommon, "resources/image/UI/mountainTopUI.png");
+	spriteProgressMountaion_->Initialize(&ctx_->dxCommon, "resources/image/UI/mountainTopUI02.png");
 	spriteProgressMountaion_->SetScale({0.25f, 0.25f});
 	spriteProgressMountaion_->SetPosition({1225.0f, 50.0f});
 
@@ -138,25 +136,27 @@ void GameScene::Initialize() {
 	noInputTimer_ = 0.0f;
 
 	// スコア表示の後ろに配置するスプライト
-	spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountUI.png");
+	spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
 	spriteCandyScore_->SetPosition({160.0f, 400.0f});
-	spriteCandyScore_->SetScale({1, 1});
+	spriteCandyScore_->SetScale({0.5f, 0.5f});
+	spriteCandyScore_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
 
 	// スコアの背景波紋
-	spriteCandyEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountUI.png");
+	spriteCandyEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
 	spriteCandyEffect_->SetPosition(spriteCandyScore_->GetPosition());
-	chargeEffectSize_ = 1.0f;
-	spriteCandyEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
+	candyEffectSize_ = 0.5f;
+	spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
+	spriteCandyEffect_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
 
 	// 弾のゲージラムネUI
-	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
-	spriteChargeUI_->SetPosition({1070.0f, 450.0f});
-	spriteChargeUI_->SetScale({1, 1});
+	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
+	spriteChargeUI_->SetPosition({1070.0f, 350.0f});
+	spriteChargeUI_->SetScale({0.4f, 0.4f});
 
 	// ラムネの波紋
-	spriteChargeUIEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/ChargeGaugeUI.png");
+	spriteChargeUIEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
 	spriteChargeUIEffect_->SetPosition(spriteChargeUI_->GetPosition());
-	chargeEffectSize_ = 1.0f;
+	chargeEffectSize_ = 0.4f;
 	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
 
 	// 山のモデル初期化
@@ -209,17 +209,17 @@ void GameScene::Initialize() {
 
 	// push スプライト
 	spritePush_->Initialize(&ctx_->dxCommon, "resources/image/UI/PushButton01UI.png");
-	spritePush_->SetPosition({1068.0f, 640.0f});
-	spritePush_->SetScale({0.1f, 0.1f});
+	spritePush_->SetPosition({1068.0f, 600.0f});
+	spritePush_->SetScale({0.2f, 0.2f});
 
 	// 腕 スプライト
 	spriteArm_->Initialize(&ctx_->dxCommon, "resources/image/UI/armUI.png");
-	spriteArm_->SetPosition({410.0f, 75.0f});
+	spriteArm_->SetPosition({450.0f, 75.0f});
 	spriteArm_->SetScale({0.25f, 0.25f});
 
 	// ピニャータ スプライト
 	spriteThorn_->Initialize(&ctx_->dxCommon, "resources/image/UI/enemyUI.png");
-	spriteThorn_->SetPosition({600.0f, 85.0f});
+	spriteThorn_->SetPosition({590.0f, 85.0f});
 	spriteThorn_->SetScale({0.25f, 0.25f});
 
 	// ○○個突破　1000の倍数
@@ -227,6 +227,53 @@ void GameScene::Initialize() {
 
 	// 振動の終了
 	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
+
+	// 地面モデル
+	modelGround_->Initialize(&ctx_->dxCommon, "Ground/Ground5.obj");
+	modelGround_->SetTexture("resources/model/Ground/Ground2.png");
+	modelGround_->SetTranslate({0.0f, -250.0f, 1400.0f});
+	modelGround_->SetScale({40.0f, 40.0f, 40.0f});
+
+	// 曇モデル
+	for (int i = 0; i < clouds_.size(); ++i) {
+		clouds_[i] = make_unique<MoveModel>();
+		clouds_[i]->model.Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
+		clouds_[i]->model.SetTexture("resources/image/0.png");
+		clouds_[i]->model.SetScale({2.0f, 1.0f, 1.0f});
+		clouds_[i]->model.SetColor({1.0f, 1.0f, 1.0f, 0.3f});
+		clouds_[i]->direction = Direction::RIGHT;
+
+		// 初期座標Y
+		const float MIN_POS_Y = 150.0f;
+		const float MAX_POS_Y = 400.0f;
+
+		std::random_device rd;
+		std::mt19937 eng(rd());
+		std::uniform_real_distribution<float> distr(MIN_POS_Y, MAX_POS_Y);
+
+		// 初期座標X
+		const float MIN_POS_X = -7.0f;
+		const float MAX_POS_X = 7.0f;
+
+		std::random_device rd2;
+		std::mt19937 eng2(rd2());
+		std::uniform_real_distribution<float> distr2(MIN_POS_X, MAX_POS_X);
+
+		// 雲の進む向きを決める
+		if (GetRandomDirection()) {
+			clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
+			clouds_[i]->direction = Direction::LEFT;
+		} else {
+			clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
+			clouds_[i]->direction = Direction::RIGHT;
+		}
+	}
+
+	// 雲のモデル座標リセットフラグ
+	isCloudPosReset_ = false;
+
+	// スコア加算時に使用するタイマー
+	scoreUpTimer_ = 0.0f;
 }
 
 void GameScene::Update() {
@@ -290,6 +337,12 @@ void GameScene::Update() {
 
 	// カメラの座標Yをプレイヤーの座標Yに合わせる
 	UpdateCameraToPlayer();
+
+	// 曇モデル座標リセット
+	if (player_->GetDirection() == PlayerDirection::DOWN && !isCloudPosReset_) {
+		ResetCloudPos();
+		isCloudPosReset_ = true;
+	}
 
 	// プレイヤーの更新
 	player_->Update();
@@ -407,6 +460,9 @@ void GameScene::Update() {
 	// push スプライトの切り替え
 	PushSpriteChange();
 
+	// ルール説明用のスプライトアニメーション
+	UpdateRuleSprite();
+
 	// 腕 スプライト
 	spriteArm_->Update();
 
@@ -419,6 +475,17 @@ void GameScene::Update() {
 	// ○○個突破スプライト
 	for (auto& sprite : spriteScoreCountOver_) {
 		sprite->Update();
+	}
+
+	// 地面モデル
+	modelGround_->Update();
+
+	// 雲モデル移動更新
+	UpdateCloudModel();
+
+	// 雲モデル
+	for (auto& cloud : clouds_) {
+		cloud->model.Update();
 	}
 }
 
@@ -439,16 +506,18 @@ void GameScene::Draw() {
 		thorn->DrawParticle(*useCamera_);
 	}
 
-	// プレイヤーの描画処理
-	player_->Draw(*useCamera_);
-
-	// ラムネゲージ
-	// spriteChargeUI_->Draw();
-
 	// 山のモデル描画
 	/*for (auto& model : modelMountain_) {
 	    model->Draw(*useCamera_);
 	}*/
+
+	// 地面モデル
+	modelGround_->Draw(*useCamera_);
+
+	// 雲モデル
+	for (auto& cloud : clouds_) {
+		cloud->model.Draw(*useCamera_);
+	}
 
 	// 画面両端の幕のスプライト描画処理
 	for (auto& curtain : curtainSprite_) {
@@ -486,10 +555,10 @@ void GameScene::Draw() {
 	spriteRule_->Draw();
 
 	// 腕 スプライト
-	// spriteArm_->Draw();
+	spriteArm_->Draw();
 
 	// ピニャータ スプライト
-	// spriteThorn_->Draw();
+	spriteThorn_->Draw();
 
 	// 進行度ゲージスプライト描画
 	spriteProgressLine_->Draw();
@@ -525,6 +594,9 @@ void GameScene::Draw() {
 		sprite->Draw();
 	}
 
+	// プレイヤーの描画処理
+	player_->Draw(*useCamera_);
+
 	///
 	/// ↑描画処理ここまで
 	///
@@ -558,6 +630,11 @@ void GameScene::Draw() {
 	ImGui::DragFloat3("goal", &spriteProgressGoal_->GetPosition().x, 1.0f);
 	ImGui::DragFloat3("chargeBGUI", &spriteChargeUI_->GetPosition().x, 1.0f);
 	ImGui::DragFloat3("spriteCandyScore", &spriteCandyScore_->GetPosition().x, 1.0f);
+	ImGui::DragFloat2("curtainSpritePos1", &curtainSprite_[0]->GetPosition().x, 1.0f);
+	ImGui::DragFloat2("curtainSpritePos2", &curtainSprite_[1]->GetPosition().x, 1.0f);
+	ImGui::ColorPicker4("curtainSpritePos2", &spriteCandyScore_->GetColor().x);
+	ImGui::DragFloat3("GroundModelPos", &modelGround_->GetTranslate().x);
+	ImGui::DragFloat3("GroundModelScale", &modelGround_->GetScale().x);
 
 	ImGui::End();
 
@@ -594,14 +671,6 @@ void GameScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				thorn->Initialize(&ctx_->dxCommon);
 				thorn->Spawn({static_cast<float>(x) * mag - 6.7f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				thorns_.push_back(std::move(thorn));
-			}
-
-			if (static_cast<TileType>(tile) == TileType::BLOCK) {
-				// トゲの描画処理
-				auto block = std::make_unique<Block>();
-				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 6.7f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				blocks_.push_back(std::move(block));
 			}
 		}
 	}
@@ -710,6 +779,7 @@ void GameScene::GameStartCount() {
 
 	// カウントが0になった瞬間に「スタート!」スプライトのイージングを開始
 	if (displayNumber == 1 && !showStart_) {
+		player_->SetIsCountDownZero(true);
 		showStart_ = true;
 		startAnimTimer_ = 0.0f;
 		// リセット状態にして表示開始
@@ -801,6 +871,8 @@ void GameScene::AnimationRuleSprite() {
 		float eased = Easing::Apply(t, Easing::Type::EaseOutCubic);
 		float posY = std::lerp(ruleStartPosY_, ruleEndPosY_, eased);
 		spriteRule_->SetPosition({640.0f, posY});
+		spriteArm_->SetPosition({spriteArm_->GetPosition().x, posY});
+		spriteThorn_->SetPosition({spriteThorn_->GetPosition().x, posY});
 
 		if (t >= 1.0f) {
 			// 到達したら待機へ移行
@@ -817,6 +889,8 @@ void GameScene::AnimationRuleSprite() {
 		}
 		// 待機中は位置を終了位置に固定
 		spriteRule_->SetPosition({640.0f, ruleEndPosY_});
+		spriteArm_->SetPosition({spriteArm_->GetPosition().x, ruleEndPosY_});
+		spriteThorn_->SetPosition({spriteThorn_->GetPosition().x, ruleEndPosY_});
 		break;
 	}
 	case RuleAnimState::Falling: {
@@ -824,6 +898,8 @@ void GameScene::AnimationRuleSprite() {
 		float eased = Easing::Apply(t, Easing::Type::EaseInCubic);
 		float posY = std::lerp(ruleEndPosY_, ruleStartPosY_, eased);
 		spriteRule_->SetPosition({640.0f, posY});
+		spriteArm_->SetPosition({spriteArm_->GetPosition().x, posY});
+		spriteThorn_->SetPosition({spriteThorn_->GetPosition().x, posY});
 
 		if (t >= 1.0f) {
 			// 終了処理
@@ -839,6 +915,8 @@ void GameScene::AnimationRuleSprite() {
 	case RuleAnimState::Done: {
 		// 完了後は位置を開始位置に固定
 		spriteRule_->SetPosition({640.0f, ruleStartPosY_});
+		spriteArm_->SetPosition({spriteArm_->GetPosition().x, ruleStartPosY_});
+		spriteThorn_->SetPosition({spriteThorn_->GetPosition().x, ruleStartPosY_});
 		break;
 	}
 	}
@@ -1042,10 +1120,6 @@ void GameScene::UpdateSpriteRotation() {
 	spriteCandyScore_->SetRotate(angleRad);     // スコアの背景
 	spriteCandyEffect_->SetRotate(angleRad);
 
-	// for (int i = 0; i < spriteScore_.size(); ++i) {
-	//	spriteScore_[i]->sprite.SetRotate(angleRad); // スコア
-	// }
-
 	frameCount_++;
 }
 
@@ -1059,12 +1133,12 @@ void GameScene::UpdateSpriteChargeEffect() {
 	}
 
 	// サイズと透明度を変更
-	chargeEffectAlpha_ -= 0.05f;
+	chargeEffectAlpha_ -= changeSpeed;
 	chargeEffectSize_ += changeSpeed;
 
 	if (chargeEffectAlpha_ <= 0.0f) {
 		chargeEffectAlpha_ = 1.0f;
-		chargeEffectSize_ = 1.0f;
+		chargeEffectSize_ = 0.4f;
 	}
 
 	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
@@ -1076,15 +1150,15 @@ void GameScene::UpdateSpriteCandyEffect() {
 	float changeSpeed = 0.0f;
 
 	if (player_->GetScore() >= 9000.0f) {
-		changeSpeed = gaugeSizeSpeeds[4];
+		changeSpeed = candySizeSpeeds[4];
 	} else if (player_->GetScore() >= 7000.0f) {
-		changeSpeed = gaugeSizeSpeeds[3];
+		changeSpeed = candySizeSpeeds[3];
 	} else if (player_->GetScore() >= 5000.0f) {
-		changeSpeed = gaugeSizeSpeeds[2];
+		changeSpeed = candySizeSpeeds[2];
 	} else if (player_->GetScore() >= 3000.0f) {
-		changeSpeed = gaugeSizeSpeeds[1];
+		changeSpeed = candySizeSpeeds[1];
 	} else if (player_->GetScore() >= 1000.0f) {
-		changeSpeed = gaugeSizeSpeeds[0];
+		changeSpeed = candySizeSpeeds[0];
 	}
 
 	// サイズと透明度を変更
@@ -1093,11 +1167,11 @@ void GameScene::UpdateSpriteCandyEffect() {
 
 	if (candyEffectAlpha_ <= 0.0f) {
 		candyEffectAlpha_ = 1.0f;
-		candyEffectSize_ = 1.0f;
+		candyEffectSize_ = 0.5f;
 	}
 
 	spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
-	spriteCandyEffect_->SetColor({1.0f, 1.0f, 1.0f, candyEffectAlpha_});
+	spriteCandyEffect_->SetColor({spriteCandyEffect_->GetColor().x, spriteCandyEffect_->GetColor().y, spriteCandyEffect_->GetColor().z, candyEffectAlpha_});
 }
 
 void GameScene::ResetSE() {
@@ -1116,8 +1190,8 @@ void GameScene::ScoreUpAnimation() {
 		float eased = Easing::Apply(t, Easing::Type::EaseOutElastic);
 
 		Vector2 scale;
-		const float kStartScale = 0.5f;
-		const float kEndScale = 1.0f;
+		const float kStartScale = 0.4f;
+		const float kEndScale = 0.8f;
 
 		scale.x = Lerp(kStartScale, kEndScale, eased);
 		scale.y = Lerp(kStartScale, kEndScale, eased);
@@ -1131,5 +1205,69 @@ void GameScene::ScoreUpAnimation() {
 			scoreUpTimer_ = 0.0f;
 			player_->SetIsScoreUpAnimation(false);
 		}
+	}
+}
+
+void GameScene::UpdateRuleSprite() {
+	static float time = 0.0f;
+	time += deltaTime_;
+
+	float amplitude = std::numbers::pi_v<float> / 12.0f; // 揺れ幅
+	float frequency = 32.0f;                             // 揺れの速さ
+
+	float angle = std::sin(time * frequency) * amplitude;
+
+	// 回転
+	spriteArm_->SetRotate(angle);
+	spriteThorn_->SetRotate(-angle);
+
+	// スケール
+	float scale = 0.25f + std::sin(time * frequency) * 0.05f;
+	spriteArm_->SetScale({scale, scale});
+	spriteThorn_->SetScale({scale, scale});
+}
+
+float GameScene::RandomFloat(float min, float max) {
+	// 二つの値からランダムに値を返す
+	static std::mt19937 rng(std::random_device{}());
+	std::uniform_real_distribution<float> dist(min, max);
+
+	return dist(rng);
+}
+
+void GameScene::UpdateCloudModel() {
+	if (player_->GetPosition().y < 150.0f)
+		return;
+
+	for (auto& model : clouds_) {
+		// 雲の移動
+		if (model->direction == Direction::LEFT) {
+			model->model.GetTranslate().x -= 0.01f;
+		} else {
+			model->model.GetTranslate().x += 0.01f;
+		}
+	}
+}
+
+int GameScene::GetRandomDirection() {
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	static std::uniform_int_distribution<int> dist(0, 1);
+
+	return dist(gen);
+}
+
+void GameScene::ResetCloudPos() {
+	for (int i = 0; i < clouds_.size(); ++i) {
+		// 初期座標X
+		const float MIN_POS_X = -7.0f;
+		const float MAX_POS_X = 7.0f;
+
+		std::random_device rd2;
+		std::mt19937 eng2(rd2());
+		std::uniform_real_distribution<float> distr2(MIN_POS_X, MAX_POS_X);
+
+		// 座標リセット
+		clouds_[i]->model.SetTranslate({distr2(eng2), clouds_[i]->model.GetTranslate().y, 10.0f});
 	}
 }

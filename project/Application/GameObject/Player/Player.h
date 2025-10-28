@@ -23,7 +23,7 @@ struct CameraShakeParams {
 	float decayRate;
 };
 
-enum class Direction {
+enum class PlayerDirection {
 	UP = 0,
 	DOWN = 1,
 };
@@ -52,7 +52,7 @@ public:
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
 	float CameraOffset() const { return playerState_.cameraOffset; }
-	Direction GetDirection() const { return direction_; }
+	PlayerDirection GetDirection() const { return direction_; }
 	Vector2 GetShakeAmount() const { return shakeAmount_; }
 	float GetStartLine() const { return START_LINE; }
 	float GetEndLine() const { return END_LINE; }
@@ -70,6 +70,7 @@ public:
 	void SetIsGoal(bool isGoal) { isGoal_ = isGoal; }
 	void SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites);
 	void SetIsScoreUpAnimation(bool isScoreUpAnimation) { isScoreUpAnimation_ = isScoreUpAnimation; }
+	void SetIsCountDownZero(bool isCountDownZero) { isCountDownZero_ = isCountDownZero; }
 
 private:
 	// プレイヤーの上昇
@@ -183,11 +184,14 @@ private:
 	// シェイクの開始関数
 	void StartCameraShake(ShakeType type);
 
-	// 下降時の回転処理
-	void DownMoveRotate();
-
 	// 前のフレームよりスコアが増えていたらアニメーションする
 	void ComparisonScore();
+
+	// 加算するスコアを受け取ってpushする
+	void ScoreParticleAdd(float score);
+
+	// スコア加算時のパーティクル更新
+	void ScoreParticleAddUpdate();
 
 private:
 	// プレイヤーのStateをJsonで管理
@@ -203,7 +207,7 @@ private:
 	Vector3 velocity_{};
 
 	// プレイヤーの進行方向
-	Direction direction_ = Direction::UP;
+	PlayerDirection direction_ = PlayerDirection::UP;
 
 	// 弾のゲージ
 	int bulletGauge_ = 0;
@@ -227,7 +231,10 @@ private:
 
 	// スタートライン、最終ライン
 	const float START_LINE = -10.0f;
-	const float END_LINE = 400.0f;
+	const float END_LINE = 440.0f;
+
+	// ゲーム終了用のライン
+	const float GAME_END_LINE = 20.0f;
 
 	// カメラオフセット
 	const float CAMERA_OFFSET_TOP = 5.0f;
@@ -241,7 +248,7 @@ private:
 	float score_ = 0;
 
 	// 羽関連(スコア)
-	float kNearThreshold = 2.3f;
+	float kNearThreshold = 2.0f;
 
 	float dis{};
 
@@ -317,11 +324,20 @@ private:
 	std::array<const float, 6> playerMaxSpeeds_ = {8.0f, 10.0f, 12.0f, 14.0f, 15.0f, 16.0f};
 
 	// プレイヤーの移動制限用の変数
-	const float moveLimitPosX_ = 9.0f;
+	const float moveLimitPosX_ = 7.0f;
 
 	// スコア増加時のアニメーション用変数
 	bool isScoreUpAnimation_ = false;
 
 	// 前フレームのスコア
 	float preScore_ = 0.0f;
+
+	// カウントダウンが0になったかどうか
+	bool isCountDownZero_ = false;
+
+	// 加算スコアパーティクル
+	std::vector<std::vector<std::unique_ptr<Sprite>>> spriteAddScoreParticle_;
+
+	// 数字スプライト集
+	std::array<std::string, 10> spriteNumCollection_;
 };

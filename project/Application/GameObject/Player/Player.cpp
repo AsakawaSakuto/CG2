@@ -1,6 +1,5 @@
 #define NOMINMAX
 #include "Application/GameObject/Player/Player.h"
-#include "Application/GameObject/Block/Block.h"
 #include "Application/GameObject/Thorn/Thorn.h"
 #include <numbers>
 
@@ -21,7 +20,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 	scoreList_ = JsonState::Load<ScoreList>("resources/Data/scoreList.json");
 
-	transform_.scale = {4.0f, 4.0f, 4.0f};
+	transform_.scale = {3.0f, 3.0f, 3.0f};
 	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
 	transform_.translate = {0.0f, -10.0f, 0.0f};
 	collisionSphere_.center = transform_.translate;
@@ -51,7 +50,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerState_.cameraOffset = CAMERA_OFFSET_TOP;
 
 	// プレイヤーの方向初期化
-	direction_ = Direction::UP;
+	direction_ = PlayerDirection::UP;
 
 	// クマ
 	bear_->Initialize(dxCommon_);
@@ -71,6 +70,20 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// 点滅用変数
 	isFlicker_ = false;
 	currentFlickFrames_ = 0;
+
+	// カウントダウンが0になったかどうか
+	isCountDownZero_ = false;
+
+	// 数字のスプライト集
+	for (int i = 0; i <= 9; ++i) {
+		spriteNumCollection_[i] = "resources/image/UI/Number" + std::to_string(i) + "UI.png";
+	}
+
+	// スコアアップアニメーションのフラグ
+	isScoreUpAnimation_ = false;
+
+	// 前フレームのスコア
+	preScore_ = 0;
 }
 
 void Player::Update() {
@@ -93,7 +106,7 @@ void Player::Update() {
 	ClampPlayerVelocity();
 
 	// プレイヤーの反転処理
-	ReverseIfAboveLimit(START_LINE, END_LINE);
+	ReverseIfAboveLimit(GAME_END_LINE, END_LINE);
 
 	// カメラのオフセット変更(補間)
 	CameraOffsetChange();
@@ -143,9 +156,6 @@ void Player::Update() {
 	// プレイヤーの点滅
 	UpdateFlicker();
 
-	// 下降時にプレイヤーを回転させる
-	DownMoveRotate();
-
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -169,6 +179,16 @@ void Player::Update() {
 
 	// スコアの比較
 	ComparisonScore();
+
+	// スコア加算パーティクル更新
+	ScoreParticleAddUpdate();
+
+	// スコア加算パーティクル
+	for (auto& digitSprites : spriteAddScoreParticle_) {
+		for (auto& sprite : digitSprites) {
+			sprite->Update();
+		}
+	}
 }
 
 void Player::Draw(Camera useCamera) {
@@ -193,6 +213,13 @@ void Player::Draw(Camera useCamera) {
 	}
 
 	DrawParticle(useCamera);
+
+	// スコア加算パーティクル
+	for (auto& digitSprites : spriteAddScoreParticle_) {
+		for (auto& sprite : digitSprites) {
+			sprite->Draw();
+		}
+	}
 }
 
 void Player::DrawImgui() {
@@ -210,6 +237,9 @@ void Player::DrawImgui() {
 
 	// スコアのImGui
 	DrawImGuiJsonStateScore();
+
+	// 羽のImGui
+	playerWing_->WingImGui();
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -226,17 +256,17 @@ void Player::ClampPlayerVelocity() {
 		playerState_.maxSpeed = playerMaxSpeeds_[bulletGauge_];
 	}
 
-	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed, playerState_.maxSpeed );
+	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed, playerState_.maxSpeed);
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最高地点に到達したとき
-	if (transform_.translate.y >= maxHeight && direction_ == Direction::UP) {
+	if (transform_.translate.y >= maxHeight && direction_ == PlayerDirection::UP) {
 		// プレイヤーの進行方向を徐々に反対方向に
 		acceleration_.y *= -1;
 
 		// プレイヤーの進行状況
-		direction_ = Direction::DOWN;
+		direction_ = PlayerDirection::DOWN;
 
 		// 反転時の無駄な時間を減らす弾の処理
 		velocity_.y = 2.0f;
@@ -248,7 +278,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	}
 
 	// プレイヤーが最低地点に到達したとき
-	if (transform_.translate.y <= minHeight && direction_ == Direction::DOWN) {
+	if (transform_.translate.y <= minHeight && direction_ == PlayerDirection::DOWN) {
 		if (!isGoal_) {
 			goalParticle1_->SetEmitterPosition({5.0f, -22.5f, 0.0f});
 			goalParticle1_->Play(false);
@@ -272,10 +302,10 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 void Player::CameraOffsetChange() {
 	// 方向に応じて目標オフセットを決定
-	float targetOffset = (direction_ == Direction::UP) ? CAMERA_OFFSET_TOP : CAMERA_OFFSET_BOTTOM;
+	float targetOffset = (direction_ == PlayerDirection::UP) ? CAMERA_OFFSET_TOP : CAMERA_OFFSET_BOTTOM;
 
 	// velocityの符号が反転したかチェック
-	bool velocityFlipped = (direction_ == Direction::UP && velocity_.y > 0.0f) || (direction_ == Direction::DOWN && velocity_.y < 0.0f);
+	bool velocityFlipped = (direction_ == PlayerDirection::UP && velocity_.y > 0.0f) || (direction_ == PlayerDirection::DOWN && velocity_.y < 0.0f);
 
 	// 徐々にオフセットを目標値に近づける
 	if (velocityFlipped) {
@@ -287,7 +317,7 @@ void Player::CameraOffsetChange() {
 
 void Player::RotateChange() {
 	// 目標回転角
-	float targetRotationZ = (direction_ == Direction::UP) ? 0.0f : std::numbers::pi_v<float>;
+	float targetRotationZ = (direction_ == PlayerDirection::UP) ? 0.0f : std::numbers::pi_v<float>;
 
 	// 補間係数
 	const float smoothing = 0.1f;
@@ -303,11 +333,11 @@ void Player::RotateChange() {
 	bear_->SetRotate(transform_.rotate);
 
 	// 方向に応じてクマのモデルの配置を変更
-	bear_->SetOffsetX((direction_ == Direction::DOWN) ? -0.2f : 0.2f);
+	bear_->SetOffsetX((direction_ == PlayerDirection::DOWN) ? -0.2f : 0.2f);
 }
 
 void Player::BulletCharge() {
-	if (!isCameraSet_)
+	if (!isCountDownZero_)
 		return;
 
 	// ゲージが最大値なら早期リターン
@@ -331,7 +361,7 @@ void Player::BulletCharge() {
 }
 
 void Player::BulletShot() {
-	if (bulletGauge_ <= 0) {
+	if (bulletGauge_ <= 0 || !isCountDownZero_) {
 		return;
 	}
 
@@ -350,7 +380,7 @@ void Player::BulletShot() {
 		});
 
 		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
-		if (direction_ == Direction::UP) {
+		if (direction_ == PlayerDirection::UP) {
 			bullet->Spawn(transform_.translate, bulletState_.maxSpeed);
 		} else {
 			bullet->Spawn(transform_.translate, -bulletState_.maxSpeed);
@@ -479,7 +509,7 @@ void Player::DrawImGuiJsonStatePlayer() {
 
 void Player::SpeedDown(float speedDpwnStrength) {
 	// 減速
-	velocity_.y += (direction_ == Direction::UP ? -speedDpwnStrength : speedDpwnStrength);
+	velocity_.y += (direction_ == PlayerDirection::UP ? -speedDpwnStrength : speedDpwnStrength);
 }
 
 void Player::Stun() {
@@ -512,7 +542,7 @@ void Player::StunRemoved() { stunTimer_.Update(); }
 void Player::CollisionThorn() {
 	for (auto& thorn : thorns_) {
 		if (Collision::IsHit(thorn->GetCollisionAABB(), collisionAABB_) && thorn->GetIsAlive()) {
-			if (direction_ == Direction::DOWN) {
+			if (direction_ == PlayerDirection::DOWN) {
 
 				// シェイク用のフラグを立てる
 				if (!isShake_) {
@@ -521,6 +551,9 @@ void Player::CollisionThorn() {
 
 				// スコア加算
 				AddScore(scoreList_.enemyHitAmount);
+
+				// パーティクル
+				ScoreParticleAdd(scoreList_.enemyHitAmount);
 
 				// ゲームパッドの振動
 				gamePad_->SetVibration(0.05f, 0.05f, 0.1f);
@@ -535,7 +568,7 @@ void Player::CollisionThorn() {
 				DestroyEnemySE_->PlayAudio(SE_Volume);
 
 				break;
-			} else if (direction_ == Direction::UP) {
+			} else if (direction_ == PlayerDirection::UP) {
 
 				// シェイク用のフラグを立てる
 				if (!isShake_ && !isStartCoolDown_ && !stunTimer_.IsActive()) {
@@ -594,6 +627,10 @@ void Player::CollisionBulletThorn() {
 
 				// スコア加算
 				AddScore(scoreList_.shotHitAmount);
+
+				// パーティクル
+				ScoreParticleAdd(scoreList_.shotHitAmount);
+
 				switch (thorn->GetThornType()) {
 				case ThornType::MIN:
 					thorn->SetThornType(ThornType::MIDDLE);
@@ -629,9 +666,9 @@ void Player::UpdateCameraShake() {
 }
 
 void Player::WingStateUpdate() {
-	if (direction_ == Direction::UP) {
+	if (direction_ == PlayerDirection::UP) {
 		playerWing_->SetIsAlive(true);
-	} else if (direction_ == Direction::DOWN) {
+	} else if (direction_ == PlayerDirection::DOWN) {
 		playerWing_->SetIsAlive(false);
 	}
 }
@@ -675,9 +712,17 @@ void Player::CollisionWingThorn() {
 
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
+
+				// パーティクル
+				ScoreParticleAdd(scoreList_.wingHitNearAmount);
+
 				thorn->PlayParticle(2);
 			} else {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
+
+				// パーティクル
+				ScoreParticleAdd(scoreList_.wingHitFarAmount);
+
 				thorn->PlayParticle(1);
 			}
 
@@ -808,8 +853,8 @@ void Player::PlayerMoveLimit() {
 
 void Player::UpdateCollisionAABB() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x - 0.8f, t.y + 0.4f, t.z + 1.0f};
-	collisionAABB_.min = {t.x + 0.2f, t.y - 0.4f, t.z - 1.0f};
+	collisionAABB_.max = {t.x - 0.4f, t.y + 0.4f, t.z + 1.0f};
+	collisionAABB_.min = {t.x + 0.1f, t.y - 0.4f, t.z - 1.0f};
 }
 
 void Player::StunRotate() {
@@ -822,7 +867,7 @@ void Player::UpdateCameraSetChange() {
 		isCameraSet_ = true;
 	}
 
-	if (transform_.translate.y <= START_LINE && isCameraSet_) {
+	if (transform_.translate.y <= GAME_END_LINE && isCameraSet_ && direction_ == PlayerDirection::DOWN) {
 		isCameraSet_ = false;
 	}
 }
@@ -976,7 +1021,7 @@ void Player::UpdateParticle() {
 	ramuneWhiteParticle_->SetEmitterPosition(transform_.translate);
 	ramuneWhiteParticle_->Update();
 
-	if (direction_ == Direction::UP) {
+	if (direction_ == PlayerDirection::UP) {
 		kasokuOffsetY_ = 12.0f;
 		if (velocity_.y >= 12.0f && velocity_.y <= 14.0f) {
 			kasokuParticle_->SetSpawnTime(0.1f);
@@ -992,7 +1037,7 @@ void Player::UpdateParticle() {
 		}
 
 		bulletChargeParticle_->SetOffSet({0.0f, 1.11f, -0.75f});
-	} else if (direction_ == Direction::DOWN) {
+	} else if (direction_ == PlayerDirection::DOWN) {
 		kasokuOffsetY_ = -12.0f;
 		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
 			kasokuParticle_->SetSpawnTime(0.1f);
@@ -1021,10 +1066,10 @@ void Player::UpdateParticle() {
 
 	stunParticle_->Update();
 
-	if (direction_ == Direction::UP) {
+	if (direction_ == PlayerDirection::UP) {
 		bulletShotParticle_->SetOffSet({0.0f, 0.75f, 0.0f});
 		bulletShotParticle_->SetEmitVelocityY(15.0f);
-	} else if (direction_ == Direction::DOWN) {
+	} else if (direction_ == PlayerDirection::DOWN) {
 		bulletShotParticle_->SetOffSet({0.0f, -0.75f, 0.0f});
 		bulletShotParticle_->SetEmitVelocityY(-15.0f);
 	}
@@ -1065,7 +1110,7 @@ void Player::UpdateParticle() {
 				float playerY = transform_.translate.y;
 
 				switch (direction_) {
-				case Direction::UP:
+				case PlayerDirection::UP:
 					if (thornPos.y < playerY - 6.0f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
@@ -1073,7 +1118,7 @@ void Player::UpdateParticle() {
 						thorn->ParticleReset(i);
 					}
 					break;
-				case Direction::DOWN:
+				case PlayerDirection::DOWN:
 					if (thornPos.y < playerY - 16.0f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
@@ -1134,12 +1179,6 @@ void Player::StartCameraShake(ShakeType type) {
 	}
 }
 
-void Player::DownMoveRotate() {
-	if (direction_ == Direction::DOWN) {
-		transform_.rotate.y += 12.0f * deltaTime_;
-	}
-}
-
 void Player::ComparisonScore() {
 	if (score_ > preScore_) {
 		// アニメーションフラグを立てる
@@ -1148,4 +1187,79 @@ void Player::ComparisonScore() {
 		// スコアを記録
 		preScore_ = score_;
 	}
+}
+
+void Player::ScoreParticleAdd(float score) {
+	// スコアを整数に変換
+	int displayScore = static_cast<int>(score);
+
+	// 分解
+	std::vector<int> digits;
+	if (displayScore == 0) {
+		digits.push_back(0);
+	} else {
+		while (displayScore > 0) {
+			digits.push_back(displayScore % 10);
+			displayScore /= 10;
+		}
+	}
+	std::reverse(digits.begin(), digits.end());
+
+	// 新しい加算用スプライト群を作成
+	std::vector<std::unique_ptr<Sprite>> digitSprites;
+
+	// 基準位置を範囲内のランダムな値で決める
+	constexpr float MIN_POS_X = 100.0f;
+	constexpr float MAX_POS_X = 200.0f;
+
+	std::random_device rd;
+	std::mt19937 eng(rd());
+	std::uniform_real_distribution<float> distr(MIN_POS_X, MAX_POS_X);
+
+	Vector2 basePos = {distr(eng), 350.0f};
+	float digitSpacing = 32.0f;
+
+	// 桁ごとにスプライト生成
+	for (size_t i = 0; i < digits.size(); ++i) {
+		int digit = digits[i];
+
+		auto sprite = std::make_unique<Sprite>();
+		sprite->Initialize(dxCommon_, "resources/image/UI/Number0UI.png");
+		sprite->SetTexture(spriteNumCollection_[digit]);
+		sprite->SetScale({0.25f, 0.25f});
+
+		Vector2 digitPos = basePos;
+		digitPos.x += static_cast<float>(i) * digitSpacing;
+		sprite->SetPosition(digitPos);
+
+		digitSprites.push_back(std::move(sprite));
+	}
+
+	spriteAddScoreParticle_.push_back(std::move(digitSprites));
+}
+
+void Player::ScoreParticleAddUpdate() {
+	for (auto& digitSprites : spriteAddScoreParticle_) {
+		for (auto& sprite : digitSprites) {
+			constexpr float MIN_SPEED_X = -1.0f;
+			constexpr float MAX_SPEED_X = 1.0f;
+
+			std::random_device rd;
+			std::mt19937 eng(rd());
+			std::uniform_real_distribution<float> distr(MIN_SPEED_X, MAX_SPEED_X);
+
+			sprite->GetColor().w -= 0.05f;
+			sprite->GetSize().x -= 5.0f;
+			sprite->GetSize().y -= 5.0f;
+			sprite->GetPosition().y -= 5.0f;
+			sprite->GetPosition().x += distr(eng);
+		}
+
+		// 透明度が0以下のスプライトを削除
+		digitSprites.erase(std::remove_if(digitSprites.begin(), digitSprites.end(), [](const std::unique_ptr<Sprite>& sprite) { return sprite->GetColor().w <= 0.0f; }), digitSprites.end());
+	}
+
+	// 空になったスコアグループも削除
+	spriteAddScoreParticle_.erase(
+	    std::remove_if(spriteAddScoreParticle_.begin(), spriteAddScoreParticle_.end(), [](const std::vector<std::unique_ptr<Sprite>>& group) { return group.empty(); }), spriteAddScoreParticle_.end());
 }

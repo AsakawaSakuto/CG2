@@ -97,14 +97,6 @@ void TestScene::SpawnObjectsByMapChip(float mag, float mapHeight) {
 				thorn->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
 				//thorns_.push_back(std::move(thorn));
 			}
-
-			if (static_cast<TileType>(tile) == TileType::BLOCK) {
-				// トゲの描画処理
-				auto block = std::make_unique<Block>();
-				block->Initialize(&ctx_->dxCommon);
-				block->Spawn({static_cast<float>(x) * mag - 8.0f, static_cast<float>(y) * mag * -1.0f + mapHeight, 0.0f});
-				//blocks_.push_back(std::move(block));
-			}
 		}
 	}
 }

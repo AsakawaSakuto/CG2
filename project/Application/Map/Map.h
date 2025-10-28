@@ -3,11 +3,11 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <charconv>
 
 enum class TileType {
 	EMPTY = 0,
 	THORN = 1,
-	BLOCK = 2,
 };
 
 class Map {

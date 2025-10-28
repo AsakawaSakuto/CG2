@@ -5,7 +5,6 @@
 #include "Application/GameObject/Player/Player.h"
 #include "Application/Map/Map.h"
 #include "Application/SceneManager/Scene/State/GameSceneState.h"
-#include <Application/GameObject/Block/Block.h>
 #include <Application/GameObject/Thorn/Thorn.h>
 
 using Microsoft::WRL::ComPtr;
@@ -42,7 +41,7 @@ private:
 	void GameStartCount();
 
 	// 演出用にスコアを加算していく関数
-    void SpriteScoreUpdate();
+	void SpriteScoreUpdate();
 
 	// ルール説明用のスプライトアニメーション
 	void AnimationRuleSprite();
@@ -86,18 +85,42 @@ private:
 	// スコア増加時のアニメーション
 	void ScoreUpAnimation();
 
+	// ルール説明用のスプライト回転更新
+	void UpdateRuleSprite();
+
+	// 二つの値からランダムに値を返す
+	float RandomFloat(float min, float max);
+
+	// 雲のモデルの挙動
+	void UpdateCloudModel();
+
+	// Directionをランダムに返す
+	int GetRandomDirection();
+
+	// 雲の座標リセット
+	void ResetCloudPos();
+
 private:
-	enum class RuleAnimState { 
-		Rising, 
-		Waiting, 
-		Falling, 
-		Done 
+	enum class RuleAnimState { Rising, Waiting, Falling, Done };
+
+	enum class RuleSpriteState {
+		RIGHT,
+		LEFT,
 	};
 
-	struct SpriteRender
-	{
+	enum Direction {
+		RIGHT,
+		LEFT,
+	};
+
+	struct SpriteRender {
 		Sprite sprite;
 		bool isDraw;
+	};
+
+	struct MoveModel {
+		Model model;
+		Direction direction;
 	};
 
 private:
@@ -122,7 +145,6 @@ private:
 	unique_ptr<Sprite> sprite_ = make_unique<Sprite>();
 	unique_ptr<Player> player_ = make_unique<Player>();
 	std::vector<std::shared_ptr<Thorn>> thorns_;
-	std::vector<std::shared_ptr<Block>> blocks_;
 
 	// ゲージ用のスプライト
 	std::array<BulletGaugeInfo, 5> bulletGaugeSprite_;
@@ -148,9 +170,6 @@ private:
 
 	// どのくらいの時間入力が無かったかを記録する変数(秒)
 	float noInputTimer_ = 0.0f;
-
-	// ゲームシーンからタイトルに戻るまでの猶予時間(秒)
-	// float noInputTimerMax_ = 5.0f;
 
 	// タイトルシーンへの切り替えのフラグ
 	bool isBackToTitleScene_ = false;
@@ -216,8 +235,8 @@ private:
 
 	// スコアの背景波紋
 	unique_ptr<Sprite> spriteCandyEffect_ = make_unique<Sprite>();
-	float candyEffectSize_ = 1.0f;                                                // サイズ
-	float candyEffectAlpha_ = 1.0f;                                               // 透明度
+	float candyEffectSize_ = 1.0f;                                                 // サイズ
+	float candyEffectAlpha_ = 1.0f;                                                // 透明度
 	std::array<float, 5> candySizeSpeeds = {0.0025f, 0.005f, 0.01f, 0.02f, 0.04f}; // サイズの変化スピード
 
 	// 弾のゲージラムネ
@@ -225,16 +244,16 @@ private:
 
 	// ラムネの波紋
 	unique_ptr<Sprite> spriteChargeUIEffect_ = make_unique<Sprite>();
-	float chargeEffectSize_ = 1.0f; // サイズ
-	float chargeEffectAlpha_ = 1.0f; // 透明度
-	std::array<float, 5> gaugeSizeSpeeds = {0.0025f, 0.005f, 0.01f, 0.02f, 0.04f}; // サイズの変化スピード
+	float chargeEffectSize_ = 1.0f;                                             // サイズ
+	float chargeEffectAlpha_ = 1.0f;                                            // 透明度
+	std::array<float, 5> gaugeSizeSpeeds = {0.02f, 0.03f, 0.04f, 0.05f, 0.06f}; // サイズの変化スピード
 
 	// 山のモデル
 	std::array<unique_ptr<Model>, 3> modelMountain_;
 
 	// 一定の時間入力がなかった時に減算されるタイマースプライト
 	std::array<unique_ptr<Sprite>, 2> spriteNoInputCountDown_;
-	
+
 	// SE
 	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> countDownSE_ = make_unique<AudioX>();
@@ -251,7 +270,7 @@ private:
 	float lastScoreChecked_ = 0.0f;
 
 	// アニメーションの状態
-	RuleAnimState snackCountOverAnimationState_ = RuleAnimState::Done ;
+	RuleAnimState snackCountOverAnimationState_ = RuleAnimState::Done;
 
 	// アニメーション用タイマー
 	float timerSnackCountOver_ = 0.0f;
@@ -292,4 +311,22 @@ private:
 	// スコア増加時のアニメーション用変数
 	float scoreUpTimer_ = 0.0f;
 	float scoreUpDuration_ = 0.2f;
+
+	// ルール説明用のスプライト角度
+	float rotateRuleSprite_ = 0.0f;
+
+	// 回転更新用タイマー
+	int rotateRuleTimer_ = 0;
+
+	// ルール説明用のスプライト状態
+	RuleSpriteState currentRuleSpriteState_ = RuleSpriteState::RIGHT;
+
+	// 地面モデル
+	unique_ptr<Model> modelGround_ = make_unique<Model>();
+
+	// 曇
+	std::array<std::unique_ptr<MoveModel>, 30> clouds_;
+
+	// 雲のモデルリセットフラグ
+	bool isCloudPosReset_ = false;
 };
