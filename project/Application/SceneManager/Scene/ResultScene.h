@@ -36,10 +36,10 @@ private:
 
 	// mask
 	unique_ptr<Sprite> mask_ = make_unique<Sprite>();
-	Vector2 maskStartPos_ = { 640.0f,360.0f };
-	Vector2 maskEndPos_ = { 640.0f,360.0f };
-	Vector2 maskStartScale_ = { 20.0f,20.0f };
-	Vector2 maskEndScale_ = { 1.0f,1.0f };
+	Vector2 maskStartPos_;
+	Vector2 maskEndPos_;
+	Vector2 maskStartScale_;
+	Vector2 maskEndScale_;
 	GameTimer maskInTimer_;
 	GameTimer maskOutTimer_;
 

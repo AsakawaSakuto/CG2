@@ -30,7 +30,14 @@ void ResultScene::Initialize() {
 	score_->Initialize(&ctx_->dxCommon, 98765);
 	score_->SetInput(&ctx_->input, &ctx_->gamePad);
 
-	mask_->Initialize(&ctx_->dxCommon, "resources/image/mask.png", { 640.0f,360.0f }, { 20.0f,20.0f });
+	// mask の初期化 - 開始位置と終了位置を適切に設定
+	mask_->Initialize(&ctx_->dxCommon, "resources/image/mask.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+	
+	// マスクのアニメーション設定 - 画面外から中央へ
+	maskStartPos_ = { 640.0f, 360.0f };  // 画面上部から開始
+	maskEndPos_ = { 640.0f, 360.0f };     // 画面中央で終了
+	maskStartScale_ = { 20.0f, 20.0f };   // 大きなスケールから開始
+	maskEndScale_ = { 1.0f, 1.0f };       // 通常サイズで終了
 
 	maskInTimer_.Start(1.0f, false);
 	maskOutTimer_.Reset();
@@ -73,9 +80,6 @@ void ResultScene::Update() {
 		if (maskInTimer_.IsFinished()) {
 			mask_->SetPosition(maskStartPos_);
 			mask_->SetScale(maskStartScale_);
-		} else {
-			mask_->SetPosition(maskEndPos_);
-			mask_->SetScale(maskEndScale_);
 		}
 	}
 
