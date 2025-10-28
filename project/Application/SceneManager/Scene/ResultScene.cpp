@@ -29,19 +29,81 @@ void ResultScene::Initialize() {
 
 	score_->Initialize(&ctx_->dxCommon, 98765);
 	score_->SetInput(&ctx_->input, &ctx_->gamePad);
+
+	mask_->Initialize(&ctx_->dxCommon, "resources/image/mask.png", { 640.0f,360.0f }, { 20.0f,20.0f });
+
+	maskInTimer_.Start(1.0f, false);
+	maskOutTimer_.Reset();
+
+	timerStarte_ = false;
 }
 
 void ResultScene::Update() {
 
-	if (score_->GoTitle()) {
-		ChangeScene(TITLE);
+	if (score_->GoTitle() && !maskOutTimer_.IsActive() && !timerStarte_) {
+		nextScene_ = 0;
+		timerStarte_ = true;
+		maskOutTimer_.Start(1.0f, false);
 	}
 
-	if (score_->GoResult()) {
-		ChangeScene(GAME);
+	if (score_->GoResult() && !maskOutTimer_.IsActive() && !timerStarte_) {
+		nextScene_ = 1;
+		timerStarte_ = true;
+		maskOutTimer_.Start(1.0f, false);
 	}
+
+	if (maskOutTimer_.IsFinished()) {
+		if (nextScene_ == 0) {
+			ChangeScene(TITLE);
+		} else {
+			ChangeScene(GAME);
+		}
+	}
+
+	if (maskInTimer_.IsActive()) {
+		mask_->SetPosition({
+		Easing::Lerp(maskEndPos_.x,maskStartPos_.x,maskInTimer_.GetProgress(),Easing::Type::EaseInSine),
+		Easing::Lerp(maskEndPos_.y,maskStartPos_.y,maskInTimer_.GetProgress(),Easing::Type::EaseInSine) });
+
+		mask_->SetScale({
+			Easing::Lerp(maskEndScale_.x,maskStartScale_.x,maskInTimer_.GetProgress(),Easing::Type::EaseInSine),
+			Easing::Lerp(maskEndScale_.y,maskStartScale_.y,maskInTimer_.GetProgress(),Easing::Type::EaseInSine) });
+
+	} else {
+		if (maskInTimer_.IsFinished()) {
+			mask_->SetPosition(maskStartPos_);
+			mask_->SetScale(maskStartScale_);
+		} else {
+			mask_->SetPosition(maskEndPos_);
+			mask_->SetScale(maskEndScale_);
+		}
+	}
+
+	if (maskOutTimer_.IsActive()) {
+		mask_->SetPosition({
+		Easing::Lerp(maskStartPos_.x,maskEndPos_.x,maskOutTimer_.GetProgress(),Easing::Type::EaseInSine),
+		Easing::Lerp(maskStartPos_.y,maskEndPos_.y,maskOutTimer_.GetProgress(),Easing::Type::EaseInSine) });
+
+		mask_->SetScale({
+			Easing::Lerp(maskStartScale_.x,maskEndScale_.x,maskOutTimer_.GetProgress(),Easing::Type::EaseInSine),
+			Easing::Lerp(maskStartScale_.y,maskEndScale_.y,maskOutTimer_.GetProgress(),Easing::Type::EaseInSine) });
+
+	} else {
+		if (maskOutTimer_.IsFinished()) {
+			mask_->SetPosition(maskEndPos_);
+			mask_->SetScale(maskEndScale_);
+		} else {
+			mask_->SetPosition(maskStartPos_);
+			mask_->SetScale(maskStartScale_);
+		}
+	}
+
+	maskInTimer_.Update();
+	maskOutTimer_.Update();
 
 	score_->Update();
+
+	mask_->Update();
 
 	CameraController();
 }
@@ -57,7 +119,9 @@ void ResultScene::Draw() {
 
 	score_->Draw(*useCamera_);
 
-	sceneFade_->Draw();
+	//sceneFade_->Draw();
+
+	mask_->Draw();
 
 	///
 	/// ↑描画処理ここまで
@@ -75,6 +139,8 @@ void ResultScene::Draw() {
 	debugCamera_->DrawImgui();
 
 	score_->DrawImGui();
+
+	mask_->DrawImGui("mask");
 
 	DrawSceneName();
 

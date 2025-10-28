@@ -109,7 +109,7 @@ void TitleScene::Update() {
 			//sceneFade_->StartFadeIn(2.0f);
 			titleObject_->PlayerEnd();
 			startGameSE_->PlayAudio(SE_Volume);
-			maskTimer_.Start(1.0f);
+			maskTimer_.Start(1.5f);
 			pushStart_ = true;
 		}
 	}
@@ -975,4 +975,5 @@ void TitleScene::InitSptite() {
 	parenthesesUI6_->SetRotate(3.16f);
 
 	mask_->Initialize(&ctx_->dxCommon, "resources/image/mask.png", { 950.0f,360.0f }, { 20.f,20.f });
+	//mask_->SetRotate(0.3f);
 }

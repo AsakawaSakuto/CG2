@@ -115,6 +115,8 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	backGroundTransform_.rotate = { 0.0f,0.0f,0.0f };
 	backGroundTransform_.translate = { 0.0f,2.0f,14.85f };
 	backGround_->SetTransform(backGroundTransform_);
+
+	pushNext_ = false;
 }
 
 void Score::Update() {
@@ -293,11 +295,12 @@ void Score::Update() {
 		{
 		case Score::NextScene::TITLE:
 
-			if (rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				goTitle_ = true;
+				pushNext_ = true;
 			}
 
-			if (rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
 				nextScene_ = NextScene::RESULT;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 500.0f;
@@ -318,11 +321,12 @@ void Score::Update() {
 			break;
 		case Score::NextScene::RESULT:
 
-			if (rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				goResult_ = true;
+				pushNext_ = true;
 			}
 
-			if (rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
 				nextScene_ = NextScene::TITLE;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 600.0f;
