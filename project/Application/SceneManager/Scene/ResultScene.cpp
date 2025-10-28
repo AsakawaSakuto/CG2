@@ -189,7 +189,7 @@ void ResultScene::Draw() {
 
 	ImGui::End();
 
-	/*debugCamera_->DrawImgui();
+	debugCamera_->DrawImgui();
 
 	score_->DrawImGui();
 
@@ -197,7 +197,7 @@ void ResultScene::Draw() {
 
 	loadingUI_->DrawImGui("loadingUI");
 
-	loadingPlayer_->DrawImGui("pla");*/
+	loadingPlayer_->DrawImGui("pla");
 
 	DrawSceneName();
 

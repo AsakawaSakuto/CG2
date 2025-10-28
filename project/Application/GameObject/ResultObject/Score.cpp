@@ -137,6 +137,22 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	backGround_->SetTransform(backGroundTransform_);
 
 	pushNext_ = false;
+
+	switch (rank_)
+	{
+	case Score::Rank::S:
+		msgUI_->Initialize(dxCommon_, "resources/image/UI/ResultTextRankSUI.png", { -300.0f,280.0f }, { 0.5f,0.5f });
+		break;
+	case Score::Rank::A:
+		msgUI_->Initialize(dxCommon_, "resources/image/UI/ResultTextRankAUI.png", { -300.0f,280.0f }, { 0.5f,0.5f });
+		break;
+	case Score::Rank::B:
+		msgUI_->Initialize(dxCommon_, "resources/image/UI/ResultTextRankBUI.png", { -300.0f,280.0f }, { 0.5f,0.5f });
+		break;
+	case Score::Rank::C:
+		msgUI_->Initialize(dxCommon_, "resources/image/UI/ResultTextRankCUI.png", { -300.0f,280.0f }, { 0.5f,0.5f });
+		break;
+	}
 }
 
 void Score::Update() {
@@ -424,6 +440,8 @@ void Score::Update() {
 	retryUI_->Update();
 	cursolUI_->Update();
 
+	msgUI_->Update();
+
 	ramuneParticle_->SetEmitterPosition(playerTransform_.translate);
 	ramuneParticle_->SetOffSet({ 1.4f,-1.18f,0.0f });
 	ramuneParticle_->Update();
@@ -555,6 +573,8 @@ void Score::Draw(Camera camera) {
 	titleUI_->Draw();
 	retryUI_->Draw();
 	cursolUI_->Draw();
+
+	msgUI_->Draw();
 }
 
 void Score::DrawImGui() {
@@ -572,6 +592,8 @@ void Score::DrawImGui() {
 
 	kazeParticle_->DrawImGui("starParticle");
 	
+	msgUI_->DrawImGui("msg");
+
 	//oneParticle_->DrawImGui("oneParticle");
 	//twoParticle_->DrawImGui("wtoParticle");
 	//threeParticle_->DrawImGui("threeParticle");
@@ -922,11 +944,12 @@ void Score::ScoreIn() {
 			// バウンス効果: 上に浮いてから元の位置に戻る
 			float bounceHeight = 0.5f; // バウンスの高さ
 			float baseY = textBaseY_[i]; // 元のY位置
-			
+
 			if (progress <= 0.3f) {
 				// 最初の30%: 上昇
 				textTransform_[i].translate.y = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
-			} else {
+			}
+			else {
 				// 残りの70%: バウンスしながら落下
 				float fallProgress = (progress - 0.3f) / 0.7f;
 				textTransform_[i].translate.y = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
@@ -944,7 +967,7 @@ void Score::ScoreIn() {
 			break;
 		}
 	}
-	
+
 	// 全て終了したら、少し待ってから再開
 	if (allBounceFinished && textBounceStartTimer_.IsFinished()) {
 		// タイマーをリセットして再開準備
@@ -963,7 +986,7 @@ void Score::ScoreIn() {
 		scoreEasingTimer_[3].Start(2.5f, false);
 		scoreEasingTimer_[4].Start(3.0f, false);
 	}
-	
+
 	for (int i = 0; i < scoreModel_.size(); ++i) {
 		scoreTransform_[i].translate.y = Easing::Lerp(
 			scoreStartY_,
@@ -985,6 +1008,9 @@ void Score::ScoreIn() {
 		shotCandy2Particle_->Play(false);
 		fallCandyParticle_->Play();
 	}
+
+	msgUI_->SetPosition({ Easing::Lerp(-300.0f, 300.0f, rankAndPlayerEasingTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack) ,280.0f });
 
 	rankTransform_[0].translate.x = Easing::Lerp(
 		rankStartX_,
@@ -1075,6 +1101,9 @@ void Score::ScoreOut() {
 			scoreOutTimer_.GetProgress(),
 			Easing::Type::EaseInOutBack
 		);
+
+		msgUI_->SetPosition({ Easing::Lerp(300.0f, -300.0f, scoreOutTimer_.GetProgress(),
+		Easing::Type::EaseInOutBack) ,280.0f });
 
 		for (int i = 0; i < rankModel_.size(); ++i) {
 			rankModel_[i]->SetTransform(rankTransform_[i]);
