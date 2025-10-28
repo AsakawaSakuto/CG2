@@ -1,5 +1,6 @@
 {
     "alphaFade": 0,
+    "blendMode": 0,
     "colorFade": 0,
     "colorRandom": 1,
     "coneAngle": 45.0,
@@ -27,10 +28,10 @@
         0.0
     ],
     "frequency": 0.5,
-    "frequencyTime": 0.11666666716337204,
+    "frequencyTime": 0.10000000149011612,
     "hemisphereAngle": 180.0,
     "isMove": 1,
-    "kMaxParticle": 1024,
+    "kMaxParticle": 512,
     "lifeTime": 2.0,
     "lifeTimeRandom": 1,
     "lineLength": 2.0,
@@ -105,9 +106,9 @@
         1.0
     ],
     "startColor": [
-        0.47058820724487305,
-        0.47058820724487305,
-        0.47058820724487305
+        1.0,
+        0.0,
+        0.0
     ],
     "startRotateVelocity": 1.5,
     "startScale": [

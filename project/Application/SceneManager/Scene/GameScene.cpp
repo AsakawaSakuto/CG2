@@ -274,6 +274,42 @@ void GameScene::Initialize() {
 
 	// スコア加算時に使用するタイマー
 	scoreUpTimer_ = 0.0f;
+
+	maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingUI.png", { 1040.0f, 640.0f }, { 1.0f, 1.0f });
+	loadingUI_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+
+	loadingPlayer_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingPlayer.png", { 680.0f, 615.0f }, { 0.3f, 0.3f });
+
+	maskType_ = static_cast<MaskType>(rand_.Int(0, 2));
+
+	switch (maskType_)
+	{
+	case GameScene::MaskType::RAMA:
+		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view01.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+		maskStartScale_ = { 0.26f, 0.26f };
+		maskEndScale_ = { 8.0f, 8.0f };
+		break;
+	case GameScene::MaskType::KUMA:
+		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view02.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+		maskStartScale_ = { 0.26f, 0.26f };
+		maskEndScale_ = { 2.5f, 2.5f };
+		break;
+	case GameScene::MaskType::AME:
+		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view03.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+		maskStartScale_ = { 0.26f, 0.26f };
+		maskEndScale_ = { 5.0f, 5.0f };
+		break;
+	}
+
+	// マスクのアニメーション設定 - 画面外から中央へ
+	maskStartPos_ = { 640.0f, 360.0f };  // 画面上部から開始
+	maskEndPos_ = { 640.0f, 360.0f };    // 画面中央で終了
+
+	maskTimer_.Start(1.0f, false);
+
+	timerStarte_ = false;
+	resultQuit_ = false;
 }
 
 void GameScene::Update() {
@@ -310,6 +346,9 @@ void GameScene::Update() {
 		sceneFade_->StartFadeIn(2.0f);
 		goSceneNum_ = SCENE::RESULT;
 		isActiveEndText_ = true; // 終了テキスト表示フラグオン
+
+		maskTimer_.Start(1.0f, false);
+		resultQuit_ = true;
 
 		// ○○個突破スプライトの座標初期化
 		spriteScoreCountOverPos_ = {-500.0f, 360.0f};
@@ -487,6 +526,42 @@ void GameScene::Update() {
 	for (auto& cloud : clouds_) {
 		cloud->model.Update();
 	}
+
+	if (maskTimer_.IsActive()) {
+		if (resultQuit_) {
+			mask_->SetPosition({
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).y });
+			mask_->SetScale({
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).y });
+		}
+		else {
+			mask_->SetPosition({
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).y });
+			mask_->SetScale({
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).y });
+		}
+	}
+	else {
+		if (resultQuit_) {
+			mask_->SetPosition(maskStartPos_);
+			mask_->SetScale(maskStartScale_);
+		}
+		else {
+			mask_->SetPosition(maskEndPos_);
+			mask_->SetScale(maskEndScale_);
+		}
+	}
+
+	maskTimer_.Update();
+
+	mask_->Update();
+	maskBox_->Update();
+	loadingUI_->Update();
+	loadingPlayer_->Update();
 }
 
 void GameScene::Draw() {
@@ -498,25 +573,28 @@ void GameScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	// トゲの描画処理
-	for (auto& thorn : thorns_) {
-		if (thorn->GetIsAlive()) {
-			thorn->Draw(*useCamera_);
-		}
-		thorn->DrawParticle(*useCamera_);
-	}
+	// 地面モデル
+	modelGround_->Draw(*useCamera_);
+
+	// プレイヤーの描画処理
+	player_->Draw(*useCamera_);
 
 	// 山のモデル描画
 	/*for (auto& model : modelMountain_) {
 	    model->Draw(*useCamera_);
 	}*/
 
-	// 地面モデル
-	modelGround_->Draw(*useCamera_);
-
 	// 雲モデル
 	for (auto& cloud : clouds_) {
 		cloud->model.Draw(*useCamera_);
+	}
+
+	// トゲの描画処理
+	for (auto& thorn : thorns_) {
+		if (thorn->GetIsAlive()) {
+			thorn->Draw(*useCamera_);
+		}
+		thorn->DrawParticle(*useCamera_);
 	}
 
 	// 画面両端の幕のスプライト描画処理
@@ -594,8 +672,13 @@ void GameScene::Draw() {
 		sprite->Draw();
 	}
 
-	// プレイヤーの描画処理
-	player_->Draw(*useCamera_);
+	mask_->Draw();
+
+	if (maskTimer_.IsFinished() && resultQuit_) {
+		maskBox_->Draw();
+		loadingUI_->Draw();
+		loadingPlayer_->Draw();
+	}
 
 	///
 	/// ↑描画処理ここまで

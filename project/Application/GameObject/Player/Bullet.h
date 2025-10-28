@@ -21,6 +21,7 @@ public:
 	// Getter
 	//float GetSpeed() const { return speed_; }
 	Transform& GetTransform() { return transform_; }
+	bool GetIsAlive() const { return isAlive_; }
 
 private:
 	//float speed_ = 0.0f;

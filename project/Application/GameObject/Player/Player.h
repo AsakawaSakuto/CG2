@@ -296,6 +296,8 @@ private:
 	std::unique_ptr<Particles> bulletChargeParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> bulletShotParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> bulletDieParticle_ = std::make_unique<Particles>();
+	// BulletMoveParticleを5個用意
+	std::array<std::unique_ptr<Particles>, 5> bulletMoveParticles_;
 	std::unique_ptr<Particles> stateChangeParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> fallParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> armHitParticle1_ = std::make_unique<Particles>();
@@ -304,7 +306,7 @@ private:
 	std::unique_ptr<Particles> goalParticle1_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> goalParticle2_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> getScoreParticle_ = std::make_unique<Particles>();
-	float ramuneOffsetY_ = -1.0f;
+	float ramuneOffsetY_ = -3.5f;
 	float kasokuOffsetY_ = 12.0f;
 	std::unique_ptr<StunP> stunParticle_ = std::make_unique<StunP>();
 	GameTimer stateChangeTimer_;

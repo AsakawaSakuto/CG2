@@ -329,4 +329,29 @@ private:
 
 	// 雲のモデルリセットフラグ
 	bool isCloudPosReset_ = false;
+
+	// mask
+	unique_ptr<Sprite> mask_ = make_unique<Sprite>();
+	unique_ptr<Sprite> maskBox_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingPlayer_ = make_unique<Sprite>();
+	Vector2 maskStartPos_;
+	Vector2 maskEndPos_;
+	Vector2 maskStartScale_;
+	Vector2 maskEndScale_;
+
+	enum class MaskType {
+		RAMA = 0,
+		KUMA = 1,
+		AME = 2,
+	};
+
+	MaskType maskType_ = MaskType::AME;
+
+	Random rand_;
+
+	GameTimer maskTimer_;
+
+	bool timerStarte_ = false;
+	bool resultQuit_ = false;
 };

@@ -92,7 +92,7 @@ private:
 	int score3rd_ = 10000;  // デフォルト値を明示的に設定
 	
 	// JSONファイルのパスを修正
-	const std::string rankingJsonPath_ = "resources/json/ranking.json";
+	const std::string rankingJsonPath_ = "resources/engineresources/test.json";
 
 	float rankingStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.5f };
 	float rankingEndX_[6] = { 6.5f,5.5f,4.5f,3.5f,2.5f,0.7f };
