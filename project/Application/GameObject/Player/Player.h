@@ -324,7 +324,7 @@ private:
 	float shakeDecayRate_ = 0.0f;
 
 	// 弾数に応じたプレイヤーの最高速度
-	std::array<const float, 6> playerMaxSpeeds_ = {8.0f, 10.0f, 12.0f, 14.0f, 15.0f, 16.0f};
+	std::array<const float, 6> playerMaxSpeeds_ = {10.0f, 12.0f, 14.0f, 15.0f, 16.0f, 17.0f};
 
 	// プレイヤーの移動制限用の変数
 	const float moveLimitPosX_ = 7.0f;
@@ -345,5 +345,5 @@ private:
 	std::array<std::string, 10> spriteNumCollection_;
 
 	// 弾の溜まる速度
-	const int chrageSpeed_ = 60;
+	const int chrageSpeed_ = 90;
 };

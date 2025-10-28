@@ -2,6 +2,6 @@
     "shotHitAmount": 5.0,
     "wingHitNearAmount": 30.0,
     "wingHitFarAmount": 10.0,
-    "enemyHitAmount": 5.0,
-    "stunAmount": -5.0
+    "enemyHitAmount": 50.0,
+    "stunAmount": -10.0
 }

@@ -41,8 +41,8 @@ void Thorn::Update() {
 		transform_.scale.z = Easing::Lerp(scaleTween_.startScale.z, scaleTween_.targetScale.z, t, Easing::Type::EaseInElastic);
 
 		Vector3 position = transform_.translate;
-		collisionAABB_.max = {position.x + transform_.scale.x / 1.6f, position.y + transform_.scale.y / 1.6f, position.z + transform_.scale.z / 1.6f};
-		collisionAABB_.min = {position.x - transform_.scale.x / 1.6f, position.y - transform_.scale.y / 1.6f, position.z - transform_.scale.z / 1.6f};
+		collisionAABB_.max = {position.x + transform_.scale.x / 1.3f, position.y + transform_.scale.y / 1.3f, position.z + transform_.scale.z / 1.3f };
+		collisionAABB_.min = {position.x - transform_.scale.x / 1.7f, position.y - transform_.scale.y / 1.7f, position.z - transform_.scale.z / 1.7f };
 
 		if (t >= 1.0f) {
 			scaleTween_.active = false;
