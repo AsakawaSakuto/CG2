@@ -2,6 +2,7 @@
 #include "Application/GameObject/State/JsonState.h"
 #include "Application/SceneManager/SceneManager.h"
 #include "Engine/System/Audio/MasterVolume.h"
+#include "Engine/System/DirectXCommon/ExeColor.h"
 
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
@@ -196,7 +197,7 @@ void GameScene::Initialize() {
 	spriteScoreCountOverPos_ = {-600.0f, 360.0f};
 	spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
 	spriteSnackCountOver_->SetScale({0.5f, 0.5f});
-	spriteSnackCountOver_->SetColor({0.5f, 0.0f, 0.0f, 0.7f});
+	spriteSnackCountOver_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 
 	// ○○個突破　スコア数　スプライト
 	for (int i = 0; i < spriteScoreCountOver_.size(); ++i) {
@@ -204,7 +205,7 @@ void GameScene::Initialize() {
 		spriteScoreCountOver_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
 		spriteScoreCountOver_[i]->SetPosition(spriteScoreCountOverPos_);
 		spriteScoreCountOver_[i]->SetScale({1.0f, 1.0f});
-		spriteScoreCountOver_[i]->SetColor({0.5f, 0.0f, 0.0f, 0.0f});
+		spriteScoreCountOver_[i]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	}
 
 	// push スプライト
@@ -310,6 +311,26 @@ void GameScene::Initialize() {
 
 	timerStarte_ = false;
 	resultQuit_ = false;
+
+	ExeColor = { 0.212f, 0.722f, 1.000f, 1.000f };
+
+	ore_->Initialize(&ctx_->dxCommon, "ore.obj");
+	ore_->SetUpdateFrustumCulling(false);
+	ore_->SetUseLight(false);
+	oreTransform_.translate = { 4.5f,450.5f,1.0f };
+	oreTransform_.rotate = { -0.33f,-3.47f,0.66f };
+	oreTransform_.scale = { 3.0f,3.0f,3.0f };
+	ore_->SetTransform(oreTransform_);
+
+	srarArea1_->Initialize(&ctx_->dxCommon);
+	srarArea2_->Initialize(&ctx_->dxCommon);
+	srarArea3_->Initialize(&ctx_->dxCommon);
+	srarArea4_->Initialize(&ctx_->dxCommon);
+
+	srarArea1_->LoadJson("starArea1");
+	srarArea2_->LoadJson("starArea2");
+	srarArea3_->LoadJson("starArea3");
+	srarArea4_->LoadJson("starArea4");
 }
 
 void GameScene::Update() {
@@ -347,7 +368,7 @@ void GameScene::Update() {
 		goSceneNum_ = SCENE::RESULT;
 		isActiveEndText_ = true; // 終了テキスト表示フラグオン
 
-		maskTimer_.Start(1.0f, false);
+		maskTimer_.Start(1.5f, false);
 		resultQuit_ = true;
 
 		// ○○個突破スプライトの座標初期化
@@ -481,8 +502,8 @@ void GameScene::Update() {
 	float currentScore = player_->GetScore();
 
 	// 1000の倍数を突破したかチェック
-	int lastThreshold = static_cast<int>(lastScoreChecked_ / 1000.0f);
-	int currentThreshold = static_cast<int>(currentScore / 1000.0f);
+	int lastThreshold = static_cast<int>(lastScoreChecked_ / 10000.0f);
+	int currentThreshold = static_cast<int>(currentScore / 10000.0f);
 
 	if (currentThreshold > lastThreshold) {
 		StartSnackOverAnimation(); // アニメーション開始
@@ -562,6 +583,13 @@ void GameScene::Update() {
 	maskBox_->Update();
 	loadingUI_->Update();
 	loadingPlayer_->Update();
+
+	ore_->Update();
+
+	srarArea1_->Update();
+	srarArea2_->Update();
+	srarArea3_->Update();
+	srarArea4_->Update();
 }
 
 void GameScene::Draw() {
@@ -575,6 +603,15 @@ void GameScene::Draw() {
 
 	// 地面モデル
 	modelGround_->Draw(*useCamera_);
+
+	// 画面両端の幕のスプライト描画処理
+	for (auto& curtain : curtainSprite_) {
+		curtain->Draw();
+	}
+
+	// スコア表示の後ろに配置するスプライト描画
+	spriteCandyScore_->Draw();
+	spriteCandyEffect_->Draw();
 
 	// プレイヤーの描画処理
 	player_->Draw(*useCamera_);
@@ -597,11 +634,6 @@ void GameScene::Draw() {
 		thorn->DrawParticle(*useCamera_);
 	}
 
-	// 画面両端の幕のスプライト描画処理
-	for (auto& curtain : curtainSprite_) {
-		curtain->Draw();
-	}
-
 	// ラムネゲージ
 	spriteChargeUI_->Draw();
 	spriteChargeUIEffect_->Draw();
@@ -617,10 +649,6 @@ void GameScene::Draw() {
 	if (player_->GetBulletGauge() > 0) { // 弾の数が1以上の時だけ描画する
 		spritePush_->Draw();
 	}
-
-	// スコア表示の後ろに配置するスプライト描画
-	spriteCandyScore_->Draw();
-	spriteCandyEffect_->Draw();
 
 	// スコアスプライトの描画処理
 	for (int i = 0; i < static_cast<int>(spriteScore_.size()); ++i) {
@@ -680,6 +708,13 @@ void GameScene::Draw() {
 		loadingPlayer_->Draw();
 	}
 
+	ore_->Draw(*useCamera_);
+
+	srarArea1_->Draw(*useCamera_);
+	srarArea2_->Draw(*useCamera_);
+	srarArea3_->Draw(*useCamera_);
+	srarArea4_->Draw(*useCamera_);
+
 	///
 	/// ↑描画処理ここまで
 	///
@@ -694,7 +729,7 @@ void GameScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	useCamera_->DrawImgui();
+	//useCamera_->DrawImgui();
 
 	// プレイヤーのImGui
 	player_->DrawImgui();
@@ -705,7 +740,7 @@ void GameScene::Draw() {
 	GameSceneStateImGui();
 
 	// カメラのImGui
-	CameraStateImGui();
+	//CameraStateImGui();
 
 	ImGui::Begin("UI");
 
@@ -720,6 +755,13 @@ void GameScene::Draw() {
 	ImGui::DragFloat3("GroundModelScale", &modelGround_->GetScale().x);
 
 	ImGui::End();
+
+	//ore_->DrawImGui("ore");
+
+	//srarArea1_->DrawImGui("1");
+	//srarArea2_->DrawImGui("2");
+	//srarArea3_->DrawImGui("3");
+	//srarArea4_->DrawImGui("4");
 
 	///
 	/// ↑ImGuiここまで
@@ -773,18 +815,21 @@ void GameScene::UpdateInput() {
 }
 
 void GameScene::NoInputTitleBack() {
-	if (isInput_) {
-		noInputTimer_ = 0; // 入力があったらリセット
-		return;
-	} else {
-		noInputTimer_ += 1.0f * deltaTime_; // タイマー加算
+	//if (isInput_) {
+	//	noInputTimer_ = 0; // 入力があったらリセット
+	//	return;
+	//} else {
+	//	noInputTimer_ += 1.0f * deltaTime_; // タイマー加算
 
-		// 5秒間入力がなかった場合
-		if (noInputTimer_ >= gameSceneState_.maxNoInputTimer) {
-			isBackToTitleScene_ = true;
-			noInputTimer_ = 0;
-		}
-	}
+	//	// 5秒間入力がなかった場合
+	//	if (noInputTimer_ >= gameSceneState_.maxNoInputTimer) {
+	//		isBackToTitleScene_ = true;
+	//		noInputTimer_ = 0;
+
+	//		ResetSE(); // SEの解放
+	//		player_->AudioReset();
+	//	}
+	//}
 }
 
 void GameScene::GameSceneStateImGui() {
@@ -1080,10 +1125,10 @@ void GameScene::UpdateSpriteScoreOver() {
 			int digit = digits[i];
 			spriteScoreCountOver_[i]->SetTexture(spriteNumCollection_[digit]);
 			spriteScoreCountOver_[i]->SetPosition({-600.0f, spriteScoreCountOver_[i]->GetPosition().y});
-			spriteScoreCountOver_[i]->SetColor({0.5f, 0.0f, 0.0f, 0.7f});
+			spriteScoreCountOver_[i]->SetColor({1.0f, 1.0f, 1.0f, 0.8f});
 		}
 
-		nextMilestone_ += 1000;
+		nextMilestone_ += 10000;
 	}
 }
 
@@ -1094,7 +1139,7 @@ void GameScene::AnimationSpriteSnackOver() {
 	float offsetX = 300.0f;
 
 	if (player_->GetScore() >= 10000.0f) {
-		offsetX = 400.0f;
+		offsetX = 350.0f;
 	}
 
 	switch (snackCountOverAnimationState_) {

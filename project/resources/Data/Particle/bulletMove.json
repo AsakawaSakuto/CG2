@@ -28,7 +28,7 @@
         0.0
     ],
     "frequency": 0.05000000074505806,
-    "frequencyTime": 0.01666666753590107,
+    "frequencyTime": 0.0,
     "hemisphereAngle": 90.0,
     "isMove": 1,
     "kMaxParticle": 512,
@@ -112,8 +112,8 @@
     ],
     "startRotateVelocity": 1.0,
     "startScale": [
-        0.5,
-        0.5
+        0.699999988079071,
+        0.699999988079071
     ],
     "startVelocity": [
         0.0,
@@ -122,10 +122,10 @@
     ],
     "texturePath": "bubble",
     "translate": [
-        -0.08299999684095383,
-        0.0,
+        -0.6597229242324829,
+        433.2422790527344,
         0.0
     ],
-    "useEmitter": 1,
+    "useEmitter": 0,
     "velocityRandom": 1
 }

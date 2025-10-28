@@ -65,6 +65,7 @@ private:
 		SKY,
 		GRY,
 		NIGHT,
+		ORANGE,  // 淡い夕焼けオレンジ色を追加
 	};
 
 	BG_Type bgType_ = BG_Type::SKY;

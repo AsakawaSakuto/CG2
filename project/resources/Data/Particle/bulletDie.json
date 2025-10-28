@@ -112,8 +112,8 @@
     ],
     "startRotateVelocity": 0.0,
     "startScale": [
-        0.75,
-        0.75
+        1.75,
+        1.75
     ],
     "startVelocity": [
         0.0,
@@ -122,8 +122,8 @@
     ],
     "texturePath": "bubble",
     "translate": [
-        0.0,
-        11.569999694824219,
+        -3.850691080093384,
+        348.2928466796875,
         0.0
     ],
     "useEmitter": 0,

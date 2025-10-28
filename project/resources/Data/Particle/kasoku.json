@@ -1,5 +1,6 @@
 {
     "alphaFade": 1,
+    "blendMode": 2,
     "colorFade": 0,
     "colorRandom": 0,
     "coneAngle": 45.0,
@@ -112,17 +113,17 @@
     "startRotateVelocity": 0.0,
     "startScale": [
         0.009999999776482582,
-        1.5
+        1.0
     ],
     "startVelocity": [
         0.0,
         0.0,
         0.0
     ],
-    "texturePath": "box2",
+    "texturePath": "box",
     "translate": [
-        0.7000007629394531,
-        189.0004119873047,
+        6.436113357543945,
+        410.56890869140625,
         0.0
     ],
     "useEmitter": 0,

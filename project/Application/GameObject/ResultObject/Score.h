@@ -117,6 +117,8 @@ private:
 	unique_ptr<Sprite> retryUI_ = make_unique<Sprite>();
 	unique_ptr<Sprite> cursolUI_ = make_unique<Sprite>();
 
+	unique_ptr<Sprite> msgUI_ = make_unique<Sprite>();
+
 	float cursolStartY_ = 500.0f;
 	float cursolEndY_ = 600.0f;
 

@@ -53,7 +53,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 		// 頂点リソースをつくる（共有）
 		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * cache->modelData.vertices.size());
-		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress();
+		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
 		cache->vertexBufferView.SizeInBytes = UINT(sizeof(Object3dVertexData) * cache->modelData.vertices.size());
 		cache->vertexBufferView.StrideInBytes = sizeof(Object3dVertexData);
 		// 頂点データ書き込み（一時マップ）
