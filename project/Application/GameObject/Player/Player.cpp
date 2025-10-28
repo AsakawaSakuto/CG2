@@ -645,7 +645,7 @@ void Player::CollisionBulletThorn() {
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
 
 				// SE再生
-				attackEnemySE_->PlayAudio(SE_Volume);
+				getItemSE_->PlayAudio(SE_Volume);
 
 				// パーティクル
 				thorn->PlayParticle(2);
@@ -719,9 +719,6 @@ void Player::CollisionWingThorn() {
 		}
 
 		if (Collision::IsHit(thorn->GetCollisionAABB(), playerWing_->GetCollisionAABB()) && playerWing_->GetIsAlive()) {
-
-			// SE再生
-			attackEnemySE_->PlayAudio(SE_Volume);
 
 			// 羽とトゲの距離に応じてスコア加算
 			Vector3 hitPos = thorn->GetPosition();
