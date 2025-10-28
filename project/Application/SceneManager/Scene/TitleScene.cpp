@@ -108,6 +108,11 @@ void TitleScene::Initialize() {
 	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
 
 	maskTimer_.Start(1.0f, false);
+
+	// 背景色変更システムの初期化
+	bgType_ = BG_Type::SKY;
+	bgChangeTimer_.Start(10.0f, false);
+	bgFadeTimer_.Reset(); // bgFadeTimer_を明示的に初期化
 }
 
 void TitleScene::Update() {
@@ -168,6 +173,9 @@ void TitleScene::Update() {
 	maskBox_->Update();
 	loadingUI_->Update();
 	loadingPlayer_->Update();
+
+	// 背景色変更の更新
+	ChangeBG();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -308,7 +316,7 @@ void TitleScene::Draw() {
 
 	//ImGui::Begin("exe");
 
-	//ImGui::ColorEdit4("color", &ExeColor.x);
+	ImGui::ColorEdit4("color", &ExeColor.x);
 
 	//ImGui::End();
 
@@ -920,18 +928,18 @@ void TitleScene::SpriteUpdate() {
 	if (maskTimer_.IsActive()) {
 		if (titleQuit_) {
 			mask_->SetPosition({
-				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).x,
-				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).y });
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).y });
 			mask_->SetScale({
-				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).x,
-				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).y });
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).y });
 		} else {
 			mask_->SetPosition({
-				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).x,
-				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).y });
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).y });
 			mask_->SetScale({
-				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).x,
-				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).y });
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).y });
 		}
 	} else {
 		if (titleQuit_) {
@@ -1034,4 +1042,71 @@ void TitleScene::InitSptite() {
 	}
 
 	titleQuit_ = false;
+}
+
+void TitleScene::ChangeBG() {
+	// Change Timer が完了したら Fade Timer を開始
+	if (bgChangeTimer_.IsFinished() && !bgFadeTimer_.IsActive()) {
+		// 現在の背景色を開始色として設定
+		switch (bgType_) {
+		case BG_Type::SKY:
+			bgColorStart_ = { 0.212f, 0.722f, 1.000f };  // 空色
+			break;
+		case BG_Type::GRY:
+			bgColorStart_ = { 0.0353f, 0.0353f, 0.0627f }; // グレー
+			break;
+		case BG_Type::NIGHT:
+			bgColorStart_ = { 0.3451f, 0.3451f, 0.3451f }; // 夜色
+			break;
+		}
+
+		// 現在の色以外からランダムに次の色を選択
+		BG_Type nextBgType;
+		do {
+			nextBgType = static_cast<BG_Type>(random_.Int(0, 2));
+		} while (nextBgType == bgType_);
+
+		// 終了色を設定
+		switch (nextBgType) {
+		case BG_Type::SKY:
+			bgColorEnd_ = { 0.212f, 0.722f, 1.000f };
+			break;
+		case BG_Type::GRY:
+			bgColorEnd_ = { 0.0353f, 0.0353f, 0.0627f };
+			break;
+		case BG_Type::NIGHT:
+			bgColorEnd_ = { 0.3451f, 0.3451f, 0.3451f };
+			break;
+		}
+
+		// 背景タイプを更新
+		bgType_ = nextBgType;
+		
+		// フェードタイマーを開始
+		bgFadeTimer_.Start(10.0f, false);
+	}
+
+	// フェード中の色のLerp処理
+	if (bgFadeTimer_.IsActive()) {
+		float progress = bgFadeTimer_.GetProgress();
+		Vector3 currentColor = {
+			Easing::Lerp(bgColorStart_.x, bgColorEnd_.x, progress, Easing::Type::EaseInOutQuint),
+			Easing::Lerp(bgColorStart_.y, bgColorEnd_.y, progress, Easing::Type::EaseInOutQuint),
+			Easing::Lerp(bgColorStart_.z, bgColorEnd_.z, progress, Easing::Type::EaseInOutQuint)
+		};
+		
+		// ExeColorグローバル変数を使用して背景色を設定
+		ExeColor.x = currentColor.x;
+		ExeColor.y = currentColor.y;
+		ExeColor.z = currentColor.z;
+		ExeColor.w = 1.0f;
+	}
+
+	// フェードが完了したら次のChangeTimerを開始
+	if (bgFadeTimer_.IsFinished()) {
+		bgChangeTimer_.Start(20.0f, false);
+	}
+
+	bgChangeTimer_.Update();
+	bgFadeTimer_.Update();
 }

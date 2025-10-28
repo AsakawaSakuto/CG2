@@ -61,6 +61,21 @@ private:
 
 	MaskType maskType_ = MaskType::AME;
 
+	enum class BG_Type {
+		SKY,
+		GRY,
+		NIGHT,
+	};
+
+	BG_Type bgType_ = BG_Type::SKY;
+
+	GameTimer bgChangeTimer_;
+	GameTimer bgFadeTimer_;
+	Vector3 bgColorStart_;
+	Vector3 bgColorEnd_;
+
+	void ChangeBG();
+
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
