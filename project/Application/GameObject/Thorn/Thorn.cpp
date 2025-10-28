@@ -109,17 +109,21 @@ void Thorn::TickCooldown() {
 }
 
 void Thorn::UpdateRotate() {
-
-	///////////////////////////////////////////Z軸回転で徐々に収束する//////////////////////////////////////////////
-
 	if (isRotate_) {
-		transform_.rotate.z += 12.0f * deltaTime_;
+		// 回転
+		transform_.rotate.z += rotateSpeed_ * deltaTime_;
 
-		// 1回転したら範囲内に収める
-		transform_.rotate.z = std::clamp(transform_.rotate.z, 0.0f, 2.0f * std::numbers::pi_v<float>);
+		// 回転速度を減衰させる
+		const float kAttenuationRate = 0.9f;
+		rotateSpeed_ *= kAttenuationRate;
+
+		// 一定以下になったら停止
+		if (rotateSpeed_ < 0.01f) {
+			rotateSpeed_ = 0.0f;
+			isRotate_ = false;
+			transform_.rotate.z = 0.0f;
+		}
 	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 void Thorn::UpgradeThorn() {

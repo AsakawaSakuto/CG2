@@ -187,6 +187,12 @@ private:
 	// 前のフレームよりスコアが増えていたらアニメーションする
 	void ComparisonScore();
 
+	// 加算するスコアを受け取ってpushする
+	void ScoreParticleAdd(float score);
+
+	// スコア加算時のパーティクル更新
+	void ScoreParticleAddUpdate();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -328,4 +334,10 @@ private:
 
 	// カウントダウンが0になったかどうか
 	bool isCountDownZero_ = false;
+
+	// 加算スコアパーティクル
+	std::vector<std::vector<std::unique_ptr<Sprite>>> spriteAddScoreParticle_;
+
+	// 数字スプライト集
+	std::array<std::string, 10> spriteNumCollection_;
 };

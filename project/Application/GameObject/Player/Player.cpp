@@ -74,6 +74,11 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// カウントダウンが0になったかどうか
 	isCountDownZero_ = false;
+
+	// 数字のスプライト集
+	for (int i = 0; i <= 9; ++i) {
+		spriteNumCollection_[i] = "resources/image/UI/Number" + std::to_string(i) + "UI.png";
+	}
 }
 
 void Player::Update() {
@@ -169,6 +174,16 @@ void Player::Update() {
 
 	// スコアの比較
 	ComparisonScore();
+
+	// スコア加算パーティクル更新
+	ScoreParticleAddUpdate();
+
+	// スコア加算パーティクル
+	for (auto& digitSprites : spriteAddScoreParticle_) {
+		for (auto& sprite : digitSprites) {
+			sprite->Update();
+		}
+	}
 }
 
 void Player::Draw(Camera useCamera) {
@@ -193,6 +208,13 @@ void Player::Draw(Camera useCamera) {
 	}
 
 	DrawParticle(useCamera);
+
+	// スコア加算パーティクル
+	for (auto& digitSprites : spriteAddScoreParticle_) {
+		for (auto& sprite : digitSprites) {
+			sprite->Draw();
+		}
+	}
 }
 
 void Player::DrawImgui() {
@@ -229,7 +251,7 @@ void Player::ClampPlayerVelocity() {
 		playerState_.maxSpeed = playerMaxSpeeds_[bulletGauge_];
 	}
 
-	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed, playerState_.maxSpeed );
+	velocity_.y = std::clamp(velocity_.y, -playerState_.maxSpeed, playerState_.maxSpeed);
 }
 
 void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
@@ -525,6 +547,9 @@ void Player::CollisionThorn() {
 				// スコア加算
 				AddScore(scoreList_.enemyHitAmount);
 
+				// パーティクル
+				ScoreParticleAdd(scoreList_.enemyHitAmount);
+
 				// ゲームパッドの振動
 				gamePad_->SetVibration(0.05f, 0.05f, 0.1f);
 
@@ -597,6 +622,10 @@ void Player::CollisionBulletThorn() {
 
 				// スコア加算
 				AddScore(scoreList_.shotHitAmount);
+
+				// パーティクル
+				ScoreParticleAdd(scoreList_.shotHitAmount);
+
 				switch (thorn->GetThornType()) {
 				case ThornType::MIN:
 					thorn->SetThornType(ThornType::MIDDLE);
@@ -678,9 +707,17 @@ void Player::CollisionWingThorn() {
 
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
+
+				// パーティクル
+				ScoreParticleAdd(scoreList_.wingHitNearAmount);
+
 				thorn->PlayParticle(2);
 			} else {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
+
+				// パーティクル
+				ScoreParticleAdd(scoreList_.wingHitFarAmount);
+
 				thorn->PlayParticle(1);
 			}
 
@@ -811,8 +848,8 @@ void Player::PlayerMoveLimit() {
 
 void Player::UpdateCollisionAABB() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x - 0.8f, t.y + 0.4f, t.z + 1.0f};
-	collisionAABB_.min = {t.x + 0.2f, t.y - 0.4f, t.z - 1.0f};
+	collisionAABB_.max = {t.x - 0.4f, t.y + 0.4f, t.z + 1.0f};
+	collisionAABB_.min = {t.x + 0.1f, t.y - 0.4f, t.z - 1.0f};
 }
 
 void Player::StunRotate() {
@@ -1142,4 +1179,79 @@ void Player::ComparisonScore() {
 		// スコアを記録
 		preScore_ = score_;
 	}
+}
+
+void Player::ScoreParticleAdd(float score) {
+	// スコアを整数に変換
+	int displayScore = static_cast<int>(score);
+
+	// 分解
+	std::vector<int> digits;
+	if (displayScore == 0) {
+		digits.push_back(0);
+	} else {
+		while (displayScore > 0) {
+			digits.push_back(displayScore % 10);
+			displayScore /= 10;
+		}
+	}
+	std::reverse(digits.begin(), digits.end());
+
+	// 新しい加算用スプライト群を作成
+	std::vector<std::unique_ptr<Sprite>> digitSprites;
+
+	// 基準位置を範囲内のランダムな値で決める
+	constexpr float MIN_POS_X = 100.0f;
+	constexpr float MAX_POS_X = 200.0f;
+
+	std::random_device rd;
+	std::mt19937 eng(rd());
+	std::uniform_real_distribution<float> distr(MIN_POS_X, MAX_POS_X);
+
+	Vector2 basePos = {distr(eng), 350.0f};
+	float digitSpacing = 32.0f;
+
+	// 桁ごとにスプライト生成
+	for (size_t i = 0; i < digits.size(); ++i) {
+		int digit = digits[i];
+
+		auto sprite = std::make_unique<Sprite>();
+		sprite->Initialize(dxCommon_, "resources/image/UI/Number0UI.png");
+		sprite->SetTexture(spriteNumCollection_[digit]);
+		sprite->SetScale({0.25f, 0.25f});
+
+		Vector2 digitPos = basePos;
+		digitPos.x += static_cast<float>(i) * digitSpacing;
+		sprite->SetPosition(digitPos);
+
+		digitSprites.push_back(std::move(sprite));
+	}
+
+	spriteAddScoreParticle_.push_back(std::move(digitSprites));
+}
+
+void Player::ScoreParticleAddUpdate() {
+	for (auto& digitSprites : spriteAddScoreParticle_) {
+		for (auto& sprite : digitSprites) {
+			constexpr float MIN_SPEED_X = -1.0f;
+			constexpr float MAX_SPEED_X = 1.0f;
+
+			std::random_device rd;
+			std::mt19937 eng(rd());
+			std::uniform_real_distribution<float> distr(MIN_SPEED_X, MAX_SPEED_X);
+
+			sprite->GetColor().w -= 0.05f;
+			sprite->GetSize().x -= 5.0f;
+			sprite->GetSize().y -= 5.0f;
+			sprite->GetPosition().y -= 5.0f;
+			sprite->GetPosition().x += distr(eng);
+		}
+
+		// 透明度が0以下のスプライトを削除
+		digitSprites.erase(std::remove_if(digitSprites.begin(), digitSprites.end(), [](const std::unique_ptr<Sprite>& sprite) { return sprite->GetColor().w <= 0.0f; }), digitSprites.end());
+	}
+
+	// 空になったスコアグループも削除
+	spriteAddScoreParticle_.erase(
+	    std::remove_if(spriteAddScoreParticle_.begin(), spriteAddScoreParticle_.end(), [](const std::vector<std::unique_ptr<Sprite>>& group) { return group.empty(); }), spriteAddScoreParticle_.end());
 }

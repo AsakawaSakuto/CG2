@@ -306,4 +306,7 @@ private:
 
 	// ルール説明用のスプライト状態
 	RuleSpriteState currentRuleSpriteState_ = RuleSpriteState::RIGHT;
+
+	// 地面モデル
+	unique_ptr<Model> modelGround_ = make_unique<Model>();
 };

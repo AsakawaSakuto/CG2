@@ -57,13 +57,15 @@ void GameScene::Initialize() {
 		bulletGaugeSprite_[i].sprite = std::make_unique<Sprite>();
 		bulletGaugeSprite_[i].sprite->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 		bulletGaugeSprite_[i].sprite->SetScale({2.0, 2.5f});
-		bulletGaugeSprite_[i].sprite->SetPosition({1068.0f, 448.0f - (44.0f * i)});
+		bulletGaugeSprite_[i].sprite->SetPosition({1070.0f, 480.0f - (44.0f * i)});
 		bulletGaugeSprite_[i].sprite->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 		bulletGaugeSprite_[i].isActive = false;
 	}
 
 	bulletGaugeSprite_[0].sprite->SetTexture("resources/image/UI/bulletGaugeEdgeBottom.png");
+	bulletGaugeSprite_[0].sprite->SetScale({2.0f, 2.5f});
 	bulletGaugeSprite_[4].sprite->SetTexture("resources/image/UI/bulletGaugeEdge.png");
+	bulletGaugeSprite_[4].sprite->SetScale({2.0f, 2.5f});
 
 	// 画面両端の幕のスプライト
 	for (int i = 0; i < curtainSprite_.size(); ++i) {
@@ -140,14 +142,14 @@ void GameScene::Initialize() {
 	spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
 	spriteCandyScore_->SetPosition({160.0f, 400.0f});
 	spriteCandyScore_->SetScale({0.5f, 0.5f});
-	spriteCandyScore_->SetColor({0.8f, 0.1f, 0.4, 1.0f});
+	spriteCandyScore_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
 
 	// スコアの背景波紋
 	spriteCandyEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
 	spriteCandyEffect_->SetPosition(spriteCandyScore_->GetPosition());
 	candyEffectSize_ = 0.5f;
 	spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
-	spriteCandyEffect_->SetColor({0.8f, 0.1f, 0.4, 1.0f});
+	spriteCandyEffect_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
 
 	// 弾のゲージラムネUI
 	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
@@ -228,6 +230,12 @@ void GameScene::Initialize() {
 
 	// 振動の終了
 	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
+
+	// 地面モデル
+	modelGround_->Initialize(&ctx_->dxCommon, "Ground/Ground.obj");
+	modelGround_->SetTexture("resources/model/Ground/Ground2.png");
+	modelGround_->SetTranslate({0.0f, -250.0f, 1400.0f});
+	modelGround_->SetScale({40.0f, 56.0f, 50.0f});
 }
 
 void GameScene::Update() {
@@ -424,6 +432,9 @@ void GameScene::Update() {
 	for (auto& sprite : spriteScoreCountOver_) {
 		sprite->Update();
 	}
+
+	// 地面モデル
+	modelGround_->Update();
 }
 
 void GameScene::Draw() {
@@ -443,13 +454,13 @@ void GameScene::Draw() {
 		thorn->DrawParticle(*useCamera_);
 	}
 
-	// プレイヤーの描画処理
-	player_->Draw(*useCamera_);
-
 	// 山のモデル描画
 	/*for (auto& model : modelMountain_) {
 	    model->Draw(*useCamera_);
 	}*/
+
+	// 地面モデル
+	modelGround_->Draw(*useCamera_);
 
 	// 画面両端の幕のスプライト描画処理
 	for (auto& curtain : curtainSprite_) {
@@ -526,6 +537,9 @@ void GameScene::Draw() {
 		sprite->Draw();
 	}
 
+	// プレイヤーの描画処理
+	player_->Draw(*useCamera_);
+
 	///
 	/// ↑描画処理ここまで
 	///
@@ -562,6 +576,8 @@ void GameScene::Draw() {
 	ImGui::DragFloat2("curtainSpritePos1", &curtainSprite_[0]->GetPosition().x, 1.0f);
 	ImGui::DragFloat2("curtainSpritePos2", &curtainSprite_[1]->GetPosition().x, 1.0f);
 	ImGui::ColorPicker4("curtainSpritePos2", &spriteCandyScore_->GetColor().x);
+	ImGui::DragFloat3("GroundModelPos", &modelGround_->GetTranslate().x);
+	ImGui::DragFloat3("GroundModelScale", &modelGround_->GetScale().x);
 
 	ImGui::End();
 

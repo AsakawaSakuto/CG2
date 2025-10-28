@@ -106,6 +106,9 @@ private:
 	// 回転のフラグ
 	bool isRotate_;
 
+	// 回転速度
+	float rotateSpeed_ = 100.0f;
+
 	// 左右に揺れる処理関連の変数
 	float shakeElapsed_ = 0.0f;
 	float shakeDuration_ = 1.5f;  // 揺れ時間
