@@ -53,6 +53,14 @@ private:
 	void AudioUpdate();
 private:
 
+	enum class MaskType {
+		RAMA = 0,
+		KUMA = 1,
+		AME = 2,
+	};
+
+	MaskType maskType_ = MaskType::AME;
+
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
@@ -152,9 +160,14 @@ private:
 
 	// mask
 	unique_ptr<Sprite> mask_ = make_unique<Sprite>();
-	Vector2 maskStartPos_ = { 950.0f,360.0f };
-	Vector2 maskEndPos_ = { 950.0f,-50.0f };
-	Vector2 maskStartScale_ = { 20.0f,20.0f };
-	Vector2 maskEndScale_ = { 1.0f,1.0f };
+	unique_ptr<Sprite> maskBox_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingPlayer_ = make_unique<Sprite>();
+	Vector2 maskStartPos_;
+	Vector2 maskEndPos_;
+	Vector2 maskStartScale_;
+	Vector2 maskEndScale_;
 	GameTimer maskTimer_;
+
+	bool titleQuit_ = false;
 };

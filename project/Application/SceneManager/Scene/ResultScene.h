@@ -21,6 +21,14 @@ public:
 
 private:
 
+	enum class MaskType {
+		RAMA = 0,
+		KUMA = 1,
+		AME = 2,
+	};
+
+	MaskType maskType_ = MaskType::AME;
+
 	int nextScene_ = 0;
 
 	// Camera
@@ -36,12 +44,19 @@ private:
 
 	// mask
 	unique_ptr<Sprite> mask_ = make_unique<Sprite>();
+	unique_ptr<Sprite> maskBox_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> loadingPlayer_ = make_unique<Sprite>();
 	Vector2 maskStartPos_;
 	Vector2 maskEndPos_;
 	Vector2 maskStartScale_;
 	Vector2 maskEndScale_;
-	GameTimer maskInTimer_;
-	GameTimer maskOutTimer_;
+
+	GameTimer maskTimer_;
+	GameTimer quitTimer_;
 
 	bool timerStarte_ = false;
+	bool resultQuit_ = false;
+
+	Random rand_;
 };

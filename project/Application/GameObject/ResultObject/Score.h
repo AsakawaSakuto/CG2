@@ -24,13 +24,25 @@ public:
 	bool GoTitle() { return goTitle_; }
 	bool GoResult() { return goResult_; }
 	
+	bool GetNext() { return pushNext_; }
+
 	// シーンを抜ける際に呼び出すメソッド
 	void SaveRankingData();
+
+	int NextSceneNum() { return sceneNum_; }
+
+	// 追加：ランキング変更検知用メソッド
+	bool IsNewRecord() const { return isNewRecord_; }
+	int GetRankingPosition() const { return rankingPosition_; } // 1,2,3,4(圏外)を返す
 
 private:
 	bool goTitle_ = false;
 	bool goResult_ = false;
 	bool pushNext_ = false;
+
+	// 追加：ランキング関連フラグ
+	bool isNewRecord_ = false;  // ランキングに入ったかどうか
+	int rankingPosition_ = 4;   // ランキング内での位置 (1=1st, 2=2nd, 3=3rd, 4=圏外)
 
 	Input* input_ = nullptr;
 	GamePad* gamePad_ = nullptr;
@@ -71,14 +83,16 @@ private:
 	float floatSpeed_ = 2.0f;      // 浮遊速度
 
 private:
+	int sceneNum_ = 0;
+
 	int nowScore_ = 0;
 
-	int score1st_ = 0;
-	int score2nd_ = 0;
-	int score3rd_ = 0;
+	int score1st_ = 30000;  // デフォルト値を明示的に設定
+	int score2nd_ = 20000;  // デフォルト値を明示的に設定
+	int score3rd_ = 10000;  // デフォルト値を明示的に設定
 	
-	// JSONファイルのパス
-	const std::string rankingJsonPath_ = "resources/engineResources/test.json";
+	// JSONファイルのパスを修正
+	const std::string rankingJsonPath_ = "resources/json/ranking.json";
 
 	float rankingStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.5f };
 	float rankingEndX_[6] = { 6.5f,5.5f,4.5f,3.5f,2.5f,0.7f };
@@ -193,7 +207,7 @@ private:
 
 	unique_ptr<Model> backGround_ = make_unique<Model>();
 	Transform backGroundTransform_;
-	Vector3 backGroundStartColor_ = { 1.0f,0.0f,0.0f };
+	Vector3 backGroundStartColor_ = { 0.0f,0.0f,0.0f };
 	Vector3 backGroundEndColor_ = { 0.0353f, 0.0353f, 0.0627f };
 	Vector3 backGroundColor_ = {};
 };
