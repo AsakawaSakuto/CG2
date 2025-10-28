@@ -3,10 +3,12 @@
 #include <filesystem>
 #include <sstream>
 #include <iomanip>
+#include <utility>
 
 void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	dxCommon_ = dxCommon;
 	score_ = score;
+	nowScore_ = static_cast<int>(score_);
 
 	goTitle_ = false;
 	goResult_ = false;
@@ -19,10 +21,24 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 
 	floatTimeCount_ = 0.0f;
 
-	// JSONファイルからランキングデータを読み込み、現在のスコアを含めてソート
+	// 最初にランキングデータを読み込み、現在のスコアを含めてソート、保存を行う
+	// これによりnowScoreがランキングに入る場合は確実に反映される
 	LoadRankingData();
 	SortRankingScores();
+	SaveRankingData();
 
+	// ランク判定（ランキング更新後に行う）
+	if (nowScore_ >= 30000) {
+		rank_ = Rank::S;
+	} else if (nowScore_ >= 20000) {
+		rank_ = Rank::A;
+	} else if (nowScore_ >= 10000) {
+		rank_ = Rank::B;
+	} else {
+		rank_ = Rank::C;
+	}
+
+	// パーティクル初期化
 	ramuneParticle_->Initialize(dxCommon_);
 	ramuneParticle_->LoadJson("RamuneResult1");
 
@@ -66,6 +82,7 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 		sRankParticle_->Stop();
 	}
 
+	// タイマー初期化
 	for (int i = 0; i < textEasingTimer_.size(); i++) {
 		textEasingTimer_[i].Reset();
 	}
@@ -100,13 +117,16 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 		nowScoreBounceTimer_[i].Reset();
 	}
 
+	// ランキング更新後にモデル初期化を行う
+	// これにより更新されたランキングデータを使ってモデルが初期化される
 	InitTextModel();
 	InitScoreModel();
 	InitRankModel();
 	InitPlayerModel();
-	InitRanking();
+	InitRanking();  // ランキング表示用のモデル初期化（更新されたランキングデータを使用）
 	InitSprite();
 
+	// 背景初期化
 	backGround_->Initialize(dxCommon_, "plane.obj");
 	backGround_->SetTexture("resources/image/0.png");
 	backGround_->SetUpdateFrustumCulling(false);
@@ -1198,12 +1218,7 @@ void Score::InitRanking() {
 	score3rdTransform_[5].translate = { 11.5f, 1.62f,0.0f };
 }
 
-void Score::LoadRankingData() {
-	// デフォルトのランキングデータ
-	//score1st_ = 30000;
-	//score2nd_ = 20000;
-	//score3rd_ = 10000;
-	
+void Score::LoadRankingData() {	
 	try {
 		std::ifstream file(rankingJsonPath_);
 		if (file.is_open()) {
@@ -1249,6 +1264,7 @@ void Score::LoadRankingData() {
 		}
 	} catch (const std::exception&) {
 		// ファイルが存在しない場合や読み込みエラーの場合はデフォルト値を使用
+		// デフォルト値は既に上で設定済み
 	}
 }
 
@@ -1256,13 +1272,36 @@ void Score::SortRankingScores() {
 	// 現在のスコアを含めた4つのスコアを配列に格納
 	std::array<int, 4> scores = { score1st_, score2nd_, score3rd_, nowScore_ };
 	
-	// 降順にソート
-	std::sort(scores.begin(), scores.end(), std::greater<int>());
+	// 各スコアに対応するインデックスも保持（どのスコアがnowScoreかを判定するため）
+	std::array<std::pair<int, int>, 4> scoreWithIndex = {
+		std::make_pair(score1st_, 0),  // 0: 1st
+		std::make_pair(score2nd_, 1),  // 1: 2nd  
+		std::make_pair(score3rd_, 2),  // 2: 3rd
+		std::make_pair(nowScore_, 3)   // 3: now
+	};
 	
-	// ソート結果を各スコアに代入
-	score1st_ = scores[0];
-	score2nd_ = scores[1];
-	score3rd_ = scores[2];
+	// 降順にソート
+	std::sort(scoreWithIndex.begin(), scoreWithIndex.end(), 
+		[](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+			return a.first > b.first;
+		});
+	
+	// nowScoreがランキング内（上位3位）に入っているかをチェック
+	isNewRecord_ = false;
+	rankingPosition_ = 4; // デフォルトは圏外
+	
+	for (int i = 0; i < 3; i++) {
+		if (scoreWithIndex[i].second == 3) { // nowScoreのインデックスが3
+			isNewRecord_ = true;
+			rankingPosition_ = i + 1; // 1st, 2nd, 3rdの位置
+			break;
+		}
+	}
+	
+	// ソート結果を各スコアに代入（上位3つのみ）
+	score1st_ = scoreWithIndex[0].first;
+	score2nd_ = scoreWithIndex[1].first;
+	score3rd_ = scoreWithIndex[2].first;
 	// 4位のスコアは保存しない（上位3つのみ保存）
 }
 

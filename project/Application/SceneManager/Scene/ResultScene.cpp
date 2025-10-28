@@ -2,6 +2,7 @@
 
 ResultScene::~ResultScene() {
 	// シーンを抜ける際にランキングデータを保存
+	// （Scoreクラスの初期化時に既にソート・更新されているが、念のため再保存）
 	if (score_) {
 		score_->SaveRankingData();
 	}
@@ -27,10 +28,18 @@ void ResultScene::Initialize() {
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
+	// ★Scoreクラスの初期化（ここで自動的にランキングがソートされて更新される）
 	score_->Initialize(&ctx_->dxCommon, ctx_->lastScore);
 	score_->SetInput(&ctx_->input, &ctx_->gamePad);
 
-	
+	// ★ランキング更新結果の確認（デバッグ用 - 必要に応じてコメントアウト）
+	if (score_->IsNewRecord()) {
+		// 新記録の場合の処理を追加可能
+		// 例：特別なエフェクトの再生、音声の再生など
+		int position = score_->GetRankingPosition();
+		// position: 1=1st, 2=2nd, 3=3rd
+	}
+
 	maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
 	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingUI.png", { 1040.0f, 640.0f }, { 1.0f, 1.0f });
 	loadingUI_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
