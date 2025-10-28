@@ -72,6 +72,7 @@ public:
 	void SetIsScoreUpAnimation(bool isScoreUpAnimation) { isScoreUpAnimation_ = isScoreUpAnimation; }
 	void SetIsCountDownZero(bool isCountDownZero) { isCountDownZero_ = isCountDownZero; }
 
+	void AudioReset();
 private:
 	// プレイヤーの上昇
 	void MovePlayerUpward();

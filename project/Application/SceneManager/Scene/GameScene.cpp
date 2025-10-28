@@ -786,6 +786,9 @@ void GameScene::NoInputTitleBack() {
 		if (noInputTimer_ >= gameSceneState_.maxNoInputTimer) {
 			isBackToTitleScene_ = true;
 			noInputTimer_ = 0;
+
+			ResetSE(); // SEの解放
+			player_->AudioReset();
 		}
 	}
 }

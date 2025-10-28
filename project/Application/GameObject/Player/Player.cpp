@@ -293,12 +293,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		playerState_.cameraOffset = CAMERA_OFFSET_BOTTOM;
 
 		// SEの解放
-		shotSE_->Reset();
-		playerDamageSE_->Reset();
-		DestroyEnemySE_->Reset();
-		gaugeChargeSE_->Reset();
-		getItemSE_->Reset();
-		attackEnemySE_->Reset();
+		AudioReset();
 	}
 }
 
@@ -1310,4 +1305,13 @@ void Player::ScoreParticleAddUpdate() {
 	// 空になったスコアグループも削除
 	spriteAddScoreParticle_.erase(
 		std::remove_if(spriteAddScoreParticle_.begin(), spriteAddScoreParticle_.end(), [](const std::vector<std::unique_ptr<Sprite>>& group) { return group.empty(); }), spriteAddScoreParticle_.end());
+}
+
+void Player::AudioReset() {
+	shotSE_->Reset();
+	playerDamageSE_->Reset();
+	DestroyEnemySE_->Reset();
+	gaugeChargeSE_->Reset();
+	getItemSE_->Reset();
+	attackEnemySE_->Reset();
 }
