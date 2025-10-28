@@ -331,7 +331,7 @@ void GameScene::Update() {
 	UpdateInput();
 
 	// プレイヤーから一定時間入力がなかった場合の処理
-	// NoInputTitleBack();
+	NoInputTitleBack();
 
 	if (isBackToTitleScene_) {
 		sceneFade_->StartFadeIn(1.0f);
