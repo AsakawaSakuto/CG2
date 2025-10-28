@@ -348,7 +348,7 @@ void Player::BulletCharge() {
 	num_++;
 
 	// 2秒に一回ゲージをためる
-	if (num_ >= 120) {
+	if (num_ >= chrageSpeed_) {
 		bulletGauge_++;
 		(*bulletGaugeSprites_)[bulletGauge_ - 1].isActive = true;
 		num_ = 0;
@@ -1131,7 +1131,7 @@ void Player::UpdateParticle() {
 		}
 	}
 
-	if (direction_ == Direction::DOWN) {
+	if (direction_ == PlayerDirection::DOWN) {
 		getScoreParticle_->SetEmitVelocityY(3.0f);
 	}
 	getScoreParticle_->Update();
