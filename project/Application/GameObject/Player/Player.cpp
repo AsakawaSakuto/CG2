@@ -61,9 +61,10 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// SE
 	shotSE_->Initialize("resources/sound/SE/InGame/ShotSE.mp3");
 	playerDamageSE_->Initialize("resources/sound/SE/InGame/PlayerDamageSE.mp3");
-	DestroyEnemySE_->Initialize("resources/sound/SE/InGame/DestroyEnemySE.mp3");
+	DestroyEnemySE_->Initialize("resources/sound/SE/InGame/AttackEnemySE.mp3");
 	gaugeChargeSE_->Initialize("resources/sound/SE/InGame/GaugeChargeSE.mp3");
 	getItemSE_->Initialize("resources/sound/SE/InGame/GetItemSE.mp3");
+	attackEnemySE_->Initialize("resources/sound/SE/InGame/AttackEnemySE.mp3");
 
 	InitParticle();
 
@@ -586,7 +587,9 @@ void Player::CollisionThorn() {
 				smorkParticle_->Play(false);
 
 				// SE再生
-				DestroyEnemySE_->PlayAudio(SE_Volume);
+				//DestroyEnemySE_->PlayAudio(SE_Volume);
+				// SE再生
+				attackEnemySE_->PlayAudio(SE_Volume);
 
 				break;
 			} else if (direction_ == PlayerDirection::UP) {
@@ -640,6 +643,9 @@ void Player::CollisionBulletThorn() {
 			}
 
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
+
+				// SE再生
+				getItemSE_->PlayAudio(SE_Volume);
 
 				// パーティクル
 				thorn->PlayParticle(2);
