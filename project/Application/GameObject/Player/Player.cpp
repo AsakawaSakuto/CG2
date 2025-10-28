@@ -6,6 +6,8 @@
 #include "Application/GameObject/State/JsonState.h"
 #include "Engine/System/Audio/MasterVolume.h"
 
+#include "Engine/System/DirectXCommon/ExeColor.h"
+
 void Player::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_ = dxCommon;

@@ -2,7 +2,7 @@
 #include "Application/GameObject/State/JsonState.h"
 #include "Application/SceneManager/SceneManager.h"
 #include "Engine/System/Audio/MasterVolume.h"
-#include "Engine//System/DirectXCommon/ExeColor.h"
+#include "Engine/System/DirectXCommon/ExeColor.h"
 
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
