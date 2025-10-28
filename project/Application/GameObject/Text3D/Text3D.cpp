@@ -209,7 +209,7 @@ void Text3D::Update() {
 	// 全て終了したら、少し待ってから再開
 	if (allFinished && muniStartTimer_.IsFinished()) {
 		// タイマーをリセットして再開準備
-		muniStartTimer_.Start(5.0f, false); // 1秒待機してから再開
+		muniStartTimer_.Start(2.5f, false); // 1秒待機してから再開
 		for (int i = 0; i < muniTimer_.size(); i++) {
 			muniTimer_[i].Reset(); // タイマーをリセット
 		}
