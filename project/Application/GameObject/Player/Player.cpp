@@ -12,7 +12,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	model_->Initialize(dxCommon_, "Machine/Body.obj");
 	model_->SetTexture("resources/model/Machine/Machine.png");
-	model_->SetColor({0.4f, 0.7f, 0.9f, 1.0f});
+	model_->SetColor({ 0.4f, 0.7f, 0.9f, 1.0f });
 	model_->SetUpdateFrustumCulling(false);
 
 	// JSONからステータスを読み込み
@@ -20,9 +20,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	bulletState_ = JsonState::Load<BulletState>("Resources/Data/bulletState.json");
 	scoreList_ = JsonState::Load<ScoreList>("resources/Data/scoreList.json");
 
-	transform_.scale = {3.0f, 3.0f, 3.0f};
-	transform_.rotate = {0.0f, std::numbers::pi_v<float>, 0.0f};
-	transform_.translate = {0.0f, -10.0f, 0.0f};
+	transform_.scale = { 3.0f, 3.0f, 3.0f };
+	transform_.rotate = { 0.0f, std::numbers::pi_v<float>, 0.0f };
+	transform_.translate = { 0.0f, -10.0f, 0.0f };
 	collisionSphere_.center = transform_.translate;
 	collisionSphere_.radius = 0.8f;
 
@@ -34,8 +34,8 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	playerWing_->SetPosition(transform_.translate);
 
 	// 速度関連初期化
-	acceleration_ = {35.0f, 2.0f, 0.0f};
-	velocity_ = {0.0f, 0.0f};
+	acceleration_ = { 35.0f, 2.0f, 0.0f };
+	velocity_ = { 0.0f, 0.0f };
 
 	// スコア
 	score_ = 0;
@@ -281,9 +281,9 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 	// プレイヤーが最低地点に到達したとき
 	if (transform_.translate.y <= minHeight && direction_ == PlayerDirection::DOWN) {
 		if (!isGoal_) {
-			goalParticle1_->SetEmitterPosition({5.0f, -22.5f, 0.0f});
+			goalParticle1_->SetEmitterPosition({ 5.0f, -22.5f, 0.0f });
 			goalParticle1_->Play(false);
-			goalParticle2_->SetEmitterPosition({-5.0f, -22.5f, 0.0f});
+			goalParticle2_->SetEmitterPosition({ -5.0f, -22.5f, 0.0f });
 			goalParticle2_->Play(false);
 			// ゴールフラグをたてる
 			isGoal_ = true;
@@ -298,6 +298,7 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 		DestroyEnemySE_->Reset();
 		gaugeChargeSE_->Reset();
 		getItemSE_->Reset();
+		attackEnemySE_->Reset();
 	}
 }
 
@@ -378,7 +379,7 @@ void Player::BulletShot() {
 			// 弾が消えた位置でパーティクルを再生
 			bulletDieParticle_->SetEmitterPosition(position);
 			bulletDieParticle_->Play(false);
-		});
+			});
 
 		// プレイヤーの向いてる方向に応じて弾の進む向きも決まる
 		if (direction_ == PlayerDirection::UP) {
@@ -417,7 +418,7 @@ void Player::BulletUpdate() {
 
 	// 生きている弾にBulletMoveParticleをセット
 	int activeParticleIndex = 0;
-	
+
 	// 全てのBulletMoveParticleを一旦停止
 	for (int i = 0; i < 5; ++i) {
 		bulletMoveParticles_[i]->Stop();
@@ -439,20 +440,20 @@ void Player::BulletUpdate() {
 	// 弾の削除
 	if (!bullets_.empty()) {
 		bullets_.erase(
-		    std::remove_if(
-		        bullets_.begin(), bullets_.end(),
-		        [playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
-			        float y = bullet->GetTransform().translate.y;
-			        bool shouldDelete = y > playerPosY + 16.0f || y < playerPosY - 16.0f; // 画面外に出たら削除
+			std::remove_if(
+				bullets_.begin(), bullets_.end(),
+				[playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
+					float y = bullet->GetTransform().translate.y;
+					bool shouldDelete = y > playerPosY + 16.0f || y < playerPosY - 16.0f; // 画面外に出たら削除
 
-			        if (shouldDelete) {
-				        // 削除前にDestroy()を呼び出してパーティクルを再生
-				        bullet->Destroy();
-			        }
+					if (shouldDelete) {
+						// 削除前にDestroy()を呼び出してパーティクルを再生
+						bullet->Destroy();
+					}
 
-			        return shouldDelete;
-		        }),
-		    bullets_.end());
+					return shouldDelete;
+				}),
+			bullets_.end());
 	}
 }
 
@@ -478,8 +479,8 @@ void Player::PlayerImGui() {
 
 	// リセットボタン
 	if (ImGui::Button("Reset")) {
-		transform_.translate = {0.0f, 0.0f, 0.0f};
-		transform_.rotate = {0.0f, 0.0f, 0.0f};
+		transform_.translate = { 0.0f, 0.0f, 0.0f };
+		transform_.rotate = { 0.0f, 0.0f, 0.0f };
 		velocity_.y = 0.0f;
 		bulletGauge_ = 0;
 	}
@@ -572,7 +573,7 @@ void Player::CollisionThorn() {
 				}
 
 				// スコア加算
-				AddScore(scoreList_.enemyHitAmount);
+				AddScoreByDistance(thorn, scoreList_.enemyHitAmount);
 
 				// パーティクル
 				ScoreParticleAdd(scoreList_.enemyHitAmount);
@@ -688,7 +689,7 @@ void Player::UpdateCameraShake() {
 
 	if (shakeTimer_ <= 0.0f || playerState_.shakeStrength <= 0.01f) {
 		isShake_ = false;
-		shakeAmount_ = {0.0f, 0.0f};
+		shakeAmount_ = { 0.0f, 0.0f };
 	}
 }
 
@@ -730,11 +731,11 @@ void Player::CollisionWingThorn() {
 			// トゲの揺れ
 			thorn->SetIsShaking(true);
 
-			armHitParticle1_->SetEmitterPosition({thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f});
+			armHitParticle1_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f });
 			armHitParticle1_->Play(false);
-			armHitParticle2_->SetEmitterPosition({thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f});
+			armHitParticle2_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f });
 			armHitParticle2_->Play(false);
-			armHitParticle3_->SetEmitterPosition({thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f});
+			armHitParticle3_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f });
 			armHitParticle3_->Play(false);
 
 			if (dis < kNearThreshold) {
@@ -880,8 +881,8 @@ void Player::PlayerMoveLimit() {
 
 void Player::UpdateCollisionAABB() {
 	Vector3 t = transform_.translate;
-	collisionAABB_.max = {t.x - 0.4f, t.y + 0.4f, t.z + 1.0f};
-	collisionAABB_.min = {t.x + 0.1f, t.y - 0.4f, t.z - 1.0f};
+	collisionAABB_.max = { t.x - 0.4f, t.y - 0.2f, t.z + 0.4f };
+	collisionAABB_.min = { t.x + 0.1f, t.y + 0.2f, t.z - 0.4f };
 }
 
 void Player::StunRotate() {
@@ -948,12 +949,14 @@ void Player::AudioUpdate() {
 	DestroyEnemySE_->SetVolume(SE_Volume);
 	gaugeChargeSE_->SetVolume(SE_Volume);
 	getItemSE_->SetVolume(SE_Volume);
+	attackEnemySE_->SetVolume(SE_Volume);
 
 	shotSE_->Update();
 	playerDamageSE_->Update();
 	DestroyEnemySE_->Update();
 	gaugeChargeSE_->Update();
 	getItemSE_->Update();
+	attackEnemySE_->Update();
 }
 
 void Player::DrawImGuiJsonStateScore() {
@@ -1047,11 +1050,11 @@ void Player::UpdateParticle() {
 		ramuneWhiteParticle_->Play();
 	}
 
-	ramuneParticle_->SetOffSet({0.0f, ramuneOffsetY_, 0.0f});
+	ramuneParticle_->SetOffSet({ 0.0f, ramuneOffsetY_, 0.0f });
 	ramuneParticle_->SetEmitterPosition(transform_.translate);
 	ramuneParticle_->Update();
 
-	ramuneWhiteParticle_->SetOffSet({0.0f, ramuneOffsetY_, 0.0f});
+	ramuneWhiteParticle_->SetOffSet({ 0.0f, ramuneOffsetY_, 0.0f });
 	ramuneWhiteParticle_->SetEmitterPosition(transform_.translate);
 	ramuneWhiteParticle_->Update();
 
@@ -1067,10 +1070,10 @@ void Player::UpdateParticle() {
 			kasokuParticle_->SetSpawnTime(0.025f);
 		} else {
 			kasokuParticle_->SetSpawnTime(99.0f);
-			kasokuParticle_->SetEmitVelocity({0.0f, -10.0f, 0.0f});
+			kasokuParticle_->SetEmitVelocity({ 0.0f, -10.0f, 0.0f });
 		}
 
-		bulletChargeParticle_->SetOffSet({0.0f, 1.65f, -0.75f});
+		bulletChargeParticle_->SetOffSet({ 0.0f, 1.65f, -0.75f });
 	} else if (direction_ == PlayerDirection::DOWN) {
 		kasokuOffsetY_ = -12.0f;
 		if (velocity_.y >= -14.0f && velocity_.y <= -12.0f) {
@@ -1083,13 +1086,13 @@ void Player::UpdateParticle() {
 			kasokuParticle_->SetSpawnTime(0.025f);
 		} else {
 			kasokuParticle_->SetSpawnTime(99.0f);
-			kasokuParticle_->SetEmitVelocity({0.0f, 10.0f, 0.0f});
+			kasokuParticle_->SetEmitVelocity({ 0.0f, 10.0f, 0.0f });
 		}
 
-		bulletChargeParticle_->SetOffSet({0.0f, -1.65f, -0.75f});
+		bulletChargeParticle_->SetOffSet({ 0.0f, -1.65f, -0.75f });
 	}
 
-	kasokuParticle_->SetOffSet({0.0f, kasokuOffsetY_, 0.0f});
+	kasokuParticle_->SetOffSet({ 0.0f, kasokuOffsetY_, 0.0f });
 	kasokuParticle_->SetEmitterPosition(transform_.translate);
 	kasokuParticle_->Update();
 
@@ -1101,10 +1104,10 @@ void Player::UpdateParticle() {
 	stunParticle_->Update();
 
 	if (direction_ == PlayerDirection::UP) {
-		bulletShotParticle_->SetOffSet({0.0f, 0.75f, 0.0f});
+		bulletShotParticle_->SetOffSet({ 0.0f, 0.75f, 0.0f });
 		bulletShotParticle_->SetEmitVelocityY(15.0f);
 	} else if (direction_ == PlayerDirection::DOWN) {
-		bulletShotParticle_->SetOffSet({0.0f, -0.75f, 0.0f});
+		bulletShotParticle_->SetOffSet({ 0.0f, -0.75f, 0.0f });
 		bulletShotParticle_->SetEmitVelocityY(-15.0f);
 	}
 	bulletShotParticle_->SetEmitterPosition(transform_.translate);
@@ -1116,7 +1119,7 @@ void Player::UpdateParticle() {
 	stateChangeParticle_->Update();
 
 	fallParticle_->SetEmitterPosition(transform_.translate);
-	fallParticle_->SetOffSet({0.0, -1.25f, 0.0f});
+	fallParticle_->SetOffSet({ 0.0, -1.25f, 0.0f });
 	fallParticle_->Update();
 
 	if (stateChangeTimer_.IsFinished()) {
@@ -1185,12 +1188,12 @@ void Player::DrawParticle(Camera useCamera) {
 	stunParticle_->Draw(useCamera);
 	bulletShotParticle_->Draw(useCamera);
 	bulletDieParticle_->Draw(useCamera);
-	
+
 	// BulletMoveParticleの配列を描画
 	for (int i = 0; i < 5; ++i) {
 		bulletMoveParticles_[i]->Draw(useCamera);
 	}
-	
+
 	stateChangeParticle_->Draw(useCamera);
 	fallParticle_->Draw(useCamera);
 	armHitParticle1_->Draw(useCamera);
@@ -1261,7 +1264,7 @@ void Player::ScoreParticleAdd(float score) {
 	std::mt19937 eng(rd());
 	std::uniform_real_distribution<float> distr(MIN_POS_X, MAX_POS_X);
 
-	Vector2 basePos = {distr(eng), 350.0f};
+	Vector2 basePos = { distr(eng), 350.0f };
 	float digitSpacing = 32.0f;
 
 	// 桁ごとにスプライト生成
@@ -1271,7 +1274,7 @@ void Player::ScoreParticleAdd(float score) {
 		auto sprite = std::make_unique<Sprite>();
 		sprite->Initialize(dxCommon_, "resources/image/UI/Number0UI.png");
 		sprite->SetTexture(spriteNumCollection_[digit]);
-		sprite->SetScale({0.25f, 0.25f});
+		sprite->SetScale({ 0.25f, 0.25f });
 
 		Vector2 digitPos = basePos;
 		digitPos.x += static_cast<float>(i) * digitSpacing;
@@ -1306,5 +1309,5 @@ void Player::ScoreParticleAddUpdate() {
 
 	// 空になったスコアグループも削除
 	spriteAddScoreParticle_.erase(
-	    std::remove_if(spriteAddScoreParticle_.begin(), spriteAddScoreParticle_.end(), [](const std::vector<std::unique_ptr<Sprite>>& group) { return group.empty(); }), spriteAddScoreParticle_.end());
+		std::remove_if(spriteAddScoreParticle_.begin(), spriteAddScoreParticle_.end(), [](const std::vector<std::unique_ptr<Sprite>>& group) { return group.empty(); }), spriteAddScoreParticle_.end());
 }
