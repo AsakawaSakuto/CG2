@@ -194,6 +194,7 @@ private:
 	// スコア加算時のパーティクル更新
 	void ScoreParticleAddUpdate();
 
+	void TranslateLerp();
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -308,6 +309,11 @@ private:
 	std::unique_ptr<Particles> goalParticle1_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> goalParticle2_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> getScoreParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> boostParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> boost2Particle_ = std::make_unique<Particles>();
+
+	GameTimer boostTimer_;
+
 	float ramuneOffsetY_ = -3.5f;
 	float kasokuOffsetY_ = 12.0f;
 	std::unique_ptr<StunP> stunParticle_ = std::make_unique<StunP>();

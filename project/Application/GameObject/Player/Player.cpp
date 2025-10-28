@@ -159,6 +159,8 @@ void Player::Update() {
 	// プレイヤーの点滅
 	UpdateFlicker();
 
+	TranslateLerp();
+
 	// モデルに座標情報を反映
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -278,6 +280,9 @@ void Player::ReverseIfAboveLimit(float minHeight, float maxHeight) {
 
 		stateChangeParticle_->Play();
 		stateChangeTimer_.Start(2.0f, false);
+
+		boost2Particle_->SetOffSet({ 0.0f,2.0f,0.0f });
+		boost2Particle_->SetTexture("resources/image/particle/flame.png");
 	}
 
 	// プレイヤーが最低地点に到達したとき
@@ -355,7 +360,8 @@ void Player::BulletCharge() {
 		// SE再生
 		gaugeChargeSE_->PlayAudio(SE_Volume);
 
-		bulletChargeParticle_->Play();
+		bulletChargeParticle_->Play(false);
+		boost2Particle_->Play(false);
 	}
 }
 
@@ -441,7 +447,7 @@ void Player::BulletUpdate() {
 				bullets_.begin(), bullets_.end(),
 				[playerPosY](const std::unique_ptr<Bullet>& bullet) { // playerPosYをキャプチャ
 					float y = bullet->GetTransform().translate.y;
-					bool shouldDelete = y > playerPosY + 16.0f || y < playerPosY - 16.0f; // 画面外に出たら削除
+					bool shouldDelete = y > playerPosY + 14.0f || y < playerPosY - 14.0f; // 画面外に出たら削除
 
 					if (shouldDelete) {
 						// 削除前にDestroy()を呼び出してパーティクルを再生
@@ -455,6 +461,10 @@ void Player::BulletUpdate() {
 }
 
 void Player::PlayerImGui() {
+
+	boostParticle_->DrawImGui("boost1");
+	boost2Particle_->DrawImGui("boost2");
+
 	// プレイヤーのImGui
 	ImGui::Begin("Player Control");
 
@@ -579,7 +589,7 @@ void Player::CollisionThorn() {
 				gamePad_->SetVibration(0.05f, 0.05f, 0.1f);
 
 				// トゲを非アクティブにする
-				thorn->PlayParticle(3);
+				thorn->PlayParticle(2);
 				thorn->SetIsAlive(false);
 				smorkParticle_->SetEmitterPosition(thorn->GetPosition());
 				smorkParticle_->Play(false);
@@ -646,7 +656,7 @@ void Player::CollisionBulletThorn() {
 				getItemSE_->PlayAudio(SE_Volume);
 
 				// パーティクル
-				thorn->PlayParticle(2);
+				thorn->PlayParticle(1);
 				smorkParticle_->SetEmitterPosition(thorn->GetPosition());
 				smorkParticle_->Play(false);
 
@@ -741,7 +751,7 @@ void Player::CollisionWingThorn() {
 				// パーティクル
 				ScoreParticleAdd(scoreList_.wingHitNearAmount);
 
-				thorn->PlayParticle(2);
+				thorn->PlayParticle(1);
 			} else {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
 
@@ -1039,9 +1049,31 @@ void Player::InitParticle() {
 		bulletMoveParticles_[i]->Initialize(dxCommon_);
 		bulletMoveParticles_[i]->LoadJson("bulletMove");
 	}
+
+	boostParticle_->Initialize(dxCommon_);
+	boostParticle_->LoadJson("boost1");	
+	boostParticle_->SetOffSet({ 0.0f, -1.0f, 0.0f });
+	boostParticle_->Stop();
+
+	boost2Particle_->Initialize(dxCommon_);
+	boost2Particle_->LoadJson("boost2");
+	boost2Particle_->SetOffSet({ 0.0f, -2.0f, 0.0f });
+	boost2Particle_->Stop();
 }
 
 void Player::UpdateParticle() {
+
+	if (isCountDownZero_ && !boostTimer_.IsFinished() && !boostTimer_.IsActive()) {
+		boostTimer_.Start(0.5f, false);
+		boostParticle_->Play();
+	}
+
+	if (boostTimer_.IsFinished()) {
+		boostParticle_->Stop();
+	}
+
+	boostTimer_.Update();
+
 	if (stunTimer_.IsFinished()) {
 		ramuneParticle_->Play();
 		ramuneWhiteParticle_->Play();
@@ -1174,6 +1206,12 @@ void Player::UpdateParticle() {
 	for (int i = 0; i < 5; ++i) {
 		bulletMoveParticles_[i]->Update();
 	}
+
+	boostParticle_->SetEmitterPosition(transform_.translate);
+	boost2Particle_->SetEmitterPosition(transform_.translate);
+
+	boostParticle_->Update();
+	boost2Particle_->Update();
 }
 
 void Player::DrawParticle(Camera useCamera) {
@@ -1199,6 +1237,9 @@ void Player::DrawParticle(Camera useCamera) {
 	goalParticle1_->Draw(useCamera);
 	goalParticle2_->Draw(useCamera);
 	getScoreParticle_->Draw(useCamera);
+
+	boostParticle_->Draw(useCamera);
+	boost2Particle_->Draw(useCamera);
 }
 
 void Player::UpdateFlicker() {
@@ -1316,4 +1357,25 @@ void Player::AudioReset() {
 	gaugeChargeSE_->Reset();
 	getItemSE_->Reset();
 	attackEnemySE_->Reset();
+}
+
+void Player::TranslateLerp() {
+	// プレイヤーのY座標を取得
+	float currentY = transform_.translate.y;
+	
+	// START_LINE (-10.0f) が 0.0f、END_LINE (440.0f) が 1.0f になるように線形補間
+	// currentYがSTART_LINE以下なら0.0f、END_LINE以上なら1.0fにクランプ
+	float t = (currentY - START_LINE) / (END_LINE - START_LINE);
+	
+	// 0.0f～1.0fの範囲にクランプ
+	t = std::clamp(t, 0.0f, 1.0f);
+	
+	Vector3 lerp = Easing::LerpVector3({ 0.212f, 0.722f, 1.000f }, { 0.0f,0.0f,0.0f }, t);
+	ExeColor.x = lerp.x;
+	ExeColor.y = lerp.y;
+	ExeColor.z = lerp.z;
+
+	// 必要に応じて、この値tを他の処理で使用する
+	// 例: プレイヤーの進行度として保存したい場合
+	// playerProgress_ = t; // メンバ変数があれば保存
 }

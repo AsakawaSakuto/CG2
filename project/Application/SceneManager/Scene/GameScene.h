@@ -210,7 +210,7 @@ private:
 	// ルール説明用のスプライトアニメーション制御
 	unique_ptr<Sprite> spriteRule_ = make_unique<Sprite>();
 	float timerSpriteRule_ = 0.0f;
-	float ruleDuration_ = 2.0f;
+	float ruleDuration_ = 0.75f;
 	float ruleWaitDuration_ = 0.5f;
 	float ruleStartPosY_ = -100.0f;
 	float ruleEndPosY_ = 100.0f;
@@ -354,4 +354,7 @@ private:
 
 	bool timerStarte_ = false;
 	bool resultQuit_ = false;
+
+	unique_ptr<Model> ore_ = make_unique<Model>();
+	Transform oreTransform_;
 };
