@@ -99,7 +99,7 @@ void TitleScene::Initialize() {
 	// 振動の終了
 	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
 
-	maskTimer_.Reset();
+	maskTimer_.Start(1.0f, false);
 }
 
 void TitleScene::Update() {
@@ -109,7 +109,8 @@ void TitleScene::Update() {
 			//sceneFade_->StartFadeIn(2.0f);
 			titleObject_->PlayerEnd();
 			startGameSE_->PlayAudio(SE_Volume);
-			maskTimer_.Start(1.5f);
+			maskTimer_.Start(1.0f, false);
+			titleQuit_ = true;
 			pushStart_ = true;
 		}
 	}
@@ -120,13 +121,15 @@ void TitleScene::Update() {
 		}
 	}
 
-	if (maskTimer_.IsFinished()) {
+	if (maskTimer_.IsFinished() && titleQuit_) {
 		ChangeScene(SCENE::GAME); // シーン切り替え
 		startGameSE_->Reset();
 		moveCursolSE_->Reset();
 		decideSE_->Reset();
 		titleSceneBGM_->Reset();
 	}
+
+	maskTimer_.Update();
 
 	TitleLogoUpdate();
 	CloudUpdate();
@@ -155,6 +158,10 @@ void TitleScene::Update() {
 
 	testParticle_->SetBlendMode(BlendMode::kBlendModeNormal);
 	testParticle_->Update();
+
+	maskBox_->Update();
+	loadingUI_->Update();
+	loadingPlayer_->Update();
 
 	// カメラ切り替え&更新
 	CameraController();
@@ -244,9 +251,14 @@ void TitleScene::Draw() {
 
 	backUI_->Draw();
 
-	sceneFade_->Draw();
+	//sceneFade_->Draw();
 
 	mask_->Draw();
+	if (maskTimer_.IsFinished() && titleQuit_) {
+		maskBox_->Draw();
+		loadingUI_->Draw();
+		loadingPlayer_->Draw();
+	}
 
 	///
 	/// ↑描画処理ここまで
@@ -894,24 +906,29 @@ void TitleScene::SpriteUpdate() {
 	OptionBearUI_->SetRotate(bearRotate);
 	OptionBearUI_->Update();
 
-	maskTimer_.Update();
-
 	if (maskTimer_.IsActive()) {
-		mask_->SetPosition({
-		Easing::Lerp(maskStartPos_.x,maskEndPos_.x,maskTimer_.GetProgress(),Easing::Type::EaseInSine),
-		Easing::Lerp(maskStartPos_.y,maskEndPos_.y,maskTimer_.GetProgress(),Easing::Type::EaseInSine) });
-
-		mask_->SetScale({
-			Easing::Lerp(maskStartScale_.x,maskEndScale_.x,maskTimer_.GetProgress(),Easing::Type::EaseInSine),
-			Easing::Lerp(maskStartScale_.y,maskEndScale_.y,maskTimer_.GetProgress(),Easing::Type::EaseInSine) });
-
-	} else {
-		if (maskTimer_.IsFinished()) {
-			mask_->SetPosition(maskEndPos_);
-			mask_->SetScale(maskEndScale_);
+		if (titleQuit_) {
+			mask_->SetPosition({
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).y });
+			mask_->SetScale({
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).y });
 		} else {
+			mask_->SetPosition({
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).y });
+			mask_->SetScale({
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).x,
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).y });
+		}
+	} else {
+		if (titleQuit_) {
 			mask_->SetPosition(maskStartPos_);
 			mask_->SetScale(maskStartScale_);
+		} else {
+			mask_->SetPosition(maskEndPos_);
+			mask_->SetScale(maskEndScale_);
 		}
 	}
 	
@@ -974,6 +991,36 @@ void TitleScene::InitSptite() {
 	parenthesesUI4_->SetRotate(3.16f);
 	parenthesesUI6_->SetRotate(3.16f);
 
-	mask_->Initialize(&ctx_->dxCommon, "resources/image/mask.png", { 950.0f,360.0f }, { 20.f,20.f });
-	//mask_->SetRotate(0.3f);
+	maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+
+	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingUI.png", { 1040.0f, 640.0f }, { 1.0f, 1.0f });
+	loadingUI_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+
+	loadingPlayer_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingPlayer.png", { 680.0f, 615.0f }, { 0.3f, 0.3f });
+
+	maskType_ = static_cast<MaskType>(random_.Int(0, 2));
+
+	maskStartPos_ = { 640.0f,360.0f };
+	maskEndPos_ = { 640.0f,360.0f };
+
+	switch (MaskType::RAMA)
+	{
+	case TitleScene::MaskType::RAMA:
+		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view01.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+		maskStartScale_ = { 0.26f, 0.26f };
+		maskEndScale_ = { 8.0f, 8.0f };
+		break;
+	case TitleScene::MaskType::KUMA:
+		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view02.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+		maskStartScale_ = { 0.26f, 0.26f };
+		maskEndScale_ = { 2.5f, 2.5f };
+		break;
+	case TitleScene::MaskType::AME:
+		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view03.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+		maskStartScale_ = { 0.26f, 0.26f };
+		maskEndScale_ = { 5.0f, 5.0f };
+		break;
+	}
+
+	titleQuit_ = false;
 }

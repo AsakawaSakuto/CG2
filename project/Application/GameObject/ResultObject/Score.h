@@ -24,9 +24,12 @@ public:
 	bool GoTitle() { return goTitle_; }
 	bool GoResult() { return goResult_; }
 	
+	bool GetNext() { return pushNext_; }
+
 	// シーンを抜ける際に呼び出すメソッド
 	void SaveRankingData();
 
+	int NextSceneNum() { return sceneNum_; }
 private:
 	bool goTitle_ = false;
 	bool goResult_ = false;
@@ -71,6 +74,8 @@ private:
 	float floatSpeed_ = 2.0f;      // 浮遊速度
 
 private:
+	int sceneNum_ = 0;
+
 	int nowScore_ = 0;
 
 	int score1st_ = 0;
@@ -193,7 +198,7 @@ private:
 
 	unique_ptr<Model> backGround_ = make_unique<Model>();
 	Transform backGroundTransform_;
-	Vector3 backGroundStartColor_ = { 1.0f,0.0f,0.0f };
+	Vector3 backGroundStartColor_ = { 0.0f,0.0f,0.0f };
 	Vector3 backGroundEndColor_ = { 0.0353f, 0.0353f, 0.0627f };
 	Vector3 backGroundColor_ = {};
 };

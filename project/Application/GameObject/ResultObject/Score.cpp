@@ -298,6 +298,7 @@ void Score::Update() {
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				goTitle_ = true;
 				pushNext_ = true;
+				sceneNum_ = 0;
 			}
 
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
@@ -324,6 +325,7 @@ void Score::Update() {
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				goResult_ = true;
 				pushNext_ = true;
+				sceneNum_ = 1;
 			}
 
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
