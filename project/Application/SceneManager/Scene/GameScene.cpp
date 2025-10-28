@@ -2,6 +2,7 @@
 #include "Application/GameObject/State/JsonState.h"
 #include "Application/SceneManager/SceneManager.h"
 #include "Engine/System/Audio/MasterVolume.h"
+#include "Engine//System/DirectXCommon/ExeColor.h"
 
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
@@ -310,6 +311,8 @@ void GameScene::Initialize() {
 
 	timerStarte_ = false;
 	resultQuit_ = false;
+
+	ExeColor = { 0.212f, 0.722f, 1.000f, 1.000f };
 }
 
 void GameScene::Update() {

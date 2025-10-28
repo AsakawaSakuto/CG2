@@ -1058,12 +1058,15 @@ void TitleScene::ChangeBG() {
 		case BG_Type::NIGHT:
 			bgColorStart_ = { 0.3451f, 0.3451f, 0.3451f }; // 夜色
 			break;
+		case BG_Type::ORANGE:
+			bgColorStart_ = { 1.0f, 0.6f, 0.3f }; // 淡い夕焼けオレンジ
+			break;
 		}
 
-		// 現在の色以外からランダムに次の色を選択
+		// 現在の色以外からランダムに次の色を選択（4色中3色から選択）
 		BG_Type nextBgType;
 		do {
-			nextBgType = static_cast<BG_Type>(random_.Int(0, 2));
+			nextBgType = static_cast<BG_Type>(random_.Int(0, 3)); // 0-3の4色から選択
 		} while (nextBgType == bgType_);
 
 		// 終了色を設定
@@ -1076,6 +1079,9 @@ void TitleScene::ChangeBG() {
 			break;
 		case BG_Type::NIGHT:
 			bgColorEnd_ = { 0.3451f, 0.3451f, 0.3451f };
+			break;
+		case BG_Type::ORANGE:
+			bgColorEnd_ = { 1.0f, 0.6f, 0.3f };
 			break;
 		}
 
