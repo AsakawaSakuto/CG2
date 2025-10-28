@@ -74,7 +74,7 @@ void TitleScene::Initialize() {
 	testParticle_->LoadJson("bulletmove");
 
 	// 雲の初期化
-	for (int i = 0; i < cloud_.size(); i++) {
+	for (int i = 1; i < 10; i++) {
 		cloud_[i] = make_unique<Model>();	
 		cloud_[i]->Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
 		cloud_[i]->SetTexture("resources/image/0.png");
@@ -84,6 +84,14 @@ void TitleScene::Initialize() {
 		cloudTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
 		cloudTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
 	}
+
+	cloud_[0] = make_unique<Model>();
+	cloud_[0]->Initialize(&ctx_->dxCommon, "enemy/enemy/enemy.obj");
+	cloud_[0]->SetUpdateFrustumCulling(false);
+	cloudIsActive_[0] = false;
+	cloudTramsform_[0].scale = { 2.0f, 2.0f, 2.0f };  // スケールを大きく
+	cloudTramsform_[0].rotate = { 0.0f, 1.6f, 0.0f };
+	cloudTramsform_[0].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
 
 	for (int i = 0; i < cloud_.size(); i++) {
 		cloudLine_[i] = make_unique<Model>();
@@ -811,8 +819,10 @@ void TitleScene::CloudUpdate() {
 			}
 		}
 		// 次の雲生成のためにタイマーを再開始
-		cloudTimer_.Start(2.5f, false);  // 間隔を少し長くして確認しやすくする
+		cloudTimer_.Start(1.5f, false);  // 間隔を少し長くして確認しやすくする
 	}
+
+	cloudTramsform_[0].rotate.z += 0.5f * deltaTime_;
 
 	// 雲の更新処理
 	for (int i = 0; i < cloud_.size(); i++) {
@@ -828,6 +838,9 @@ void TitleScene::CloudUpdate() {
 		}
 		// 雲の色と透明度を設定
 		cloud_[i]->SetColor({ 1.0f, 1.0f, 1.0f, 0.5f });
+		
+		cloud_[0]->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
 		cloud_[i]->SetTransform(cloudTramsform_[i]);
 		cloud_[i]->Update();
 	}
@@ -848,7 +861,7 @@ void TitleScene::CloudUpdate() {
 			}
 		}
 		// 次の雲生成のためにタイマーを再開始
-		cloudLineTimer_.Start(0.5f, false);  // 間隔を少し長くして確認しやすくする
+		cloudLineTimer_.Start(0.25f, false);  // 間隔を少し長くして確認しやすくする
 	}
 
 	// 雲の更新処理
@@ -907,18 +920,18 @@ void TitleScene::SpriteUpdate() {
 	if (maskTimer_.IsActive()) {
 		if (titleQuit_) {
 			mask_->SetPosition({
-				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).x,
-				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress()).y });
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).x,
+				Easing::LerpVector2(maskEndPos_,maskStartPos_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).y });
 			mask_->SetScale({
-				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).x,
-				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).y });
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).x,
+				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress(),Easing::Type::EaseInOutCirc).y });
 		} else {
 			mask_->SetPosition({
-				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).x,
-				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).y });
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).x,
+				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).y });
 			mask_->SetScale({
-				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).x,
-				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).y });
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).x,
+				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress(),Easing::Type::EaseInQuart).y });
 		}
 	} else {
 		if (titleQuit_) {
