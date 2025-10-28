@@ -312,6 +312,8 @@ private:
 	std::unique_ptr<Particles> boostParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> boost2Particle_ = std::make_unique<Particles>();
 
+	std::unique_ptr<Particles> armHitParticle4_ = std::make_unique<Particles>();
+
 	GameTimer boostTimer_;
 
 	float ramuneOffsetY_ = -3.5f;

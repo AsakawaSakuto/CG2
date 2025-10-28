@@ -197,7 +197,7 @@ void GameScene::Initialize() {
 	spriteScoreCountOverPos_ = {-600.0f, 360.0f};
 	spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
 	spriteSnackCountOver_->SetScale({0.5f, 0.5f});
-	spriteSnackCountOver_->SetColor({1.0f, 1.0f, 1.0f, 0.8f});
+	spriteSnackCountOver_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 
 	// ○○個突破　スコア数　スプライト
 	for (int i = 0; i < spriteScoreCountOver_.size(); ++i) {
@@ -205,7 +205,7 @@ void GameScene::Initialize() {
 		spriteScoreCountOver_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
 		spriteScoreCountOver_[i]->SetPosition(spriteScoreCountOverPos_);
 		spriteScoreCountOver_[i]->SetScale({1.0f, 1.0f});
-		spriteScoreCountOver_[i]->SetColor({0.5f, 0.0f, 0.0f, 0.0f});
+		spriteScoreCountOver_[i]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	}
 
 	// push スプライト
@@ -318,7 +318,7 @@ void GameScene::Initialize() {
 	ore_->SetUpdateFrustumCulling(false);
 	ore_->SetUseLight(false);
 	oreTransform_.translate = { 4.5f,450.5f,1.0f };
-	oreTransform_.rotate = { -0.33f,-0.47f,0.66f };
+	oreTransform_.rotate = { -0.33f,-3.47f,0.66f };
 	oreTransform_.scale = { 3.0f,3.0f,3.0f };
 	ore_->SetTransform(oreTransform_);
 
@@ -729,7 +729,7 @@ void GameScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	useCamera_->DrawImgui();
+	//useCamera_->DrawImgui();
 
 	// プレイヤーのImGui
 	player_->DrawImgui();
@@ -740,7 +740,7 @@ void GameScene::Draw() {
 	GameSceneStateImGui();
 
 	// カメラのImGui
-	CameraStateImGui();
+	//CameraStateImGui();
 
 	ImGui::Begin("UI");
 
@@ -756,12 +756,12 @@ void GameScene::Draw() {
 
 	ImGui::End();
 
-	ore_->DrawImGui("ore");
+	//ore_->DrawImGui("ore");
 
-	srarArea1_->DrawImGui("1");
-	srarArea2_->DrawImGui("2");
-	srarArea3_->DrawImGui("3");
-	srarArea4_->DrawImGui("4");
+	//srarArea1_->DrawImGui("1");
+	//srarArea2_->DrawImGui("2");
+	//srarArea3_->DrawImGui("3");
+	//srarArea4_->DrawImGui("4");
 
 	///
 	/// ↑ImGuiここまで

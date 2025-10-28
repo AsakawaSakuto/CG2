@@ -30,9 +30,9 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	// ランク判定（ランキング更新後に行う）
 	if (nowScore_ >= 50000) {
 		rank_ = Rank::S;
-	} else if (nowScore_ >= 40000) {
+	} else if (nowScore_ >= 35000) {
 		rank_ = Rank::A;
-	} else if (nowScore_ >= 30000) {
+	} else if (nowScore_ >= 20000) {
 		rank_ = Rank::B;
 	} else {
 		rank_ = Rank::C;

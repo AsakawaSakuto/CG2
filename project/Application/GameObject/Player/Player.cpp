@@ -497,26 +497,27 @@ void Player::PlayerImGui() {
 	ImGui::End();
 
 	// パーティクルのImGui
-	ramuneParticle_->DrawImGui("ramuneP");
-	ramuneWhiteParticle_->DrawImGui("ramunePW");
-	fallParticle_->DrawImGui("fall");
-	bulletChargeParticle_->DrawImGui("bulletCharge");
+	//ramuneParticle_->DrawImGui("ramuneP");
+	//ramuneWhiteParticle_->DrawImGui("ramunePW");
+	//fallParticle_->DrawImGui("fall");
+	//bulletChargeParticle_->DrawImGui("bulletCharge");
 	// kasokuParticle_->DrawImGui("kasoku");
 	// smorkParticle_->DrawImGui("enemyDie");
 	// bulletChargeParticle_->DrawImGui("shot");
 	// bulletShotParticle_->DrawImGui("bulletShot");
 	// bulletDieParticle_->DrawImGui("bulletDie");
 	// stateChangeParticle_->DrawImGui("stateChange");
-	// fallParticle_->DrawImGui("armHit1");
-	// arrticle1_->DrawImGui("armHit2");
-	armHitParticle3_->DrawImGui("armHit3");
+	//armHitParticle1_->DrawImGui("armHit1");
+	//armHitParticle2_->DrawImGui("armHit2");
+	//armHitParticle3_->DrawImGui("armHit3");
+	armHitParticle4_->DrawImGui("armHit4");
 	// goalParticle_->DrawImGui("goal");
 
-	ImGui::Begin("WingThornDistance");
+	//ImGui::Begin("WingThornDistance");
 
-	ImGui::DragFloat("kNearThreshold", &kNearThreshold, 0.01f);
+	//ImGui::DragFloat("kNearThreshold", &kNearThreshold, 0.01f);
 
-	ImGui::End();
+	//ImGui::End();
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -738,13 +739,6 @@ void Player::CollisionWingThorn() {
 			// トゲの揺れ
 			thorn->SetIsShaking(true);
 
-			armHitParticle1_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f });
-			armHitParticle1_->Play(false);
-			armHitParticle2_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f });
-			armHitParticle2_->Play(false);
-			armHitParticle3_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z - 1.0f });
-			armHitParticle3_->Play(false);
-
 			if (dis < kNearThreshold) {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
 
@@ -752,6 +746,9 @@ void Player::CollisionWingThorn() {
 				ScoreParticleAdd(scoreList_.wingHitNearAmount);
 
 				thorn->PlayParticle(1);
+
+				armHitParticle4_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z });
+				armHitParticle4_->Play(false);
 			} else {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
 
@@ -759,6 +756,13 @@ void Player::CollisionWingThorn() {
 				ScoreParticleAdd(scoreList_.wingHitFarAmount);
 
 				thorn->PlayParticle(1);
+
+				armHitParticle1_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z});
+				armHitParticle1_->Play(false);
+				armHitParticle2_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z});
+				armHitParticle2_->Play(false);
+				armHitParticle3_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z});
+				armHitParticle3_->Play(false);
 			}
 
 			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
@@ -1032,6 +1036,7 @@ void Player::InitParticle() {
 	armHitParticle3_->Initialize(dxCommon_);
 	armHitParticle3_->LoadJson("armHit3");
 	armHitParticle3_->Stop();
+	armHitParticle4_->Initialize(dxCommon_);
 
 	goalParticle1_->Initialize(dxCommon_);
 	goalParticle1_->LoadJson("goal");
@@ -1161,6 +1166,7 @@ void Player::UpdateParticle() {
 	armHitParticle1_->Update();
 	armHitParticle2_->Update();
 	armHitParticle3_->Update();
+	armHitParticle4_->Update();
 
 	goalParticle1_->Update();
 	goalParticle2_->Update();
@@ -1235,6 +1241,7 @@ void Player::DrawParticle(Camera useCamera) {
 	armHitParticle1_->Draw(useCamera);
 	armHitParticle2_->Draw(useCamera);
 	armHitParticle3_->Draw(useCamera);
+	armHitParticle4_->Draw(useCamera);
 	goalParticle1_->Draw(useCamera);
 	goalParticle2_->Draw(useCamera);
 	getScoreParticle_->Draw(useCamera);
