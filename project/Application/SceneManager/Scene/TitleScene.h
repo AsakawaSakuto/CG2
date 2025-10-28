@@ -149,4 +149,12 @@ private:
 	SoundVolume bgmVolume_ = SoundVolume::TYU;
 
 	Random random_;
+
+	// mask
+	unique_ptr<Sprite> mask_ = make_unique<Sprite>();
+	Vector2 maskStartPos_ = { 950.0f,360.0f };
+	Vector2 maskEndPos_ = { 950.0f,-50.0f };
+	Vector2 maskStartScale_ = { 20.0f,20.0f };
+	Vector2 maskEndScale_ = { 1.0f,1.0f };
+	GameTimer maskTimer_;
 };

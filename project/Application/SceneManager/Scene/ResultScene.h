@@ -20,6 +20,9 @@ public:
 	~ResultScene();
 
 private:
+
+	int nextScene_ = 0;
+
 	// Camera
 	Camera* useCamera_ = nullptr;                                      // 使用するカメラ
 	unique_ptr<Camera> normalCamera_ = make_unique<Camera>();          // ノーマルカメラ
@@ -30,4 +33,15 @@ private:
 	float lastScore_ = 0.0f; // 前のシーンから受け取るスコア
 
 	unique_ptr<Score> score_ = make_unique<Score>();
+
+	// mask
+	unique_ptr<Sprite> mask_ = make_unique<Sprite>();
+	Vector2 maskStartPos_;
+	Vector2 maskEndPos_;
+	Vector2 maskStartScale_;
+	Vector2 maskEndScale_;
+	GameTimer maskInTimer_;
+	GameTimer maskOutTimer_;
+
+	bool timerStarte_ = false;
 };

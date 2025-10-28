@@ -10,12 +10,6 @@
 /// シーン遷移、ゲーム内演出のタイミング制御に使用（イージングは分離）
 class GameTimer {
 public:
-    /// @brief コールバック情報
-    struct TimerCallback {
-        float triggerTime;              // 発火時間
-        std::function<void()> callback; // コールバック関数
-        bool triggered = false;         // 既に発火したか
-    };
 
     /// @brief デフォルトコンストラクタ
     GameTimer() = default;
@@ -121,33 +115,6 @@ public:
     /// @return タイムスケール
     float GetTimeScale() const;
 
-    // --- コールバック機能 ---
-
-    /// @brief 指定時間でコールバックを追加
-    /// @param triggerTime 発火時間（秒）
-    /// @param callback コールバック関数
-    void AddCallback(float triggerTime, std::function<void()> callback);
-
-    /// @brief 進行率でコールバックを追加
-    /// @param progress 発火進行率（0.0～1.0）
-    /// @param callback コールバック関数
-    void AddCallbackAtProgress(float progress, std::function<void()> callback);
-
-    /// @brief 全コールバックをクリア
-    void ClearCallbacks();
-
-    // --- デバッグ表示 ---
-
-#ifdef _DEBUG
-    /// @brief ImGuiでタイマー状態を表示（デバッグビルドのみ）
-    /// @param label タイマーのラベル
-    void DrawImGui(const char* label = "Timer");
-#endif
-
-    /// @brief タイマー名を設定（デバッグ用）
-    /// @param name タイマー名
-    void SetName(const char* name);
-
 private:
     float currentTime_ = 0.0f;          // 現在の経過時間
     float duration_ = 0.0f;             // タイマーの継続時間
@@ -164,11 +131,4 @@ private:
     int totalFrames_ = 0;               // 総フレーム数（フレーム単位使用時）
     bool useFrameMode_ = false;         // フレーム単位モードかどうか
     float targetFPS_ = 60.0f;           // 目標FPS（フレーム単位モード用）
-
-    // コールバック・デバッグ機能
-    std::vector<TimerCallback> callbacks_;  // コールバックリスト
-    std::string name_ = "Timer";            // タイマー名（デバッグ用）
-
-    /// @brief コールバックをチェックして実行
-    void CheckAndExecuteCallbacks();
 };

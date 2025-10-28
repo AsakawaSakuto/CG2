@@ -11,6 +11,8 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	goTitle_ = false;
 	goResult_ = false;
 
+	isCandyShot_ = false;
+
 	screenType_ = ScreenType::SCORE;
 
 	nextScene_ = NextScene::TITLE;
@@ -29,6 +31,35 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 
 	sRankParticle_->Initialize(dxCommon_);
 	sRankParticle_->LoadJson("SRank");
+
+	oneParticle_->Initialize(dxCommon_);
+	oneParticle_->LoadJson("1stkirakira");
+
+	twoParticle_->Initialize(dxCommon_);
+	twoParticle_->LoadJson("2ndkirakira");
+
+	threeParticle_->Initialize(dxCommon_);
+	threeParticle_->LoadJson("3rdkirakira");
+
+	kazeParticle_->Initialize(dxCommon_);
+	kazeParticle_->LoadJson("resultKaze");
+	kazeParticle_->Stop();
+
+	fallCandyParticle_->Initialize(dxCommon_);
+	fallCandyParticle_->LoadJson("fallCandy");
+	fallCandyParticle_->Stop();
+	fallCandyParticle_->SetEmitterPosition({ 0.0f,15.0f,3.0f });
+
+	shotCandyParticle_->Initialize(dxCommon_);
+	shotCandyParticle_->LoadJson("shotCandy");
+	shotCandyParticle_->Stop();
+	shotCandyParticle_->SetEmitterPosition({ -15.0f,-10.0f,0.0f });
+
+	shotCandy2Particle_->Initialize(dxCommon_);
+	shotCandy2Particle_->LoadJson("shotCandy2");
+	shotCandy2Particle_->Stop();
+	shotCandy2Particle_->SetEmitterPosition({ 15.0f,-10.0f,0.0f });
+
 	if (rank_== Rank::S) {
 		sRankParticle_->Play();
 	} else {
@@ -51,12 +82,41 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 
 	scoreOutTimer_.Reset();
 
+	// バウンスアニメーション用タイマーをリセット
+	textBounceStartTimer_.Reset();
+	for (int i = 0; i < textBounceTimer_.size(); i++) {
+		textBounceTimer_[i].Reset();
+	}
+
+	// スコアのバウンスアニメーション用タイマーをリセット
+	scoreBounceStartTimer_.Reset();
+	for (int i = 0; i < scoreBounceTimer_.size(); i++) {
+		scoreBounceTimer_[i].Reset();
+	}
+
+	// nowScoreのバウンスアニメーション用タイマーをリセット
+	nowScoreBounceStartTimer_.Reset();
+	for (int i = 0; i < nowScoreBounceTimer_.size(); i++) {
+		nowScoreBounceTimer_[i].Reset();
+	}
+
 	InitTextModel();
 	InitScoreModel();
 	InitRankModel();
 	InitPlayerModel();
 	InitRanking();
 	InitSprite();
+
+	backGround_->Initialize(dxCommon_, "plane.obj");
+	backGround_->SetTexture("resources/image/0.png");
+	backGround_->SetUpdateFrustumCulling(false);
+	backGround_->SetColorVector3(backGroundStartColor_);
+	backGroundTransform_.scale = { 14.62f,8.5f,1.0f };
+	backGroundTransform_.rotate = { 0.0f,0.0f,0.0f };
+	backGroundTransform_.translate = { 0.0f,2.0f,14.85f };
+	backGround_->SetTransform(backGroundTransform_);
+
+	pushNext_ = false;
 }
 
 void Score::Update() {
@@ -87,6 +147,94 @@ void Score::Update() {
 		retryUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
 		cursolUI_->SetColor({ 1.0f,1.0f,1.0f,rankingInTimer_[0].GetProgress() });
 
+		// nowScoreのX軸アニメーションと同時にバウンスアニメーション処理
+		for (int i = 0; i < 5; i++) {
+			// X軸の移動アニメーション（バウンス中でない場合）
+			if (!nowScoreBounceTimer_[i].IsActive()) {
+				nowScoreTransform_[i].translate.x = Easing::Lerp(
+					nowStartX_[i],
+					nowEndX_[i],
+					rankingInTimer_[i].GetProgress(),
+					Easing::Type::EaseInOutBack
+				);
+			}
+		}
+
+		// nowScore用の特別処理（index 5は除外）
+		nowScoreTransform_[5].translate.x = Easing::Lerp(
+			nowStartX_[5],
+			nowEndX_[5],
+			rankingInTimer_[5].GetProgress(),
+			Easing::Type::EaseInOutBack
+		);
+
+		// nowScoreのInアニメーションが全て完了したらバウンスアニメーション開始
+		bool allNowScoreAnimationFinished = true;
+		for (int i = 0; i < 5; i++) { // 0-4のみチェック
+			if (!rankingInTimer_[i].IsFinished()) {
+				allNowScoreAnimationFinished = false;
+				break;
+			}
+		}
+
+		// nowScoreバウンスアニメーション開始条件（1回だけ実行するように）
+		if (allNowScoreAnimationFinished && !nowScoreBounceStartTimer_.IsActive() && !nowScoreBounceStartTimer_.IsFinished()) {
+			nowScoreBounceStartTimer_.Start(1.5f, false); // 1.5秒待機してからバウンス開始
+		}
+
+		// 最初のnowScoreのバウンスを開始
+		if (nowScoreBounceStartTimer_.IsFinished() && !nowScoreBounceTimer_[0].IsActive() && !nowScoreBounceTimer_[0].IsFinished()) {
+			nowScoreBounceTimer_[0].Start(0.6f, false);
+		}
+
+		// 連続してnowScoreバウンスタイマーを開始（波のように重複させる）
+		for (int i = 1; i < nowScoreBounceTimer_.size(); i++) {
+			// 前の数字が開始してから0.1秒後に次の数字を開始（重複して動く）
+			if (nowScoreBounceTimer_[i - 1].IsActive() && nowScoreBounceTimer_[i - 1].GetProgress() >= 0.15f && !nowScoreBounceTimer_[i].IsActive() && !nowScoreBounceTimer_[i].IsFinished()) {
+				nowScoreBounceTimer_[i].Start(0.6f, false);
+			}
+		}
+
+		// nowScoreバウンスアニメーション実行
+		for (int i = 0; i < 5; i++) {
+			if (nowScoreBounceTimer_[i].IsActive()) {
+				float progress = nowScoreBounceTimer_[i].GetProgress();
+				// バウンス効果: 上に浮いてから元の位置に戻る
+				float bounceHeight = 0.7f; // nowScore用のバウンスの高さ
+				float baseY = nowScoreBaseY_[i]; // 元のY位置
+				
+				if (progress <= 0.3f) {
+					// 最初の30%: 上昇
+					nowScoreTransform_[i].translate.y = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
+				} else {
+					// 残りの70%: バウンスしながら落下
+					float fallProgress = (progress - 0.3f) / 0.7f;
+					nowScoreTransform_[i].translate.y = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
+				}
+			}
+			nowScoreBounceTimer_[i].Update();
+		}
+
+		// 全てのnowScore数字のバウンスが終了したら、再びループを開始
+		bool allNowScoreBounceFinished = true;
+		for (int i = 0; i < nowScoreBounceTimer_.size(); i++) {
+			if (nowScoreBounceTimer_[i].IsActive() || !nowScoreBounceTimer_[i].IsFinished()) {
+				allNowScoreBounceFinished = false;
+				break;
+			}
+		}
+		
+		// 全て終了したら、少し待ってから再開
+		if (allNowScoreBounceFinished && nowScoreBounceStartTimer_.IsFinished()) {
+			// タイマーをリセットして再開準備
+			nowScoreBounceStartTimer_.Start(1.0f, false); // 4秒待機してから再開
+			for (int i = 0; i < nowScoreBounceTimer_.size(); i++) {
+				nowScoreBounceTimer_[i].Reset(); // タイマーをリセット
+			}
+		}
+
+		nowScoreBounceStartTimer_.Update();
+
 		for (int i = 0; i < 6; i++) {
 			score1stTransform_[i].translate.x = Easing::Lerp(
 				rankingStartX_[i],
@@ -105,13 +253,6 @@ void Score::Update() {
 			score3rdTransform_[i].translate.x = Easing::Lerp(
 				rankingStartX_[i],
 				rankingEndX_[i],
-				rankingInTimer_[i].GetProgress(),
-				Easing::Type::EaseInOutBack
-			);
-
-			nowScoreTransform_[i].translate.x = Easing::Lerp(
-				nowStartX_[i],
-				nowEndX_[i],
 				rankingInTimer_[i].GetProgress(),
 				Easing::Type::EaseInOutBack
 			);
@@ -154,11 +295,12 @@ void Score::Update() {
 		{
 		case Score::NextScene::TITLE:
 
-			if (rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				goTitle_ = true;
+				pushNext_ = true;
 			}
 
-			if (rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
 				nextScene_ = NextScene::RESULT;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 500.0f;
@@ -179,11 +321,12 @@ void Score::Update() {
 			break;
 		case Score::NextScene::RESULT:
 
-			if (rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				goResult_ = true;
+				pushNext_ = true;
 			}
 
-			if (rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
 				nextScene_ = NextScene::TITLE;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 600.0f;
@@ -271,10 +414,42 @@ void Score::Update() {
 	sRankParticle_->SetOffSet({ 0.2f,0.1f,-1.0f });
 	sRankParticle_->Update();
 
+	kazeParticle_->Update();
+
+	oneParticle_->SetEmitterPosition(score1stTransform_[5].translate);
+	oneParticle_->SetOffSet({ 0.0f,0.0f,-1.0f });
+	oneParticle_->Update();
+
+	twoParticle_->SetEmitterPosition(score2ndTransform_[5].translate);
+	twoParticle_->SetOffSet({ 0.0f,0.0f,-1.0f });
+	twoParticle_->Update();
+
+	threeParticle_->SetEmitterPosition(score3rdTransform_[5].translate);
+	threeParticle_->SetOffSet({ 0.0f,0.0f,-1.0f });
+	threeParticle_->Update();
+
 	cursolMoveTimer_.Update();
+
+	if (rankingInTimer_[5].IsActive()) {
+		backGround_->SetColorVector3({
+		Easing::LerpVector3(
+			backGroundStartColor_,
+			backGroundEndColor_,
+			rankingInTimer_[5].GetProgress(),
+			Easing::Type::Linear
+		) }
+		);
+	}
+	backGround_->Update();
+
+	fallCandyParticle_->Update();
+	shotCandyParticle_->Update();
+	shotCandy2Particle_->Update();
 }
 
 void Score::Draw(Camera camera) {
+
+	backGround_->Draw(camera);
 
 	switch (screenType_)
 	{
@@ -295,9 +470,20 @@ void Score::Draw(Camera camera) {
 			score3rdModel_[i]->Draw(camera);
 		}
 
-		for (int i = 0; i < nowScoreModel_.size(); i++) {
-			nowScoreModel_[i]->Draw(camera);
+		nowScoreModel_[5]->Draw(camera);
+		if (nowScore_ >= 10000) {
+			nowScoreModel_[4]->Draw(camera);
 		}
+		if (nowScore_ >= 1000) {
+			nowScoreModel_[3]->Draw(camera);
+		}
+		if (nowScore_ >= 100) {
+			nowScoreModel_[2]->Draw(camera);
+		}
+		if (nowScore_ >= 10) {
+			nowScoreModel_[1]->Draw(camera);
+		}
+		nowScoreModel_[0]->Draw(camera);
 
 		player2Model_->Draw(camera);
 		player2ArmModel_->Draw(camera);
@@ -310,8 +496,18 @@ void Score::Draw(Camera camera) {
 		textModel_[i]->Draw(camera);
 	}
 
-	for (int i = 0; i < scoreModel_.size(); ++i) {
-		scoreModel_[i]->Draw(camera);
+	scoreModel_[0]->Draw(camera);
+	if (nowScore_ >= 10) {
+		scoreModel_[1]->Draw(camera);
+	}
+	if (nowScore_ >= 100) {
+		scoreModel_[2]->Draw(camera);
+	}
+	if (nowScore_ >= 1000) {
+		scoreModel_[3]->Draw(camera);
+	}
+	if (nowScore_ >= 10000) {
+		scoreModel_[4]->Draw(camera);
 	}
 
 	for (int i = 0; i < rankModel_.size(); ++i) {
@@ -324,6 +520,14 @@ void Score::Draw(Camera camera) {
 	ramuneParticle_->Draw(camera);
 	ramuneParticle2_->Draw(camera);
 	sRankParticle_->Draw(camera);
+	kazeParticle_->Draw(camera);
+	oneParticle_->Draw(camera);
+	twoParticle_->Draw(camera);
+	threeParticle_->Draw(camera);
+
+	fallCandyParticle_->Draw(camera);
+	shotCandyParticle_->Draw(camera);
+	shotCandy2Particle_->Draw(camera);
 
 	pushAsusumu_->Draw();
 	titleUI_->Draw();
@@ -333,6 +537,25 @@ void Score::Draw(Camera camera) {
 
 void Score::DrawImGui() {
 
+	fallCandyParticle_->DrawImGui("fallCandyParticle");
+	shotCandyParticle_->DrawImGui("shotCandyParticle");
+	shotCandy2Particle_->DrawImGui("shotCandy2Particle");
+
+	ImGui::Begin("GB_ColorFade");
+
+	ImGui::ColorEdit3("start", &backGroundStartColor_.x);
+	ImGui::ColorEdit3("end", &backGroundEndColor_.x);
+
+	ImGui::End();
+
+	kazeParticle_->DrawImGui("starParticle");
+	
+	//oneParticle_->DrawImGui("oneParticle");
+	//twoParticle_->DrawImGui("wtoParticle");
+	//threeParticle_->DrawImGui("threeParticle");
+
+	//backGround_->DrawImGui("back");
+
 	//ramuneParticle_->DrawImGui("ramuneParticle");
 	//ramuneParticle2_->DrawImGui("ramuneParticle2");
 
@@ -340,24 +563,24 @@ void Score::DrawImGui() {
 
 	//pushAsusumu_->DrawImGui("pushAsusumu");
 
-	//ImGui::Begin("text");
+	ImGui::Begin("text");
 
-	//ImGui::DragFloat3("t0", &textTransform_[0].translate.x,0.01f);
-	//ImGui::DragFloat3("t1", &textTransform_[1].translate.x,0.01f);
-	//ImGui::DragFloat3("t2", &textTransform_[2].translate.x,0.01f);
-	//ImGui::DragFloat3("t3", &textTransform_[3].translate.x,0.01f);
-	//ImGui::DragFloat3("t4", &textTransform_[4].translate.x,0.01f);
-	//ImGui::DragFloat3("t5", &textTransform_[5].translate.x,0.01f);
-	//ImGui::DragFloat3("t6", &textTransform_[6].translate.x,0.01f);
-	//ImGui::DragFloat3("t7", &textTransform_[7].translate.x,0.01f);
+	/*ImGui::DragFloat3("t0", &textTransform_[0].translate.x,0.01f);
+	ImGui::DragFloat3("t1", &textTransform_[1].translate.x,0.01f);
+	ImGui::DragFloat3("t2", &textTransform_[2].translate.x,0.01f);
+	ImGui::DragFloat3("t3", &textTransform_[3].translate.x,0.01f);
+	ImGui::DragFloat3("t4", &textTransform_[4].translate.x,0.01f);
+	ImGui::DragFloat3("t5", &textTransform_[5].translate.x,0.01f);
+	ImGui::DragFloat3("t6", &textTransform_[6].translate.x,0.01f);
+	ImGui::DragFloat3("t7", &textTransform_[7].translate.x,0.01f);*/
 
-	//ImGui::Separator();
-	//ImGui::Text("Score Digits");
-	//ImGui::DragFloat3("s0", &scoreTransform_[0].translate.x,0.01f);
-	//ImGui::DragFloat3("s1", &scoreTransform_[1].translate.x,0.01f);
-	//ImGui::DragFloat3("s2", &scoreTransform_[2].translate.x,0.01f);
-	//ImGui::DragFloat3("s3", &scoreTransform_[3].translate.x,0.01f);
-	//ImGui::DragFloat3("s4", &scoreTransform_[4].translate.x,0.01f);
+	ImGui::Separator();
+	ImGui::Text("Score Digits");
+	ImGui::DragFloat3("s0", &scoreTransform_[0].translate.x,0.01f);
+	ImGui::DragFloat3("s1", &scoreTransform_[1].translate.x,0.01f);
+	ImGui::DragFloat3("s2", &scoreTransform_[2].translate.x,0.01f);
+	ImGui::DragFloat3("s3", &scoreTransform_[3].translate.x,0.01f);
+	ImGui::DragFloat3("s4", &scoreTransform_[4].translate.x,0.01f);
 
 	//ImGui::Separator();
 	//ImGui::Text("rank Digits");
@@ -366,9 +589,9 @@ void Score::DrawImGui() {
 	//ImGui::DragFloat3("rr0", &rankTransform_[0].rotate.x, 0.01f);
 	//ImGui::DragFloat3("rr1", &rankTransform_[1].rotate.x, 0.01f);
 	//ImGui::DragFloat3("rs0", &rankTransform_[0].scale.x, 0.01f);
-	//ImGui::DragFloat3("rs1", &rankTransform_[1].scale.x, 0.01f);//
+	//ImGui::DragFloat3("rs1", &rankTransform_[1].scale.x, 0.01f);
 
-	//ImGui::End();
+	ImGui::End();
 
 	//ImGui::Begin("playerTranslate");
 	//
@@ -445,6 +668,15 @@ void Score::InitTextModel() {
 	textModel_[5]->Initialize(dxCommon_, "resultLogo/ka.obj");
 	textModel_[6]->Initialize(dxCommon_, "resultLogo/si.obj");
 	textModel_[7]->Initialize(dxCommon_, "resultLogo/ha.obj");
+
+	for (int i = 0; i < 4; i++) {
+		textModel_[i]->SetColor({0.706f, 1.000f, 0.471f, 1.000f});
+	}
+
+	for (int i = 4; i < 8; i++) {
+		textModel_[i]->SetColor({ 1.000f, 0.482f, 0.953f, 1.000f });
+	}
+
 	for (int i = 0; i < textModel_.size(); ++i) {
 		textModel_[i]->SetTexture("resources/image/0.png");
 		textModel_[i]->SetUpdateFrustumCulling(false);
@@ -463,14 +695,14 @@ void Score::InitTextModel() {
 	textTransform_[6].translate = { -3.22f,4.5f,0.0f };
 	textTransform_[7].translate = { -2.72f,4.5f,0.0f };
 
-	textEasingTimer_[0].Start(1.2f, false);
-	textEasingTimer_[1].Start(1.4f, false);
-	textEasingTimer_[2].Start(1.6f, false);
-	textEasingTimer_[3].Start(1.8f, false);
-	textEasingTimer_[4].Start(2.0f, false);
-	textEasingTimer_[5].Start(2.2f, false);
-	textEasingTimer_[6].Start(2.4f, false);
-	textEasingTimer_[7].Start(2.6f, false);
+	// 各テキストの基準Y座標を保存
+	for (int i = 0; i < textBaseY_.size(); i++) {
+		textBaseY_[i] = textEndY_; // 4.5f
+	}
+
+	for (int i = 0; i < textEasingTimer_.size(); i++) {
+		textEasingTimer_[i].Start(1.0f + 0.2f * i, false);
+	}
 }
 
 void Score::InitScoreModel() {
@@ -495,11 +727,16 @@ void Score::InitScoreModel() {
 		scoreTransform_[i].scale = { 1.5f,1.5f,0.5f };
 		scoreTransform_[i].rotate = { 0.0f,0.0f,0.0f };
 	}
-	scoreTransform_[0].translate = { 4.15f,14.75f,0.0f };
-	scoreTransform_[1].translate = { 2.71f,14.75f,0.0f };
-	scoreTransform_[2].translate = { 1.3f,14.75f,0.0f };
-	scoreTransform_[3].translate = { -0.1f,14.75f,0.0f };
+	scoreTransform_[0].translate = { 3.7f,14.75f,0.0f };
+	scoreTransform_[1].translate = { 2.4f,14.75f,0.0f };
+	scoreTransform_[2].translate = { 1.1f,14.75f,0.0f };
+	scoreTransform_[3].translate = { -0.2f,14.75f,0.0f };
 	scoreTransform_[4].translate = { -1.5f,14.75f,0.0f };
+
+	// 各スコア数字の基準Y座標を保存
+	for (int i = 0; i < scoreBaseY_.size(); i++) {
+		scoreBaseY_[i] = scoreEndY_; // 5.0f
+	}
 
 	//------------------------------------------------------------//
 
@@ -528,6 +765,11 @@ void Score::InitScoreModel() {
 	nowScoreTransform_[3].translate = { 14.46f,-0.5f,0.0f };
 	nowScoreTransform_[4].translate = { 13.5f, -0.5f,0.0f };
 	nowScoreTransform_[5].translate = { 11.5f, -0.5f,0.0f };
+
+	// 各nowScore数字の基準Y座標を保存（ランキング画面用）
+	for (int i = 0; i < nowScoreBaseY_.size(); i++) {
+		nowScoreBaseY_[i] = -0.5f; // nowScoreTransformの基準Y座標
+	}
 }
 
 void Score::InitRankModel() {
@@ -555,6 +797,8 @@ void Score::InitRankModel() {
 	}
 	
 	rankModel_[1]->Initialize(dxCommon_, "rank/rank.obj");
+
+	rankModel_[1]->SetColor({ 0.75f,0.75f,0.75f,1.0f });
 
 	rankModel_[0]->SetTexture("resources/image/0.png");
 	rankModel_[1]->SetTexture("resources/image/0.png");
@@ -608,16 +852,87 @@ void Score::InitPlayerModel() {
 }
 
 void Score::ScoreIn() {
+	// バウンスアニメーション中でない場合のみ、通常の位置アニメーションを適用
 	for (int i = 0; i < textModel_.size(); ++i) {
-		textTransform_[i].translate.y = Easing::Lerp(
-			textStartY_,
-			textEndY_,
-			textEasingTimer_[i].GetProgress(),
-			Easing::Type::EaseInOutBounce
-		);
+		if (!textBounceTimer_[i].IsActive()) {
+			textTransform_[i].translate.y = Easing::Lerp(
+				textStartY_,
+				textEndY_,
+				textEasingTimer_[i].GetProgress(),
+				Easing::Type::EaseInOutBounce
+			);
+		}
 		textEasingTimer_[i].Update();
 		textModel_[i]->SetTransform(textTransform_[i]);
 	}
+
+	// テキストのInアニメーションが全て完了したらバウンスアニメーション開始
+	bool allTextAnimationFinished = true;
+	for (int i = 0; i < textEasingTimer_.size(); i++) {
+		if (!textEasingTimer_[i].IsFinished()) {
+			allTextAnimationFinished = false;
+			break;
+		}
+	}
+
+	// バウンスアニメーション開始条件（1回だけ実行するように）
+	if (allTextAnimationFinished && !textBounceStartTimer_.IsActive() && !textBounceStartTimer_.IsFinished()) {
+		textBounceStartTimer_.Start(2.0f, false); // 2秒待機してからバウンス開始
+	}
+
+	// 最初のテキストのバウンスを開始
+	if (textBounceStartTimer_.IsFinished() && !textBounceTimer_[0].IsActive() && !textBounceTimer_[0].IsFinished()) {
+		textBounceTimer_[0].Start(0.6f, false);
+	}
+
+	// 連続してバウンスタイマーを開始（波のように重複させる）
+	for (int i = 1; i < textBounceTimer_.size(); i++) {
+		// 前の文字が開始してから0.1秒後に次の文字を開始（重複して動く）
+		if (textBounceTimer_[i - 1].IsActive() && textBounceTimer_[i - 1].GetProgress() >= 0.15f && !textBounceTimer_[i].IsActive() && !textBounceTimer_[i].IsFinished()) {
+			textBounceTimer_[i].Start(0.6f, false);
+		}
+	}
+
+	// バウンスアニメーション実行
+	for (int i = 0; i < textModel_.size(); ++i) {
+		if (textBounceTimer_[i].IsActive()) {
+			float progress = textBounceTimer_[i].GetProgress();
+			// バウンス効果: 上に浮いてから元の位置に戻る
+			float bounceHeight = 0.5f; // バウンスの高さ
+			float baseY = textBaseY_[i]; // 元のY位置
+			
+			if (progress <= 0.3f) {
+				// 最初の30%: 上昇
+				textTransform_[i].translate.y = Easing::Lerp(baseY, baseY + bounceHeight, progress / 0.3f, Easing::Type::EaseOutQuad);
+			} else {
+				// 残りの70%: バウンスしながら落下
+				float fallProgress = (progress - 0.3f) / 0.7f;
+				textTransform_[i].translate.y = Easing::Lerp(baseY + bounceHeight, baseY, fallProgress, Easing::Type::EaseOutBounce);
+			}
+			textModel_[i]->SetTransform(textTransform_[i]);
+		}
+		textBounceTimer_[i].Update();
+	}
+
+	// 全てのテキストのバウンスが終了したら、再びループを開始
+	bool allBounceFinished = true;
+	for (int i = 0; i < textBounceTimer_.size(); i++) {
+		if (textBounceTimer_[i].IsActive() || !textBounceTimer_[i].IsFinished()) {
+			allBounceFinished = false;
+			break;
+		}
+	}
+	
+	// 全て終了したら、少し待ってから再開
+	if (allBounceFinished && textBounceStartTimer_.IsFinished()) {
+		// タイマーをリセットして再開準備
+		textBounceStartTimer_.Start(3.0f, false); // 3秒待機してから再開
+		for (int i = 0; i < textBounceTimer_.size(); i++) {
+			textBounceTimer_[i].Reset(); // タイマーをリセット
+		}
+	}
+
+	textBounceStartTimer_.Update();
 
 	if (textEasingTimer_[7].IsActive()) {
 		scoreEasingTimer_[0].Start(1.0f, false);
@@ -626,7 +941,7 @@ void Score::ScoreIn() {
 		scoreEasingTimer_[3].Start(2.5f, false);
 		scoreEasingTimer_[4].Start(3.0f, false);
 	}
-
+	
 	for (int i = 0; i < scoreModel_.size(); ++i) {
 		scoreTransform_[i].translate.y = Easing::Lerp(
 			scoreStartY_,
@@ -640,6 +955,13 @@ void Score::ScoreIn() {
 
 	if (scoreEasingTimer_[4].IsActive()) {
 		rankAndPlayerEasingTimer_.Start(1.0f, false);
+	}
+
+	if (scoreEasingTimer_[4].IsFinished() && !isCandyShot_) {
+		isCandyShot_ = true;
+		shotCandyParticle_->Play(false);
+		shotCandy2Particle_->Play(false);
+		fallCandyParticle_->Play();
 	}
 
 	rankTransform_[0].translate.x = Easing::Lerp(
@@ -683,8 +1005,12 @@ void Score::ScoreIn() {
 			screenType_ = ScreenType::RANKING;
 			scoreOutTimer_.Start(1.0f, false);
 			
+			kazeParticle_->Play();
+
+			fallCandyParticle_->LoadJson("fallcandy2");
+
 			for (int i = 0; i < rankingInTimer_.size(); i++) {
-				rankingInTimer_[i].Start(3.0f - i * 0.3f, false);
+				rankingInTimer_[i].Start(2.2f - i * 0.2f, false);
 			}
 		}
 	}
@@ -753,7 +1079,7 @@ void Score::ScoreOut() {
 
 void Score::InitSprite() {
 	pushAsusumu_->Initialize(dxCommon_, "resources/image/UI/ContinueAUI.png", { 1155.0f,666.0f }, { 0.3f,0.3f });
-	pushAsusumu_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	pushAsusumu_->SetColor({ 0.0f,0.0f,0.0f,0.0f });
 	titleUI_->Initialize(dxCommon_, "resources/image/UI/BackToTitleUI.png", { 350.0f,500.0f }, { 0.3f,0.3f });
 	retryUI_->Initialize(dxCommon_, "resources/image/UI/retryUI.png", { 355.0f,600.0f }, { 0.3f,0.3f });
 	cursolUI_->Initialize(dxCommon_, "resources/image/UI/Cursol.png", { 180.0f,500.0f }, { 0.3f,0.3f });
@@ -790,12 +1116,12 @@ void Score::InitRanking() {
 	}
 	score1stTransform_[5].scale = { 1.5f,1.5f,0.5f };
 
-	score1stTransform_[0].translate = { 17.24f,4.85f,0.0f };
-	score1stTransform_[1].translate = { 16.34f,4.85f,0.0f };
-	score1stTransform_[2].translate = { 15.35f,4.85f,0.0f };
-	score1stTransform_[3].translate = { 14.46f,4.85f,0.0f };
-	score1stTransform_[4].translate = { 13.5f, 4.85f,0.0f };
-	score1stTransform_[5].translate = { 11.5f, 4.85f,0.0f };
+	score1stTransform_[0].translate = { 17.24f,4.88f,0.0f };
+	score1stTransform_[1].translate = { 16.34f,4.88f,0.0f };
+	score1stTransform_[2].translate = { 15.35f,4.88f,0.0f };
+	score1stTransform_[3].translate = { 14.46f,4.88f,0.0f };
+	score1stTransform_[4].translate = { 13.5f, 4.88f,0.0f };
+	score1stTransform_[5].translate = { 11.5f, 4.88f,0.0f };
 
 	// -------------------------------------------------------------------------//
 
@@ -826,12 +1152,12 @@ void Score::InitRanking() {
 	}
 	score2ndTransform_[5].scale = { 1.5f,1.5f,0.5f };
 
-	score2ndTransform_[0].translate = { 17.24f,3.18f,0.0f };
-	score2ndTransform_[1].translate = { 16.34f,3.18f,0.0f };
-	score2ndTransform_[2].translate = { 15.35f,3.18f,0.0f };
-	score2ndTransform_[3].translate = { 14.46f,3.18f,0.0f };
-	score2ndTransform_[4].translate = { 13.5f, 3.18f,0.0f };
-	score2ndTransform_[5].translate = { 11.5f, 3.18f,0.0f };
+	score2ndTransform_[0].translate = { 17.24f,3.24f,0.0f };
+	score2ndTransform_[1].translate = { 16.34f,3.24f,0.0f };
+	score2ndTransform_[2].translate = { 15.35f,3.24f,0.0f };
+	score2ndTransform_[3].translate = { 14.46f,3.24f,0.0f };
+	score2ndTransform_[4].translate = { 13.5f, 3.24f,0.0f };
+	score2ndTransform_[5].translate = { 11.5f, 3.24f,0.0f };
 
 	// -------------------------------------------------------------------------//
 
@@ -862,12 +1188,12 @@ void Score::InitRanking() {
 	}
 	score3rdTransform_[5].scale = { 1.5f,1.5f,0.5f };
 
-	score3rdTransform_[0].translate = { 17.24f,1.55f,0.0f };
-	score3rdTransform_[1].translate = { 16.34f,1.55f,0.0f };
-	score3rdTransform_[2].translate = { 15.35f,1.55f,0.0f };
-	score3rdTransform_[3].translate = { 14.46f,1.55f,0.0f };
-	score3rdTransform_[4].translate = { 13.5f, 1.55f,0.0f };
-	score3rdTransform_[5].translate = { 11.5f, 1.55f,0.0f };
+	score3rdTransform_[0].translate = { 17.24f,1.62f,0.0f };
+	score3rdTransform_[1].translate = { 16.34f,1.62f,0.0f };
+	score3rdTransform_[2].translate = { 15.35f,1.62f,0.0f };
+	score3rdTransform_[3].translate = { 14.46f,1.62f,0.0f };
+	score3rdTransform_[4].translate = { 13.5f, 1.62f,0.0f };
+	score3rdTransform_[5].translate = { 11.5f, 1.62f,0.0f };
 }
 
 void Score::LoadRankingData() {

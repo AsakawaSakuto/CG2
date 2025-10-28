@@ -30,6 +30,7 @@ public:
 private:
 	bool goTitle_ = false;
 	bool goResult_ = false;
+	bool pushNext_ = false;
 
 	Input* input_ = nullptr;
 	GamePad* gamePad_ = nullptr;
@@ -80,9 +81,9 @@ private:
 	const std::string rankingJsonPath_ = "resources/engineResources/test.json";
 
 	float rankingStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.5f };
-	float rankingEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.5f };
+	float rankingEndX_[6] = { 6.5f,5.5f,4.5f,3.5f,2.5f,0.7f };
 	float nowStartX_[6] = { 17.24f,16.34f,15.35f,14.46f,13.5f,11.59f };
-	float nowEndX_[6] = { 7.24f,6.34f,5.35f,4.46f,3.5f,1.59f };
+	float nowEndX_[6] = { 6.5f,5.5f,4.5f,3.5f,2.5f,0.7f };
 
 	std::array<unique_ptr<Model>, 6> score1stModel_;
 	std::array<Transform, 6> score1stTransform_;
@@ -127,7 +128,7 @@ private:
 
 	float score_ = 0.0f;
 	float scoreStartY_ = 14.75f;
-	float scoreEndY_ = 4.75f;
+	float scoreEndY_ = 5.0f;
 	float textStartY_ = 10.0f;
 	float textEndY_ = 4.5f;
 
@@ -147,6 +148,21 @@ private:
 	GameTimer scoreOutTimer_;
 	GameTimer cursolMoveTimer_;
 
+	// ★追加：テキストのバウンスアニメーション用タイマー
+	GameTimer textBounceStartTimer_;
+	std::array<GameTimer, 8> textBounceTimer_;
+	std::array<float, 8> textBaseY_; // 各テキストの基準Y座標を保存
+
+	// ★追加：スコアのバウンスアニメーション用タイマー
+	GameTimer scoreBounceStartTimer_;
+	std::array<GameTimer, 5> scoreBounceTimer_;
+	std::array<float, 5> scoreBaseY_; // 各スコアの基準Y座標を保存
+
+	// ★追加：nowScoreランキング画面でのバウンスアニメーション用タイマー
+	GameTimer nowScoreBounceStartTimer_;
+	std::array<GameTimer, 5> nowScoreBounceTimer_;
+	std::array<float, 5> nowScoreBaseY_; // 各nowScoreの基準Y座標を保存
+
 	Vector4 rankColor_[4] = {
 	{0.255f, 0.839f, 0.153f, 1.0f}, // 緑
 	{0.173f, 0.365f, 0.835f, 1.0f}, // 青
@@ -164,4 +180,20 @@ private:
 	unique_ptr<Particles> ramuneParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> ramuneParticle2_ = make_unique<Particles>();
 	unique_ptr<Particles> sRankParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> kazeParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> oneParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> twoParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> threeParticle_ = make_unique<Particles>();
+
+	unique_ptr<Particles> fallCandyParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> shotCandyParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> shotCandy2Particle_ = make_unique<Particles>();
+
+	bool isCandyShot_ = false;
+
+	unique_ptr<Model> backGround_ = make_unique<Model>();
+	Transform backGroundTransform_;
+	Vector3 backGroundStartColor_ = { 1.0f,0.0f,0.0f };
+	Vector3 backGroundEndColor_ = { 0.0353f, 0.0353f, 0.0627f };
+	Vector3 backGroundColor_ = {};
 };

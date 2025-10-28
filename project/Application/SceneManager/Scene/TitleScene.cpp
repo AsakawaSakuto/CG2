@@ -98,15 +98,18 @@ void TitleScene::Initialize() {
 
 	// 振動の終了
 	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
+
+	maskTimer_.Reset();
 }
 
 void TitleScene::Update() {
 	
 	if (selectMenu_ == PLAY) {
 		if ((input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) && titleTimer_.IsFinished() && !pushStart_) {
-			sceneFade_->StartFadeIn(2.0f);
+			//sceneFade_->StartFadeIn(2.0f);
 			titleObject_->PlayerEnd();
 			startGameSE_->PlayAudio(SE_Volume);
+			maskTimer_.Start(1.5f);
 			pushStart_ = true;
 		}
 	}
@@ -117,7 +120,7 @@ void TitleScene::Update() {
 		}
 	}
 
-	if (sceneFade_->EndFadeIn()) {
+	if (maskTimer_.IsFinished()) {
 		ChangeScene(SCENE::GAME); // シーン切り替え
 		startGameSE_->Reset();
 		moveCursolSE_->Reset();
@@ -243,6 +246,8 @@ void TitleScene::Draw() {
 
 	sceneFade_->Draw();
 
+	mask_->Draw();
+
 	///
 	/// ↑描画処理ここまで
 	///
@@ -266,6 +271,8 @@ void TitleScene::Draw() {
 	//titleParticle_->DrawImGui("titleParticle");
 
 	testParticle_->DrawImGui("testParticle");
+
+	mask_->DrawImGui("mask");
 
 	/*parenthesesUI1_->DrawImGui("pare1");
 	parenthesesUI2_->DrawImGui("pare2");
@@ -886,6 +893,29 @@ void TitleScene::SpriteUpdate() {
 	bearRotate -= 1.0f * deltaTime_;
 	OptionBearUI_->SetRotate(bearRotate);
 	OptionBearUI_->Update();
+
+	maskTimer_.Update();
+
+	if (maskTimer_.IsActive()) {
+		mask_->SetPosition({
+		Easing::Lerp(maskStartPos_.x,maskEndPos_.x,maskTimer_.GetProgress(),Easing::Type::EaseInSine),
+		Easing::Lerp(maskStartPos_.y,maskEndPos_.y,maskTimer_.GetProgress(),Easing::Type::EaseInSine) });
+
+		mask_->SetScale({
+			Easing::Lerp(maskStartScale_.x,maskEndScale_.x,maskTimer_.GetProgress(),Easing::Type::EaseInSine),
+			Easing::Lerp(maskStartScale_.y,maskEndScale_.y,maskTimer_.GetProgress(),Easing::Type::EaseInSine) });
+
+	} else {
+		if (maskTimer_.IsFinished()) {
+			mask_->SetPosition(maskEndPos_);
+			mask_->SetScale(maskEndScale_);
+		} else {
+			mask_->SetPosition(maskStartPos_);
+			mask_->SetScale(maskStartScale_);
+		}
+	}
+	
+	mask_->Update();
 }
 
 void TitleScene::AudioUpdate() {
@@ -943,4 +973,7 @@ void TitleScene::InitSptite() {
 	parenthesesUI2_->SetRotate(3.16f);
 	parenthesesUI4_->SetRotate(3.16f);
 	parenthesesUI6_->SetRotate(3.16f);
+
+	mask_->Initialize(&ctx_->dxCommon, "resources/image/mask.png", { 950.0f,360.0f }, { 20.f,20.f });
+	//mask_->SetRotate(0.3f);
 }
