@@ -188,15 +188,15 @@ void GameScene::Initialize() {
 	clearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
 
 	// BGM
-	gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM01.mp3");
+	gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM03.wav");
 	gameSceneBGM02_->Initialize("resources/sound/BGM/InGameBGM02.mp3");
-	gameSceneBGM01_->PlayAudio(BGM_Volume, true);
+	gameSceneBGM01_->PlayAudio(gameSceneBGM01_BaseVolume_ * BGM_Volume, true);
 
 	// ○○個突破!スプライト
 	spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
 	spriteScoreCountOverPos_ = {-600.0f, 360.0f};
 	spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
-	spriteSnackCountOver_->SetScale({0.5f, 0.5f});
+	spriteSnackCountOver_->SetScale({0.4f, 0.4f});
 	spriteSnackCountOver_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 
 	// ○○個突破　スコア数　スプライト
@@ -331,6 +331,11 @@ void GameScene::Initialize() {
 	srarArea2_->LoadJson("starArea2");
 	srarArea3_->LoadJson("starArea3");
 	srarArea4_->LoadJson("starArea4");
+
+	startGameSE_BaseVolume_ = 0.45f;
+	countDownSE_BaseVolume_ = 0.65f;
+	clearSE_BaseVolume_ = 0.8f;
+	gameSceneBGM01_BaseVolume_ = 1.0f;
 }
 
 void GameScene::Update() {
@@ -375,7 +380,11 @@ void GameScene::Update() {
 		spriteScoreCountOverPos_ = {-500.0f, 360.0f};
 
 		// SE再生
-		clearSE_->PlayAudio(SE_Volume);
+		clearSE_->PlayAudio();
+	}
+
+	if (maskTimer_.IsActive() && resultQuit_) {
+		gameSceneBGM01_BaseVolume_ = Lerp(1.0f, 0.0f, maskTimer_.GetProgress());
 	}
 
 	// 終了テキストの更新
@@ -453,6 +462,7 @@ void GameScene::Update() {
 	spriteRule_->Update();
 
 	// ○○個突破!スプライト更新
+	spriteSnackCountOver_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	spriteSnackCountOver_->Update();
 
 	// 進行度ゲージ更新
@@ -556,8 +566,7 @@ void GameScene::Update() {
 			mask_->SetScale({
 				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).x,
 				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).y });
-		}
-		else {
+		} else {
 			mask_->SetPosition({
 				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).x,
 				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).y });
@@ -565,8 +574,7 @@ void GameScene::Update() {
 				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).x,
 				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).y });
 		}
-	}
-	else {
+	} else {
 		if (resultQuit_) {
 			mask_->SetPosition(maskStartPos_);
 			mask_->SetScale(maskStartScale_);
@@ -729,39 +737,32 @@ void GameScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	//useCamera_->DrawImgui();
-
 	// プレイヤーのImGui
 	player_->DrawImgui();
 
 	DrawSceneName();
 
-	// ゲームシーン上で管理しているステータスのImGui
-	GameSceneStateImGui();
+	ImGui::Text("GameScene_Audio");
 
-	// カメラのImGui
-	//CameraStateImGui();
+	ImGui::DragFloat("startGame_SE",&startGameSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("countDown_SE",&countDownSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("clear_SE",&clearSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("gameScene_BGM01", &gameSceneBGM01_BaseVolume_, 0.01f);
+	ImGui::DragFloat("gameScene_BGM02",&gameSceneBGM02_BaseVolume_, 0.01f);
 
-	ImGui::Begin("UI");
+	if (ImGui::Button("start")) {
+		startGameSE_->PlayAudio();
+	}
 
-	ImGui::DragFloat3("line", &spriteProgressLine_->GetPosition().x, 1.0f);
-	ImGui::DragFloat3("goal", &spriteProgressGoal_->GetPosition().x, 1.0f);
-	ImGui::DragFloat3("chargeBGUI", &spriteChargeUI_->GetPosition().x, 1.0f);
-	ImGui::DragFloat3("spriteCandyScore", &spriteCandyScore_->GetPosition().x, 1.0f);
-	ImGui::DragFloat2("curtainSpritePos1", &curtainSprite_[0]->GetPosition().x, 1.0f);
-	ImGui::DragFloat2("curtainSpritePos2", &curtainSprite_[1]->GetPosition().x, 1.0f);
-	ImGui::ColorPicker4("curtainSpritePos2", &spriteCandyScore_->GetColor().x);
-	ImGui::DragFloat3("GroundModelPos", &modelGround_->GetTranslate().x);
-	ImGui::DragFloat3("GroundModelScale", &modelGround_->GetScale().x);
+	if (ImGui::Button("countdown")) {
+		countDownSE_->PlayAudio();
+	}
+
+	if (ImGui::Button("clear")) {
+		clearSE_->PlayAudio();
+	}
 
 	ImGui::End();
-
-	//ore_->DrawImGui("ore");
-
-	//srarArea1_->DrawImGui("1");
-	//srarArea2_->DrawImGui("2");
-	//srarArea3_->DrawImGui("3");
-	//srarArea4_->DrawImGui("4");
 
 	///
 	/// ↑ImGuiここまで
@@ -884,7 +885,7 @@ void GameScene::GameStartCount() {
 
 		if (displayNumber >= 1) {
 			// SE再生
-			countDownSE_->PlayAudio(SE_Volume);
+			countDownSE_->PlayAudio();
 		}
 	}
 
@@ -915,7 +916,7 @@ void GameScene::GameStartCount() {
 		spriteStart_->SetColor({1.0f, 1.0f, 1.0f, startAnimStartAlpha_});
 
 		// SE再生
-		startGameSE_->PlayAudio(SE_Volume);
+		startGameSE_->PlayAudio();
 	}
 
 	// 「スタート!」スプライトのイージング処理
@@ -1091,11 +1092,11 @@ void GameScene::UpdateEndText() {
 }
 
 void GameScene::AudioUpdate() {
-	startGameSE_->SetVolume(SE_Volume);
-	countDownSE_->SetVolume(SE_Volume);
-	clearSE_->SetVolume(SE_Volume);
-	gameSceneBGM01_->SetVolume(BGM_Volume);
-	gameSceneBGM02_->SetVolume(BGM_Volume);
+	startGameSE_->SetVolume(startGameSE_BaseVolume_ * SE_Volume);
+	countDownSE_->SetVolume(countDownSE_BaseVolume_ * SE_Volume);
+	clearSE_->SetVolume(clearSE_BaseVolume_ * SE_Volume);
+	gameSceneBGM01_->SetVolume(gameSceneBGM01_BaseVolume_ * BGM_Volume);
+	gameSceneBGM02_->SetVolume(gameSceneBGM02_BaseVolume_ * BGM_Volume);
 
 	startGameSE_->Update();
 	countDownSE_->Update();

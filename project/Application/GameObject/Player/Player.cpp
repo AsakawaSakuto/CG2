@@ -228,23 +228,13 @@ void Player::Draw(Camera useCamera) {
 }
 
 void Player::DrawImgui() {
-	// プレイヤーのImGui
+
 	PlayerImGui();
 
 	// プレイヤーのステータス
 	DrawImGuiJsonStatePlayer();
 
-	// 弾のステータス
-	DrawImGuiJsonStateBullet();
-
-	// クマのモデルのImGui
-	bear_->ImGuiUpdate();
-
-	// スコアのImGui
-	DrawImGuiJsonStateScore();
-
-	// 羽のImGui
-	playerWing_->WingImGui();
+	armHitParticle4_->DrawImGui("4");
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -358,7 +348,7 @@ void Player::BulletCharge() {
 		num_ = 0;
 
 		// SE再生
-		gaugeChargeSE_->PlayAudio(SE_Volume);
+		gaugeChargeSE_->PlayAudio();
 
 		bulletChargeParticle_->Play(false);
 		boost2Particle_->Play(false);
@@ -406,7 +396,7 @@ void Player::BulletShot() {
 		num_ = 0;
 
 		// SEの再生
-		shotSE_->PlayAudio(SE_Volume);
+		shotSE_->PlayAudio();
 
 		//
 		bulletShotParticle_->Play(false);
@@ -462,62 +452,25 @@ void Player::BulletUpdate() {
 
 void Player::PlayerImGui() {
 
-	boostParticle_->DrawImGui("boost1");
-	boost2Particle_->DrawImGui("boost2");
-
 	// プレイヤーのImGui
 	ImGui::Begin("Player Control");
 
-	// 座標
 	ShowLabeledVector3("Translate", &transform_.translate.x);
-
-	// 回転
-	ShowLabeledVector3("Rotate", &transform_.rotate.x);
-
-	// 大きさ
-	ShowLabeledVector3("Scale", &transform_.scale.x);
-
-	// 速度
-	ShowLabeledVector3("Velocity", &velocity_.x);
-
-	// 弾のステータス
-	ImGui::Text("BulletGauge: %d", bulletGauge_);
-	ImGui::Text("Bullet Count: %d", static_cast<int>(bullets_.size()));
-
-	// リセットボタン
-	if (ImGui::Button("Reset")) {
-		transform_.translate = { 0.0f, 0.0f, 0.0f };
-		transform_.rotate = { 0.0f, 0.0f, 0.0f };
-		velocity_.y = 0.0f;
-		bulletGauge_ = 0;
-	}
 
 	ImGui::Checkbox("Player Move", &playerIsMove_);
 
 	ImGui::End();
 
-	// パーティクルのImGui
-	//ramuneParticle_->DrawImGui("ramuneP");
-	//ramuneWhiteParticle_->DrawImGui("ramunePW");
-	//fallParticle_->DrawImGui("fall");
-	//bulletChargeParticle_->DrawImGui("bulletCharge");
-	// kasokuParticle_->DrawImGui("kasoku");
-	// smorkParticle_->DrawImGui("enemyDie");
-	// bulletChargeParticle_->DrawImGui("shot");
-	// bulletShotParticle_->DrawImGui("bulletShot");
-	// bulletDieParticle_->DrawImGui("bulletDie");
-	// stateChangeParticle_->DrawImGui("stateChange");
-	//armHitParticle1_->DrawImGui("armHit1");
-	//armHitParticle2_->DrawImGui("armHit2");
-	//armHitParticle3_->DrawImGui("armHit3");
-	armHitParticle4_->DrawImGui("armHit4");
-	// goalParticle_->DrawImGui("goal");
+	ImGui::Begin("Player Audio");
 
-	//ImGui::Begin("WingThornDistance");
+	ImGui::DragFloat("shotSE", &shotSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("damage", &playerDamageSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("getItem", &getItemSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("gaugeCharge", &gaugeChargeSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("attackEnemy", &attackEnemySE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("destroyEnemy", &DestroyEnemySE_BaseVolume_, 0.01f);
 
-	//ImGui::DragFloat("kNearThreshold", &kNearThreshold, 0.01f);
-
-	//ImGui::End();
+	ImGui::End();
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -534,6 +487,9 @@ void Player::DrawImGuiJsonStatePlayer() {
 	if (ImGui::Button("Save JSON")) {
 		JsonState::Save("Resources/Data/playerState.json", playerState_);
 	}
+
+	ImGui::DragFloat3("tra", &transform_.translate.x, 0.01f);
+	ImGui::Checkbox("isMove", &playerIsMove_);
 
 	ImGui::End();
 }
@@ -558,7 +514,7 @@ void Player::Stun() {
 		AddScore(scoreList_.stunAmount);
 
 		// SE再生
-		playerDamageSE_->PlayAudio(SE_Volume);
+		playerDamageSE_->PlayAudio();
 
 		// パーティクル停止
 		ramuneParticle_->Stop();
@@ -611,7 +567,7 @@ void Player::CollisionThorn() {
 				// SE再生
 				//DestroyEnemySE_->PlayAudio(SE_Volume);
 				// SE再生
-				attackEnemySE_->PlayAudio(SE_Volume);
+				attackEnemySE_->PlayAudio();
 
 				break;
 			} else if (direction_ == PlayerDirection::UP) {
@@ -667,7 +623,7 @@ void Player::CollisionBulletThorn() {
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
 
 				// SE再生
-				getItemSE_->PlayAudio(SE_Volume);
+				getItemSE_->PlayAudio();
 
 				// パーティクル
 				thorn->PlayParticle(1);
@@ -808,7 +764,7 @@ void Player::CollisionWingThorn() {
 			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
 
 			// SE再生
-			getItemSE_->PlayAudio(SE_Volume);
+			getItemSE_->PlayAudio();
 
 			break;
 		}
@@ -995,12 +951,12 @@ void Player::UpdatePlayerHorizontalMove() {
 }
 
 void Player::AudioUpdate() {
-	shotSE_->SetVolume(SE_Volume);
-	playerDamageSE_->SetVolume(SE_Volume);
-	DestroyEnemySE_->SetVolume(SE_Volume);
-	gaugeChargeSE_->SetVolume(SE_Volume);
-	getItemSE_->SetVolume(SE_Volume);
-	attackEnemySE_->SetVolume(SE_Volume);
+	shotSE_->SetVolume(shotSE_BaseVolume_ * SE_Volume);
+	playerDamageSE_->SetVolume(playerDamageSE_BaseVolume_ * SE_Volume);
+	DestroyEnemySE_->SetVolume(DestroyEnemySE_BaseVolume_ * SE_Volume);
+	gaugeChargeSE_->SetVolume(gaugeChargeSE_BaseVolume_ * SE_Volume);
+	getItemSE_->SetVolume(getItemSE_BaseVolume_ * SE_Volume);
+	attackEnemySE_->SetVolume(attackEnemySE_BaseVolume_ * SE_Volume);
 
 	shotSE_->Update();
 	playerDamageSE_->Update();
@@ -1077,6 +1033,8 @@ void Player::InitParticle() {
 	armHitParticle3_->LoadJson("armHit3");
 	armHitParticle3_->Stop();
 	armHitParticle4_->Initialize(dxCommon_);
+	armHitParticle4_->LoadJson("armHit4");
+	armHitParticle4_->Stop();
 
 	goalParticle1_->Initialize(dxCommon_);
 	goalParticle1_->LoadJson("goal");
@@ -1234,6 +1192,7 @@ void Player::UpdateParticle() {
 				case PlayerDirection::DOWN:
 					if (thornPos.y < playerY - 13.75f) {
 						getScoreParticle_->SetEmitterPosition(thornPos);
+						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
 						getScoreParticle_->Play(false);
 						thorn->ParticleReset(i);
@@ -1361,6 +1320,18 @@ void Player::ScoreParticleAdd(float score) {
 		sprite->Initialize(dxCommon_, "resources/image/UI/Number0UI.png");
 		sprite->SetTexture(spriteNumCollection_[digit]);
 		sprite->SetScale({ 0.25f, 0.25f });
+
+		if (score == 5) {
+			sprite->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
+		} else if (score == 10) {
+			sprite->SetColor({ 0.5490f, 0.9098f, 0.4392f, 1.0f });
+		} else if (score == 30) {
+			sprite->SetColor({ 0.6275f, 0.9686f, 0.9608f, 1.0f });
+		} else if (score == 50) {
+			sprite->SetColor({ 0.8549f, 0.6392f, 0.9451f, 1.0f });
+		} else if (score == -10) {
+			sprite->SetColor({ 0.9373f, 0.4275f, 0.4275f, 1.0f });
+		}
 
 		Vector2 digitPos = basePos;
 		digitPos.x += static_cast<float>(i) * digitSpacing;

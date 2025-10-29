@@ -114,11 +114,14 @@ void ResultScene::Update() {
 
 	if (maskTimer_.IsFinished() && resultQuit_) {
 		if (quitTimer_.IsFinished()) {
+			score_->ResetAudio();
 			ChangeScene(TITLE);
 		} else {
 			if (score_->NextSceneNum() == 0) {
+				score_->ResetAudio();
 				ChangeScene(TITLE);
 			} else {
+				score_->ResetAudio();
 				ChangeScene(GAME);
 			}
 		}
@@ -183,21 +186,7 @@ void ResultScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	ImGui::Begin("timer");
-
-	ImGui::Text("maskTimer: %.2f", quitTimer_.GetElapsedTime());
-
-	ImGui::End();
-
-	debugCamera_->DrawImgui();
-
 	score_->DrawImGui();
-
-	mask_->DrawImGui("mask");
-
-	loadingUI_->DrawImGui("loadingUI");
-
-	loadingPlayer_->DrawImGui("pla");
 
 	DrawSceneName();
 

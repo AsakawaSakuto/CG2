@@ -35,6 +35,7 @@ public:
 	bool IsNewRecord() const { return isNewRecord_; }
 	int GetRankingPosition() const { return rankingPosition_; } // 1,2,3,4(圏外)を返す
 
+	void ResetAudio();
 private:
 	bool goTitle_ = false;
 	bool goResult_ = false;
@@ -87,9 +88,9 @@ private:
 
 	int nowScore_ = 0;
 
-	int score1st_ = 30000;  // デフォルト値を明示的に設定
-	int score2nd_ = 20000;  // デフォルト値を明示的に設定
-	int score3rd_ = 10000;  // デフォルト値を明示的に設定
+	int score1st_ = 50000;  // デフォルト値を明示的に設定
+	int score2nd_ = 40000;  // デフォルト値を明示的に設定
+	int score3rd_ = 30000;  // デフォルト値を明示的に設定
 	
 	// JSONファイルのパスを修正
 	const std::string rankingJsonPath_ = "resources/engineresources/test.json";
@@ -157,6 +158,8 @@ private:
 	float machineStartX_ = 13.85f;
 	float machineEndX_ = 3.85f;
 
+	bool isDrumroll_ = false;
+
 	std::array<GameTimer, 8> textEasingTimer_;
 	std::array<GameTimer, 5> scoreEasingTimer_;
 	std::array<GameTimer, 6> rankingInTimer_;
@@ -164,17 +167,19 @@ private:
 	GameTimer scoreOutTimer_;
 	GameTimer cursolMoveTimer_;
 
-	// ★追加：テキストのバウンスアニメーション用タイマー
+	GameTimer maskTimer_;
+
+	//　テキストのバウンスアニメーション用タイマー
 	GameTimer textBounceStartTimer_;
 	std::array<GameTimer, 8> textBounceTimer_;
 	std::array<float, 8> textBaseY_; // 各テキストの基準Y座標を保存
 
-	// ★追加：スコアのバウンスアニメーション用タイマー
+	// スコアのバウンスアニメーション用タイマー
 	GameTimer scoreBounceStartTimer_;
 	std::array<GameTimer, 5> scoreBounceTimer_;
 	std::array<float, 5> scoreBaseY_; // 各スコアの基準Y座標を保存
 
-	// ★追加：nowScoreランキング画面でのバウンスアニメーション用タイマー
+	// nowScoreランキング画面でのバウンスアニメーション用タイマー
 	GameTimer nowScoreBounceStartTimer_;
 	std::array<GameTimer, 5> nowScoreBounceTimer_;
 	std::array<float, 5> nowScoreBaseY_; // 各nowScoreの基準Y座標を保存
@@ -212,4 +217,20 @@ private:
 	Vector3 backGroundStartColor_ = { 0.0f,0.0f,0.0f };
 	Vector3 backGroundEndColor_ = { 0.0353f, 0.0353f, 0.0627f };
 	Vector3 backGroundColor_ = {};
+
+	//---------------------------------------------------------------------//
+
+	unique_ptr<AudioX> completeSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> drumrollSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> moveCursolSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> decideSE_ = make_unique<AudioX>();
+	unique_ptr<AudioX> resultSceneBGM_ = make_unique<AudioX>();
+
+	float completeSE_BaseVolume_ = 0.5f;
+	float drumrollSE_BaseVolume_ = 0.5f;
+	float moveCursolSE_BaseVolume_ = 0.5f;
+	float decideSE_BaseVolume_ = 0.5f;
+	float resultSceneBGM_BaseVolume_ = 0.5f;
+
+	void UpdateAudio();
 };

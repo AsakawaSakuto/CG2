@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <utility>
 
+#include "Engine//System/Audio/MasterVolume.h"
+
 void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	dxCommon_ = dxCommon;
 	score_ = score;
@@ -153,6 +155,20 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 		msgUI_->Initialize(dxCommon_, "resources/image/UI/ResultTextRankCUI.png", { -300.0f,280.0f }, { 0.5f,0.5f });
 		break;
 	}
+
+	isDrumroll_ = false;
+
+	completeSE_BaseVolume_ = 1.0f;
+	drumrollSE_BaseVolume_ = 0.15f;
+	moveCursolSE_BaseVolume_ = 0.5f;
+	decideSE_BaseVolume_ = 1.0f;
+	resultSceneBGM_BaseVolume_ = 0.5f;
+
+	drumrollSE_->Initialize("resources/sound/se/Result/DrumrollSE.mp3");
+	completeSE_->Initialize("resources/sound/se/Result/CompleteSE.mp3");
+	moveCursolSE_->Initialize("resources/sound/se/title/moveCursolSE.mp3");
+	decideSE_->Initialize("resources/sound/se/title/DecideSE.mp3");
+	resultSceneBGM_->Initialize("resources/sound/bgm/bgm26.wav");
 }
 
 void Score::Update() {
@@ -165,6 +181,11 @@ void Score::Update() {
 	player2Transform_.translate.y = 3.5f + floatOffset;
 	player2ArmTransform_.translate.y = 3.78f + floatOffset;
 	machine2Transform_.translate.y = 2.39f + floatOffset;
+
+	if (textEasingTimer_[0].IsFinished() && !isDrumroll_) {
+		isDrumroll_ = true;
+		drumrollSE_->PlayAudio(drumrollSE_BaseVolume_ * SE_Volume, true);
+	}
 
 	switch (screenType_)
 	{
@@ -335,6 +356,8 @@ void Score::Update() {
 				goTitle_ = true;
 				pushNext_ = true;
 				sceneNum_ = 0;
+				decideSE_->PlayAudio();
+				maskTimer_.Start(1.0f, false);
 			}
 
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
@@ -342,6 +365,7 @@ void Score::Update() {
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 500.0f;
 				cursolEndY_ = 600.0f;
+				moveCursolSE_->PlayAudio();
 			}
 
 			if (cursolMoveTimer_.IsActive()) {
@@ -362,6 +386,8 @@ void Score::Update() {
 				goResult_ = true;
 				pushNext_ = true;
 				sceneNum_ = 1;
+				decideSE_->PlayAudio();
+				maskTimer_.Start(1.0f, false);
 			}
 
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
@@ -369,6 +395,7 @@ void Score::Update() {
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 600.0f;
 				cursolEndY_ = 500.0f;
+				moveCursolSE_->PlayAudio();
 			}
 
 			if (cursolMoveTimer_.IsActive()) {
@@ -485,6 +512,10 @@ void Score::Update() {
 	fallCandyParticle_->Update();
 	shotCandyParticle_->Update();
 	shotCandy2Particle_->Update();
+
+	maskTimer_.Update();
+
+	UpdateAudio();
 }
 
 void Score::Draw(Camera camera) {
@@ -579,125 +610,22 @@ void Score::Draw(Camera camera) {
 
 void Score::DrawImGui() {
 
-	fallCandyParticle_->DrawImGui("fallCandyParticle");
-	shotCandyParticle_->DrawImGui("shotCandyParticle");
-	shotCandy2Particle_->DrawImGui("shotCandy2Particle");
+	ImGui::Begin("result Audio");
 
-	ImGui::Begin("GB_ColorFade");
+	ImGui::DragFloat("completeSE", &completeSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("drumrollSE", &drumrollSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("moveCursolSE", &moveCursolSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("decideSE", &decideSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("resultSceneBGM", &resultSceneBGM_BaseVolume_, 0.01f);
 
-	ImGui::ColorEdit3("start", &backGroundStartColor_.x);
-	ImGui::ColorEdit3("end", &backGroundEndColor_.x);
-
-	ImGui::End();
-
-	kazeParticle_->DrawImGui("starParticle");
-	
-	msgUI_->DrawImGui("msg");
-
-	//oneParticle_->DrawImGui("oneParticle");
-	//twoParticle_->DrawImGui("wtoParticle");
-	//threeParticle_->DrawImGui("threeParticle");
-
-	//backGround_->DrawImGui("back");
-
-	//ramuneParticle_->DrawImGui("ramuneParticle");
-	//ramuneParticle2_->DrawImGui("ramuneParticle2");
-
-	//sRankParticle_->DrawImGui("sRankParticle");
-
-	//pushAsusumu_->DrawImGui("pushAsusumu");
-
-	ImGui::Begin("text");
-
-	/*ImGui::DragFloat3("t0", &textTransform_[0].translate.x,0.01f);
-	ImGui::DragFloat3("t1", &textTransform_[1].translate.x,0.01f);
-	ImGui::DragFloat3("t2", &textTransform_[2].translate.x,0.01f);
-	ImGui::DragFloat3("t3", &textTransform_[3].translate.x,0.01f);
-	ImGui::DragFloat3("t4", &textTransform_[4].translate.x,0.01f);
-	ImGui::DragFloat3("t5", &textTransform_[5].translate.x,0.01f);
-	ImGui::DragFloat3("t6", &textTransform_[6].translate.x,0.01f);
-	ImGui::DragFloat3("t7", &textTransform_[7].translate.x,0.01f);*/
-
-	ImGui::Separator();
-	ImGui::Text("Score Digits");
-	ImGui::DragFloat3("s0", &scoreTransform_[0].translate.x,0.01f);
-	ImGui::DragFloat3("s1", &scoreTransform_[1].translate.x,0.01f);
-	ImGui::DragFloat3("s2", &scoreTransform_[2].translate.x,0.01f);
-	ImGui::DragFloat3("s3", &scoreTransform_[3].translate.x,0.01f);
-	ImGui::DragFloat3("s4", &scoreTransform_[4].translate.x,0.01f);
-
-	//ImGui::Separator();
-	//ImGui::Text("rank Digits");
-	//ImGui::DragFloat3("r0", &rankTransform_[0].translate.x, 0.01f);
-	//ImGui::DragFloat3("r1", &rankTransform_[1].translate.x, 0.01f);
-	//ImGui::DragFloat3("rr0", &rankTransform_[0].rotate.x, 0.01f);
-	//ImGui::DragFloat3("rr1", &rankTransform_[1].rotate.x, 0.01f);
-	//ImGui::DragFloat3("rs0", &rankTransform_[0].scale.x, 0.01f);
-	//ImGui::DragFloat3("rs1", &rankTransform_[1].scale.x, 0.01f);
+	if (ImGui::Button("comp")) {
+		completeSE_->PlayAudio();
+	}
+	if (ImGui::Button("drum")) {
+		drumrollSE_->PlayAudio();
+	}
 
 	ImGui::End();
-
-	//ImGui::Begin("playerTranslate");
-	//
-	//ImGui::DragFloat3("Pt", &playerTransform_.translate.x, 0.01f);
-	//ImGui::DragFloat3("Pr", &playerTransform_.rotate.x, 0.01f);
-	//ImGui::DragFloat3("Ps", &playerTransform_.scale.x, 0.01f);
-	//ImGui::DragFloat3("Mt", &machineTransform_.translate.x, 0.01f);
-	//ImGui::DragFloat3("Mr", &machineTransform_.rotate.x, 0.01f);
-	//ImGui::DragFloat3("Ms", &machineTransform_.scale.x, 0.01f);
-	//
-	//ImGui::End();
-
-	//titleUI_->DrawImGui("title");
-	//retryUI_->DrawImGui("retry");
-	//cursolUI_->DrawImGui("curcol");
-
-	/*ImGui::Begin("p2");
-
-	ImGui::DragFloat3("Pt", &player2Transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("Pr", &player2Transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("Ps", &player2Transform_.scale.x, 0.01f);
-	ImGui::DragFloat3("PtA", &player2ArmTransform_.translate.x, 0.01f);
-	ImGui::DragFloat3("PrA", &player2ArmTransform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("PsA", &player2ArmTransform_.scale.x, 0.01f);
-	ImGui::DragFloat3("Mt", &machine2Transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("Mr", &machine2Transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("Ms", &machine2Transform_.scale.x, 0.01f);
-
-	ImGui::End();*/
-
-	/*ImGui::Begin("1st");
-
-	ImGui::DragFloat3("0", &score1stTransform_[0].translate.x,0.01f);
-	ImGui::DragFloat3("1", &score1stTransform_[1].translate.x,0.01f);
-	ImGui::DragFloat3("2", &score1stTransform_[2].translate.x,0.01f);
-	ImGui::DragFloat3("3", &score1stTransform_[3].translate.x,0.01f);
-	ImGui::DragFloat3("4", &score1stTransform_[4].translate.x,0.01f);
-	ImGui::DragFloat3("5", &score1stTransform_[5].translate.x,0.01f);
-
-	ImGui::End();
-
-	ImGui::Begin("2nd");
-
-	ImGui::DragFloat3("0", &score2ndTransform_[0].translate.x, 0.01f);
-	ImGui::DragFloat3("1", &score2ndTransform_[1].translate.x, 0.01f);
-	ImGui::DragFloat3("2", &score2ndTransform_[2].translate.x, 0.01f);
-	ImGui::DragFloat3("3", &score2ndTransform_[3].translate.x, 0.01f);
-	ImGui::DragFloat3("4", &score2ndTransform_[4].translate.x, 0.01f);
-	ImGui::DragFloat3("5", &score2ndTransform_[5].translate.x, 0.01f);
-
-	ImGui::End();
-
-	ImGui::Begin("3rd");
-
-	ImGui::DragFloat3("0", &score3rdTransform_[0].translate.x, 0.01f);
-	ImGui::DragFloat3("1", &score3rdTransform_[1].translate.x, 0.01f);
-	ImGui::DragFloat3("2", &score3rdTransform_[2].translate.x, 0.01f);
-	ImGui::DragFloat3("3", &score3rdTransform_[3].translate.x, 0.01f);
-	ImGui::DragFloat3("4", &score3rdTransform_[4].translate.x, 0.01f);
-	ImGui::DragFloat3("5", &score3rdTransform_[5].translate.x, 0.01f);
-
-	ImGui::End();*/
 }
 
 void Score::InitTextModel() {
@@ -1007,6 +935,10 @@ void Score::ScoreIn() {
 		shotCandyParticle_->Play(false);
 		shotCandy2Particle_->Play(false);
 		fallCandyParticle_->Play();
+
+		completeSE_->PlayAudio();
+		drumrollSE_->StopAll();
+		resultSceneBGM_->PlayAudio(resultSceneBGM_BaseVolume_* BGM_Volume, true);
 	}
 
 	msgUI_->SetPosition({ Easing::Lerp(-300.0f, 300.0f, rankAndPlayerEasingTimer_.GetProgress(),
@@ -1054,6 +986,8 @@ void Score::ScoreIn() {
 			scoreOutTimer_.Start(1.0f, false);
 			
 			kazeParticle_->Play();
+
+			decideSE_->PlayAudio();
 
 			fallCandyParticle_->LoadJson("fallcandy2");
 
@@ -1352,4 +1286,30 @@ void Score::SaveRankingData() {
 	} catch (const std::exception&) {
 		// エラーログを出力したい場合はここに追加
 	}
+}
+
+void Score::UpdateAudio() {
+	if (maskTimer_.IsActive()) {
+		resultSceneBGM_BaseVolume_ = Lerp(0.5f, 0.0f, maskTimer_.GetProgress());
+	}
+
+	completeSE_->SetVolume(completeSE_BaseVolume_ * SE_Volume);
+	drumrollSE_->SetVolume(drumrollSE_BaseVolume_ * SE_Volume);
+	moveCursolSE_->SetVolume(moveCursolSE_BaseVolume_ * SE_Volume);
+	decideSE_->SetVolume(decideSE_BaseVolume_ * SE_Volume);
+	resultSceneBGM_->SetVolume(resultSceneBGM_BaseVolume_ * BGM_Volume);
+
+	completeSE_->Update();
+	drumrollSE_->Update();
+	moveCursolSE_->Update();
+	decideSE_->Update();
+	resultSceneBGM_->Update();
+}
+
+void Score::ResetAudio() {
+	drumrollSE_->Reset();
+	completeSE_->Reset();
+	moveCursolSE_->Reset();
+	decideSE_->Reset();
+	resultSceneBGM_->Reset();
 }

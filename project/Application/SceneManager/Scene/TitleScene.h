@@ -135,6 +135,11 @@ private:
 	unique_ptr<AudioX> decideSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> titleSceneBGM_ = make_unique<AudioX>();
 
+	float startGameSE_BaseVolume_ = 1.0f;
+	float moveCursolSE_BaseVolume_ = 0.5f;
+	float decideSE_BaseVolume_ = 1.0f;
+	float titleSceneBGM_BaseVolume_ = 1.0f;
+
 	unique_ptr<Particles> titleParticle_ = make_unique<Particles>();
 
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
@@ -159,13 +164,13 @@ private:
 
 	bool optionOpen_ = false;
 
-	float daiVolumeSE_ = 0.2f;
-	float tyuVolumeSE_ = 0.1f;
-	float syouVolumeSE_ = 0.05f;
+	float daiVolumeSE_ = 1.0f;
+	float tyuVolumeSE_ = 0.5f;
+	float syouVolumeSE_ = 0.1f;
 
-	float daiVolumeBGM_ = 0.3f;
-	float tyuVolumeBGM_ = 0.1f;
-	float syouVolumeBGM_ = 0.05f;
+	float daiVolumeBGM_ = 1.0f;
+	float tyuVolumeBGM_ = 0.5f;
+	float syouVolumeBGM_ = 0.1f;
 
 	Menu selectMenu_ = Menu::PLAY;
 	OptionMenu selectOptionMenu_ = OptionMenu::NONE;
