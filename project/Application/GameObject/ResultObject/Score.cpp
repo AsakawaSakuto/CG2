@@ -28,7 +28,7 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	SaveRankingData();
 
 	// ランク判定（ランキング更新後に行う）
-	if (nowScore_ >= 50000) {
+	if (nowScore_ >= 45000) {
 		rank_ = Rank::S;
 	} else if (nowScore_ >= 35000) {
 		rank_ = Rank::A;
