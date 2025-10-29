@@ -229,6 +229,8 @@ void Player::Draw(Camera useCamera) {
 
 void Player::DrawImgui() {
 
+	PlayerImGui();
+
 	// プレイヤーのステータス
 	DrawImGuiJsonStatePlayer();
 
@@ -346,7 +348,7 @@ void Player::BulletCharge() {
 		num_ = 0;
 
 		// SE再生
-		gaugeChargeSE_->PlayAudio(SE_Volume);
+		gaugeChargeSE_->PlayAudio();
 
 		bulletChargeParticle_->Play(false);
 		boost2Particle_->Play(false);
@@ -394,7 +396,7 @@ void Player::BulletShot() {
 		num_ = 0;
 
 		// SEの再生
-		shotSE_->PlayAudio(SE_Volume);
+		shotSE_->PlayAudio();
 
 		//
 		bulletShotParticle_->Play(false);
@@ -450,62 +452,25 @@ void Player::BulletUpdate() {
 
 void Player::PlayerImGui() {
 
-	boostParticle_->DrawImGui("boost1");
-	boost2Particle_->DrawImGui("boost2");
-
 	// プレイヤーのImGui
 	ImGui::Begin("Player Control");
 
-	// 座標
 	ShowLabeledVector3("Translate", &transform_.translate.x);
-
-	// 回転
-	ShowLabeledVector3("Rotate", &transform_.rotate.x);
-
-	// 大きさ
-	ShowLabeledVector3("Scale", &transform_.scale.x);
-
-	// 速度
-	ShowLabeledVector3("Velocity", &velocity_.x);
-
-	// 弾のステータス
-	ImGui::Text("BulletGauge: %d", bulletGauge_);
-	ImGui::Text("Bullet Count: %d", static_cast<int>(bullets_.size()));
-
-	// リセットボタン
-	if (ImGui::Button("Reset")) {
-		transform_.translate = { 0.0f, 0.0f, 0.0f };
-		transform_.rotate = { 0.0f, 0.0f, 0.0f };
-		velocity_.y = 0.0f;
-		bulletGauge_ = 0;
-	}
 
 	ImGui::Checkbox("Player Move", &playerIsMove_);
 
 	ImGui::End();
 
-	// パーティクルのImGui
-	//ramuneParticle_->DrawImGui("ramuneP");
-	//ramuneWhiteParticle_->DrawImGui("ramunePW");
-	//fallParticle_->DrawImGui("fall");
-	//bulletChargeParticle_->DrawImGui("bulletCharge");
-	// kasokuParticle_->DrawImGui("kasoku");
-	// smorkParticle_->DrawImGui("enemyDie");
-	// bulletChargeParticle_->DrawImGui("shot");
-	// bulletShotParticle_->DrawImGui("bulletShot");
-	// bulletDieParticle_->DrawImGui("bulletDie");
-	// stateChangeParticle_->DrawImGui("stateChange");
-	//armHitParticle1_->DrawImGui("armHit1");
-	//armHitParticle2_->DrawImGui("armHit2");
-	//armHitParticle3_->DrawImGui("armHit3");
-	armHitParticle4_->DrawImGui("armHit4");
-	// goalParticle_->DrawImGui("goal");
+	ImGui::Begin("Player Audio");
 
-	//ImGui::Begin("WingThornDistance");
+	ImGui::DragFloat("shotSE", &shotSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("damage", &playerDamageSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("getItem", &getItemSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("gaugeCharge", &gaugeChargeSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("attackEnemy", &attackEnemySE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("destroyEnemy", &DestroyEnemySE_BaseVolume_, 0.01f);
 
-	//ImGui::DragFloat("kNearThreshold", &kNearThreshold, 0.01f);
-
-	//ImGui::End();
+	ImGui::End();
 }
 
 void Player::DrawImGuiJsonStatePlayer() {
@@ -549,7 +514,7 @@ void Player::Stun() {
 		AddScore(scoreList_.stunAmount);
 
 		// SE再生
-		playerDamageSE_->PlayAudio(SE_Volume);
+		playerDamageSE_->PlayAudio();
 
 		// パーティクル停止
 		ramuneParticle_->Stop();
@@ -589,7 +554,7 @@ void Player::CollisionThorn() {
 				// SE再生
 				//DestroyEnemySE_->PlayAudio(SE_Volume);
 				// SE再生
-				attackEnemySE_->PlayAudio(SE_Volume);
+				attackEnemySE_->PlayAudio();
 
 				break;
 			} else if (direction_ == PlayerDirection::UP) {
@@ -645,7 +610,7 @@ void Player::CollisionBulletThorn() {
 			if (Collision::IsHit(bullet->GetCollisionSphere(), thorn->GetCollisionSphere())) {
 
 				// SE再生
-				getItemSE_->PlayAudio(SE_Volume);
+				getItemSE_->PlayAudio();
 
 				// パーティクル
 				thorn->PlayParticle(1);
@@ -759,7 +724,7 @@ void Player::CollisionWingThorn() {
 			thorn->SetUpgradeCooldownWing(10); // 10フレームのクールダウン
 
 			// SE再生
-			getItemSE_->PlayAudio(SE_Volume);
+			getItemSE_->PlayAudio();
 
 			break;
 		}
@@ -946,12 +911,12 @@ void Player::UpdatePlayerHorizontalMove() {
 }
 
 void Player::AudioUpdate() {
-	shotSE_->SetVolume(SE_Volume);
-	playerDamageSE_->SetVolume(SE_Volume);
-	DestroyEnemySE_->SetVolume(SE_Volume);
-	gaugeChargeSE_->SetVolume(SE_Volume);
-	getItemSE_->SetVolume(SE_Volume);
-	attackEnemySE_->SetVolume(SE_Volume);
+	shotSE_->SetVolume(shotSE_BaseVolume_ * SE_Volume);
+	playerDamageSE_->SetVolume(playerDamageSE_BaseVolume_ * SE_Volume);
+	DestroyEnemySE_->SetVolume(DestroyEnemySE_BaseVolume_ * SE_Volume);
+	gaugeChargeSE_->SetVolume(gaugeChargeSE_BaseVolume_ * SE_Volume);
+	getItemSE_->SetVolume(getItemSE_BaseVolume_ * SE_Volume);
+	attackEnemySE_->SetVolume(attackEnemySE_BaseVolume_ * SE_Volume);
 
 	shotSE_->Update();
 	playerDamageSE_->Update();
@@ -1186,6 +1151,7 @@ void Player::UpdateParticle() {
 					break;
 				case PlayerDirection::DOWN:
 					if (thornPos.y < playerY - 13.75f) {
+						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetEmitterPosition(thornPos);
 						getScoreParticle_->SetStartColor(thorn->GetColor(i));
 						getScoreParticle_->Play(false);

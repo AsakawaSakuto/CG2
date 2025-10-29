@@ -113,6 +113,11 @@ void TitleScene::Initialize() {
 	bgType_ = BG_Type::SKY;
 	bgChangeTimer_.Start(10.0f, false);
 	bgFadeTimer_.Reset(); // bgFadeTimer_を明示的に初期化
+
+	startGameSE_BaseVolume_ = 1.0f;
+	moveCursolSE_BaseVolume_ = 0.5f;
+	decideSE_BaseVolume_ = 1.0f;
+	titleSceneBGM_BaseVolume_ = 0.15f;
 }
 
 void TitleScene::Update() {
@@ -919,6 +924,11 @@ void TitleScene::AudioUpdate() {
 	startGameSE_->Update();
 	moveCursolSE_->Update();
 	decideSE_->Update();
+
+	if (maskTimer_.IsActive() && titleQuit_) {
+		titleSceneBGM_BaseVolume_ = Lerp(0.15f, 0.0f, maskTimer_.GetProgress());
+	}
+
 	titleSceneBGM_->Update();
 }
 

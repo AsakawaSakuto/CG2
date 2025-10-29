@@ -291,6 +291,13 @@ private:
 	unique_ptr<AudioX> getItemSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> attackEnemySE_ = make_unique<AudioX>();
 
+	float shotSE_BaseVolume_ = 0.35f;
+	float playerDamageSE_BaseVolume_ = 0.3f;
+	float DestroyEnemySE_BaseVolume_ = 0.5f;
+	float gaugeChargeSE_BaseVolume_ = 1.0f;
+	float getItemSE_BaseVolume_ = 0.4f;
+	float attackEnemySE_BaseVolume_ = 0.5f;
+
 	// ramuneから出るパーティクル
 	std::unique_ptr<Particles> ramuneParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> ramuneWhiteParticle_ = std::make_unique<Particles>();

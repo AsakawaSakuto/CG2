@@ -258,10 +258,15 @@ private:
 	unique_ptr<AudioX> startGameSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> countDownSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> clearSE_ = make_unique<AudioX>();
-
 	// BGM
 	unique_ptr<AudioX> gameSceneBGM01_ = make_unique<AudioX>();
 	unique_ptr<AudioX> gameSceneBGM02_ = make_unique<AudioX>();
+
+	float startGameSE_BaseVolume_ = 0.45f;
+	float countDownSE_BaseVolume_ = 0.65f;
+	float clearSE_BaseVolume_ = 0.8f;
+	float gameSceneBGM01_BaseVolume_ = 0.15f;
+	float gameSceneBGM02_BaseVolume_ = 0.5f;
 
 	// ○○個突破 スプライト
 	unique_ptr<Sprite> spriteSnackCountOver_ = make_unique<Sprite>();

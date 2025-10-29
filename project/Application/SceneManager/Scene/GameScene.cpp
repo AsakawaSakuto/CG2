@@ -190,7 +190,7 @@ void GameScene::Initialize() {
 	// BGM
 	gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM01.mp3");
 	gameSceneBGM02_->Initialize("resources/sound/BGM/InGameBGM02.mp3");
-	gameSceneBGM01_->PlayAudio(BGM_Volume, true);
+	gameSceneBGM01_->PlayAudio(gameSceneBGM01_BaseVolume_ * BGM_Volume, true);
 
 	// ○○個突破!スプライト
 	spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
@@ -375,7 +375,7 @@ void GameScene::Update() {
 		spriteScoreCountOverPos_ = {-500.0f, 360.0f};
 
 		// SE再生
-		clearSE_->PlayAudio(SE_Volume);
+		clearSE_->PlayAudio();
 	}
 
 	// 終了テキストの更新
@@ -735,6 +735,28 @@ void GameScene::Draw() {
 
 	DrawSceneName();
 
+	ImGui::Text("GameScene_Audio");
+
+	ImGui::DragFloat("startGame_SE",&startGameSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("countDown_SE",&countDownSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("clear_SE",&clearSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("gameScene_BGM01", &gameSceneBGM01_BaseVolume_, 0.01f);
+	ImGui::DragFloat("gameScene_BGM02",&gameSceneBGM02_BaseVolume_, 0.01f);
+
+	if (ImGui::Button("start")) {
+		startGameSE_->PlayAudio();
+	}
+
+	if (ImGui::Button("countdown")) {
+		countDownSE_->PlayAudio();
+	}
+
+	if (ImGui::Button("clear")) {
+		clearSE_->PlayAudio();
+	}
+
+	ImGui::End();
+
 	///
 	/// ↑ImGuiここまで
 	///
@@ -856,7 +878,7 @@ void GameScene::GameStartCount() {
 
 		if (displayNumber >= 1) {
 			// SE再生
-			countDownSE_->PlayAudio(SE_Volume);
+			countDownSE_->PlayAudio();
 		}
 	}
 
@@ -887,7 +909,7 @@ void GameScene::GameStartCount() {
 		spriteStart_->SetColor({1.0f, 1.0f, 1.0f, startAnimStartAlpha_});
 
 		// SE再生
-		startGameSE_->PlayAudio(SE_Volume);
+		startGameSE_->PlayAudio();
 	}
 
 	// 「スタート!」スプライトのイージング処理
@@ -1063,11 +1085,11 @@ void GameScene::UpdateEndText() {
 }
 
 void GameScene::AudioUpdate() {
-	startGameSE_->SetVolume(SE_Volume);
-	countDownSE_->SetVolume(SE_Volume);
-	clearSE_->SetVolume(SE_Volume);
-	gameSceneBGM01_->SetVolume(BGM_Volume);
-	gameSceneBGM02_->SetVolume(BGM_Volume);
+	startGameSE_->SetVolume(startGameSE_BaseVolume_ * SE_Volume);
+	countDownSE_->SetVolume(countDownSE_BaseVolume_ * SE_Volume);
+	clearSE_->SetVolume(clearSE_BaseVolume_ * SE_Volume);
+	gameSceneBGM01_->SetVolume(gameSceneBGM01_BaseVolume_ * BGM_Volume);
+	gameSceneBGM02_->SetVolume(gameSceneBGM02_BaseVolume_ * BGM_Volume);
 
 	startGameSE_->Update();
 	countDownSE_->Update();
