@@ -1323,13 +1323,13 @@ void Player::ScoreParticleAdd(float score) {
 
 		if (score == 5) {
 			sprite->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
-		} else if (score == 10) {
+		} else if (score == 100) {
 			sprite->SetColor({ 0.5490f, 0.9098f, 0.4392f, 1.0f });
 		} else if (score == 30) {
 			sprite->SetColor({ 0.6275f, 0.9686f, 0.9608f, 1.0f });
-		} else if (score == 50) {
+		} else if (score == 20) {
 			sprite->SetColor({ 0.8549f, 0.6392f, 0.9451f, 1.0f });
-		} else if (score == -10) {
+		} else if (score == -20) {
 			sprite->SetColor({ 0.9373f, 0.4275f, 0.4275f, 1.0f });
 		}
 

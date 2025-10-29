@@ -738,7 +738,7 @@ void GameScene::Draw() {
 	///
 
 	// プレイヤーのImGui
-	player_->DrawImgui();
+	/*player_->DrawImgui();
 
 	DrawSceneName();
 
@@ -762,7 +762,7 @@ void GameScene::Draw() {
 		clearSE_->PlayAudio();
 	}
 
-	ImGui::End();
+	ImGui::End();*/
 
 	///
 	/// ↑ImGuiここまで

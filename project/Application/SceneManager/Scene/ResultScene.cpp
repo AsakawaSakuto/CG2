@@ -186,9 +186,9 @@ void ResultScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	score_->DrawImGui();
+	/*score_->DrawImGui();
 
-	DrawSceneName();
+	DrawSceneName();*/
 
 	///
 	/// ↑ImGuiここまで

@@ -292,14 +292,14 @@ void TitleScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	ImGui::Begin("TitleScene");
+	/*ImGui::Begin("TitleScene");
 
 	ImGui::DragFloat("cursol", &moveCursolSE_BaseVolume_, 0.01f);
 	ImGui::DragFloat("start", &startGameSE_BaseVolume_, 0.01f);
 	ImGui::DragFloat("decide", &decideSE_BaseVolume_, 0.01f);
 	ImGui::DragFloat("bgm", &titleSceneBGM_BaseVolume_, 0.01f);
 
-	ImGui::End();
+	ImGui::End();*/
 
 	///
 	/// ↑ImGuiここまで
