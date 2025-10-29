@@ -168,7 +168,7 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	completeSE_->Initialize("resources/sound/se/Result/CompleteSE.mp3");
 	moveCursolSE_->Initialize("resources/sound/se/title/moveCursolSE.mp3");
 	decideSE_->Initialize("resources/sound/se/title/DecideSE.mp3");
-	resultSceneBGM_->Initialize("resources/sound/bgm/bgm26.wav");
+	resultSceneBGM_->Initialize("resources/sound/bgm/BGM26_ver1.1.wav");
 }
 
 void Score::Update() {

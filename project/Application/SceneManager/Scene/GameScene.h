@@ -214,7 +214,7 @@ private:
 	unique_ptr<Sprite> spriteRule_ = make_unique<Sprite>();
 	float timerSpriteRule_ = 0.0f;
 	float ruleDuration_ = 0.75f;
-	float ruleWaitDuration_ = 0.5f;
+	float ruleWaitDuration_ = 4.0f;
 	float ruleStartPosY_ = -100.0f;
 	float ruleEndPosY_ = 100.0f;
 	RuleAnimState ruleState_ = RuleAnimState::Rising;

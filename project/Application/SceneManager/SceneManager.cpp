@@ -103,14 +103,14 @@ int SceneManager::Run() {
         appContext_->input.Update();
         appContext_->gamePad.Update();
 
-        if (GetAsyncKeyState(VK_F11) & 1) {
+       /* if (GetAsyncKeyState(VK_F11) & 1) {
             if (!appContext_->winApp.IsFullscreen()) {
                 appContext_->winApp.EnterBorderlessFullscreen();
             } else {
                 appContext_->winApp.ExitBorderlessFullscreen();
             }
             appContext_->dxCommon.ResizeToWindow();
-        }
+        }*/
 
         // シーン切り替えチェック
         int nextSceneNo = -1;

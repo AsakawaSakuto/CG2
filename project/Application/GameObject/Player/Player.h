@@ -318,6 +318,8 @@ private:
 	std::unique_ptr<Particles> goalParticle1_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> goalParticle2_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> getScoreParticle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> getScore2Particle_ = std::make_unique<Particles>();
+	std::unique_ptr<Particles> getScore3Particle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> boostParticle_ = std::make_unique<Particles>();
 	std::unique_ptr<Particles> boost2Particle_ = std::make_unique<Particles>();
 
@@ -366,4 +368,6 @@ private:
 	const int chrageSpeed_ = 90;
 
 	Vector3 lerp_;
+
+	Random rand_;
 };

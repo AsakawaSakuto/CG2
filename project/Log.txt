@@ -567,15 +567,3 @@
 
 [Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
-

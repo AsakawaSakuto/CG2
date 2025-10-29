@@ -390,8 +390,7 @@ void GameScene::Initialize() {
     if (!gameSceneBGM01_) gameSceneBGM01_ = std::make_unique<AudioX>();
     if (!gameSceneBGM02_) gameSceneBGM02_ = std::make_unique<AudioX>();
     
-    gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM03.wav");
-    gameSceneBGM02_->Initialize("resources/sound/BGM/InGameBGM02.mp3");
+    gameSceneBGM01_->Initialize("resources/sound/BGM/BGM23_ver1.9.wav");
     gameSceneBGM01_->PlayAudio(gameSceneBGM01_BaseVolume_ * BGM_Volume, true);
 
     // ○○個突破!スプライト
@@ -1011,7 +1010,7 @@ void GameScene::Draw() {
 	///
 
 	// プレイヤーのImGui
-	player_->DrawImgui();
+	//player_->DrawImgui();
 
 	///
 	/// ↑ImGuiここまで

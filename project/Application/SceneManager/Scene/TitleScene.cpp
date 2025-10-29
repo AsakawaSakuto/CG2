@@ -173,7 +173,7 @@ void TitleScene::Initialize() {
     startGameSE_->Initialize("resources/sound/SE/Title/startGameSE.mp3");
     moveCursolSE_->Initialize("resources/sound/SE/Title/moveCursolSE.mp3");
     decideSE_->Initialize("resources/sound/SE/Title/DecideSE.mp3");
-    titleSceneBGM_->Initialize("resources/sound/BGM/TitleBGM.mp3");
+    titleSceneBGM_->Initialize("resources/sound/BGM/BGM23_ver2.0.wav");
     titleSceneBGM_->PlayAudio(titleSceneBGM_BaseVolume_ * BGM_Volume, true);
 
     // パーティクルシステムの初期化
@@ -428,8 +428,6 @@ void TitleScene::Draw() {
 	///
 	/// ↓ImGuiここから
 	///
-
-	backGround_->DrawImGui("bg");
 
 	/*ImGui::Begin("TitleScene");
 
@@ -922,7 +920,7 @@ void TitleScene::CloudUpdate() {
 				// Y座標を画面上部に設定
 				cloudTramsform_[i].translate.y = 7.5f;
 				// Z座標をランダムに設定（奥行き）
-				cloudTramsform_[i].translate.z = random_.Float(-3.0f, 10.0f);
+				cloudTramsform_[i].translate.z = random_.Float(2.0f, 10.0f);
 				break;
 			}
 		}
@@ -964,7 +962,7 @@ void TitleScene::CloudUpdate() {
 				// Y座標を画面上部に設定
 				cloudLineTramsform_[i].translate.y = 7.5f;
 				// Z座標をランダムに設定（奥行き）
-				cloudLineTramsform_[i].translate.z = random_.Float(-3.0f, 10.0f);
+				cloudLineTramsform_[i].translate.z = random_.Float(2.0f, 10.0f);
 				break;
 			}
 		}
