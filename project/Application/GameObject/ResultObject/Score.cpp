@@ -448,7 +448,29 @@ void Score::Update() {
 
 	for (int i = 0; i < nowScoreModel_.size(); i++) {
 		nowScoreModel_[i]->SetTransform(nowScoreTransform_[i]);
-		nowScoreModel_[i]->SetColor(rankingColor_[3]);
+		
+		// ★ランキング更新時の色変更処理を追加
+		if (isNewRecord_) {
+			// ランキング入りした場合は、その順位の色を設定
+			switch (rankingPosition_) {
+			case 1: // 1st
+				nowScoreModel_[i]->SetColor(rankingColor_[0]);
+				break;
+			case 2: // 2nd
+				nowScoreModel_[i]->SetColor(rankingColor_[1]);
+				break;
+			case 3: // 3rd
+				nowScoreModel_[i]->SetColor(rankingColor_[2]);
+				break;
+			default: // 圏外（念のため）
+				nowScoreModel_[i]->SetColor(rankingColor_[3]);
+				break;
+			}
+		} else {
+			// ランキング圏外の場合は通常の色（白）
+			nowScoreModel_[i]->SetColor(rankingColor_[3]);
+		}
+		
 		nowScoreModel_[i]->Update();
 	}
 
