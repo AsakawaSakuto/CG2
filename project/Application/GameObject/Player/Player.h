@@ -289,7 +289,6 @@ private:
 	unique_ptr<AudioX> DestroyEnemySE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> gaugeChargeSE_ = make_unique<AudioX>();
 	unique_ptr<AudioX> getItemSE_ = make_unique<AudioX>();
-	unique_ptr<AudioX> attackEnemySE_ = make_unique<AudioX>();
 
 	float shotSE_BaseVolume_ = 0.35f;
 	float playerDamageSE_BaseVolume_ = 0.3f;

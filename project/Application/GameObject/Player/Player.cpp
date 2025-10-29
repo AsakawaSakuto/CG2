@@ -63,10 +63,9 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 	// SE
 	shotSE_->Initialize("resources/sound/SE/InGame/ShotSE.mp3");
 	playerDamageSE_->Initialize("resources/sound/SE/InGame/PlayerDamageSE.mp3");
-	DestroyEnemySE_->Initialize("resources/sound/SE/InGame/AttackEnemySE.mp3");
+	DestroyEnemySE_->Initialize("resources/sound/SE/InGame/DestroyEnemySE.mp3");
 	gaugeChargeSE_->Initialize("resources/sound/SE/InGame/GaugeChargeSE.mp3");
 	getItemSE_->Initialize("resources/sound/SE/InGame/GetItemSE.mp3");
-	attackEnemySE_->Initialize("resources/sound/SE/InGame/AttackEnemySE.mp3");
 
 	InitParticle();
 
@@ -565,9 +564,7 @@ void Player::CollisionThorn() {
 				smorkParticle_->Play(false);
 
 				// SE再生
-				//DestroyEnemySE_->PlayAudio(SE_Volume);
-				// SE再生
-				attackEnemySE_->PlayAudio();
+				DestroyEnemySE_->PlayAudio(SE_Volume);
 
 				break;
 			} else if (direction_ == PlayerDirection::UP) {
@@ -956,14 +953,12 @@ void Player::AudioUpdate() {
 	DestroyEnemySE_->SetVolume(DestroyEnemySE_BaseVolume_ * SE_Volume);
 	gaugeChargeSE_->SetVolume(gaugeChargeSE_BaseVolume_ * SE_Volume);
 	getItemSE_->SetVolume(getItemSE_BaseVolume_ * SE_Volume);
-	attackEnemySE_->SetVolume(attackEnemySE_BaseVolume_ * SE_Volume);
 
 	shotSE_->Update();
 	playerDamageSE_->Update();
 	DestroyEnemySE_->Update();
 	gaugeChargeSE_->Update();
 	getItemSE_->Update();
-	attackEnemySE_->Update();
 }
 
 void Player::DrawImGuiJsonStateScore() {
@@ -1375,7 +1370,6 @@ void Player::AudioReset() {
 	DestroyEnemySE_->Reset();
 	gaugeChargeSE_->Reset();
 	getItemSE_->Reset();
-	attackEnemySE_->Reset();
 }
 
 void Player::TranslateLerp() {
