@@ -14,6 +14,12 @@ private:
     std::unique_ptr<IScene> sceneArr_[sceneNum];
     int currentSceneNo_;
     int prevSceneNo_;
+    int sceneChangeCount_;  // デバッグ用：シーン切り替え回数
+    
+    // プライベートヘルパーメソッド
+    void CleanupAllScenes();
+    std::unique_ptr<IScene> CreateScene(int sceneNo);
+
 public:
     SceneManager();
     ~SceneManager();

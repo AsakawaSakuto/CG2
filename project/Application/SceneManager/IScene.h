@@ -7,7 +7,6 @@ using std::unique_ptr;
 using std::make_unique;
 
 enum SCENE {
-    TEST,
     TITLE,
     GAME,
     RESULT,

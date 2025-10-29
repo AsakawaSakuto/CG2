@@ -10,8 +10,6 @@ using std::make_unique;
 using std::unique_ptr;
 
 class ResultScene : public IScene {
-private:
-
 public:
 	void SetAppContext(AppContext* ctx) override;
 	void Initialize() override;
@@ -20,6 +18,8 @@ public:
 	~ResultScene();
 
 private:
+	// リソースクリーンアップメソッド
+	void CleanupResources();
 
 	enum class MaskType {
 		RAMA = 0,

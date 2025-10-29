@@ -22,6 +22,9 @@ public:
 	~GameScene();
 
 private:
+	// リソースクリーンアップメソッド
+	void CleanupResources();
+
 	// カメラの座標Xをプレイヤーに合わせる
 	void UpdateCameraToPlayer();
 
@@ -367,4 +370,7 @@ private:
 	unique_ptr<Particles> srarArea2_ = make_unique<Particles>();
 	unique_ptr<Particles> srarArea3_ = make_unique<Particles>();
 	unique_ptr<Particles> srarArea4_ = make_unique<Particles>();
+
+	unique_ptr<Model> backGround_ = make_unique<Model>();
+	Transform backGroundTransform_;
 };

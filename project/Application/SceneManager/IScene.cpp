@@ -1,6 +1,6 @@
 #include"IScene.h"
 
-int IScene::sceneNo = RESULT;
+int IScene::sceneNo = TITLE;
 
 int IScene::GetSceneNo() { return sceneNo; }
 
@@ -20,9 +20,6 @@ void IScene::DrawSceneName() {
 	);
 	// ここにUIを書いていく
 	switch (sceneNo) {
-	case TEST:
-		ImGui::Text("TestScene");
-		break;
 	case TITLE:
 		ImGui::Text("TitleScene");
 		break;

@@ -1,11 +1,47 @@
 #include "ResultScene.h"
 
 ResultScene::~ResultScene() {
+	CleanupResources();
+}
+
+void ResultScene::CleanupResources() {
 	// シーンを抜ける際にランキングデータを保存
 	// （Scoreクラスの初期化時に既にソート・更新されているが、念のため再保存）
 	if (score_) {
 		score_->SaveRankingData();
+		score_.reset();
 	}
+	
+	// Reset sprite resources
+	if (mask_) {
+		mask_.reset();
+	}
+	if (maskBox_) {
+		maskBox_.reset();
+	}
+	if (loadingUI_) {
+		loadingUI_.reset();
+	}
+	if (loadingPlayer_) {
+		loadingPlayer_.reset();
+	}
+	
+	// Reset scene fade
+	if (sceneFade_) {
+		sceneFade_.reset();
+	}
+	
+	// Reset cameras
+	if (debugCamera_) {
+		debugCamera_.reset();
+	}
+	if (normalCamera_) {
+		normalCamera_.reset();
+	}
+	
+	// Reset timers
+	maskTimer_.Reset();
+	quitTimer_.Reset();
 }
 
 void ResultScene::SetAppContext(AppContext* ctx) {
@@ -14,21 +50,37 @@ void ResultScene::SetAppContext(AppContext* ctx) {
 }
 
 void ResultScene::Initialize() {
+	// Initialize before cleanup to ensure clean state
+	CleanupResources();
+	
 	// inputSystemの初期化
 	gamePad_ = &ctx_->gamePad;
 	input_ = &ctx_->input;
 
 	// カメラの初期化
+	if (!debugCamera_) {
+		debugCamera_ = std::make_unique<DebugCamera>();
+	}
+	if (!normalCamera_) {
+		normalCamera_ = std::make_unique<Camera>();
+	}
+	
 	debugCamera_->SetInput(&ctx_->input);
 	normalCamera_->SetPosition({0.0f, 2.0f, -20.0f});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
 	// Create SceneFade
+	if (sceneFade_) {
+		sceneFade_.reset();
+	}
 	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
 	// ★Scoreクラスの初期化（ここで自動的にランキングがソートされて更新される）
+	if (!score_) {
+		score_ = std::make_unique<Score>();
+	}
 	score_->Initialize(&ctx_->dxCommon, ctx_->lastScore);
 	score_->SetInput(&ctx_->input, &ctx_->gamePad);
 
@@ -38,6 +90,20 @@ void ResultScene::Initialize() {
 		// 例：特別なエフェクトの再生、音声の再生など
 		int position = score_->GetRankingPosition();
 		// position: 1=1st, 2=2nd, 3=3rd
+	}
+
+	// Initialize sprite resources
+	if (!maskBox_) {
+		maskBox_ = std::make_unique<Sprite>();
+	}
+	if (!loadingUI_) {
+		loadingUI_ = std::make_unique<Sprite>();
+	}
+	if (!loadingPlayer_) {
+		loadingPlayer_ = std::make_unique<Sprite>();
+	}
+	if (!mask_) {
+		mask_ = std::make_unique<Sprite>();
 	}
 
 	maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
@@ -141,12 +207,22 @@ void ResultScene::Update() {
 	maskTimer_.Update();
 	quitTimer_.Update();
 
-	score_->Update();
+	if (score_) {
+		score_->Update();
+	}
 
-	mask_->Update();
-	maskBox_->Update();
-	loadingUI_->Update();
-	loadingPlayer_->Update();
+	if (mask_) {
+		mask_->Update();
+	}
+	if (maskBox_) {
+		maskBox_->Update();
+	}
+	if (loadingUI_) {
+		loadingUI_->Update();
+	}
+	if (loadingPlayer_) {
+		loadingPlayer_->Update();
+	}
 
 	CameraController();
 }
@@ -160,18 +236,27 @@ void ResultScene::Draw() {
 	/// ↓描画処理ここから
 	///
 
-	score_->Draw(*useCamera_);
+	if (score_) {
+		score_->Draw(*useCamera_);
+	}
 
 	//sceneFade_->Draw();
 
-	mask_->Draw();
+	if (mask_) {
+		mask_->Draw();
+	}
 
 	if (maskTimer_.IsFinished() && resultQuit_) {
-		maskBox_->Draw();
-		loadingUI_->Draw();
-		loadingPlayer_->Draw();
+		if (maskBox_) {
+			maskBox_->Draw();
+		}
+		if (loadingUI_) {
+			loadingUI_->Draw();
+		}
+		if (loadingPlayer_) {
+			loadingPlayer_->Draw();
+		}
 	}
-	
 
 	///
 	/// ↑描画処理ここまで
@@ -186,9 +271,9 @@ void ResultScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	score_->DrawImGui();
+	/*score_->DrawImGui();
 
-	DrawSceneName();
+	DrawSceneName();*/
 
 	///
 	/// ↑ImGuiここまで
