@@ -363,6 +363,8 @@ private:
 	bool timerStarte_ = false;
 	bool resultQuit_ = false;
 
+	bool isAlphaDecayActive_ = false;
+
 	unique_ptr<Model> ore_ = make_unique<Model>();
 	Transform oreTransform_;
 
@@ -370,6 +372,11 @@ private:
 	unique_ptr<Particles> srarArea2_ = make_unique<Particles>();
 	unique_ptr<Particles> srarArea3_ = make_unique<Particles>();
 	unique_ptr<Particles> srarArea4_ = make_unique<Particles>();
+
+	unique_ptr<Model> airPlane_ = make_unique<Model>();
+	unique_ptr<Model> ufo_ = make_unique<Model>();
+	unique_ptr<Model> balloon_ = make_unique<Model>();
+	unique_ptr<Model> tsuru_ = make_unique<Model>();
 
 	unique_ptr<Model> backGround_ = make_unique<Model>();
 	Transform backGroundTransform_;

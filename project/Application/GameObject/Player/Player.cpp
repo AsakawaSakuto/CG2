@@ -231,12 +231,12 @@ void Player::Draw(Camera useCamera) {
 
 void Player::DrawImgui() {
 
-	PlayerImGui();
+	//PlayerImGui();
+
+	getScoreParticle_->DrawImGui("GetScoreParticle");
 
 	// プレイヤーのステータス
 	DrawImGuiJsonStatePlayer();
-
-	armHitParticle4_->DrawImGui("4");
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -453,6 +453,8 @@ void Player::BulletUpdate() {
 }
 
 void Player::PlayerImGui() {
+
+	getScoreParticle_->DrawImGui("Get Score Particle");
 
 	// プレイヤーのImGui
 	ImGui::Begin("Player Control");
@@ -1203,6 +1205,9 @@ void Player::UpdateParticle() {
 
 	if (direction_ == PlayerDirection::DOWN) {
 		getScoreParticle_->SetEmitVelocityY(3.0f);
+	}
+	if (direction_ == PlayerDirection::UP) {
+		getScoreParticle_->SetEmitVelocityY(25.0f);
 	}
 	getScoreParticle_->Update();
 

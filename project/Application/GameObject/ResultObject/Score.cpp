@@ -32,9 +32,9 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	// ランク判定（ランキング更新後に行う）
 	if (nowScore_ >= 45000) {
 		rank_ = Rank::S;
-	} else if (nowScore_ >= 35000) {
+	} else if (nowScore_ >= 30000) {
 		rank_ = Rank::A;
-	} else if (nowScore_ >= 20000) {
+	} else if (nowScore_ >= 15000) {
 		rank_ = Rank::B;
 	} else {
 		rank_ = Rank::C;
@@ -360,7 +360,7 @@ void Score::Update() {
 				maskTimer_.Start(1.0f, false);
 			}
 
-			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK))) {
 				nextScene_ = NextScene::RESULT;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 500.0f;
@@ -390,7 +390,7 @@ void Score::Update() {
 				maskTimer_.Start(1.0f, false);
 			}
 
-			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK))) {
 				nextScene_ = NextScene::TITLE;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 600.0f;
