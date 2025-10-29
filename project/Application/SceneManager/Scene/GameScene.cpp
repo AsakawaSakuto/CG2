@@ -188,7 +188,7 @@ void GameScene::Initialize() {
 	clearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
 
 	// BGM
-	gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM01.mp3");
+	gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM03.wav");
 	gameSceneBGM02_->Initialize("resources/sound/BGM/InGameBGM02.mp3");
 	gameSceneBGM01_->PlayAudio(gameSceneBGM01_BaseVolume_ * BGM_Volume, true);
 
@@ -331,6 +331,11 @@ void GameScene::Initialize() {
 	srarArea2_->LoadJson("starArea2");
 	srarArea3_->LoadJson("starArea3");
 	srarArea4_->LoadJson("starArea4");
+
+	startGameSE_BaseVolume_ = 0.45f;
+	countDownSE_BaseVolume_ = 0.65f;
+	clearSE_BaseVolume_ = 0.8f;
+	gameSceneBGM01_BaseVolume_ = 1.0f;
 }
 
 void GameScene::Update() {
@@ -376,6 +381,10 @@ void GameScene::Update() {
 
 		// SE再生
 		clearSE_->PlayAudio();
+	}
+
+	if (maskTimer_.IsActive() && resultQuit_) {
+		gameSceneBGM01_BaseVolume_ = Lerp(1.0f, 0.0f, maskTimer_.GetProgress());
 	}
 
 	// 終了テキストの更新
@@ -557,8 +566,7 @@ void GameScene::Update() {
 			mask_->SetScale({
 				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).x,
 				Easing::LerpVector2(maskEndScale_,maskStartScale_,maskTimer_.GetProgress()).y });
-		}
-		else {
+		} else {
 			mask_->SetPosition({
 				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).x,
 				Easing::LerpVector2(maskStartPos_,maskEndPos_,maskTimer_.GetProgress()).y });
@@ -566,8 +574,7 @@ void GameScene::Update() {
 				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).x,
 				Easing::LerpVector2(maskStartScale_,maskEndScale_,maskTimer_.GetProgress()).y });
 		}
-	}
-	else {
+	} else {
 		if (resultQuit_) {
 			mask_->SetPosition(maskStartPos_);
 			mask_->SetScale(maskStartScale_);

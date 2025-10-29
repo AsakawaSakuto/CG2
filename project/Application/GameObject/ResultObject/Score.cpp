@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <utility>
 
+#include "Engine//System/Audio/MasterVolume.h"
+
 void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	dxCommon_ = dxCommon;
 	score_ = score;
@@ -153,6 +155,20 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 		msgUI_->Initialize(dxCommon_, "resources/image/UI/ResultTextRankCUI.png", { -300.0f,280.0f }, { 0.5f,0.5f });
 		break;
 	}
+
+	isDrumroll_ = false;
+
+	completeSE_BaseVolume_ = 1.0f;
+	drumrollSE_BaseVolume_ = 0.15f;
+	moveCursolSE_BaseVolume_ = 0.5f;
+	decideSE_BaseVolume_ = 1.0f;
+	resultSceneBGM_BaseVolume_ = 0.5f;
+
+	drumrollSE_->Initialize("resources/sound/se/Result/DrumrollSE.mp3");
+	completeSE_->Initialize("resources/sound/se/Result/CompleteSE.mp3");
+	moveCursolSE_->Initialize("resources/sound/se/title/moveCursolSE.mp3");
+	decideSE_->Initialize("resources/sound/se/title/DecideSE.mp3");
+	resultSceneBGM_->Initialize("resources/sound/bgm/bgm26.wav");
 }
 
 void Score::Update() {
@@ -165,6 +181,11 @@ void Score::Update() {
 	player2Transform_.translate.y = 3.5f + floatOffset;
 	player2ArmTransform_.translate.y = 3.78f + floatOffset;
 	machine2Transform_.translate.y = 2.39f + floatOffset;
+
+	if (textEasingTimer_[0].IsFinished() && !isDrumroll_) {
+		isDrumroll_ = true;
+		drumrollSE_->PlayAudio(drumrollSE_BaseVolume_ * SE_Volume, true);
+	}
 
 	switch (screenType_)
 	{
@@ -335,6 +356,8 @@ void Score::Update() {
 				goTitle_ = true;
 				pushNext_ = true;
 				sceneNum_ = 0;
+				decideSE_->PlayAudio();
+				maskTimer_.Start(1.0f, false);
 			}
 
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
@@ -342,6 +365,7 @@ void Score::Update() {
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 500.0f;
 				cursolEndY_ = 600.0f;
+				moveCursolSE_->PlayAudio();
 			}
 
 			if (cursolMoveTimer_.IsActive()) {
@@ -362,6 +386,8 @@ void Score::Update() {
 				goResult_ = true;
 				pushNext_ = true;
 				sceneNum_ = 1;
+				decideSE_->PlayAudio();
+				maskTimer_.Start(1.0f, false);
 			}
 
 			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
@@ -369,6 +395,7 @@ void Score::Update() {
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 600.0f;
 				cursolEndY_ = 500.0f;
+				moveCursolSE_->PlayAudio();
 			}
 
 			if (cursolMoveTimer_.IsActive()) {
@@ -485,6 +512,10 @@ void Score::Update() {
 	fallCandyParticle_->Update();
 	shotCandyParticle_->Update();
 	shotCandy2Particle_->Update();
+
+	maskTimer_.Update();
+
+	UpdateAudio();
 }
 
 void Score::Draw(Camera camera) {
@@ -579,6 +610,22 @@ void Score::Draw(Camera camera) {
 
 void Score::DrawImGui() {
 
+	ImGui::Begin("result Audio");
+
+	ImGui::DragFloat("completeSE", &completeSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("drumrollSE", &drumrollSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("moveCursolSE", &moveCursolSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("decideSE", &decideSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("resultSceneBGM", &resultSceneBGM_BaseVolume_, 0.01f);
+
+	if (ImGui::Button("comp")) {
+		completeSE_->PlayAudio();
+	}
+	if (ImGui::Button("drum")) {
+		drumrollSE_->PlayAudio();
+	}
+
+	ImGui::End();
 }
 
 void Score::InitTextModel() {
@@ -888,6 +935,10 @@ void Score::ScoreIn() {
 		shotCandyParticle_->Play(false);
 		shotCandy2Particle_->Play(false);
 		fallCandyParticle_->Play();
+
+		completeSE_->PlayAudio();
+		drumrollSE_->StopAll();
+		resultSceneBGM_->PlayAudio(resultSceneBGM_BaseVolume_* BGM_Volume, true);
 	}
 
 	msgUI_->SetPosition({ Easing::Lerp(-300.0f, 300.0f, rankAndPlayerEasingTimer_.GetProgress(),
@@ -935,6 +986,8 @@ void Score::ScoreIn() {
 			scoreOutTimer_.Start(1.0f, false);
 			
 			kazeParticle_->Play();
+
+			decideSE_->PlayAudio();
 
 			fallCandyParticle_->LoadJson("fallcandy2");
 
@@ -1233,4 +1286,30 @@ void Score::SaveRankingData() {
 	} catch (const std::exception&) {
 		// エラーログを出力したい場合はここに追加
 	}
+}
+
+void Score::UpdateAudio() {
+	if (maskTimer_.IsActive()) {
+		resultSceneBGM_BaseVolume_ = Lerp(0.5f, 0.0f, maskTimer_.GetProgress());
+	}
+
+	completeSE_->SetVolume(completeSE_BaseVolume_ * SE_Volume);
+	drumrollSE_->SetVolume(drumrollSE_BaseVolume_ * SE_Volume);
+	moveCursolSE_->SetVolume(moveCursolSE_BaseVolume_ * SE_Volume);
+	decideSE_->SetVolume(decideSE_BaseVolume_ * SE_Volume);
+	resultSceneBGM_->SetVolume(resultSceneBGM_BaseVolume_ * BGM_Volume);
+
+	completeSE_->Update();
+	drumrollSE_->Update();
+	moveCursolSE_->Update();
+	decideSE_->Update();
+	resultSceneBGM_->Update();
+}
+
+void Score::ResetAudio() {
+	drumrollSE_->Reset();
+	completeSE_->Reset();
+	moveCursolSE_->Reset();
+	decideSE_->Reset();
+	resultSceneBGM_->Reset();
 }

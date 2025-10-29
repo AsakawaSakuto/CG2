@@ -138,7 +138,7 @@ private:
 	float startGameSE_BaseVolume_ = 1.0f;
 	float moveCursolSE_BaseVolume_ = 0.5f;
 	float decideSE_BaseVolume_ = 1.0f;
-	float titleSceneBGM_BaseVolume_ = 0.15f;
+	float titleSceneBGM_BaseVolume_ = 1.0f;
 
 	unique_ptr<Particles> titleParticle_ = make_unique<Particles>();
 

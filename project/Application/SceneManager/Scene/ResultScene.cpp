@@ -114,11 +114,14 @@ void ResultScene::Update() {
 
 	if (maskTimer_.IsFinished() && resultQuit_) {
 		if (quitTimer_.IsFinished()) {
+			score_->ResetAudio();
 			ChangeScene(TITLE);
 		} else {
 			if (score_->NextSceneNum() == 0) {
+				score_->ResetAudio();
 				ChangeScene(TITLE);
 			} else {
+				score_->ResetAudio();
 				ChangeScene(GAME);
 			}
 		}

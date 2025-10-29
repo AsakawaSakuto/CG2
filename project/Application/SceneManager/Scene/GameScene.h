@@ -265,7 +265,7 @@ private:
 	float startGameSE_BaseVolume_ = 0.45f;
 	float countDownSE_BaseVolume_ = 0.65f;
 	float clearSE_BaseVolume_ = 0.8f;
-	float gameSceneBGM01_BaseVolume_ = 0.15f;
+	float gameSceneBGM01_BaseVolume_ = 1.0f;
 	float gameSceneBGM02_BaseVolume_ = 0.5f;
 
 	// ○○個突破 スプライト

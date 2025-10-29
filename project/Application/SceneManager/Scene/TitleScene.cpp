@@ -117,7 +117,7 @@ void TitleScene::Initialize() {
 	startGameSE_BaseVolume_ = 1.0f;
 	moveCursolSE_BaseVolume_ = 0.5f;
 	decideSE_BaseVolume_ = 1.0f;
-	titleSceneBGM_BaseVolume_ = 0.15f;
+	titleSceneBGM_BaseVolume_ = 1.0f;
 }
 
 void TitleScene::Update() {
@@ -926,7 +926,7 @@ void TitleScene::AudioUpdate() {
 	decideSE_->Update();
 
 	if (maskTimer_.IsActive() && titleQuit_) {
-		titleSceneBGM_BaseVolume_ = Lerp(0.15f, 0.0f, maskTimer_.GetProgress());
+		titleSceneBGM_BaseVolume_ = Lerp(1.0f, 0.0f, maskTimer_.GetProgress());
 	}
 
 	titleSceneBGM_->Update();
