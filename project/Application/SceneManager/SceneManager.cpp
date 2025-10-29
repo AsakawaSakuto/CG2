@@ -1,18 +1,59 @@
 #include "SceneManager.h"
 
 SceneManager::SceneManager() {
-	// シーン初期化、Enumと配列の順番を合わせること
-    sceneArr_[0] = std::make_unique<TestScene>();
-    sceneArr_[1] = std::make_unique<TitleScene>();
-    sceneArr_[2] = std::make_unique<GameScene>();
-    sceneArr_[3] = std::make_unique<ResultScene>();
+    // シーン配列は初期化時には空にする
+    for (int i = 0; i < sceneNum; i++) {
+        sceneArr_[i] = nullptr;
+    }
 
-    currentSceneNo_ = TEST;
-    prevSceneNo_ = TEST;
+    currentSceneNo_ = TITLE;
+    prevSceneNo_ = TITLE;
+    sceneChangeCount_ = 0;
 }
 
 SceneManager::~SceneManager() {
-    // 明示的な解放処理がなければ空でもOK
+    // 明示的な解放処理
+    CleanupAllScenes();
+}
+
+void SceneManager::CleanupAllScenes() {
+    for (int i = 0; i < sceneNum; i++) {
+        if (sceneArr_[i]) {
+            // デバッグ：どのシーンを削除するかログ出力
+            #ifdef _DEBUG
+            OutputDebugStringA(("Cleaning up scene " + std::to_string(i) + "\n").c_str());
+            #endif
+            sceneArr_[i].reset();
+        }
+    }
+}
+
+std::unique_ptr<IScene> SceneManager::CreateScene(int sceneNo) {
+    #ifdef _DEBUG
+    OutputDebugStringA(("Creating scene " + std::to_string(sceneNo) + "\n").c_str());
+    #endif
+
+    try {
+        switch (sceneNo) {
+        case TITLE:
+            return std::make_unique<TitleScene>();
+        case GAME:
+            return std::make_unique<GameScene>();
+        case RESULT:
+            return std::make_unique<ResultScene>();
+        default:
+            #ifdef _DEBUG
+            OutputDebugStringA("Invalid scene number\n");
+            #endif
+            return nullptr;
+        }
+    }
+    catch (const std::exception& e) {
+        #ifdef _DEBUG
+        OutputDebugStringA(("Scene creation failed: " + std::string(e.what()) + "\n").c_str());
+        #endif
+        return nullptr;
+    }
 }
 
 int SceneManager::Run() {
@@ -35,13 +76,12 @@ int SceneManager::Run() {
     appContext_->input.Initialize(&appContext_->winApp);
     appContext_->gamePad.Initialize();
 
-    // 各シーンにAppContextを渡す
-    for (int i = 0; i < static_cast<int>(sceneNum); i++) {
-        sceneArr_[i]->SetAppContext(appContext_.get());
+    // 初期シーンを作成
+    sceneArr_[currentSceneNo_] = CreateScene(currentSceneNo_);
+    if (sceneArr_[currentSceneNo_]) {
+        sceneArr_[currentSceneNo_]->SetAppContext(appContext_.get());
+        sceneArr_[currentSceneNo_]->Initialize();
     }
-
-    // 初期シーンのInitialize
-    sceneArr_[currentSceneNo_]->Initialize();
 
     MSG msg = {};
     bool running = true;
@@ -73,7 +113,10 @@ int SceneManager::Run() {
         }
 
         // シーン切り替えチェック
-        int nextSceneNo = sceneArr_[currentSceneNo_]->GetSceneNo();
+        int nextSceneNo = -1;
+        if (sceneArr_[currentSceneNo_]) {
+            nextSceneNo = sceneArr_[currentSceneNo_]->GetSceneNo();
+        }
 
         if (nextSceneNo == -1) {
             running = false;
@@ -81,20 +124,73 @@ int SceneManager::Run() {
         }
 
         if (nextSceneNo != currentSceneNo_) {
+            sceneChangeCount_++;
+            
+            #ifdef _DEBUG
+            OutputDebugStringA(("Scene change #" + std::to_string(sceneChangeCount_) + 
+                              ": " + std::to_string(currentSceneNo_) + " -> " + 
+                              std::to_string(nextSceneNo) + "\n").c_str());
+            #endif
+
+            // シーン切り替え処理
             prevSceneNo_ = currentSceneNo_;
+            
+            // 現在のシーンを完全に削除（デストラクタが呼ばれてリソース解放）
+            if (sceneArr_[currentSceneNo_]) {
+                sceneArr_[currentSceneNo_].reset();
+                sceneArr_[currentSceneNo_] = nullptr;
+                
+                // ガベージコレクションを強制実行（メモリ圧迫を軽減）
+                #ifdef _DEBUG
+                // TextureManagerのリソース状況をチェック（もしメソッドがあれば）
+                OutputDebugStringA("Forcing garbage collection...\n");
+                #endif
+            }
+            
+            // 新しいシーン番号を設定
             currentSceneNo_ = nextSceneNo;
-            sceneArr_[currentSceneNo_]->SetAppContext(appContext_.get());
-            sceneArr_[currentSceneNo_]->Initialize();
+            
+            // 新しいシーンを作成（古いシーンが完全に削除された後）
+            sceneArr_[currentSceneNo_] = CreateScene(currentSceneNo_);
+            
+            // 新しいシーンの初期化
+            if (sceneArr_[currentSceneNo_]) {
+                sceneArr_[currentSceneNo_]->SetAppContext(appContext_.get());
+                
+                try {
+                    sceneArr_[currentSceneNo_]->Initialize();
+                    #ifdef _DEBUG
+                    OutputDebugStringA("Scene initialization completed successfully\n");
+                    #endif
+                }
+                catch (const std::exception& e) {
+                    #ifdef _DEBUG
+                    OutputDebugStringA(("Scene initialization failed: " + std::string(e.what()) + "\n").c_str());
+                    #endif
+                }
+            } else {
+                #ifdef _DEBUG
+                OutputDebugStringA("Failed to create new scene\n");
+                #endif
+            }
         }
 
-        // 更新・描画
-        sceneArr_[currentSceneNo_]->Update();
+        // 更新・描画 - nullチェック追加
         if (sceneArr_[currentSceneNo_]) {
-            sceneArr_[currentSceneNo_]->Draw();
+            try {
+                sceneArr_[currentSceneNo_]->Update();
+                sceneArr_[currentSceneNo_]->Draw();
+            } catch (const std::exception& e) {
+                #ifdef _DEBUG
+                OutputDebugStringA(("Scene update/draw error: " + std::string(e.what()) + "\n").c_str());
+                #endif
+            }
         }
     }
 
-    // 終了処理
+    // 終了処理 - 全シーンのクリーンアップ
+    CleanupAllScenes();
+    
     TextureManager::GetInstance()->Finalize();
     appContext_->dxCommon.CloseFence();
     appContext_->winApp.Finalize();

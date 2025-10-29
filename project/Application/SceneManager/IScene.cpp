@@ -20,9 +20,6 @@ void IScene::DrawSceneName() {
 	);
 	// ここにUIを書いていく
 	switch (sceneNo) {
-	case TEST:
-		ImGui::Text("TestScene");
-		break;
 	case TITLE:
 		ImGui::Text("TitleScene");
 		break;

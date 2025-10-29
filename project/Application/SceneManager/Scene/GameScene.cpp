@@ -7,10 +7,143 @@
 void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
 GameScene::~GameScene() {
+	CleanupResources();
+}
+
+void GameScene::CleanupResources() {
+	// Clear containers
 	thorns_.clear();
+	
+	// Reset unique_ptr resources
+	if (player_) {
+		player_.reset();
+	}
+	if (map_) {
+		map_.reset();
+	}
+	if (sceneFade_) {
+		sceneFade_.reset();
+	}
+	
+	// Reset sprite resources
+	for (auto& gauge : bulletGaugeSprite_) {
+		if (gauge.sprite) {
+			gauge.sprite.reset();
+		}
+	}
+	
+	for (auto& curtain : curtainSprite_) {
+		if (curtain) {
+			curtain.reset();
+		}
+	}
+	
+	for (auto& scoreSprite : spriteScore_) {
+		if (scoreSprite) {
+			scoreSprite.reset();
+		}
+	}
+	
+	for (auto& sprite : spriteScoreCountOver_) {
+		if (sprite) {
+			sprite.reset();
+		}
+	}
+	
+	for (auto& sprite : spriteNoInputCountDown_) {
+		if (sprite) {
+			sprite.reset();
+		}
+	}
+	
+	// Reset individual sprites
+	if (spriteNumber_) spriteNumber_.reset();
+	if (spriteStart_) spriteStart_.reset();
+	if (spriteRule_) spriteRule_.reset();
+	if (spriteGameEnd_) spriteGameEnd_.reset();
+	if (spriteProgressLine_) spriteProgressLine_.reset();
+	if (spriteProgressPlayer_) spriteProgressPlayer_.reset();
+	if (spriteProgressGoal_) spriteProgressGoal_.reset();
+	if (spriteProgressMountaion_) spriteProgressMountaion_.reset();
+	if (spriteCandyScore_) spriteCandyScore_.reset();
+	if (spriteCandyEffect_) spriteCandyEffect_.reset();
+	if (spriteChargeUI_) spriteChargeUI_.reset();
+	if (spriteChargeUIEffect_) spriteChargeUIEffect_.reset();
+	if (spriteSnackCountOver_) spriteSnackCountOver_.reset();
+	if (spritePush_) spritePush_.reset();
+	if (spriteArm_) spriteArm_.reset();
+	if (spriteThorn_) spriteThorn_.reset();
+	if (maskBox_) maskBox_.reset();
+	if (loadingUI_) loadingUI_.reset();
+	if (loadingPlayer_) loadingPlayer_.reset();
+	if (mask_) mask_.reset();
+	
+	// Reset model resources
+	for (auto& mountain : modelMountain_) {
+		if (mountain) {
+			mountain.reset();
+		}
+	}
+	
+	if (modelGround_) {
+		modelGround_.reset();
+	}
+	
+	for (auto& cloud : clouds_) {
+		if (cloud) {
+			cloud.reset();
+		}
+	}
+	
+	if (ore_) {
+		ore_.reset();
+	}
+	
+	// Reset particle systems
+	if (srarArea1_) srarArea1_.reset();
+	if (srarArea2_) srarArea2_.reset();
+	if (srarArea3_) srarArea3_.reset();
+	if (srarArea4_) srarArea4_.reset();
+	
+	// Reset audio resources
+	if (startGameSE_) {
+		startGameSE_->Reset();
+		startGameSE_.reset();
+	}
+	if (countDownSE_) {
+		countDownSE_->Reset();
+		countDownSE_.reset();
+	}
+	if (clearSE_) {
+		clearSE_->Reset();
+		clearSE_.reset();
+	}
+	if (gameSceneBGM01_) {
+		gameSceneBGM01_->Reset();
+		gameSceneBGM01_.reset();
+	}
+	if (gameSceneBGM02_) {
+		gameSceneBGM02_->Reset();
+		gameSceneBGM02_.reset();
+	}
+	
+	// Reset cameras
+	if (debugCamera_) {
+		debugCamera_.reset();
+	}
+	if (normalCamera_) {
+		normalCamera_.reset();
+	}
+	
+	// Reset timers
+	gameTimer_.Reset();
+	maskTimer_.Reset();
 }
 
 void GameScene::Initialize() {
+	// Initialize before cleanup to ensure clean state
+	CleanupResources();
+	
 	// JSONからステータスを読み込み
 	gameSceneState_ = JsonState::Load<GameSceneState>("Resources/Data/gameSceneState.json");
 
@@ -21,16 +154,30 @@ void GameScene::Initialize() {
 	// カメラのZ座標
 	cameraPosisionZ_ = -38.0f;
 
-	// カメラの初期化
+	// カメラの初期化 - make_uniqueで適切に作成
+	if (!debugCamera_) {
+		debugCamera_ = std::make_unique<DebugCamera>();
+	}
+	if (!normalCamera_) {
+		normalCamera_ = std::make_unique<Camera>();
+	}
+	
 	debugCamera_->SetInput(&ctx_->input);
 	normalCamera_->SetPosition({0.0f, 0.0f, cameraPosisionZ_});
 	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
+	// Player initialization
+	if (!player_) {
+		player_ = std::make_unique<Player>();
+	}
 	player_->Initialize(&ctx_->dxCommon);
 	player_->SetInputSystem(&ctx_->input);
 	player_->SetGamePadSystem(&ctx_->gamePad);
 
 	// マップの初期化
+	if (!map_) {
+		map_ = std::make_unique<Map>();
+	}
 	map_->Initialize();
 
 	// 汎用機能
@@ -46,12 +193,18 @@ void GameScene::Initialize() {
 	player_->SetThrons(thorns_);
 
 	// Create SceneFade
+	if (sceneFade_) {
+		sceneFade_.reset();
+	}
 	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
 	sceneFade_->StartFadeOut(1.0f);
 
 	// 弾のゲージスプライト
 	for (int i = 0; i < bulletGaugeSprite_.size(); ++i) {
+		if (bulletGaugeSprite_[i].sprite) {
+			bulletGaugeSprite_[i].sprite.reset();
+		}
 		bulletGaugeSprite_[i].sprite = std::make_unique<Sprite>();
 		bulletGaugeSprite_[i].sprite->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 		bulletGaugeSprite_[i].sprite->SetScale({2.0, 2.5f});
@@ -67,6 +220,9 @@ void GameScene::Initialize() {
 
 	// 画面両端の幕のスプライト
 	for (int i = 0; i < curtainSprite_.size(); ++i) {
+		if (curtainSprite_[i]) {
+			curtainSprite_[i].reset();
+		}
 		curtainSprite_[i] = std::make_unique<Sprite>();
 		curtainSprite_[i]->Initialize(&ctx_->dxCommon, "resources/image/UI/SidePanelUI.png");
 		curtainSprite_[i]->SetScale({0.5f, 0.5f});
@@ -80,6 +236,9 @@ void GameScene::Initialize() {
 
 	// スコア用スプライト5桁分
 	for (int i = 0; i < spriteScore_.size(); ++i) {
+		if (spriteScore_[i]) {
+			spriteScore_[i].reset();
+		}
 		spriteScore_[i] = make_unique<SpriteRender>();
 		spriteScore_[i]->sprite.Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
 		spriteScore_[i]->sprite.SetPosition({100.0f + i * 32.0f, 400.0f});
@@ -87,6 +246,9 @@ void GameScene::Initialize() {
 	}
 
 	// カウントダウン用のスプライト初期化
+	if (!spriteNumber_) {
+		spriteNumber_ = std::make_unique<Sprite>();
+	}
 	spriteNumber_->Initialize(&ctx_->dxCommon, spriteNumCollection_[3]);
 	spriteNumber_->SetScale({1, 1});
 	spriteNumber_->SetPosition({640.0f, 360.0f});
@@ -98,244 +260,305 @@ void GameScene::Initialize() {
 	isGameStart_ = false;
 
 	// 「スタート!」スプライト初期化
+	if (!spriteStart_) {
+		spriteStart_ = std::make_unique<Sprite>();
+	}
 	spriteStart_->Initialize(&ctx_->dxCommon, "resources/image/UI/StartUI.png");
 	spriteStart_->SetScale({1, 1});
 	spriteStart_->SetPosition({640.0f, 360.0f});
 	spriteStart_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
 
 	// ルール説明用のスプライト
+	if (!spriteRule_) {
+		spriteRule_ = std::make_unique<Sprite>();
+	}
 	spriteRule_->Initialize(&ctx_->dxCommon, "resources/image/UI/GameRuleUI.png");
 	spriteRule_->SetPosition({640.0f, -100.0f});
 	spriteRule_->SetScale({0.25f, 0.25f});
 
 	// ゲーム終了時に表示するスプライト
+	if (!spriteGameEnd_) {
+		spriteGameEnd_ = std::make_unique<Sprite>();
+	}
 	spriteGameEnd_->Initialize(&ctx_->dxCommon, "resources/image/UI/FinishUI.png");
 	spriteGameEnd_->SetPosition({640.0f, 360.0f});
 	spriteGameEnd_->SetScale({1, 1});
 
 	// 進行度ゲージスプライト
-	spriteProgressLine_->Initialize(&ctx_->dxCommon, "resources/image/UI/altitudeGaugeUI.png");
-	spriteProgressLine_->SetScale({0.2f, 0.3f});
-	spriteProgressLine_->SetPosition({1230.0f, 360.0f});
+	if (!spriteProgressLine_) spriteProgressLine_ = std::make_unique<Sprite>();
+	if (!spriteProgressPlayer_) spriteProgressPlayer_ = std::make_unique<Sprite>();
+	if (!spriteProgressGoal_) spriteProgressGoal_ = std::make_unique<Sprite>();
+	if (!spriteProgressMountaion_) spriteProgressMountaion_ = std::make_unique<Sprite>();
+	if (!spriteCandyScore_) spriteCandyScore_ = std::make_unique<Sprite>();
+	if (!spriteCandyEffect_) spriteCandyEffect_ = std::make_unique<Sprite>();
+	if (!spriteChargeUI_) spriteChargeUI_ = std::make_unique<Sprite>();
+	if (!spriteChargeUIEffect_) spriteChargeUIEffect_ = std::make_unique<Sprite>();
+	if (!spriteSnackCountOver_) spriteSnackCountOver_ = std::make_unique<Sprite>();
+	if (!spritePush_) spritePush_ = std::make_unique<Sprite>();
+	if (!spriteArm_) spriteArm_ = std::make_unique<Sprite>();
+	if (!spriteThorn_) spriteThorn_ = std::make_unique<Sprite>();
+	if (!maskBox_) maskBox_ = std::make_unique<Sprite>();
+	if (!loadingUI_) loadingUI_ = std::make_unique<Sprite>();
+	if (!loadingPlayer_) loadingPlayer_ = std::make_unique<Sprite>();
+	if (!mask_) mask_ = std::make_unique<Sprite>();
 
-	spriteProgressPlayer_->Initialize(&ctx_->dxCommon, "resources/image/UI/bearUI.png");
-	spriteProgressPlayer_->SetScale({0.25f, 0.25f});
-	spriteProgressPlayer_->SetPosition({988.0f, 360.0f});
+    // Initialize sprites
+    spriteProgressLine_->Initialize(&ctx_->dxCommon, "resources/image/UI/altitudeGaugeUI.png");
+    spriteProgressLine_->SetScale({0.2f, 0.3f});
+    spriteProgressLine_->SetPosition({1230.0f, 360.0f});
 
-	spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/UI/flagUI02.png");
-	spriteProgressGoal_->SetScale({0.5f, 0.5f});
-	spriteProgressGoal_->SetPosition({1230.0f, 680.0f});
+    spriteProgressPlayer_->Initialize(&ctx_->dxCommon, "resources/image/UI/bearUI.png");
+    spriteProgressPlayer_->SetScale({0.25f, 0.25f});
+    spriteProgressPlayer_->SetPosition({988.0f, 360.0f});
 
-	spriteProgressMountaion_->Initialize(&ctx_->dxCommon, "resources/image/UI/mountainTopUI02.png");
-	spriteProgressMountaion_->SetScale({0.25f, 0.25f});
-	spriteProgressMountaion_->SetPosition({1225.0f, 50.0f});
+    spriteProgressGoal_->Initialize(&ctx_->dxCommon, "resources/image/UI/flagUI02.png");
+    spriteProgressGoal_->SetScale({0.5f, 0.5f});
+    spriteProgressGoal_->SetPosition({1230.0f, 680.0f});
 
-	// ゲーム終了フラグ
-	isActiveEndText_ = false;
+    spriteProgressMountaion_->Initialize(&ctx_->dxCommon, "resources/image/UI/mountainTopUI02.png");
+    spriteProgressMountaion_->SetScale({0.25f, 0.25f});
+    spriteProgressMountaion_->SetPosition({1225.0f, 50.0f});
 
-	// 入力が無い時間をカウント
-	noInputTimer_ = 0.0f;
+    // ゲーム終了フラグ
+    isActiveEndText_ = false;
 
-	// スコア表示の後ろに配置するスプライト
-	spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
-	spriteCandyScore_->SetPosition({160.0f, 400.0f});
-	spriteCandyScore_->SetScale({0.5f, 0.5f});
-	spriteCandyScore_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
+    // 入力が無い時間をカウント
+    noInputTimer_ = 0.0f;
 
-	// スコアの背景波紋
-	spriteCandyEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
-	spriteCandyEffect_->SetPosition(spriteCandyScore_->GetPosition());
-	candyEffectSize_ = 0.5f;
-	spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
-	spriteCandyEffect_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
+    // スコア表示の後ろに配置するスプライト
+    spriteCandyScore_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
+    spriteCandyScore_->SetPosition({160.0f, 400.0f});
+    spriteCandyScore_->SetScale({0.5f, 0.5f});
+    spriteCandyScore_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
 
-	// 弾のゲージラムネUI
-	spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
-	spriteChargeUI_->SetPosition({1070.0f, 350.0f});
-	spriteChargeUI_->SetScale({0.4f, 0.4f});
+    // スコアの背景波紋
+    spriteCandyEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyUI.png");
+    spriteCandyEffect_->SetPosition(spriteCandyScore_->GetPosition());
+    candyEffectSize_ = 0.5f;
+    spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
+    spriteCandyEffect_->SetColor({0.8f, 0.1f, 0.4f, 1.0f});
 
-	// ラムネの波紋
-	spriteChargeUIEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
-	spriteChargeUIEffect_->SetPosition(spriteChargeUI_->GetPosition());
-	chargeEffectSize_ = 0.4f;
-	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
+    // 弾のゲージラムネUI
+    spriteChargeUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
+    spriteChargeUI_->SetPosition({1070.0f, 350.0f});
+    spriteChargeUI_->SetScale({0.4f, 0.4f});
 
-	// 山のモデル初期化
-	for (int i = 0; i < static_cast<int>(modelMountain_.size()); ++i) {
-		modelMountain_[i] = make_unique<Model>();
-		modelMountain_[i]->Initialize(&ctx_->dxCommon, "Mountain/Mountain.obj");
-		modelMountain_[i]->SetColor({0.0f, 0.7f, 0.4f, 1.0f});
-	}
+    // ラムネの波紋
+    spriteChargeUIEffect_->Initialize(&ctx_->dxCommon, "resources/image/UI/shotChargeGaugeUI.png");
+    spriteChargeUIEffect_->SetPosition(spriteChargeUI_->GetPosition());
+    chargeEffectSize_ = 0.4f;
+    spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
 
-	modelMountain_[0]->SetTranslate({-3.9f, -6.8f, 8.0f});
-	modelMountain_[0]->SetScale({5.4f, 6.6f, 6.0f});
-	modelMountain_[1]->SetTranslate({0, -8.8f, 22.0f});
-	modelMountain_[1]->SetScale({8.6f, 14.0f, 6.9f});
-	modelMountain_[2]->SetTranslate({3.2f, -6.8f, 8.0f});
-	modelMountain_[2]->SetScale({6.6f, 4.6f, 5.0f});
+    // 山のモデル初期化
+    for (int i = 0; i < static_cast<int>(modelMountain_.size()); ++i) {
+        if (modelMountain_[i]) {
+            modelMountain_[i].reset();
+        }
+        modelMountain_[i] = make_unique<Model>();
+        modelMountain_[i]->Initialize(&ctx_->dxCommon, "Mountain/Mountain.obj");
+        modelMountain_[i]->SetColor({0.0f, 0.7f, 0.4f, 1.0f});
+    }
 
-	// 一定の時間入力がなかった時に減算されるタイマースプライト
-	for (int i = 0; i < static_cast<int>(spriteNoInputCountDown_.size()); ++i) {
-		spriteNoInputCountDown_[i] = make_unique<Sprite>();
-		spriteNoInputCountDown_[i]->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
-		spriteNoInputCountDown_[i]->SetPosition({1200.0f, 32.0f});
-		spriteNoInputCountDown_[i]->SetScale({1, 1});
-	}
+    modelMountain_[0]->SetTranslate({-3.9f, -6.8f, 8.0f});
+    modelMountain_[0]->SetScale({5.4f, 6.6f, 6.0f});
+    modelMountain_[1]->SetTranslate({0, -8.8f, 22.0f});
+    modelMountain_[1]->SetScale({8.6f, 14.0f, 6.9f});
+    modelMountain_[2]->SetTranslate({3.2f, -6.8f, 8.0f});
+    modelMountain_[2]->SetScale({6.6f, 4.6f, 5.0f});
 
-	// SE
-	startGameSE_->Initialize("resources/sound/SE/InGame/StartGameSE.mp3");
-	countDownSE_->Initialize("resources/sound/SE/InGame/CountDownSE.mp3");
-	clearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
+    // 一定の時間入力がなかった時に減算されるタイマースプライト
+    for (int i = 0; i < static_cast<int>(spriteNoInputCountDown_.size()); ++i) {
+        if (spriteNoInputCountDown_[i]) {
+            spriteNoInputCountDown_[i].reset();
+        }
+        spriteNoInputCountDown_[i] = make_unique<Sprite>();
+        spriteNoInputCountDown_[i]->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
+        spriteNoInputCountDown_[i]->SetPosition({1200.0f, 32.0f});
+        spriteNoInputCountDown_[i]->SetScale({1, 1});
+    }
 
-	// BGM
-	gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM03.wav");
-	gameSceneBGM02_->Initialize("resources/sound/BGM/InGameBGM02.mp3");
-	gameSceneBGM01_->PlayAudio(gameSceneBGM01_BaseVolume_ * BGM_Volume, true);
+    // SE
+    if (!startGameSE_) startGameSE_ = std::make_unique<AudioX>();
+    if (!countDownSE_) countDownSE_ = std::make_unique<AudioX>();
+    if (!clearSE_) clearSE_ = std::make_unique<AudioX>();
+    
+    startGameSE_->Initialize("resources/sound/SE/InGame/StartGameSE.mp3");
+    countDownSE_->Initialize("resources/sound/SE/InGame/CountDownSE.mp3");
+    clearSE_->Initialize("resources/sound/SE/InGame/ClearSE.mp3");
 
-	// ○○個突破!スプライト
-	spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
-	spriteScoreCountOverPos_ = {-600.0f, 360.0f};
-	spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
-	spriteSnackCountOver_->SetScale({0.4f, 0.4f});
-	spriteSnackCountOver_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+    // BGM
+    if (!gameSceneBGM01_) gameSceneBGM01_ = std::make_unique<AudioX>();
+    if (!gameSceneBGM02_) gameSceneBGM02_ = std::make_unique<AudioX>();
+    
+    gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM03.wav");
+    gameSceneBGM02_->Initialize("resources/sound/BGM/InGameBGM02.mp3");
+    gameSceneBGM01_->PlayAudio(gameSceneBGM01_BaseVolume_ * BGM_Volume, true);
 
-	// ○○個突破　スコア数　スプライト
-	for (int i = 0; i < spriteScoreCountOver_.size(); ++i) {
-		spriteScoreCountOver_[i] = make_unique<Sprite>();
-		spriteScoreCountOver_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
-		spriteScoreCountOver_[i]->SetPosition(spriteScoreCountOverPos_);
-		spriteScoreCountOver_[i]->SetScale({1.0f, 1.0f});
-		spriteScoreCountOver_[i]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	}
+    // ○○個突破!スプライト
+    spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
+    spriteScoreCountOverPos_ = {-600.0f, 360.0f};
+    spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
+    spriteSnackCountOver_->SetScale({0.4f, 0.4f});
+    spriteSnackCountOver_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 
-	// push スプライト
-	spritePush_->Initialize(&ctx_->dxCommon, "resources/image/UI/PushButton01UI.png");
-	spritePush_->SetPosition({1068.0f, 600.0f});
-	spritePush_->SetScale({0.2f, 0.2f});
+    // ○○個突破　スコア数　スプライト
+    for (int i = 0; i < spriteScoreCountOver_.size(); ++i) {
+        if (spriteScoreCountOver_[i]) {
+            spriteScoreCountOver_[i].reset();
+        }
+        spriteScoreCountOver_[i] = make_unique<Sprite>();
+        spriteScoreCountOver_[i]->Initialize(&ctx_->dxCommon, "resources/image/number/0.png");
+        spriteScoreCountOver_[i]->SetPosition(spriteScoreCountOverPos_);
+        spriteScoreCountOver_[i]->SetScale({1.0f, 1.0f});
+        spriteScoreCountOver_[i]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+    }
 
-	// 腕 スプライト
-	spriteArm_->Initialize(&ctx_->dxCommon, "resources/image/UI/armUI.png");
-	spriteArm_->SetPosition({450.0f, 75.0f});
-	spriteArm_->SetScale({0.25f, 0.25f});
+    // push スプライト
+    spritePush_->Initialize(&ctx_->dxCommon, "resources/image/UI/PushButton01UI.png");
+    spritePush_->SetPosition({1068.0f, 600.0f});
+    spritePush_->SetScale({0.2f, 0.2f});
 
-	// ピニャータ スプライト
-	spriteThorn_->Initialize(&ctx_->dxCommon, "resources/image/UI/enemyUI.png");
-	spriteThorn_->SetPosition({590.0f, 85.0f});
-	spriteThorn_->SetScale({0.25f, 0.25f});
+    // 腕 スプライト
+    spriteArm_->Initialize(&ctx_->dxCommon, "resources/image/UI/armUI.png");
+    spriteArm_->SetPosition({450.0f, 75.0f});
+    spriteArm_->SetScale({0.25f, 0.25f});
 
-	// ○○個突破　1000の倍数
-	nextMilestone_ = 0;
+    // ピニャータ スプライト
+    spriteThorn_->Initialize(&ctx_->dxCommon, "resources/image/UI/enemyUI.png");
+    spriteThorn_->SetPosition({590.0f, 85.0f});
+    spriteThorn_->SetScale({0.25f, 0.25f});
 
-	// 振動の終了
-	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
+    // ○○個突破　1000の倍数
+    nextMilestone_ = 0;
 
-	// 地面モデル
-	modelGround_->Initialize(&ctx_->dxCommon, "Ground/Ground5.obj");
-	modelGround_->SetTexture("resources/model/Ground/Ground2.png");
-	modelGround_->SetTranslate({0.0f, -250.0f, 1400.0f});
-	modelGround_->SetScale({40.0f, 40.0f, 40.0f});
+    // 振動の終了
+    gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
 
-	// 曇モデル
-	for (int i = 0; i < clouds_.size(); ++i) {
-		clouds_[i] = make_unique<MoveModel>();
-		clouds_[i]->model.Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
-		clouds_[i]->model.SetTexture("resources/image/0.png");
-		clouds_[i]->model.SetScale({2.0f, 1.0f, 1.0f});
-		clouds_[i]->model.SetColor({1.0f, 1.0f, 1.0f, 0.3f});
-		clouds_[i]->direction = Direction::RIGHT;
+    // 地面モデル
+    if (!modelGround_) {
+        modelGround_ = std::make_unique<Model>();
+    }
+    modelGround_->Initialize(&ctx_->dxCommon, "Ground/Ground5.obj");
+    modelGround_->SetTexture("resources/model/Ground/Ground2.png");
+    modelGround_->SetTranslate({0.0f, -250.0f, 1400.0f});
+    modelGround_->SetScale({40.0f, 40.0f, 40.0f});
 
-		// 初期座標Y
-		const float MIN_POS_Y = 150.0f;
-		const float MAX_POS_Y = 400.0f;
+    // 曇モデル
+    for (int i = 0; i < clouds_.size(); ++i) {
+        if (clouds_[i]) {
+            clouds_[i].reset();
+        }
+        clouds_[i] = make_unique<MoveModel>();
+        clouds_[i]->model.Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
+        clouds_[i]->model.SetTexture("resources/image/0.png");
+        clouds_[i]->model.SetScale({2.0f, 1.0f, 1.0f});
+        clouds_[i]->model.SetColor({1.0f, 1.0f, 1.0f, 0.3f});
+        clouds_[i]->direction = Direction::RIGHT;
 
-		std::random_device rd;
-		std::mt19937 eng(rd());
-		std::uniform_real_distribution<float> distr(MIN_POS_Y, MAX_POS_Y);
+        // 初期座標Y
+        const float MIN_POS_Y = 150.0f;
+        const float MAX_POS_Y = 400.0f;
 
-		// 初期座標X
-		const float MIN_POS_X = -7.0f;
-		const float MAX_POS_X = 7.0f;
+        std::random_device rd;
+        std::mt19937 eng(rd());
+        std::uniform_real_distribution<float> distr(MIN_POS_Y, MAX_POS_Y);
 
-		std::random_device rd2;
-		std::mt19937 eng2(rd2());
-		std::uniform_real_distribution<float> distr2(MIN_POS_X, MAX_POS_X);
+        // 初期座標X
+        const float MIN_POS_X = -7.0f;
+        const float MAX_POS_X = 7.0f;
 
-		// 雲の進む向きを決める
-		if (GetRandomDirection()) {
-			clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
-			clouds_[i]->direction = Direction::LEFT;
-		} else {
-			clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
-			clouds_[i]->direction = Direction::RIGHT;
-		}
-	}
+        std::random_device rd2;
+        std::mt19937 eng2(rd2());
+        std::uniform_real_distribution<float> distr2(MIN_POS_X, MAX_POS_X);
 
-	// 雲のモデル座標リセットフラグ
-	isCloudPosReset_ = false;
+        // 雲の進む向きを決める
+        if (GetRandomDirection()) {
+            clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
+            clouds_[i]->direction = Direction::LEFT;
+        } else {
+            clouds_[i]->model.SetTranslate({distr2(eng2), distr(eng), 20.0f});
+            clouds_[i]->direction = Direction::RIGHT;
+        }
+    }
 
-	// スコア加算時に使用するタイマー
-	scoreUpTimer_ = 0.0f;
+    // 雲のモデル座標リセットフラグ
+    isCloudPosReset_ = false;
 
-	maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
-	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingUI.png", { 1040.0f, 640.0f }, { 1.0f, 1.0f });
-	loadingUI_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+    // スコア加算時に使用するタイマー
+    scoreUpTimer_ = 0.0f;
 
-	loadingPlayer_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingPlayer.png", { 680.0f, 615.0f }, { 0.3f, 0.3f });
+    maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+    loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingUI.png", { 1040.0f, 640.0f }, { 1.0f, 1.0f });
+    loadingUI_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
-	maskType_ = static_cast<MaskType>(rand_.Int(0, 2));
+    loadingPlayer_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingPlayer.png", { 680.0f, 615.0f }, { 0.3f, 0.3f });
 
-	switch (maskType_)
-	{
-	case GameScene::MaskType::RAMA:
-		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view01.png", { 640.0f,360.0f }, { 1.0f,1.0f });
-		maskStartScale_ = { 0.26f, 0.26f };
-		maskEndScale_ = { 8.0f, 8.0f };
-		break;
-	case GameScene::MaskType::KUMA:
-		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view02.png", { 640.0f,360.0f }, { 1.0f,1.0f });
-		maskStartScale_ = { 0.26f, 0.26f };
-		maskEndScale_ = { 2.5f, 2.5f };
-		break;
-	case GameScene::MaskType::AME:
-		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view03.png", { 640.0f,360.0f }, { 1.0f,1.0f });
-		maskStartScale_ = { 0.26f, 0.26f };
-		maskEndScale_ = { 5.0f, 5.0f };
-		break;
-	}
+    maskType_ = static_cast<MaskType>(rand_.Int(0, 2));
 
-	// マスクのアニメーション設定 - 画面外から中央へ
-	maskStartPos_ = { 640.0f, 360.0f };  // 画面上部から開始
-	maskEndPos_ = { 640.0f, 360.0f };    // 画面中央で終了
+    switch (maskType_)
+    {
+    case GameScene::MaskType::RAMA:
+        mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view01.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+        maskStartScale_ = { 0.26f, 0.26f };
+        maskEndScale_ = { 8.0f, 8.0f };
+        break;
+    case GameScene::MaskType::KUMA:
+        mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view02.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+        maskStartScale_ = { 0.26f, 0.26f };
+        maskEndScale_ = { 2.5f, 2.5f };
+        break;
+    case GameScene::MaskType::AME:
+        mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view03.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+        maskStartScale_ = { 0.26f, 0.26f };
+        maskEndScale_ = { 5.0f, 5.0f };
+        break;
+    }
 
-	maskTimer_.Start(1.0f, false);
+    // マスクのアニメーション設定 - 画面外から中央へ
+    maskStartPos_ = { 640.0f, 360.0f };  // 画面上部から開始
+    maskEndPos_ = { 640.0f, 360.0f };    // 画面中央で終了
 
-	timerStarte_ = false;
-	resultQuit_ = false;
+    maskTimer_.Start(1.0f, false);
 
-	ExeColor = { 0.212f, 0.722f, 1.000f, 1.000f };
+    timerStarte_ = false;
+    resultQuit_ = false;
 
-	ore_->Initialize(&ctx_->dxCommon, "ore.obj");
-	ore_->SetUpdateFrustumCulling(false);
-	ore_->SetUseLight(false);
-	oreTransform_.translate = { 4.5f,450.5f,1.0f };
-	oreTransform_.rotate = { -0.33f,-3.47f,0.66f };
-	oreTransform_.scale = { 3.0f,3.0f,3.0f };
-	ore_->SetTransform(oreTransform_);
+    ExeColor = { 0.212f, 0.722f, 1.000f, 1.000f };
 
-	srarArea1_->Initialize(&ctx_->dxCommon);
-	srarArea2_->Initialize(&ctx_->dxCommon);
-	srarArea3_->Initialize(&ctx_->dxCommon);
-	srarArea4_->Initialize(&ctx_->dxCommon);
+    if (!ore_) {
+        ore_ = std::make_unique<Model>();
+    }
+    ore_->Initialize(&ctx_->dxCommon, "ore.obj");
+    ore_->SetUpdateFrustumCulling(false);
+    ore_->SetUseLight(false);
+    oreTransform_.translate = { 4.5f,450.5f,1.0f };
+    oreTransform_.rotate = { -0.55f,-0.6f,0.6f };
+    oreTransform_.scale = { 3.0f,3.0f,3.0f };
+    ore_->SetTransform(oreTransform_);
 
-	srarArea1_->LoadJson("starArea1");
-	srarArea2_->LoadJson("starArea2");
-	srarArea3_->LoadJson("starArea3");
-	srarArea4_->LoadJson("starArea4");
+    if (!srarArea1_) srarArea1_ = std::make_unique<Particles>();
+    if (!srarArea2_) srarArea2_ = std::make_unique<Particles>();
+    if (!srarArea3_) srarArea3_ = std::make_unique<Particles>();
+    if (!srarArea4_) srarArea4_ = std::make_unique<Particles>();
 
-	startGameSE_BaseVolume_ = 0.45f;
-	countDownSE_BaseVolume_ = 0.65f;
-	clearSE_BaseVolume_ = 0.8f;
-	gameSceneBGM01_BaseVolume_ = 1.0f;
+    srarArea1_->Initialize(&ctx_->dxCommon);
+    srarArea2_->Initialize(&ctx_->dxCommon);
+    srarArea3_->Initialize(&ctx_->dxCommon);
+    srarArea4_->Initialize(&ctx_->dxCommon);
+
+    srarArea1_->LoadJson("starArea1");
+    srarArea2_->LoadJson("starArea2");
+    srarArea3_->LoadJson("starArea3");
+    srarArea4_->LoadJson("starArea4");
+
+    startGameSE_BaseVolume_ = 0.45f;
+    countDownSE_BaseVolume_ = 0.65f;
+    clearSE_BaseVolume_ = 0.8f;
+    gameSceneBGM01_BaseVolume_ = 1.0f;
+
+	backGround_->Initialize(&ctx_->dxCommon, "plane.obj");
+	backGround_->SetTexture("resources/image/0.png");
+	backGround_->SetUseLight(false);
 }
 
 void GameScene::Update() {
@@ -598,6 +821,14 @@ void GameScene::Update() {
 	srarArea2_->Update();
 	srarArea3_->Update();
 	srarArea4_->Update();
+
+	backGround_->SetTranslate({
+		player_->GetPosition().x,
+		player_->GetPosition().y,
+		player_->GetPosition().z + 1500.0f });
+	backGround_->SetScale({ 400.0f,400.0f,1.0f });
+	backGround_->SetColorVector3(player_->GetColorLerp());
+	backGround_->Update();
 }
 
 void GameScene::Draw() {
@@ -608,6 +839,8 @@ void GameScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	backGround_->Draw(*useCamera_);
 
 	// 地面モデル
 	modelGround_->Draw(*useCamera_);
@@ -738,9 +971,13 @@ void GameScene::Draw() {
 	///
 
 	// プレイヤーのImGui
-	/*player_->DrawImgui();
+	player_->DrawImgui();
 
-	DrawSceneName();
+	ore_->DrawImGui("ore");
+
+	backGround_->DrawImGui("backGround");
+
+	/*DrawSceneName();
 
 	ImGui::Text("GameScene_Audio");
 

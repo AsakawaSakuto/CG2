@@ -64,6 +64,8 @@ public:
 	bool GetIsCameraSet() const { return isCameraSet_; }
 	bool GetIsScoreUpAnimation() const { return isScoreUpAnimation_; }
 
+	Vector3 GetColorLerp() { return lerp_; }
+
 	// Setter
 	void SetThrons(std::vector<std::shared_ptr<Thorn>>& thorns) { thorns_ = thorns; }
 	void SetBlocks(std::vector<std::shared_ptr<Block>>& blocks) { blocks_ = blocks; }
@@ -195,6 +197,7 @@ private:
 	void ScoreParticleAddUpdate();
 
 	void TranslateLerp();
+
 private:
 	// プレイヤーのStateをJsonで管理
 	PlayerState playerState_;
@@ -362,4 +365,6 @@ private:
 
 	// 弾の溜まる速度
 	const int chrageSpeed_ = 90;
+
+	Vector3 lerp_;
 };

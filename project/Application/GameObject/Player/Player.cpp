@@ -87,6 +87,7 @@ void Player::Initialize(DirectXCommon* dxCommon) {
 
 	// 前フレームのスコア
 	preScore_ = 0;
+
 }
 
 void Player::Update() {
@@ -194,9 +195,11 @@ void Player::Update() {
 			sprite->Update();
 		}
 	}
+
 }
 
 void Player::Draw(Camera useCamera) {
+
 	// プレイヤー描画
 	if (currentFlickFrames_ % 2 == 0) {
 		model_->Draw(useCamera);
@@ -1389,10 +1392,7 @@ void Player::TranslateLerp() {
 	// 0.0f～1.0fの範囲にクランプ
 	t = std::clamp(t, 0.0f, 1.0f);
 	
-	Vector3 lerp = Easing::LerpVector3({ 0.212f, 0.722f, 1.000f }, { 0.0f,0.0f,0.0f }, t);
-	ExeColor.x = lerp.x;
-	ExeColor.y = lerp.y;
-	ExeColor.z = lerp.z;
+	lerp_ = Easing::LerpVector3({ 0.212f, 0.722f, 1.000f }, { 0.0f,0.0f,0.0f }, t);
 
 	// 必要に応じて、この値tを他の処理で使用する
 	// 例: プレイヤーの進行度として保存したい場合

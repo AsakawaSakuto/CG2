@@ -191,4 +191,7 @@ private:
 	GameTimer maskTimer_;
 
 	bool titleQuit_ = false;
+
+	unique_ptr<Model> backGround_ = make_unique<Model>();
+	Transform backGroundTransform_;
 };

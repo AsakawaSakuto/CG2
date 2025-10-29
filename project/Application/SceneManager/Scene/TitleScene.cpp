@@ -3,121 +3,254 @@
 
 #include "Engine/System/DirectXCommon/ExeColor.h"
 
-void TitleScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
+void TitleScene::SetAppContext(AppContext* ctx) { 
+    ctx_ = ctx; 
+}
 
 TitleScene::~TitleScene() {
-	CleanupResources();
+    CleanupResources();
 }
 
 void TitleScene::CleanupResources() {
-	titleLogo_.reset();
-	playUI_.reset();
-	optionUI_.reset();
-	cursolUI_.reset();
-	sceneFade_.reset();
-	titleTimer_.Reset();
-	cursolTimer_.Reset();
+    // ModelやSpriteなどのリソースを確実に解放
+    titleLogo_.reset();
+    titleObject_.reset();
+    playUI_.reset();
+    optionUI_.reset();
+    quitUI_.reset();
+    cursolUI_.reset();
+    optionBG_.reset();
+    uiBoxUI_.reset();
+    optionCursolUI_.reset();
+    fullScreenUI_.reset();
+    onUI_.reset();
+    offUI_.reset();
+    seUI_.reset();
+    bgmUI_.reset();
+    daiUI_.reset();
+    dai2UI_.reset();
+    tyuUI_.reset();
+    tyu2UI_.reset();
+    syouUI_.reset();
+    syou2UI_.reset();
+    backUI_.reset();
+    OptionBearUI_.reset();
+    parenthesesUI1_.reset();
+    parenthesesUI2_.reset();
+    parenthesesUI3_.reset();
+    parenthesesUI4_.reset();
+    parenthesesUI5_.reset();
+    parenthesesUI6_.reset();
+    maskBox_.reset();
+    loadingUI_.reset();
+    loadingPlayer_.reset();
+    mask_.reset();
+    
+    // 雲とラインのモデルを解放
+    for (auto& cloud : cloud_) {
+        cloud.reset();
+    }
+    for (auto& cloudLine : cloudLine_) {
+        cloudLine.reset();
+    }
+
+    // パーティクルシステムを解放
+    titleParticle_.reset();
+    testParticle_.reset();
+    
+    // オーディオリソースを解放
+    if (startGameSE_) {
+        startGameSE_->Reset();
+        startGameSE_.reset();
+    }
+    if (moveCursolSE_) {
+        moveCursolSE_->Reset();
+        moveCursolSE_.reset();
+    }
+    if (decideSE_) {
+        decideSE_->Reset();
+        decideSE_.reset();
+    }
+    if (titleSceneBGM_) {
+        titleSceneBGM_->Reset();
+        titleSceneBGM_.reset();
+    }
+    
+    // カメラリソースを解放
+    debugCamera_.reset();
+    normalCamera_.reset();
+    
+    // SceneFadeを解放
+    sceneFade_.reset();
+    
+    // タイマーをリセット
+    titleTimer_.Reset();
+    cursolTimer_.Reset();
+    optionTimer_.Reset();
+    optionCursolTimer_.Reset();
+    fullScreenTimer_.Reset();
+    cloudTimer_.Reset();
+    cloudLineTimer_.Reset();
+    maskTimer_.Reset();
+    bgChangeTimer_.Reset();
+    bgFadeTimer_.Reset();
 }
 
 void TitleScene::Initialize() {
-	// inputSystemの初期化
-	gamePad_ = &ctx_->gamePad;
-	input_ = &ctx_->input;
+    // 初期化前に既存リソースをクリーンアップ
+    CleanupResources();
+    
+    // inputSystemの初期化
+    gamePad_ = &ctx_->gamePad;
+    input_ = &ctx_->input;
 
-	// カメラの初期化
-	debugCamera_->SetInput(&ctx_->input);
-	debugCamera_->SetPosition({ 0.0f, 0.0f, -15.0f });
-	normalCamera_->SetPosition({0.0f, 0.0f, -15.0f});
-	normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
+    // カメラの初期化 - make_uniqueで適切に作成
+    if (!debugCamera_) {
+        debugCamera_ = std::make_unique<DebugCamera>();
+    }
+    if (!normalCamera_) {
+        normalCamera_ = std::make_unique<Camera>();
+    }
+    
+    debugCamera_->SetInput(&ctx_->input);
+    debugCamera_->SetPosition({ 0.0f, 0.0f, -15.0f });
+    normalCamera_->SetPosition({0.0f, 0.0f, -15.0f});
+    normalCamera_->SetRotate({0.0f, 0.0f, 0.0f});
 
-	useDebugCamera_ = false;
+    useDebugCamera_ = false;
 
-	// Create SceneFade
-	sceneFade_ = std::make_unique<SceneFade>();
-	sceneFade_->Initialize(&ctx_->dxCommon);
-	sceneFade_->StartFadeOut(1.0f);
+    // Create SceneFade - 既存のものがある場合はリセット
+    if (sceneFade_) {
+        sceneFade_.reset();
+    }
+    sceneFade_ = std::make_unique<SceneFade>();
+    sceneFade_->Initialize(&ctx_->dxCommon);
+    sceneFade_->StartFadeOut(1.0f);
 
-	titleLogo_.reset();
-	titleLogo_ = make_unique<Text3D>();
-	titleLogo_->Initialize(&ctx_->dxCommon);
+    // Text3Dの初期化 - 既存チェックを追加
+    if (titleLogo_) {
+        titleLogo_.reset();
+    }
+    titleLogo_ = make_unique<Text3D>();
+    titleLogo_->Initialize(&ctx_->dxCommon);
 
-	titleObject_.reset();
-	titleObject_ = make_unique<TitleObject>();
-	titleObject_->Initialize(&ctx_->dxCommon);
+    // TitleObjectの初期化
+    if (titleObject_) {
+        titleObject_.reset();
+    }
+    titleObject_ = make_unique<TitleObject>();
+    titleObject_->Initialize(&ctx_->dxCommon);
 
-	uiAlpha_ = 0.0f;
-	titleTimer_.Reset();
-	cursolTimer_.Reset();
+    uiAlpha_ = 0.0f;
+    titleTimer_.Reset();
+    cursolTimer_.Reset();
 
-	// cloudTimer_の初期化を追加
-	cloudTimer_.Reset();
-	cloudLineTimer_.Reset();
+    // cloudTimer_の初期化を追加
+    cloudTimer_.Reset();
+    cloudLineTimer_.Reset();
 
-	SE_Volume = tyuVolumeSE_;
-	BGM_Volume = tyuVolumeBGM_;
+    SE_Volume = tyuVolumeSE_;
+    BGM_Volume = tyuVolumeBGM_;
 
-	InitSptite();
+    InitSptite();
 
-	pushStart_ = false;
+    pushStart_ = false;
 
-	startGameSE_->Initialize("resources/sound/SE/Title/startGameSE.mp3");
-	moveCursolSE_->Initialize("resources/sound/SE/Title/moveCursolSE.mp3");
-	decideSE_->Initialize("resources/sound/SE/Title/DecideSE.mp3");
-	titleSceneBGM_->Initialize("resources/sound/BGM/TitleBGM.mp3");
-	titleSceneBGM_->PlayAudio(titleSceneBGM_BaseVolume_ * BGM_Volume, true);
+    // オーディオリソースの初期化 - 既存チェックを追加
+    if (!startGameSE_) {
+        startGameSE_ = std::make_unique<AudioX>();
+    }
+    if (!moveCursolSE_) {
+        moveCursolSE_ = std::make_unique<AudioX>();
+    }
+    if (!decideSE_) {
+        decideSE_ = std::make_unique<AudioX>();
+    }
+    if (!titleSceneBGM_) {
+        titleSceneBGM_ = std::make_unique<AudioX>();
+    }
 
-	titleParticle_->Initialize(&ctx_->dxCommon, 2);
-	titleParticle_->LoadJson("candy");
-	titleParticle_->Stop();
+    startGameSE_->Initialize("resources/sound/SE/Title/startGameSE.mp3");
+    moveCursolSE_->Initialize("resources/sound/SE/Title/moveCursolSE.mp3");
+    decideSE_->Initialize("resources/sound/SE/Title/DecideSE.mp3");
+    titleSceneBGM_->Initialize("resources/sound/BGM/TitleBGM.mp3");
+    titleSceneBGM_->PlayAudio(titleSceneBGM_BaseVolume_ * BGM_Volume, true);
 
-	testParticle_->Initialize(&ctx_->dxCommon, 1);
-	testParticle_->LoadJson("bulletmove");
+    // パーティクルシステムの初期化
+    if (!titleParticle_) {
+        titleParticle_ = std::make_unique<Particles>();
+    }
+    if (!testParticle_) {
+        testParticle_ = std::make_unique<Particles>();
+    }
 
-	// 雲の初期化
-	for (int i = 1; i < 10; i++) {
-		cloud_[i] = make_unique<Model>();	
-		cloud_[i]->Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
-		cloud_[i]->SetTexture("resources/image/0.png");
-		cloud_[i]->SetUpdateFrustumCulling(false);
-		cloudIsActive_[i] = false;
-		cloudTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };  // スケールを大きく
-		cloudTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
-		cloudTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
-	}
+    titleParticle_->Initialize(&ctx_->dxCommon, 2);
+    titleParticle_->LoadJson("candy");
+    titleParticle_->Stop();
 
-	cloud_[0] = make_unique<Model>();
-	cloud_[0]->Initialize(&ctx_->dxCommon, "enemy/enemy/enemy.obj");
-	cloud_[0]->SetUpdateFrustumCulling(false);
-	cloudIsActive_[0] = false;
-	cloudTramsform_[0].scale = { 2.0f, 2.0f, 2.0f };  // スケールを大きく
-	cloudTramsform_[0].rotate = { 0.0f, 1.6f, 0.0f };
-	cloudTramsform_[0].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
+    testParticle_->Initialize(&ctx_->dxCommon, 1);
+    testParticle_->LoadJson("bulletmove");
 
-	for (int i = 0; i < cloud_.size(); i++) {
-		cloudLine_[i] = make_unique<Model>();
-		cloudLine_[i]->Initialize(&ctx_->dxCommon, "Cloud/LineI.obj");
-		cloudLine_[i]->SetTexture("resources/image/0.png");
-		cloudLine_[i]->SetUpdateFrustumCulling(false);
-		cloudLineIsActive_[i] = false;
-		cloudLineTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };  // スケールを大きく
-		cloudLineTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
-		cloudLineTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };  // 初期位置を上に
-	}
+    // 雲の初期化 - 配列の再初期化
+    for (int i = 1; i < cloud_.size(); i++) {
+        if (cloud_[i]) {
+            cloud_[i].reset();
+        }
+        cloud_[i] = make_unique<Model>();	
+        cloud_[i]->Initialize(&ctx_->dxCommon, "Cloud/Cloud.obj");
+        cloud_[i]->SetTexture("resources/image/0.png");
+        cloud_[i]->SetUpdateFrustumCulling(false);
+        cloudIsActive_[i] = false;
+        cloudTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };
+        cloudTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
+        cloudTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };
+    }
 
-	// 振動の終了
-	gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
+    if (cloud_[0]) {
+        cloud_[0].reset();
+    }
+    cloud_[0] = make_unique<Model>();
+    cloud_[0]->Initialize(&ctx_->dxCommon, "enemy/enemy/enemy.obj");
+    cloud_[0]->SetUpdateFrustumCulling(false);
+    cloudIsActive_[0] = false;
+    cloudTramsform_[0].scale = { 2.0f, 2.0f, 2.0f };
+    cloudTramsform_[0].rotate = { 0.0f, 1.6f, 0.0f };
+    cloudTramsform_[0].translate = { 0.0f, 7.5f, 0.0f };
 
-	maskTimer_.Start(1.0f, false);
+    for (int i = 0; i < cloudLine_.size(); i++) {
+        if (cloudLine_[i]) {
+            cloudLine_[i].reset();
+        }
+        cloudLine_[i] = make_unique<Model>();
+        cloudLine_[i]->Initialize(&ctx_->dxCommon, "Cloud/LineI.obj");
+        cloudLine_[i]->SetTexture("resources/image/0.png");
+        cloudLine_[i]->SetUpdateFrustumCulling(false);
+        cloudLineIsActive_[i] = false;
+        cloudLineTramsform_[i].scale = { 1.0f, 1.0f, 1.0f };
+        cloudLineTramsform_[i].rotate = { 0.0f, 0.0f, 0.0f };
+        cloudLineTramsform_[i].translate = { 0.0f, 7.5f, 0.0f };
+    }
 
-	// 背景色変更システムの初期化
-	bgType_ = BG_Type::SKY;
-	bgChangeTimer_.Start(10.0f, false);
-	bgFadeTimer_.Reset(); // bgFadeTimer_を明示的に初期化
+    // 振動の終了
+    gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
 
-	startGameSE_BaseVolume_ = 1.0f;
-	moveCursolSE_BaseVolume_ = 0.5f;
-	decideSE_BaseVolume_ = 1.0f;
-	titleSceneBGM_BaseVolume_ = 1.0f;
+    maskTimer_.Start(1.0f, false);
+
+    // 背景色変更システムの初期化
+    bgType_ = BG_Type::SKY;
+    bgChangeTimer_.Start(10.0f, false);
+    bgFadeTimer_.Reset();
+
+    startGameSE_BaseVolume_ = 1.0f;
+    moveCursolSE_BaseVolume_ = 0.5f;
+    decideSE_BaseVolume_ = 1.0f;
+    titleSceneBGM_BaseVolume_ = 1.0f;
+
+	backGround_->Initialize(&ctx_->dxCommon, "plane.obj");
+	backGround_->SetTexture("resources/image/0.png");
+	backGround_->SetTranslate({ 0.0f, 0.0f, 20.0f });
+	backGround_->SetScale({ 20.0f, 15.0f, 1.0f });
+	backGround_->SetUseLight(false);
 }
 
 void TitleScene::Update() {
@@ -179,6 +312,8 @@ void TitleScene::Update() {
 	loadingUI_->Update();
 	loadingPlayer_->Update();
 
+	backGround_->Update();
+
 	// 背景色変更の更新
 	ChangeBG();
 
@@ -194,6 +329,8 @@ void TitleScene::Draw() {
 	///
 	/// ↓描画処理ここから
 	///
+
+	backGround_->Draw(*useCamera_);
 
 	titleLogo_->Draw(*useCamera_);
 	titleObject_->Draw(*useCamera_);
@@ -291,6 +428,8 @@ void TitleScene::Draw() {
 	///
 	/// ↓ImGuiここから
 	///
+
+	backGround_->DrawImGui("bg");
 
 	/*ImGui::Begin("TitleScene");
 
@@ -933,81 +1072,145 @@ void TitleScene::AudioUpdate() {
 }
 
 void TitleScene::InitSptite() {
-	playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png", { 342.0f,384.0f }, { 0.6f,0.6f });
-	playUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    // 既存のSpriteリソースをリセット
+    if (playUI_) playUI_.reset();
+    if (optionUI_) optionUI_.reset();
+    if (quitUI_) quitUI_.reset();
+    if (cursolUI_) cursolUI_.reset();
+    if (optionBG_) optionBG_.reset();
+    if (uiBoxUI_) uiBoxUI_.reset();
+    if (optionCursolUI_) optionCursolUI_.reset();
+    if (fullScreenUI_) fullScreenUI_.reset();
+    if (onUI_) onUI_.reset();
+    if (offUI_) offUI_.reset();
+    if (seUI_) seUI_.reset();
+    if (bgmUI_) bgmUI_.reset();
+    if (daiUI_) daiUI_.reset();
+    if (dai2UI_) dai2UI_.reset();
+    if (tyuUI_) tyuUI_.reset();
+    if (tyu2UI_) tyu2UI_.reset();
+    if (syouUI_) syouUI_.reset();
+    if (syou2UI_) syou2UI_.reset();
+    if (backUI_) backUI_.reset();
+    if (OptionBearUI_) OptionBearUI_.reset();
+    if (parenthesesUI1_) parenthesesUI1_.reset();
+    if (parenthesesUI2_) parenthesesUI2_.reset();
+    if (parenthesesUI3_) parenthesesUI3_.reset();
+    if (parenthesesUI4_) parenthesesUI4_.reset();
+    if (parenthesesUI5_) parenthesesUI5_.reset();
+    if (parenthesesUI6_) parenthesesUI6_.reset();
+    if (maskBox_) maskBox_.reset();
+    if (loadingUI_) loadingUI_.reset();
+    if (loadingPlayer_) loadingPlayer_.reset();
+    if (mask_) mask_.reset();
 
-	optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png", { 390.0f,488.0f }, { 0.6f,0.6f });
-	optionUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    // 新しいSpriteリソースを作成
+    playUI_ = std::make_unique<Sprite>();
+    optionUI_ = std::make_unique<Sprite>();
+    quitUI_ = std::make_unique<Sprite>();
+    cursolUI_ = std::make_unique<Sprite>();
+    optionBG_ = std::make_unique<Sprite>();
+    uiBoxUI_ = std::make_unique<Sprite>();
+    optionCursolUI_ = std::make_unique<Sprite>();
+    fullScreenUI_ = std::make_unique<Sprite>();
+    onUI_ = std::make_unique<Sprite>();
+    offUI_ = std::make_unique<Sprite>();
+    seUI_ = std::make_unique<Sprite>();
+    bgmUI_ = std::make_unique<Sprite>();
+    daiUI_ = std::make_unique<Sprite>();
+    dai2UI_ = std::make_unique<Sprite>();
+    tyuUI_ = std::make_unique<Sprite>();
+    tyu2UI_ = std::make_unique<Sprite>();
+    syouUI_ = std::make_unique<Sprite>();
+    syou2UI_ = std::make_unique<Sprite>();
+    backUI_ = std::make_unique<Sprite>();
+    OptionBearUI_ = std::make_unique<Sprite>();
+    parenthesesUI1_ = std::make_unique<Sprite>();
+    parenthesesUI2_ = std::make_unique<Sprite>();
+    parenthesesUI3_ = std::make_unique<Sprite>();
+    parenthesesUI4_ = std::make_unique<Sprite>();
+    parenthesesUI5_ = std::make_unique<Sprite>();
+    parenthesesUI6_ = std::make_unique<Sprite>();
+    maskBox_ = std::make_unique<Sprite>();
+    loadingUI_ = std::make_unique<Sprite>();
+    loadingPlayer_ = std::make_unique<Sprite>();
+    mask_ = std::make_unique<Sprite>();
 
-	quitUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/quitUI.png", { 347.0f,581.0f }, { 0.6f,0.6f });
-	quitUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    playUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/PlayUI.png", { 342.0f,384.0f }, { 0.6f,0.6f });
+    playUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,386.0f }, { 0.3f,0.3f });
-	cursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    optionUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionUI.png", { 390.0f,488.0f }, { 0.6f,0.6f });
+    optionUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/UIBoxUI.png", { 640.0f,355.0f }, { 0.0f,0.0f });
-	optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.85f });
+    quitUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/quitUI.png", { 347.0f,581.0f }, { 0.6f,0.6f });
+    quitUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	optionCursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 150.0f,156.0f }, { 0.0f,0.0f });
-	optionCursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    cursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 210.0f,386.0f }, { 0.3f,0.3f });
+    cursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	fullScreenUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/fullscreenModeUI.png", { 791.0f,151.0f }, { 0.4f,0.4f });
-	onUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/onUI.png", { 1068.0f,151.0f }, { 0.4f,0.4f });
-	offUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/offUI.png", { 1070.0f,151.0f }, { 0.4f,0.4f });
-	seUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/seUI.png", { 656.0f,237.0f }, { 0.4f,0.4f });
-	bgmUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/bgmUI.png", { 670.0f,323.0f }, { 0.4f,0.4f });
-	daiUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,235.0f }, { 0.4f,0.4f });
-	dai2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,321.0f }, { 0.4f,0.4f });
-	tyuUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,235.0f }, { 0.4f,0.4f });
-	tyu2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,321.0f }, { 0.4f,0.4f });
-	syouUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,236.0f }, { 0.4f,0.4f });
-	syou2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,321.0f }, { 0.4f,0.4f });
-	backUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/backUI.png", { 674.0f,403.0f }, { 0.4f,0.4f });
-	OptionBearUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBearUI.png", { 320.0f,350.0f }, { 0.6f,0.6f });
-	uiBoxUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/uiBoxUI.png", { 860.0f,350.0f }, { 0.0f,0.0f });
-	uiBoxUI_->SetColor({ 0.5f,0.5f,0.5f,0.5f });
-	parenthesesUI1_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,151.0f });
-	parenthesesUI2_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,151.0f });
-	parenthesesUI3_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,234.0f });
-	parenthesesUI4_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,234.0f });
-	parenthesesUI5_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,323.0f });
-	parenthesesUI6_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,323.0f });
-	parenthesesUI2_->SetRotate(3.16f);
-	parenthesesUI4_->SetRotate(3.16f);
-	parenthesesUI6_->SetRotate(3.16f);
+    optionBG_->Initialize(&ctx_->dxCommon, "resources/image/UI/UIBoxUI.png", { 640.0f,355.0f }, { 0.0f,0.0f });
+    optionBG_->SetColor({ 0.0f,0.0f,0.0f,0.85f });
 
-	maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+    optionCursolUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/cursol.png", { 150.0f,156.0f }, { 0.0f,0.0f });
+    optionCursolUI_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingUI.png", { 1040.0f, 640.0f }, { 1.0f, 1.0f });
-	loadingUI_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+    fullScreenUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/fullscreenModeUI.png", { 791.0f,151.0f }, { 0.4f,0.4f });
+    onUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/onUI.png", { 1068.0f,151.0f }, { 0.4f,0.4f });
+    offUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/offUI.png", { 1070.0f,151.0f }, { 0.4f,0.4f });
+    seUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/seUI.png", { 656.0f,237.0f }, { 0.4f,0.4f });
+    bgmUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/bgmUI.png", { 670.0f,323.0f }, { 0.4f,0.4f });
+    daiUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,235.0f }, { 0.4f,0.4f });
+    dai2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/daiUI.png", { 1069.0f,321.0f }, { 0.4f,0.4f });
+    tyuUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,235.0f }, { 0.4f,0.4f });
+    tyu2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/tyuUI.png", { 1070.0f,321.0f }, { 0.4f,0.4f });
+    syouUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,236.0f }, { 0.4f,0.4f });
+    syou2UI_->Initialize(&ctx_->dxCommon, "resources/image/UI/syouUI.png", { 1068.0f,321.0f }, { 0.4f,0.4f });
+    backUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/backUI.png", { 674.0f,403.0f }, { 0.4f,0.4f });
+    OptionBearUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/optionBearUI.png", { 320.0f,350.0f }, { 0.6f,0.6f });
+    uiBoxUI_->Initialize(&ctx_->dxCommon, "resources/image/UI/uiBoxUI.png", { 860.0f,350.0f }, { 0.0f,0.0f });
+    uiBoxUI_->SetColor({ 0.5f,0.5f,0.5f,0.5f });
+    parenthesesUI1_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,151.0f });
+    parenthesesUI2_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,151.0f });
+    parenthesesUI3_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,234.0f });
+    parenthesesUI4_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,234.0f });
+    parenthesesUI5_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1115.0f,323.0f });
+    parenthesesUI6_->Initialize(&ctx_->dxCommon, "resources/image/UI/parenthesesUI.png", { 1023.0f,323.0f });
+    parenthesesUI2_->SetRotate(3.16f);
+    parenthesesUI4_->SetRotate(3.16f);
+    parenthesesUI6_->SetRotate(3.16f);
 
-	loadingPlayer_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingPlayer.png", { 680.0f, 615.0f }, { 0.3f, 0.3f });
+    maskBox_->Initialize(&ctx_->dxCommon, "resources/image/mask/box.png", { 640.0f,360.0f }, { 1.0f,1.0f });
 
-	maskType_ = static_cast<MaskType>(random_.Int(0, 2));
+    loadingUI_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingUI.png", { 1040.0f, 640.0f }, { 1.0f, 1.0f });
+    loadingUI_->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 
-	maskStartPos_ = { 640.0f,360.0f };
-	maskEndPos_ = { 640.0f,360.0f };
+    loadingPlayer_->Initialize(&ctx_->dxCommon, "resources/image/mask/loadingPlayer.png", { 680.0f, 615.0f }, { 0.3f, 0.3f });
 
-	switch (MaskType::RAMA)
-	{
-	case TitleScene::MaskType::RAMA:
-		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view01.png", { 640.0f,360.0f }, { 1.0f,1.0f });
-		maskStartScale_ = { 0.26f, 0.26f };
-		maskEndScale_ = { 8.0f, 8.0f };
-		break;
-	case TitleScene::MaskType::KUMA:
-		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view02.png", { 640.0f,360.0f }, { 1.0f,1.0f });
-		maskStartScale_ = { 0.26f, 0.26f };
-		maskEndScale_ = { 2.5f, 2.5f };
-		break;
-	case TitleScene::MaskType::AME:
-		mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view03.png", { 640.0f,360.0f }, { 1.0f,1.0f });
-		maskStartScale_ = { 0.26f, 0.26f };
-		maskEndScale_ = { 5.0f, 5.0f };
-		break;
-	}
+    maskType_ = static_cast<MaskType>(random_.Int(0, 2));
 
-	titleQuit_ = false;
+    maskStartPos_ = { 640.0f,360.0f };
+    maskEndPos_ = { 640.0f,360.0f };
+
+    switch (MaskType::RAMA)
+    {
+    case TitleScene::MaskType::RAMA:
+        mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view01.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+        maskStartScale_ = { 0.26f, 0.26f };
+        maskEndScale_ = { 8.0f, 8.0f };
+        break;
+    case TitleScene::MaskType::KUMA:
+        mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view02.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+        maskStartScale_ = { 0.26f, 0.26f };
+        maskEndScale_ = { 2.5f, 2.5f };
+        break;
+    case TitleScene::MaskType::AME:
+        mask_->Initialize(&ctx_->dxCommon, "resources/image/mask/view03.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+        maskStartScale_ = { 0.26f, 0.26f };
+        maskEndScale_ = { 5.0f, 5.0f };
+        break;
+    }
+
+    titleQuit_ = false;
 }
 
 void TitleScene::ChangeBG() {
@@ -1073,6 +1276,8 @@ void TitleScene::ChangeBG() {
 		ExeColor.z = currentColor.z;
 		ExeColor.w = 1.0f;
 	}
+
+	backGround_->SetColor(ExeColor);
 
 	// フェードが完了したら次のChangeTimerを開始
 	if (bgFadeTimer_.IsFinished()) {

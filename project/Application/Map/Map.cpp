@@ -10,57 +10,20 @@ void Map::Update() {}
 void Map::Draw() {}
 
 std::vector<std::vector<int>> Map::LoadMapCSV(const std::string& filename) {
-    std::ifstream file(filename, std::ios::binary);
-    if (!file) {
-        throw std::runtime_error("Failed to open map file: " + filename);
-    }
-
-    // ファイル全体をメモリに読み込む
-    std::string buffer((std::istreambuf_iterator<char>(file)),
-                       std::istreambuf_iterator<char>());
-
     std::vector<std::vector<int>> mapData;
-    mapData.reserve(403); // 予想行数を入れておくといい
+    std::ifstream file(filename);
+    std::string line;
 
-    std::vector<int> row;
-    row.reserve(14); // 予想列数
+    while (std::getline(file, line)) {
+        std::vector<int> row;
+        std::stringstream ss(line);
+        std::string cell;
 
-    const char* ptr = buffer.data();
-    const char* end = ptr + buffer.size();
-    int value = 0;
-    bool inNumber = false;
-    bool negative = false;
-
-    while (ptr < end) {
-        char c = *ptr++;
-        if (c == ',' || c == '\n' || c == '\r') {
-            if (inNumber) {
-                row.push_back(negative ? -value : value);
-                value = 0;
-                inNumber = false;
-                negative = false;
-            }
-            if (c == '\n') {
-                if (!row.empty()) {
-                    mapData.push_back(std::move(row));
-                    row.clear();
-                    row.reserve(256);
-                }
-            }
-        } else if (c == '-') {
-            negative = true;
-        } else if (c >= '0' && c <= '9') {
-            inNumber = true;
-            value = value * 10 + (c - '0');
+        while (std::getline(ss, cell, ',')) {
+            row.push_back(std::stoi(cell));
         }
-    }
 
-    // 最後の行の処理
-    if (inNumber) {
-        row.push_back(negative ? -value : value);
-    }
-    if (!row.empty()) {
-        mapData.push_back(std::move(row));
+        mapData.push_back(row);
     }
 
     return mapData;
