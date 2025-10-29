@@ -540,7 +540,20 @@ void Player::CollisionThorn() {
 				AddScoreByDistance(thorn, scoreList_.enemyHitAmount);
 
 				// パーティクル
-				ScoreParticleAdd(scoreList_.enemyHitAmount);
+				
+				switch (thorn->GetThornType()) {
+				case ThornType::MIN:
+					ScoreParticleAdd(scoreList_.enemyHitAmount);	// 等倍
+					break;
+				case ThornType::MIDDLE:
+					ScoreParticleAdd(scoreList_.enemyHitAmount*2);	// 2倍
+					break;	
+				case ThornType::MAX:
+					ScoreParticleAdd(scoreList_.enemyHitAmount*3);	// 3倍
+					break;
+				default:
+					break;
+				}
 
 				// ゲームパッドの振動
 				gamePad_->SetVibration(0.05f, 0.05f, 0.1f);
@@ -626,11 +639,11 @@ void Player::CollisionBulletThorn() {
 				switch (thorn->GetThornType()) {
 				case ThornType::MIN:
 					thorn->SetThornType(ThornType::MIDDLE);
-					thorn->SetUpgradeCooldownBullet(10); // 10フレームのクールダウン
+					thorn->SetUpgradeCooldownBullet(7); // 10フレームのクールダウン
 					break;
 				case ThornType::MIDDLE:
 					thorn->SetThornType(ThornType::MAX);
-					thorn->SetUpgradeCooldownBullet(10);
+					thorn->SetUpgradeCooldownBullet(7);
 					break;
 				default:
 					break;
@@ -699,7 +712,21 @@ void Player::CollisionWingThorn() {
 				AddScoreByDistance(thorn, scoreList_.wingHitNearAmount); // 近距離スコア
 
 				// パーティクル
-				ScoreParticleAdd(scoreList_.wingHitNearAmount);
+				
+
+				switch (thorn->GetThornType()) {
+				case ThornType::MIN:
+					ScoreParticleAdd(scoreList_.wingHitNearAmount);
+					break;
+				case ThornType::MIDDLE:
+					ScoreParticleAdd(scoreList_.wingHitNearAmount*2);
+					break;
+				case ThornType::MAX:
+					ScoreParticleAdd(scoreList_.wingHitNearAmount*3);
+					break;
+				default:
+					break;
+				}
 
 				thorn->PlayParticle(1);
 
@@ -709,7 +736,20 @@ void Player::CollisionWingThorn() {
 				AddScoreByDistance(thorn, scoreList_.wingHitFarAmount); // 遠距離スコア
 
 				// パーティクル
-				ScoreParticleAdd(scoreList_.wingHitFarAmount);
+
+				switch (thorn->GetThornType()) {
+				case ThornType::MIN:
+					ScoreParticleAdd(scoreList_.wingHitFarAmount);
+					break;
+				case ThornType::MIDDLE:
+					ScoreParticleAdd(scoreList_.wingHitFarAmount * 2);
+					break;
+				case ThornType::MAX:
+					ScoreParticleAdd(scoreList_.wingHitFarAmount * 3);
+					break;
+				default:
+					break;
+				}
 
 				thorn->PlayParticle(1);
 

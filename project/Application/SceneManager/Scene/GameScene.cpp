@@ -56,7 +56,7 @@ void GameScene::Initialize() {
 		bulletGaugeSprite_[i].sprite->Initialize(&ctx_->dxCommon, "resources/image/white16x16.png");
 		bulletGaugeSprite_[i].sprite->SetScale({2.0, 2.5f});
 		bulletGaugeSprite_[i].sprite->SetPosition({1070.0f, 480.0f - (44.0f * i)});
-		bulletGaugeSprite_[i].sprite->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+		bulletGaugeSprite_[i].sprite->SetColor({51.0f/255.0f, 153.0f/255.0f, 1.0f, 1.0f});
 		bulletGaugeSprite_[i].isActive = false;
 	}
 
