@@ -196,7 +196,7 @@ void GameScene::Initialize() {
 	spriteSnackCountOver_->Initialize(&ctx_->dxCommon, "resources/image/UI/CandyCountNotificationUI.png");
 	spriteScoreCountOverPos_ = {-600.0f, 360.0f};
 	spriteSnackCountOver_->SetPosition(spriteScoreCountOverPos_);
-	spriteSnackCountOver_->SetScale({0.5f, 0.5f});
+	spriteSnackCountOver_->SetScale({0.4f, 0.4f});
 	spriteSnackCountOver_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 
 	// ○○個突破　スコア数　スプライト
@@ -453,6 +453,7 @@ void GameScene::Update() {
 	spriteRule_->Update();
 
 	// ○○個突破!スプライト更新
+	spriteSnackCountOver_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 	spriteSnackCountOver_->Update();
 
 	// 進行度ゲージ更新
@@ -729,39 +730,10 @@ void GameScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	//useCamera_->DrawImgui();
-
 	// プレイヤーのImGui
 	player_->DrawImgui();
 
 	DrawSceneName();
-
-	// ゲームシーン上で管理しているステータスのImGui
-	GameSceneStateImGui();
-
-	// カメラのImGui
-	//CameraStateImGui();
-
-	ImGui::Begin("UI");
-
-	ImGui::DragFloat3("line", &spriteProgressLine_->GetPosition().x, 1.0f);
-	ImGui::DragFloat3("goal", &spriteProgressGoal_->GetPosition().x, 1.0f);
-	ImGui::DragFloat3("chargeBGUI", &spriteChargeUI_->GetPosition().x, 1.0f);
-	ImGui::DragFloat3("spriteCandyScore", &spriteCandyScore_->GetPosition().x, 1.0f);
-	ImGui::DragFloat2("curtainSpritePos1", &curtainSprite_[0]->GetPosition().x, 1.0f);
-	ImGui::DragFloat2("curtainSpritePos2", &curtainSprite_[1]->GetPosition().x, 1.0f);
-	ImGui::ColorPicker4("curtainSpritePos2", &spriteCandyScore_->GetColor().x);
-	ImGui::DragFloat3("GroundModelPos", &modelGround_->GetTranslate().x);
-	ImGui::DragFloat3("GroundModelScale", &modelGround_->GetScale().x);
-
-	ImGui::End();
-
-	//ore_->DrawImGui("ore");
-
-	//srarArea1_->DrawImGui("1");
-	//srarArea2_->DrawImGui("2");
-	//srarArea3_->DrawImGui("3");
-	//srarArea4_->DrawImGui("4");
 
 	///
 	/// ↑ImGuiここまで

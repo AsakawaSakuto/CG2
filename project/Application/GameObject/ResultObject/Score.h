@@ -87,9 +87,9 @@ private:
 
 	int nowScore_ = 0;
 
-	int score1st_ = 30000;  // デフォルト値を明示的に設定
-	int score2nd_ = 20000;  // デフォルト値を明示的に設定
-	int score3rd_ = 10000;  // デフォルト値を明示的に設定
+	int score1st_ = 50000;  // デフォルト値を明示的に設定
+	int score2nd_ = 40000;  // デフォルト値を明示的に設定
+	int score3rd_ = 30000;  // デフォルト値を明示的に設定
 	
 	// JSONファイルのパスを修正
 	const std::string rankingJsonPath_ = "resources/engineresources/test.json";

@@ -228,23 +228,11 @@ void Player::Draw(Camera useCamera) {
 }
 
 void Player::DrawImgui() {
-	// プレイヤーのImGui
-	PlayerImGui();
 
 	// プレイヤーのステータス
 	DrawImGuiJsonStatePlayer();
 
-	// 弾のステータス
-	DrawImGuiJsonStateBullet();
-
-	// クマのモデルのImGui
-	bear_->ImGuiUpdate();
-
-	// スコアのImGui
-	DrawImGuiJsonStateScore();
-
-	// 羽のImGui
-	playerWing_->WingImGui();
+	armHitParticle4_->DrawImGui("4");
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -534,6 +522,9 @@ void Player::DrawImGuiJsonStatePlayer() {
 	if (ImGui::Button("Save JSON")) {
 		JsonState::Save("Resources/Data/playerState.json", playerState_);
 	}
+
+	ImGui::DragFloat3("tra", &transform_.translate.x, 0.01f);
+	ImGui::Checkbox("isMove", &playerIsMove_);
 
 	ImGui::End();
 }
@@ -1037,6 +1028,8 @@ void Player::InitParticle() {
 	armHitParticle3_->LoadJson("armHit3");
 	armHitParticle3_->Stop();
 	armHitParticle4_->Initialize(dxCommon_);
+	armHitParticle4_->LoadJson("armHit4");
+	armHitParticle4_->Stop();
 
 	goalParticle1_->Initialize(dxCommon_);
 	goalParticle1_->LoadJson("goal");
@@ -1321,6 +1314,18 @@ void Player::ScoreParticleAdd(float score) {
 		sprite->Initialize(dxCommon_, "resources/image/UI/Number0UI.png");
 		sprite->SetTexture(spriteNumCollection_[digit]);
 		sprite->SetScale({ 0.25f, 0.25f });
+
+		if (score == 5) {
+			sprite->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
+		} else if (score == 10) {
+			sprite->SetColor({ 0.5490f, 0.9098f, 0.4392f, 1.0f });
+		} else if (score == 30) {
+			sprite->SetColor({ 0.6275f, 0.9686f, 0.9608f, 1.0f });
+		} else if (score == 50) {
+			sprite->SetColor({ 0.8549f, 0.6392f, 0.9451f, 1.0f });
+		} else if (score == -10) {
+			sprite->SetColor({ 0.9373f, 0.4275f, 0.4275f, 1.0f });
+		}
 
 		Vector2 digitPos = basePos;
 		digitPos.x += static_cast<float>(i) * digitSpacing;

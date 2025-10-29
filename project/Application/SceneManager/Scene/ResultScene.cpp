@@ -183,21 +183,7 @@ void ResultScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	ImGui::Begin("timer");
-
-	ImGui::Text("maskTimer: %.2f", quitTimer_.GetElapsedTime());
-
-	ImGui::End();
-
-	debugCamera_->DrawImgui();
-
 	score_->DrawImGui();
-
-	mask_->DrawImGui("mask");
-
-	loadingUI_->DrawImGui("loadingUI");
-
-	loadingPlayer_->DrawImGui("pla");
 
 	DrawSceneName();
 

@@ -64,7 +64,7 @@ void TitleScene::Initialize() {
 	moveCursolSE_->Initialize("resources/sound/SE/Title/moveCursolSE.mp3");
 	decideSE_->Initialize("resources/sound/SE/Title/DecideSE.mp3");
 	titleSceneBGM_->Initialize("resources/sound/BGM/TitleBGM.mp3");
-	titleSceneBGM_->PlayAudio(BGM_Volume, true);
+	titleSceneBGM_->PlayAudio(titleSceneBGM_BaseVolume_ * BGM_Volume, true);
 
 	titleParticle_->Initialize(&ctx_->dxCommon, 2);
 	titleParticle_->LoadJson("candy");
@@ -121,7 +121,7 @@ void TitleScene::Update() {
 		if ((input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) && titleTimer_.IsFinished() && !pushStart_) {
 			//sceneFade_->StartFadeIn(2.0f);
 			titleObject_->PlayerEnd();
-			startGameSE_->PlayAudio(SE_Volume);
+			startGameSE_->PlayAudio();
 			maskTimer_.Start(1.0f, false);
 			titleQuit_ = true;
 			pushStart_ = true;
@@ -287,58 +287,14 @@ void TitleScene::Draw() {
 	/// ↓ImGuiここから
 	///
 
-	//DrawSceneName();
+	ImGui::Begin("TitleScene");
 
-	//titleLogo_->DrawImGui();
+	ImGui::DragFloat("cursol", &moveCursolSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("start", &startGameSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("decide", &decideSE_BaseVolume_, 0.01f);
+	ImGui::DragFloat("bgm", &titleSceneBGM_BaseVolume_, 0.01f);
 
-	//OptionBearUI_->DrawImGui("bear");
-	//uiBoxUI_->DrawImGui("uiBox");
-
-	//titleParticle_->DrawImGui("titleParticle");
-
-	testParticle_->DrawImGui("testParticle");
-
-	mask_->DrawImGui("mask");
-
-	/*parenthesesUI1_->DrawImGui("pare1");
-	parenthesesUI2_->DrawImGui("pare2");
-	parenthesesUI3_->DrawImGui("pare3");
-	parenthesesUI4_->DrawImGui("pare4");
-	parenthesesUI5_->DrawImGui("pare5");
-	parenthesesUI6_->DrawImGui("pare6");*/
-
-
-	//debugCamera_->DrawImgui();
-
-	//cloud_->DrawImGui("cloud");
-
-	//titleObject_->DrawImGui();
-
-	//ImGui::Begin("exe");
-
-	ImGui::ColorEdit4("color", &ExeColor.x);
-
-	//ImGui::End();
-
-	//optionCursolUI_->DrawImGui("optionCursol");
-	//optionBG_->DrawImGui("optionBG");
-	//fullScreenUI_->DrawImGui("full");
-	//onUI_->DrawImGui("on");
-	//offUI_->DrawImGui("off");
-	//seUI_->DrawImGui("se");
-	//bgmUI_->DrawImGui("bgm");
-	//daiUI_->DrawImGui("dai");
-	//dai2UI_->DrawImGui("dai2");
-	//tyuUI_->DrawImGui("tyu");
-	//tyu2UI_->DrawImGui("tyu2");
-	//syouUI_->DrawImGui("syou");
-	//syou2UI_->DrawImGui("syou2");
-	//backUI_->DrawImGui("back");
-
-	//playUI_->DrawImGui("play");
-	//optionUI_->DrawImGui("option");
-	//quitUI_->DrawImGui("quit");
-	//cursolUI_->DrawImGui("ya");
+	ImGui::End();
 
 	///
 	/// ↑ImGuiここまで
@@ -405,7 +361,7 @@ void TitleScene::SelectUIUpdate() {
 				startCursolY_ = 386.0f;
 				endCursolY_ = 487.0f;
 
-				moveCursolSE_->PlayAudio(SE_Volume);
+				moveCursolSE_->PlayAudio();
 			}
 		} else if (selectMenu_ == OPTION) {
 			if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
@@ -414,14 +370,14 @@ void TitleScene::SelectUIUpdate() {
 				startCursolY_ = 487.0f;
 				endCursolY_ = 386.0f;
 
-				moveCursolSE_->PlayAudio(SE_Volume);
+				moveCursolSE_->PlayAudio();
 			} else if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
 				selectMenu_ = QUIT;
 				cursolTimer_.Start(0.25f, false);
 				startCursolY_ = 487.0f;
 				endCursolY_ = 584.0f;
 
-				moveCursolSE_->PlayAudio(SE_Volume);
+				moveCursolSE_->PlayAudio();
 			}
 		} else if (selectMenu_ == QUIT) {
 			if (input_->TriggerKey(DIK_UP) || input_->TriggerKey(DIK_W) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK)) {
@@ -430,7 +386,7 @@ void TitleScene::SelectUIUpdate() {
 				startCursolY_ = 584.0f;
 				endCursolY_ = 487.0f;
 
-				moveCursolSE_->PlayAudio(SE_Volume);
+				moveCursolSE_->PlayAudio();
 			}
 		}
 	}
@@ -470,7 +426,7 @@ void TitleScene::OptionUIUpdate() {
 			selectOptionMenu_ = OptionMenu::FULLSCREEN;
 			optionCursolUI_->SetPosition({ 590.0f, 151.0f });
 
-			decideSE_->PlayAudio(SE_Volume);
+			decideSE_->PlayAudio();
 		}
 	}
 
@@ -479,7 +435,7 @@ void TitleScene::OptionUIUpdate() {
 		optionOpen_ = false;
 		selectOptionMenu_ = OptionMenu::NONE;
 
-		decideSE_->PlayAudio(SE_Volume);
+		decideSE_->PlayAudio();
 	}
 
 	switch (selectOptionMenu_)
@@ -504,7 +460,7 @@ void TitleScene::OptionUIUpdate() {
 
 			fullScreenTimer_.Start(0.5f, false);
 
-			decideSE_->PlayAudio(SE_Volume);
+			decideSE_->PlayAudio();
 		}
 
 		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
@@ -514,7 +470,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolStart_ = 151.0f;
 			optionCursolEnd_ = 237.0f;
 
-			moveCursolSE_->PlayAudio(SE_Volume);
+			moveCursolSE_->PlayAudio();
 		}
 		break;
 	case SE:
@@ -533,7 +489,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolStart_ = 237.0f;
 			optionCursolEnd_ = 151.0f;
 
-			moveCursolSE_->PlayAudio(SE_Volume);
+			moveCursolSE_->PlayAudio();
 		}
 
 		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
@@ -543,7 +499,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolStart_ = 237.0f;
 			optionCursolEnd_ = 321.0f;
 
-			moveCursolSE_->PlayAudio(SE_Volume);
+			moveCursolSE_->PlayAudio();
 		}
 
 		switch (seVolume_)
@@ -552,19 +508,19 @@ void TitleScene::OptionUIUpdate() {
 			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				seVolume_ = SoundVolume::SYOU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				seVolume_ = SoundVolume::SYOU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				seVolume_ = SoundVolume::TYU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			SE_Volume = daiVolumeSE_;
@@ -573,19 +529,19 @@ void TitleScene::OptionUIUpdate() {
 			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				seVolume_ = SoundVolume::DAI;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				seVolume_ = SoundVolume::DAI;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				seVolume_ = SoundVolume::SYOU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			SE_Volume = tyuVolumeSE_;
@@ -594,19 +550,19 @@ void TitleScene::OptionUIUpdate() {
 			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				seVolume_ = SoundVolume::TYU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				seVolume_ = SoundVolume::TYU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				seVolume_ = SoundVolume::DAI;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			SE_Volume = syouVolumeSE_;
@@ -630,7 +586,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolStart_ = 321.0f;
 			optionCursolEnd_ = 237.0f;
 
-			moveCursolSE_->PlayAudio(SE_Volume);
+			moveCursolSE_->PlayAudio();
 		}
 
 		if (input_->TriggerKey(DIK_DOWN) || input_->TriggerKey(DIK_S) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK)) {
@@ -640,7 +596,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolStart_ = 321.0f;
 			optionCursolEnd_ = 402.0f;
 
-			moveCursolSE_->PlayAudio(SE_Volume);
+			moveCursolSE_->PlayAudio();
 		}
 
 		switch (bgmVolume_)
@@ -649,19 +605,19 @@ void TitleScene::OptionUIUpdate() {
 			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				bgmVolume_ = SoundVolume::TYU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			BGM_Volume = daiVolumeBGM_;
@@ -670,19 +626,19 @@ void TitleScene::OptionUIUpdate() {
 			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				bgmVolume_ = SoundVolume::DAI;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				bgmVolume_ = SoundVolume::DAI;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				bgmVolume_ = SoundVolume::SYOU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			BGM_Volume = tyuVolumeBGM_;
@@ -691,19 +647,19 @@ void TitleScene::OptionUIUpdate() {
 			if (input_->TriggerKey(DIK_SPACE) || gamePad_->TriggerButton(GamePad::A)) {
 				bgmVolume_ = SoundVolume::TYU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_RIGHT) || input_->TriggerKey(DIK_D) || gamePad_->TriggerButton(GamePad::RIGHT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::RIGHT_STICK)) {
 				bgmVolume_ = SoundVolume::TYU;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			if (input_->TriggerKey(DIK_LEFT) || input_->TriggerKey(DIK_A) || gamePad_->TriggerButton(GamePad::LEFT_BOTTON) || gamePad_->TriggerLeftStick(GamePad::LEFT_STICK)) {
 				bgmVolume_ = SoundVolume::DAI;
 
-				decideSE_->PlayAudio(SE_Volume);
+				decideSE_->PlayAudio();
 			}
 
 			BGM_Volume = syouVolumeBGM_;
@@ -727,7 +683,7 @@ void TitleScene::OptionUIUpdate() {
 			optionCursolStart_ = 402.0f;
 			optionCursolEnd_ = 321.0f;
 
-			moveCursolSE_->PlayAudio(SE_Volume);
+			moveCursolSE_->PlayAudio();
 		}
 		break;
 	}
@@ -955,10 +911,10 @@ void TitleScene::SpriteUpdate() {
 }
 
 void TitleScene::AudioUpdate() {
-	startGameSE_->SetVolume(SE_Volume);
-	moveCursolSE_->SetVolume(SE_Volume);
-	decideSE_->SetVolume(SE_Volume);
-	titleSceneBGM_->SetVolume(BGM_Volume);
+	startGameSE_->SetVolume(startGameSE_BaseVolume_ * SE_Volume);
+	moveCursolSE_->SetVolume(moveCursolSE_BaseVolume_ * SE_Volume);
+	decideSE_->SetVolume(decideSE_BaseVolume_ * SE_Volume);
+	titleSceneBGM_->SetVolume(titleSceneBGM_BaseVolume_ * BGM_Volume);
 
 	startGameSE_->Update();
 	moveCursolSE_->Update();
