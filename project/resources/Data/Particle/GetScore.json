@@ -19,8 +19,8 @@
     ],
     "endRotateVelocity": -1.0,
     "endScale": [
-        0.0,
-        0.0
+        1.0,
+        1.0
     ],
     "endVelocity": [
         0.0,
@@ -32,7 +32,7 @@
     "hemisphereAngle": 90.0,
     "isMove": 1,
     "kMaxParticle": 512,
-    "lifeTime": 1.0,
+    "lifeTime": 0.75,
     "lifeTimeRandom": 0,
     "lineLength": 2.0,
     "lineStart": [
@@ -54,7 +54,7 @@
     ],
     "maxVelocity": [
         1.0,
-        22.5,
+        3.0,
         0.0
     ],
     "minColor": [
@@ -71,7 +71,7 @@
     ],
     "minVelocity": [
         -1.0,
-        20.0,
+        3.0,
         0.0
     ],
     "normalVelocity": [
@@ -106,9 +106,9 @@
         1.0
     ],
     "startColor": [
-        0.7394126057624817,
-        0.5250877141952515,
-        0.6009576320648193
+        0.35562804341316223,
+        0.49349772930145264,
+        0.46000540256500244
     ],
     "startRotateVelocity": 1.0,
     "startScale": [
@@ -120,10 +120,10 @@
         0.0,
         0.0
     ],
-    "texturePath": "10reverse",
+    "texturePath": "face01",
     "translate": [
-        5.506779193878174,
-        389.26263427734375,
+        -8.132741928100586,
+        38.92560577392578,
         0.0
     ],
     "useEmitter": 0,

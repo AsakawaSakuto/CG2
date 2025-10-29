@@ -390,8 +390,7 @@ void GameScene::Initialize() {
     if (!gameSceneBGM01_) gameSceneBGM01_ = std::make_unique<AudioX>();
     if (!gameSceneBGM02_) gameSceneBGM02_ = std::make_unique<AudioX>();
     
-    gameSceneBGM01_->Initialize("resources/sound/BGM/InGameBGM03.wav");
-    gameSceneBGM02_->Initialize("resources/sound/BGM/InGameBGM02.mp3");
+    gameSceneBGM01_->Initialize("resources/sound/BGM/BGM23_ver1.9.wav");
     gameSceneBGM01_->PlayAudio(gameSceneBGM01_BaseVolume_ * BGM_Volume, true);
 
     // ○○個突破!スプライト
@@ -559,6 +558,36 @@ void GameScene::Initialize() {
 	backGround_->Initialize(&ctx_->dxCommon, "plane.obj");
 	backGround_->SetTexture("resources/image/0.png");
 	backGround_->SetUseLight(false);
+
+	airPlane_->Initialize(&ctx_->dxCommon, "AirPlane/Airplane.obj");
+	airPlane_->SetTexture("resources/model/AirPlane/AirPlane.png");
+	airPlane_->SetTranslate({ -1.84f, 300.0f, 15.0f });
+	airPlane_->SetRotate({ 0.38f, 15.39f, 0.0f });
+	airPlane_->SetScale({ 1.0f, 1.0f, 1.0f });
+	airPlane_->SetUpdateFrustumCulling(false);
+
+	ufo_->Initialize(&ctx_->dxCommon, "UFO/UFO.obj");
+	ufo_->SetTexture("resources/model/UFO/UFO.png");
+	ufo_->SetTranslate({ -5.4f, 440.0f, 15.0f });
+	ufo_->SetRotate({ -0.14f, 2.32f, 0.23f });
+	ufo_->SetScale({ 1.0f, 1.0f, 1.0f });
+	ufo_->SetUpdateFrustumCulling(false);
+
+	balloon_->Initialize(&ctx_->dxCommon, "Balloon/Balloon.obj");
+	balloon_->SetTexture("resources/model/Balloon/Balloon.png");
+	balloon_->SetTranslate({ 7.5f, 200.0f, 37.0f });
+	balloon_->SetRotate({ 0.0f, 3.77f, 0.0f });
+	balloon_->SetScale({ 1.0f, 1.0f, 1.0f });
+	balloon_->SetUpdateFrustumCulling(false);
+
+	tsuru_->Initialize(&ctx_->dxCommon, "PlayerTsuru/PlayerPauseModel.obj");
+	tsuru_->SetTexture("resources/model/PlayerTsuru/playerHead.png");
+	tsuru_->SetTranslate({ 9.42f, 100.0f, 30.0f });
+	tsuru_->SetRotate({ 5.5f, 7.33f, 0.0f });
+	tsuru_->SetScale({ 2.0f, 2.0f, 2.0f });
+	tsuru_->SetUpdateFrustumCulling(false);
+
+	isAlphaDecayActive_ = false;
 }
 
 void GameScene::Update() {
@@ -829,6 +858,11 @@ void GameScene::Update() {
 	backGround_->SetScale({ 400.0f,400.0f,1.0f });
 	backGround_->SetColorVector3(player_->GetColorLerp());
 	backGround_->Update();
+
+	airPlane_->Update();
+	ufo_->Update();
+	balloon_->Update();
+	tsuru_->Update();
 }
 
 void GameScene::Draw() {
@@ -844,6 +878,11 @@ void GameScene::Draw() {
 
 	// 地面モデル
 	modelGround_->Draw(*useCamera_);
+
+	tsuru_->Draw(*useCamera_);
+	balloon_->Draw(*useCamera_);
+	airPlane_->Draw(*useCamera_);
+	ufo_->Draw(*useCamera_);
 
 	// 画面両端の幕のスプライト描画処理
 	for (auto& curtain : curtainSprite_) {
@@ -971,35 +1010,7 @@ void GameScene::Draw() {
 	///
 
 	// プレイヤーのImGui
-	player_->DrawImgui();
-
-	ore_->DrawImGui("ore");
-
-	backGround_->DrawImGui("backGround");
-
-	/*DrawSceneName();
-
-	ImGui::Text("GameScene_Audio");
-
-	ImGui::DragFloat("startGame_SE",&startGameSE_BaseVolume_, 0.01f);
-	ImGui::DragFloat("countDown_SE",&countDownSE_BaseVolume_, 0.01f);
-	ImGui::DragFloat("clear_SE",&clearSE_BaseVolume_, 0.01f);
-	ImGui::DragFloat("gameScene_BGM01", &gameSceneBGM01_BaseVolume_, 0.01f);
-	ImGui::DragFloat("gameScene_BGM02",&gameSceneBGM02_BaseVolume_, 0.01f);
-
-	if (ImGui::Button("start")) {
-		startGameSE_->PlayAudio();
-	}
-
-	if (ImGui::Button("countdown")) {
-		countDownSE_->PlayAudio();
-	}
-
-	if (ImGui::Button("clear")) {
-		clearSE_->PlayAudio();
-	}
-
-	ImGui::End();*/
+	//player_->DrawImgui();
 
 	///
 	/// ↑ImGuiここまで
@@ -1496,34 +1507,43 @@ void GameScene::UpdateSpriteChargeEffect() {
 
 	if (gauge >= 1 && gauge <= 5) {
 		changeSpeed = gaugeSizeSpeeds[gauge - 1];
+		isAlphaDecayActive_ = true;
+	}
+	else if (gauge == 0 && chargeEffectAlpha_ >= 0.01f && isAlphaDecayActive_) {
+		changeSpeed = 0.02f;
 	}
 
 	// サイズと透明度を変更
 	chargeEffectAlpha_ -= changeSpeed;
 	chargeEffectSize_ += changeSpeed;
 
-	if (chargeEffectAlpha_ <= 0.0f) {
+	if (chargeEffectAlpha_ <=  0.0f || chargeEffectSize_ >= 1.0f) {
 		chargeEffectAlpha_ = 1.0f;
 		chargeEffectSize_ = 0.4f;
+		isAlphaDecayActive_ = false;
 	}
 
-	spriteChargeUIEffect_->SetScale({chargeEffectSize_, chargeEffectSize_});
-	spriteChargeUIEffect_->SetColor({1.0f, 1.0f, 1.0f, chargeEffectAlpha_});
+	spriteChargeUIEffect_->SetScale({ chargeEffectSize_, chargeEffectSize_ });
+	spriteChargeUIEffect_->SetColor({ 1.0f, 1.0f, 1.0f, chargeEffectAlpha_ });
 }
 
 void GameScene::UpdateSpriteCandyEffect() {
 	// スコアに応じてサイズの変更速度を変える
 	float changeSpeed = 0.0f;
 
-	if (player_->GetScore() >= 9000.0f) {
+	if (player_->GetScore() >= 30000.0f) {
 		changeSpeed = candySizeSpeeds[4];
-	} else if (player_->GetScore() >= 7000.0f) {
+	}
+	else if (player_->GetScore() >= 20000.0f) {
 		changeSpeed = candySizeSpeeds[3];
-	} else if (player_->GetScore() >= 5000.0f) {
+	}
+	else if (player_->GetScore() >= 10000.0f) {
 		changeSpeed = candySizeSpeeds[2];
-	} else if (player_->GetScore() >= 3000.0f) {
+	}
+	else if (player_->GetScore() >= 5000.0f) {
 		changeSpeed = candySizeSpeeds[1];
-	} else if (player_->GetScore() >= 1000.0f) {
+	}
+	else if (player_->GetScore() >= 3000.0f) {
 		changeSpeed = candySizeSpeeds[0];
 	}
 
@@ -1531,13 +1551,13 @@ void GameScene::UpdateSpriteCandyEffect() {
 	candyEffectAlpha_ -= 0.05f;
 	candyEffectSize_ += changeSpeed;
 
-	if (candyEffectAlpha_ <= 0.0f) {
+	if (candyEffectAlpha_ <= 0.0f || candyEffectSize_ >= 0.8f) {
 		candyEffectAlpha_ = 1.0f;
 		candyEffectSize_ = 0.5f;
 	}
 
-	spriteCandyEffect_->SetScale({candyEffectSize_, candyEffectSize_});
-	spriteCandyEffect_->SetColor({spriteCandyEffect_->GetColor().x, spriteCandyEffect_->GetColor().y, spriteCandyEffect_->GetColor().z, candyEffectAlpha_});
+	spriteCandyEffect_->SetScale({ candyEffectSize_, candyEffectSize_ });
+	spriteCandyEffect_->SetColor({ spriteCandyEffect_->GetColor().x, spriteCandyEffect_->GetColor().y, spriteCandyEffect_->GetColor().z, candyEffectAlpha_ });
 }
 
 void GameScene::ResetSE() {

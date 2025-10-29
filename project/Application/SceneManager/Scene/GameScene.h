@@ -214,7 +214,7 @@ private:
 	unique_ptr<Sprite> spriteRule_ = make_unique<Sprite>();
 	float timerSpriteRule_ = 0.0f;
 	float ruleDuration_ = 0.75f;
-	float ruleWaitDuration_ = 0.5f;
+	float ruleWaitDuration_ = 4.0f;
 	float ruleStartPosY_ = -100.0f;
 	float ruleEndPosY_ = 100.0f;
 	RuleAnimState ruleState_ = RuleAnimState::Rising;
@@ -363,6 +363,8 @@ private:
 	bool timerStarte_ = false;
 	bool resultQuit_ = false;
 
+	bool isAlphaDecayActive_ = false;
+
 	unique_ptr<Model> ore_ = make_unique<Model>();
 	Transform oreTransform_;
 
@@ -370,6 +372,11 @@ private:
 	unique_ptr<Particles> srarArea2_ = make_unique<Particles>();
 	unique_ptr<Particles> srarArea3_ = make_unique<Particles>();
 	unique_ptr<Particles> srarArea4_ = make_unique<Particles>();
+
+	unique_ptr<Model> airPlane_ = make_unique<Model>();
+	unique_ptr<Model> ufo_ = make_unique<Model>();
+	unique_ptr<Model> balloon_ = make_unique<Model>();
+	unique_ptr<Model> tsuru_ = make_unique<Model>();
 
 	unique_ptr<Model> backGround_ = make_unique<Model>();
 	Transform backGroundTransform_;

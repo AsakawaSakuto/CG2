@@ -32,9 +32,9 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	// ランク判定（ランキング更新後に行う）
 	if (nowScore_ >= 45000) {
 		rank_ = Rank::S;
-	} else if (nowScore_ >= 35000) {
+	} else if (nowScore_ >= 30000) {
 		rank_ = Rank::A;
-	} else if (nowScore_ >= 20000) {
+	} else if (nowScore_ >= 15000) {
 		rank_ = Rank::B;
 	} else {
 		rank_ = Rank::C;
@@ -168,7 +168,7 @@ void Score::Initialize(DirectXCommon* dxCommon, float score) {
 	completeSE_->Initialize("resources/sound/se/Result/CompleteSE.mp3");
 	moveCursolSE_->Initialize("resources/sound/se/title/moveCursolSE.mp3");
 	decideSE_->Initialize("resources/sound/se/title/DecideSE.mp3");
-	resultSceneBGM_->Initialize("resources/sound/bgm/bgm26.wav");
+	resultSceneBGM_->Initialize("resources/sound/bgm/BGM26_ver1.1.wav");
 }
 
 void Score::Update() {
@@ -360,7 +360,7 @@ void Score::Update() {
 				maskTimer_.Start(1.0f, false);
 			}
 
-			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) || gamePad_->TriggerButton(GamePad::DOWN_BOTTON) || gamePad_->TriggerLeftStick(GamePad::DOWN_STICK))) {
 				nextScene_ = NextScene::RESULT;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 500.0f;
@@ -390,7 +390,7 @@ void Score::Update() {
 				maskTimer_.Start(1.0f, false);
 			}
 
-			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON))) {
+			if (!pushNext_ && rankingInTimer_[0].IsFinished() && !cursolMoveTimer_.IsActive() && (input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) || gamePad_->TriggerButton(GamePad::UP_BOTTON) || gamePad_->TriggerLeftStick(GamePad::UP_STICK))) {
 				nextScene_ = NextScene::TITLE;
 				cursolMoveTimer_.Start(0.25f);
 				cursolStartY_ = 600.0f;
@@ -448,7 +448,29 @@ void Score::Update() {
 
 	for (int i = 0; i < nowScoreModel_.size(); i++) {
 		nowScoreModel_[i]->SetTransform(nowScoreTransform_[i]);
-		nowScoreModel_[i]->SetColor(rankingColor_[3]);
+		
+		// ★ランキング更新時の色変更処理を追加
+		if (isNewRecord_) {
+			// ランキング入りした場合は、その順位の色を設定
+			switch (rankingPosition_) {
+			case 1: // 1st
+				nowScoreModel_[i]->SetColor(rankingColor_[0]);
+				break;
+			case 2: // 2nd
+				nowScoreModel_[i]->SetColor(rankingColor_[1]);
+				break;
+			case 3: // 3rd
+				nowScoreModel_[i]->SetColor(rankingColor_[2]);
+				break;
+			default: // 圏外（念のため）
+				nowScoreModel_[i]->SetColor(rankingColor_[3]);
+				break;
+			}
+		} else {
+			// ランキング圏外の場合は通常の色（白）
+			nowScoreModel_[i]->SetColor(rankingColor_[3]);
+		}
+		
 		nowScoreModel_[i]->Update();
 	}
 

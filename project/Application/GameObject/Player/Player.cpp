@@ -231,12 +231,14 @@ void Player::Draw(Camera useCamera) {
 
 void Player::DrawImgui() {
 
-	PlayerImGui();
+	//PlayerImGui();
+
+	getScoreParticle_->DrawImGui("GetScoreParticle");
+	getScore2Particle_->DrawImGui("GetScore2Particle");
+	getScore3Particle_->DrawImGui("GetScore3Particle");
 
 	// プレイヤーのステータス
 	DrawImGuiJsonStatePlayer();
-
-	armHitParticle4_->DrawImGui("4");
 }
 
 void Player::SetBulletGaugeSprites(std::array<BulletGaugeInfo, 5>* gaugeSprites) { bulletGaugeSprites_ = gaugeSprites; }
@@ -454,6 +456,7 @@ void Player::BulletUpdate() {
 
 void Player::PlayerImGui() {
 
+	
 	// プレイヤーのImGui
 	ImGui::Begin("Player Control");
 
@@ -728,7 +731,7 @@ void Player::CollisionWingThorn() {
 					break;
 				}
 
-				thorn->PlayParticle(1);
+				thorn->PlayParticle(2);
 
 				armHitParticle4_->SetEmitterPosition({ thorn->GetPosition().x, thorn->GetPosition().y, thorn->GetPosition().z });
 				armHitParticle4_->Play(false);
@@ -1045,6 +1048,12 @@ void Player::InitParticle() {
 	getScoreParticle_->Initialize(dxCommon_);
 	getScoreParticle_->LoadJson("getScore");
 
+	getScore2Particle_->Initialize(dxCommon_);
+	getScore2Particle_->LoadJson("getScore2");
+
+	getScore3Particle_->Initialize(dxCommon_);
+	getScore3Particle_->LoadJson("getScore3");
+
 	for (int i = 0; i < 5; ++i) {
 		bulletMoveParticles_[i] = make_unique<Particles>();
 		bulletMoveParticles_[i]->Initialize(dxCommon_);
@@ -1170,8 +1179,17 @@ void Player::UpdateParticle() {
 	for (auto& thorn : thorns_) {
 		for (int i = 0; i < 5; i++) {
 			if (thorn->GetLifeTimerFinish(i)) {
-				getScoreParticle_->SetEmitterPosition(thorn->GetTranslate(i));
-				getScoreParticle_->Play(false);
+				int randomIndex = rand_.Int(0, 2);
+				if (randomIndex == 0) {
+					getScoreParticle_->SetEmitterPosition(thorn->GetTranslate(i));
+					getScoreParticle_->Play(false);
+				} else if (randomIndex == 1) {
+					getScore2Particle_->SetEmitterPosition(thorn->GetTranslate(i));
+					getScore2Particle_->Play(false);
+				} else if (randomIndex == 2) {
+					getScore3Particle_->SetEmitterPosition(thorn->GetTranslate(i));
+					getScore3Particle_->Play(false);
+				}
 			}
 
 			if (thorn->GetLifeTimerActive(i)) {
@@ -1181,18 +1199,39 @@ void Player::UpdateParticle() {
 				switch (direction_) {
 				case PlayerDirection::UP:
 					if (thornPos.y < playerY - 3.75f) {
-						getScoreParticle_->SetEmitterPosition(thornPos);
-						getScoreParticle_->SetStartColor(thorn->GetColor(i));
-						getScoreParticle_->Play(false);
+						int randomIndex = rand_.Int(0, 2);
+						if (randomIndex == 0) {
+							getScoreParticle_->SetEmitterPosition(thornPos);
+							getScoreParticle_->SetStartColor(thorn->GetColor(i));
+							getScoreParticle_->Play(false);
+						} else if (randomIndex == 1) {
+							getScore2Particle_->SetEmitterPosition(thornPos);
+							getScore2Particle_->SetStartColor(thorn->GetColor(i));
+							getScore2Particle_->Play(false);
+						} else if (randomIndex == 2) {
+							getScore3Particle_->SetEmitterPosition(thornPos);
+							getScore3Particle_->SetStartColor(thorn->GetColor(i));
+							getScore3Particle_->Play(false);
+						}
 						thorn->ParticleReset(i);
 					}
 					break;
 				case PlayerDirection::DOWN:
 					if (thornPos.y < playerY - 13.75f) {
-						getScoreParticle_->SetEmitterPosition(thornPos);
-						getScoreParticle_->SetEmitterPosition(thornPos);
-						getScoreParticle_->SetStartColor(thorn->GetColor(i));
-						getScoreParticle_->Play(false);
+						int randomIndex = rand_.Int(0, 2);
+						if (randomIndex == 0) {
+							getScoreParticle_->SetEmitterPosition(thornPos);
+							getScoreParticle_->SetStartColor(thorn->GetColor(i));
+							getScoreParticle_->Play(false);
+						} else if (randomIndex == 1) {
+							getScore2Particle_->SetEmitterPosition(thornPos);
+							getScore2Particle_->SetStartColor(thorn->GetColor(i));
+							getScore2Particle_->Play(false);
+						} else if (randomIndex == 2) {
+							getScore3Particle_->SetEmitterPosition(thornPos);
+							getScore3Particle_->SetStartColor(thorn->GetColor(i));
+							getScore3Particle_->Play(false);
+						}
 						thorn->ParticleReset(i);
 					}
 					break;
@@ -1203,8 +1242,17 @@ void Player::UpdateParticle() {
 
 	if (direction_ == PlayerDirection::DOWN) {
 		getScoreParticle_->SetEmitVelocityY(3.0f);
+		getScore2Particle_->SetEmitVelocityY(3.0f);
+		getScore3Particle_->SetEmitVelocityY(3.0f);
+	}
+	if (direction_ == PlayerDirection::UP) {
+		getScoreParticle_->SetEmitVelocityY(25.0f);
+		getScore2Particle_->SetEmitVelocityY(25.0f);
+		getScore3Particle_->SetEmitVelocityY(25.0f);
 	}
 	getScoreParticle_->Update();
+	getScore2Particle_->Update();
+	getScore3Particle_->Update();
 
 	// BulletMoveParticleの配列を更新
 	for (int i = 0; i < 5; ++i) {
@@ -1242,6 +1290,8 @@ void Player::DrawParticle(Camera useCamera) {
 	goalParticle1_->Draw(useCamera);
 	goalParticle2_->Draw(useCamera);
 	getScoreParticle_->Draw(useCamera);
+	getScore2Particle_->Draw(useCamera);
+	getScore3Particle_->Draw(useCamera);
 
 	boostParticle_->Draw(useCamera);
 	boost2Particle_->Draw(useCamera);
@@ -1320,7 +1370,7 @@ void Player::ScoreParticleAdd(float score) {
 		sprite->SetScale({ 0.25f, 0.25f });
 
 		if (score == 5) {
-			sprite->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
+			sprite->SetColor({ 0.9373f, 0.5608f, 0.5373f, 1.0f });
 		} else if (score == 100) {
 			sprite->SetColor({ 0.5490f, 0.9098f, 0.4392f, 1.0f });
 		} else if (score == 30) {
@@ -1329,6 +1379,12 @@ void Player::ScoreParticleAdd(float score) {
 			sprite->SetColor({ 0.8549f, 0.6392f, 0.9451f, 1.0f });
 		} else if (score == -20) {
 			sprite->SetColor({ 0.9373f, 0.4275f, 0.4275f, 1.0f });
+		} else if (score == 60) {
+			sprite->SetColor({ 0.9490f, 0.9176f, 0.5765f, 1.0f });
+		} else if (score == 40) {
+			sprite->SetColor({ 0.9490f, 0.5804f, 0.8039f, 1.0f });
+		} else if (score == 10) {
+			sprite->SetColor({ 0.6941f, 0.8902f, 0.5569f, 1.0f });
 		}
 
 		Vector2 digitPos = basePos;
