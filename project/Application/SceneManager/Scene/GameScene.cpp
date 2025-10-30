@@ -1064,21 +1064,21 @@ void GameScene::UpdateInput() {
 }
 
 void GameScene::NoInputTitleBack() {
-	//if (isInput_) {
-	//	noInputTimer_ = 0; // 入力があったらリセット
-	//	return;
-	//} else {
-	//	noInputTimer_ += 1.0f * deltaTime_; // タイマー加算
+	if (isInput_) {
+		noInputTimer_ = 0; // 入力があったらリセット
+		return;
+	} else {
+		noInputTimer_ += 1.0f * deltaTime_; // タイマー加算
 
-	//	// 5秒間入力がなかった場合
-	//	if (noInputTimer_ >= gameSceneState_.maxNoInputTimer) {
-	//		isBackToTitleScene_ = true;
-	//		noInputTimer_ = 0;
+		// 5秒間入力がなかった場合
+		if (noInputTimer_ >= gameSceneState_.maxNoInputTimer) {
+			isBackToTitleScene_ = true;
+			noInputTimer_ = 0;
 
-	//		ResetSE(); // SEの解放
-	//		player_->AudioReset();
-	//	}
-	//}
+			ResetSE(); // SEの解放
+			player_->AudioReset();
+		}
+	}
 }
 
 void GameScene::GameSceneStateImGui() {
