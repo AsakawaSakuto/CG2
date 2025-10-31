@@ -198,7 +198,6 @@ void GameScene::Initialize() {
 	}
 	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
-	sceneFade_->StartFadeOut(1.0f);
 
 	// 弾のゲージスプライト
 	for (int i = 0; i < bulletGaugeSprite_.size(); ++i) {
@@ -612,7 +611,6 @@ void GameScene::Update() {
 	NoInputTitleBack();
 
 	if (isBackToTitleScene_) {
-		sceneFade_->StartFadeIn(1.0f);
 		goSceneNum_ = SCENE::TITLE;
 		isBackToTitleScene_ = false;
 
@@ -621,7 +619,6 @@ void GameScene::Update() {
 	}
 
 	if (player_->GetIsGoal() && goSceneNum_ == 0) {
-		sceneFade_->StartFadeIn(2.0f);
 		goSceneNum_ = SCENE::RESULT;
 		isActiveEndText_ = true; // 終了テキスト表示フラグオン
 

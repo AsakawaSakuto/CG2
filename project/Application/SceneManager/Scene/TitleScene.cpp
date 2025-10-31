@@ -125,7 +125,6 @@ void TitleScene::Initialize() {
     }
     sceneFade_ = std::make_unique<SceneFade>();
     sceneFade_->Initialize(&ctx_->dxCommon);
-    sceneFade_->StartFadeOut(1.0f);
 
     // Text3Dの初期化 - 既存チェックを追加
     if (titleLogo_) {
