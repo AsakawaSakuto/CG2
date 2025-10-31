@@ -75,7 +75,6 @@ void ResultScene::Initialize() {
 	}
 	sceneFade_ = std::make_unique<SceneFade>();
 	sceneFade_->Initialize(&ctx_->dxCommon);
-	sceneFade_->StartFadeOut(1.0f);
 
 	// ★Scoreクラスの初期化（ここで自動的にランキングがソートされて更新される）
 	if (!score_) {

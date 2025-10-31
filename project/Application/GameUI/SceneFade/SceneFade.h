@@ -16,9 +16,6 @@ public:
 	void Update();
 	void Draw();
 
-	void StartFadeIn(float fadeTime) { if (!fadeInTimer_.IsActive()){ fadeInTimer_.Start(fadeTime, false, false); } }
-	void StartFadeOut(float fadeTime) { if (!fadeOutTimer_.IsActive()) { fadeOutTimer_.Start(fadeTime, false, true); } }
-
 	bool EndFadeIn() { return fadeInTimer_.IsFinished(); }
 	bool EndFadeOut() { return fadeOutTimer_.IsFinished(); }
 
