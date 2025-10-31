@@ -24,4 +24,5 @@ private:
 
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
 	Camera camera_;
+	DebugCamera debugCamera_;
 };
