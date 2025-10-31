@@ -1,8 +1,6 @@
 #include"IScene.h"
 
-int IScene::sceneNo = TITLE;
-
-int IScene::GetSceneNo() { return sceneNo; }
+SCENE IScene::GetSceneNo() { return nowSceneName_; }
 
 void IScene::Quit() {
 	PostQuitMessage(0);
@@ -19,15 +17,19 @@ void IScene::DrawSceneName() {
 		ImGuiWindowFlags_NoTitleBar          // タイトルバー非表示（必要なら外す）
 	);
 	// ここにUIを書いていく
-	switch (sceneNo) {
-	case TITLE:
-		ImGui::Text("TitleScene");
+	switch (nowSceneName_)
+	{
+	case SCENE::TEST:
+		ImGui::Text("TEST SCENE");
 		break;
-	case GAME:
-		ImGui::Text("GameScene");
+	case SCENE::TITLE:
+		ImGui::Text("TITLE SCENE");
 		break;
-	case RESULT:
-		ImGui::Text("ResultScene");
+	case SCENE::GAME:
+		ImGui::Text("GAME SCENE");
+		break;
+	case SCENE::RESULT:
+		ImGui::Text("RESULT SCENE");
 		break;
 	default:
 		break;

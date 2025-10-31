@@ -1,45 +1,33 @@
 #pragma once
 #include"Application/AppContext.h"
-#include"Application/GameUI/SceneFade/SceneFade.h"
-#include"Audio.h"
 
 using std::unique_ptr;
 using std::make_unique;
 
-enum SCENE {
+enum class SCENE {
+    TEST = 0,
     TITLE,
     GAME,
     RESULT,
 };
 
-class SceneFade;
-
 class IScene {
 protected:
-    static int sceneNo;
+    SCENE nowSceneName_ = SCENE::TEST;
 
     // AppContext
     AppContext* ctx_ = nullptr;
 
-    // InputSystem
-    GamePad* gamePad_ = nullptr;
-    Input* input_ = nullptr;
-
-    // Fade
-	unique_ptr<SceneFade> sceneFade_;
-
-    // Audio
-	unique_ptr<AudioX> audio_;
-
 	void DrawSceneName();
 
-	void ChangeScene(int nextScene) { sceneNo = nextScene; }
+	void ChangeScene(SCENE nextSceneName) { nowSceneName_ = nextSceneName; }
+
+    void Quit();
 public:
     virtual void SetAppContext(AppContext* ctx) = 0;
     virtual void Initialize() = 0;
     virtual void Update() = 0;
     virtual void Draw() = 0;
     virtual ~IScene() {}
-    int GetSceneNo();
-    void Quit();
+    SCENE GetSceneNo();
 };

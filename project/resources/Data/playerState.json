@@ -1,9 +1,0 @@
-{
-    "cameraOffset": -4.0,
-    "maxSpeed": 10.0,
-    "shakeStrength": 0.5,
-    "speedDownStrengthBullet": 2.0,
-    "speedDownStrengthThorn": 2.0,
-    "stunDuration": 1.0,
-    "maxCoolDownWing": 60
-}
