@@ -2,10 +2,6 @@
 #include <algorithm>
 #include <cmath>
 
-#ifdef _DEBUG
-#include "externals/ImGui/imgui.h"
-#endif
-
 GameTimer::GameTimer(float duration, bool loop)
     : duration_(duration), loop_(loop) {
 }
@@ -17,47 +13,28 @@ void GameTimer::Update() {
 
     float scaledDeltaTime = deltaTime_ * timeScale_;
 
-    if (isCountdown_) {
-        currentTime_ -= scaledDeltaTime;
-        if (currentTime_ <= 0.0f) {
-            finished_ = true;
+    currentTime_ += scaledDeltaTime;
+    if (currentTime_ >= duration_) {
+        finished_ = true;
 
-            if (loop_) {
-                currentTime_ = duration_;
-                finished_ = false;
-                loopedThisFrame_ = true;
-            } else {
-                currentTime_ = 0.0f;
-                isActive_ = false;
-            }
-        }
-    } else {
-        currentTime_ += scaledDeltaTime;
-        if (currentTime_ >= duration_) {
-            finished_ = true;
-
-            if (loop_) {
-                currentTime_ = 0.0f;
-                finished_ = false;
-                loopedThisFrame_ = true;
-            } else {
-                isActive_ = false;
-            }
+        if (loop_) {
+            currentTime_ = 0.0f;
+            finished_ = false;
+            loopedThisFrame_ = true;
+        } else {
+            isActive_ = false;
         }
     }
 }
 
 
-void GameTimer::Start(float duration, bool loop, bool countdown) {
+void GameTimer::Start(float duration, bool loop) {
     duration_ = duration;
     loop_ = loop;
-    isCountdown_ = countdown;
     isActive_ = true;
     finished_ = false;
     useFrameMode_ = false;
     loopedThisFrame_ = false;
-
-    currentTime_ = countdown ? duration : 0.0f;
 }
 
 void GameTimer::Stop() {
@@ -96,9 +73,6 @@ float GameTimer::GetProgress() const {
     float progress = currentTime_ / duration_;
     progress = std::clamp(progress, 0.0f, 1.0f);
 
-    if (isCountdown_) {
-        progress = 1.0f - progress;
-    }
     return progress;
 }
 
@@ -108,7 +82,7 @@ float GameTimer::GetReverseProgress() const {
 
 float GameTimer::GetEasedProgress(Easing::Type easingType) const {
     float progress = GetProgress();
-    return Easing::Apply(progress, easingType);  // --- EasingUtilを使用 ---
+    return Easing::Apply(progress, easingType);
 }
 
 float GameTimer::GetRemainingTime() const {
@@ -123,17 +97,8 @@ float GameTimer::GetDuration() const {
     return duration_;
 }
 
-bool GameTimer::IsLoop() const {
-    return loop_;
-}
-
-bool GameTimer::HasLooped() const {
-    return loopedThisFrame_;
-}
-
 void GameTimer::SetDuration(float duration) {
     duration_ = duration;
-    // 現在時間が新しい継続時間を超えている場合の処理
     if (currentTime_ >= duration_ && isActive_) {
         finished_ = true;
         if (!loop_) {
@@ -146,7 +111,6 @@ void GameTimer::SetLoop(bool loop) {
     loop_ = loop;
 }
 
-// --- 新機能：フレームカウンター ---
 
 void GameTimer::StartFrames(int frameCount, bool loop, float targetFPS) {
     totalFrames_ = frameCount;
@@ -169,12 +133,6 @@ int GameTimer::GetTotalFrames() const {
     return totalFrames_;
 }
 
-// --- 新機能：タイムスケール ---
-
 void GameTimer::SetTimeScale(float scale) {
-    timeScale_ = (std::max)(0.0f, scale);  // 負の値は防ぐ
-}
-
-float GameTimer::GetTimeScale() const {
-    return timeScale_;
+    timeScale_ = (std::max)(0.0f, scale);
 }
