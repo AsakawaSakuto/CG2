@@ -133,24 +133,18 @@ int SceneManager::Run() {
         }
 
         if (nextSceneNo != currentSceneNo_) {
-            
-            #ifdef _DEBUG
-            OutputDebugStringA(("Scene change #" + std::to_string(sceneChangeCount_) + 
-                              ": " + std::to_string(static_cast<int>(currentSceneNo_)) + " -> " + 
-                              std::to_string(static_cast<int>(nextSceneNo)) + "\n").c_str());
-            #endif
 
             // シーン切り替え処理
             prevSceneNo_ = currentSceneNo_;
             
-            // 現在のシーンを完全に削除（デストラクタが呼ばれてリソース解放）
+            // 現在のシーンを完全に削除
             if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
                 sceneArr_[static_cast<int>(currentSceneNo_)].reset();
                 sceneArr_[static_cast<int>(currentSceneNo_)] = nullptr;
                 
-                // ガベージコレクションを強制実行（メモリ圧迫を軽減）
+                // ガベージコレクションを強制実行
                 #ifdef _DEBUG
-                // TextureManagerのリソース状況をチェック（もしメソッドがあれば）
+                // TextureManagerのリソース状況をチェック
                 OutputDebugStringA("Forcing garbage collection...\n");
                 #endif
             }
@@ -158,7 +152,7 @@ int SceneManager::Run() {
             // 新しいシーン番号を設定
             currentSceneNo_ = nextSceneNo;
             
-            // 新しいシーンを作成（古いシーンが完全に削除された後）
+            // 新しいシーンを作成
             sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
             
             // 新しいシーンの初期化
@@ -183,7 +177,7 @@ int SceneManager::Run() {
             }
         }
 
-        // 更新・描画 - nullチェック追加
+        // 更新・描画
         if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
             try {
                 sceneArr_[static_cast<int>(currentSceneNo_)]->Update();
@@ -196,7 +190,7 @@ int SceneManager::Run() {
         }
     }
 
-    // 終了処理 - 全シーンのクリーンアップ
+    // 終了処理
     CleanupAllScenes();
     
     TextureManager::GetInstance()->Finalize();
