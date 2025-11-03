@@ -7,6 +7,9 @@
 #include"Vector2.h"
 #include"Vector3.h"
 
+// イージング実装の際に参考にしたサイト
+// https://aketama.work/easing-list
+
 /// 汎用イージング関数
 namespace Easing {
 
@@ -22,60 +25,70 @@ namespace Easing {
         EaseInQuad,
         EaseOutQuad,
         EaseInOutQuad,
+        EaseOutInQuad,
 
         // Cubic
 
         EaseInCubic,
         EaseOutCubic,
         EaseInOutCubic,
+        EaseOutInCubic,
 
         // Quartic
 
         EaseInQuart,
         EaseOutQuart,
         EaseInOutQuart,
+        EaseOutInQuart,
 
         // Quintic
 
         EaseInQuint,
         EaseOutQuint,
         EaseInOutQuint,
+        EaseOutInQuint,
 
         // Sine
 
         EaseInSine,
         EaseOutSine,
         EaseInOutSine,
+        EaseOutInSine,
 
         // Exponential
 
         EaseInExpo,
         EaseOutExpo,
         EaseInOutExpo,
+        EaseOutInExpo,
 
         // Circular
 
         EaseInCirc,
         EaseOutCirc,
         EaseInOutCirc,
+        EaseOutInCirc,
 
         // Back
 
         EaseInBack,
         EaseOutBack,
         EaseInOutBack,
+        EaseOutInBack,
 
         // Elastic
 
         EaseInElastic,
         EaseOutElastic,
         EaseInOutElastic,
+        EaseOutInElastic,
 
         // Bounce
 
         EaseInBounce,
         EaseOutBounce,
-        EaseInOutBounce
+        EaseInOutBounce,
+        EaseOutInBounce
     };
 
     /// @brief 2つの値の間を補間

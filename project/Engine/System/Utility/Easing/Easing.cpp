@@ -24,6 +24,13 @@ namespace Easing {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 2.0f) / 2.0f;
             }
 
+        case Type::EaseOutInQuad:
+            if (t < 0.5f) {
+                return 0.5f * (1.0f - (1.0f - 2.0f * t) * (1.0f - 2.0f * t));
+            } else {
+                return 0.5f + 0.5f * (2.0f * t - 1.0f) * (2.0f * t - 1.0f);
+            }
+
         case Type::EaseInCubic:
             return t * t * t;
 
@@ -35,6 +42,13 @@ namespace Easing {
                 return 4.0f * t * t * t;
             } else {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 3.0f) / 2.0f;
+            }
+
+        case Type::EaseOutInCubic:
+            if (t < 0.5f) {
+                return 0.5f * (1.0f - std::pow(1.0f - 2.0f * t, 3.0f));
+            } else {
+                return 0.5f + 0.5f * std::pow(2.0f * t - 1.0f, 3.0f);
             }
 
         case Type::EaseInQuart:
@@ -50,6 +64,13 @@ namespace Easing {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 4.0f) / 2.0f;
             }
 
+        case Type::EaseOutInQuart:
+            if (t < 0.5f) {
+                return 0.5f * (1.0f - std::pow(1.0f - 2.0f * t, 4.0f));
+            } else {
+                return 0.5f + 0.5f * std::pow(2.0f * t - 1.0f, 4.0f);
+            }
+
         case Type::EaseInQuint:
             return t * t * t * t * t;
 
@@ -63,6 +84,13 @@ namespace Easing {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 5.0f) / 2.0f;
             }
 
+        case Type::EaseOutInQuint:
+            if (t < 0.5f) {
+                return 0.5f * (1.0f - std::pow(1.0f - 2.0f * t, 5.0f));
+            } else {
+                return 0.5f + 0.5f * std::pow(2.0f * t - 1.0f, 5.0f);
+            }
+
         case Type::EaseInSine:
             return 1.0f - std::cos((t * std::numbers::pi_v<float>) / 2.0f);
 
@@ -71,6 +99,13 @@ namespace Easing {
 
         case Type::EaseInOutSine:
             return -(std::cos(std::numbers::pi_v<float> *t) - 1.0f) / 2.0f;
+
+        case Type::EaseOutInSine:
+            if (t < 0.5f) {
+                return 0.5f * std::sin((2.0f * t * std::numbers::pi_v<float>) / 2.0f);
+            } else {
+                return 1.0f - 0.5f * std::cos(((2.0f * t - 1.0f) * std::numbers::pi_v<float>) / 2.0f);
+            }
 
         case Type::EaseInExpo:
             return t == 0.0f ? 0.0f : std::pow(2.0f, 10.0f * (t - 1.0f));
@@ -88,6 +123,15 @@ namespace Easing {
                 return (2.0f - std::pow(2.0f, -20.0f * t + 10.0f)) / 2.0f;
             }
 
+        case Type::EaseOutInExpo:
+            if (t == 0.0f) return 0.0f;
+            if (t == 1.0f) return 1.0f;
+            if (t < 0.5f) {
+                return 0.5f * (1.0f - std::pow(2.0f, -20.0f * t));
+            } else {
+                return 0.5f + 0.5f * std::pow(2.0f, 20.0f * (t - 1.0f));
+            }
+
         case Type::EaseInCirc:
             return 1.0f - std::sqrt(1.0f - t * t);
 
@@ -100,6 +144,13 @@ namespace Easing {
             }
             else {
                 return (std::sqrt(1.0f - std::pow(-2.0f * t + 2.0f, 2.0f)) + 1.0f) / 2.0f;
+            }
+
+        case Type::EaseOutInCirc:
+            if (t < 0.5f) {
+                return 0.5f * std::sqrt(1.0f - std::pow(2.0f * t - 1.0f, 2.0f));
+            } else {
+                return 1.0f - 0.5f * std::sqrt(1.0f - std::pow(2.0f * t - 1.0f, 2.0f));
             }
 
         case Type::EaseInBack: {
@@ -125,6 +176,16 @@ namespace Easing {
             }
         }
 
+        case Type::EaseOutInBack: {
+            const float c1 = 1.70158f;
+            const float c3 = c1 + 1.0f;
+            if (t < 0.5f) {
+                return 0.5f * (1.0f + c3 * std::pow(2.0f * t - 1.0f, 3.0f) + c1 * std::pow(2.0f * t - 1.0f, 2.0f));
+            } else {
+                return 0.5f + 0.5f * (c3 * std::pow(2.0f * t - 1.0f, 3.0f) - c1 * std::pow(2.0f * t - 1.0f, 2.0f));
+            }
+        }
+
         case Type::EaseInElastic: {
             const float c4 = (2.0f * std::numbers::pi_v<float>) / 3.0f;
             if (t == 0.0f) return 0.0f;
@@ -145,11 +206,24 @@ namespace Easing {
             if (t == 1.0f) return 1.0f;
             if (t < 0.5f) {
                 return -(std::pow(2.0f, 20.0f * t - 10.0f) * std::sin((20.0f * t - 11.125f) * c5)) / 2.0f;
-            }
-            else {
+            } else {
                 return (std::pow(2.0f, -20.0f * t + 10.0f) * std::sin((20.0f * t - 11.125f) * c5)) / 2.0f + 1.0f;
             }
         }
+
+        case Type::EaseOutInElastic: {
+            const float c4 = (2.0f * std::numbers::pi_v<float>) / 3.0f;
+            if (t == 0.0f) return 0.0f;
+            if (t == 1.0f) return 1.0f;
+            if (t < 0.5f) {
+                return 0.5f * (std::pow(2.0f, -20.0f * t) * std::sin((20.0f * t - 0.75f) * c4) + 1.0f);
+            } else {
+                return 1.0f - 0.5f * std::pow(2.0f, 20.0f * (t - 1.0f)) * std::sin((20.0f * (t - 1.0f) - 10.75f) * c4);
+            }
+        }
+
+        case Type::EaseInBounce:
+            return 1.0f - Apply(1.0f - t, Type::EaseOutBounce);
 
         case Type::EaseOutBounce: {
             const float n1 = 7.5625f;
@@ -169,15 +243,20 @@ namespace Easing {
             }
         }
 
-        case Type::EaseInBounce:
-            return 1.0f - Apply(1.0f - t, Type::EaseOutBounce);
-
         case Type::EaseInOutBounce:
             if (t < 0.5f) {
                 return (1.0f - Apply(1.0f - 2.0f * t, Type::EaseOutBounce)) / 2.0f;
             }
-            else {
+            else
+            {
                 return (1.0f + Apply(2.0f * t - 1.0f, Type::EaseOutBounce)) / 2.0f;
+            }
+
+        case Type::EaseOutInBounce:
+            if (t < 0.5f) {
+                return 0.5f * Apply(2.0f * t, Type::EaseOutBounce);
+            } else {
+                return 1.0f - 0.5f * Apply(2.0f - 2.0f * t, Type::EaseOutBounce);
             }
 
         default:

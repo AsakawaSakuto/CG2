@@ -9,22 +9,8 @@
     <FxCompile Include="resources\shaders\Sprite\Sprite.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application\GameObject\ExperiencePoints\ExperiencePoints.cpp" />
-    <ClCompile Include="Application\GameObject\Player\Bullet.cpp" />
-    <ClCompile Include="Application\GameObject\Player\Player.cpp" />
-    <ClCompile Include="Application\GameObject\Player\PlayerWing.cpp" />
-    <ClCompile Include="Application\GameObject\Player\State\PlayerStateLoader.cpp" />
-    <ClCompile Include="Application\GameObject\Temp\TempGameObject.cpp" />
-    <ClCompile Include="Application\GameObject\Thorn\Thorn.cpp" />
-    <ClCompile Include="Application\GameUI\SceneFade\SceneFade.cpp" />
-    <ClCompile Include="Application\GameUI\Temp\TempGameUI.cpp" />
-    <ClCompile Include="Application\Map\Map.cpp" />
     <ClCompile Include="Application\SceneManager\IScene.cpp" />
     <ClCompile Include="Application\SceneManager\SceneManager.cpp" />
-    <ClCompile Include="Application\SceneManager\Scene\GameScene.cpp" />
-    <ClCompile Include="Application\SceneManager\Scene\ResultScene.cpp" />
-    <ClCompile Include="Application\SceneManager\Scene\TitleScene.cpp" />
-    <ClCompile Include="Application\SceneManager\Temp\TempScene.cpp" />
     <ClCompile Include="Application\SceneManager\Test\TestScene.cpp" />
     <ClCompile Include="Engine\3d\Particles\Json\EmitterStateLoder.cpp" />
     <ClCompile Include="Engine\3d\Particles\ParticleDescriptorAllocator.cpp" />
@@ -50,7 +36,6 @@
     <ClCompile Include="Engine\System\Input\Input.cpp" />
     <ClCompile Include="Engine\System\Utility\Logger\Logger.cpp" />
     <ClCompile Include="Engine\3d\Particles\Particles.cpp" />
-    <ClCompile Include="Application\GameObject\State\JsonState.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\System\Utility\MatrixFunction\MatrixFunction.cpp" />
     <ClCompile Include="Engine\3d\Object3d\Object3d.cpp" />
@@ -58,38 +43,14 @@
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
     <ClCompile Include="Engine\System\PSOManager\PSOManager.cpp" />
-    <ClCompile Include="Application\GameObject\Text3D\Text3D.cpp" />
-    <ClCompile Include="Application\GameObject\Thorn\Particle\ThornParticle.cpp" />
-    <ClCompile Include="Application\GameObject\Player\Bear.cpp" />
-    <ClCompile Include="Application\GameObject\TitleObject\TitleObject.cpp" />
     <ClCompile Include="Engine\System\DirectXCommon\ExeColor.cpp" />
     <ClCompile Include="Engine\System\Audio\MasterVolume.cpp" />
-    <ClCompile Include="Application\GameObject\Player\Particle\stunP.cpp" />
-    <ClCompile Include="Application\GameObject\ResultObject\Score.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
     <ClInclude Include="Application\EngineSystem.h" />
-    <ClInclude Include="Application\GameObject\ExperiencePoints\ExperiencePoints.h" />
-    <ClInclude Include="Application\GameObject\GameObject.h" />
-    <ClInclude Include="Application\GameObject\Player\Bullet.h" />
-    <ClInclude Include="Application\GameObject\Player\Player.h" />
-    <ClInclude Include="Application\GameObject\Player\PlayerWing.h" />
-    <ClInclude Include="Application\GameObject\Player\State\BulletState.h" />
-    <ClInclude Include="Application\GameObject\Player\State\playerState.h" />
-    <ClInclude Include="Application\GameObject\Player\State\PlayerStateLoader.h" />
-    <ClInclude Include="Application\GameObject\Temp\TempGameObject.h" />
-    <ClInclude Include="Application\GameObject\Thorn\Thorn.h" />
-    <ClInclude Include="Application\GameUI\GameUI.h" />
-    <ClInclude Include="Application\GameUI\SceneFade\SceneFade.h" />
-    <ClInclude Include="Application\GameUI\Temp\TempGameUI.h" />
-    <ClInclude Include="Application\Map\Map.h" />
     <ClInclude Include="Application\SceneManager\IScene.h" />
     <ClInclude Include="Application\SceneManager\SceneManager.h" />
-    <ClInclude Include="Application\SceneManager\Scene\GameScene.h" />
-    <ClInclude Include="Application\SceneManager\Scene\ResultScene.h" />
-    <ClInclude Include="Application\SceneManager\Scene\TitleScene.h" />
-    <ClInclude Include="Application\SceneManager\Temp\TempScene.h" />
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterStateLoder.h" />
     <ClInclude Include="Engine\3d\Particles\ParticleDescriptorAllocator.h" />
@@ -149,19 +110,10 @@
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleMaterial.h" />
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />
     <ClInclude Include="Engine\System\Utility\Random\Random.h" />
-    <ClInclude Include="Application\GameObject\State\JsonState.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />
-    <ClInclude Include="Application\GameObject\Text3D\Text3D.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
-    <ClInclude Include="Application\SceneManager\Scene\State\GameSceneState.h" />
-    <ClInclude Include="Application\GameObject\Thorn\Particle\ThornParticle.h" />
     <ClInclude Include="Engine\System\Audio\MasterVolume.h" />
-    <ClInclude Include="Application\GameObject\Player\Bear.h" />
-    <ClInclude Include="Application\GameObject\TitleObject\TitleObject.h" />
     <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
-    <ClInclude Include="Application\Score\ScoreList.h" />
-    <ClInclude Include="Application\GameObject\Player\Particle\stunP.h" />
-    <ClInclude Include="Application\GameObject\ResultObject\Score.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

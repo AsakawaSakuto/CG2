@@ -1,9 +1,6 @@
 #pragma once
 #include"IScene.h"
 #include"Application/SceneManager/Test/TestScene.h"
-#include"Application/SceneManager/Scene/TitleScene.h"
-#include"Application/SceneManager/Scene/GameScene.h"
-#include"Application/SceneManager/Scene/ResultScene.h"
 #include<memory>
 
 // シーン数
@@ -12,13 +9,12 @@ constexpr uint32_t sceneNum = 4;
 class SceneManager {
 private:
     std::unique_ptr<IScene> sceneArr_[sceneNum];
-    int currentSceneNo_;
-    int prevSceneNo_;
-    int sceneChangeCount_;  // デバッグ用：シーン切り替え回数
-    
+    SCENE currentSceneNo_;
+    SCENE prevSceneNo_;
+
     // プライベートヘルパーメソッド
     void CleanupAllScenes();
-    std::unique_ptr<IScene> CreateScene(int sceneNo);
+    std::unique_ptr<IScene> CreateScene(SCENE sceneNo);
 
 public:
     SceneManager();
