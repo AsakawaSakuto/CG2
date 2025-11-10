@@ -25,5 +25,4 @@ private:
 	// 移動関連のメンバ変数
 	float moveSpeed_ = 5.0f;
 	Camera camera_; // 現在のカメラへの参照
-	
 };

@@ -21,7 +21,7 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	if (ctx_->gamePad.TriggerButton(GamePad::A)) {
+	if (ctx_->gamePad.TriggerButton(GamePad::START)) {
 		ChangeScene(SCENE::TITLE);
 	}
 
