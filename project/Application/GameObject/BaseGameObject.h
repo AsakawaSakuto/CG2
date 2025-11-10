@@ -9,6 +9,8 @@ class BaseGameObject {
 protected:
     AppContext* ctx_;
 
+    bool isAlive_ = true;
+
 	Transform transform_;
     AABB aabbCollision_;
 	Sphere sphereCollision_;

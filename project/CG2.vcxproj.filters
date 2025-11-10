@@ -53,6 +53,7 @@
     <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
     <ClCompile Include="Application\GameObject\Player\player.cpp" />
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
+    <ClCompile Include="Application\GameObject\Enemy\Enemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -131,6 +132,7 @@
     <ClInclude Include="Application\GameObject\Player\player.h" />
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
     <ClInclude Include="Application\GameObject\Player\playerStatus.h" />
+    <ClInclude Include="Application\GameObject\Enemy\Enemy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

@@ -33,12 +33,12 @@ private:
 	Camera camera_; // 現在のカメラへの参照
 	
 	// ジャンプ関連のメンバ変数
-	int jumpCanCount_ = 1;           // ジャンプ可能回数
-	int currentJumpCount_ = 0;        // 現在のジャンプ回数
-	float jumpPower_ = 8.0f;          // ジャンプ力
-	float velocity_Y_ = 0.0f;         // Y軸方向の速度
-	float gravity_ = 20.0f;           // 重力
-	float groundLevel_ = 0.0f;        // 地面のY座標
-	bool isGrounded_ = true;          // 地面にいるかどうか
-	bool wasGrounded_ = true;         // 前フレームで地面にいたかどうか
+	int jumpCanCount_ = 1;     // ジャンプ可能回数
+	int currentJumpCount_ = 0; // 現在のジャンプ回数
+	float jumpPower_ = 8.0f;   // ジャンプ力
+	float velocity_Y_ = 0.0f;  // Y軸方向の速度
+	float gravity_ = 20.0f;    // 重力
+	float groundLevel_ = 0.0f; // 地面のY座標
+	bool isGrounded_ = true;   // 地面にいるかどうか
+	bool wasGrounded_ = true;  // 前フレームで地面にいたかどうか
 };
