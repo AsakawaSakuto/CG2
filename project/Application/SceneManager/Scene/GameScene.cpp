@@ -17,7 +17,10 @@ void GameScene::Initialize() {
 	player_->Initialize(ctx_);
 
 	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
-	testPlane_->SetScale({ 10.0f,1.0f,10.0f });
+	testPlane_->SetScale({ 100.0f,1.0f,100.0f });
+	testPlane_->SetTranslate({ 0.0f,-0.5f,0.0f });
+	testWall_->Initialize(&ctx_->dxCommon, "wall.obj");
+	testWall_->SetTranslate({ 0.0f,-40.0f,0.0f });
 }
 
 void GameScene::Update() {
@@ -31,15 +34,17 @@ void GameScene::Update() {
 	gameCamera_->Update();
 
 	camera_ = gameCamera_->GetCamera();
-	//camera_.Update();
+	camera_.Update();
 
 	testPlane_->Update();
+	testWall_->Update();
 }
 
 void GameScene::Draw() {
 	player_->Draw(gameCamera_->GetCamera());
 
 	testPlane_->Draw(camera_);
+	testWall_->Draw(camera_);
 }
 
 void GameScene::DrawImGui() {

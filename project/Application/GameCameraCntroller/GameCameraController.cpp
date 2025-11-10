@@ -6,8 +6,8 @@ void GameCameraController::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 	
 	// カメラの初期設定
-	camera_.SetTarget({0.0f, 0.0f, 0.0f});  // デフォルトターゲット
-	camera_.SetDistance(15.0f);              // デフォルト距離
+	camera_.SetTarget({0.0f, 0.0f, 0.0f});   // デフォルトターゲット
+	camera_.SetDistance(30.0f);              // デフォルト距離
 	camera_.SetTPSAngles(0.0f, 0.3f);        // デフォルト角度（少し上から見下ろす）
 }
 
@@ -37,12 +37,13 @@ void GameCameraController::Update() {
 		}
 	}
 
-	// TPSカメラの更新
+	// TPSカメラの更新（地面貫通の制限はCalculateTPSPosition内で処理される）
 	camera_.UpdateTPS();
 }
 
 void GameCameraController::SetTarget(Vector3 targetPosition) {
-	camera_.SetTarget(targetPosition);
+	targetPosition_ = targetPosition;
+	camera_.SetTarget(targetPosition_);
 }
 
 void GameCameraController::SetDistance(float distance) {

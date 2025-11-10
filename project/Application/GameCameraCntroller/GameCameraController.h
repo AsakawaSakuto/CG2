@@ -18,4 +18,5 @@ public:
 private:
 	Camera camera_;
 	AppContext* ctx_ = nullptr;
+	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
 };

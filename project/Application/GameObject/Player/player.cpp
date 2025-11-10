@@ -13,6 +13,10 @@ void Player::Initialize(AppContext* ctx) {
 void Player::Update() {
 
 	Move();
+	Jump();
+
+	transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
+	transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
 
 	model_->SetTransform(transform_);
 	model_->Update();
@@ -32,6 +36,18 @@ void Player::DrawImGui() {
 	ImGui::DragFloat("Move Speed", &moveSpeed_, 0.1f, 0.1f, 20.0f);
 	ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
+	
+	// ジャンプ設定
+	ImGui::Separator();
+	ImGui::Text("Jump Settings");
+	ImGui::DragInt("Jump Can Count", &jumpCanCount_, 1, 1, 5);
+	ImGui::DragFloat("Jump Power", &jumpPower_, 0.1f, 1.0f, 20.0f);
+	ImGui::DragFloat("Gravity", &gravity_, 0.1f, 1.0f, 50.0f);
+	ImGui::DragFloat("Ground Level", &groundLevel_, 0.1f, -10.0f, 10.0f);
+	ImGui::Text("Current Jump Count: %d / %d", currentJumpCount_, jumpCanCount_);
+	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
+	ImGui::Text("Velocity Y: %.2f", velocity_Y_);
+	ImGui::End();
 }
 
 void Player::Move() {
@@ -95,8 +111,8 @@ Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 	
 	// スティック入力に応じて移動方向を計算
 	// stickY > 0: 上に倒す → カメラが向いている方向（前方向）に移動
-	// stickY < 0: 下に倒す → カメラと反対方向（後方向）に移動  
-	// stickX > 0: 右に倒す → 카メラから見て右方向に移動
+	// stickY < 0: 下に倒す → 카メラと反対方向（後方向）に移動  
+	// stickX > 0: 右に倒す → 카메ラから見て右方向に移動
 	// stickX < 0: 左に倒す → 카メラから見て左方向に移動
 	Vector3 moveDirection = {
 		forward.x * stickY + right.x * stickX,
@@ -105,4 +121,30 @@ Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 	};
 	
 	return moveDirection.Normalize();
+}
+
+void Player::Jump() {
+	// 地面にいるかのチェック
+	if (transform_.translate.y <= groundLevel_) {
+		transform_.translate.y = groundLevel_;
+		velocity_Y_ = 0.0f;
+		isGrounded_ = true;
+		currentJumpCount_ = 0; // 地面に着いたらジャンプカウントをリセット
+	} else {
+		isGrounded_ = false;
+	}
+
+	// Aボタンでジャンプ
+	if (ctx_->gamePad.TriggerButton(GamePad::A)) {
+		if (currentJumpCount_ < jumpCanCount_) {
+			velocity_Y_ = jumpPower_;
+			currentJumpCount_++;
+		}
+	}
+
+	// 重力を適用
+	if (!isGrounded_ || velocity_Y_ > 0.0f) {
+		velocity_Y_ -= gravity_ * deltaTime_;
+		transform_.translate.y += velocity_Y_ * deltaTime_;
+	}
 }

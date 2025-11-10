@@ -72,6 +72,15 @@ Vector3 Camera::CalculateTPSPosition() const {
 	position.y = target_.y + distance_ * sinVertical;
 	position.z = target_.z + distance_ * cosVertical * cosHorizontal;
 	
+	// 地面を貫通しないように制限
+	const float minHeight = 0.1f;
+	if (position.y < minHeight) {
+		position.y = minHeight;
+	}
+	
+	position.x = std::clamp(position.x, -49.0f, 49.0f);
+	position.z = std::clamp(position.z, -49.0f, 49.0f);
+
 	return position;
 }
 

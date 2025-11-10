@@ -7,6 +7,8 @@
 #include "Engine/System/Utility/Math/Plane.h"
 
 #include "WinApp.h"
+#include <cmath>
+#include <algorithm>
 
 // フラスタム構造体
 struct Frustum {
@@ -55,12 +57,37 @@ public:
 	}
 	void AddTPSAngles(float deltaHorizontal, float deltaVertical) {
 		horizontalAngle_ += deltaHorizontal;
-		verticalAngle_ += deltaVertical;
+		
+		// 仮の垂直角度を計算
+		float newVerticalAngle = verticalAngle_ + deltaVertical;
+		
 		// 垂直角度を制限（真上と真下を避ける）
 		const float maxVertical = 1.5f;
 		const float minVertical = -1.5f;
-		if (verticalAngle_ > maxVertical) verticalAngle_ = maxVertical;
-		if (verticalAngle_ < minVertical) verticalAngle_ = minVertical;
+		if (newVerticalAngle > maxVertical) newVerticalAngle = maxVertical;
+		if (newVerticalAngle < minVertical) newVerticalAngle = minVertical;
+		
+		// 地面貫通チェック：新しい角度でカメラ位置を計算
+		const float minHeight = 0.1f;
+		float testY = target_.y + distance_ * std::sin(newVerticalAngle);
+		
+		// カメラが地面より下にならない角度を計算
+		if (testY < minHeight) {
+			// 地面ギリギリの角度を計算
+			float maxAllowedSin = (minHeight - target_.y) / distance_;
+			// sinの値を-1.0～1.0の範囲に制限
+			maxAllowedSin = (std::max)(-1.0f, std::min(1.0f, maxAllowedSin));
+			float maxAllowedAngle = std::asin(maxAllowedSin);
+			
+			// 現在の角度が既に制限値に達している場合、下方向への変更を無視
+			if (deltaVertical < 0.0f) {
+				verticalAngle_ = maxAllowedAngle;
+			} else {
+				verticalAngle_ = newVerticalAngle;
+			}
+		} else {
+			verticalAngle_ = newVerticalAngle;
+		}
 	}
 	
 	Vector3 GetTarget() const { return target_; }
