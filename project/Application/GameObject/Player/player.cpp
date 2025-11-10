@@ -26,6 +26,7 @@ void Player::Update() {
 	model_->Update();
 
 	moveParticle_->SetEmitterPosition(transform_.translate);
+	moveParticle_->SetOffSet({ 0.0f, -0.2f, 0.0f });
 	moveParticle_->Update();
 	landingParticle_->SetEmitterPosition(transform_.translate);
 	landingParticle_->Update();
@@ -60,7 +61,7 @@ void Player::DrawImGui() {
 	ImGui::Text("Velocity Y: %.2f", velocity_Y_);
 	ImGui::End();
 
-	moveParticle_->DrawImGui("move Particle");
+	//landingParticle_->DrawImGui("move Particle");
 }
 
 void Player::Move() {
@@ -130,9 +131,9 @@ Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 	
 	// スティック入力に応じて移動方向を計算
 	// stickY > 0: 上に倒す → カメラが向いている方向（前方向）に移動
-	// stickY < 0: 下に倒す → 카メラと反対方向（後方向）に移動  
-	// stickX > 0: 右に倒す → 카메ラから見て右方向に移動
-	// stickX < 0: 左に倒す → 카メラから見て左方向に移動
+	// stickY < 0: 下に倒す → カメラと反対方向（後方向）に移動  
+	// stickX > 0: 右に倒す → カメラから見て右方向に移動
+	// stickX < 0: 左に倒す → カメラから見て左方向に移動
 	Vector3 moveDirection = {
 		forward.x * stickY + right.x * stickX,
 		0.0f,
@@ -143,12 +144,21 @@ Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 }
 
 void Player::Jump() {
+	// 前フレームの地面接触状態を保存
+	wasGrounded_ = isGrounded_;
+
 	// 地面にいるかのチェック
 	if (transform_.translate.y <= groundLevel_) {
 		transform_.translate.y = groundLevel_;
 		velocity_Y_ = 0.0f;
 		isGrounded_ = true;
 		currentJumpCount_ = 0; // 地面に着いたらジャンプカウントをリセット
+		
+		// 着地した瞬間の判定（前フレームで空中にいて、今フレームで地面に接触）
+		if (!wasGrounded_) {
+			// 着地した瞬間の処理
+			landingParticle_->Play(false);
+		}
 	} else {
 		isGrounded_ = false;
 	}

@@ -1,5 +1,5 @@
 {
-    "alphaFade": 0,
+    "alphaFade": 1,
     "blendMode": 2,
     "colorFade": 0,
     "colorRandom": 0,
@@ -17,7 +17,7 @@
         0.0,
         0.0
     ],
-    "endRotateVelocity": 0.0,
+    "endRotateVelocity": -3.0,
     "endScale": [
         0.0,
         0.0
@@ -95,7 +95,7 @@
         0.0
     ],
     "ringOuterRadius": 1.0,
-    "rotateMove": 0,
+    "rotateMove": 1,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
@@ -110,10 +110,10 @@
         1.0,
         1.0
     ],
-    "startRotateVelocity": 0.0,
+    "startRotateVelocity": 3.0,
     "startScale": [
-        1.0,
-        1.0
+        0.699999988079071,
+        0.699999988079071
     ],
     "startVelocity": [
         0.0,
@@ -122,9 +122,9 @@
     ],
     "texturePath": "smork2",
     "translate": [
-        16.158313751220703,
-        -0.10000000149011612,
-        -12.71418285369873
+        -17.358163833618164,
+        -0.20000000298023224,
+        10.43714714050293
     ],
     "useEmitter": 1,
     "velocityRandom": 1

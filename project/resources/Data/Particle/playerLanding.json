@@ -1,5 +1,5 @@
 {
-    "alphaFade": 0,
+    "alphaFade": 1,
     "blendMode": 2,
     "colorFade": 0,
     "colorRandom": 0,
@@ -10,7 +10,7 @@
         0.0
     ],
     "coneHeight": 2.0,
-    "count": 10,
+    "count": 15,
     "emit": 0,
     "endColor": [
         1.0,
@@ -122,9 +122,9 @@
     ],
     "texturePath": "smork2",
     "translate": [
-        -21.53077507019043,
+        3.361185073852539,
         0.0,
-        14.704140663146973
+        -18.598539352416992
     ],
     "useEmitter": 0,
     "velocityRandom": 0

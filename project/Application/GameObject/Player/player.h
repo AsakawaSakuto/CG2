@@ -40,4 +40,5 @@ private:
 	float gravity_ = 20.0f;           // 重力
 	float groundLevel_ = 0.0f;        // 地面のY座標
 	bool isGrounded_ = true;          // 地面にいるかどうか
+	bool wasGrounded_ = true;         // 前フレームで地面にいたかどうか
 };

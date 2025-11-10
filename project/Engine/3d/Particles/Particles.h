@@ -100,22 +100,6 @@ public:
 	/// <param name="count">出すパーティクルの数</param>
 	void SetSpawnCount(uint32_t count) { emitter_.count = count; }
 
-	void SetSpawnTime(float time) { emitter_.frequency = time; }
-
-	void SetEmitVelocity(Vector3 velocity) { 
-		emitter_.minVelocity = velocity;
-		emitter_.maxVelocity = velocity;
-	}
-
-	void SetEmitVelocityY(float velocityY) {
-		emitter_.minVelocity.y = velocityY;
-		emitter_.maxVelocity.y = velocityY;
-	}
-
-	void SetStartColor(Vector3 startColor) {
-		emitter_.startColor = startColor;
-	}
-
 	/// <summary>
 	/// パーティクルの生成開始
 	/// </summary>
