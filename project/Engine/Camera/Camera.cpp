@@ -24,6 +24,57 @@ void Camera::Update() {
 	UpdateFrustum();
 }
 
+void Camera::UpdateTPS() {
+	// TPSカメラの位置を計算
+	Vector3 cameraPosition = CalculateTPSPosition();
+	transform_.translate = cameraPosition;
+
+	// カメラからターゲットへの方向ベクトルを計算
+	Vector3 forward = {
+		target_.x - cameraPosition.x,
+		target_.y - cameraPosition.y,
+		target_.z - cameraPosition.z
+	};
+	
+	// 正規化
+	float length = std::sqrt(forward.x * forward.x + forward.y * forward.y + forward.z * forward.z);
+	if (length > 0.0f) {
+		forward.x /= length;
+		forward.y /= length;
+		forward.z /= length;
+	}
+
+	// ピッチ（X軸回転）を計算
+	float pitch = std::asin(-forward.y);
+	
+	// ヨー（Y軸回転）を計算
+	float yaw = std::atan2(forward.x, forward.z);
+
+	// 回転を設定
+	transform_.rotate = { pitch, yaw, 0.0f };
+
+	// 通常の更新処理
+	Update();
+}
+
+Vector3 Camera::CalculateTPSPosition() const {
+	// 球面座標系でカメラ位置を計算
+	Vector3 position;
+	
+	// 水平角度と垂直角度からカメラの相対位置を計算
+	float cosVertical = std::cos(verticalAngle_);
+	float sinVertical = std::sin(verticalAngle_);
+	float cosHorizontal = std::cos(horizontalAngle_);
+	float sinHorizontal = std::sin(horizontalAngle_);
+	
+	// ターゲットから見たカメラの相対位置
+	position.x = target_.x + distance_ * cosVertical * sinHorizontal;
+	position.y = target_.y + distance_ * sinVertical;
+	position.z = target_.z + distance_ * cosVertical * cosHorizontal;
+	
+	return position;
+}
+
 void Camera::UpdateFrustum() {
 	Matrix4x4 viewProjection = viewProjectionMatrix_;
 	
@@ -104,6 +155,14 @@ void Camera::DrawImgui() {
 
 	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
 	ImGui::DragFloat3("Rotate", &transform_.rotate.x, 0.01f);
+	
+	// TPS設定
+	ImGui::Separator();
+	ImGui::Text("TPS Settings");
+	ImGui::DragFloat3("Target", &target_.x, 0.1f);
+	ImGui::DragFloat("Distance", &distance_, 0.1f, 1.0f, 50.0f);
+	ImGui::DragFloat("Horizontal Angle", &horizontalAngle_, 0.01f);
+	ImGui::DragFloat("Vertical Angle", &verticalAngle_, 0.01f, -1.5f, 1.5f);
 }
 
 Vector3 Camera::GetWorldPosition() {

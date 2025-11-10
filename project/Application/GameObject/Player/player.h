@@ -9,6 +9,7 @@ public:
     void Draw(Camera camera) override;
     void DrawImGui() override;
 
+    const Vector3& GetPosition() { return transform_.translate; }
 private:
 	unique_ptr<Model> model_ = make_unique<Model>();
 };

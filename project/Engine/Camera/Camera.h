@@ -46,6 +46,31 @@ public:
 	Frustum GetFrustum() const { return frustum_; }
 	bool IsInFrustum(const Vector3& position, float radius) const;
 
+	// TPS機能
+	void SetTarget(const Vector3& target) { target_ = target; }
+	void SetDistance(float distance) { distance_ = distance; }
+	void SetTPSAngles(float horizontal, float vertical) { 
+		horizontalAngle_ = horizontal; 
+		verticalAngle_ = vertical; 
+	}
+	void AddTPSAngles(float deltaHorizontal, float deltaVertical) {
+		horizontalAngle_ += deltaHorizontal;
+		verticalAngle_ += deltaVertical;
+		// 垂直角度を制限（真上と真下を避ける）
+		const float maxVertical = 1.5f;
+		const float minVertical = -1.5f;
+		if (verticalAngle_ > maxVertical) verticalAngle_ = maxVertical;
+		if (verticalAngle_ < minVertical) verticalAngle_ = minVertical;
+	}
+	
+	Vector3 GetTarget() const { return target_; }
+	float GetDistance() const { return distance_; }
+	float GetHorizontalAngle() const { return horizontalAngle_; }
+	float GetVerticalAngle() const { return verticalAngle_; }
+
+	// TPSモードでの更新
+	void UpdateTPS();
+
 protected:
 	Matrix4x4 worldMatrix_;
 	Matrix4x4 viewProjectionMatrix_;
@@ -60,8 +85,17 @@ protected:
 	// フラスタム
 	Frustum frustum_;
 
+	// TPS用パラメータ
+	Vector3 target_ = {0.0f, 0.0f, 0.0f};      // 注視点
+	float distance_ = 10.0f;                   // ターゲットからの距離
+	float horizontalAngle_ = 0.0f;             // 水平角度（Y軸周り）
+	float verticalAngle_ = 0.0f;               // 垂直角度（X軸周り相当）
+
 private:
 	// フラスタムを更新する
 	void UpdateFrustum();
+	
+	// TPSカメラの位置を計算
+	Vector3 CalculateTPSPosition() const;
 };
 
