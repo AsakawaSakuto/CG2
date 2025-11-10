@@ -1,6 +1,6 @@
 #pragma once
 #include "Camera.h"
-
+#include "Application/AppContext.h"
 class GameCameraController
 {
 public:
@@ -10,4 +10,5 @@ public:
 	Camera& GetCamera() { return camera_; }
 private:
 	Camera camera_;
+	AppContext* ctx_ = nullptr;
 };
