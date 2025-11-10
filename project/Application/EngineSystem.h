@@ -36,3 +36,6 @@
 #include "Engine/system/Utility/Easing/Easing.h"
 #include "Engine/system/Utility/GameTimer/GameTimer.h"
 #include "Engine/System/Utility/Collision/Collision.h"
+
+using std::unique_ptr;
+using std::make_unique;

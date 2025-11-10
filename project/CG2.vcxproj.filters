@@ -45,6 +45,14 @@
     <ClCompile Include="Engine\System\PSOManager\PSOManager.cpp" />
     <ClCompile Include="Engine\System\DirectXCommon\ExeColor.cpp" />
     <ClCompile Include="Engine\System\Audio\MasterVolume.cpp" />
+    <ClCompile Include="Application\SceneManager\Scene\TiTleScene.cpp" />
+    <ClCompile Include="Application\SceneManager\Scene\GameScene.cpp" />
+    <ClCompile Include="Application\SceneManager\Scene\ResultScene.cpp" />
+    <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
+    <ClCompile Include="Application\GameUI\BaseUI.cpp" />
+    <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
+    <ClCompile Include="Application\GameObject\Player\player.cpp" />
+    <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -114,6 +122,14 @@
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
     <ClInclude Include="Engine\System\Audio\MasterVolume.h" />
     <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
+    <ClInclude Include="Application\SceneManager\Scene\TiTleScene.h" />
+    <ClInclude Include="Application\SceneManager\Scene\GameScene.h" />
+    <ClInclude Include="Application\SceneManager\Scene\ResultScene.h" />
+    <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />
+    <ClInclude Include="Application\GameUI\BaseUI.h" />
+    <ClInclude Include="Application\GameObject\BaseGameObject.h" />
+    <ClInclude Include="Application\GameObject\Player\player.h" />
+    <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
