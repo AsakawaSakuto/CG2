@@ -31,12 +31,13 @@ void GameScene::Update() {
 	gameCamera_->Update();
 
 	camera_ = gameCamera_->GetCamera();
+	//camera_.Update();
 
 	testPlane_->Update();
 }
 
 void GameScene::Draw() {
-	player_->Draw(camera_);
+	player_->Draw(gameCamera_->GetCamera());
 
 	testPlane_->Draw(camera_);
 }
