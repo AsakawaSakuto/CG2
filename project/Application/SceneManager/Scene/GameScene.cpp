@@ -41,10 +41,10 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	player_->Draw(gameCamera_->GetCamera());
-
 	testPlane_->Draw(camera_);
 	testWall_->Draw(camera_);
+
+	player_->Draw(camera_);
 }
 
 void GameScene::DrawImGui() {

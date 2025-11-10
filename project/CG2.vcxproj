@@ -202,6 +202,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
     <ClInclude Include="Application\GameObject\Player\player.h" />
+    <ClInclude Include="Application\GameObject\Player\playerStatus.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />
     <ClInclude Include="Application\SceneManager\IScene.h" />

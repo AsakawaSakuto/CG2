@@ -130,6 +130,7 @@
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
     <ClInclude Include="Application\GameObject\Player\player.h" />
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
+    <ClInclude Include="Application\GameObject\Player\playerStatus.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

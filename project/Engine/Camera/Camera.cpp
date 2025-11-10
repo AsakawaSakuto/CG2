@@ -78,8 +78,8 @@ Vector3 Camera::CalculateTPSPosition() const {
 		position.y = minHeight;
 	}
 	
-	position.x = std::clamp(position.x, -49.0f, 49.0f);
-	position.z = std::clamp(position.z, -49.0f, 49.0f);
+	//position.x = std::clamp(position.x, -49.0f, 49.0f);
+	//position.z = std::clamp(position.z, -49.0f, 49.0f);
 
 	return position;
 }

@@ -16,14 +16,18 @@ private:
 
 	// 移動処理
 	void Move();
+
 	// カメラの向きに基づいた移動方向を計算
 	Vector3 CalculateCameraMoveDirection(float stickX, float stickY);
+
 	// ジャンプ処理
 	void Jump();
 
 private:
 	unique_ptr<Model> model_ = make_unique<Model>();
-	
+	unique_ptr<Particles> moveParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> landingParticle_ = make_unique<Particles>();
+
 	// 移動関連のメンバ変数
 	float moveSpeed_ = 5.0f;
 	Camera camera_; // 現在のカメラへの参照

@@ -4,10 +4,14 @@
 
 void Player::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
-	model_->Initialize(&ctx_->dxCommon, "player/player.obj");
 	transform_.scale = { 1.0f,1.0f,1.0f };
-	// 移動速度を設定
-	moveSpeed_ = 5.0f;
+
+	model_->Initialize(&ctx_->dxCommon, "player/player.obj");
+
+	moveParticle_->Initialize(&ctx_->dxCommon);
+	moveParticle_->LoadJson("playerMove");
+	landingParticle_->Initialize(&ctx_->dxCommon);
+	landingParticle_->LoadJson("playerLanding");
 }
 
 void Player::Update() {
@@ -20,17 +24,24 @@ void Player::Update() {
 
 	model_->SetTransform(transform_);
 	model_->Update();
+
+	moveParticle_->SetEmitterPosition(transform_.translate);
+	moveParticle_->Update();
+	landingParticle_->SetEmitterPosition(transform_.translate);
+	landingParticle_->Update();
 }
 
 void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
 	model_->Draw(camera);
+
+	moveParticle_->Draw(camera);
+	landingParticle_->Draw(camera);
 }
 
 void Player::DrawImGui() {
-	model_->DrawImGui("PlayerModel");
-	
+
 	// プレイヤー固有のImGui
 	ImGui::Begin("Player Settings");
 	ImGui::DragFloat("Move Speed", &moveSpeed_, 0.1f, 0.1f, 20.0f);
@@ -48,6 +59,8 @@ void Player::DrawImGui() {
 	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
 	ImGui::Text("Velocity Y: %.2f", velocity_Y_);
 	ImGui::End();
+
+	moveParticle_->DrawImGui("move Particle");
 }
 
 void Player::Move() {
@@ -76,6 +89,12 @@ void Player::Move() {
 			float targetYaw = std::atan2(moveDirection.x, moveDirection.z);
 			transform_.rotate.y = targetYaw;
 		}
+		
+		if (!moveParticle_->IsPlaying()) {
+			moveParticle_->Play();
+		}
+	} else {
+		moveParticle_->Stop();
 	}
 }
 
