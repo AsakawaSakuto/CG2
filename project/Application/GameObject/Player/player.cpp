@@ -45,20 +45,20 @@ void Player::DrawImGui() {
 
 	// プレイヤー固有のImGui
 	ImGui::Begin("Player Settings");
-	ImGui::DragFloat("Move Speed", &moveSpeed_, 0.1f, 0.1f, 20.0f);
+	ImGui::DragFloat("Move Speed", &status_.moveSpeed_, 0.1f, 0.1f, 20.0f);
 	ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
 	
 	// ジャンプ設定
 	ImGui::Separator();
 	ImGui::Text("Jump Settings");
-	ImGui::DragInt("Jump Can Count", &jumpCanCount_, 1, 1, 5);
-	ImGui::DragFloat("Jump Power", &jumpPower_, 0.1f, 1.0f, 20.0f);
-	ImGui::DragFloat("Gravity", &gravity_, 0.1f, 1.0f, 50.0f);
+	ImGui::DragInt("Jump Can Count", &status_.jumpCanCount_, 1, 1, 5);
+	ImGui::DragFloat("Jump Power", &status_.jumpPower_, 0.1f, 1.0f, 20.0f);
+	ImGui::DragFloat("Gravity", &status_.gravity_, 0.1f, 1.0f, 50.0f);
 	ImGui::DragFloat("Ground Level", &groundLevel_, 0.1f, -10.0f, 10.0f);
-	ImGui::Text("Current Jump Count: %d / %d", currentJumpCount_, jumpCanCount_);
+	ImGui::Text("Current Jump Count: %d / %d", status_.currentJumpCount_, status_.jumpCanCount_);
 	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
-	ImGui::Text("Velocity Y: %.2f", velocity_Y_);
+	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y_);
 	ImGui::End();
 
 	//landingParticle_->DrawImGui("move Particle");
@@ -76,9 +76,9 @@ void Player::Move() {
 
 		// 移動量を計算
 		Vector3 movement = {
-			moveDirection.x * moveSpeed_ * deltaTime_,
+			moveDirection.x * status_.moveSpeed_ * deltaTime_,
 			0.0f, // Y軸移動は制限
-			moveDirection.z * moveSpeed_ * deltaTime_
+			moveDirection.z * status_.moveSpeed_ * deltaTime_
 		};
 
 		// プレイヤーの位置を更新
@@ -150,9 +150,9 @@ void Player::Jump() {
 	// 地面にいるかのチェック
 	if (transform_.translate.y <= groundLevel_) {
 		transform_.translate.y = groundLevel_;
-		velocity_Y_ = 0.0f;
+		status_.velocity_Y_ = 0.0f;
 		isGrounded_ = true;
-		currentJumpCount_ = 0; // 地面に着いたらジャンプカウントをリセット
+		status_.currentJumpCount_ = 0; // 地面に着いたらジャンプカウントをリセット
 		
 		// 着地した瞬間の判定（前フレームで空中にいて、今フレームで地面に接触）
 		if (!wasGrounded_) {
@@ -165,15 +165,15 @@ void Player::Jump() {
 
 	// Aボタンでジャンプ
 	if (ctx_->gamePad.TriggerButton(GamePad::A)) {
-		if (currentJumpCount_ < jumpCanCount_) {
-			velocity_Y_ = jumpPower_;
-			currentJumpCount_++;
+		if (status_.currentJumpCount_ < status_.jumpCanCount_) {
+			status_.velocity_Y_ = status_.jumpPower_;
+			status_.currentJumpCount_++;
 		}
 	}
 
 	// 重力を適用
-	if (!isGrounded_ || velocity_Y_ > 0.0f) {
-		velocity_Y_ -= gravity_ * deltaTime_;
-		transform_.translate.y += velocity_Y_ * deltaTime_;
+	if (!isGrounded_ || status_.velocity_Y_ > 0.0f) {
+		status_.velocity_Y_ -= status_.gravity_ * deltaTime_;
+		transform_.translate.y += status_.velocity_Y_ * deltaTime_;
 	}
 }

@@ -3,6 +3,7 @@
 #include"Application/SceneManager/IScene.h"
 #include"Application/GameObject/Player/player.h"
 #include"Application/GameCameraCntroller/GameCameraController.h"
+#include"Application/GameObject/EnemyManager/EnemyManager.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -30,6 +31,9 @@ private:
 	unique_ptr<Model> testPlane_ = make_unique<Model>();
 	unique_ptr<Model> testWall_ = make_unique<Model>();
 
+	// プレイヤー関連のクラス
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<GameCameraController> gameCamera_ = make_unique<GameCameraController>();
+
+	unique_ptr<EnemyManager> enemyManager_ = make_unique<EnemyManager>();
 };

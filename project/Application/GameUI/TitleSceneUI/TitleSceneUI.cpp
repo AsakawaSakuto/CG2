@@ -21,7 +21,7 @@ void TitleSceneUI::Update() {
 			selectState_ = TitleSelectState::QUIT;
 		}
 
-		if (ctx_->gamePad.TriggerButton(GamePad::A)) {
+		if (ctx_->gamePad.TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
 			isPlay_ = true;
 		}
 

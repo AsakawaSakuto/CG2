@@ -2,6 +2,7 @@
 #include "Application/GameObject/BaseGameObject.h"
 #include "Application/EngineSystem.h"
 #include "externals/imgui/imgui.h"
+#include "playerStatus.h"
 
 class Player : public BaseGameObject {
 public:
@@ -28,16 +29,11 @@ private:
 	unique_ptr<Particles> moveParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> landingParticle_ = make_unique<Particles>();
 
-	// 移動関連のメンバ変数
-	float moveSpeed_ = 5.0f;
 	Camera camera_; // 現在のカメラへの参照
 	
+	PlayerStatus status_; // プレイヤーステータス
+
 	// ジャンプ関連のメンバ変数
-	int jumpCanCount_ = 1;     // ジャンプ可能回数
-	int currentJumpCount_ = 0; // 現在のジャンプ回数
-	float jumpPower_ = 8.0f;   // ジャンプ力
-	float velocity_Y_ = 0.0f;  // Y軸方向の速度
-	float gravity_ = 20.0f;    // 重力
 	float groundLevel_ = 0.0f; // 地面のY座標
 	bool isGrounded_ = true;   // 地面にいるかどうか
 	bool wasGrounded_ = true;  // 前フレームで地面にいたかどうか

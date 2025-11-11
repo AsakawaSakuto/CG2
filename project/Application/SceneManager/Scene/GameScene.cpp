@@ -16,9 +16,12 @@ void GameScene::Initialize() {
 	gameCamera_->Initialize(ctx_);
 	player_->Initialize(ctx_);
 
+	enemyManager_->Initialize(ctx_);
+
 	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
 	testPlane_->SetScale({ 100.0f,1.0f,100.0f });
 	testPlane_->SetTranslate({ 0.0f,-0.5f,0.0f });
+
 	testWall_->Initialize(&ctx_->dxCommon, "wall.obj");
 	testWall_->SetTranslate({ 0.0f,-40.0f,0.0f });
 }
@@ -33,6 +36,8 @@ void GameScene::Update() {
 	gameCamera_->SetTarget(player_->GetPosition());
 	gameCamera_->Update();
 
+	enemyManager_->Update();
+
 	camera_ = gameCamera_->GetCamera();
 	camera_.Update();
 
@@ -45,6 +50,8 @@ void GameScene::Draw() {
 	testWall_->Draw(camera_);
 
 	player_->Draw(camera_);
+
+	enemyManager_->Draw(camera_);
 }
 
 void GameScene::DrawImGui() {

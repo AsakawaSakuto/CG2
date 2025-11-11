@@ -51,9 +51,10 @@
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
     <ClCompile Include="Application\GameUI\BaseUI.cpp" />
     <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
-    <ClCompile Include="Application\GameObject\Player\player.cpp" />
+    <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
-    <ClCompile Include="Application\GameObject\Enemy\Enemy.cpp" />
+    <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
+    <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -129,10 +130,11 @@
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
-    <ClInclude Include="Application\GameObject\Player\player.h" />
+    <ClInclude Include="Application\GameObject\Player\Player.h" />
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
-    <ClInclude Include="Application\GameObject\Player\playerStatus.h" />
-    <ClInclude Include="Application\GameObject\Enemy\Enemy.h" />
+    <ClInclude Include="Application\GameObject\Player\PlayerStatus.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\Enemy\Enemy.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\EnemyManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
