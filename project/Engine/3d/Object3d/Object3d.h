@@ -148,8 +148,8 @@ private:
 
 	// フラスタムカリング関連
 	float boundingRadius_ = 1.0f; // オブジェクトのバウンディング半径
-	bool useDrawFrustumCulling_ = false; // フラスタムカリング有効/無効
-	bool useUpdateFrustumCulling_ = false;
+	bool useDrawFrustumCulling_ = true; // フラスタムカリング有効/無効
+	bool useUpdateFrustumCulling_ = true;
 
 	//-----------------------------------------------------------//
 

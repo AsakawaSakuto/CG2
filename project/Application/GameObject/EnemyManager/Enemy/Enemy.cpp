@@ -6,8 +6,8 @@ void Enemy::Initialize(AppContext* ctx) {
 	transform_.translate = { 0.f,0.f,0.f };
 
 	model_->Initialize(&ctx_->dxCommon, "enemy/enemy.obj");
-	model_->SetUpdateFrustumCulling(true);
-	//model_->SetDrawFrustumCulling(true);
+	model_->SetUpdateFrustumCulling(false);
+	model_->SetDrawFrustumCulling(false);
 }
 
 void Enemy::Update() {
@@ -16,6 +16,9 @@ void Enemy::Update() {
 
 	model_->SetTransform(transform_);
 	model_->Update();
+
+	sphereCollision_.center = transform_.translate;
+	sphereCollision_.radius = collicionRadius_;
 }
 
 void Enemy::Draw(Camera camera) {
@@ -27,19 +30,19 @@ void Enemy::DrawImGui() {
 }
 
 void Enemy::Move() {
-	// zx平面でターゲット位置への方向ベクトルを計算（yは無視）
+	// .xz平面でターゲット位置への方向ベクトルを計算（yは無視）
 	Vector3 direction = {
 		targetPosition_.x - transform_.translate.x,
 		0.0f, // y成分は0にして水平移動のみ
 		targetPosition_.z - transform_.translate.z
 	};
 
-	// zx平面での距離を計算
+	// .xz平面での距離を計算
 	float distanceXZ = std::sqrt(direction.x * direction.x + direction.z * direction.z);
 
 	// ターゲットに到達していない場合のみ移動と回転
 	if (distanceXZ > 0.01f) { // 微小な閾値で到達判定
-		// zx平面で正規化（yは0のまま）
+		// .xz平面で正規化（yは0のまま）
 		direction.x /= distanceXZ;
 		direction.z /= distanceXZ;
 
@@ -57,5 +60,33 @@ void Enemy::Move() {
 		// 位置を更新（yはそのまま）
 		transform_.translate.x += velocity.x;
 		transform_.translate.z += velocity.z;
+	}
+}
+
+void Enemy::PushAway(const Vector3& otherPosition, float otherRadius) {
+	// 自分と他のEnemyとの方向ベクトルを計算（xz平面のみ）
+	Vector3 direction = {
+		transform_.translate.x - otherPosition.x,
+		0.0f,
+		transform_.translate.z - otherPosition.z
+	};
+
+	// .xz平面での距離を計算
+	float distance = std::sqrt(direction.x * direction.x + direction.z * direction.z);
+
+	// 重なり量を計算
+	float radiusSum = collicionRadius_ + otherRadius;
+	float overlap = radiusSum - distance;
+
+	// 重なっている場合のみ押し出す
+	if (overlap > 0.0f && distance > 0.01f) {
+		// 正規化
+		direction.x /= distance;
+		direction.z /= distance;
+
+		// 押し出す距離の半分ずつ移動（お互いに押し合う）
+		float pushDistance = overlap * 0.5f;
+		transform_.translate.x += direction.x * pushDistance;
+		transform_.translate.z += direction.z * pushDistance;
 	}
 }
