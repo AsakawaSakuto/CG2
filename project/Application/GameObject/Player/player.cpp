@@ -30,6 +30,9 @@ void Player::Update() {
 	moveParticle_->Update();
 	landingParticle_->SetEmitterPosition(transform_.translate);
 	landingParticle_->Update();
+
+	sphereCollision_.center = transform_.translate;
+	sphereCollision_.radius = collisionRadius_;
 }
 
 void Player::Draw(Camera camera) {

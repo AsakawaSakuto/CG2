@@ -32,6 +32,8 @@ private:
 	
 	PlayerStatus status_; // プレイヤーステータス
 
+	float collisionRadius_ = 0.5f;
+
 	// ジャンプ関連のメンバ変数
 	float groundLevel_ = 0.0f; // 地面のY座標
 	bool isGrounded_ = true;   // 地面にいるかどうか
