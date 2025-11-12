@@ -1,7 +1,10 @@
 #pragma once
 #include "EmitterState.h"
 #include <string>
+
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
+#endif
 
 class EmitterStateLoader {
 public:
@@ -14,5 +17,7 @@ public:
     // cppのある階層にJsonファイルを出力する関数
     static void SaveToCurrentDir(const EmitterState& state, const std::string& ImGuiName);
 
+#ifdef USE_IMGUI
     static bool InputText(const char* label, std::string& str, ImGuiInputTextFlags flags = 0);
+#endif
 };

@@ -1,5 +1,4 @@
 #include "GameCameraController.h"
-#include "externals/imgui/imgui.h"
 
 void GameCameraController::Initialize(AppContext* ctx) {
 	// AppContextを保存

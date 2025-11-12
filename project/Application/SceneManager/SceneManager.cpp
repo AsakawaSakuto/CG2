@@ -189,9 +189,8 @@ int SceneManager::Run() {
 				// シーンの描画処理,SpriteやModel,Particle等
                 sceneArr_[static_cast<int>(currentSceneNo_)]->Draw();
 
-                #if defined(_DEBUG) || defined(DEVELOP_BUILD)
-                // Debug または Development のときだけ ImGui を通す
-               
+                #ifdef USE_IMGUI
+                
                 // フレームの先頭でImguiにここからフレームが始まる旨を告げる
                 ImGui_ImplDX12_NewFrame();
                 ImGui_ImplWin32_NewFrame();

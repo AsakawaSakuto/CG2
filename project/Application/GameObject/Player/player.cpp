@@ -42,7 +42,7 @@ void Player::Draw(Camera camera) {
 }
 
 void Player::DrawImGui() {
-
+#ifdef USE_IMGUI
 	// プレイヤー固有のImGui
 	ImGui::Begin("Player Settings");
 	ImGui::DragFloat("Move Speed", &status_.moveSpeed_, 0.1f, 0.1f, 20.0f);
@@ -60,7 +60,7 @@ void Player::DrawImGui() {
 	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
 	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y_);
 	ImGui::End();
-
+#endif
 	//landingParticle_->DrawImGui("move Particle");
 }
 

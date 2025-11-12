@@ -1,6 +1,8 @@
 #pragma once
-#include "AppContext.h"
+#include <filesystem>
+#include <memory>
 
+#include "AppContext.h"
 #include "Application/SceneManager/IScene.h"
 
 // Include
@@ -14,8 +16,6 @@
 #include "D3DResourceLeakChecker.h"
 #include "TextureManager.h"
 #include "GamePad.h"
-#include <filesystem>
-#include <memory>
 
 // Object
 #include "Sprite.h"

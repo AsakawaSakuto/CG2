@@ -5,7 +5,7 @@
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
-// 修正: PSOManagerをインクルード（相対パス修正）
+// PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 
 void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position, Vector2 scale) {
@@ -117,6 +117,8 @@ void Sprite::Draw() {
 
 void Sprite::DrawImGui(const char* objectName) {
 
+#ifdef USE_IMGUI
+
 	ImGui::Begin(objectName);
 
 	ImGui::Text("Transform");
@@ -147,6 +149,7 @@ void Sprite::DrawImGui(const char* objectName) {
 
 	ImGui::End();
 
+#endif
 }
 
 void Sprite::SetTexture(const std::string& textureName) {

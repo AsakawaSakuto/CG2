@@ -265,6 +265,7 @@ void EmitterStateLoader::SaveToCurrentDir(const EmitterState& state, const std::
     }
 }
 
+#ifdef USE_IMGUI
 bool EmitterStateLoader::InputText(const char* label, std::string& str, ImGuiInputTextFlags flags) {
     // 現在の文字列サイズに合わせてバッファを確保
     static char buffer[256]; // 一時的な入力用バッファ（256文字まで対応）
@@ -276,3 +277,4 @@ bool EmitterStateLoader::InputText(const char* label, std::string& str, ImGuiInp
     }
     return false; // 変更なし
 }
+#endif

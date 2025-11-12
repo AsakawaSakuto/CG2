@@ -1,7 +1,9 @@
 #include "DebugCamera.h"
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"           
 #include "externals/imgui/imgui_impl_dx12.h" 
 #include "externals/imgui/imgui_impl_win32.h"
+#endif
 
 DebugCamera::DebugCamera() {
 	moveSpeedMultiplier = 1.0f;
@@ -73,7 +75,7 @@ void DebugCamera::Update() {
 }
 
 void DebugCamera::DrawImgui() {
-
+#ifdef USE_IMGUI
 	ImGui::Begin("DebugCamera Control");
 
 	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
@@ -88,4 +90,5 @@ void DebugCamera::DrawImgui() {
 	}
 
 	ImGui::End();
+#endif
 }

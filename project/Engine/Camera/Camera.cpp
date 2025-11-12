@@ -1,8 +1,11 @@
 #include "Camera.h"
+#include <cmath>
+
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"           
 #include "externals/imgui/imgui_impl_dx12.h" 
 #include "externals/imgui/imgui_impl_win32.h"
-#include <cmath>
+#endif
 
 Camera::Camera() {
 	transform_ = { {1.f,1.f,1.f},{0.f,0.f,0.f},{0.f,4.f,-29.f} };
@@ -159,7 +162,7 @@ bool Camera::IsInFrustum(const Vector3& position, float radius) const {
 }
 
 void Camera::DrawImgui() {
-
+#ifdef USE_IMGUI
 	ImGui::Begin("Camera Control");
 
 	ImGui::DragFloat3("Translate", &transform_.translate.x, 0.01f);
@@ -172,6 +175,7 @@ void Camera::DrawImgui() {
 	ImGui::DragFloat("Distance", &distance_, 0.1f, 1.0f, 50.0f);
 	ImGui::DragFloat("Horizontal Angle", &horizontalAngle_, 0.01f);
 	ImGui::DragFloat("Vertical Angle", &verticalAngle_, 0.01f, -1.5f, 1.5f);
+#endif
 }
 
 Vector3 Camera::GetWorldPosition() {
