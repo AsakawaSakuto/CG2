@@ -55,6 +55,9 @@
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -135,6 +138,11 @@
     <ClInclude Include="Application\GameObject\Player\PlayerStatus.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\Enemy.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\EnemyManager.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponManager.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponStatus.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
@@ -142,8 +150,5 @@
     <None Include="resources\shaders\Sprite\Sprite.hlsli" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
 </Project>

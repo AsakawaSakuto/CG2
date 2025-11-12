@@ -147,9 +147,9 @@ private:
 	float uvRotate_ = 0.0f;
 
 	// フラスタムカリング関連
-	float boundingRadius_ = 1.0f; // オブジェクトのバウンディング半径
-	bool useDrawFrustumCulling_ = false; // フラスタムカリング有効/無効
-	bool useUpdateFrustumCulling_ = false;
+	float boundingRadius_ = 0.5f; // オブジェクトのバウンディング半径
+	bool useDrawFrustumCulling_ = true; // フラスタムカリング有効/無効
+	bool useUpdateFrustumCulling_ = true;
 
 	//-----------------------------------------------------------//
 

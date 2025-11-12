@@ -268,7 +268,7 @@ Object3dModelData LoadObject3dFile(const std::string& filepath) {
 
     // テクスチャが見つからなかった場合
     if (!hasTexture) {
-        modelData.material.textureFilePath = "resources/engineResources/uvChecker.png";
+        modelData.material.textureFilePath = "resources/image/uvChecker.png";
     }
     
     return modelData;

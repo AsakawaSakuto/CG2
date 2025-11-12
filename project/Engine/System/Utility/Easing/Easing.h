@@ -115,6 +115,15 @@ namespace Easing {
     /// @return 補間されたベクトル
     Vector3 LerpVector3(const Vector3& start, const Vector3& end, float t, Type type = Type::Linear);
 
+    /// @brief Vector3の補間、行って帰ってくる
+    /// @param start 開始ベクトル、終了ベクトル
+    /// @param end 中間ベクトル
+    /// @param t 進行状況 0.0～1.0
+    /// @param goType 開始のイージングタイプ
+    /// @param backType 戻ってくる時のイージングタイプ
+    /// @return 補間されたベクトル
+    Vector3 LerpVector3_GAB(const Vector3& start, const Vector3& end, float t, Type goType = Type::Linear, Type backType = Type::Linear);
+
     /// @brief イージング関数を適用
     /// @param t 進行状況 0.0～1.0
     /// @param type イージングタイプ

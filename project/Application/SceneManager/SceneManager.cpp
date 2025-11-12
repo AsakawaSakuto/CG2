@@ -14,9 +14,6 @@ SceneManager::SceneManager() {
     for (int i = 0; i < sceneNum; i++) {
         sceneArr_[i] = nullptr;
     }
-
-    currentSceneNo_ = SCENE::TITLE;
-    prevSceneNo_ = SCENE::TITLE;
 }
 
 SceneManager::~SceneManager() {

@@ -38,6 +38,9 @@ void GameScene::Update() {
 
 	enemyManager_->SetTargetPosition(player_->GetPosition());
 	enemyManager_->Update();
+	
+	// プレイヤーとEnemyの当たり判定を実行
+	enemyManager_->CheckCollisionWithPlayer(player_->GetSphereCollision());
 
 	camera_ = gameCamera_->GetCamera();
 	camera_.Update();
