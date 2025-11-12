@@ -11,6 +11,7 @@ public:
     void DrawImGui() override;
 
     const Vector3& GetPosition() { return transform_.translate; }
+    const Sphere& GetSphereCollision() const { return sphereCollision_; }
     
 private:
 

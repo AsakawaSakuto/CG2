@@ -12,6 +12,9 @@ public:
 	void DrawImGui();
 
 	void SetTargetPosition(const Vector3& target);
+	
+	void CheckCollisionWithPlayer(const Sphere& playerSphere);
+
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Enemy>> enemies_;

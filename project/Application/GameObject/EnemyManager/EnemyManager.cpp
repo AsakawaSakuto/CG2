@@ -74,3 +74,19 @@ void EnemyManager::SetTargetPosition(const Vector3& target) {
 		enemy->SetTargetPosition(target);
 	}
 }
+
+void EnemyManager::CheckCollisionWithPlayer(const Sphere& playerSphere) {
+	// イテレータを使って削除処理を行う
+	auto it = enemies_.begin();
+	while (it != enemies_.end()) {
+		const Sphere& enemySphere = (*it)->GetSphereCollision();
+		
+		// プレイヤーとEnemyの衝突判定
+		if (Collision::IsHit(playerSphere, enemySphere)) {
+			// 衝突したEnemyを削除
+			it = enemies_.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
