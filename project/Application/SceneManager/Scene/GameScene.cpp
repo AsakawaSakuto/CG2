@@ -36,6 +36,7 @@ void GameScene::Update() {
 	gameCamera_->SetTarget(player_->GetPosition());
 	gameCamera_->Update();
 
+	enemyManager_->SetTargetPosition(player_->GetPosition());
 	enemyManager_->Update();
 
 	camera_ = gameCamera_->GetCamera();
@@ -58,4 +59,6 @@ void GameScene::DrawImGui() {
 	DrawSceneName();
 
 	player_->DrawImGui();
+
+	enemyManager_->DrawImGui();
 }
