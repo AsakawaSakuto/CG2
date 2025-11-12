@@ -257,6 +257,7 @@ void WinApp::CleanupIcons() {
 
 // ウィンドウプロシャージャ
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+#ifdef USE_IMGUI
     // これ書かないとImgui使えない
     extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     // ImGui にメッセージを渡す
@@ -264,6 +265,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
     {
         return true; // ImGuiが処理したらそれを返す
     }
+#endif
     switch (msg) {
     case WM_DESTROY:
         PostQuitMessage(0);

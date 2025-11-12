@@ -27,12 +27,14 @@ void DebugCamera::Update() {
 		}
 	}*/
 
+#ifdef USE_IMGUI
 	if (!ImGui::GetIO().WantCaptureMouse && input_->PushMouseButtonL()) {
 		Vector2 delta = input_->GetMouseDelta();
 		float rotateSpeed = 0.001f;
 		transform_.rotate.y += delta.x * rotateSpeed * rotateSpeedMultiplier;
 		transform_.rotate.x += delta.y * rotateSpeed * rotateSpeedMultiplier;
 	}
+#endif
 
 	if (input_->PushKey(DIK_R)) {
 		transform_.rotate.x = 0.0f;

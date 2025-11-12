@@ -1,7 +1,9 @@
 #pragma once
 #include <Windows.h>
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#endif
 #include <cstdint>
 #include <string>
 #include <d3d12.h>

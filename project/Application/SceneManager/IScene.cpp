@@ -7,6 +7,7 @@ void IScene::Quit() {
 }
 
 void IScene::DrawSceneName() {
+#ifdef  USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(0, 0));     // 左上に固定
 	ImGui::SetNextWindowSize(ImVec2(100, 50)); // 任意のサイズ
 	ImGui::SetNextWindowBgAlpha(0.5f);         // 背景透明度（0.0f〜1.0f）
@@ -36,4 +37,5 @@ void IScene::DrawSceneName() {
 	}
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 	ImGui::End();
+#endif //  USE_IMGUI
 }
