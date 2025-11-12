@@ -1,7 +1,7 @@
 #pragma once
 // Audio.h
-// // XAudio2を安全に扱う薄いラッパ。SourceVoiceはunique_ptr＋カスタムデリータで管理。
-// // 1ファイル読み込み（WAV/MP3）→任意回数Play（同時再生可）。ループにも対応。
+// .XAudio2を安全に扱う薄いラッパ。SourceVoiceはunique_ptr＋カスタムデリータで管理。
+// 1ファイル読み込み（WAV/MP3）→任意回数Play（同時再生可）。ループにも対応。
 
 #include <memory>
 #include <vector>

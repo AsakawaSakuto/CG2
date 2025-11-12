@@ -233,6 +233,8 @@ Vector3 Model::GetWorldPosition() {
 
 void Model::DrawImGui(const char* objectName) {
 
+#ifdef USE_IMGUI
+
 	ImGui::Begin(objectName);
 
 	ImGui::Text("Transform");
@@ -376,6 +378,8 @@ void Model::DrawImGui(const char* objectName) {
 	}
 
 	ImGui::End();
+
+#endif
 }
 
 void Model::CreateVertexResource() {

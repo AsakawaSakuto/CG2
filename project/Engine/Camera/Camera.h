@@ -125,4 +125,3 @@ private:
 	// TPSカメラの位置を計算
 	Vector3 CalculateTPSPosition() const;
 };
-

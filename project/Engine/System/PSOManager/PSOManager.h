@@ -102,7 +102,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePSOOnDemand(PSOType type);
     
     // 事前定義されたPSOを作成（削除予定 - 遅延初期化に移行）
-    void CreatePredefinedPSOs();
+    //void CreatePredefinedPSOs();
     
     // 共通のRoot Signatureを作成
     void CreateRootSignatures();

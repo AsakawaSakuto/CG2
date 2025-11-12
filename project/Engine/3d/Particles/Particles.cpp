@@ -201,6 +201,8 @@ void Particles::Draw(Camera& useCamera) {
 
 void Particles::DrawImGui(const char* objectName) {
 
+#ifdef USE_IMGUI
+
 	ImGui::Begin(objectName);
 
 	// Play/Stop control buttons
@@ -657,6 +659,8 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Spacing();
 
 	ImGui::End();
+
+#endif
 }
 
 void Particles::SetTexture(const std::string& textureName) {

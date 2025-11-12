@@ -1,7 +1,6 @@
 #pragma once
 #include "Application/GameObject/BaseGameObject.h"
 #include "Application/EngineSystem.h"
-#include "externals/imgui/imgui.h"
 #include "playerStatus.h"
 
 class Player : public BaseGameObject {

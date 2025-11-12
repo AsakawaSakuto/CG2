@@ -12,9 +12,11 @@
 #include <chrono>
 #include <thread>
 
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"           
 #include "externals/imgui/imgui_impl_dx12.h" 
 #include "externals/imgui/imgui_impl_win32.h"
+#endif
 
 #include"WinApp.h"
 #include"Logger.h"
@@ -155,8 +157,10 @@ private:
     Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_;
     Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_;
 
+#ifdef USE_IMGUI
     // Imguiの初期化
     void CreateImgui();
+#endif
 
     // DirectXの描画前処理
     UINT backBufferIndex_;

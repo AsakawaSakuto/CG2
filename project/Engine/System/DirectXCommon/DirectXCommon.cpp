@@ -28,7 +28,10 @@ void DirectXCommon::Initialize(WinApp* winApp) {
     CreateViewportRect();
     CreateScissorRect();
     CreateShaderCompiler();
+
+#ifdef USE_IMGUI
     CreateImgui();
+#endif
 
     // 追加: PSOManagerの初期化
     PSOManager::GetInstance().Initialize(this);
@@ -280,6 +283,7 @@ void DirectXCommon::CreateShaderCompiler() {
     assert(SUCCEEDED(hr_));
 }
 
+#ifdef USE_IMGUI
 void DirectXCommon::CreateImgui() {
     // ImGuiの初期化。詳細はさして重要ではないので解説は省略する。
         // こういうもんである
@@ -294,6 +298,7 @@ void DirectXCommon::CreateImgui() {
         srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
         srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
 }
+#endif
 
 void DirectXCommon::PreDraw() {
     if (!commandList_ || !swapChainResources_[backBufferIndex_]) {
@@ -356,10 +361,12 @@ void DirectXCommon::PostDraw() {
     }
     assert(commandList_ != nullptr);   
 
+#ifdef USE_IMGUI
     // 諸諸の処理が終わった後にコマンドを積む、GUIは画面の最前面に映すので最後の描画
     // ただしResourceBarrierによってD3D12_RESOURCE_STATE_RENDER_TARGET→D3D12_RESOURCE_STATE_PRESENTへ遷移させる前
     // 実際のcommandListのImGuiの描画コマンドを積む
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
+#endif
 
     // TransitionBarrierを貼ってPresent状態へ遷移
     barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;

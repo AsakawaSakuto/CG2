@@ -20,9 +20,11 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"           
 #include "externals/imgui/imgui_impl_dx12.h" 
 #include "externals/imgui/imgui_impl_win32.h"
+#endif
 
 #include"Object3dModelData.h"
 #include"Object3dMaterialData.h"

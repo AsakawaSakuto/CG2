@@ -13,8 +13,8 @@ public:
     // 毎フレーム更新
     void Update();
 
-    // // --- ボタン判定 ---
-    // 押下中
+    // --- ボタン判定 ---
+    //押下中
     bool PushButton(int button) const;
     // 押した瞬間（立ち上がり）
     bool TriggerButton(int button) const;
@@ -39,7 +39,7 @@ public:
         RIGHT_STICK,
     };
 
-    // // --- 方向別スティック判定 ---
+    // --- 方向別スティック判定 ---
     // 左スティックの方向別瞬間判定
     bool TriggerLeftStick(DownStick direction) const;
     // 右スティックの方向別瞬間判定
@@ -49,7 +49,7 @@ public:
     // 右スティックの方向別押下中判定
     bool PushRightStick(DownStick direction) const;
 
-    // // --- 便利アクセサ ---
+    // --- 便利アクセサ ---
     bool IsConnected() const { return connected_; }
     float LeftStickX()  const { return leftStickX_; }
     float LeftStickY()  const { return leftStickY_; }

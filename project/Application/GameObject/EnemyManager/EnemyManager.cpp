@@ -27,6 +27,7 @@ void EnemyManager::Draw(Camera camera) {
 }
 
 void EnemyManager::DrawImGui() {
+#ifdef USE_IMGUI
 	ImGui::Begin("EnemyManager");
 	
 	ImGui::Text("Enemy Count: %zu", enemies_.size());
@@ -48,6 +49,7 @@ void EnemyManager::DrawImGui() {
 	}
 	
 	ImGui::End();
+#endif
 }
 
 void EnemyManager::SetTargetPosition(const Vector3& target) {
