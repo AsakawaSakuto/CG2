@@ -10,6 +10,7 @@ void GameTimer::Update() {
     if (!isActive_) return;
 
     loopedThisFrame_ = false;
+    finished_ = false;
 
     float scaledDeltaTime = deltaTime_ * timeScale_;
 
@@ -19,7 +20,6 @@ void GameTimer::Update() {
 
         if (loop_) {
             currentTime_ = 0.0f;
-            finished_ = false;
             loopedThisFrame_ = true;
         } else {
             isActive_ = false;
@@ -31,6 +31,7 @@ void GameTimer::Update() {
 void GameTimer::Start(float duration, bool loop) {
     duration_ = duration;
     loop_ = loop;
+    currentTime_ = 0.0f;  // currentTime_を初期化
     isActive_ = true;
     finished_ = false;
     useFrameMode_ = false;

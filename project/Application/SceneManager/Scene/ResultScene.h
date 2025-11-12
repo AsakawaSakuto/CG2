@@ -6,14 +6,14 @@ using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
 using std::make_unique;
 
-class TestScene : public IScene {
+class ResultScene : public IScene {
 public:
 	void SetAppContext(AppContext* ctx) override;
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
 	void DrawImGui() override;
-	~TestScene();
+	~ResultScene();
 
 private:
 	// リソースクリーンアップメソッド
@@ -23,7 +23,6 @@ private:
 	// AppContext
 	AppContext* ctx_ = nullptr;
 
-	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
 	Camera camera_;
 	DebugCamera debugCamera_;
 };

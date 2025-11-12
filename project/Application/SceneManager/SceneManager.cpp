@@ -46,11 +46,11 @@ std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
         case SCENE::TEST:
             return std::make_unique<TestScene>();
         case SCENE::TITLE:
-            return std::make_unique<TestScene>();
+            return std::make_unique<TitleScene>();
         case SCENE::GAME:
-            return std::make_unique<TestScene>();
+            return std::make_unique<GameScene>();
         case SCENE::RESULT:
-            return std::make_unique<TestScene>();
+            return std::make_unique<ResultScene>();
         default:
             #ifdef _DEBUG
             OutputDebugStringA("Invalid scene number\n");
@@ -180,8 +180,32 @@ int SceneManager::Run() {
         // 更新・描画
         if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
             try {
+				// シーンの更新処理
                 sceneArr_[static_cast<int>(currentSceneNo_)]->Update();
+
+				// 描画前処理
+                appContext_->dxCommon.PreDraw();
+
+				// シーンの描画処理,SpriteやModel,Particle等
                 sceneArr_[static_cast<int>(currentSceneNo_)]->Draw();
+
+                #if defined(_DEBUG) || defined(DEVELOP_BUILD)
+                // Debug または Development のときだけ ImGui を通す
+               
+                // フレームの先頭でImguiにここからフレームが始まる旨を告げる
+                ImGui_ImplDX12_NewFrame();
+                ImGui_ImplWin32_NewFrame();
+                ImGui::NewFrame();
+
+                sceneArr_[static_cast<int>(currentSceneNo_)]->DrawImGui();
+
+                // Imguiの内部コマンドを生成する
+                ImGui::Render();
+
+                #endif
+
+				// 描画後処理
+                appContext_->dxCommon.PostDraw();
             } catch (const std::exception& e) {
                 #ifdef _DEBUG
                 OutputDebugStringA(("Scene update/draw error: " + std::string(e.what()) + "\n").c_str());
