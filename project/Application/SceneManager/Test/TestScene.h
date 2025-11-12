@@ -24,6 +24,11 @@ private:
 	AppContext* ctx_ = nullptr;
 
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
+	unique_ptr<Model> cube_ = make_unique<Model>();
+
+	Transform cubeTransform_;
+	GameTimer testTimer_;
+
 	Camera camera_;
 	DebugCamera debugCamera_;
 };

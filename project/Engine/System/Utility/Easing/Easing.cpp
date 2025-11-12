@@ -284,4 +284,22 @@ namespace Easing {
         Vector3 scaledDiff = diff * easedT;
         return start + scaledDiff;
     }
+
+    Vector3 LerpVector3_GAB(const Vector3& start, const Vector3& end, float t, Type goType, Type backType) {
+        // tを0.0～1.0の範囲にClamp
+        t = std::clamp(t, 0.0f, 1.0f);
+
+        // t=0.0～0.5の範囲: startからendへ移動
+        if (t < 0.5f) {
+            // tを0.0～1.0の範囲に正規化
+            float normalizedT = t * 2.0f;
+            return LerpVector3(start, end, normalizedT, goType);
+        }
+        // t=0.5～1.0の範囲: endからstartへ移動
+        else {
+            // tを0.0～1.0の範囲に正規化
+            float normalizedT = (t - 0.5f) * 2.0f;
+            return LerpVector3(end, start, normalizedT, backType);
+        }
+    }
 }

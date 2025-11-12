@@ -7,7 +7,7 @@ void EnemyManager::Initialize(AppContext* ctx) {
 }
 
 void EnemyManager::Update() {
-	if (enemies_.size() < 350) {
+	if (enemies_.size() < 300) {
 		spawnTimer_.Update();
 
 		if (spawnTimer_.IsFinished()) {

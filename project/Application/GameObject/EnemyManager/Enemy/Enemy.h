@@ -10,7 +10,6 @@ public:
     void DrawImGui() override;
 
 	void SetTargetPosition(const Vector3& target) { targetPosition_ = target; }
-	
 	void PushAway(const Vector3& otherPosition, float otherRadius);
 
 private:
