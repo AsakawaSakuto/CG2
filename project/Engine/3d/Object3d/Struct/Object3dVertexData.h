@@ -3,7 +3,7 @@
 #include"Vector3.h"
 #include"Vector4.h"
 
-struct Object3dVertexData {
+struct ModelVertexData {
 	Vector4 position; // 16 bytes
 	Vector2 texcoord; // 8 bytes
 	Vector3 normal;   // 12 bytes

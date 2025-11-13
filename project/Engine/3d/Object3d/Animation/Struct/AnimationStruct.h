@@ -30,8 +30,3 @@ struct Animation {
     // NodeAnimationの集合。Node名でひけるようにしておく
     std::map<std::string, NodeAnimation> nodeAnimations;
 };
-
-// 関数宣言
-Vector3 CalculateValueVector3(const std::vector<KeyframeVector3>& keyframes, float time);
-
-Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);

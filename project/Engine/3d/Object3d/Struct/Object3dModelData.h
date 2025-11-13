@@ -4,8 +4,8 @@
 #include"Object3dNode.h"
 #include <vector>
 
-struct Object3dModelData {
-	std::vector<Object3dVertexData> vertices;
-	Object3dMaterialData material;
-	Object3dNode rootNode;
+struct ModelData {
+	std::vector<ModelVertexData> vertices;
+	ModeldMaterialData material;
+	ModelNode rootNode;
 };

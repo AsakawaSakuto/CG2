@@ -10,8 +10,8 @@ using namespace Microsoft::WRL;
 
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
-
 #include "../Utility/GameTimer/DeltaTime.h"
+#include "../Animation/Function/AnimationFunction.h"
 
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
@@ -45,12 +45,14 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 			// .obj形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
 			useAnimation_ = false; // objはアニメーション非対応
+			useAnimationTimer_ = false;
 		} else if (extension == ".gltf" || extension == ".glb") {
 			// .gltf/.glb形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
 			cache->animationData = LoadAnimationFile(modelPath_);
 			
 			useAnimation_ = true; // gltfはアニメーション対応
+			useAnimationTimer_ = true;
 		} else {
 			Logger::Log("Unsupported model format: %s\n");
 		}
@@ -76,14 +78,14 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
 
 		// 頂点リソースをつくる（共有）
-		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * cache->modelData.vertices.size());
+		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
-		cache->vertexBufferView.SizeInBytes = UINT(sizeof(Object3dVertexData) * cache->modelData.vertices.size());
-		cache->vertexBufferView.StrideInBytes = sizeof(Object3dVertexData);
+		cache->vertexBufferView.SizeInBytes = UINT(sizeof(ModelVertexData) * cache->modelData.vertices.size());
+		cache->vertexBufferView.StrideInBytes = sizeof(ModelVertexData);
 		// 頂点データ書き込み（一時マップ）
-		Object3dVertexData* tmp = nullptr;
+		ModelVertexData* tmp = nullptr;
 		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
-		std::memcpy(tmp, cache->modelData.vertices.data(), sizeof(Object3dVertexData) * cache->modelData.vertices.size());
+		std::memcpy(tmp, cache->modelData.vertices.data(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexResource->Unmap(0, nullptr);
 
 		// キャッシュ登録
@@ -98,12 +100,12 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	animationData_ = cache->animationData;
 	textureName_ = cache->textureName;
 	textureIndex_ = cache->textureIndex;
-	vertexResource_ = cache->vertexResource; // 共有
-	vertexBufferView_ = cache->vertexBufferView; // 共有
+	vertexResource_ = cache->vertexResource;
+	vertexBufferView_ = cache->vertexBufferView;
 	boundingRadius_ = cache->boundingRadius;
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
-
+	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
 	direction_ = { 1.0f,-1.0f,1.0f };
 
 	// 以降はインスタンス専用のリソースのみ作成
@@ -116,6 +118,10 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 }
 
 void Model::Update() {
+
+	transform_.scale.x = std::clamp(transform_.scale.x, 0.0f, 100.0f);
+	transform_.scale.y = std::clamp(transform_.scale.y, 0.0f, 100.0f);
+	transform_.scale.z = std::clamp(transform_.scale.z, 0.0f, 100.0f);
 
 	if (useUpdateFrustumCulling_) {
 		Vector3 worldPosition = GetWorldPosition();
@@ -141,15 +147,19 @@ void Model::Update() {
 	// 追加処理：法線変換行列を計算
 	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
 
-	if (useAnimation_) {
+	if (useAnimationTimer_) {
 		animationTime_ += deltaTime_;
 		animationTime_ = fmod(animationTime_, animationData_.duration);
+	}
+
+	// アニメーションの適用
+	if (useAnimation_) {
 
 		NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
-		Vector3 translateA = CalculateValueVector3(rootNodeAnimation.translate.keyframes, animationTime_);
-		Quaternion rotateA = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-		Vector3 scaleA = CalculateValueVector3(rootNodeAnimation.scale.keyframes, animationTime_);
-		Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scaleA, rotateA, translateA);
+		Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
+		Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+		Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
+		Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scale, rotate, translate);
 
 		modelData_.rootNode.localMatrix = localMatrix;
 
@@ -164,36 +174,28 @@ void Model::Update() {
 
 	directionalLightData_->direction = direction_;
 
-	if (transform_.scale.x <= 0.0f) {
-		transform_.scale.x = 0.0f;
-	}
-	if (transform_.scale.y <= 0.0f) {
-		transform_.scale.y = 0.0f;
-	}
-	if (transform_.scale.z <= 0.0f) {
-		transform_.scale.z = 0.0f;
-	}
-
+	// UV変換行列の計算
 	Matrix4x4 scale = MakeIdentityMatrix();
-	scale.m[0][0] = uvScale_.x;
-	scale.m[1][1] = uvScale_.y;
+	scale.m[0][0] = uvTransform_.scale.x;
+	scale.m[1][1] = uvTransform_.scale.y;
 
 	Matrix4x4 rot = MakeIdentityMatrix();
-	rot.m[0][0] = cos(uvRotate_);
-	rot.m[0][1] = -sin(uvRotate_);
-	rot.m[1][0] = sin(uvRotate_);
-	rot.m[1][1] = cos(uvRotate_);
+	rot.m[0][0] = cos(uvTransform_.rotate);
+	rot.m[0][1] = -sin(uvTransform_.rotate);
+	rot.m[1][0] = sin(uvTransform_.rotate);
+	rot.m[1][1] = cos(uvTransform_.rotate);
 
 	Matrix4x4 trans = MakeIdentityMatrix();
-	trans.m[3][0] = uvTranslate_.x;
-	trans.m[3][1] = uvTranslate_.y;
+	trans.m[3][0] = uvTransform_.translate.x;
+	trans.m[3][1] = uvTransform_.translate.y;
 
 	// 最終変換行列
-	materialData_->uvTransform = scale * rot * trans;
+	materialData_->uvTransformMatrix = scale * rot * trans;
 }
 
-void Model::Draw(Camera& useCamera) {
+void Model::Draw(Camera& useCamera, const Transform& transform) {
 	camera_ = useCamera;
+	transform_ = transform;
 
 	// フラスタムカリングのチェック
 	if (useDrawFrustumCulling_) {
@@ -207,8 +209,6 @@ void Model::Draw(Camera& useCamera) {
 			return; // 描画をスキップ
 		}
 	}
-
-	// --- 描画処理 ---
 	
 	// PSOManagerからRootSignatureとPSOを取得
 	auto& psoManager = PSOManager::GetInstance();
@@ -219,13 +219,13 @@ void Model::Draw(Camera& useCamera) {
 
 	// 半透明フラグでPSO切替（深度書き込みOFFのNormalブレンド）
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
-	if (transparent_) {
+	if (useTransparent_) {
 		pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
 	} else {
 		// 描画モードに応じてPSOを取得・設定
-		pso = drawMode_ ? 
-			psoManager.GetPSO(PSOType::Model_Solid_Normal) : 
-			psoManager.GetPSO(PSOType::Model_Wireframe_Normal);
+		pso = useWireFrame ? 
+			psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
+			psoManager.GetPSO(PSOType::Model_Solid_Normal);
 	}
 	commandList_->SetPipelineState(pso.Get());
 
@@ -245,7 +245,7 @@ void Model::Draw(Camera& useCamera) {
 	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 
-	// 頂点描画（DrawIndexedではなくDrawInstanced）
+	// 頂点描画（DrawInstanced）
 	commandList_->DrawInstanced(
 		static_cast<UINT>(modelData_.vertices.size()), // 頂点数ぶん描画
 		1, 0, 0);
@@ -291,17 +291,17 @@ void Model::DrawImGui(const char* objectName) {
 	ImGui::Separator();
 
 	ImGui::Text("MaterialEdit");
-	ImGui::DragFloat2("uvTranslate", &uvTranslate_.x, 0.01f);
-	ImGui::DragFloat2("uvScale", &uvScale_.x, 0.01f);
-	ImGui::DragFloat("uvRotate", &uvRotate_, 0.01f);
+	ImGui::DragFloat2("uvTranslate", &uvTransform_.translate.x, 0.01f);
+	ImGui::DragFloat2("uvScale", &uvTransform_.scale.x, 0.01f);
+	ImGui::DragFloat("uvRotate", &uvTransform_.rotate, 0.01f);
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
-	ImGui::Checkbox("DrawMode", &drawMode_);
-	ImGui::Checkbox("Transparent", &transparent_); // 透明描画フラグ
+	ImGui::Checkbox("DrawMode", &useWireFrame);
+	ImGui::Checkbox("Transparent", &useTransparent_); // 透明描画フラグ
 	
 	if (ImGui::Button("mReset")) {
-		uvTranslate_ = { 0.0f,0.0f };
-		uvScale_ = { 1.0f,1.0f };
-		uvRotate_ = 0.0f;
+		uvTransform_.translate = { 0.0f,0.0f };
+		uvTransform_.scale = { 1.0f,1.0f };
+		uvTransform_.rotate = 0.0f;
 		materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
@@ -425,34 +425,34 @@ void Model::DrawImGui(const char* objectName) {
 void Model::CreateVertexResource() {
 	// 旧実装は共有キャッシュ導入により未使用（後方互換のため残すが呼ばれない想定）
 	// 頂点リソースをつくる
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * modelData_.vertices.size());
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * modelData_.vertices.size());
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズは頂点のサイズ
-	vertexBufferView_.SizeInBytes = UINT(sizeof(Object3dVertexData) * modelData_.vertices.size()); 
+	vertexBufferView_.SizeInBytes = UINT(sizeof(ModelVertexData) * modelData_.vertices.size()); 
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(Object3dVertexData);
+	vertexBufferView_.StrideInBytes = sizeof(ModelVertexData);
 	// 頂点リソースにデータを書き込む、書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	// 頂点データをリソースにコピー
-	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(Object3dVertexData) * modelData_.vertices.size()); 
+	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(ModelVertexData) * modelData_.vertices.size()); 
 }
 
 void Model::CreateMaterialResource() {
 	// MaterialResource
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dMaterial));
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(ModelMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = true;
-	materialData_->uvTransform = MakeIdentityMatrix();
+	materialData_->uvTransformMatrix = MakeIdentityMatrix();
 	materialData_->shininess = 5000.0f;
 }
 
 void Model::CreateTransformationResource() {
 	// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dTransformationMatrix));
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(ModelTransformationMatrix));
 	// 書き込むためのアドレスを取得
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_));
 	// 単位行列を書き込む

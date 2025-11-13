@@ -17,7 +17,6 @@ void Enemy::Update() {
 	
 	Move();
 
-	model_->SetTransform(transform_);
 	model_->Update();
 
 	sphereCollision_.center = transform_.translate;

@@ -54,8 +54,6 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
 // from方向 → to方向 に向ける回転行列
 Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
 
-Matrix4x4 MakeAffineAnimationMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate);
-
 Vector3 TransformVtoM(const Vector3& v, const Matrix4x4& m);
 
 float Dot_(const Vector3& a, const Vector3& b);

@@ -81,10 +81,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
 	// リソースデータ
-	Object3dVertexData* vertexData_ = nullptr;
+	ModelVertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
-	Object3dMaterial* materialData_ = nullptr;
-	Object3dTransformationMatrix* transformationData_ = nullptr;
+	ModelMaterial* materialData_ = nullptr;
+	ModelTransformationMatrix* transformationData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 	CameraForGPU* cameraData_ = nullptr;
 	PointLight* pointLightData_ = nullptr;

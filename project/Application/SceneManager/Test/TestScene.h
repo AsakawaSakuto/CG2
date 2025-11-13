@@ -27,9 +27,13 @@ private:
 	AppContext* ctx_ = nullptr;
 
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
-	unique_ptr<Model> cube_ = make_unique<Model>();
 
-	Transform cubeTransform_;
+	unique_ptr<Model> normalCube_ = make_unique<Model>();
+	unique_ptr<Model> animationCube_ = make_unique<Model>();
+	
+	Transform normalCubeTransform_;
+	Transform animationCubeTransform_;
+
 	GameTimer testTimer_;
 
 	Camera camera_;

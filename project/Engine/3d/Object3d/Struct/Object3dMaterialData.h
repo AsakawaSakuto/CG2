@@ -1,6 +1,6 @@
 #pragma once
 #include"ConvertString.h"
 
-struct Object3dMaterialData {
+struct ModeldMaterialData {
 	std::string textureFilePath;
 };

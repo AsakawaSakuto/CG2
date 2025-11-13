@@ -6,13 +6,13 @@
 
 #include <assimp/scene.h>
 
-struct Object3dNode {
+struct ModelNode {
     Matrix4x4 localMatrix;
     std::string name;
-    std::vector<Object3dNode> children;
+    std::vector<ModelNode> children;
 
-    Object3dNode ReadNode(aiNode* node) {
-        Object3dNode result;
+    ModelNode ReadNode(aiNode* node) {
+        ModelNode result;
         aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeのlocalMatrixを取得
         aiLocalMatrix.Transpose(); // 列ベクトル形式を行ベクトル形式に転置
         for (uint32_t i = 0; i < 4; i++)

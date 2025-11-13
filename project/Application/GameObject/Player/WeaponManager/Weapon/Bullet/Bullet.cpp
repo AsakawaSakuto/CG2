@@ -11,7 +11,6 @@ void Bullet::Update() {
 
     transform_.translate.y += 1.0f * deltaTime_;
 
-	model_->SetTransform(transform_);
     model_->Update();
 }
 
