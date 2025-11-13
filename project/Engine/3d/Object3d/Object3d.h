@@ -122,6 +122,7 @@ private:
 	static std::unordered_map<std::string, std::shared_ptr<GeometryCache>> s_geometryCache_;
 
 private:
+	bool useAnimation_ = false;
 	float animationTime_ = 0.0f;
 
 	Animation animationData_;

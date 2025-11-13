@@ -25,15 +25,35 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 	modelPath_ = "resources/model/" + modelPath;
 
+	// 拡張子を取得
+	std::string extension = "";
+	size_t dotPos = modelPath.rfind('.');
+	if (dotPos != std::string::npos) {
+		extension = modelPath.substr(dotPos);
+		// 小文字に変換
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+	}
+
 	// まずキャッシュを探す
 	auto it = s_geometryCache_.find(modelPath_);
 	if (it == s_geometryCache_.end()) {
 		// 未ロードなので新規ロードしてキャッシュ
 		auto cache = std::make_shared<GeometryCache>();
 
-		cache->modelData = LoadObject3dFile(modelPath_);
-
-		cache->animationData = LoadAnimationFile(modelPath_);
+		// 拡張子によって処理を分岐
+		if (extension == ".obj") {
+			// .obj形式の処理
+			cache->modelData = LoadObject3dFile(modelPath_);
+			useAnimation_ = false; // objはアニメーション非対応
+		} else if (extension == ".gltf" || extension == ".glb") {
+			// .gltf/.glb形式の処理
+			cache->modelData = LoadObject3dFile(modelPath_);
+			cache->animationData = LoadAnimationFile(modelPath_);
+			
+			useAnimation_ = true; // gltfはアニメーション対応
+		} else {
+			Logger::Log("Unsupported model format: %s\n");
+		}
 
 		// バウンディング半径を自動計算
 		float maxDistanceSquared = 0.0f;
@@ -121,22 +141,25 @@ void Model::Update() {
 	// 追加処理：法線変換行列を計算
 	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
 
-	animationTime_ += deltaTime_;
-	animationTime_ = fmod(animationTime_, animationData_.duration);
+	if (useAnimation_) {
+		animationTime_ += deltaTime_;
+		animationTime_ = fmod(animationTime_, animationData_.duration);
 
-	NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
-	Vector3 translateA = CalculateValueVector3(rootNodeAnimation.translate.keyframes, animationTime_);
-	Quaternion rotateA = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-	Vector3 scaleA = CalculateValueVector3(rootNodeAnimation.scale.keyframes, animationTime_);
-	Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scaleA, rotateA, translateA);
+		NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
+		Vector3 translateA = CalculateValueVector3(rootNodeAnimation.translate.keyframes, animationTime_);
+		Quaternion rotateA = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+		Vector3 scaleA = CalculateValueVector3(rootNodeAnimation.scale.keyframes, animationTime_);
+		Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scaleA, rotateA, translateA);
 
-	// 書き込み
-	
-	modelData_.rootNode.localMatrix = localMatrix;
+		modelData_.rootNode.localMatrix = localMatrix;
 
-	//transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, MultiplyMatrix(worldMatrix,worldViewProjectionMatrix));
-	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
-	transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
+		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
+	} else {
+		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
+	}
+
 	transformationData_->WorldInverseTranspose = worldInverseMatrix;
 
 	directionalLightData_->direction = direction_;
