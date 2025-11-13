@@ -18,10 +18,15 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
 
-	cube_->Initialize(&ctx_->dxCommon, "cube.obj");
-	cubeTransform_.scale = { 1.0f,1.0f,1.0f };
+    normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
+    normalCubeTransform_.scale = { 2.0f,2.0f,2.0f };
+    normalCubeTransform_.translate = { 0.0f,2.0f,0.0f };
 
-	testTimer_.Start(1.0f, true);
+	animationCube_->Initialize(&ctx_->dxCommon, "Animation/AnimatedCube.gltf");
+	animationCubeTransform_.scale = { 1.0f,1.0f,1.0f };
+	animationCubeTransform_.translate = { 0.0f,-2.0f,0.0f };
+
+	testTimer_.Start(5.0f, true);
 }
 
 void TestScene::Update() {
@@ -32,12 +37,19 @@ void TestScene::Update() {
 	//	{ 0.0f,0.0f,0.0f }, { 10.0f,5.0f,3.0f }, testTimer_.GetProgress(),
 	//	Easing::Type::EaseOutInBack);
 
-	cubeTransform_.translate = Easing::LerpVector3_GAB(
-		{ 0.0f,0.0f,0.0f }, { 10.0f,5.0f,3.0f }, testTimer_.GetProgress(), 
-		Easing::Type::Linear, Easing::Type::EaseOutBounce);
+    if (ctx_->input.TriggerKey(DIK_Z)) {
+        animationCube_->PlayAnimation();
+    }
 
-	cube_->SetTransform(cubeTransform_);
-	cube_->Update();
+    if (ctx_->input.TriggerKey(DIK_X)) {
+        animationCube_->StopAnimation();
+    }
+
+    normalCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
+    animationCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseOutBack);
+
+	normalCube_->Update();
+	animationCube_->Update();
 
 	testTimer_.Update();
 
@@ -47,7 +59,8 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-	cube_->Draw(camera_);
+    normalCube_->Draw(camera_, normalCubeTransform_);
+    animationCube_->Draw(camera_, animationCubeTransform_);
 	testParticle_->Draw(camera_);
 }
 
@@ -57,7 +70,8 @@ void TestScene::DrawImGui() {
 
     testParticle_->DrawImGui("TestParticle");
 
-	cube_->DrawImGui("TestCube");
+	//normalCube_->DrawImGui("NormalCube");
+	//animationCube_->DrawImGui("AnimationCube");
 
 	//MT4_01_03();
 	//MT4_01_04();

@@ -2,8 +2,9 @@
 #include "Quaternion.h"
 #include "Vector3.h"
 #include "Matrix4x4.h"
-#include "../MathFunction/MathFunction.h"
 #include <cmath>
+#include <vector>
+#include "../MathFunction/MathFunction.h"
 
 // Quaternionの積
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs);

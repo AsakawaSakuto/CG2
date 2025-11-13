@@ -84,7 +84,7 @@ void Sprite::Update() {
 	trans.m[3][1] = uvTranslate_.y;
 
 	// 最終変換行列
-	materialData_->uvTransform = scale * rot * trans;
+	materialData_->uvTransformMatrix = scale * rot * trans;
 }
 
 void Sprite::Draw() {
@@ -166,13 +166,13 @@ void Sprite::SetTexture(const std::string& textureName) {
 
 void Sprite::CreateVertexResource() {
 	// 頂点リソース
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dVertexData) * 4);
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * 4);
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズ
-	vertexBufferView_.SizeInBytes = sizeof(Object3dVertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(ModelVertexData) * 4;
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(Object3dVertexData);
+	vertexBufferView_.StrideInBytes = sizeof(ModelVertexData);
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	float width = size_.x;
@@ -219,20 +219,20 @@ indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
 
 void Sprite::CreateMaterialResource() {
 	// MaterialResource
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dMaterial));
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(ModelMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = false;
-	materialData_->uvTransform = MakeIdentityMatrix();
+	materialData_->uvTransformMatrix = MakeIdentityMatrix();
 
 	materialResource_->Unmap(0, nullptr);
 }
 
 void Sprite::CreateTransformationResource() {
 	//
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(Object3dTransformationMatrix));
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(ModelTransformationMatrix));
 	//
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_));
 	//

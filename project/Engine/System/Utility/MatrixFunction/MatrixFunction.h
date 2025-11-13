@@ -3,6 +3,8 @@
 #include "Vector3.h"
 #include <cmath>
 #include <iostream>
+#include "../Quaternion/Quaternion.h"
+#include "../Quaternion/QuaternionFunction.h"
 
 // 単位行列
 Matrix4x4 MakeIdentityMatrix();
