@@ -19,6 +19,9 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
+	void MT4_01_03();
+	void MT4_01_04();
+	void MT4_01_05();
 private:
 	// AppContext
 	AppContext* ctx_ = nullptr;
