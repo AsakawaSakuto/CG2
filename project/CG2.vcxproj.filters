@@ -58,6 +58,8 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
+    <ClCompile Include="Engine\System\Utility\MathFunction\MathFunction.cpp" />
+    <ClCompile Include="Engine\System\Utility\Quaternion\QuaternionFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -143,6 +145,11 @@
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.h" />
+    <ClInclude Include="Engine\3d\Object3d\Animation\AnimationStruct.h" />
+    <ClInclude Include="Engine\System\Utility\MathFunction\MathFunction.h" />
+    <ClInclude Include="Engine\System\Utility\Math\Segment.h" />
+    <ClInclude Include="Engine\System\Utility\Quaternion\Quaternion.h" />
+    <ClInclude Include="Engine\System\Utility\Quaternion\QuaternionFunction.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

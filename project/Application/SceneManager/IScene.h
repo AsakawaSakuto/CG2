@@ -13,7 +13,7 @@ enum class SCENE {
 
 class IScene {
 protected:
-    SCENE nowSceneName_ = SCENE::TITLE;
+    SCENE nowSceneName_ = SCENE::TEST;
 
     // AppContext
     AppContext* ctx_ = nullptr;
