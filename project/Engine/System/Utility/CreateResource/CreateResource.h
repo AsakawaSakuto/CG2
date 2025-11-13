@@ -29,6 +29,8 @@
 #include"Object3dModelData.h"
 #include"Object3dMaterialData.h"
 
+#include "../Object3d/Animation/AnimationStruct.h"
+
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 	ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
@@ -49,3 +51,5 @@ void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mip
 Object3dMaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 Object3dModelData LoadObject3dFile(const std::string& filepath);
+
+Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename);

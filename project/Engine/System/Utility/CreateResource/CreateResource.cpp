@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -272,4 +273,116 @@ Object3dModelData LoadObject3dFile(const std::string& filepath) {
     }
     
     return modelData;
+}
+
+Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename)
+{
+    Animation animation; // 今回作るアニメーション
+
+    Assimp::Importer importer;
+    std::string filePath = directoryPath + "/" + filename;
+
+    // モデルと同じでOK。資料では 0 になってるが、既に使ってるフラグがあればそれでいい
+    const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
+    assert(scene && "Failed to load animation file");
+    assert(scene->mNumAnimations != 0 && "No animations in file");
+
+    // 最初のアニメーションだけ採用
+    aiAnimation* animationAssimp = scene->mAnimations[0];
+
+    // 時間の単位を秒に変換
+    const double ticksPerSecond =
+        (animationAssimp->mTicksPerSecond != 0.0)
+        ? animationAssimp->mTicksPerSecond
+        : 1.0; // 0防止
+
+    animation.duration = static_cast<float>(
+        animationAssimp->mDuration / ticksPerSecond);
+
+    // 各ノードの Animation(channel) を解析
+    for (uint32_t channelIndex = 0;
+        channelIndex < animationAssimp->mNumChannels;
+        ++channelIndex)
+    {
+        aiNodeAnim* nodeAnimationAssimp =
+            animationAssimp->mChannels[channelIndex];
+
+        // ノード名で NodeAnimation を取得
+        NodeAnimation& nodeAnimation =
+            animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+
+        // --------- Translate ----------
+        for (uint32_t keyIndex = 0;
+            keyIndex < nodeAnimationAssimp->mNumPositionKeys;
+            ++keyIndex)
+        {
+            aiVectorKey& keyAssimp =
+                nodeAnimationAssimp->mPositionKeys[keyIndex];
+
+            KeyframeVector3 keyframe;
+            keyframe.time = static_cast<float>(
+                keyAssimp.mTime / ticksPerSecond);  // 秒に変換
+
+            // 右手→左手変換（資料どおり：x反転だけ or x,z反転など、
+            // 自分のモデル読み込みと揃えること）
+            keyframe.value = {
+                -keyAssimp.mValue.x,
+                 keyAssimp.mValue.y,
+                 keyAssimp.mValue.z
+            };
+
+            nodeAnimation.translate.keyframes.push_back(keyframe);
+        }
+
+        // --------- Rotate ----------
+        for (uint32_t keyIndex = 0;
+            keyIndex < nodeAnimationAssimp->mNumRotationKeys;
+            ++keyIndex)
+        {
+            aiQuatKey& keyAssimp =
+                nodeAnimationAssimp->mRotationKeys[keyIndex];
+
+            KeyframeQuaternion keyframe;
+            keyframe.time = static_cast<float>(
+                keyAssimp.mTime / ticksPerSecond);
+
+            // Assimp は右手系。自分のエンジンに合わせて変換
+            const aiQuaternion& q = keyAssimp.mValue;
+
+            // 例：Y,Z 反転で右手→左手 にするパターン
+            Quaternion rotate{};
+            rotate.x = q.x;
+            rotate.y = -q.y;
+            rotate.z = -q.z;
+            rotate.w = q.w;
+
+            keyframe.value = rotate;
+            nodeAnimation.rotate.keyframes.push_back(keyframe);
+        }
+
+        // --------- Scale ----------
+        for (uint32_t keyIndex = 0;
+            keyIndex < nodeAnimationAssimp->mNumScalingKeys;
+            ++keyIndex)
+        {
+            aiVectorKey& keyAssimp =
+                nodeAnimationAssimp->mScalingKeys[keyIndex];
+
+            KeyframeVector3 keyframe;
+            keyframe.time = static_cast<float>(
+                keyAssimp.mTime / ticksPerSecond);
+
+            // Scale はそのままでOK
+            keyframe.value = {
+                keyAssimp.mValue.x,
+                keyAssimp.mValue.y,
+                keyAssimp.mValue.z
+            };
+
+            nodeAnimation.scale.keyframes.push_back(keyframe);
+        }
+    }
+
+    // 解析完了
+    return animation;
 }
