@@ -5,7 +5,7 @@
 #include "../MathFunction/MathFunction.h"
 #include <cmath>
 
-// Quaternionの積（ハミルトン積）
+// Quaternionの積
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs);
 
 // 単位Quaternionを返す
@@ -14,7 +14,7 @@ Quaternion IdentityQuaternion();
 // 共役Quaternionを返す
 Quaternion Conjugate(const Quaternion& quaternion);
 
-// Quaternionのnorm（長さ）を返す
+// Quaternionのnormを返す
 float Norm(const Quaternion& quaternion);
 
 // 正規化したQuaternionを返す

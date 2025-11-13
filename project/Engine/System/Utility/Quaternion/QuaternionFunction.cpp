@@ -1,6 +1,6 @@
 #include "QuaternionFunction.h"
 
-// Quaternionの積（ハミルトン積）
+// Quaternionの積
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
     Quaternion result{};
 
@@ -37,7 +37,7 @@ Quaternion Conjugate(const Quaternion& quaternion) {
     return { -quaternion.x, -quaternion.y, -quaternion.z, quaternion.w };
 }
 
-// Quaternionのnorm（長さ）を返す
+// Quaternionのnormを返す
 float Norm(const Quaternion& quaternion) {
     return std::sqrt(
         quaternion.x * quaternion.x +
@@ -64,7 +64,7 @@ Quaternion Normalize(const Quaternion& quaternion) {
 
 // 逆Quaternionを返す
 Quaternion Inverse(const Quaternion& quaternion) {
-    // |q|^2
+
     float n2 =
         quaternion.x * quaternion.x +
         quaternion.y * quaternion.y +
@@ -72,7 +72,7 @@ Quaternion Inverse(const Quaternion& quaternion) {
         quaternion.w * quaternion.w;
 
     if (n2 == 0.0f) {
-        // 逆が定義できないのでゼロを返す（ここも方針に合わせてOK）
+        // 逆が定義できないのでゼロを返す
         return { 0.0f, 0.0f, 0.0f, 0.0f };
     }
 
@@ -105,16 +105,15 @@ Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle) {
 
 // ベクトルをQuaternionで回転させた結果のベクトルを求める
 Vector3 RotateVector(const Vector3& v, const Quaternion& q) {
-    // 最適化版： v' = v + 2w (q.xyz × v) + 2 (q.xyz × (q.xyz × v))
     Vector3 qv{ q.x, q.y, q.z };
 
-    Vector3 t = Cross(qv, v); // q.xyz × v
+    Vector3 t = Cross(qv, v);
     t.x *= 2.0f * q.w;
     t.y *= 2.0f * q.w;
     t.z *= 2.0f * q.w;
 
-    Vector3 u = Cross(qv, v); // 再計算しても良いが t 使ってもOK
-    u = Cross(qv, u);         // q.xyz × (q.xyz × v)
+    Vector3 u = Cross(qv, v);
+    u = Cross(qv, u);
     u.x *= 2.0f;
     u.y *= 2.0f;
     u.z *= 2.0f;
@@ -194,7 +193,7 @@ Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
         r.y = q0.y + (q1Adj.y - q0.y) * t;
         r.z = q0.z + (q1Adj.z - q0.z) * t;
         r.w = q0.w + (q1Adj.w - q0.w) * t;
-        return r; // ここでは正規化まではしない（スライドの注意どおり）
+        return r; // ここでは正規化まではしない
     }
 
     // 角
