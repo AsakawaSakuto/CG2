@@ -1,7 +1,6 @@
 #pragma once
 #include "Application/EngineSystem.h"
 #include "Application/GameObject/BaseGameObject.h"
-#include "Application/GameObject/Player/WeaponManager/WeaponStatus.h"
 
 class Bullet : public BaseGameObject {
 public:

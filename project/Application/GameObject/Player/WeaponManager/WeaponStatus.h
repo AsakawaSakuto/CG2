@@ -7,7 +7,8 @@
 struct WeaponStatus {
 	float cooldownTime;      // 複数打つ際のクールタイム
 	float intervalTime;      // 攻撃間隔
-	float shotNumber;        // 撃つ個数
+	int shotMaxCount;        // 撃つ個数
+	int shotNowCount;        // 現在撃った個数
 	float size;              // サイズ
 	float damage;            // ダメージ
 	int criticalRand;        // クリティカル発生確率
@@ -16,6 +17,4 @@ struct WeaponStatus {
 	int bounceCount;         // 跳弾する回数
 	float nockBackPower;     // ノックバックさせる力
 	float durationTime;      // 持続時間
-	GameTimer coolDownTimer; // クールタイムタイマー
-	GameTimer intervalTimer; // 攻撃間隔タイマー
 };
