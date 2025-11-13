@@ -19,7 +19,7 @@
 
 // Object
 #include "Sprite.h"
-#include "Object3d.h"
+#include "../Model/Model.h"
 #include "Particles.h"
 #include "EmitterState.h"
 

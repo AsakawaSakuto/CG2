@@ -1,5 +1,5 @@
 #define NOMINMAX
-#include "Object3d.h"
+#include "Model.h"
 #include "WinApp.h"
 #include <algorithm>
 #include <cmath>
@@ -11,7 +11,7 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 #include "../Utility/GameTimer/DeltaTime.h"
-#include "../Animation/Function/AnimationFunction.h"
+#include "../Model/Animation/Function/AnimationFunction.h"
 
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;

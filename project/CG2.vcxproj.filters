@@ -38,7 +38,7 @@
     <ClCompile Include="Engine\3d\Particles\Particles.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\System\Utility\MatrixFunction\MatrixFunction.cpp" />
-    <ClCompile Include="Engine\3d\Object3d\Object3d.cpp" />
+    <ClCompile Include="Engine\3d\Model\Model.cpp" />
     <ClCompile Include="Engine\2d\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
@@ -60,7 +60,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
     <ClCompile Include="Engine\System\Utility\MathFunction\MathFunction.cpp" />
     <ClCompile Include="Engine\System\Utility\Quaternion\QuaternionFunction.cpp" />
-    <ClCompile Include="Engine\3d\Object3d\Animation\Function\AnimationFunction.cpp" />
+    <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -82,8 +82,6 @@
     <ClInclude Include="Engine\System\Audio\Audio.h" />
     <ClInclude Include="Engine\System\Audio\AudioData.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
-    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dNode.h" />
-    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dSubMesh.h" />
     <ClInclude Include="Engine\System\Utility\Collision\Collision.h" />
     <ClInclude Include="Engine\System\Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\System\Utility\CreateResource\CreateResource.h" />
@@ -106,19 +104,14 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Engine\System\Input\Input.h" />
     <ClInclude Include="Engine\System\Utility\Logger\Logger.h" />
-    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dMaterial.h" />
-    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dMaterialData.h" />
     <ClInclude Include="Engine\System\Utility\MatrixFunction\MatrixFunction.h" />
-    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dModelData.h" />
-    <ClInclude Include="Engine\3d\Object3d\Object3d.h" />
+    <ClInclude Include="Engine\3d\Model\Model.h" />
     <ClInclude Include="Engine\2d\Sprite\Sprite.h" />
     <ClInclude Include="Engine\System\TextureManager\TextureManager.h" />
     <ClInclude Include="Engine\System\ResourceData\Transform.h" />
-    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dTransformationMatrix.h" />
     <ClInclude Include="Engine\System\Utility\Math\Vector2.h" />
     <ClInclude Include="Engine\System\Utility\Math\Vector4.h" />
     <ClInclude Include="Engine\System\Utility\Math\Vector3.h" />
-    <ClInclude Include="Engine\3d\Object3d\Struct\Object3dVertexData.h" />
     <ClInclude Include="Engine\System\WinApp\WinApp.h" />
     <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h" />
     <ClInclude Include="Engine\3d\Particles\Particles.h" />
@@ -146,12 +139,13 @@
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.h" />
-    <ClInclude Include="Engine\3d\Object3d\Animation\Struct\AnimationStruct.h" />
+    <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\System\Utility\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\System\Utility\Math\Segment.h" />
     <ClInclude Include="Engine\System\Utility\Quaternion\Quaternion.h" />
     <ClInclude Include="Engine\System\Utility\Quaternion\QuaternionFunction.h" />
-    <ClInclude Include="Engine\3d\Object3d\Animation\Function\AnimationFunction.h" />
+    <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
+    <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

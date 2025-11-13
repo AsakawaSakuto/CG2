@@ -19,10 +19,7 @@
 
 #include"DirectXCommon.h"
 
-#include"Object3dModelData.h"
-#include"Object3dVertexData.h"
-#include"Object3dMaterial.h"
-#include"Object3dTransformationMatrix.h"
+#include "../Model/ModelDataStruct.h"
 
 #include"Transform.h"
 #include"DirectionalLight.h"

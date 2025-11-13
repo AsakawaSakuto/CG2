@@ -2,7 +2,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Matrix4x4.h"
 #include "../Quaternion/Quaternion.h"
-#include "../Animation/Struct/AnimationStruct.h"
+#include "../Model/Animation/AnimationStruct.h"
 #include <vector>
 #include <cassert> 
 

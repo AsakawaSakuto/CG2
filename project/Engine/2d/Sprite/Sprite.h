@@ -1,8 +1,7 @@
 #pragma once
+#include "../Model/ModelDataStruct.h"
+
 #include "DirectXCommon.h"
-#include "Object3dVertexData.h"
-#include "Object3dMaterial.h"
-#include "Object3dTransformationMatrix.h"
 #include "Transform.h"
 #include "DirectionalLight.h"
 #include "TextureManager.h"

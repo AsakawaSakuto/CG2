@@ -26,10 +26,8 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #endif
 
-#include"Object3dModelData.h"
-#include"Object3dMaterialData.h"
-
-#include "../Object3d/Animation/Struct/AnimationStruct.h"
+#include "../Model/ModelDataStruct.h"
+#include "../Model/Animation/Function/AnimationFunction.h"
 
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
 	ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
