@@ -183,6 +183,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\System\DirectXCommon\DirectXCommon.cpp" />
     <ClCompile Include="Engine\System\Utility\Easing\Easing.cpp" />
     <ClCompile Include="Engine\System\Utility\GameTimer\GameTimer.cpp" />
+    <ClCompile Include="Engine\System\Utility\Quaternion\QuaternionFunction.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -272,8 +273,10 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\Utility\GameTimer\GameTimer.h" />
     <ClInclude Include="Engine\System\Utility\Math\AABB.h" />
     <ClInclude Include="Engine\System\Utility\Math\Plane.h" />
+    <ClInclude Include="Engine\System\Utility\Quaternion\Quaternion.h" />
     <ClInclude Include="Engine\System\Utility\Math\Segment.h" />
     <ClInclude Include="Engine\System\Utility\Math\Sphere.h" />
+    <ClInclude Include="Engine\System\Utility\Quaternion\QuaternionFunction.h" />
     <ClInclude Include="externals\imgui\imconfig.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
