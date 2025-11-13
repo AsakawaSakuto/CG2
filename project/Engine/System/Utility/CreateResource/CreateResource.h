@@ -52,4 +52,4 @@ Object3dMaterialData LoadMaterialTemplateFile(const std::string& directoryPath, 
 
 Object3dModelData LoadObject3dFile(const std::string& filepath);
 
-Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
+Animation LoadAnimationFile(const std::string& filename);

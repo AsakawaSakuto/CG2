@@ -18,7 +18,7 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
 
-	cube_->Initialize(&ctx_->dxCommon, "cube.obj");
+	cube_->Initialize(&ctx_->dxCommon, "Animation/AnimatedCube.gltf");
 	cubeTransform_.scale = { 1.0f,1.0f,1.0f };
 
 	testTimer_.Start(1.0f, true);
@@ -32,11 +32,11 @@ void TestScene::Update() {
 	//	{ 0.0f,0.0f,0.0f }, { 10.0f,5.0f,3.0f }, testTimer_.GetProgress(),
 	//	Easing::Type::EaseOutInBack);
 
-	cubeTransform_.translate = Easing::LerpVector3_GAB(
+	/*cubeTransform_.translate = Easing::LerpVector3_GAB(
 		{ 0.0f,0.0f,0.0f }, { 10.0f,5.0f,3.0f }, testTimer_.GetProgress(), 
 		Easing::Type::Linear, Easing::Type::EaseOutBounce);
 
-	cube_->SetTransform(cubeTransform_);
+	cube_->SetTransform(cubeTransform_);*/
 	cube_->Update();
 
 	testTimer_.Update();

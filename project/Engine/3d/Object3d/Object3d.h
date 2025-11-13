@@ -114,6 +114,7 @@ private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;             // 共有VBV
 		Object3dModelData modelData;                           // 共有モデルデータ
+		Animation animationData;                               // 共有アニメーションデータ
 		std::string textureName;                               // 使用テクスチャ名
 		uint32_t textureIndex = 0;                             // テクスチャインデックス
 		float boundingRadius = 1.0f;                           // バウンディング半径
@@ -121,6 +122,10 @@ private:
 	static std::unordered_map<std::string, std::shared_ptr<GeometryCache>> s_geometryCache_;
 
 private:
+	float animationTime_ = 0.0f;
+
+	Animation animationData_;
+
 	Matrix4x4 worldMatrix;
 	Camera camera_;
 

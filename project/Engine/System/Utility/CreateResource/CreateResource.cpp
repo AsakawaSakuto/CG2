@@ -275,12 +275,12 @@ Object3dModelData LoadObject3dFile(const std::string& filepath) {
     return modelData;
 }
 
-Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename)
+Animation LoadAnimationFile(const std::string& filename)
 {
     Animation animation; // 今回作るアニメーション
 
     Assimp::Importer importer;
-    std::string filePath = directoryPath + "/" + filename;
+    std::string filePath = filename;
 
     // モデルと同じでOK。資料では 0 になってるが、既に使ってるフラグがあればそれでいい
     const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);

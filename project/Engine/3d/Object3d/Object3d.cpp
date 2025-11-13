@@ -11,6 +11,8 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 
+#include "../Utility/GameTimer/DeltaTime.h"
+
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
 
@@ -30,6 +32,8 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		auto cache = std::make_shared<GeometryCache>();
 
 		cache->modelData = LoadObject3dFile(modelPath_);
+
+		cache->animationData = LoadAnimationFile(modelPath_);
 
 		// バウンディング半径を自動計算
 		float maxDistanceSquared = 0.0f;
@@ -71,6 +75,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	// キャッシュからインスタンスへ設定
 	const auto& cache = it->second;
 	modelData_ = cache->modelData;
+	animationData_ = cache->animationData;
 	textureName_ = cache->textureName;
 	textureIndex_ = cache->textureIndex;
 	vertexResource_ = cache->vertexResource; // 共有
@@ -116,7 +121,19 @@ void Model::Update() {
 	// 追加処理：法線変換行列を計算
 	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
 
+	animationTime_ += deltaTime_;
+	animationTime_ = fmod(animationTime_, animationData_.duration);
+
+	NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
+	Vector3 translateA = CalculateValueVector3(rootNodeAnimation.translate.keyframes, animationTime_);
+	Quaternion rotateA = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+	Vector3 scaleA = CalculateValueVector3(rootNodeAnimation.scale.keyframes, animationTime_);
+	Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scaleA, rotateA, translateA);
+
 	// 書き込み
+	
+	modelData_.rootNode.localMatrix = localMatrix;
+
 	//transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, MultiplyMatrix(worldMatrix,worldViewProjectionMatrix));
 	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
 	transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
