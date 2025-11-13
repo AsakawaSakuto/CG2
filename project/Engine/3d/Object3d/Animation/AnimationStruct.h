@@ -1,44 +1,31 @@
 #pragma once
-#include "Vector3.h"
-#include "Matrix4x4.h"
-#include <string>
+#include "../Quaternion/Quaternion.h"
+#include "../Math/Vector3.h"
 #include <vector>
-#include <unordered_map>
+#include <map>
 
-struct Bone {
-    std::string name;
-    int parentIndex;         // -1 なら root
-    Matrix4x4 localBindPose; // バインドポーズ時のローカル行列
-    Matrix4x4 inverseBind;   // 逆バインド行列
-};
-
-
-struct Skeleton {
-    std::vector<Bone> bones;
-    // 名前 → インデックスのマップもあると便利
-    std::unordered_map<std::string, int> boneNameToIndex;
-};
-
-struct Quaternion {
-    float x; 
-    float y; 
-    float z; 
-    float w;
-};
-
+template <typename tValue>
 struct Keyframe {
     float time;
-    Vector3 translate;
-    Quaternion rotate;
-    Vector3 scale;
+    tValue value;
 };
 
-struct BoneAnimation {
-    std::vector<Keyframe> keyframes;
+using KeyframeVector3 = Keyframe<Vector3>;
+using KeyframeQuaternion = Keyframe<Quaternion>;
+
+template<typename tValue>
+struct AnimationCurve {
+    std::vector<Keyframe<tValue>> keyframes;
 };
 
-struct AnimationClip {
-    std::string name;
-    float duration;
-    std::vector<BoneAnimation> boneAnimations; // [boneCount]
+struct NodeAnimation {
+    AnimationCurve<Vector3> translate;
+    AnimationCurve<Quaternion> rotate;
+    AnimationCurve<Vector3> scale;
+};
+
+struct Animation {
+    float duration;  // アニメーション全体の尺（単位は秒）
+    // NodeAnimationの集合。Node名でひけるようにしておく
+    std::map<std::string, NodeAnimation> nodeAnimations;
 };
