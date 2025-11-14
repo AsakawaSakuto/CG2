@@ -172,16 +172,16 @@ void Model::Update() {
 	// アニメーションの適用
 	if (useAnimation_) {
 
-		ApplyAnimation(skeleton_, animationData_, animationTime_);
-		UpdateAnimation(skeleton_);
+		//ApplyAnimation(skeleton_, animationData_, animationTime_);
+		//UpdateAnimation(skeleton_);
 
-		/*NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
+		NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
 		Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
 		Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
 		Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
 		Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scale, rotate, translate);
 
-		modelData_.rootNode.localMatrix = localMatrix;*/
+		modelData_.rootNode.localMatrix = localMatrix;
 
 		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
 		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
@@ -439,31 +439,6 @@ void Model::DrawImGui(const char* objectName) {
 	ImGui::End();
 
 #endif
-}
-
-void Model::CreateVertexResource() {
-	// 旧実装は共有キャッシュ導入により未使用（後方互換のため残すが呼ばれない想定）
-	// 頂点リソースをつくる
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * modelData_.vertices.size());
-	// リソースの先頭のアドレスから使う
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	// 使用するリソースのサイズは頂点のサイズ
-	vertexBufferView_.SizeInBytes = UINT(sizeof(ModelVertexData) * modelData_.vertices.size()); 
-	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(ModelVertexData);
-	// 頂点リソースにデータを書き込む、書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	// 頂点データをリソースにコピー
-	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(ModelVertexData) * modelData_.vertices.size()); 
-}
-
-void Model::CreateIndexResource() {
-	indexResource_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * modelData_.indeces.size());
-	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	indexBufferView_.SizeInBytes = UINT(sizeof(uint32_t) * modelData_.indeces.size());
-	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
-	std::memcpy(indexData_, modelData_.indeces.data(), sizeof(uint32_t) * modelData_.indeces.size());
 }
 
 void Model::CreateMaterialResource() {

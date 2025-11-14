@@ -185,8 +185,6 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
 	// 各種リソースの作成関数
-	void CreateVertexResource();           // 頂点バッファ生成
-	void CreateIndexResource();            // インデックスバッファ生成
 	void CreateMaterialResource();         // マテリアルバッファ生成
 	void CreateTransformationResource();   // 行列バッファ生成
 	void CreateDirectionalLightResource(); // ライトバッファ生成
