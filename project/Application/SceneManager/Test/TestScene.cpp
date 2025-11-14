@@ -18,7 +18,7 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
 
-    normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
+    normalCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
     normalCubeTransform_.scale = { 2.0f,2.0f,2.0f };
     normalCubeTransform_.translate = { 0.0f,2.0f,0.0f };
 

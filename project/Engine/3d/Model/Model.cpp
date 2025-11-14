@@ -89,7 +89,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		std::memcpy(tmp, cache->modelData.indeces.data(), sizeof(uint32_t) * cache->modelData.indeces.size());
 		cache->indexResource->Unmap(0, nullptr);
 
-		// 頂点リソースをつくる（共有）
+		// 頂點リソースをつくる（共有）
 		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress();
 		cache->vertexBufferView.SizeInBytes = UINT(sizeof(ModelVertexData) * cache->modelData.vertices.size());
@@ -103,8 +103,11 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		// キャッシュ登録
 		s_geometryCache_.emplace(modelPath_, cache);
 		it = s_geometryCache_.find(modelPath_);
+	} else {
+		// キャッシュヒット
+		std::string message = "Model cache hit: " + modelPath_ + "\n";
+		OutputDebugStringA(message.c_str());
 	}
-	// else の場合：キャッシュヒット = モデル読み込みスキップ成功
 
 	// キャッシュからインスタンスへ設定
 	const auto& cache = it->second;

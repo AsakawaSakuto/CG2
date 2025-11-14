@@ -24,42 +24,38 @@ void PSOManager::Initialize(DirectXCommon* dxCommon) {
 }
 
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::GetPSO(PSOType type) {
-    auto startTime = std::chrono::high_resolution_clock::now();
-    
     // キャッシュをチェック
     auto it = predefindedPSOs_.find(type);
     if (it != predefindedPSOs_.end()) {
         psoCacheHits_++;
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-        
-        char buffer[256];
-        sprintf_s(buffer, "PSO Cache HIT for type %d in %lld μs\n", static_cast<int>(type), duration.count());
-        OutputDebugStringA(buffer);
-        
+        // キャッシュヒット時のログは削除（頻繁すぎるため）
         return it->second;
     }
     
     // キャッシュにない場合は遅延作成
     psoCacheMisses_++;
+    
+#ifdef _DEBUG
+    auto startTime = std::chrono::high_resolution_clock::now();
     OutputDebugStringA("PSO Cache MISS - Creating PSO on demand...\n");
+#endif
     
     auto pso = CreatePSOOnDemand(type);
     predefindedPSOs_[type] = pso;
     
+#ifdef _DEBUG
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     
     char buffer[256];
     sprintf_s(buffer, "PSO Cache MISS for type %d - Created in %lld ms\n", static_cast<int>(type), duration.count());
     OutputDebugStringA(buffer);
+#endif
     
     return pso;
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::GetOrCompileShader(const std::wstring& filePath, const wchar_t* profile) {
-    auto startTime = std::chrono::high_resolution_clock::now();
-    
     // キャッシュキーを生成
     std::wstring cacheKey = filePath + L"_" + profile;
     
@@ -67,33 +63,32 @@ Microsoft::WRL::ComPtr<IDxcBlob> PSOManager::GetOrCompileShader(const std::wstri
     auto it = shaderCache_.find(cacheKey);
     if (it != shaderCache_.end()) {
         shaderCacheHits_++;
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-        
-        char buffer[512];
-        sprintf_s(buffer, "Shader Cache HIT for %ws_%ws in %lld μs\n", 
-                  filePath.c_str(), profile, duration.count());
-        OutputDebugStringA(buffer);
-        
+        // キャッシュヒット時のログは削除（頻繁すぎるため）
         return it->second;
     }
     
     // キャッシュミス：新規コンパイル
     shaderCacheMisses_++;
+    
+#ifdef _DEBUG
+    auto startTime = std::chrono::high_resolution_clock::now();
     char buffer[512];
     sprintf_s(buffer, "Shader Cache MISS - Compiling %ws_%ws...\n", 
               filePath.c_str(), profile);
     OutputDebugStringA(buffer);
+#endif
     
     auto shader = dxCommon_->CompileShader(filePath, profile);
     shaderCache_[cacheKey] = shader;
     
+#ifdef _DEBUG
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     
     sprintf_s(buffer, "Shader Cache MISS for %ws_%ws - Compiled in %lld ms\n", 
               filePath.c_str(), profile, duration.count());
     OutputDebugStringA(buffer);
+#endif
     
     return shader;
 }
