@@ -22,9 +22,13 @@ void TestScene::Initialize() {
     normalCubeTransform_.scale = { 2.0f,2.0f,2.0f };
     normalCubeTransform_.translate = { 0.0f,2.0f,0.0f };
 
-	animationCube_->Initialize(&ctx_->dxCommon, "Animation/AnimatedCube.gltf");
+	animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
 	animationCubeTransform_.scale = { 1.0f,1.0f,1.0f };
 	animationCubeTransform_.translate = { 0.0f,-2.0f,0.0f };
+
+	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
+	simpleSkinTransform_.scale = { 1.0f,1.0f,1.0f };
+	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };
 
 	testTimer_.Start(5.0f, true);
 }
@@ -46,10 +50,11 @@ void TestScene::Update() {
     }
 
     normalCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
-    animationCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseOutBack);
+    animationCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
 
 	normalCube_->Update();
 	animationCube_->Update();
+	simpleSkin_->Update();
 
 	testTimer_.Update();
 
@@ -61,6 +66,8 @@ void TestScene::Update() {
 void TestScene::Draw() {
     normalCube_->Draw(camera_, normalCubeTransform_);
     animationCube_->Draw(camera_, animationCubeTransform_);
+    simpleSkin_->Draw(camera_, simpleSkinTransform_);
+
 	testParticle_->Draw(camera_);
 }
 
@@ -70,6 +77,7 @@ void TestScene::DrawImGui() {
 
     testParticle_->DrawImGui("TestParticle");
 
+	//simpleSkin_->DrawImGui("SimpleSkin");
 	//normalCube_->DrawImGui("NormalCube");
 	//animationCube_->DrawImGui("AnimationCube");
 

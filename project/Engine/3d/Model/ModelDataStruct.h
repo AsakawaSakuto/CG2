@@ -1,5 +1,7 @@
 #pragma once
+#include "Transform.h"
 #include "Matrix4x4.h"
+#include "MatrixFunction.h"
 #include "Vector4.h"
 #include "Vector3.h"
 #include "Vector2.h"
@@ -41,21 +43,20 @@ struct ModelSubMesh {
 };
 
 struct ModelNode {
+    QuaternionTransform transform;
     Matrix4x4 localMatrix;
     std::string name;
     std::vector<ModelNode> children;
 
     ModelNode ReadNode(aiNode* node) {
         ModelNode result;
-        aiMatrix4x4 aiLocalMatrix = node->mTransformation; // nodeのlocalMatrixを取得
-        aiLocalMatrix.Transpose(); // 列ベクトル形式を行ベクトル形式に転置
-        for (uint32_t i = 0; i < 4; i++)
-        {
-            for (uint32_t j = 0; j < 4; j++)
-            {
-                result.localMatrix.m[i][j] = aiLocalMatrix[i][j];
-            }
-        }
+        aiVector3D scale, translate;
+        aiQuaternion rotate;
+        node->mTransformation.Decompose(scale, rotate, translate); // assimpの行列からSRTを抽出する関数を利用
+        result.transform.scale = { scale.x, scale.y, scale.z }; // Scaleはそのまま
+        result.transform.rotate = { rotate.x, -rotate.y, -rotate.z, rotate.w }; // x軸を反転、さらに回転方向が逆なので軸を反転させる
+        result.transform.translate = { -translate.x, translate.y, translate.z }; // x軸を反転
+        result.localMatrix = MakeAffineAnimationMatrix(result.transform.scale, result.transform.rotate, result.transform.translate);
         result.name = node->mName.C_Str(); // Node名を格納
         result.children.resize(node->mNumChildren); // 子供の数だけ確保
         for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
@@ -68,6 +69,7 @@ struct ModelNode {
 
 struct ModelData {
     std::vector<ModelVertexData> vertices;
+    std::vector<uint32_t> indeces;
     ModeldMaterialData material;
     ModelNode rootNode;
 };

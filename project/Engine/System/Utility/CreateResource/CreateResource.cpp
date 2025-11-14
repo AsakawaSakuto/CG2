@@ -232,25 +232,47 @@ ModelData LoadObject3dFile(const std::string& filepath) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());
         assert(mesh->HasTextureCoords(0));
+        modelData.vertices.resize(mesh->mNumVertices);
+
+        for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+            aiVector3D& position = mesh->mVertices[vertexIndex];
+            aiVector3D& normal = mesh->mNormals[vertexIndex];
+            aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+            // 右手系→左手系への変換を忘れずに
+            modelData.vertices[vertexIndex].position = { -position.x, position.y, position.z, 1.0f };
+            modelData.vertices[vertexIndex].normal = { -normal.x, normal.y, normal.z };
+            modelData.vertices[vertexIndex].texcoord = { texcoord.x, texcoord.y };
+        }
+
 
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
             aiFace face = mesh->mFaces[faceIndex];
             assert(face.mNumIndices >= 3); // triangle only
 
-            for (uint32_t i = 0; i < face.mNumIndices; ++i) {
-                uint32_t index = face.mIndices[i];
+            for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+                aiFace& face = mesh->mFaces[faceIndex];
+                assert(face.mNumIndices == 3);
 
-                aiVector3D pos = mesh->mVertices[index];
-                aiVector3D normal = mesh->mNormals[index];
-                aiVector3D uv = mesh->mTextureCoords[0][index];
-
-                ModelVertexData vtx{};
-                vtx.position = { -pos.x, pos.y, pos.z, 1.0f };  // 左右反転
-                vtx.normal = { -normal.x, normal.y, normal.z };  // 左右反転
-                vtx.texcoord = { uv.x, uv.y };
-
-                modelData.vertices.push_back(vtx);
+                for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+                    uint32_t vertexIndex = face.mIndices[element];
+                    modelData.indeces.push_back(vertexIndex);
+                }
             }
+
+            //for (uint32_t i = 0; i < face.mNumIndices; ++i) {
+            //    uint32_t index = face.mIndices[i];
+            //
+            //    aiVector3D pos = mesh->mVertices[index];
+            //    aiVector3D normal = mesh->mNormals[index];
+            //    aiVector3D uv = mesh->mTextureCoords[0][index];
+            //
+            //    ModelVertexData vtx{};
+            //    vtx.position = { -pos.x, pos.y, pos.z, 1.0f };  // 左右反転
+            //    vtx.normal = { -normal.x, normal.y, normal.z };  // 左右反転
+            //    vtx.texcoord = { uv.x, uv.y };
+            //
+            //    modelData.vertices.push_back(vtx);
+            //}
         }
     }
 

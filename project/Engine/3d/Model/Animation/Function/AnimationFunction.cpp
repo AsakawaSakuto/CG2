@@ -1,4 +1,5 @@
 #include "AnimationFunction.h"
+#include "../MatrixFunction/MatrixFunction.h"
 #include "../Quaternion/QuaternionFunction.h"
 #include "../Easing/Easing.h"
 
@@ -118,6 +119,39 @@ Animation LoadAnimationFile(const std::string& filename)
     return animation;
 }
 
+Skeleton CreateSkeleton(const ModelNode& rootNode) {
+    Skeleton skeleton;
+    skeleton.root = CreateJoint(rootNode, {}, skeleton.joints);
+
+    // 名前とindexのマッピングを行いアクセスしやすくする
+    for (const Joint& joint : skeleton.joints) {
+        skeleton.jointMap.emplace(joint.name, joint.index);
+    }
+
+    return skeleton;
+}
+
+int32_t CreateJoint(const ModelNode& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
+
+    Joint joint;
+    joint.name = node.name;
+    joint.localMatrix = node.localMatrix;
+    joint.skeletonSpaceMatrix = MakeIdentityMatrix();
+    joint.transform = node.transform;
+    joint.index = int32_t(joints.size()); // 現在登録されている数をIndexに
+    joint.parent = parent;
+    joints.push_back(joint); // SkeletonのJoint列に追加
+
+    // 子Jontを作成し、そのIndexを登録
+    for (const ModelNode& child : node.children) {
+        int32_t childIndex = CreateJoint(child, joint.index, joints);
+        joints[joint.index].children.push_back(childIndex);
+    }
+
+    // 自身のIndexを返す
+    return joint.index;
+}
+
 Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {
 
     assert(!keyframes.empty());   // キーがないと値がわからないのでダメ
@@ -148,7 +182,6 @@ Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time
     return (*keyframes.rbegin()).value;
 }
 
-
 Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time) {
 
     assert(!keyframes.empty());
@@ -176,40 +209,26 @@ Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, floa
     return (*keyframes.rbegin()).value;
 }
 
-Matrix4x4 MakeAffineAnimationMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate)
-{
-    Matrix4x4 m{};
-
-    // 回転行列を取得
-    Matrix4x4 rot = MakeRotateMatrix(rotate);
-
-    // 拡大を反映（行列の各要素にスケールを掛ける）
-    rot.m[0][0] *= scale.x;
-    rot.m[0][1] *= scale.x;
-    rot.m[0][2] *= scale.x;
-
-    rot.m[1][0] *= scale.y;
-    rot.m[1][1] *= scale.y;
-    rot.m[1][2] *= scale.y;
-
-    rot.m[2][0] *= scale.z;
-    rot.m[2][1] *= scale.z;
-    rot.m[2][2] *= scale.z;
-
-    // 行列にコピー
-    for (int r = 0; r < 3; r++) {
-        for (int c = 0; c < 3; c++) {
-            m.m[r][c] = rot.m[r][c];
+void UpdateAnimation(Skeleton& skeleton) {
+    // すべてのJointを更新。親が若いので通常ループで処理可能になっている
+    for (Joint& joint : skeleton.joints) {
+        joint.localMatrix = MakeAffineAnimationMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
+        if (joint.parent) { // 親がいれば親の行列を掛ける
+            joint.skeletonSpaceMatrix = joint.localMatrix * skeleton.joints[*joint.parent].skeletonSpaceMatrix;
+        } else { // 親がいないのでlocalMatrixとskeletonSpaceMatrixは一致する
+            joint.skeletonSpaceMatrix = joint.localMatrix;
         }
     }
+}
 
-    // 平行移動
-    m.m[3][0] = translate.x;
-    m.m[3][1] = translate.y;
-    m.m[3][2] = translate.z;
-
-    // 最後の要素
-    m.m[3][3] = 1.0f;
-
-    return m;
+void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime) {
+    for (Joint& joint : skeleton.joints) {
+        // 対象のJointのAnimationがあれば、値の適用を行う。下記のif文はC++17から可能になった初期化付きif文。
+        if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
+            const NodeAnimation& rootNodeAnimation = (*it).second;
+            joint.transform.translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime);
+            joint.transform.rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime);
+            joint.transform.scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime);
+        }
+    }
 }

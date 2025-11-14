@@ -448,26 +448,40 @@ Vector3 TransformVtoM(const Vector3& v, const Matrix4x4& m) {
 	return result;
 }
 
-float Dot_(const Vector3& a, const Vector3& b) {
-	return a.x * b.x + a.y * b.y + a.z * b.z;
+Matrix4x4 MakeAffineAnimationMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
+
+	Matrix4x4 m{};
+
+	// 回転行列を取得
+	Matrix4x4 rot = MakeRotateMatrix(rotate);
+
+	// 拡大を反映（行列の各要素にスケールを掛ける）
+	rot.m[0][0] *= scale.x;
+	rot.m[0][1] *= scale.x;
+	rot.m[0][2] *= scale.x;
+
+	rot.m[1][0] *= scale.y;
+	rot.m[1][1] *= scale.y;
+	rot.m[1][2] *= scale.y;
+
+	rot.m[2][0] *= scale.z;
+	rot.m[2][1] *= scale.z;
+	rot.m[2][2] *= scale.z;
+
+	// 行列にコピー
+	for (int r = 0; r < 3; r++) {
+		for (int c = 0; c < 3; c++) {
+			m.m[r][c] = rot.m[r][c];
+		}
+	}
+
+	// 平行移動
+	m.m[3][0] = translate.x;
+	m.m[3][1] = translate.y;
+	m.m[3][2] = translate.z;
+
+	// 最後の要素
+	m.m[3][3] = 1.0f;
+
+	return m;
 }
-
-bool IsCollideSphere(const Vector3& centerA, float radiusA,
-	const Vector3& centerB, float radiusB)
-{
-	// 中心間ベクトル
-	Vector3 d = { centerB.x - centerA.x, centerB.y - centerA.y, centerB.z - centerA.z };
-
-	// 中心間距離の二乗
-	float dist2 = Dot_(d, d);
-
-	// 半径の和
-	float r = radiusA + radiusB;
-
-	// 当たり判定：中心間距離 <= 半径の和
-	return dist2 <= (r * r);
-}
-
-float Lerp(float start, float end, float t) {
-	return start + (end - start) * t;
-};

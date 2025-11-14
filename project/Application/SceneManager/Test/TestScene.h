@@ -30,9 +30,11 @@ private:
 
 	unique_ptr<Model> normalCube_ = make_unique<Model>();
 	unique_ptr<Model> animationCube_ = make_unique<Model>();
-	
+	unique_ptr<Model> simpleSkin_ = make_unique<Model>();
+
 	Transform normalCubeTransform_;
 	Transform animationCubeTransform_;
+	Transform simpleSkinTransform_;
 
 	GameTimer testTimer_;
 

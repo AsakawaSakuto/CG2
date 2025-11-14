@@ -103,6 +103,8 @@ private:
 
 	// モデルジオメトリ共有キャッシュ
 	struct GeometryCache {
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource; // 共有頂点リソース
+		D3D12_INDEX_BUFFER_VIEW indexBufferView;             // 共有VBV
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;             // 共有VBV
 		ModelData modelData;                           // 共有モデルデータ
@@ -139,14 +141,15 @@ private:
 	// フラスタムカリング関連(カメラ外か否かの判定)
 	Camera camera_; 				      // カメラ情報
 	float boundingRadius_ = 0.5f;         // オブジェクトのバウンディング半径
-	bool useDrawFrustumCulling_ = true;   // カメラ外の描画、有効/無効
-	bool useUpdateFrustumCulling_ = true; // カメラ外の更新、有効/無効
+	bool useDrawFrustumCulling_ = false;   // カメラ外の描画、有効/無効
+	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
 
 	// アニメーション関連
 	bool useAnimationTimer_ = false; // 
 	bool useAnimation_ = false;      // アニメーション使用フラグ
 	float animationTime_ = 0.0f;     // アニメーション再生時間
 	Animation animationData_;        // アニメーションデータ
+	Skeleton skeleton_;              // スケルトンデータ
 
 	//-----------------------------------------------------------//
 
@@ -157,6 +160,7 @@ private:
 
 	// 各種GPUリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;             // 頂点リソース（共有可）
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;           // マテリアルリソース（インスタンス毎）
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;     // 行列リソース（インスタンス毎）
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;   // ライトリソース（インスタンス毎）
@@ -166,6 +170,7 @@ private:
 
 	// 各種リソースのCPU側ポインタ
 	ModelVertexData* vertexData_ = nullptr;                   // 頂点データ（初期化時のみ使用）
+	uint32_t* indexData_ = nullptr;                        // インデックスデータ（初期化時のみ使用）
 	ModelMaterial* materialData_ = nullptr;                   // マテリアルデータ
 	ModelTransformationMatrix* transformationData_ = nullptr; // 行列データ
 	DirectionalLight* directionalLightData_ = nullptr;           // ライトデータ
@@ -181,6 +186,7 @@ private:
 
 	// 各種リソースの作成関数
 	void CreateVertexResource();           // 頂点バッファ生成
+	void CreateIndexResource();            // インデックスバッファ生成
 	void CreateMaterialResource();         // マテリアルバッファ生成
 	void CreateTransformationResource();   // 行列バッファ生成
 	void CreateDirectionalLightResource(); // ライトバッファ生成

@@ -50,7 +50,8 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 			// .gltf/.glb形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
 			cache->animationData = LoadAnimationFile(modelPath_);
-			
+			skeleton_ = CreateSkeleton(cache->modelData.rootNode);
+
 			useAnimation_ = true; // gltfはアニメーション対応
 			useAnimationTimer_ = true;
 		} else {
@@ -78,14 +79,25 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
 
 		// 頂点リソースをつくる（共有）
+		cache->indexResource = CreateBufferResource(device_.Get(), sizeof(uint32_t) * cache->modelData.indeces.size());
+		cache->indexBufferView.BufferLocation = cache->indexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
+		cache->indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * cache->modelData.indeces.size());
+		cache->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+		// 頂点データ書き込み（一時マップ）
+		uint32_t* tmp = nullptr;
+		cache->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
+		std::memcpy(tmp, cache->modelData.indeces.data(), sizeof(uint32_t) * cache->modelData.indeces.size());
+		cache->indexResource->Unmap(0, nullptr);
+
+		// 頂点リソースをつくる（共有）
 		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
-		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
+		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress();
 		cache->vertexBufferView.SizeInBytes = UINT(sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexBufferView.StrideInBytes = sizeof(ModelVertexData);
 		// 頂点データ書き込み（一時マップ）
-		ModelVertexData* tmp = nullptr;
-		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
-		std::memcpy(tmp, cache->modelData.vertices.data(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
+		ModelVertexData* vertexTmp = nullptr;
+		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexTmp));
+		std::memcpy(vertexTmp, cache->modelData.vertices.data(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexResource->Unmap(0, nullptr);
 
 		// キャッシュ登録
@@ -100,8 +112,10 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	animationData_ = cache->animationData;
 	textureName_ = cache->textureName;
 	textureIndex_ = cache->textureIndex;
-	vertexResource_ = cache->vertexResource;
+	indexResource_ = cache->indexResource;
+	indexBufferView_ = cache->indexBufferView;
 	vertexBufferView_ = cache->vertexBufferView;
+	vertexResource_ = cache->vertexResource;
 	boundingRadius_ = cache->boundingRadius;
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
@@ -155,13 +169,16 @@ void Model::Update() {
 	// アニメーションの適用
 	if (useAnimation_) {
 
-		NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
+		ApplyAnimation(skeleton_, animationData_, animationTime_);
+		UpdateAnimation(skeleton_);
+
+		/*NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
 		Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
 		Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
 		Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
 		Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scale, rotate, translate);
 
-		modelData_.rootNode.localMatrix = localMatrix;
+		modelData_.rootNode.localMatrix = localMatrix;*/
 
 		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
 		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
@@ -233,7 +250,7 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList_->IASetIndexBuffer(nullptr); // インデックス使っていないので設定しない
+	commandList_->IASetIndexBuffer(&indexBufferView_); // インデックス使っていないので設定しない
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// RootParams 設定（そのままでOK）
@@ -246,9 +263,8 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 
 	// 頂点描画（DrawInstanced）
-	commandList_->DrawInstanced(
-		static_cast<UINT>(modelData_.vertices.size()), // 頂点数ぶん描画
-		1, 0, 0);
+	commandList_->DrawIndexedInstanced(
+		static_cast<UINT>(modelData_.indeces.size()), 1, 0, 0, 0);
 }
 
 void Model::SetTexture(const std::string& textureName) {
@@ -436,6 +452,15 @@ void Model::CreateVertexResource() {
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	// 頂点データをリソースにコピー
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(ModelVertexData) * modelData_.vertices.size()); 
+}
+
+void Model::CreateIndexResource() {
+	indexResource_ = CreateBufferResource(device_.Get(), sizeof(uint32_t) * modelData_.indeces.size());
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexBufferView_.SizeInBytes = UINT(sizeof(uint32_t) * modelData_.indeces.size());
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
+	std::memcpy(indexData_, modelData_.indeces.data(), sizeof(uint32_t) * modelData_.indeces.size());
 }
 
 void Model::CreateMaterialResource() {
