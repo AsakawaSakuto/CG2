@@ -244,7 +244,6 @@ ModelData LoadObject3dFile(const std::string& filepath) {
             modelData.vertices[vertexIndex].texcoord = { texcoord.x, texcoord.y };
         }
 
-
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
             aiFace face = mesh->mFaces[faceIndex];
             assert(face.mNumIndices >= 3); // triangle only
@@ -258,21 +257,24 @@ ModelData LoadObject3dFile(const std::string& filepath) {
                     modelData.indeces.push_back(vertexIndex);
                 }
             }
+        }
 
-            //for (uint32_t i = 0; i < face.mNumIndices; ++i) {
-            //    uint32_t index = face.mIndices[i];
-            //
-            //    aiVector3D pos = mesh->mVertices[index];
-            //    aiVector3D normal = mesh->mNormals[index];
-            //    aiVector3D uv = mesh->mTextureCoords[0][index];
-            //
-            //    ModelVertexData vtx{};
-            //    vtx.position = { -pos.x, pos.y, pos.z, 1.0f };  // 左右反転
-            //    vtx.normal = { -normal.x, normal.y, normal.z };  // 左右反転
-            //    vtx.texcoord = { uv.x, uv.y };
-            //
-            //    modelData.vertices.push_back(vtx);
-            //}
+        for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+            aiBone* bone = mesh->mBones[boneIndex];
+            std::string jointName = bone->mName.C_Str();
+            JointWeightData& jointWeightData = modelData.skinClusterData[jointName];
+
+            aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+            aiVector3D scale, translate;
+            aiQuaternion rotate;
+            bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+            Matrix4x4 bindPoseMatrix = MakeAffineAnimationMatrix(
+                { scale.x, scale.y, scale.z }, { rotate.x, -rotate.y, -rotate.z, rotate.w }, { -translate.x, translate.y, translate.z });
+            jointWeightData.inverseBindPoseMatrix = InverseMatrix(bindPoseMatrix);
+
+            for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+                jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
+            }
         }
     }
 

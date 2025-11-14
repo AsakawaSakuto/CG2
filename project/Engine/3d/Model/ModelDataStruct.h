@@ -7,6 +7,7 @@
 #include "Vector2.h"
 #include <string>
 #include <vector>
+#include <map>
 #include <assimp/scene.h>
 
 struct ModelVertexData {
@@ -67,7 +68,18 @@ struct ModelNode {
     }
 };
 
+struct VertexWeightData {
+    float weight;
+    uint32_t vertexIndex;
+};
+
+struct JointWeightData {
+    Matrix4x4 inverseBindPoseMatrix;
+    std::vector<VertexWeightData> vertexWeights;
+};
+
 struct ModelData {
+    std::map<std::string, JointWeightData> skinClusterData;
     std::vector<ModelVertexData> vertices;
     std::vector<uint32_t> indeces;
     ModeldMaterialData material;
