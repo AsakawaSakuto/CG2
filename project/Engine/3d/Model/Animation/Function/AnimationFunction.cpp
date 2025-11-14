@@ -194,7 +194,6 @@ SkinCluster CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device
     return skinCluster;
 }
 
-
 int32_t CreateJoint(const ModelNode& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
 
     Joint joint;
@@ -285,7 +284,7 @@ void UpdateAnimation(Skeleton& skeleton) {
     }
 }
 
-void UpdateCuruster(SkinCluster& skinCluster, const Skeleton& skeleton) {
+void UpdateCluster(SkinCluster& skinCluster, const Skeleton& skeleton) {
     for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
         assert(jointIndex < skinCluster.inverseBindPoseMatrices.size());
         skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix =

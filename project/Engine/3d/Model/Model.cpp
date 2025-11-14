@@ -51,6 +51,14 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 			cache->modelData = LoadObject3dFile(modelPath_);
 			cache->animationData = LoadAnimationFile(modelPath_);
 			skeleton_ = CreateSkeleton(cache->modelData.rootNode);
+			skinCluster_= CreateSkinCluster(
+				device_,
+				skeleton_,
+				cache->modelData,
+				dxCommon_->GetSRV(),
+				dxCommon_->GetDescriptorSizeSRV(),
+				DirectXCommon::kMaxSRVCount_ - 1
+			);
 
 			useAnimation_ = true; // gltfはアニメーション対応
 			useAnimationTimer_ = true;
@@ -172,18 +180,20 @@ void Model::Update() {
 	// アニメーションの適用
 	if (useAnimation_) {
 
-		//ApplyAnimation(skeleton_, animationData_, animationTime_);
-		//UpdateAnimation(skeleton_);
+		ApplyAnimation(skeleton_, animationData_, animationTime_);
+		UpdateAnimation(skeleton_);
+		UpdateCluster(skinCluster_, skeleton_);
 
-		NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
+		/*NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
 		Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
 		Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
 		Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
 		Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scale, rotate, translate);
 
-		modelData_.rootNode.localMatrix = localMatrix;
+		modelData_.rootNode.localMatrix = localMatrix;*/
 
-		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+		//transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+		transformationData_->WVP = worldViewProjectionMatrix;
 		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
 	} else {
 		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);

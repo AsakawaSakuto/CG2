@@ -150,6 +150,7 @@ private:
 	float animationTime_ = 0.0f;     // アニメーション再生時間
 	Animation animationData_;        // アニメーションデータ
 	Skeleton skeleton_;              // スケルトンデータ
+	SkinCluster skinCluster_;        // スキンクラスター
 
 	//-----------------------------------------------------------//
 

@@ -24,6 +24,6 @@ Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, floa
 
 void UpdateAnimation(Skeleton& skeleton);
 
-void UpdateCuluster(SkinCluster& skinCluster, const Skeleton& skeleton);
+void UpdateCluster(SkinCluster& skinCluster, const Skeleton& skeleton);
 
 void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
