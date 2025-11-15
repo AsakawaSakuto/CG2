@@ -2,6 +2,10 @@
 #pragma region Include
 #include"DirectXCommon.h"
 
+#include "../Particles/Struct/ParticleDataStruct.h"
+#include "ParticleDescriptorAllocator.h"
+#include"Json/EmitterStateLoder.h"
+
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
@@ -15,28 +19,18 @@
 
 #include "externals/DirectXTex/DirectXTex.h"
 
-#include "ParticleVertexData.h"
-#include "ParticleMaterial.h"
 #include "Transform.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "Camera.h"
-#include "ParticleDataCS.h"
 #include "BlendMode.h"
-#include "PreView.h"
-#include "PreFrame.h"
 #include "EmitterState.h"
-
-#include "ParticleDescriptorAllocator.h"
 
 #include <random>
 #include <numbers>
 #include <memory>
 
-#include"Json/EmitterStateLoder.h"
-
 #pragma endregion
-
 
 /// <summary>
 /// パーティクルクラス

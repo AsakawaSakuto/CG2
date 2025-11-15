@@ -68,6 +68,19 @@ ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device, i
 
 ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
 {
+    // ★サイズチェック追加
+    if (sizeInBytes == 0) {
+        OutputDebugStringA("ERROR: CreateBufferResource called with size 0!\n");
+        assert(false && "Buffer size is 0");
+    }
+    
+    if (sizeInBytes > 256 * 1024 * 1024) { // 256MB以上は警告
+        char buffer[256];
+        sprintf_s(buffer, "WARNING: Creating large buffer: %zu bytes (%.2f MB)\n", 
+                  sizeInBytes, sizeInBytes / (1024.0f * 1024.0f));
+        OutputDebugStringA(buffer);
+    }
+    
     // アップロードヒープの設定
     D3D12_HEAP_PROPERTIES heapProperties{};
     heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -100,6 +113,25 @@ ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device* device, size_t sizeInB
         nullptr,
         IID_PPV_ARGS(&bufferResource)
     );
+
+    // ★エラー情報を詳しく出力
+    if (FAILED(hr)) {
+        char buffer[512];
+        sprintf_s(buffer, "ERROR: CreateCommittedResource failed!\n");
+        OutputDebugStringA(buffer);
+        sprintf_s(buffer, "  HRESULT: 0x%08X\n", hr);
+        OutputDebugStringA(buffer);
+        sprintf_s(buffer, "  Requested size: %zu bytes (%.2f MB)\n", 
+                  sizeInBytes, sizeInBytes / (1024.0f * 1024.0f));
+        OutputDebugStringA(buffer);
+        
+        // よくあるエラーコードの説明
+        if (hr == E_OUTOFMEMORY) {
+            OutputDebugStringA("  Error: E_OUTOFMEMORY - Not enough memory available\n");
+        } else if (hr == E_INVALIDARG) {
+            OutputDebugStringA("  Error: E_INVALIDARG - Invalid argument\n");
+        }
+    }
 
     assert(SUCCEEDED(hr));
     return bufferResource;
@@ -232,24 +264,44 @@ ModelData LoadObject3dFile(const std::string& filepath) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());
         assert(mesh->HasTextureCoords(0));
+        modelData.vertices.resize(mesh->mNumVertices);
 
+        for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+            aiVector3D& position = mesh->mVertices[vertexIndex];
+            aiVector3D& normal = mesh->mNormals[vertexIndex];
+            aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+            // 右手系→左手系への変換を忘れずに
+            modelData.vertices[vertexIndex].position = { -position.x, position.y, position.z, 1.0f };
+            modelData.vertices[vertexIndex].normal = { -normal.x, normal.y, normal.z };
+            modelData.vertices[vertexIndex].texcoord = { texcoord.x, texcoord.y };
+        }
+
+        // ★インデックスの読み込み（二重ループを削除）
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
-            aiFace face = mesh->mFaces[faceIndex];
-            assert(face.mNumIndices >= 3); // triangle only
+            aiFace& face = mesh->mFaces[faceIndex];
+            assert(face.mNumIndices == 3); // 三角形のみ対応
 
-            for (uint32_t i = 0; i < face.mNumIndices; ++i) {
-                uint32_t index = face.mIndices[i];
+            for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+                uint32_t vertexIndex = face.mIndices[element];
+                modelData.indeces.push_back(vertexIndex);
+            }
+        }
 
-                aiVector3D pos = mesh->mVertices[index];
-                aiVector3D normal = mesh->mNormals[index];
-                aiVector3D uv = mesh->mTextureCoords[0][index];
+        for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+            aiBone* bone = mesh->mBones[boneIndex];
+            std::string jointName = bone->mName.C_Str();
+            JointWeightData& jointWeightData = modelData.skinClusterData[jointName];
 
-                ModelVertexData vtx{};
-                vtx.position = { -pos.x, pos.y, pos.z, 1.0f };  // 左右反転
-                vtx.normal = { -normal.x, normal.y, normal.z };  // 左右反転
-                vtx.texcoord = { uv.x, uv.y };
+            aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+            aiVector3D scale, translate;
+            aiQuaternion rotate;
+            bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+            Matrix4x4 bindPoseMatrix = MakeAffineAnimationMatrix(
+                { scale.x, scale.y, scale.z }, { rotate.x, -rotate.y, -rotate.z, rotate.w }, { -translate.x, translate.y, translate.z });
+            jointWeightData.inverseBindPoseMatrix = InverseMatrix(bindPoseMatrix);
 
-                modelData.vertices.push_back(vtx);
+            for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+                jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
             }
         }
     }

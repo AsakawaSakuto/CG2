@@ -46,14 +46,14 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	emitter_.emit = 0;
 	emitter_.count = 1;
 	emitter_.kMaxParticle = kMaxParticles_;
-	emitter_.frequency = 1.0f;
+	emitter_.frequency = 0.1f;
 	emitter_.frequencyTime = 0.0f;
 	emitter_.startScale = { 1.0f, 1.0f };
 	emitter_.endScale = { 0.0f, 0.0f };
 	emitter_.scaleFade = 0;
 	emitter_.scaleRandom = 0;
-	emitter_.minScale = { 0.5f, 0.5f, 0.5f };
-	emitter_.maxScale = { 1.5f, 1.5f, 1.5f };
+	emitter_.minScale = { 0.0f, 0.0f, 0.0f };
+	emitter_.maxScale = { 1.0f, 1.0f, 1.0f };
 	emitter_.rotateMove = 0;
 	emitter_.startRotateVelocity = 0.0f;
 	emitter_.endRotateVelocity = 0.0f;
@@ -73,36 +73,17 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	emitter_.velocityRandom = 0;
 	emitter_.minVelocity = { -1.0f, -1.0f, -1.0f };
 	emitter_.maxVelocity = { 1.0f, 1.0f, 1.0f };
-	emitter_.lifeTime = 2.0f;
+	emitter_.lifeTime = 5.0f;
 	emitter_.lifeTimeRandom = 0;
 	emitter_.minLifeTime = 1.0f;
 	emitter_.maxLifeTime = 5.0f;
-	
-	// Initialize new emitter shape fields
-	emitter_.shapeType = static_cast<uint32_t>(EmitterShapeType::SPHERE_VOLUME);
-	emitter_.size = { 1.0f, 1.0f, 1.0f };  // Default box size
-	emitter_.lineStart = { -1.0f, 0.0f, 0.0f };  // Default line start
-	emitter_.lineLength = 2.0f;  // Default line length
-	emitter_.ringInnerRadius = 0.5f;  // Default ring inner radius
-	emitter_.ringOuterRadius = 1.0f;  // Default ring outer radius
-
-	// Initialize cone and hemisphere fields
-	emitter_.coneAngle = 45.0f;  // Default cone angle in degrees
-	emitter_.coneHeight = 2.0f;  // Default cone height
-	emitter_.coneDirection = { 0.0f, 1.0f, 0.0f };  // Default direction (up)
-	emitter_.hemisphereAngle = 180.0f;  // Default hemisphere angle (full hemisphere)
-
-	// Initialize angle-based plane and ring fields
-	emitter_.planeNormal = { 0.0f, 1.0f, 0.0f };  // Default plane normal (up)
-	emitter_.planeWidth = 2.0f;   // Default plane width
-	emitter_.planeHeight = 2.0f;  // Default plane height
-	emitter_.ringAngle = 0.0f;    // Default ring rotation angle
-	emitter_.ringNormal = { 0.0f, 1.0f, 0.0f };  // Default ring normal (up)
-
-	// Initialize texture path
+	emitter_.isMove = 1;
+	emitter_.velocityRandom = 1;
+	emitter_.scaleFade = 1;
+	emitter_.alphaFade = 1;
+	emitter_.colorRandom = 1;
+	emitter_.shapeType = static_cast<uint32_t>(EmitterShapeType::POINT);
 	emitter_.texturePath = TextureName;
-	
-	// Initialize blend mode
 	emitter_.blendMode = kBlendModeAdd;
 
 	CreateEmitterResource();

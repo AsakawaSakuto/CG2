@@ -9,21 +9,21 @@ using namespace Microsoft::WRL;
 #include "../../System/PSOManager/PSOManager.h"
 
 void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position, Vector2 scale) {
-	//
+
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 	
-	textureName_ = fileName;
+	textureName_ = "resources/image/" + fileName + ".png";
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 
 	// テクスチャからサイズを自動取得
 	size_ = TextureManager::GetInstance()->GetTextureSize(textureName_);
 
-	position_ = position;
-	transform_.scale = { scale.x,scale.y,1.f };
-	transform_.translate = { 0.f,0.f,0.f };
+	transform2D_.scale = scale;
+	transform2D_.rotate = 0.0f;
+	transform2D_.translate = position;
 
 	CreateVertexResource();
 	CreateIndexResource();
@@ -59,29 +59,30 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Ve
 }
 
 void Sprite::Update() {
-	transform_.translate.x = position_.x;
-	transform_.translate.y = position_.y;
 
 	//Sprite用のWorldViewProjectionMatrixを作る
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(
+		{ transform2D_.scale.x,transform2D_.scale.y,0.0f }, 
+		{ 0.0f, 0.0f, transform2D_.rotate}, 
+		{ transform2D_.translate.x, transform2D_.translate.y, 0.0f });
 	Matrix4x4 viewMatrix = MakeIdentityMatrix();
 	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth_), static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrixSprite = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrixSprite));
 	transformationData_->WVP = worldViewProjectionMatrixSprite;
 
 	Matrix4x4 scale = MakeIdentityMatrix();
-	scale.m[0][0] = uvScale_.x;
-	scale.m[1][1] = uvScale_.y;
+	scale.m[0][0] = uvTransform_.scale.x;
+	scale.m[1][1] = uvTransform_.scale.y;
 
 	Matrix4x4 rot = MakeIdentityMatrix();
-	rot.m[0][0] = cos(uvRotate_);
-	rot.m[0][1] = -sin(uvRotate_);
-	rot.m[1][0] = sin(uvRotate_);
-	rot.m[1][1] = cos(uvRotate_);
+	rot.m[0][0] = cos(uvTransform_.rotate);
+	rot.m[0][1] = -sin(uvTransform_.rotate);
+	rot.m[1][0] = sin(uvTransform_.rotate);
+	rot.m[1][1] = cos(uvTransform_.rotate);
 
 	Matrix4x4 trans = MakeIdentityMatrix();
-	trans.m[3][0] = uvTranslate_.x;
-	trans.m[3][1] = uvTranslate_.y;
+	trans.m[3][0] = uvTransform_.translate.x;
+	trans.m[3][1] = uvTransform_.translate.y;
 
 	// 最終変換行列
 	materialData_->uvTransformMatrix = scale * rot * trans;
@@ -122,28 +123,28 @@ void Sprite::DrawImGui(const char* objectName) {
 	ImGui::Begin(objectName);
 
 	ImGui::Text("Transform");
-	ImGui::DragFloat2("translate", &position_.x, 1.f);
-	ImGui::DragFloat2("scale", &transform_.scale.x, 0.01f);
-	ImGui::DragFloat("rotate", &transform_.rotate.z, 0.01f);
+	ImGui::DragFloat2("translate", &transform2D_.translate.x, 1.f);
+	ImGui::DragFloat2("scale", &transform2D_.scale.x, 0.01f);
+	ImGui::DragFloat("rotate", &transform2D_.rotate, 0.01f);
 
 	if (ImGui::Button("tReset")) {
-		position_ = { 128.0f ,128.0f };
-		transform_.rotate = { 0.0f, 0.0f, 0.0f };
-		transform_.scale = { 1.0f, 1.0f, 1.0f };
+		transform2D_.translate = { 0.0f ,0.0f };
+		transform2D_.scale = { 1.0f, 1.0f};
+		transform2D_.rotate = 0.0f;
 	}
 
 	ImGui::Separator();
 
 	ImGui::Text("MaterialEdit");
-	ImGui::DragFloat2("uvTranslate", &uvTranslate_.x, 0.01f);
-	ImGui::DragFloat2("uvScale", &uvScale_.x, 0.01f);
-	ImGui::DragFloat("uvRotate", &uvRotate_, 0.01f);
+	ImGui::DragFloat2("uvTranslate", &uvTransform_.translate.x, 0.01f);
+	ImGui::DragFloat2("uvScale", &uvTransform_.scale.x, 0.01f);
+	ImGui::DragFloat("uvRotate", &uvTransform_.rotate, 0.01f);
 	ImGui::ColorEdit4("Color", &materialData_->color.x);
 	
 	if (ImGui::Button("mReset")) {
-		uvTranslate_ = { 0.0f,0.0f };
-		uvScale_ = { 1.0f,1.0f };
-		uvRotate_ = 0.0f;
+		uvTransform_.translate = { 0.0f,0.0f };
+		uvTransform_.scale = { 1.0f,1.0f };
+		uvTransform_.rotate = 0.0f;
 		materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
@@ -210,7 +211,7 @@ void Sprite::CreateIndexResource() {
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
 	// 表面（三角形2枚）
 	indexData_[0] = 0; indexData_[1] = 1; indexData_[2] = 2;
-indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
+    indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
 
 	// 裏面（三角形2枚、巻き方向を逆に）
 	/*indexData_[6] = 2; indexData_[7] = 1; indexData_[8] = 0;

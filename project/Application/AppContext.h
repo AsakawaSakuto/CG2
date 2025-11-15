@@ -5,7 +5,6 @@
 #include"GamePad.h"
 
 struct AppContext {
-	WinApp winApp;
 	DirectXCommon dxCommon;
 	Input input;
 	GamePad gamePad;

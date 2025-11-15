@@ -14,17 +14,30 @@ void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 void TestScene::Initialize() {
     CleanupResources();
 	testParticle_->Initialize(&ctx_->dxCommon);
-	camera_.SetPosition({ 0.0f, 0.0f, -10.0f });
+	camera_.SetPosition({ 0.0f, 0.0f, -20.0f });
 	debugCamera_.SetInput(&ctx_->input);
-	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
+	debugCamera_.SetPosition({ 0.0f, 0.0f, -20.0f });
 
-    normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
-    normalCubeTransform_.scale = { 2.0f,2.0f,2.0f };
-    normalCubeTransform_.translate = { 0.0f,2.0f,0.0f };
+	normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
+    normalCubeTransform_.translate = { -1.5f,2.5f,0.0f };
 
-	animationCube_->Initialize(&ctx_->dxCommon, "Animation/AnimatedCube.gltf");
-	animationCubeTransform_.scale = { 1.0f,1.0f,1.0f };
-	animationCubeTransform_.translate = { 0.0f,-2.0f,0.0f };
+	animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
+    animationCubeTransform_.translate = { 1.5f,2.5f,0.0f };
+	animationCubeTransform_.scale = { 0.5f,0.5f,0.5f };
+
+	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
+	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };
+	simpleSkinTransform_.translate = { -3.0f,0.0f,0.0f };
+
+    walk_->Initialize(&ctx_->dxCommon, "Animation/human/Walk.gltf");
+    walkTransform_.rotate = { 0.0f,3.12f,0.0f };
+    walkTransform_.translate = { 0.0f,0.0f,0.0f };
+
+    sneakWalk_->Initialize(&ctx_->dxCommon, "Animation/human/sneakWalk.gltf");
+    sneakWalkTransform_.rotate = { 0.0f, 3.12f,0.0f };
+    sneakWalkTransform_.translate = { 3.0f,0.0f,0.0f };
+
+	walkAnimation_ = LoadAnimationFile("Animation/human/Walk.gltf");
 
 	testTimer_.Start(5.0f, true);
 }
@@ -32,10 +45,6 @@ void TestScene::Initialize() {
 void TestScene::Update() {
 
 	testParticle_->Update();
-
-	//cubeTransform_.translate = Easing::LerpVector3(
-	//	{ 0.0f,0.0f,0.0f }, { 10.0f,5.0f,3.0f }, testTimer_.GetProgress(),
-	//	Easing::Type::EaseOutInBack);
 
     if (ctx_->input.TriggerKey(DIK_Z)) {
         animationCube_->PlayAnimation();
@@ -45,11 +54,15 @@ void TestScene::Update() {
         animationCube_->StopAnimation();
     }
 
-    normalCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
-    animationCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseOutBack);
+    if (ctx_->input.TriggerKey(DIK_V)) {
+        sneakWalk_->SetAnimationData(walkAnimation_);
+    }
 
 	normalCube_->Update();
 	animationCube_->Update();
+    simpleSkin_->Update();
+    sneakWalk_->Update();
+	walk_->Update();
 
 	testTimer_.Update();
 
@@ -61,24 +74,33 @@ void TestScene::Update() {
 void TestScene::Draw() {
     normalCube_->Draw(camera_, normalCubeTransform_);
     animationCube_->Draw(camera_, animationCubeTransform_);
+    simpleSkin_->Draw(camera_, simpleSkinTransform_);
+	walk_->Draw(camera_, walkTransform_);
+    sneakWalk_->Draw(camera_, sneakWalkTransform_);
+
 	testParticle_->Draw(camera_);
 }
 
 void TestScene::DrawImGui() {
-
-    DrawSceneName();
-
+#ifdef USE_IMGUI
     testParticle_->DrawImGui("TestParticle");
 
-	//normalCube_->DrawImGui("NormalCube");
-	//animationCube_->DrawImGui("AnimationCube");
+	walk_ ->DrawImGui("WalkModel");
+
+	normalCubeTransform_.DrawImGui("NormalCubeTransform");
+	animationCubeTransform_.DrawImGui("AnimationCubeTransform");
+	//simpleSkinTransform_.DrawImGui("SimpleSkinTransform");
+	//walkTransform_.DrawImGui("WalkTransform");
+	//sneakWalkTransform_.DrawImGui("SneakWalkTransform");
 
 	//MT4_01_03();
 	//MT4_01_04();
     //MT4_01_05();
+#endif
 }
 
 void TestScene::MT4_01_03() {
+#ifdef USE_IMGUI
     Quaternion q1 = { 2.0f, 3.0f, 4.0f, 1.0f };
     Quaternion q2 = { 1.0f, 3.0f, 5.0f, 2.0f };
 
@@ -131,9 +153,11 @@ void TestScene::MT4_01_03() {
     ImGui::Text("Norm(q1) = %.2f", norm);
 
     ImGui::End();
+#endif
 }
 
 void TestScene::MT4_01_04() {
+#ifdef USE_IMGUI
     Vector3 axis{ 1.0f, 0.4f, -0.2f };
     float angle = 0.45f;
     Vector3 pointY{ 2.1f, -0.9f, 1.3f };
@@ -184,10 +208,11 @@ void TestScene::MT4_01_04() {
         rotateByMat.x, rotateByMat.y, rotateByMat.z);
 
     ImGui::End();
+#endif
 }
 
 void TestScene::MT4_01_05() {
-
+#ifdef USE_IMGUI
     Quaternion rotation0 = MakeRotateAxisAngleQuaternion({ 0.71f, 0.71f, 0.0f }, 0.3f);
     Quaternion rotation1 = MakeRotateAxisAngleQuaternion({ 0.71f, 0.0f, 0.71f }, 3.141592f);
 
@@ -230,4 +255,5 @@ void TestScene::MT4_01_05() {
         interpolate4.x, interpolate4.y, interpolate4.z, interpolate4.w);
 
     ImGui::End();
+#endif
 }

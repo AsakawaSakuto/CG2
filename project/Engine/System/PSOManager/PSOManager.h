@@ -37,6 +37,12 @@ enum class PSOType {
     Model_Wireframe_Normal,
     Model_Alpha_Normal, // 追加: 透明モデル用（深度書き込みOFF）
     
+    // スキニングモデル用（新規追加）
+    SkinningModel_Solid_Normal,
+    SkinningModel_Solid_Add,
+    SkinningModel_Wireframe_Normal,
+    SkinningModel_Alpha_Normal,
+    
     // スプライト用
     Sprite_Normal,
     

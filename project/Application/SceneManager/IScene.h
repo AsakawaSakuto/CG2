@@ -18,8 +18,6 @@ protected:
     // AppContext
     AppContext* ctx_ = nullptr;
 
-	void DrawSceneName();
-
 	void ChangeScene(SCENE nextSceneName) { nowSceneName_ = nextSceneName; }
 
     void Quit();
@@ -31,4 +29,6 @@ public:
     virtual void DrawImGui() = 0;
     virtual ~IScene() {}
     SCENE GetSceneNo();
+
+    void DrawSceneName();
 };

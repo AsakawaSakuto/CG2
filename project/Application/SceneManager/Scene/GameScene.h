@@ -31,6 +31,9 @@ private:
 	unique_ptr<Model> testPlane_ = make_unique<Model>();
 	unique_ptr<Model> testWall_ = make_unique<Model>();
 
+	Transform testPlaneTransform_;
+	Transform testWallTransform_;
+
 	// プレイヤー関連のクラス
 	unique_ptr<Player> player_ = make_unique<Player>();
 	unique_ptr<GameCameraController> gameCamera_ = make_unique<GameCameraController>();

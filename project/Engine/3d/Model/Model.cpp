@@ -12,11 +12,19 @@ using namespace Microsoft::WRL;
 #include "../../System/PSOManager/PSOManager.h"
 #include "../Utility/GameTimer/DeltaTime.h"
 #include "../Model/Animation/Function/AnimationFunction.h"
+#include "../../3d/Particles/ParticleDescriptorAllocator.h"
 
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
 
 //"resources/uvChecker.png"
+
+Model::~Model() {
+	// アニメーション使用時にSRVインデックスを解放
+	if (skinClusterSrvIndex_ != 0 && dxCommon_ != nullptr) {
+		dxCommon_->GetModelAlloc().Free(skinClusterSrvIndex_);
+	}
+}
 
 void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	dxCommon_ = dxCommon;
@@ -42,19 +50,66 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 		// 拡張子によって処理を分岐
 		if (extension == ".obj") {
+
 			// .obj形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
-			useAnimation_ = false; // objはアニメーション非対応
-			useAnimationTimer_ = false;
+			cache->animationData = {}; // アニメーションデータを初期化
+
 		} else if (extension == ".gltf" || extension == ".glb") {
+
 			// .gltf/.glb形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
-			cache->animationData = LoadAnimationFile(modelPath_);
-			
-			useAnimation_ = true; // gltfはアニメーション対応
-			useAnimationTimer_ = true;
+			cache->animationData = LoadAnimationFile(modelPath);
+
 		} else {
 			Logger::Log("Unsupported model format: %s\n");
+		}
+
+		// アニメーションタイプを判定
+		// スキンクラスターデータがある → BONE（ボーン付きスキニング）
+		if (!cache->modelData.skinClusterData.empty()) {
+			animationType_ = AnimationType::BONE;
+			useAnimationTimer_ = true;
+			
+			cache->skeletonData = CreateSkeleton(cache->modelData.rootNode);
+
+			// Model専用のSRVアロケータから空きインデックスを取得
+			cache->skinClusterIndex = dxCommon_->GetModelAlloc().Allocate();
+
+			cache->skinClusterData = CreateSkinCluster(
+				device_,
+				cache->skeletonData,
+				cache->modelData,
+				dxCommon_->GetSRV(),
+				dxCommon_->GetDescriptorSizeSRV(),
+				cache->skinClusterIndex // 動的に割り当てられたインデックスを使用
+			);
+
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to BONE for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+			sprintf_s(debugBuffer, "SkinClusterData count: %zu\n", cache->modelData.skinClusterData.size());
+			OutputDebugStringA(debugBuffer);
+		}
+		// アニメーションデータがある → NORMAL（キーフレームアニメーション）
+		else if (!cache->animationData.nodeAnimations.empty()) {
+			animationType_ = AnimationType::NORMAL;
+			useAnimationTimer_ = true;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NORMAL for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+			sprintf_s(debugBuffer, "NodeAnimations count: %zu\n", cache->animationData.nodeAnimations.size());
+			OutputDebugStringA(debugBuffer);
+		}
+		// 両方ない → NONE（アニメーションなし）
+		else {
+			animationType_ = AnimationType::NONE;
+			useAnimationTimer_ = false;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NONE for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
 		}
 
 		// バウンディング半径を自動計算
@@ -78,21 +133,60 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
 
 		// 頂点リソースをつくる（共有）
-		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
-		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
+  		cache->indexResource = CreateBufferResource(device_.Get(), sizeof(uint32_t) * cache->modelData.indeces.size());
+		cache->indexBufferView.BufferLocation = cache->indexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
+		cache->indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * cache->modelData.indeces.size());
+		cache->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+		// 頂点データ書き込み（一時マップ）
+ 		uint32_t* tmp = nullptr;
+ 		cache->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
+ 		std::memcpy(tmp, cache->modelData.indeces.data(), sizeof(uint32_t) * cache->modelData.indeces.size());
+ 		cache->indexResource->Unmap(0, nullptr);
+
+		// 頂點リソースをつくる（共有）
+ 		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
+		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress();
 		cache->vertexBufferView.SizeInBytes = UINT(sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexBufferView.StrideInBytes = sizeof(ModelVertexData);
 		// 頂点データ書き込み（一時マップ）
-		ModelVertexData* tmp = nullptr;
-		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
-		std::memcpy(tmp, cache->modelData.vertices.data(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
+ 		ModelVertexData* vertexTmp = nullptr;
+ 		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexTmp));
+ 		std::memcpy(vertexTmp, cache->modelData.vertices.data(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexResource->Unmap(0, nullptr);
 
 		// キャッシュ登録
 		s_geometryCache_.emplace(modelPath_, cache);
 		it = s_geometryCache_.find(modelPath_);
+	} else {
+		// キャッシュヒット
+		std::string message = "Model cache hit: " + modelPath_ + "\n";
+		OutputDebugStringA(message.c_str());
+		
+		// キャッシュヒット時もアニメーションタイプを判定
+		const auto& cache = it->second;
+		if (!cache->modelData.skinClusterData.empty()) {
+			animationType_ = AnimationType::BONE;
+			useAnimationTimer_ = true;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to BONE (cache hit) for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+		} else if (!cache->animationData.nodeAnimations.empty()) {
+			animationType_ = AnimationType::NORMAL;
+			useAnimationTimer_ = true;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NORMAL (cache hit) for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+		} else {
+			animationType_ = AnimationType::NONE;
+			useAnimationTimer_ = false;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NONE (cache hit) for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+		}
 	}
-	// else の場合：キャッシュヒット = モデル読み込みスキップ成功
 
 	// キャッシュからインスタンスへ設定
 	const auto& cache = it->second;
@@ -100,9 +194,13 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	animationData_ = cache->animationData;
 	textureName_ = cache->textureName;
 	textureIndex_ = cache->textureIndex;
-	vertexResource_ = cache->vertexResource;
+	indexResource_ = cache->indexResource;
+	indexBufferView_ = cache->indexBufferView;
 	vertexBufferView_ = cache->vertexBufferView;
+	vertexResource_ = cache->vertexResource;
 	boundingRadius_ = cache->boundingRadius;
+	skeleton_ = cache->skeletonData;
+	skinCluster_ = cache->skinClusterData;
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
@@ -119,10 +217,6 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 void Model::Update() {
 
-	transform_.scale.x = std::clamp(transform_.scale.x, 0.0f, 100.0f);
-	transform_.scale.y = std::clamp(transform_.scale.y, 0.0f, 100.0f);
-	transform_.scale.z = std::clamp(transform_.scale.z, 0.0f, 100.0f);
-
 	if (useUpdateFrustumCulling_) {
 		Vector3 worldPosition = GetWorldPosition();
 		// スケールを考慮したバウンディング半径を計算
@@ -131,9 +225,13 @@ void Model::Update() {
 
 		// カメラのフラスタム内にない場合は描画をスキップ
 		if (!camera_.IsInFrustum(worldPosition, adjustedRadius)) {
-			return; // 描画をスキップ
+			return; // 更新をスキップ
 		}
 	}
+
+	transform_.scale.x = std::clamp(transform_.scale.x, 0.0f, 100.0f);
+	transform_.scale.y = std::clamp(transform_.scale.y, 0.0f, 100.0f);
+	transform_.scale.z = std::clamp(transform_.scale.z, 0.0f, 100.0f);
 
 	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
 
@@ -152,8 +250,16 @@ void Model::Update() {
 		animationTime_ = fmod(animationTime_, animationData_.duration);
 	}
 
-	// アニメーションの適用
-	if (useAnimation_) {
+	switch (animationType_)
+	{
+	case AnimationType::NONE: {
+
+		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
+
+		break;
+	}
+	case AnimationType::NORMAL: {
 
 		NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
 		Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
@@ -165,9 +271,20 @@ void Model::Update() {
 
 		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
 		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
-	} else {
-		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
-		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
+
+		break;
+	}
+	case AnimationType::BONE: {
+
+		ApplyAnimation(skeleton_, animationData_, animationTime_);
+		UpdateAnimation(skeleton_);
+		UpdateCluster(skinCluster_, skeleton_);
+
+		transformationData_->WVP = worldViewProjectionMatrix;
+		transformationData_->World = worldMatrix;
+
+		break;
+	}
 	}
 
 	transformationData_->WorldInverseTranspose = worldInverseMatrix;
@@ -200,55 +317,101 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	// フラスタムカリングのチェック
 	if (useDrawFrustumCulling_) {
 		Vector3 worldPosition = GetWorldPosition();
-		// スケールを考慮したバウンディング半径を計算
 		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
 		float adjustedRadius = boundingRadius_ * maxScale;
-		
-		// カメラのフラスタム内にない場合は描画をスキップ
+
 		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
-			return; // 描画をスキップ
+			return;
 		}
 	}
-	
-	// PSOManagerからRootSignatureとPSOを取得
-	auto& psoManager = PSOManager::GetInstance();
-	auto rootSignature = psoManager.GetRootSignature("Object3D");
-	
-	// RootSignatureを設定
-	commandList_->SetGraphicsRootSignature(rootSignature.Get());
 
-	// 半透明フラグでPSO切替（深度書き込みOFFのNormalブレンド）
+	auto& psoManager = PSOManager::GetInstance();
+
+	// アニメーション使用の有無でRootSignatureとPSOを切り替え
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
-	if (useTransparent_) {
-		pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
-	} else {
-		// 描画モードに応じてPSOを取得・設定
-		pso = useWireFrame ? 
-			psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
-			psoManager.GetPSO(PSOType::Model_Solid_Normal);
+	
+	switch (animationType_)
+	{
+	case Model::AnimationType::NONE: {
+
+		rootSignature = psoManager.GetRootSignature("Object3D");
+
+		if (useTransparent_) {
+			pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
+		} else {
+			pso = useWireFrame ?
+				psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
+				psoManager.GetPSO(PSOType::Model_Solid_Normal);
+		}
+
+		break;
 	}
+	case Model::AnimationType::NORMAL: {
+
+		rootSignature = psoManager.GetRootSignature("Object3D");
+
+		if (useTransparent_) {
+			pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
+		} else {
+			pso = useWireFrame ?
+				psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
+				psoManager.GetPSO(PSOType::Model_Solid_Normal);
+		}
+
+		break;
+	}
+	case Model::AnimationType::BONE: {
+
+		rootSignature = psoManager.GetRootSignature("Skinning");
+
+		if (useTransparent_) {
+			pso = psoManager.GetPSO(PSOType::SkinningModel_Alpha_Normal);
+		} else {
+			pso = useWireFrame ?
+				psoManager.GetPSO(PSOType::SkinningModel_Wireframe_Normal) :
+				psoManager.GetPSO(PSOType::SkinningModel_Solid_Normal);
+		}
+
+		break;
+	}
+	}
+
+	commandList_->SetGraphicsRootSignature(rootSignature.Get());
 	commandList_->SetPipelineState(pso.Get());
 
-	// プリミティブトポロジーを設定
+	if (animationType_ == AnimationType::BONE) {
+		// Skinningモデルは2つのVBVを使用
+		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			vertexBufferView_,
+			skinCluster_.influenceBufferView
+		};
+		commandList_->IASetVertexBuffers(0, 2, vbvs);
+	} else {
+		// 通常モデルは1つのVBVのみ
+		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	}
+
+	commandList_->IASetIndexBuffer(&indexBufferView_);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList_->IASetIndexBuffer(nullptr); // インデックス使っていないので設定しない
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// RootParams 設定（そのままでOK）
+	// 共通パラメータの設定
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
-	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 
-	// 頂点描画（DrawInstanced）
-	commandList_->DrawInstanced(
-		static_cast<UINT>(modelData_.vertices.size()), // 頂点数ぶん描画
-		1, 0, 0);
+	// Skinningモデルの場合、MatrixPaletteを設定
+	if (animationType_ == AnimationType::BONE) {
+		commandList_->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
+	}
+
+	// 描画
+	commandList_->DrawIndexedInstanced(
+		static_cast<UINT>(modelData_.indeces.size()), 1, 0, 0, 0);
 }
 
 void Model::SetTexture(const std::string& textureName) {
@@ -422,22 +585,6 @@ void Model::DrawImGui(const char* objectName) {
 #endif
 }
 
-void Model::CreateVertexResource() {
-	// 旧実装は共有キャッシュ導入により未使用（後方互換のため残すが呼ばれない想定）
-	// 頂点リソースをつくる
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * modelData_.vertices.size());
-	// リソースの先頭のアドレスから使う
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	// 使用するリソースのサイズは頂点のサイズ
-	vertexBufferView_.SizeInBytes = UINT(sizeof(ModelVertexData) * modelData_.vertices.size()); 
-	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(ModelVertexData);
-	// 頂点リソースにデータを書き込む、書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	// 頂点データをリソースにコピー
-	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(ModelVertexData) * modelData_.vertices.size()); 
-}
-
 void Model::CreateMaterialResource() {
 	// MaterialResource
 	materialResource_ = CreateBufferResource(device_.Get(), sizeof(ModelMaterial));
@@ -445,9 +592,9 @@ void Model::CreateMaterialResource() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
-	materialData_->enableLighting = true;
-	materialData_->uvTransformMatrix = MakeIdentityMatrix();
-	materialData_->shininess = 5000.0f;
+ 	materialData_->enableLighting = true;
+ 	materialData_->uvTransformMatrix = MakeIdentityMatrix();
+ 	materialData_->shininess = 100.0f;
 }
 
 void Model::CreateTransformationResource() {

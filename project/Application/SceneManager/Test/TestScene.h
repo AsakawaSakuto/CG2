@@ -16,6 +16,7 @@ public:
 	~TestScene();
 
 private:
+
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
@@ -30,9 +31,18 @@ private:
 
 	unique_ptr<Model> normalCube_ = make_unique<Model>();
 	unique_ptr<Model> animationCube_ = make_unique<Model>();
-	
+	unique_ptr<Model> simpleSkin_ = make_unique<Model>();
+	unique_ptr<Model> walk_ = make_unique<Model>();
+	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
+
 	Transform normalCubeTransform_;
 	Transform animationCubeTransform_;
+	Transform simpleSkinTransform_;
+	Transform walkTransform_;
+	Transform sneakWalkTransform_;
+
+	Animation walkAnimation_;
+	Animation sneakWalkAnimation_;
 
 	GameTimer testTimer_;
 

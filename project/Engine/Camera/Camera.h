@@ -55,6 +55,7 @@ public:
 		horizontalAngle_ = horizontal; 
 		verticalAngle_ = vertical; 
 	}
+
 	void AddTPSAngles(float deltaHorizontal, float deltaVertical) {
 		horizontalAngle_ += deltaHorizontal;
 		

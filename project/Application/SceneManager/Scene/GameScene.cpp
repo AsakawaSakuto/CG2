@@ -19,11 +19,12 @@ void GameScene::Initialize() {
 	enemyManager_->Initialize(ctx_);
 
 	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
-	testPlane_->SetScale({ 100.0f,1.0f,100.0f });
-	testPlane_->SetTranslate({ 0.0f,-0.5f,0.0f });
+	testPlaneTransform_.scale = { 100.0f,1.0f,100.0f };
+	testPlaneTransform_.translate = { 0.0f,-0.5f,0.0f };
 
 	testWall_->Initialize(&ctx_->dxCommon, "wall.obj");
 	testWall_->SetTranslate({ 0.0f,-40.0f,0.0f });
+	testWallTransform_.translate = { 0.0f,-40.0f,0.0f };
 }
 
 void GameScene::Update() {
@@ -50,8 +51,8 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	testPlane_->Draw(camera_);
-	testWall_->Draw(camera_);
+	testPlane_->Draw(camera_, testPlaneTransform_);
+	testWall_->Draw(camera_, testWallTransform_);
 
 	player_->Draw(camera_);
 
@@ -59,8 +60,7 @@ void GameScene::Draw() {
 }
 
 void GameScene::DrawImGui() {
-	DrawSceneName();
-
+	
 	player_->DrawImGui();
 
 	enemyManager_->DrawImGui();
