@@ -19,10 +19,11 @@ void TestScene::Initialize() {
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
 
 	normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
-    normalCubeTransform_.translate = { -1.5f,2.0f,0.0f };
+    normalCubeTransform_.translate = { -1.5f,2.5f,0.0f };
 
 	animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
-    animationCubeTransform_.translate = { -1.5f,2.0f,0.0f };
+    animationCubeTransform_.translate = { 1.5f,2.5f,0.0f };
+	animationCubeTransform_.scale = { 0.5f,0.5f,0.5f };
 
 	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
 	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };

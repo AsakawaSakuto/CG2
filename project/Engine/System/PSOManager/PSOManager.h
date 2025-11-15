@@ -73,7 +73,6 @@ public:
     
     // 共通のRoot Signatureを取得
     Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature(const std::string& signatureType);
-    Microsoft::WRL::ComPtr<ID3D12RootSignature> GetSkinningRootSignature(const std::string& signatureType);
 
     // シェーダーキャッシュからシェーダーを取得（新規追加）
     Microsoft::WRL::ComPtr<IDxcBlob> GetOrCompileShader(const std::wstring& filePath, const wchar_t* profile);

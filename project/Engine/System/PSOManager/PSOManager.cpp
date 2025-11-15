@@ -24,34 +24,41 @@ void PSOManager::Initialize(DirectXCommon* dxCommon) {
 }
 
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::GetPSO(PSOType type) {
-    // キャッシュをチェック
+    // キャッシュチェック
     auto it = predefindedPSOs_.find(type);
     if (it != predefindedPSOs_.end()) {
         psoCacheHits_++;
-        // キャッシュヒット時のログは削除（頻繁すぎるため）
-        return it->second;
+        return it->second;   // ここはそのままでOK
     }
-    
-    // キャッシュにない場合は遅延作成
+
+    // 未作成 → 作成
     psoCacheMisses_++;
-    
+
 #ifdef _DEBUG
     auto startTime = std::chrono::high_resolution_clock::now();
     OutputDebugStringA("PSO Cache MISS - Creating PSO on demand...\n");
 #endif
-    
+
     auto pso = CreatePSOOnDemand(type);
+
+    if (!pso) {
+        char buf[256];
+        sprintf_s(buf, "ERROR[GetPSO]: PSO creation FAILED for type=%d\n", (int)type);
+        OutputDebugStringA(buf);
+        // キャッシュしないでそのまま nullptr を返す
+        return nullptr;
+    }
+
     predefindedPSOs_[type] = pso;
-    
+
 #ifdef _DEBUG
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-    
-    char buffer[256];
-    sprintf_s(buffer, "PSO Cache MISS for type %d - Created in %lld ms\n", static_cast<int>(type), duration.count());
+    char buffer[128];
+    sprintf_s(buffer, "PSO created and cached in %lld ms\n", duration.count());
     OutputDebugStringA(buffer);
 #endif
-    
+
     return pso;
 }
 
@@ -593,9 +600,18 @@ void PSOManager::CreateRootSignatures() {
 }
 
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOInternal(const PSOCreateParams& params) {
+
     D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc = {};
     pipelineDesc.pRootSignature = params.rootSignature.Get();
     pipelineDesc.InputLayout = params.inputLayout;
+
+    // 事前チェック（nullptr 防止）
+    if (!pipelineDesc.pRootSignature || !params.vertexShader || !params.pixelShader) {
+        OutputDebugStringA("ERROR[CreatePSOInternal]: RootSignature or Shader is nullptr\n");
+        assert(false && "RootSignature or Shader is nullptr");
+        return nullptr;
+    }
+
     pipelineDesc.VS = { params.vertexShader->GetBufferPointer(), params.vertexShader->GetBufferSize() };
     pipelineDesc.PS = { params.pixelShader->GetBufferPointer(), params.pixelShader->GetBufferSize() };
     pipelineDesc.BlendState = params.blendState;
@@ -611,7 +627,24 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOInternal(const 
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
     HRESULT hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&pipelineDesc, IID_PPV_ARGS(&pipelineState));
-    assert(SUCCEEDED(hr));
+
+    if (FAILED(hr)) {
+        char buf[512];
+        sprintf_s(buf,
+            "ERROR[CreatePSOInternal]: CreateGraphicsPipelineState FAILED (hr=0x%08X)\n"
+            "  RS=%p, VS=%p, PS=%p, RTV=%d, DSV=%d, Topology=%d\n",
+            hr,
+            pipelineDesc.pRootSignature,
+            params.vertexShader.Get(),
+            params.pixelShader.Get(),
+            (int)pipelineDesc.RTVFormats[0],
+            (int)pipelineDesc.DSVFormat,
+            (int)pipelineDesc.PrimitiveTopologyType);
+        OutputDebugStringA(buf);
+
+        assert(false && "CreateGraphicsPipelineState FAILED");
+        return nullptr;
+    }
 
     return pipelineState;
 }
@@ -727,13 +760,12 @@ D3D12_DEPTH_STENCIL_DESC PSOManager::CreateDepthStencilState(const std::string& 
 }
 
 D3D12_INPUT_LAYOUT_DESC PSOManager::CreateInputLayout(const std::string& layoutType) {
-    // Object3D用の入力レイアウト（3要素）
-    static D3D12_INPUT_ELEMENT_DESC object3dInputElementDescs[3] = {};
-    
-    // Skinning用の入力レイアウト（5要素: 通常の3つ + WEIGHT + INDEX）
-    static D3D12_INPUT_ELEMENT_DESC skinningInputElementDescs[5] = {};
-    
+
     if (layoutType == "Skinning") {
+
+        // Skinning用の入力レイアウト（5要素: 通常の3つ + WEIGHT + INDEX）
+        static D3D12_INPUT_ELEMENT_DESC skinningInputElementDescs[5] = {};
+
         // POSITION
         skinningInputElementDescs[0].SemanticName = "POSITION";
         skinningInputElementDescs[0].SemanticIndex = 0;
@@ -784,6 +816,10 @@ D3D12_INPUT_LAYOUT_DESC PSOManager::CreateInputLayout(const std::string& layoutT
         inputLayoutDesc.NumElements = _countof(skinningInputElementDescs);
         return inputLayoutDesc;
     } else {
+
+        // Object3D用の入力レイアウト（3要素）
+        static D3D12_INPUT_ELEMENT_DESC object3dInputElementDescs[3] = {};
+
         // Object3D, Particle用の共通入力レイアウト
         object3dInputElementDescs[0].SemanticName = "POSITION";
         object3dInputElementDescs[0].SemanticIndex = 0;

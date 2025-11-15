@@ -3,7 +3,7 @@
 StructuredBuffer<Well> gMatrixPalette : register(t1);
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b1);
 
-Skinned Skinning(VertexShaderInput input)
+Skinned Skinning(SkinningVertexShaderInput input)
 {
     Skinned skinned;
     
@@ -24,7 +24,7 @@ Skinned Skinning(VertexShaderInput input)
     return skinned;
 }
 
-VertexShaderOutput main(VertexShaderInput input)
+VertexShaderOutput main(SkinningVertexShaderInput input)
 {
     VertexShaderOutput output;
     Skinned skinned = Skinning(input);
