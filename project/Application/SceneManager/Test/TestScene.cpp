@@ -14,9 +14,9 @@ void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 void TestScene::Initialize() {
     CleanupResources();
 	testParticle_->Initialize(&ctx_->dxCommon);
-	camera_.SetPosition({ 0.0f, 0.0f, -10.0f });
+	camera_.SetPosition({ 0.0f, 0.0f, -20.0f });
 	debugCamera_.SetInput(&ctx_->input);
-	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
+	debugCamera_.SetPosition({ 0.0f, 0.0f, -20.0f });
 
 	normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
     normalCubeTransform_.translate = { -1.5f,2.5f,0.0f };
