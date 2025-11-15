@@ -12,7 +12,7 @@ Animation LoadAnimationFile(const std::string& filename)
     Animation animation; // 今回作るアニメーション
 
     Assimp::Importer importer;
-    std::string filePath = filename;
+    std::string filePath = "resources/model/" + filename;
 
     // モデルと同じでOK。資料では 0 になってるが、既に使ってるフラグがあればそれでいい
     const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);

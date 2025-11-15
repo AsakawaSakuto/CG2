@@ -26,4 +26,5 @@ public:
     ~SceneManager();
     int Run();  // メインループ
     std::unique_ptr<AppContext> appContext_;
+	std::unique_ptr<WinApp> winApp_;
 };

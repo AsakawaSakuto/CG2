@@ -71,10 +71,6 @@
     <ClInclude Include="Engine\3d\Particles\Json\EmitterStateLoder.h" />
     <ClInclude Include="Engine\3d\Particles\ParticleDescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\EmitterState.h" />
-    <ClInclude Include="Engine\3d\Particles\Struct\ParticleDataCS.h" />
-    <ClInclude Include="Engine\3d\Particles\Struct\ParticleVertexData.h" />
-    <ClInclude Include="Engine\3d\Particles\Struct\PreFrame.h" />
-    <ClInclude Include="Engine\3d\Particles\Struct\PreView.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\System\GamePad\GamePad.h" />
     <ClInclude Include="Engine\System\HeapManager\HeapManager.h" />
@@ -116,7 +112,6 @@
     <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h" />
     <ClInclude Include="Engine\3d\Particles\Particles.h" />
     <ClInclude Include="Engine\System\ResourceData\PointLight.h" />
-    <ClInclude Include="Engine\3d\Particles\Struct\ParticleMaterial.h" />
     <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />
     <ClInclude Include="Engine\System\Utility\Random\Random.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />
@@ -146,6 +141,7 @@
     <ClInclude Include="Engine\System\Utility\Quaternion\QuaternionFunction.h" />
     <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
+    <ClInclude Include="Engine\3d\Particles\Struct\ParticleDataStruct.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />

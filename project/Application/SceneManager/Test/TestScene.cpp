@@ -37,6 +37,8 @@ void TestScene::Initialize() {
     sneakWalkTransform_.rotate = { 0.0f, 3.12f,0.0f };
     sneakWalkTransform_.translate = { 3.0f,0.0f,0.0f };
 
+	walkAnimation_ = LoadAnimationFile("Animation/human/Walk.gltf");
+
 	testTimer_.Start(5.0f, true);
 }
 
@@ -50,6 +52,10 @@ void TestScene::Update() {
 
     if (ctx_->input.TriggerKey(DIK_X)) {
         animationCube_->StopAnimation();
+    }
+
+    if (ctx_->input.TriggerKey(DIK_V)) {
+        sneakWalk_->SetAnimationData(walkAnimation_);
     }
 
 	normalCube_->Update();
@@ -76,9 +82,7 @@ void TestScene::Draw() {
 }
 
 void TestScene::DrawImGui() {
-
-    DrawSceneName();
-
+#ifdef USE_IMGUI
     testParticle_->DrawImGui("TestParticle");
 
 	walk_ ->DrawImGui("WalkModel");
@@ -92,9 +96,11 @@ void TestScene::DrawImGui() {
 	//MT4_01_03();
 	//MT4_01_04();
     //MT4_01_05();
+#endif
 }
 
 void TestScene::MT4_01_03() {
+#ifdef USE_IMGUI
     Quaternion q1 = { 2.0f, 3.0f, 4.0f, 1.0f };
     Quaternion q2 = { 1.0f, 3.0f, 5.0f, 2.0f };
 
@@ -147,9 +153,11 @@ void TestScene::MT4_01_03() {
     ImGui::Text("Norm(q1) = %.2f", norm);
 
     ImGui::End();
+#endif
 }
 
 void TestScene::MT4_01_04() {
+#ifdef USE_IMGUI
     Vector3 axis{ 1.0f, 0.4f, -0.2f };
     float angle = 0.45f;
     Vector3 pointY{ 2.1f, -0.9f, 1.3f };
@@ -200,10 +208,11 @@ void TestScene::MT4_01_04() {
         rotateByMat.x, rotateByMat.y, rotateByMat.z);
 
     ImGui::End();
+#endif
 }
 
 void TestScene::MT4_01_05() {
-
+#ifdef USE_IMGUI
     Quaternion rotation0 = MakeRotateAxisAngleQuaternion({ 0.71f, 0.71f, 0.0f }, 0.3f);
     Quaternion rotation1 = MakeRotateAxisAngleQuaternion({ 0.71f, 0.0f, 0.71f }, 3.141592f);
 
@@ -246,4 +255,5 @@ void TestScene::MT4_01_05() {
         interpolate4.x, interpolate4.y, interpolate4.z, interpolate4.w);
 
     ImGui::End();
+#endif
 }

@@ -33,7 +33,6 @@ void TitleScene::Draw() {
 }
 
 void TitleScene::DrawImGui() {
-	DrawSceneName();
-
+	
 	titleUI_->DrawImGui();
 }

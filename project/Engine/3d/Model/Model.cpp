@@ -59,7 +59,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 			// .gltf/.glb形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
-			cache->animationData = LoadAnimationFile(modelPath_);
+			cache->animationData = LoadAnimationFile(modelPath);
 
 		} else {
 			Logger::Log("Unsupported model format: %s\n");
@@ -71,6 +71,20 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 			animationType_ = AnimationType::BONE;
 			useAnimationTimer_ = true;
 			
+			cache->skeletonData = CreateSkeleton(cache->modelData.rootNode);
+
+			// Model専用のSRVアロケータから空きインデックスを取得
+			cache->skinClusterIndex = dxCommon_->GetModelAlloc().Allocate();
+
+			cache->skinClusterData = CreateSkinCluster(
+				device_,
+				cache->skeletonData,
+				cache->modelData,
+				dxCommon_->GetSRV(),
+				dxCommon_->GetDescriptorSizeSRV(),
+				cache->skinClusterIndex // 動的に割り当てられたインデックスを使用
+			);
+
 			char debugBuffer[256];
 			sprintf_s(debugBuffer, "AnimationType set to BONE for model: %s\n", modelPath_.c_str());
 			OutputDebugStringA(debugBuffer);
@@ -185,22 +199,8 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	vertexBufferView_ = cache->vertexBufferView;
 	vertexResource_ = cache->vertexResource;
 	boundingRadius_ = cache->boundingRadius;
-	
-	if (animationType_ == AnimationType::BONE) {
-		skeleton_ = CreateSkeleton(modelData_.rootNode);
-		
-		// Model専用のSRVアロケータから空きインデックスを取得
-		skinClusterSrvIndex_ = dxCommon_->GetModelAlloc().Allocate();
-		
-		skinCluster_ = CreateSkinCluster(
-			device_,
-			skeleton_,
-			modelData_,
-			dxCommon_->GetSRV(),
-			dxCommon_->GetDescriptorSizeSRV(),
-			skinClusterSrvIndex_ // 動的に割り当てられたインデックスを使用
-		);
-	}
+	skeleton_ = cache->skeletonData;
+	skinCluster_ = cache->skinClusterData;
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
@@ -375,24 +375,6 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 
 		break;
 	}
-	}
-
-	// RootSignatureとPSOのnullチェック
-	if (!rootSignature) {
-		char debugBuffer[256];
-		sprintf_s(debugBuffer, "ERROR: RootSignature is nullptr for AnimationType: %d\n", static_cast<int>(animationType_));
-		OutputDebugStringA(debugBuffer);
-		assert(false && "RootSignature is nullptr");
-		return;
-	}
-
-	if (!pso) {
-		char debugBuffer[512];
-		sprintf_s(debugBuffer, "ERROR: PSO is nullptr for AnimationType: %d, useTransparent: %d, useWireFrame: %d, modelPath: %s\n", 
-			static_cast<int>(animationType_), useTransparent_, useWireFrame, modelPath_.c_str());
-		OutputDebugStringA(debugBuffer);
-		assert(false && "PSO is nullptr");
-		return;
 	}
 
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());

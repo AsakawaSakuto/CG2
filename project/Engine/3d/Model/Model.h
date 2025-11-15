@@ -79,7 +79,7 @@ public:
 	void SetDrawMode(bool drawMode) { useWireFrame = drawMode; }
 
 	// uv座標変換情報を設定
-	void SetUvTransform(const UvTransform& uvT) { uvTransform_ = uvT; }
+	void SetUvTransform(const Transform2D& uvT) { uvTransform_ = uvT; }
 
 	// uv座標を設定
 	void SetUvTranslate(Vector2 uvT) { uvTransform_.translate = uvT; }
@@ -98,6 +98,8 @@ public:
 	void PlayAnimation() { if (!useAnimationTimer_) { useAnimationTimer_ = true; } }
 	void StopAnimation() { if (useAnimationTimer_) { useAnimationTimer_ = false; } }
 
+	void SetAnimationData(Animation animation) { animationData_ = animation; }
+
 	//float GetBoundingRadius() const { return boundingRadius_; }
 	//bool GetDrawFrustumCulling() const { return useDrawFrustumCulling_; }
 	//bool GetUpdateFrustumCulling() const { return useUpdateFrustumCulling_; }
@@ -106,12 +108,15 @@ private:
 
 	// モデルジオメトリ共有キャッシュ
 	struct GeometryCache {
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource; // 共有頂点リソース
-		D3D12_INDEX_BUFFER_VIEW indexBufferView;             // 共有VBV
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;  // 共有頂点リソース
+		D3D12_INDEX_BUFFER_VIEW indexBufferView;               // 共有VBV
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;             // 共有VBV
-		ModelData modelData;                           // 共有モデルデータ
+		ModelData modelData;                                   // 共有モデルデータ
 		Animation animationData;                               // 共有アニメーションデータ
+		Skeleton skeletonData;
+		SkinCluster skinClusterData;
+		uint32_t skinClusterIndex;
 		std::string textureName;                               // 使用テクスチャ名
 		uint32_t textureIndex = 0;                             // テクスチャインデックス
 		float boundingRadius = 1.0f;                           // バウンディング半径
@@ -138,7 +143,7 @@ private:
 	
 	// ワールド変換行列情報
 	Transform transform_;     // SRT情報
-	UvTransform uvTransform_; // UV変換情報
+	Transform2D uvTransform_; // UV変換情報
 
 	// テクスチャ関連
 	std::string textureName_;   // 使用テクスチャファイルパス

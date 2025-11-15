@@ -24,7 +24,7 @@ void Enemy::Update() {
 }
 
 void Enemy::Draw(Camera camera) {
-	model_->Draw(camera);
+	model_->Draw(camera, transform_);
 }
 
 void Enemy::DrawImGui() {

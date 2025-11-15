@@ -17,7 +17,6 @@ class Sprite
 {
 public:
 
-	// サイズを画像から自動取得する版
 	void Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position = { 0.0f,0.0f }, Vector2 scale = { 1.0f,1.0f });
 
 	void Update();
@@ -26,40 +25,33 @@ public:
 
 	void DrawImGui(const char* objectName);
 
-	const Vector2& GetPosition()const { return position_; }
+	void SetTransform2D(const Transform2D& transform) { transform2D_ = transform; }
 
-	void SetPosition(const Vector2& position) { position_ = position; }
+	void SetUVTransform(const Transform2D& uvTransform) { uvTransform_ = uvTransform; }
 
-	void SetScale(const Vector2& s) { transform_.scale = { s.x,s.y,1.0f }; }
+	void SetPosition(const Vector2& position) { transform2D_.translate = position; }
 
-	void SetSize(const Vector2& size) { size_ = size; }
+	void SetScale(const Vector2& scale) { transform2D_.scale = scale; }
+
+	void SetRotate(float rotate) { transform2D_.rotate = rotate; }
 
 	void SetColor(const Vector4& Color) { materialData_->color = Color; }
 
-	void SetRotate(float rotate) { transform_.rotate.z = rotate; }
-
-	Vector2& GetPosition() { return position_; }
-
 	Vector2& GetSize() { return size_; }
-
-	Vector4& GetColor() { return materialData_->color; }
-
-	float GetRotate() { return transform_.rotate.z; }
 
 	void SetTexture(const std::string& textureName);
 
-	Vector2 GetUvTranslate_() { return uvTranslate_; }
-
-	void SetUvTranslate(Vector2 uvT) { uvTranslate_ = uvT; }
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	HRESULT hr_;
 
 	uint32_t textureIndex_ = 0;
 
-	Vector2 uvScale_ = { 1.0f,1.0f };
-	Vector2 uvTranslate_ = { 0.0f,0.0f };
-	float uvRotate_ = 0.0f;
+	Transform2D transform2D_ = {};
+	Transform2D uvTransform_ = {};
+
+	Vector2 size_ = {};
+	Vector2 anchorPoint = { 0.5f,0.5f };
 
 	std::string textureName_;
 
@@ -91,11 +83,6 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_ = {};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_ = {};
-
-	Transform transform_ = {};
-	Vector2 position_ = {};
-	Vector2 size_ = {};
-	Vector2 anchorPoint = { 0.5f,0.5f };
 
 	//----------------------------------------------//
 

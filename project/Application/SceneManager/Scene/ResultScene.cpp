@@ -24,6 +24,4 @@ void ResultScene::Draw() {
 
 void ResultScene::DrawImGui() {
 
-	DrawSceneName();
-
 }

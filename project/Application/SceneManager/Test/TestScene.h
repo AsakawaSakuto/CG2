@@ -41,6 +41,9 @@ private:
 	Transform walkTransform_;
 	Transform sneakWalkTransform_;
 
+	Animation walkAnimation_;
+	Animation sneakWalkAnimation_;
+
 	GameTimer testTimer_;
 
 	Camera camera_;

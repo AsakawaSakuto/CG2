@@ -33,6 +33,29 @@ struct Transform {
 #endif
 };
 
+struct Transform2D {
+	Vector2 scale = { 1.0f,1.0f };
+	float rotate = 0.0f;
+	Vector2 translate = { 0.0f,0.0f };
+#ifdef USE_IMGUI
+	void DrawImGui(const char* name) {
+		ImGui::Begin(name);
+
+		ImGui::DragFloat2("translate", &translate.x, 0.01f);
+		ImGui::DragFloat("rotate", &rotate, 0.01f);
+		ImGui::DragFloat2("scale", &scale.x, 0.01f);
+
+		if (ImGui::Button("Reset")) {
+			translate = { 0.0f,0.0f };
+			rotate = { 0.0f };
+			scale = { 1.0f,1.0f };
+		}
+
+		ImGui::End();
+	}
+#endif
+};
+
 struct EulerTransform {
 	Vector3 scale;
 	Vector3 rotate;
@@ -43,10 +66,4 @@ struct QuaternionTransform {
 	Vector3 scale;
 	Quaternion rotate;
 	Vector3 translate;
-};
-
-struct UvTransform {
-	Vector2 scale = {1.0f,1.0f};
-	float rotate = 0.0f;
-	Vector2 translate = {0.0f,0.0f};
 };

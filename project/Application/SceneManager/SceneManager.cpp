@@ -56,6 +56,7 @@ std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
         }
     }
     catch (const std::exception& e) {
+        e;
         #ifdef _DEBUG
         OutputDebugStringA(("Scene creation failed: " + std::string(e.what()) + "\n").c_str());
         #endif
@@ -69,19 +70,20 @@ int SceneManager::Run() {
 
     // ヒープ上にAppContextを生成
     appContext_ = std::make_unique<AppContext>();
+	winApp_ = std::make_unique<WinApp>();
 
     // 各種初期化
-    appContext_->winApp.Initialize(L"Engine");
+    winApp_->Initialize(L"Engine");
     
     // exeのアイコン設定
-    appContext_->winApp.SetIconFromTexture("resources/image/icon.png");
+    winApp_->SetIconFromTexture("resources/image/icon.png");
     
-    appContext_->winApp.EnableResize(false);
-    appContext_->dxCommon.Initialize(&appContext_->winApp);
+    winApp_->EnableResize(false);
+    appContext_->dxCommon.Initialize(winApp_.get());
     TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);
     Logger::Initialize(); 
     std::filesystem::create_directory("logs");
-    appContext_->input.Initialize(&appContext_->winApp);
+    appContext_->input.Initialize(winApp_.get());
     appContext_->gamePad.Initialize();
 
     // 初期シーンを作成
@@ -112,10 +114,10 @@ int SceneManager::Run() {
         appContext_->gamePad.Update();
 
         if (GetAsyncKeyState(VK_F11) & 1) {
-            if (!appContext_->winApp.IsFullscreen()) {
-                appContext_->winApp.EnterBorderlessFullscreen();
+            if (!winApp_->IsFullscreen()) {
+                winApp_->EnterBorderlessFullscreen();
             } else {
-                appContext_->winApp.ExitBorderlessFullscreen();
+                winApp_->ExitBorderlessFullscreen();
             }
             appContext_->dxCommon.ResizeToWindow();
         }
@@ -163,6 +165,7 @@ int SceneManager::Run() {
                     #endif
                 }
                 catch (const std::exception& e) {
+                    e;
                     #ifdef _DEBUG
                     OutputDebugStringA(("Scene initialization failed: " + std::string(e.what()) + "\n").c_str());
                     #endif
@@ -193,6 +196,7 @@ int SceneManager::Run() {
                 ImGui_ImplWin32_NewFrame();
                 ImGui::NewFrame();
 
+                sceneArr_[static_cast<int>(currentSceneNo_)]->DrawSceneName();
                 sceneArr_[static_cast<int>(currentSceneNo_)]->DrawImGui();
 
                 // Imguiの内部コマンドを生成する
@@ -203,6 +207,7 @@ int SceneManager::Run() {
 				// 描画後処理
                 appContext_->dxCommon.PostDraw();
             } catch (const std::exception& e) {
+                e;
                 #ifdef _DEBUG
                 OutputDebugStringA(("Scene update/draw error: " + std::string(e.what()) + "\n").c_str());
                 #endif
@@ -215,7 +220,7 @@ int SceneManager::Run() {
     
     TextureManager::GetInstance()->Finalize();
     appContext_->dxCommon.CloseFence();
-    appContext_->winApp.Finalize();
+    winApp_->Finalize();
     CoUninitialize();
 
     // 振動のリセット

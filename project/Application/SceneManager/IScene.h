@@ -13,12 +13,10 @@ enum class SCENE {
 
 class IScene {
 protected:
-    SCENE nowSceneName_ = SCENE::TEST;
+    SCENE nowSceneName_ = SCENE::TITLE;
 
     // AppContext
     AppContext* ctx_ = nullptr;
-
-	void DrawSceneName();
 
 	void ChangeScene(SCENE nextSceneName) { nowSceneName_ = nextSceneName; }
 
@@ -31,4 +29,6 @@ public:
     virtual void DrawImGui() = 0;
     virtual ~IScene() {}
     SCENE GetSceneNo();
+
+    void DrawSceneName();
 };
