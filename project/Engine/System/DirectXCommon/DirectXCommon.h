@@ -51,18 +51,18 @@ public:
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
     // ヒープ総数 既存と整合させる
-    static const uint32_t kMaxSRVCount_ = 2048;
+    static const uint32_t kMaxSRVCount_ = 512;
 
-    // テクスチャ専用レンジ [1-1023]
+    // テクスチャ専用レンジ
     static const uint32_t kTextureSRVBegin = 1;
-    static const uint32_t kTextureSRVEnd = 1023; // 両端含む
+    static const uint32_t kTextureSRVEnd = 256; // 両端含む
 
-    // パーティクル専用レンジ [1024-1535]
-    static const uint32_t kParticleSRVBegin = 1024;
-    static const uint32_t kParticleSRVEnd = 1535;
+    // パーティクル専用レンジ
+    static const uint32_t kParticleSRVBegin = 257;
+    static const uint32_t kParticleSRVEnd = 384;
 
-    // Model(Skinning)専用レンジ [1536-2047]
-    static const uint32_t kModelSRVBegin = 1536;
+    // Model(Skinning)専用レンジ
+    static const uint32_t kModelSRVBegin = 385;
     static const uint32_t kModelSRVEnd = kMaxSRVCount_ - 1;
 
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }

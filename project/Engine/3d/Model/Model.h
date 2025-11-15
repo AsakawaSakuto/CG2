@@ -118,8 +118,15 @@ private:
 	};
 	static std::unordered_map<std::string, std::shared_ptr<GeometryCache>> s_geometryCache_;
 
+	enum class AnimationType {
+		NONE,
+		NORMAL,
+		BONE,
+	};
+
 private:
-	
+	AnimationType animationType_ = AnimationType::NONE;
+
 	// モデルのパス
 	std::string modelPath_;
 
@@ -148,8 +155,7 @@ private:
 	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
 
 	// アニメーション関連
-	bool useAnimationTimer_ = false; // 
-	bool useAnimation_ = false;      // アニメーション使用フラグ
+	bool useAnimationTimer_ = false; // アニメーション使用フラグ
 	float animationTime_ = 0.0f;     // アニメーション再生時間
 	Animation animationData_;        // アニメーションデータ
 	Skeleton skeleton_;              // スケルトンデータ

@@ -18,18 +18,18 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
 
+	//normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
+	//animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
+
 	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
-	simpleSkinTransform_.scale = { 1.0f,1.0f,1.0f };
 	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };
 	simpleSkinTransform_.translate = { -3.0f,0.0f,0.0f };
 
     walk_->Initialize(&ctx_->dxCommon, "Animation/human/Walk.gltf");
-    walkTransform_.scale = { 1.0f,1.0f,1.0f };
     walkTransform_.rotate = { 0.0f,3.12f,0.0f };
     walkTransform_.translate = { 0.0f,0.0f,0.0f };
 
     sneakWalk_->Initialize(&ctx_->dxCommon, "Animation/human/sneakWalk.gltf");
-    sneakWalkTransform_.scale = { 1.0f,1.0f,1.0f };
     sneakWalkTransform_.rotate = { 0.0f, 3.12f,0.0f };
     sneakWalkTransform_.translate = { 3.0f,0.0f,0.0f };
 
@@ -40,10 +40,6 @@ void TestScene::Update() {
 
 	testParticle_->Update();
 
-	//cubeTransform_.translate = Easing::LerpVector3(
-	//	{ 0.0f,0.0f,0.0f }, { 10.0f,5.0f,3.0f }, testTimer_.GetProgress(),
-	//	Easing::Type::EaseOutInBack);
-
     if (ctx_->input.TriggerKey(DIK_Z)) {
         animationCube_->PlayAnimation();
     }
@@ -52,9 +48,8 @@ void TestScene::Update() {
         animationCube_->StopAnimation();
     }
 
-    normalCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
-    animationCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
-
+	//normalCube_->Update();
+	//animationCube_->Update();
     simpleSkin_->Update();
     sneakWalk_->Update();
 	walk_->Update();
@@ -82,9 +77,13 @@ void TestScene::DrawImGui() {
 
     testParticle_->DrawImGui("TestParticle");
 
-	//simpleSkin_->DrawImGui("SimpleSkin");
-	//normalCube_->DrawImGui("NormalCube");
-	//animationCube_->DrawImGui("AnimationCube");
+	walk_ ->DrawImGui("WalkModel");
+
+	//normalCubeTransform_.DrawImGui("NormalCubeTransform");
+	//animationCubeTransform_.DrawImGui("AnimationCubeTransform");
+	simpleSkinTransform_.DrawImGui("SimpleSkinTransform");
+	walkTransform_.DrawImGui("WalkTransform");
+	sneakWalkTransform_.DrawImGui("SneakWalkTransform");
 
 	//MT4_01_03();
 	//MT4_01_04();
