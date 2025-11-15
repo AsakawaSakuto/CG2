@@ -57,9 +57,13 @@ public:
     static const uint32_t kTextureSRVBegin = 1;
     static const uint32_t kTextureSRVEnd = 1023; // 両端含む
 
-    // パーティクル専用レンジ [1024-2047]
+    // パーティクル専用レンジ [1024-1535]
     static const uint32_t kParticleSRVBegin = 1024;
-    static const uint32_t kParticleSRVEnd = kMaxSRVCount_ - 1;
+    static const uint32_t kParticleSRVEnd = 1535;
+
+    // Model(Skinning)専用レンジ [1536-2047]
+    static const uint32_t kModelSRVBegin = 1536;
+    static const uint32_t kModelSRVEnd = kMaxSRVCount_ - 1;
 
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
 
@@ -85,10 +89,15 @@ public:
     uint32_t GetDescriptorSizeUAV() { return descriptorSizeUAV_; }
 
     ParticleDescriptorAllocator& GetParticleAlloc();
+    ParticleDescriptorAllocator& GetModelAlloc();
+
 private:
 
     std::unique_ptr<ParticleDescriptorAllocator> particleAlloc_;
     bool particleAllocInitialized_ = false;
+
+    std::unique_ptr<ParticleDescriptorAllocator> modelAlloc_;
+    bool modelAllocInitialized_ = false;
 
     // 
     WinApp* winApp_ = nullptr;

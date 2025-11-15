@@ -12,11 +12,19 @@ using namespace Microsoft::WRL;
 #include "../../System/PSOManager/PSOManager.h"
 #include "../Utility/GameTimer/DeltaTime.h"
 #include "../Model/Animation/Function/AnimationFunction.h"
+#include "../../3d/Particles/ParticleDescriptorAllocator.h"
 
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
 
 //"resources/uvChecker.png"
+
+Model::~Model() {
+	// アニメーション使用時にSRVインデックスを解放
+	if (useAnimation_ && skinClusterSrvIndex_ != 0 && dxCommon_ != nullptr) {
+		dxCommon_->GetModelAlloc().Free(skinClusterSrvIndex_);
+	}
+}
 
 void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	dxCommon_ = dxCommon;
@@ -78,25 +86,25 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
 
 		// 頂点リソースをつくる（共有）
-		cache->indexResource = CreateBufferResource(device_.Get(), sizeof(uint32_t) * cache->modelData.indeces.size());
+  		cache->indexResource = CreateBufferResource(device_.Get(), sizeof(uint32_t) * cache->modelData.indeces.size());
 		cache->indexBufferView.BufferLocation = cache->indexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
 		cache->indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * cache->modelData.indeces.size());
 		cache->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 		// 頂点データ書き込み（一時マップ）
-		uint32_t* tmp = nullptr;
-		cache->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
-		std::memcpy(tmp, cache->modelData.indeces.data(), sizeof(uint32_t) * cache->modelData.indeces.size());
-		cache->indexResource->Unmap(0, nullptr);
+ 		uint32_t* tmp = nullptr;
+ 		cache->indexResource->Map(0, nullptr, reinterpret_cast<void**>(&tmp));
+ 		std::memcpy(tmp, cache->modelData.indeces.data(), sizeof(uint32_t) * cache->modelData.indeces.size());
+ 		cache->indexResource->Unmap(0, nullptr);
 
 		// 頂點リソースをつくる（共有）
-		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
+ 		cache->vertexResource = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexBufferView.BufferLocation = cache->vertexResource->GetGPUVirtualAddress();
 		cache->vertexBufferView.SizeInBytes = UINT(sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexBufferView.StrideInBytes = sizeof(ModelVertexData);
 		// 頂点データ書き込み（一時マップ）
-		ModelVertexData* vertexTmp = nullptr;
-		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexTmp));
-		std::memcpy(vertexTmp, cache->modelData.vertices.data(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
+ 		ModelVertexData* vertexTmp = nullptr;
+ 		cache->vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexTmp));
+ 		std::memcpy(vertexTmp, cache->modelData.vertices.data(), sizeof(ModelVertexData) * cache->modelData.vertices.size());
 		cache->vertexResource->Unmap(0, nullptr);
 
 		// キャッシュ登録
@@ -131,13 +139,17 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	
 	if (useAnimation_) {
 		skeleton_ = CreateSkeleton(modelData_.rootNode);
+		
+		// Model専用のSRVアロケータから空きインデックスを取得
+		skinClusterSrvIndex_ = dxCommon_->GetModelAlloc().Allocate();
+		
 		skinCluster_ = CreateSkinCluster(
 			device_,
 			skeleton_,
 			modelData_,
 			dxCommon_->GetSRV(),
 			dxCommon_->GetDescriptorSizeSRV(),
-			DirectXCommon::kMaxSRVCount_ - 1
+			skinClusterSrvIndex_ // 動的に割り当てられたインデックスを使用
 		);
 	}
 
@@ -501,9 +513,9 @@ void Model::CreateMaterialResource() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
-	materialData_->enableLighting = true;
-	materialData_->uvTransformMatrix = MakeIdentityMatrix();
-	materialData_->shininess = 5000.0f;
+ 	materialData_->enableLighting = true;
+ 	materialData_->uvTransformMatrix = MakeIdentityMatrix();
+ 	materialData_->shininess = 100.0f;
 }
 
 void Model::CreateTransformationResource() {

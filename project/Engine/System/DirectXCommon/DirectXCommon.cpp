@@ -536,6 +536,17 @@ ParticleDescriptorAllocator& DirectXCommon::GetParticleAlloc() {
     return *particleAlloc_;
 }
 
+ParticleDescriptorAllocator& DirectXCommon::GetModelAlloc() {
+    if (!modelAlloc_) {
+        modelAlloc_ = std::make_unique<ParticleDescriptorAllocator>();
+    }
+    if (!modelAllocInitialized_) {
+        modelAlloc_->Initialize(this, kModelSRVBegin, kModelSRVEnd);
+        modelAllocInitialized_ = true;
+    }
+    return *modelAlloc_;
+}
+
 void DirectXCommon::ResizeToWindow() {
     // GPUの実行完了を待機（これをしないとResizeBuffersが失敗しやすい）
     WaitForGPU();

@@ -36,6 +36,9 @@ public:
 	// 初期化
 	void Initialize(DirectXCommon* dxCommon, const std::string& ModelPath);
 
+	// デストラクタ
+	~Model();
+
 	// 更新
 	void Update();
 
@@ -151,6 +154,7 @@ private:
 	Animation animationData_;        // アニメーションデータ
 	Skeleton skeleton_;              // スケルトンデータ
 	SkinCluster skinCluster_;        // スキンクラスター
+	uint32_t skinClusterSrvIndex_ = 0; // SkinCluster用のSRVインデックス（動的割り当て）
 
 	//-----------------------------------------------------------//
 
