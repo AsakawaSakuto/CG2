@@ -18,8 +18,11 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
 
-	//normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
-	//animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
+	normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
+    normalCubeTransform_.translate = { -1.5f,2.0f,0.0f };
+
+	animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
+    animationCubeTransform_.translate = { -1.5f,2.0f,0.0f };
 
 	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
 	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };
@@ -48,8 +51,8 @@ void TestScene::Update() {
         animationCube_->StopAnimation();
     }
 
-	//normalCube_->Update();
-	//animationCube_->Update();
+	normalCube_->Update();
+	animationCube_->Update();
     simpleSkin_->Update();
     sneakWalk_->Update();
 	walk_->Update();
@@ -62,8 +65,8 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-    //normalCube_->Draw(camera_, normalCubeTransform_);
-    //animationCube_->Draw(camera_, animationCubeTransform_);
+    normalCube_->Draw(camera_, normalCubeTransform_);
+    animationCube_->Draw(camera_, animationCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
 	walk_->Draw(camera_, walkTransform_);
     sneakWalk_->Draw(camera_, sneakWalkTransform_);
@@ -79,11 +82,11 @@ void TestScene::DrawImGui() {
 
 	walk_ ->DrawImGui("WalkModel");
 
-	//normalCubeTransform_.DrawImGui("NormalCubeTransform");
-	//animationCubeTransform_.DrawImGui("AnimationCubeTransform");
-	simpleSkinTransform_.DrawImGui("SimpleSkinTransform");
-	walkTransform_.DrawImGui("WalkTransform");
-	sneakWalkTransform_.DrawImGui("SneakWalkTransform");
+	normalCubeTransform_.DrawImGui("NormalCubeTransform");
+	animationCubeTransform_.DrawImGui("AnimationCubeTransform");
+	//simpleSkinTransform_.DrawImGui("SimpleSkinTransform");
+	//walkTransform_.DrawImGui("WalkTransform");
+	//sneakWalkTransform_.DrawImGui("SneakWalkTransform");
 
 	//MT4_01_03();
 	//MT4_01_04();

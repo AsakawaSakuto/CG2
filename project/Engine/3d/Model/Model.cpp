@@ -53,19 +53,49 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 
 			// .obj形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
-			animationType_ = AnimationType::NONE;
-			useAnimationTimer_ = false;
+			cache->animationData = {}; // アニメーションデータを初期化
 
 		} else if (extension == ".gltf" || extension == ".glb") {
 
 			// .gltf/.glb形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
 			cache->animationData = LoadAnimationFile(modelPath_);
-			animationType_ = AnimationType::BONE;
-			useAnimationTimer_ = true;
 
 		} else {
 			Logger::Log("Unsupported model format: %s\n");
+		}
+
+		// アニメーションタイプを判定
+		// スキンクラスターデータがある → BONE（ボーン付きスキニング）
+		if (!cache->modelData.skinClusterData.empty()) {
+			animationType_ = AnimationType::BONE;
+			useAnimationTimer_ = true;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to BONE for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+			sprintf_s(debugBuffer, "SkinClusterData count: %zu\n", cache->modelData.skinClusterData.size());
+			OutputDebugStringA(debugBuffer);
+		}
+		// アニメーションデータがある → NORMAL（キーフレームアニメーション）
+		else if (!cache->animationData.nodeAnimations.empty()) {
+			animationType_ = AnimationType::NORMAL;
+			useAnimationTimer_ = true;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NORMAL for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+			sprintf_s(debugBuffer, "NodeAnimations count: %zu\n", cache->animationData.nodeAnimations.size());
+			OutputDebugStringA(debugBuffer);
+		}
+		// 両方ない → NONE（アニメーションなし）
+		else {
+			animationType_ = AnimationType::NONE;
+			useAnimationTimer_ = false;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NONE for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
 		}
 
 		// バウンディング半径を自動計算
@@ -118,11 +148,29 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		std::string message = "Model cache hit: " + modelPath_ + "\n";
 		OutputDebugStringA(message.c_str());
 		
-		// キャッシュヒット時も拡張子チェックしてアニメーションフラグを設定
-		if (extension == ".gltf" || extension == ".glb") {
+		// キャッシュヒット時もアニメーションタイプを判定
+		const auto& cache = it->second;
+		if (!cache->modelData.skinClusterData.empty()) {
+			animationType_ = AnimationType::BONE;
 			useAnimationTimer_ = true;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to BONE (cache hit) for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
+		} else if (!cache->animationData.nodeAnimations.empty()) {
+			animationType_ = AnimationType::NORMAL;
+			useAnimationTimer_ = true;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NORMAL (cache hit) for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
 		} else {
+			animationType_ = AnimationType::NONE;
 			useAnimationTimer_ = false;
+			
+			char debugBuffer[256];
+			sprintf_s(debugBuffer, "AnimationType set to NONE (cache hit) for model: %s\n", modelPath_.c_str());
+			OutputDebugStringA(debugBuffer);
 		}
 	}
 
@@ -283,19 +331,9 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
 	
-	if (animationType_ == AnimationType::BONE) {
-
-		rootSignature = psoManager.GetRootSignature("Skinning");
-
-		if (useTransparent_) {
-			pso = psoManager.GetPSO(PSOType::SkinningModel_Alpha_Normal);
-		} else {
-			pso = useWireFrame ?
-				psoManager.GetPSO(PSOType::SkinningModel_Wireframe_Normal) :
-				psoManager.GetPSO(PSOType::SkinningModel_Solid_Normal);
-		}
-
-	} else {
+	switch (animationType_)
+	{
+	case Model::AnimationType::NONE: {
 
 		rootSignature = psoManager.GetRootSignature("Object3D");
 
@@ -307,6 +345,54 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 				psoManager.GetPSO(PSOType::Model_Solid_Normal);
 		}
 
+		break;
+	}
+	case Model::AnimationType::NORMAL: {
+
+		rootSignature = psoManager.GetRootSignature("Object3D");
+
+		if (useTransparent_) {
+			pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
+		} else {
+			pso = useWireFrame ?
+				psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
+				psoManager.GetPSO(PSOType::Model_Solid_Normal);
+		}
+
+		break;
+	}
+	case Model::AnimationType::BONE: {
+
+		rootSignature = psoManager.GetRootSignature("Skinning");
+
+		if (useTransparent_) {
+			pso = psoManager.GetPSO(PSOType::SkinningModel_Alpha_Normal);
+		} else {
+			pso = useWireFrame ?
+				psoManager.GetPSO(PSOType::SkinningModel_Wireframe_Normal) :
+				psoManager.GetPSO(PSOType::SkinningModel_Solid_Normal);
+		}
+
+		break;
+	}
+	}
+
+	// RootSignatureとPSOのnullチェック
+	if (!rootSignature) {
+		char debugBuffer[256];
+		sprintf_s(debugBuffer, "ERROR: RootSignature is nullptr for AnimationType: %d\n", static_cast<int>(animationType_));
+		OutputDebugStringA(debugBuffer);
+		assert(false && "RootSignature is nullptr");
+		return;
+	}
+
+	if (!pso) {
+		char debugBuffer[512];
+		sprintf_s(debugBuffer, "ERROR: PSO is nullptr for AnimationType: %d, useTransparent: %d, useWireFrame: %d, modelPath: %s\n", 
+			static_cast<int>(animationType_), useTransparent_, useWireFrame, modelPath_.c_str());
+		OutputDebugStringA(debugBuffer);
+		assert(false && "PSO is nullptr");
+		return;
 	}
 
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());
