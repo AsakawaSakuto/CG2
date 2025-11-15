@@ -50,18 +50,9 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 			// .gltf/.glb形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
 			cache->animationData = LoadAnimationFile(modelPath_);
-			skeleton_ = CreateSkeleton(cache->modelData.rootNode);
-			skinCluster_= CreateSkinCluster(
-				device_,
-				skeleton_,
-				cache->modelData,
-				dxCommon_->GetSRV(),
-				dxCommon_->GetDescriptorSizeSRV(),
-				DirectXCommon::kMaxSRVCount_ - 1
-			);
-
 			useAnimation_ = true; // gltfはアニメーション対応
 			useAnimationTimer_ = true;
+
 		} else {
 			Logger::Log("Unsupported model format: %s\n");
 		}
@@ -115,6 +106,15 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		// キャッシュヒット
 		std::string message = "Model cache hit: " + modelPath_ + "\n";
 		OutputDebugStringA(message.c_str());
+		
+		// キャッシュヒット時も拡張子チェックしてアニメーションフラグを設定
+		if (extension == ".gltf" || extension == ".glb") {
+			useAnimation_ = true;
+			useAnimationTimer_ = true;
+		} else {
+			useAnimation_ = false;
+			useAnimationTimer_ = false;
+		}
 	}
 
 	// キャッシュからインスタンスへ設定
@@ -128,6 +128,18 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 	vertexBufferView_ = cache->vertexBufferView;
 	vertexResource_ = cache->vertexResource;
 	boundingRadius_ = cache->boundingRadius;
+	
+	if (useAnimation_) {
+		skeleton_ = CreateSkeleton(modelData_.rootNode);
+		skinCluster_ = CreateSkinCluster(
+			device_,
+			skeleton_,
+			modelData_,
+			dxCommon_->GetSRV(),
+			dxCommon_->GetDescriptorSizeSRV(),
+			DirectXCommon::kMaxSRVCount_ - 1
+		);
+	}
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
@@ -193,8 +205,9 @@ void Model::Update() {
 		modelData_.rootNode.localMatrix = localMatrix;*/
 
 		//transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+		//transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
 		transformationData_->WVP = worldViewProjectionMatrix;
-		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
+		transformationData_->World = worldMatrix;
 	} else {
 		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
 		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
@@ -230,52 +243,82 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	// フラスタムカリングのチェック
 	if (useDrawFrustumCulling_) {
 		Vector3 worldPosition = GetWorldPosition();
-		// スケールを考慮したバウンディング半径を計算
 		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
 		float adjustedRadius = boundingRadius_ * maxScale;
-		
-		// カメラのフラスタム内にない場合は描画をスキップ
+
 		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
-			return; // 描画をスキップ
+			return;
 		}
 	}
-	
-	// PSOManagerからRootSignatureとPSOを取得
-	auto& psoManager = PSOManager::GetInstance();
-	auto rootSignature = psoManager.GetRootSignature("Object3D");
-	
-	// RootSignatureを設定
-	commandList_->SetGraphicsRootSignature(rootSignature.Get());
 
-	// 半透明フラグでPSO切替（深度書き込みOFFのNormalブレンド）
+	auto& psoManager = PSOManager::GetInstance();
+
+	// アニメーション使用の有無でRootSignatureとPSOを切り替え
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
-	if (useTransparent_) {
-		pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
-	} else {
-		// 描画モードに応じてPSOを取得・設定
-		pso = useWireFrame ? 
-			psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
-			psoManager.GetPSO(PSOType::Model_Solid_Normal);
+
+	if (useAnimation_) {
+		// Skinningモデル用
+		rootSignature = psoManager.GetRootSignature("Skinning");
+
+		if (useTransparent_) {
+			pso = psoManager.GetPSO(PSOType::SkinningModel_Alpha_Normal);
+		}
+		else {
+			pso = useWireFrame ?
+				psoManager.GetPSO(PSOType::SkinningModel_Wireframe_Normal) :
+				psoManager.GetPSO(PSOType::SkinningModel_Solid_Normal);
+		}
 	}
+	else {
+		// 通常モデル用
+		rootSignature = psoManager.GetRootSignature("Object3D");
+
+		if (useTransparent_) {
+			pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
+		}
+		else {
+			pso = useWireFrame ?
+				psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
+				psoManager.GetPSO(PSOType::Model_Solid_Normal);
+		}
+	}
+
+	commandList_->SetGraphicsRootSignature(rootSignature.Get());
 	commandList_->SetPipelineState(pso.Get());
 
-	// プリミティブトポロジーを設定
+	// 頂点バッファの設定
+	if (useAnimation_) {
+		// Skinningモデルは2つのVBVを使用
+		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			vertexBufferView_,
+			skinCluster_.influenceBufferView
+		};
+		commandList_->IASetVertexBuffers(0, 2, vbvs);
+	}
+	else {
+		// 通常モデルは1つのVBVのみ
+		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	}
+
+	commandList_->IASetIndexBuffer(&indexBufferView_);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	commandList_->IASetIndexBuffer(&indexBufferView_); // インデックス使っていないので設定しない
-	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// RootParams 設定（そのままでOK）
+	// 共通パラメータの設定
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
-	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 
-	// 頂点描画（DrawInstanced）
+	// Skinningモデルの場合、MatrixPaletteを設定
+	if (useAnimation_) {
+		commandList_->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
+	}
+
+	// 描画
 	commandList_->DrawIndexedInstanced(
 		static_cast<UINT>(modelData_.indeces.size()), 1, 0, 0, 0);
 }

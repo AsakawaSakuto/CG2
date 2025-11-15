@@ -18,17 +18,20 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -10.0f });
 
-    normalCube_->Initialize(&ctx_->dxCommon, "Animation/test/test.gltf");
-    normalCubeTransform_.scale = { 1.0f,1.0f,1.0f };
-    normalCubeTransform_.translate = { 0.0f,2.0f,0.0f };
-
-	animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
-	animationCubeTransform_.scale = { 1.0f,1.0f,1.0f };
-	animationCubeTransform_.translate = { 0.0f,-2.0f,0.0f };
-
 	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
 	simpleSkinTransform_.scale = { 1.0f,1.0f,1.0f };
 	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };
+	simpleSkinTransform_.translate = { -3.0f,0.0f,0.0f };
+
+    walk_->Initialize(&ctx_->dxCommon, "Animation/human/Walk.gltf");
+    walkTransform_.scale = { 1.0f,1.0f,1.0f };
+    walkTransform_.rotate = { 0.0f,3.12f,0.0f };
+    walkTransform_.translate = { 0.0f,0.0f,0.0f };
+
+    sneakWalk_->Initialize(&ctx_->dxCommon, "Animation/human/sneakWalk.gltf");
+    sneakWalkTransform_.scale = { 1.0f,1.0f,1.0f };
+    sneakWalkTransform_.rotate = { 0.0f, 3.12f,0.0f };
+    sneakWalkTransform_.translate = { 3.0f,0.0f,0.0f };
 
 	testTimer_.Start(5.0f, true);
 }
@@ -52,9 +55,9 @@ void TestScene::Update() {
     normalCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
     animationCubeTransform_.translate.x = Easing::Lerp(0.0f, 10.0f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
 
-	//normalCube_->Update();
-	//animationCube_->Update();
-	simpleSkin_->Update();
+    simpleSkin_->Update();
+    sneakWalk_->Update();
+	walk_->Update();
 
 	testTimer_.Update();
 
@@ -67,6 +70,8 @@ void TestScene::Draw() {
     //normalCube_->Draw(camera_, normalCubeTransform_);
     //animationCube_->Draw(camera_, animationCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
+	walk_->Draw(camera_, walkTransform_);
+    sneakWalk_->Draw(camera_, sneakWalkTransform_);
 
 	testParticle_->Draw(camera_);
 }

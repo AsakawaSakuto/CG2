@@ -135,8 +135,27 @@ SkinCluster CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device
 {
     SkinCluster skinCluster;
     
+    // ★デバッグログ追加
+    char buffer[512];
+    sprintf_s(buffer, "=== CreateSkinCluster Debug ===\n");
+    OutputDebugStringA(buffer);
+    
+    sprintf_s(buffer, "Joint count: %zu\n", skeleton.joints.size());
+    OutputDebugStringA(buffer);
+    
+    sprintf_s(buffer, "Vertex count: %zu\n", modelData.vertices.size());
+    OutputDebugStringA(buffer);
+    
     // palette用のResourceを確保
-    skinCluster.paletteResource = CreateBufferResource(device.Get(), sizeof(WellForGPU) * skeleton.joints.size());
+    size_t paletteSize = sizeof(WellForGPU) * skeleton.joints.size();
+    sprintf_s(buffer, "Palette buffer size: %zu bytes (WellForGPU size: %zu)\n", 
+              paletteSize, sizeof(WellForGPU));
+    OutputDebugStringA(buffer);
+    
+    OutputDebugStringA("Creating palette resource...\n");
+    skinCluster.paletteResource = CreateBufferResource(device.Get(), paletteSize);
+    OutputDebugStringA("Palette resource created successfully!\n");
+    
     WellForGPU* mappedPalette = nullptr;
     skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
     skinCluster.mappedPalette = { mappedPalette, skeleton.joints.size() }; // spanを使ってアクセスするようにする
@@ -153,9 +172,19 @@ SkinCluster CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device
     paletteSrvDesc.Buffer.NumElements = UINT(skeleton.joints.size());
     paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
     device->CreateShaderResourceView(skinCluster.paletteResource.Get(), &paletteSrvDesc, skinCluster.paletteSrvHandle.first);
+    
+    OutputDebugStringA("Palette SRV created successfully!\n");
 
     // influence用のResourceを確保。頂点ごとにinfluence情報を追加できるようにする
-    skinCluster.influenceResource = CreateBufferResource(device.Get(), sizeof(VertexInfluence) * modelData.vertices.size());
+    size_t influenceSize = sizeof(VertexInfluence) * modelData.vertices.size();
+    sprintf_s(buffer, "Influence buffer size: %zu bytes (VertexInfluence size: %zu)\n", 
+              influenceSize, sizeof(VertexInfluence));
+    OutputDebugStringA(buffer);
+    
+    OutputDebugStringA("Creating influence resource...\n");
+    skinCluster.influenceResource = CreateBufferResource(device.Get(), influenceSize);
+    OutputDebugStringA("Influence resource created successfully!\n");
+    
     VertexInfluence* mappedInfluence = nullptr;
     skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
     std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * modelData.vertices.size());  // 0埋め。weightを0にしておく。
@@ -190,7 +219,10 @@ SkinCluster CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device
             }
         }
     }
-
+    
+    OutputDebugStringA("CreateSkinCluster completed successfully!\n");
+    OutputDebugStringA("===============================\n");
+    
     return skinCluster;
 }
 

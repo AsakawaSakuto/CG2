@@ -37,6 +37,12 @@ enum class PSOType {
     Model_Wireframe_Normal,
     Model_Alpha_Normal, // 追加: 透明モデル用（深度書き込みOFF）
     
+    // スキニングモデル用（新規追加）
+    SkinningModel_Solid_Normal,
+    SkinningModel_Solid_Add,
+    SkinningModel_Wireframe_Normal,
+    SkinningModel_Alpha_Normal,
+    
     // スプライト用
     Sprite_Normal,
     
@@ -67,6 +73,7 @@ public:
     
     // 共通のRoot Signatureを取得
     Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature(const std::string& signatureType);
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> GetSkinningRootSignature(const std::string& signatureType);
 
     // シェーダーキャッシュからシェーダーを取得（新規追加）
     Microsoft::WRL::ComPtr<IDxcBlob> GetOrCompileShader(const std::wstring& filePath, const wchar_t* profile);
