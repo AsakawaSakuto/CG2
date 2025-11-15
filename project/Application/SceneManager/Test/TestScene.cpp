@@ -13,17 +13,22 @@ void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
 void TestScene::Initialize() {
     CleanupResources();
-	testParticle_->Initialize(&ctx_->dxCommon);
 	camera_.SetPosition({ 0.0f, 0.0f, -20.0f });
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 0.0f, -20.0f });
 
-	normalCube_->Initialize(&ctx_->dxCommon, "cube.obj");
-    normalCubeTransform_.translate = { -1.5f,2.5f,0.0f };
+	testParticle_->Initialize(&ctx_->dxCommon);
 
-	animationCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
-    animationCubeTransform_.translate = { 1.5f,2.5f,0.0f };
-	animationCubeTransform_.scale = { 0.5f,0.5f,0.5f };
+	testSprite_->Initialize(&ctx_->dxCommon, "icon");
+    testSpriteTransform_.translate = { 256.0f,256.0f };
+	testSprite_->SetTransform(testSpriteTransform_);
+
+	cube_->Initialize(&ctx_->dxCommon, "cube.obj");
+    cubeTransform_.translate = { -1.5f,2.5f,0.0f };
+
+	spinCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
+    spinCubeTransform_.translate = { 1.5f,2.5f,0.0f };
+	spinCubeTransform_.scale = { 0.5f,0.5f,0.5f };
 
 	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
 	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };
@@ -38,6 +43,7 @@ void TestScene::Initialize() {
     sneakWalkTransform_.translate = { 3.0f,0.0f,0.0f };
 
 	walkAnimation_ = LoadAnimationFile("Animation/human/Walk.gltf");
+	sneakWalkAnimation_ = LoadAnimationFile("Animation/human/sneakWalk.gltf");
 
 	testTimer_.Start(5.0f, true);
 }
@@ -47,24 +53,27 @@ void TestScene::Update() {
 	testParticle_->Update();
 
     if (ctx_->input.TriggerKey(DIK_Z)) {
-        animationCube_->PlayAnimation();
+        spinCube_->PlayAnimation();
     }
 
     if (ctx_->input.TriggerKey(DIK_X)) {
-        animationCube_->StopAnimation();
+        spinCube_->StopAnimation();
     }
 
     if (ctx_->input.TriggerKey(DIK_V)) {
         sneakWalk_->SetAnimationData(walkAnimation_);
     }
 
-	normalCube_->Update();
-	animationCube_->Update();
+	cube_->Update();
+	spinCube_->Update();
     simpleSkin_->Update();
     sneakWalk_->Update();
 	walk_->Update();
 
 	testTimer_.Update();
+
+    testSprite_->SetTransform(testSpriteTransform_);
+	testSprite_->Update();
 
     camera_ = debugCamera_;
 	camera_.Update();
@@ -72,13 +81,15 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-    normalCube_->Draw(camera_, normalCubeTransform_);
-    animationCube_->Draw(camera_, animationCubeTransform_);
+    cube_->Draw(camera_, cubeTransform_);
+    spinCube_->Draw(camera_, spinCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
 	walk_->Draw(camera_, walkTransform_);
     sneakWalk_->Draw(camera_, sneakWalkTransform_);
 
 	testParticle_->Draw(camera_);
+
+	testSprite_->Draw();
 }
 
 void TestScene::DrawImGui() {
@@ -87,8 +98,9 @@ void TestScene::DrawImGui() {
 
 	walk_ ->DrawImGui("WalkModel");
 
-	normalCubeTransform_.DrawImGui("NormalCubeTransform");
-	animationCubeTransform_.DrawImGui("AnimationCubeTransform");
+	cubeTransform_.DrawImGui("NormalCubeTransform");
+	spinCubeTransform_.DrawImGui("AnimationCubeTransform");
+	testSpriteTransform_.DrawImGui("TestSpriteTransform");
 	//simpleSkinTransform_.DrawImGui("SimpleSkinTransform");
 	//walkTransform_.DrawImGui("WalkTransform");
 	//sneakWalkTransform_.DrawImGui("SneakWalkTransform");

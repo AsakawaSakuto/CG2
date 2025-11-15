@@ -25,7 +25,7 @@ public:
 
 	void DrawImGui(const char* objectName);
 
-	void SetTransform2D(const Transform2D& transform) { transform2D_ = transform; }
+	void SetTransform(const Transform2D& transform) { transform2D_ = transform; }
 
 	void SetUVTransform(const Transform2D& uvTransform) { uvTransform_ = uvTransform; }
 

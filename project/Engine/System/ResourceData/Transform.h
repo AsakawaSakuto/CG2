@@ -41,7 +41,7 @@ struct Transform2D {
 	void DrawImGui(const char* name) {
 		ImGui::Begin(name);
 
-		ImGui::DragFloat2("translate", &translate.x, 0.01f);
+		ImGui::DragFloat2("translate", &translate.x, 1.0f);
 		ImGui::DragFloat("rotate", &rotate, 0.01f);
 		ImGui::DragFloat2("scale", &scale.x, 0.01f);
 

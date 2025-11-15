@@ -27,16 +27,19 @@ private:
 	// AppContext
 	AppContext* ctx_ = nullptr;
 
+	unique_ptr<Sprite> testSprite_ = make_unique<Sprite>();
+	Transform2D testSpriteTransform_;
+
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
 
-	unique_ptr<Model> normalCube_ = make_unique<Model>();
-	unique_ptr<Model> animationCube_ = make_unique<Model>();
+	unique_ptr<Model> cube_ = make_unique<Model>();
+	unique_ptr<Model> spinCube_ = make_unique<Model>();
 	unique_ptr<Model> simpleSkin_ = make_unique<Model>();
 	unique_ptr<Model> walk_ = make_unique<Model>();
 	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
 
-	Transform normalCubeTransform_;
-	Transform animationCubeTransform_;
+	Transform cubeTransform_;
+	Transform spinCubeTransform_;
 	Transform simpleSkinTransform_;
 	Transform walkTransform_;
 	Transform sneakWalkTransform_;
