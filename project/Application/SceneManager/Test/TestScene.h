@@ -28,7 +28,6 @@ private:
 	AppContext* ctx_ = nullptr;
 
 	unique_ptr<Sprite> testSprite_ = make_unique<Sprite>();
-	Transform2D testSpriteTransform_;
 
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
 

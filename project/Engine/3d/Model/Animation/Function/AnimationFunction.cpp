@@ -267,7 +267,7 @@ Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time
                 (time - keyframes[index].time) /
                 (keyframes[nextIndex].time - keyframes[index].time);
 
-            return Easing::LerpVector3(keyframes[index].value,
+            return Easing::Lerp(keyframes[index].value,
                 keyframes[nextIndex].value,
                 t);
         }

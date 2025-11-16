@@ -31,7 +31,7 @@ void GameTimer::Update() {
 void GameTimer::Start(float duration, bool loop) {
     duration_ = duration;
     loop_ = loop;
-    currentTime_ = 0.0f;  // currentTime_を初期化
+    currentTime_ = 0.0f;
     isActive_ = true;
     finished_ = false;
     useFrameMode_ = false;

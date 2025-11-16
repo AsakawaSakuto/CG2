@@ -15,6 +15,10 @@ struct Transform {
 	Vector3 translate = { 0.0f,0.0f,0.0f };
 
 #ifdef USE_IMGUI
+	/// <summary>
+	/// Transformの値をImGuiで編集する
+	/// </summary>
+	/// <param name="name">適切な名前を入力</param>
 	void DrawImGui(const char* name) {
 		ImGui::Begin(name);
 
@@ -38,6 +42,10 @@ struct Transform2D {
 	float rotate = 0.0f;
 	Vector2 translate = { 0.0f,0.0f };
 #ifdef USE_IMGUI
+	/// <summary>
+	/// Transform2Dの値をImGuiで編集する
+	/// </summary>
+	/// <param name="name">適切な名前を入力</param>
 	void DrawImGui(const char* name) {
 		ImGui::Begin(name);
 

@@ -31,78 +31,154 @@
 #include"CameraForGPU.h"
 #include"MatrixFunction.h"
 
+/// <summary>
+/// 3Dモデルクラス
+/// </summary>
 class Model {
 public:
-	// 初期化
+	
+	/// <summary>
+	/// Modelの初期化
+	/// </summary>
+	/// <param name="dxCommon">dxCommonを渡す</param>
+	/// <param name="ModelPath">"resources/model/" 以降のPathを渡す</param>
 	void Initialize(DirectXCommon* dxCommon, const std::string& ModelPath);
 
 	// デストラクタ
 	~Model();
 
-	// 更新
+	/// <summary>
+	/// 行列計算やアニメーションの更新
+	/// </summary>
 	void Update();
 
-	// 描画
+	/// <summary>
+	/// Modelの描画
+	/// </summary>
+	/// <param name="useCamera">シーンで使用してるCameraを渡す</param>
+	/// <param name="transform">Transformを渡してSRTの更新をする(任意)</param>
 	void Draw(Camera& useCamera, const Transform& transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
-	// ImGuiの描画
+	/// <summary>
+	/// MaterialやLightのImGui描画
+	/// </summary>
+	/// <param name="objectName">適切な名前を入力</param>
 	void DrawImGui(const char* objectName);
 
-	// 座標変換情報を設定
+	/// <summary>
+	/// Transformを設定
+	/// </summary>
+	/// <param name="transform">更新したいTransformを渡す</param>
 	void SetTransform(const Transform& transform) { transform_ = transform; }
 
-	// 座標を設定
+	/// <summary>
+	/// Translateを設定
+	/// </summary>
+	/// <param name="position">更新したいTranslateを渡す</param>
 	void SetTranslate(Vector3 position) { transform_.translate = position; }
 
-    // 角度を設定
+	/// <summary>
+	/// Rotateを設定
+	/// </summary>
+	/// <param name="rotate">更新したいRotateを渡す</param>
 	void SetRotate(Vector3 rotate) { transform_.rotate = rotate; }
 
-	// サイズを設定
+	/// <summary>
+	/// Scaleを設定
+	/// </summary>
+	/// <param name="scale">更新したいScaleを渡す</param>
 	void SetScale(Vector3 scale) { transform_.scale = scale; }
 
-    // 半透明描画を有効/無効
+    /// <summary>
+    /// 半透明描画を有効/無効
+    /// </summary>
+    /// <param name="enable">ture/false</param>
     void SetTransparent(bool enable) { useTransparent_ = enable; }
 
-	// 色を設定 Vector4
-	void SetColor(Vector4 color) { materialData_->color = color; }
+	/// <summary>
+	/// Colorを設定 Alpha含む
+	/// </summary>
+	/// <param name="color">更新したいColorを渡す</param>
+	void SetColor4(Vector4 color) { materialData_->color = color; }
 
-	// 色を設定 Vector3
-	void SetColor(Vector3 color) { materialData_->color.x = color.x; materialData_->color.y = color.y; materialData_->color.z = color.z; }
+	/// <summary>
+	/// Colorを設定
+	/// </summary>
+	/// <param name="color">更新したいColorを渡す</param>
+	void SetColor3(Vector3 color) { materialData_->color.x = color.x; materialData_->color.y = color.y; materialData_->color.z = color.z; }
 
-	// ワールド座標を取得
-	Vector3 GetWorldPosition();
-
-	// 使用するテクスチャを変更
+	/// <summary>
+	/// 使用してるTextureを変更
+	/// </summary>
+	/// <param name="textureName">Pathカット無し、全部入力してね</param>
 	void SetTexture(const std::string& textureName);
 
-	// 描画モードを変更 trueで通常 falseでワイヤーフレーム
+	/// <summary>
+	/// 描画モードを変更 trueで通常 falseでワイヤーフレーム
+	/// </summary>
+	/// <param name="drawMode">true/false</param>
 	void SetDrawMode(bool drawMode) { useWireFrame = drawMode; }
 
-	// uv座標変換情報を設定
-	void SetUvTransform(const Transform2D& uvT) { uvTransform_ = uvT; }
+	/// <summary>
+	/// UVのTransformを設定
+	/// </summary>
+	/// <param name="uvT">更新したいUvTransformを渡す</param>
+	void SetUvTransform(const Transform2D& uvTransform) { uvTransform_ = uvTransform; }
 
-	// uv座標を設定
-	void SetUvTranslate(Vector2 uvT) { uvTransform_.translate = uvT; }
+	/// <summary>
+	/// UVのTranslateを設定
+	/// </summary>
+	/// <param name="uvT">更新したいUvTranslateを渡す</param>
+	void SetUvTranslate(Vector2 uvTranslate) { uvTransform_.translate = uvTranslate; }
 
-	// uv角度を設定
-	void SetUvRotate(float uvR) { uvTransform_.rotate = uvR; }
+	/// <summary>
+	/// UVのRotateを設定
+	/// </summary>
+	/// <param name="uvR">更新したいUvRotateを渡す</param>
+	void SetUvRotate(float uvRotate) { uvTransform_.rotate = uvRotate; }
 
-	// uvサイズを設定
-	void SetUvScale(Vector2 uvS) { uvTransform_.scale = uvS; }
+	/// <summary>
+	/// UVのScaleを設定
+	/// </summary>
+	/// <param name="uvS">更新したいUvScaleを渡す</param>
+	void SetUvScale(Vector2 uvScale) { uvTransform_.scale = uvScale; }
 
 	// フラスタムカリング関連
-	void SetBoundingRadius(float radius) { boundingRadius_ = radius; }
+	//void SetBoundingRadius(float radius) { boundingRadius_ = radius; }
+
+	/// <summary>
+	/// trueでカメラ外の描画を行わない、falseで描画する
+	/// </summary>
+	/// <param name="enable">true/false</param>
 	void SetDrawFrustumCulling(bool enable) { useDrawFrustumCulling_ = enable; }
+
+	/// <summary>
+	/// trueでカメラ外の更新を行わない、falseで更新する
+	/// </summary>
+	/// <param name="enable">true/false</param>
 	void SetUpdateFrustumCulling(bool enable) { useUpdateFrustumCulling_ = enable; }
 
+	/// <summary>
+	/// カメラ外か内かを取得
+	/// </summary>
+	/// <returns>true カメラ外 / false カメラ内</returns>
+	bool GetIsInFrustum() const { return isInFrustum_; }
+
+	/// <summary>
+	/// アニメーションを再生しModelを動かす
+	/// </summary>
 	void PlayAnimation() { if (!useAnimationTimer_) { useAnimationTimer_ = true; } }
+
+	/// <summary>
+	/// アニメーションを停止しModelを静止させる
+	/// </summary>
 	void StopAnimation() { if (useAnimationTimer_) { useAnimationTimer_ = false; } }
 
+	/// <summary>
+	/// アニメーションデータを設定
+	/// </summary>
+	/// <param name="animation">アニメーションがコピーされ、設定したアニメーションを行うようになる</param>
 	void SetAnimationData(Animation animation) { animationData_ = animation; }
-
-	//float GetBoundingRadius() const { return boundingRadius_; }
-	//bool GetDrawFrustumCulling() const { return useDrawFrustumCulling_; }
-	//bool GetUpdateFrustumCulling() const { return useUpdateFrustumCulling_; }
 
 private:
 
@@ -123,13 +199,18 @@ private:
 	};
 	static std::unordered_map<std::string, std::shared_ptr<GeometryCache>> s_geometryCache_;
 
+	// アニメーションタイプ
 	enum class AnimationType {
-		NONE,
-		NORMAL,
-		BONE,
+		NONE,     // アニメーション無し
+		NORMAL,   // キーフレームアニメーション
+		SKINNING, // スキニングアニメーション
 	};
 
+	// ワールド座標を取得
+	Vector3 GetWorldPosition();
+
 private:
+	// アニメーションタイプ
 	AnimationType animationType_ = AnimationType::NONE;
 
 	// モデルのパス
@@ -154,10 +235,11 @@ private:
 	bool useTransparent_ = false; // 半透明描画、有効/無効
 
 	// フラスタムカリング関連(カメラ外か否かの判定)
-	Camera camera_; 				      // カメラ情報
-	float boundingRadius_ = 0.5f;         // オブジェクトのバウンディング半径
+	Camera camera_; 				       // カメラ情報
+	float boundingRadius_ = 0.5f;          // オブジェクトのバウンディング半径
 	bool useDrawFrustumCulling_ = false;   // カメラ外の描画、有効/無効
 	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
+	bool isInFrustum_ = false;              // フラスタム内か否か
 
 	// アニメーション関連
 	bool useAnimationTimer_ = false; // アニメーション使用フラグ
