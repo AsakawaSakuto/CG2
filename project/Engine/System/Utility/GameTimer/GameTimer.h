@@ -93,7 +93,7 @@ public:
     int GetTotalFrames() const;
 
     /// @brief タイムスケールを設定
-    /// @param scale タイムスケール 1.0=通常、0.5=半分速度、2.0=倍速
+    /// @param scale タイムスケール 1.0 = 通常、0.5 = 半分速度、2.0 = 倍速
     void SetTimeScale(float scale);
 
 private:

@@ -14,7 +14,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Ve
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 	
-	textureName_ = "resources/image/" + fileName + ".png";
+	textureName_ = "resources/image/" + fileName;
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 
@@ -155,10 +155,10 @@ void Sprite::DrawImGui(const char* objectName) {
 
 void Sprite::SetTexture(const std::string& textureName) {
 	// すでに同じテクスチャなら処理をスキップ
-	if (textureName_ == textureName) {
+	if (textureName_ == "resources/image/" + textureName) {
 		return;
 	}
-	textureName_ = textureName;
+	textureName_ = "resources/image/" + textureName;
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	// 読み込んだテクスチャの番号を取得

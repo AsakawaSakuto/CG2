@@ -68,7 +68,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		// アニメーションタイプを判定
 		// スキンクラスターデータがある → BONE（ボーン付きスキニング）
 		if (!cache->modelData.skinClusterData.empty()) {
-			animationType_ = AnimationType::BONE;
+			animationType_ = AnimationType::SKINNING;
 			useAnimationTimer_ = true;
 			
 			cache->skeletonData = CreateSkeleton(cache->modelData.rootNode);
@@ -165,7 +165,7 @@ void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
 		// キャッシュヒット時もアニメーションタイプを判定
 		const auto& cache = it->second;
 		if (!cache->modelData.skinClusterData.empty()) {
-			animationType_ = AnimationType::BONE;
+			animationType_ = AnimationType::SKINNING;
 			useAnimationTimer_ = true;
 			
 			char debugBuffer[256];
@@ -225,7 +225,10 @@ void Model::Update() {
 
 		// カメラのフラスタム内にない場合は描画をスキップ
 		if (!camera_.IsInFrustum(worldPosition, adjustedRadius)) {
+			isInFrustum_ = true;
 			return; // 更新をスキップ
+		} else {
+			isInFrustum_ = false;
 		}
 	}
 
@@ -274,7 +277,7 @@ void Model::Update() {
 
 		break;
 	}
-	case AnimationType::BONE: {
+	case AnimationType::SKINNING: {
 
 		ApplyAnimation(skeleton_, animationData_, animationTime_);
 		UpdateAnimation(skeleton_);
@@ -311,8 +314,6 @@ void Model::Update() {
 }
 
 void Model::Draw(Camera& useCamera, const Transform& transform) {
-	camera_ = useCamera;
-	transform_ = transform;
 
 	// フラスタムカリングのチェック
 	if (useDrawFrustumCulling_) {
@@ -321,9 +322,15 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 		float adjustedRadius = boundingRadius_ * maxScale;
 
 		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
+			isInFrustum_ = true;
 			return;
+		} else {
+			isInFrustum_ = false;
 		}
 	}
+
+	camera_ = useCamera;
+	transform_ = transform;
 
 	auto& psoManager = PSOManager::GetInstance();
 
@@ -361,7 +368,7 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 
 		break;
 	}
-	case Model::AnimationType::BONE: {
+	case Model::AnimationType::SKINNING: {
 
 		rootSignature = psoManager.GetRootSignature("Skinning");
 
@@ -380,7 +387,7 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());
 	commandList_->SetPipelineState(pso.Get());
 
-	if (animationType_ == AnimationType::BONE) {
+	if (animationType_ == AnimationType::SKINNING) {
 		// Skinningモデルは2つのVBVを使用
 		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
 			vertexBufferView_,
@@ -405,7 +412,7 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 
 	// Skinningモデルの場合、MatrixPaletteを設定
-	if (animationType_ == AnimationType::BONE) {
+	if (animationType_ == AnimationType::SKINNING) {
 		commandList_->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
 	}
 
@@ -439,19 +446,6 @@ void Model::DrawImGui(const char* objectName) {
 #ifdef USE_IMGUI
 
 	ImGui::Begin(objectName);
-
-	ImGui::Text("Transform");
-	ImGui::DragFloat3("translate", &transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("scale", &transform_.scale.x, 0.01f);
-
-	if (ImGui::Button("tReset")) {
-		transform_.translate = { 0.0f, 0.0f, 0.0f };
-		transform_.rotate = { 0.0f, 0.0f, 0.0f };
-		transform_.scale = { 1.0f, 1.0f, 1.0f };
-	}
-
-	ImGui::Separator();
 
 	ImGui::Text("MaterialEdit");
 	ImGui::DragFloat2("uvTranslate", &uvTransform_.translate.x, 0.01f);

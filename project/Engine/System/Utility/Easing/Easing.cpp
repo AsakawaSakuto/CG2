@@ -20,14 +20,16 @@ namespace Easing {
         case Type::EaseInOutQuad:
             if (t < 0.5f) {
                 return 2.0f * t * t;
-            } else {
+            }
+            else {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 2.0f) / 2.0f;
             }
 
         case Type::EaseOutInQuad:
             if (t < 0.5f) {
                 return 0.5f * (1.0f - (1.0f - 2.0f * t) * (1.0f - 2.0f * t));
-            } else {
+            }
+            else {
                 return 0.5f + 0.5f * (2.0f * t - 1.0f) * (2.0f * t - 1.0f);
             }
 
@@ -40,14 +42,16 @@ namespace Easing {
         case Type::EaseInOutCubic:
             if (t < 0.5f) {
                 return 4.0f * t * t * t;
-            } else {
+            }
+            else {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 3.0f) / 2.0f;
             }
 
         case Type::EaseOutInCubic:
             if (t < 0.5f) {
                 return 0.5f * (1.0f - std::pow(1.0f - 2.0f * t, 3.0f));
-            } else {
+            }
+            else {
                 return 0.5f + 0.5f * std::pow(2.0f * t - 1.0f, 3.0f);
             }
 
@@ -60,14 +64,16 @@ namespace Easing {
         case Type::EaseInOutQuart:
             if (t < 0.5f) {
                 return 8.0f * t * t * t * t;
-            } else {
+            }
+            else {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 4.0f) / 2.0f;
             }
 
         case Type::EaseOutInQuart:
             if (t < 0.5f) {
                 return 0.5f * (1.0f - std::pow(1.0f - 2.0f * t, 4.0f));
-            } else {
+            }
+            else {
                 return 0.5f + 0.5f * std::pow(2.0f * t - 1.0f, 4.0f);
             }
 
@@ -80,14 +86,16 @@ namespace Easing {
         case Type::EaseInOutQuint:
             if (t < 0.5f) {
                 return 16.0f * t * t * t * t * t;
-            } else {
+            }
+            else {
                 return 1.0f - std::pow(-2.0f * t + 2.0f, 5.0f) / 2.0f;
             }
 
         case Type::EaseOutInQuint:
             if (t < 0.5f) {
                 return 0.5f * (1.0f - std::pow(1.0f - 2.0f * t, 5.0f));
-            } else {
+            }
+            else {
                 return 0.5f + 0.5f * std::pow(2.0f * t - 1.0f, 5.0f);
             }
 
@@ -103,7 +111,8 @@ namespace Easing {
         case Type::EaseOutInSine:
             if (t < 0.5f) {
                 return 0.5f * std::sin((2.0f * t * std::numbers::pi_v<float>) / 2.0f);
-            } else {
+            }
+            else {
                 return 1.0f - 0.5f * std::cos(((2.0f * t - 1.0f) * std::numbers::pi_v<float>) / 2.0f);
             }
 
@@ -128,7 +137,8 @@ namespace Easing {
             if (t == 1.0f) return 1.0f;
             if (t < 0.5f) {
                 return 0.5f * (1.0f - std::pow(2.0f, -20.0f * t));
-            } else {
+            }
+            else {
                 return 0.5f + 0.5f * std::pow(2.0f, 20.0f * (t - 1.0f));
             }
 
@@ -149,7 +159,8 @@ namespace Easing {
         case Type::EaseOutInCirc:
             if (t < 0.5f) {
                 return 0.5f * std::sqrt(1.0f - std::pow(2.0f * t - 1.0f, 2.0f));
-            } else {
+            }
+            else {
                 return 1.0f - 0.5f * std::sqrt(1.0f - std::pow(2.0f * t - 1.0f, 2.0f));
             }
 
@@ -181,7 +192,8 @@ namespace Easing {
             const float c3 = c1 + 1.0f;
             if (t < 0.5f) {
                 return 0.5f * (1.0f + c3 * std::pow(2.0f * t - 1.0f, 3.0f) + c1 * std::pow(2.0f * t - 1.0f, 2.0f));
-            } else {
+            }
+            else {
                 return 0.5f + 0.5f * (c3 * std::pow(2.0f * t - 1.0f, 3.0f) - c1 * std::pow(2.0f * t - 1.0f, 2.0f));
             }
         }
@@ -206,7 +218,8 @@ namespace Easing {
             if (t == 1.0f) return 1.0f;
             if (t < 0.5f) {
                 return -(std::pow(2.0f, 20.0f * t - 10.0f) * std::sin((20.0f * t - 11.125f) * c5)) / 2.0f;
-            } else {
+            }
+            else {
                 return (std::pow(2.0f, -20.0f * t + 10.0f) * std::sin((20.0f * t - 11.125f) * c5)) / 2.0f + 1.0f;
             }
         }
@@ -217,7 +230,8 @@ namespace Easing {
             if (t == 1.0f) return 1.0f;
             if (t < 0.5f) {
                 return 0.5f * (std::pow(2.0f, -20.0f * t) * std::sin((20.0f * t - 0.75f) * c4) + 1.0f);
-            } else {
+            }
+            else {
                 return 1.0f - 0.5f * std::pow(2.0f, 20.0f * (t - 1.0f)) * std::sin((20.0f * (t - 1.0f) - 10.75f) * c4);
             }
         }
@@ -247,59 +261,20 @@ namespace Easing {
             if (t < 0.5f) {
                 return (1.0f - Apply(1.0f - 2.0f * t, Type::EaseOutBounce)) / 2.0f;
             }
-            else
-            {
+            else {
                 return (1.0f + Apply(2.0f * t - 1.0f, Type::EaseOutBounce)) / 2.0f;
             }
 
         case Type::EaseOutInBounce:
             if (t < 0.5f) {
                 return 0.5f * Apply(2.0f * t, Type::EaseOutBounce);
-            } else {
+            }
+            else {
                 return 1.0f - 0.5f * Apply(2.0f - 2.0f * t, Type::EaseOutBounce);
             }
 
         default:
             return t;
-        }
-    }
-
-    float Lerp(float start, float end, float t, Type type) {
-        float easedT = Apply(t, type);
-        return start + (end - start) * easedT;
-    }
-
-    Vector2 LerpVector2(const Vector2& start, const Vector2& end, float t, Type type) {
-        float easedT = Apply(t, type);
-
-        Vector2 diff = end - start;
-        Vector2 scaledDiff = diff * easedT;
-        return start + scaledDiff;
-    }
-
-    Vector3 LerpVector3(const Vector3& start, const Vector3& end, float t, Type type) {
-        float easedT = Apply(t, type);
-
-        Vector3 diff = end - start;
-        Vector3 scaledDiff = diff * easedT;
-        return start + scaledDiff;
-    }
-
-    Vector3 LerpVector3_GAB(const Vector3& start, const Vector3& end, float t, Type goType, Type backType) {
-        // tを0.0～1.0の範囲にClamp
-        t = std::clamp(t, 0.0f, 1.0f);
-
-        // t=0.0～0.5の範囲: startからendへ移動
-        if (t < 0.5f) {
-            // tを0.0～1.0の範囲に正規化
-            float normalizedT = t * 2.0f;
-            return LerpVector3(start, end, normalizedT, goType);
-        }
-        // t=0.5～1.0の範囲: endからstartへ移動
-        else {
-            // tを0.0～1.0の範囲に正規化
-            float normalizedT = (t - 0.5f) * 2.0f;
-            return LerpVector3(end, start, normalizedT, backType);
         }
     }
 }

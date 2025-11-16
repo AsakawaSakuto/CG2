@@ -4,16 +4,20 @@
 #include <algorithm>
 #include <numbers>
 
-#include"Vector2.h"
-#include"Vector3.h"
+#include "Vector2.h"
+#include "Vector3.h"
 
 // イージング実装の際に参考にしたサイト
 // https://aketama.work/easing-list
 
-/// 汎用イージング関数
+/// <summary>
+/// 汎用イージング関数群 float, Vector2, Vector3 対応
+/// </summary>
 namespace Easing {
 
-    /// イージングのタイプ
+    /// <summary>
+    /// イージングタイプ
+    /// </summary>
     enum class Type {
 
         // 等速
@@ -91,42 +95,44 @@ namespace Easing {
         EaseOutInBounce
     };
 
-    /// @brief 2つの値の間を補間
-    /// @param start 開始値
-    /// @param end 終了値
-    /// @param t 進行状況 0.0～1.0
-    /// @param type イージングタイプ
-    /// @return 補間された値
-    float Lerp(float start, float end, float t, Type type = Type::Linear);
-
-    /// @brief Vector2の補間
-    /// @param start 開始ベクトル
-    /// @param end 終了ベクトル
-    /// @param t 進行状況 0.0～1.0
-    /// @param type イージングタイプ
-    /// @return 補間されたベクトル
-    Vector2 LerpVector2(const Vector2& start, const Vector2& end, float t, Type type = Type::Linear);
-
-    /// @brief Vector3の補間
-	/// @param start 開始ベクトル
-    /// @param end 終了ベクトル
-    /// @param t 進行状況 0.0～1.0
-    /// @param type イージングタイプ
-    /// @return 補間されたベクトル
-    Vector3 LerpVector3(const Vector3& start, const Vector3& end, float t, Type type = Type::Linear);
-
-    /// @brief Vector3の補間、行って帰ってくる
-    /// @param start 開始ベクトル、終了ベクトル
-    /// @param end 中間ベクトル
-    /// @param t 進行状況 0.0～1.0
-    /// @param goType 開始のイージングタイプ
-    /// @param backType 戻ってくる時のイージングタイプ
-    /// @return 補間されたベクトル
-    Vector3 LerpVector3_GAB(const Vector3& start, const Vector3& end, float t, Type goType = Type::Linear, Type backType = Type::Linear);
-
     /// @brief イージング関数を適用
     /// @param t 進行状況 0.0～1.0
     /// @param type イージングタイプ
     /// @return イージング適用済み値 0.0～1.0
     float Apply(float t, Type type);
+
+    /// @brief 任意型の補間 Start -> End
+    /// @param start      開始ベクトル/値
+    /// @param end       終了ベクトル/値
+    /// @param t            進行状況 0.0～1.0
+    /// @param goType イージングタイプ
+    template<typename T>
+    T Lerp(const T& start, const T& end, float t, Type type = Type::Linear) {
+        float easedT = Apply(t, type);
+        return start + (end - start) * easedT;
+    }
+
+    /// @brief 任意型の補間、行って帰ってくる
+    /// @param start         開始ベクトル/値
+    /// @param end          中間ベクトル/値
+    /// @param t               進行状況 0.0～1.0
+    /// @param goType    行きのイージング
+    /// @param backType 帰りのイージング
+    template<typename T>
+    T Lerp_GAB(const T& start, const T& end, float t,
+        Type goType = Type::Linear, Type backType = Type::Linear) {
+
+        // 0〜1 に Clamp
+        t = std::clamp(t, 0.0f, 1.0f);
+
+        if (t < 0.5f) {
+            // 行き：start → end
+            float normalizedT = t * 2.0f;           // 0〜0.5 → 0〜1
+            return Lerp<T>(start, end, normalizedT, goType);
+        } else {
+            // 帰り：end → start
+            float normalizedT = (t - 0.5f) * 2.0f;  // 0.5〜1 → 0〜1
+            return Lerp<T>(end, start, normalizedT, backType);
+        }
+    }
 }

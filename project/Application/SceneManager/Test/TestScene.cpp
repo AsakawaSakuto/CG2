@@ -13,15 +13,13 @@ void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 
 void TestScene::Initialize() {
     CleanupResources();
-	camera_.SetPosition({ 0.0f, 0.0f, -20.0f });
+	camera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 	debugCamera_.SetInput(&ctx_->input);
-	debugCamera_.SetPosition({ 0.0f, 0.0f, -20.0f });
+	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
 	testParticle_->Initialize(&ctx_->dxCommon);
 
-	testSprite_->Initialize(&ctx_->dxCommon, "icon");
-    testSpriteTransform_.translate = { 256.0f,256.0f };
-	testSprite_->SetTransform(testSpriteTransform_);
+	testSprite_->Initialize(&ctx_->dxCommon, "icon.png", { 64.0f,64.0f });
 
 	cube_->Initialize(&ctx_->dxCommon, "cube.obj");
     cubeTransform_.translate = { -1.5f,2.5f,0.0f };
@@ -45,24 +43,15 @@ void TestScene::Initialize() {
 	walkAnimation_ = LoadAnimationFile("Animation/human/Walk.gltf");
 	sneakWalkAnimation_ = LoadAnimationFile("Animation/human/sneakWalk.gltf");
 
-	testTimer_.Start(5.0f, true);
+	testTimer_.Start(2.0f, true);
 }
 
 void TestScene::Update() {
 
 	testParticle_->Update();
 
-    if (ctx_->input.TriggerKey(DIK_Z)) {
-        spinCube_->PlayAnimation();
-    }
-
-    if (ctx_->input.TriggerKey(DIK_X)) {
-        spinCube_->StopAnimation();
-    }
-
-    if (ctx_->input.TriggerKey(DIK_V)) {
-        sneakWalk_->SetAnimationData(walkAnimation_);
-    }
+    cubeTransform_.translate.x = Easing::Lerp(-1.5f, 1.5f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
+    spinCubeTransform_.translate = Easing::Lerp(Vector3({ 1.5f,2.5f,0.0f }), Vector3({ -1.5f,5.0f,0.0f }), testTimer_.GetProgress(), Easing::Type::EaseInBounce);
 
 	cube_->Update();
 	spinCube_->Update();
@@ -70,10 +59,9 @@ void TestScene::Update() {
     sneakWalk_->Update();
 	walk_->Update();
 
-	testTimer_.Update();
-
-    testSprite_->SetTransform(testSpriteTransform_);
 	testSprite_->Update();
+
+	testTimer_.Update();
 
     camera_ = debugCamera_;
 	camera_.Update();
@@ -94,20 +82,11 @@ void TestScene::Draw() {
 
 void TestScene::DrawImGui() {
 #ifdef USE_IMGUI
-    testParticle_->DrawImGui("TestParticle");
-
-	walk_ ->DrawImGui("WalkModel");
-
-	cubeTransform_.DrawImGui("NormalCubeTransform");
-	spinCubeTransform_.DrawImGui("AnimationCubeTransform");
-	testSpriteTransform_.DrawImGui("TestSpriteTransform");
-	//simpleSkinTransform_.DrawImGui("SimpleSkinTransform");
-	//walkTransform_.DrawImGui("WalkTransform");
-	//sneakWalkTransform_.DrawImGui("SneakWalkTransform");
 
 	//MT4_01_03();
 	//MT4_01_04();
     //MT4_01_05();
+
 #endif
 }
 

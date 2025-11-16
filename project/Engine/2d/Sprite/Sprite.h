@@ -13,32 +13,84 @@
 #include <cmath>
 #include <numbers>
 
+/// <summary>
+/// 2Dスプライトクラス
+/// </summary>
 class Sprite
 {
 public:
 
+	/// <summary>
+	/// Spriteの初期化
+	/// </summary>
+	/// <param name="dxCommon">dxCommonを渡す</param>
+	/// <param name="fileName">"resources/image/" 以降のPathを渡す</param>
+	/// <param name="position">Vector2型でスクリーン座標を設定(任意)</param>
+	/// <param name="scale">Vector2型でScaleを設定(任意)</param>
 	void Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position = { 0.0f,0.0f }, Vector2 scale = { 1.0f,1.0f });
 
+	/// <summary>
+	/// 行列計算などの更新
+	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// Spriteの描画
+	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// TransformやMaterialのImGui描画
+	/// </summary>
+	/// <param name="objectName">適切な名前を入力</param>
 	void DrawImGui(const char* objectName);
 
+	/// <summary>
+	/// Transform2Dを設定
+	/// </summary>
+	/// <param name="transform">更新したいTransform2Dを渡す</param>
 	void SetTransform(const Transform2D& transform) { transform2D_ = transform; }
 
-	void SetUVTransform(const Transform2D& uvTransform) { uvTransform_ = uvTransform; }
-
+	/// <summary>
+	/// Vector2型でTranslateを設定
+	/// </summary>
+	/// <param name="position">更新したいTranslateを渡す</param>
 	void SetPosition(const Vector2& position) { transform2D_.translate = position; }
 
+	/// <summary>
+	/// Vector2型でScaleを設定
+	/// </summary>
+	/// <param name="scale">更新したいScaleを渡す</param>
 	void SetScale(const Vector2& scale) { transform2D_.scale = scale; }
 
+	/// <summary>
+	/// floatでRotateを設定
+	/// </summary>
+	/// <param name="rotate">更新したいRotateを渡す</param>
 	void SetRotate(float rotate) { transform2D_.rotate = rotate; }
 
+	/// <summary>
+	/// Colorを設定 Alpha含む
+	/// </summary>
+	/// <param name="Color">更新したいColorを渡す</param>
 	void SetColor(const Vector4& Color) { materialData_->color = Color; }
 
+	/// <summary>
+	/// UV用のTransform2Dを設定
+	/// </summary>
+	/// <param name="transform">更新したいUV用のTransform2Dを渡す</param>
+	void SetUVTransform(const Transform2D& uvTransform) { uvTransform_ = uvTransform; }
+
+	/// <summary>
+	/// Vector2型で画像サイズを取得
+	/// </summary>
+	/// <returns>Vector2型で画像サイズを取得</returns>
 	Vector2& GetSize() { return size_; }
 
+	/// <summary>
+	/// 使用してるTextureを変更
+	/// </summary>
+	/// <param name="textureName">resources/image/" 以降のPathを渡す</param>
 	void SetTexture(const std::string& textureName);
 
 private:

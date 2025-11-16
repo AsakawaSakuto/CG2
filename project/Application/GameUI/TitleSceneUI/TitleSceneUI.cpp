@@ -6,9 +6,9 @@ TitleSceneUI::~TitleSceneUI() {
 void TitleSceneUI::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 
-	playUI_->Initialize(&ctx_->dxCommon, "UI/title/playUI", { 640.0f,440.0f }, { 0.5f,0.5f });
-	quitUI_->Initialize(&ctx_->dxCommon, "UI/title/quitUI", { 640.0f,600.0f }, { 0.5f,0.5f });
-	titleLogoUI_->Initialize(&ctx_->dxCommon, "UI/title/titlelogo", { 640.0f,200.0f });
+	playUI_->Initialize(&ctx_->dxCommon, "UI/title/playUI.png", { 640.0f,440.0f }, { 0.5f,0.5f });
+	quitUI_->Initialize(&ctx_->dxCommon, "UI/title/quitUI.png", { 640.0f,600.0f }, { 0.5f,0.5f });
+	titleLogoUI_->Initialize(&ctx_->dxCommon, "UI/title/titlelogo.png", { 640.0f,200.0f });
 }
 
 void TitleSceneUI::Update() {
