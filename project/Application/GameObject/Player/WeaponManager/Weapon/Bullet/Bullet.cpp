@@ -1,7 +1,7 @@
 #include "bullet.h"
 
 void Bullet::Initialize(AppContext* ctx) {
-    ctx = ctx;
+    ctx_ = ctx;
     model_->Initialize(&ctx->dxCommon, "cube.obj");
 
 	transform_.scale = { 0.25f,0.25f,0.25f };
@@ -21,4 +21,8 @@ void Bullet::Draw(Camera camera) {
 
 void Bullet::DrawImGui() {
 
+}
+
+void Bullet::SetPosition(const Vector3& position) {
+    transform_.translate = position;
 }

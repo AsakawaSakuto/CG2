@@ -11,6 +11,8 @@ public:
 	void Update();
 
 	void Draw(Camera camera);
+
+	void SetPlayerPosition(const Vector3& position);
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Bullet>> bullets_;
@@ -18,4 +20,6 @@ private:
 	WeaponStatus status_;
 	GameTimer coolDownTimer_; // クールタイムタイマー
 	GameTimer intervalTimer_; // 攻撃間隔タイマー
+
+	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 };

@@ -18,3 +18,9 @@ void WeaponManager::Draw(Camera camera) {
 		weapon->Draw(camera);
 	}
 }
+
+void WeaponManager::SetPlayerPosition(const Vector3& position) {
+	for (auto& weapon : weapons_) {
+		weapon->SetPlayerPosition(position);
+	}
+}

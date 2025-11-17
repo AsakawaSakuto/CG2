@@ -33,6 +33,7 @@ void Player::Update() {
 	landingParticle_->SetEmitterPosition(transform_.translate);
 	landingParticle_->Update();
 
+	weaponManager_->SetPlayerPosition(transform_.translate);
 	weaponManager_->Update();
 
 	sphereCollision_.center = transform_.translate;
