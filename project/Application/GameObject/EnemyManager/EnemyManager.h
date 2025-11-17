@@ -15,6 +15,9 @@ public:
 	
 	void CheckCollisionWithPlayer(const Sphere& playerSphere);
 
+	// 敵のリストへのアクセス（const参照）
+	const std::vector<std::unique_ptr<Enemy>>& GetEnemies() const { return enemies_; }
+
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Enemy>> enemies_;

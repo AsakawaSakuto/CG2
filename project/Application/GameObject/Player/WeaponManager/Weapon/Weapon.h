@@ -4,6 +4,10 @@
 #include "Application/GameObject/Player/WeaponManager/WeaponStatus.h"
 #include "Camera.h"
 
+//#include "../Application/GameObject/Player/Player.h"
+
+//class Player;
+
 class Weapon {
 public:
 	void Initialize(AppContext* ctx);
@@ -13,6 +17,8 @@ public:
 	void Draw(Camera camera);
 
 	void SetPlayerPosition(const Vector3& position);
+	void SetDirectionToEnemy(const Vector3& direction);
+
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Bullet>> bullets_;
@@ -22,4 +28,7 @@ private:
 	GameTimer intervalTimer_; // 攻撃間隔タイマー
 
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
+	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
+
+	//Player* player_ = nullptr;
 };

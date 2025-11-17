@@ -9,7 +9,7 @@ void Bullet::Initialize(AppContext* ctx) {
 
 void Bullet::Update() {
 
-    transform_.translate.y += 1.0f * deltaTime_;
+    transform_.translate += directionToEnemy_ * 100.0f * deltaTime_;
 
     model_->Update();
 }
@@ -25,4 +25,8 @@ void Bullet::DrawImGui() {
 
 void Bullet::SetPosition(const Vector3& position) {
     transform_.translate = position;
+}
+
+void Bullet::SetDirectionToEnemy(const Vector3& direction) {
+    directionToEnemy_ = direction.Normalize();
 }

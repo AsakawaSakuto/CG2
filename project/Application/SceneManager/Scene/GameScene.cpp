@@ -18,6 +18,9 @@ void GameScene::Initialize() {
 
 	enemyManager_->Initialize(ctx_);
 
+	// プレイヤーにEnemyManagerへの参照を設定
+	player_->SetEnemyManager(enemyManager_.get());
+
 	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
 	testPlaneTransform_.scale = { 100.0f,1.0f,100.0f };
 	testPlaneTransform_.translate = { 0.0f,-0.5f,0.0f };

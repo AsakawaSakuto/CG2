@@ -3,7 +3,7 @@
 
 void EnemyManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
-	spawnTimer_.Start(0.01f, true);
+	spawnTimer_.Start(5.0f, true);
 }
 
 void EnemyManager::Update() {

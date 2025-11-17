@@ -1,6 +1,8 @@
 #include "player.h"
+#include "Application/GameObject/EnemyManager/EnemyManager.h"
 #include <cmath>
 #include <algorithm>
+#include <limits>
 
 void Player::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
@@ -21,6 +23,8 @@ void Player::Update() {
 	Move();
 	Jump();
 
+	directionToEnemy_ = GetDirectionToEnemy();
+
 	transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
 	transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
 
@@ -33,6 +37,7 @@ void Player::Update() {
 	landingParticle_->SetEmitterPosition(transform_.translate);
 	landingParticle_->Update();
 
+	weaponManager_->SetDirectionToEnemy(directionToEnemy_);
 	weaponManager_->SetPlayerPosition(transform_.translate);
 	weaponManager_->Update();
 
@@ -186,4 +191,64 @@ void Player::Jump() {
 		status_.velocity_Y_ -= status_.gravity_ * deltaTime_;
 		transform_.translate.y += status_.velocity_Y_ * deltaTime_;
 	}
+}
+
+Vector3 Player::GetDirectionToEnemy() const {
+	// EnemyManagerが設定されていない場合はゼロベクトルを返す
+	if (!enemyManager_) {
+		return Vector3{ 0.0f, 0.0f, 0.0f };
+	}
+
+	const auto& enemies = enemyManager_->GetEnemies();
+	
+	// 敵がいない場合はゼロベクトルを返す
+	if (enemies.empty()) {
+		return Vector3{ 0.0f, 0.0f, 0.0f };
+	}
+
+	float minDistanceSquared = (std::numeric_limits<float>::max)();
+	Vector3 vectorToNearest = { 0.0f, 0.0f, 0.0f };
+	const Vector3& playerPos = transform_.translate;
+
+	// 全ての敵をチェックして最も近い敵を見つける
+	for (const auto& enemy : enemies) {
+		// 死んでいる敵はスキップ
+		if (!enemy->IsAlive()) {
+			continue;
+		}
+
+		const Vector3& enemyPos = enemy->GetPosition();
+		
+		// 敵へのベクトルを計算
+		Vector3 vectorToEnemy = {
+			enemyPos.x - playerPos.x,
+			enemyPos.y - playerPos.y,
+			enemyPos.z - playerPos.z
+		};
+
+		// 距離の二乗を計算（sqrtを避けるため）
+		float distanceSquared = 
+			vectorToEnemy.x * vectorToEnemy.x +
+			vectorToEnemy.y * vectorToEnemy.y +
+			vectorToEnemy.z * vectorToEnemy.z;
+
+		// より近い敵が見つかった場合
+		if (distanceSquared < minDistanceSquared) {
+			minDistanceSquared = distanceSquared;
+			vectorToNearest = vectorToEnemy;
+		}
+	}
+
+	return vectorToNearest;
+}
+
+float Player::GetDistanceToNearestEnemy() const {
+	Vector3 vectorToNearest = GetDirectionToEnemy();
+	
+	// ゼロベクトルの場合は無限大を返す
+	if (vectorToNearest.x == 0.0f && vectorToNearest.y == 0.0f && vectorToNearest.z == 0.0f) {
+		return (std::numeric_limits<float>::max)();
+	}
+
+	return vectorToNearest.Length();
 }
