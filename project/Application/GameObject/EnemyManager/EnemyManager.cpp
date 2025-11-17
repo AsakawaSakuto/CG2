@@ -3,7 +3,7 @@
 
 void EnemyManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
-	spawnTimer_.Start(5.0f, true);
+	spawnTimer_.Start(0.2f, true);
 }
 
 void EnemyManager::Update() {
@@ -13,6 +13,25 @@ void EnemyManager::Update() {
 		if (spawnTimer_.IsFinished()) {
 			auto enemy = std::make_unique<Enemy>();
 			enemy->Initialize(ctx_);
+
+			int i = random_.Int(0, 1);
+			int j = random_.Int(0, 1);
+			float x = 0.0f;
+			float z = 0.0f;
+			if (i == 0) {
+				x = 10.0f;
+			} else {
+				x = -10.0f;
+			}
+			if (j == 0) {
+				z = 10.0f;
+			} else {
+				z = -10.0f;
+			}
+			enemy->SetPosition(
+				{targetPosition_.x + random_.Float(-5.0f,5.0f) + x,
+				 0.0f,
+				 targetPosition_.z + random_.Float(-5.0f,5.0f) + z });
 			enemies_.push_back(std::move(enemy));
 		}
 	}
@@ -70,7 +89,8 @@ void EnemyManager::DrawImGui() {
 }
 
 void EnemyManager::SetTargetPosition(const Vector3& target) {
+	targetPosition_ = target;
 	for (auto& enemy : enemies_) {
-		enemy->SetTargetPosition(target);
+		enemy->SetTargetPosition(targetPosition_);
 	}
 }

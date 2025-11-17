@@ -2,7 +2,7 @@
 #include "Application/GameObject/BaseGameObject.h"
 #include "Application/EngineSystem.h"
 #include "playerStatus.h"
-#include "../Player/WeaponManager/WeaponManager.h"
+#include "Application/GameObject/Player/WeaponManager/WeaponManager.h"
 
 // 前方宣言
 class EnemyManager;
@@ -16,6 +16,9 @@ public:
   
 	// EnemyManagerへの参照を設定
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
+
+	// WeaponManagerへのアクセス
+	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
 
 private:
 

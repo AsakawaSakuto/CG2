@@ -21,10 +21,11 @@ void GameScene::Initialize() {
 	// プレイヤーにEnemyManagerへの参照を設定
 	player_->SetEnemyManager(enemyManager_.get());
 
-	// CollisionManagerを初期化し、PlayerとEnemyManagerへの参照を設定
+	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
 	collisionManager_->Initialize();
 	collisionManager_->SetPlayer(player_.get());
 	collisionManager_->SetEnemyManager(enemyManager_.get());
+	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
 
 	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
 	testPlaneTransform_.scale = { 100.0f,1.0f,100.0f };

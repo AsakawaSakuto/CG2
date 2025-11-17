@@ -22,6 +22,10 @@ public:
 			weapon->SetDirectionToEnemy(direction);
 		}
 	}
+
+	// 武器のリストへのアクセス（const参照）
+	const std::vector<std::unique_ptr<Weapon>>& GetWeapons() const { return weapons_; }
+
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Weapon>> weapons_;

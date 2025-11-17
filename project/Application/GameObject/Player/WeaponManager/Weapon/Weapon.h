@@ -19,6 +19,9 @@ public:
 	void SetPlayerPosition(const Vector3& position);
 	void SetDirectionToEnemy(const Vector3& direction);
 
+	// 弾のリストへのアクセス（const参照）
+	const std::vector<std::unique_ptr<Bullet>>& GetBullets() const { return bullets_; }
+
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Bullet>> bullets_;

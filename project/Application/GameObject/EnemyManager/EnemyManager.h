@@ -20,4 +20,6 @@ private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Enemy>> enemies_;
 	GameTimer spawnTimer_;
+	Random random_;
+	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
 };
