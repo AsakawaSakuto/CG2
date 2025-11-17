@@ -12,8 +12,6 @@ public:
 	void DrawImGui();
 
 	void SetTargetPosition(const Vector3& target);
-	
-	void CheckCollisionWithPlayer(const Sphere& playerSphere);
 
 	// 敵のリストへのアクセス（const参照）
 	const std::vector<std::unique_ptr<Enemy>>& GetEnemies() const { return enemies_; }
