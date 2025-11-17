@@ -2,7 +2,10 @@
 #include "Application/GameObject/BaseGameObject.h"
 #include "Application/EngineSystem.h"
 #include "playerStatus.h"
-#include "../Player/WeaponManager/WeaponManager.h"
+#include "Application/GameObject/Player/WeaponManager/WeaponManager.h"
+
+// 前方宣言
+class EnemyManager;
 
 class Player : public BaseGameObject {
 public:
@@ -10,20 +13,29 @@ public:
     void Update() override;
     void Draw(Camera camera) override;
     void DrawImGui() override;
+  
+	// EnemyManagerへの参照を設定
+	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
 
-    const Vector3& GetPosition() { return transform_.translate; }
-    const Sphere& GetSphereCollision() const { return sphereCollision_; }
-    
+	// WeaponManagerへのアクセス
+	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
+
 private:
 
 	// 移動処理
 	void Move();
 
+	// ジャンプ処理
+	void Jump();
+
 	// カメラの向きに基づいた移動方向を計算
 	Vector3 CalculateCameraMoveDirection(float stickX, float stickY);
 
-	// ジャンプ処理
-	void Jump();
+	// プレイヤーから最も近い敵へのベクトルを取得（正規化されていない）
+	Vector3 GetDirectionToEnemy() const;
+
+	// プレイヤーから最も近い敵までの距離を取得
+	float GetDistanceToNearestEnemy() const;
 
 private:
 	unique_ptr<Model> model_ = make_unique<Model>();
@@ -36,10 +48,15 @@ private:
 	
 	PlayerStatus status_; // プレイヤーステータス
 
+	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
+
 	float collisionRadius_ = 0.5f;
 
 	// ジャンプ関連のメンバ変数
 	float groundLevel_ = 0.0f; // 地面のY座標
 	bool isGrounded_ = true;   // 地面にいるかどうか
 	bool wasGrounded_ = true;  // 前フレームで地面にいたかどうか
+
+	// EnemyManagerへの参照（生ポインタ、所有権なし)
+	EnemyManager* enemyManager_ = nullptr;
 };

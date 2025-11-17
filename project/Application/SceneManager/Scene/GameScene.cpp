@@ -18,6 +18,15 @@ void GameScene::Initialize() {
 
 	enemyManager_->Initialize(ctx_);
 
+	// プレイヤーにEnemyManagerへの参照を設定
+	player_->SetEnemyManager(enemyManager_.get());
+
+	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
+	collisionManager_->Initialize();
+	collisionManager_->SetPlayer(player_.get());
+	collisionManager_->SetEnemyManager(enemyManager_.get());
+	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
+
 	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
 	testPlaneTransform_.scale = { 100.0f,1.0f,100.0f };
 	testPlaneTransform_.translate = { 0.0f,-0.5f,0.0f };
@@ -40,8 +49,8 @@ void GameScene::Update() {
 	enemyManager_->SetTargetPosition(player_->GetPosition());
 	enemyManager_->Update();
 	
-	// プレイヤーとEnemyの当たり判定を実行
-	enemyManager_->CheckCollisionWithPlayer(player_->GetSphereCollision());
+	// CollisionManagerで衝突判定を実行
+	collisionManager_->Update();
 
 	camera_ = gameCamera_->GetCamera();
 	camera_.Update();
@@ -54,9 +63,9 @@ void GameScene::Draw() {
 	testPlane_->Draw(camera_, testPlaneTransform_);
 	testWall_->Draw(camera_, testWallTransform_);
 
-	player_->Draw(camera_);
-
 	enemyManager_->Draw(camera_);
+
+	player_->Draw(camera_);
 }
 
 void GameScene::DrawImGui() {

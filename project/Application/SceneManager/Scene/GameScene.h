@@ -4,6 +4,7 @@
 #include"Application/GameObject/Player/player.h"
 #include"Application/GameCameraCntroller/GameCameraController.h"
 #include"Application/GameObject/EnemyManager/EnemyManager.h"
+#include"Application/CollisionManager/CollisionManager.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -39,4 +40,7 @@ private:
 	unique_ptr<GameCameraController> gameCamera_ = make_unique<GameCameraController>();
 
 	unique_ptr<EnemyManager> enemyManager_ = make_unique<EnemyManager>();
+
+	// 衝突判定マネージャー
+	unique_ptr<CollisionManager> collisionManager_ = make_unique<CollisionManager>();
 };

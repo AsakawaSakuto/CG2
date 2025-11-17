@@ -32,6 +32,7 @@ void Weapon::Update() {
 		auto bullet = std::make_unique<Bullet>();
 		bullet->Initialize(ctx_);
 		bullet->SetPosition(playerPosition_);
+		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullets_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
@@ -58,4 +59,8 @@ void Weapon::Draw(Camera camera) {
 
 void Weapon::SetPlayerPosition(const Vector3& position) {
 	playerPosition_ = position;
+}
+
+void Weapon::SetDirectionToEnemy(const Vector3& direction) {
+	directionToEnemy_ = direction;
 }

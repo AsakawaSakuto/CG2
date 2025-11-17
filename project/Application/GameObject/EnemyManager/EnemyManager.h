@@ -12,11 +12,14 @@ public:
 	void DrawImGui();
 
 	void SetTargetPosition(const Vector3& target);
-	
-	void CheckCollisionWithPlayer(const Sphere& playerSphere);
+
+	// 敵のリストへのアクセス（const参照）
+	const std::vector<std::unique_ptr<Enemy>>& GetEnemies() const { return enemies_; }
 
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Enemy>> enemies_;
 	GameTimer spawnTimer_;
+	Random random_;
+	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
 };

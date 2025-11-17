@@ -19,7 +19,14 @@ public:
     virtual void Update() = 0;
     virtual void Draw(Camera camera) = 0;
     virtual void DrawImGui() = 0;
+
+	virtual const Vector3& GetPosition() { return transform_.translate; }
+
 	virtual const AABB& GetAABBCollision() { return aabbCollision_; }
 	virtual const Sphere& GetSphereCollision() { return sphereCollision_; }
+
+	virtual bool IsAlive() const { return isAlive_; }
+    virtual void Dead() { isAlive_ = false; }
+
     virtual ~BaseGameObject() {}
 };

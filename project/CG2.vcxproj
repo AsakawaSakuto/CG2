@@ -145,6 +145,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
     <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
@@ -221,6 +222,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
+    <ClInclude Include="Application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="Application\EngineSystem.h" />
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
