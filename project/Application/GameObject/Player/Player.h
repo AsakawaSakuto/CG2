@@ -2,6 +2,7 @@
 #include "Application/GameObject/BaseGameObject.h"
 #include "Application/EngineSystem.h"
 #include "playerStatus.h"
+#include "../Player/WeaponManager/WeaponManager.h"
 
 class Player : public BaseGameObject {
 public:
@@ -28,6 +29,8 @@ private:
 	unique_ptr<Model> model_ = make_unique<Model>();
 	unique_ptr<Particles> moveParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> landingParticle_ = make_unique<Particles>();
+
+	unique_ptr<WeaponManager> weaponManager_ = make_unique<WeaponManager>();
 
 	Camera camera_; // 現在のカメラへの参照
 	

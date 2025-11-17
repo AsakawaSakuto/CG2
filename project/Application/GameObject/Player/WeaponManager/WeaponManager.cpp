@@ -2,6 +2,9 @@
 
 void WeaponManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
+	auto weapon = std::make_unique<Weapon>();
+	weapon->Initialize(ctx_);
+	weapons_.push_back(std::move(weapon));
 }
 
 void WeaponManager::Update() {

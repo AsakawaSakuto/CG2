@@ -3,7 +3,7 @@
 void Weapon::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 
-	status_.cooldownTime = 1.0f;
+	status_.cooldownTime = 2.0f;
 	status_.intervalTime = 0.2f;
 	status_.shotMaxCount = 5;
 	status_.shotNowCount = 0;
@@ -29,8 +29,13 @@ void Weapon::Update() {
 
 	if (intervalTimer_.IsFinished()) {
 
+		auto bullet = std::make_unique<Bullet>();
+		bullet->Initialize(ctx_);
+		bullets_.push_back(std::move(bullet));
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= status_.shotMaxCount) {
+			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
 		}

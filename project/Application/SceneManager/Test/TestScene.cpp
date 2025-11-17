@@ -25,7 +25,7 @@ void TestScene::Initialize() {
     cubeTransform_.translate = { -1.5f,2.5f,0.0f };
 
 	spinCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
-    spinCubeTransform_.translate = { 1.5f,2.5f,0.0f };
+    spinCubeTransform_.translate = { 1.5f,4.5f,0.0f };
 	spinCubeTransform_.scale = { 0.5f,0.5f,0.5f };
 
 	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
@@ -51,7 +51,7 @@ void TestScene::Update() {
 	testParticle_->Update();
 
     cubeTransform_.translate.x = Easing::Lerp(-1.5f, 1.5f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
-    spinCubeTransform_.translate = Easing::Lerp(Vector3({ 1.5f,2.5f,0.0f }), Vector3({ -1.5f,5.0f,0.0f }), testTimer_.GetProgress(), Easing::Type::EaseInBounce);
+    spinCubeTransform_.translate.x = Easing::Lerp_GAB(-1.5f, 1.5f, testTimer_.GetProgress(), Easing::Type::Linear, Easing::Type::EaseOutBounce);
 
 	cube_->Update();
 	spinCube_->Update();
@@ -83,9 +83,73 @@ void TestScene::Draw() {
 void TestScene::DrawImGui() {
 #ifdef USE_IMGUI
 
-	//MT4_01_03();
-	//MT4_01_04();
-    //MT4_01_05();
+	MT4_01_01();
+	MT4_01_02();
+	MT4_01_03();
+	MT4_01_04();
+    MT4_01_05();
+
+#endif
+}
+
+void TestScene::MT4_01_01() {
+#ifdef USE_IMGUI
+
+    Vector3 axis = Normalize(Vector3{ 1.0f, 1.0f, 1.0f });
+    float  angle = 0.44f;
+    Matrix4x4 rotateMatrix = MakeRotateAxisAngle(axis, angle);
+
+    ImGui::Begin("MT4_01_01");
+
+    ImGui::TextUnformatted("rotateMatrix");
+    for (int r = 0; r < 4; ++r) {
+        ImGui::Text(
+            "% .3f  % .3f  % .3f  % .3f",
+            rotateMatrix.m[r][0], rotateMatrix.m[r][1],
+            rotateMatrix.m[r][2], rotateMatrix.m[r][3]
+        );
+    }
+
+    ImGui::End();
+
+#endif
+}
+
+void TestScene::MT4_01_02() {
+#ifdef USE_IMGUI
+
+    Vector3 from0 = Normalize(Vector3{ 1.0f, 0.7f, 0.5f });
+    Vector3 to0 = Normalize(Vector3{ -1.0f, -0.7f, -0.5f });
+
+    Vector3 from1 = Normalize(Vector3{ -0.6f, 0.9f, 0.2f });
+    Vector3 to1 = Normalize(Vector3{ 0.4f, 0.7f, -0.5f });
+
+    Matrix4x4 rotateMatrix0 = DirectionToDirection(
+        Normalize(Vector3{ 1.0f, 0.0f, 0.0f }),
+        Normalize(Vector3{ -1.0f, 0.0f, 0.0f })
+    );
+    Matrix4x4 rotateMatrix1 = DirectionToDirection(from0, to0);
+    Matrix4x4 rotateMatrix2 = DirectionToDirection(from1, to1);
+
+    // ---- ImGuiでの表示部分 ----
+    ImGui::Begin("MT4_01_02");
+
+    auto ShowMatrix = [](const char* label, const Matrix4x4& m)
+        {
+            ImGui::TextUnformatted(label);
+            for (int r = 0; r < 4; ++r) {
+                ImGui::Text("%.3f  %.3f  %.3f  %.3f",
+                    m.m[r][0], m.m[r][1], m.m[r][2], m.m[r][3]);
+            }
+        };
+
+    ShowMatrix("rotateMatrix0", rotateMatrix0);
+    ImGui::Separator();
+    ShowMatrix("rotateMatrix1", rotateMatrix1);
+    ImGui::Separator();
+    ShowMatrix("rotateMatrix2", rotateMatrix2);
+
+    ImGui::End();
 
 #endif
 }
@@ -162,11 +226,6 @@ void TestScene::MT4_01_04() {
 
     ImGui::Begin("MT4_01_04");
 
-    ImGui::Text("Axis & Angle");
-    ImGui::DragFloat3("Axis (raw)", &axis.x, 0.01f);
-    ImGui::DragFloat("Angle (rad)", &angle, 0.01f);
-
-    ImGui::Separator();
     ImGui::Text("Axis (normalized)");
     ImGui::Text("(%.2f, %.2f, %.2f)",
         axisNormalized.x, axisNormalized.y, axisNormalized.z);
@@ -213,7 +272,7 @@ void TestScene::MT4_01_05() {
     Quaternion interpolate3 = Slerp(rotation0, rotation1, 0.7f);
     Quaternion interpolate4 = Slerp(rotation0, rotation1, 1.0f);
 
-    ImGui::Begin("Quaternion Slerp Test");
+    ImGui::Begin("MT4_01_05");
 
     ImGui::Text("rotation0");
     ImGui::Text("x:%.2f  y:%.2f  z:%.2f  w:%.2f",

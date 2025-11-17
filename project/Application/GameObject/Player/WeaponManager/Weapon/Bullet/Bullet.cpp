@@ -4,7 +4,7 @@ void Bullet::Initialize(AppContext* ctx) {
     ctx = ctx;
     model_->Initialize(&ctx->dxCommon, "cube.obj");
 
-    transform_.scale = { 1.0f,1.0f,1.0f };
+	transform_.scale = { 0.25f,0.25f,0.25f };
 }
 
 void Bullet::Update() {
@@ -16,7 +16,7 @@ void Bullet::Update() {
 
 void Bullet::Draw(Camera camera) {
 
-    model_->Draw(camera);
+    model_->Draw(camera, transform_);
 }
 
 void Bullet::DrawImGui() {
