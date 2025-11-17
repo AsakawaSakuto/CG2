@@ -10,6 +10,8 @@ public:
 	void Update();
 
 	void Draw(Camera camera);
+
+	void SetPlayerPosition(const Vector3& position);
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Weapon>> weapons_;

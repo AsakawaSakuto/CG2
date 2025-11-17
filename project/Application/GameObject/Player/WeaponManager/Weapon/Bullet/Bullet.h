@@ -9,6 +9,8 @@ public:
     void Draw(Camera camera) override;
     void DrawImGui() override;
 
+    void SetPosition(const Vector3& position);
+
 private:
 
 private:
