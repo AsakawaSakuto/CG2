@@ -12,6 +12,8 @@ void Player::Initialize(AppContext* ctx) {
 	moveParticle_->LoadJson("playerMove");
 	landingParticle_->Initialize(&ctx_->dxCommon);
 	landingParticle_->LoadJson("playerLanding");
+
+	weaponManager_->Initialize(ctx_);
 }
 
 void Player::Update() {
@@ -31,6 +33,8 @@ void Player::Update() {
 	landingParticle_->SetEmitterPosition(transform_.translate);
 	landingParticle_->Update();
 
+	weaponManager_->Update();
+
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = collisionRadius_;
 }
@@ -39,6 +43,8 @@ void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
 	model_->Draw(camera);
+
+	weaponManager_->Draw(camera);
 
 	moveParticle_->Draw(camera);
 	landingParticle_->Draw(camera);
