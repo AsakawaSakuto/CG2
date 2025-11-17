@@ -62,9 +62,9 @@ void GameScene::Draw() {
 	testPlane_->Draw(camera_, testPlaneTransform_);
 	testWall_->Draw(camera_, testWallTransform_);
 
-	player_->Draw(camera_);
-
 	enemyManager_->Draw(camera_);
+
+	player_->Draw(camera_);
 }
 
 void GameScene::DrawImGui() {
