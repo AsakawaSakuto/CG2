@@ -11,6 +11,8 @@ void Enemy::Initialize(AppContext* ctx) {
 
 	moveSpeed_ = 2.0f;
 	collicionRadius_ = 0.5f;
+
+	drawTimer_.Start(0.5f, false);
 }
 
 void Enemy::Update() {
@@ -19,12 +21,17 @@ void Enemy::Update() {
 
 	model_->Update();
 
+	transform_.scale = Easing::Lerp(Vector3({0.0f,0.0f,0.0f}), Vector3({ 1.0f,1.0f,1.0f }), 
+		drawTimer_.GetProgress(), Easing::Type::Linear);
+
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = collicionRadius_;
+
+	drawTimer_.Update();
 }
 
 void Enemy::Draw(Camera camera) {
-	model_->Draw(camera, transform_);
+	if (drawTimer_.GetProgress() > 0.1f) { model_->Draw(camera, transform_); }
 }
 
 void Enemy::DrawImGui() {

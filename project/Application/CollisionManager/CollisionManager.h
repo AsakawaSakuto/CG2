@@ -21,14 +21,21 @@ public:
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
 	void SetWeaponManager(WeaponManager* weaponManager) { weaponManager_ = weaponManager; }
 
+	bool GetGoResult() const { return goResult_; }
 private:
 	// PlayerとEnemyの衝突判定
 	void CheckPlayerEnemyCollision();
+
+	//
+	void CheckExpItemPlayerCollision();
 
 	// BulletとEnemyの衝突判定
 	void CheckBulletEnemyCollision();
 
 private:
+
+	bool goResult_ = false;
+
 	AppContext* ctx_ = nullptr;
 
 	Player* player_ = nullptr;
@@ -36,4 +43,5 @@ private:
 	WeaponManager* weaponManager_ = nullptr;
 
 	unique_ptr<Particles> enemyDieParticle_ = make_unique<Particles>();
+	unique_ptr<Particles> expItemGetParticle_ = make_unique<Particles>();
 };

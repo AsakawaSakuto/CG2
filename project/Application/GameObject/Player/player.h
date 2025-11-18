@@ -14,6 +14,8 @@ public:
     void Draw(Camera camera) override;
     void DrawImGui() override;
   
+	Sphere& GetExpItemStateChangeCollision() { return expItemStateChangeCollision_; }
+
 	// EnemyManagerへの参照を設定
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
 
@@ -39,6 +41,10 @@ private:
 
 private:
 	unique_ptr<Model> model_ = make_unique<Model>();
+	unique_ptr<Model> expItemGetRange_ = make_unique<Model>();
+
+	Transform expGetRangeTransform_;
+
 	unique_ptr<Particles> moveParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> landingParticle_ = make_unique<Particles>();
 
@@ -59,4 +65,7 @@ private:
 
 	// EnemyManagerへの参照（生ポインタ、所有権なし)
 	EnemyManager* enemyManager_ = nullptr;
+
+	Sphere expItemStateChangeCollision_;
+	float expItemStateChangeRadius_ = 3.5f;
 };

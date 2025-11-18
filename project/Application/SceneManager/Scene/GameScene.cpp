@@ -30,6 +30,7 @@ void GameScene::Initialize() {
 	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
 	testPlaneTransform_.scale = { 100.0f,1.0f,100.0f };
 	testPlaneTransform_.translate = { 0.0f,-0.5f,0.0f };
+	testPlane_->UseLight(false);
 
 	testWall_->Initialize(&ctx_->dxCommon, "wall.obj");
 	testWall_->SetTranslate({ 0.0f,-40.0f,0.0f });
@@ -61,6 +62,10 @@ void GameScene::Update() {
 	testWall_->Update();
 
 	testParticle_->Update();
+
+	if (collisionManager_->GetGoResult()) {
+		ChangeScene(SCENE::RESULT);
+	}
 }
 
 void GameScene::Draw() {
@@ -71,7 +76,7 @@ void GameScene::Draw() {
 
 	player_->Draw(camera_);
 
-	testParticle_->Draw(camera_);
+	//testParticle_->Draw(camera_);
 
 	collisionManager_->Draw(camera_);
 }

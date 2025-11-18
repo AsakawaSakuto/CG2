@@ -118,7 +118,7 @@
 			"componentType":5126,
 			"count":2,
 			"max":[
-				2.5
+				2.4583333333333335
 			],
 			"min":[
 				0.041666666666666664
@@ -134,9 +134,9 @@
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":60,
+			"count":59,
 			"max":[
-				2.5
+				2.4583333333333335
 			],
 			"min":[
 				0.041666666666666664
@@ -146,7 +146,7 @@
 		{
 			"bufferView":7,
 			"componentType":5126,
-			"count":60,
+			"count":59,
 			"type":"VEC4"
 		},
 		{
@@ -193,23 +193,23 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":240,
+			"byteLength":236,
 			"byteOffset":2072
 		},
 		{
 			"buffer":0,
-			"byteLength":960,
-			"byteOffset":2312
+			"byteLength":944,
+			"byteOffset":2308
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":3272
+			"byteOffset":3252
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":3296,
+			"byteLength":3276,
 			"uri":"ExpItem.bin"
 		}
 	]

@@ -12,20 +12,29 @@ void CollisionManager::Initialize(AppContext* ctx) {
 	enemyDieParticle_->Initialize(&ctx_->dxCommon);
 	enemyDieParticle_->LoadJson("EnemyDie");
 	enemyDieParticle_->Stop();
+
+	expItemGetParticle_->Initialize(&ctx_->dxCommon);
+	expItemGetParticle_->LoadJson("expItemGet");
+	expItemGetParticle_->Stop();
 }
 
 void CollisionManager::Update() {
 	// PlayerとEnemyの衝突判定を実行
 	CheckPlayerEnemyCollision();
 
+	//
+	CheckExpItemPlayerCollision();
+
 	// BulletとEnemyの衝突判定を実行
 	CheckBulletEnemyCollision();
 
 	enemyDieParticle_->Update();
+	expItemGetParticle_->Update();
 }
 
 void CollisionManager::Draw(Camera camera) {
 	enemyDieParticle_->Draw(camera);
+	expItemGetParticle_->Draw(camera);
 }
 
 void CollisionManager::CheckPlayerEnemyCollision() {
@@ -48,6 +57,7 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 		if (Collision::IsHit(playerSphere, enemySphere)) {
 			// 衝突したEnemyを死亡状態にする
 			enemy->Dead();
+			goResult_ = true;
 		}
 	}
 }
@@ -96,6 +106,41 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					break; // この弾は当たったので次の弾へ
 				}
 			}
+		}
+	}
+}
+
+void CollisionManager::CheckExpItemPlayerCollision() {
+	// PlayerまたはEnemyManagerが設定されていない場合は何もしない
+	if (!player_ || !enemyManager_) {
+		return;
+	}
+
+	// プレイヤーの球体コライダーを取得
+	const Sphere& playerSphere = player_->GetSphereCollision();
+	const Sphere& stateChangeSphere = player_->GetExpItemStateChangeCollision();
+
+	// 敵のリストを取得
+	const auto& expItems = enemyManager_->GetExpItems();
+
+	// 全ての敵をチェック
+	for (const auto& expItem : expItems) {
+		const Sphere& expItemSphere = expItem->GetSphereCollision();
+
+		// プレイヤーとEnemyの衝突判定
+		if (Collision::IsHit(stateChangeSphere, expItemSphere)) {
+			// 衝突したEnemyを死亡状態にする
+			expItem->StateChange();
+		}
+
+		// プレイヤーとEnemyの衝突判定
+		if (Collision::IsHit(playerSphere, expItemSphere)) {
+			// 衝突したEnemyを死亡状態にする
+
+			expItemGetParticle_->SetEmitterPosition(player_->GetPosition());
+			expItemGetParticle_->Play(false);
+
+			expItem->Dead();
 		}
 	}
 }

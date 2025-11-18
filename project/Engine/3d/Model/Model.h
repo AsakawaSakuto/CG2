@@ -180,6 +180,7 @@ public:
 	/// <param name="animation">アニメーションがコピーされ、設定したアニメーションを行うようになる</param>
 	void SetAnimationData(Animation animation) { animationData_ = animation; }
 
+	void UseLight(bool use) { materialData_->enableLighting = use; }
 private:
 
 	// モデルジオメトリ共有キャッシュ

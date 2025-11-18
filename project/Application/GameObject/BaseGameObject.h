@@ -18,7 +18,7 @@ public:
     virtual void Initialize(AppContext* ctx) = 0;
     virtual void Update() = 0;
     virtual void Draw(Camera camera) = 0;
-    virtual void DrawImGui() = 0;
+    virtual void DrawImGui() {};
 
 	virtual const Vector3& GetPosition() { return transform_.translate; }
 

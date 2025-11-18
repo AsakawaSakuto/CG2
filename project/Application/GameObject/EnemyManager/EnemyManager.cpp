@@ -4,7 +4,7 @@
 
 void EnemyManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
-	spawnTimer_.Start(0.2f, true);
+	spawnTimer_.Start(0.5f, true);
 
 	dieParticle_ = std::make_unique<Particles>();
 	dieParticle_->Initialize(&ctx_->dxCommon);
@@ -60,12 +60,36 @@ void EnemyManager::Update() {
 		enemy->Update();
 	}
 
+	if (ctx_->input.TriggerKey(DIK_P)) {
+		for (auto& expItem : expItems_) {
+			expItem->StateChange();
+		}
+	}
+
+	for (auto& expItem : expItems_) {
+		expItem->Update();
+	}
+
 	// 死亡した敵を削除し、その位置でパーティクルを再生
 	for (auto it = enemies_.begin(); it != enemies_.end();) {
 		if (!(*it)->IsAlive()) {
 			dieParticle_->SetEmitterPosition((*it)->GetPosition());
 			dieParticle_->Play(false);
+
+			auto expItem = std::make_unique<ExpItem>();
+			expItem->Initialize(ctx_);
+			expItem->SetPosition((*it)->GetPosition());
+			expItems_.push_back(std::move(expItem));
+
 			it = enemies_.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	for (auto it = expItems_.begin(); it != expItems_.end();) {
+		if (!(*it)->IsAlive()) {
+			it = expItems_.erase(it);
 		} else {
 			++it;
 		}
@@ -77,6 +101,10 @@ void EnemyManager::Update() {
 void EnemyManager::Draw(Camera camera) {
 	for (auto& enemy : enemies_) {
 		enemy->Draw(camera);
+	}
+
+	for (auto& expItem : expItems_) {
+		expItem->Draw(camera);
 	}
 }
 
@@ -111,12 +139,8 @@ void EnemyManager::SetTargetPosition(const Vector3& target) {
 	for (auto& enemy : enemies_) {
 		enemy->SetTargetPosition(targetPosition_);
 	}
-}
 
-void EnemyManager::IsDie() {
-	for (auto& enemy : enemies_) {
-		enemy->Dead();
-		dieParticle_->SetEmitterPosition(enemy->GetPosition());
-		dieParticle_->Play(false);
+	for (auto& expItem : expItems_) {
+		expItem->SetTargetPosition(targetPosition_);
 	}
 }
