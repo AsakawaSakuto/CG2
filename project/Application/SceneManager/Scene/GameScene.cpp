@@ -22,7 +22,7 @@ void GameScene::Initialize() {
 	player_->SetEnemyManager(enemyManager_.get());
 
 	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
-	collisionManager_->Initialize();
+	collisionManager_->Initialize(ctx_);
 	collisionManager_->SetPlayer(player_.get());
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
@@ -34,6 +34,8 @@ void GameScene::Initialize() {
 	testWall_->Initialize(&ctx_->dxCommon, "wall.obj");
 	testWall_->SetTranslate({ 0.0f,-40.0f,0.0f });
 	testWallTransform_.translate = { 0.0f,-40.0f,0.0f };
+
+	testParticle_->Initialize(&ctx_->dxCommon);
 }
 
 void GameScene::Update() {
@@ -57,6 +59,8 @@ void GameScene::Update() {
 
 	testPlane_->Update();
 	testWall_->Update();
+
+	testParticle_->Update();
 }
 
 void GameScene::Draw() {
@@ -66,6 +70,10 @@ void GameScene::Draw() {
 	enemyManager_->Draw(camera_);
 
 	player_->Draw(camera_);
+
+	testParticle_->Draw(camera_);
+
+	collisionManager_->Draw(camera_);
 }
 
 void GameScene::DrawImGui() {
@@ -73,4 +81,6 @@ void GameScene::DrawImGui() {
 	player_->DrawImGui();
 
 	enemyManager_->DrawImGui();
+
+	testParticle_->DrawImGui("fire");
 }

@@ -13,10 +13,6 @@ public:
 
 	void SetTargetPosition(const Vector3& target) { targetPosition_ = target; }
 	void PushAway(const Vector3& otherPosition, float otherRadius);
-
-	// 敵の位置を取得
-	const Vector3& GetPosition() const { return transform_.translate; }
-
 private:
 
     void Move();

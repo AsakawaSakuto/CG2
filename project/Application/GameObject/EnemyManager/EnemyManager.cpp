@@ -1,9 +1,14 @@
 #include "EnemyManager.h"
 #include "Engine/System/Utility/Collision/Collision.h"
+#include <algorithm>
 
 void EnemyManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 	spawnTimer_.Start(0.2f, true);
+
+	dieParticle_ = std::make_unique<Particles>();
+	dieParticle_->Initialize(&ctx_->dxCommon);
+	dieParticle_->LoadJson("EnemyDie");
 }
 
 void EnemyManager::Update() {
@@ -54,6 +59,19 @@ void EnemyManager::Update() {
 	for (auto& enemy : enemies_) {
 		enemy->Update();
 	}
+
+	// 死亡した敵を削除し、その位置でパーティクルを再生
+	for (auto it = enemies_.begin(); it != enemies_.end();) {
+		if (!(*it)->IsAlive()) {
+			dieParticle_->SetEmitterPosition((*it)->GetPosition());
+			dieParticle_->Play(false);
+			it = enemies_.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	dieParticle_->Update();
 }
 
 void EnemyManager::Draw(Camera camera) {
@@ -92,5 +110,13 @@ void EnemyManager::SetTargetPosition(const Vector3& target) {
 	targetPosition_ = target;
 	for (auto& enemy : enemies_) {
 		enemy->SetTargetPosition(targetPosition_);
+	}
+}
+
+void EnemyManager::IsDie() {
+	for (auto& enemy : enemies_) {
+		enemy->Dead();
+		dieParticle_->SetEmitterPosition(enemy->GetPosition());
+		dieParticle_->Play(false);
 	}
 }

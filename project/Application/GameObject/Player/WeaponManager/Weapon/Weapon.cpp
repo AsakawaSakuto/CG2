@@ -1,4 +1,5 @@
 #include "Weapon.h"
+#include <algorithm>
 
 void Weapon::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
@@ -49,6 +50,15 @@ void Weapon::Update() {
 	for (auto& bullet : bullets_) {
 		bullet->Update();
 	}
+
+	// 死亡した弾を削除
+	bullets_.erase(
+		std::remove_if(bullets_.begin(), bullets_.end(),
+			[](const std::unique_ptr<Bullet>& bullet) {
+				return !bullet->IsAlive();
+			}),
+		bullets_.end()
+	);
 }
 
 void Weapon::Draw(Camera camera) {

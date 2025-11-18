@@ -2,20 +2,20 @@
 
 void Bullet::Initialize(AppContext* ctx) {
     ctx_ = ctx;
-    model_->Initialize(&ctx->dxCommon, "cube.obj");
+    model_->Initialize(&ctx_->dxCommon, "ball.obj");
 
-	transform_.scale = { 0.25f,0.25f,0.25f };
+	transform_.scale = { 0.5f,0.5f,0.5f };
 }
 
 void Bullet::Update() {
 
-    transform_.translate += directionToEnemy_ * 100.0f * deltaTime_;
+    transform_.translate += directionToEnemy_ * 50.0f * deltaTime_;
 
     model_->Update();
 
 	// Sphere collider update
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = 0.25f; // Radius matched to bullet's size
+	sphereCollision_.radius = 0.5f; // Radius matched to bullet's size
 }
 
 void Bullet::Draw(Camera camera) {
