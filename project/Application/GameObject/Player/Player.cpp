@@ -9,6 +9,9 @@ void Player::Initialize(AppContext* ctx) {
 	transform_.scale = { 1.0f,1.0f,1.0f };
 
 	model_->Initialize(&ctx_->dxCommon, "player/player.obj");
+	expItemGetRange_->Initialize(&ctx_->dxCommon, "player/expItemGetRange.obj");
+	expItemGetRange_->SetTexture("resources/image/white16x16.png");
+	expItemGetRange_->SetDrawMode(true);
 
 	moveParticle_->Initialize(&ctx_->dxCommon);
 	moveParticle_->LoadJson("playerMove");
@@ -28,8 +31,11 @@ void Player::Update() {
 	transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
 	transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
 
-	model_->SetTransform(transform_);
+	expGetRangeTransform_.translate = transform_.translate;
+	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
+
 	model_->Update();
+	expItemGetRange_->Update();
 
 	moveParticle_->SetEmitterPosition(transform_.translate);
 	moveParticle_->SetOffSet({ 0.0f, -0.2f, 0.0f });
@@ -43,12 +49,17 @@ void Player::Update() {
 
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = collisionRadius_;
+
+	expItemStateChangeCollision_.center = transform_.translate;
+	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
 }
 
 void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
-	model_->Draw(camera);
+	model_->Draw(camera, transform_);
+
+	expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
 	weaponManager_->Draw(camera);
 
