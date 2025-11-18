@@ -150,6 +150,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
+    <ClCompile Include="Application\GameObject\ExpItem\ExpItem.cpp" />
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
@@ -229,6 +230,7 @@ copy "$(windowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameObject\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\Enemy.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />
+    <ClInclude Include="Application\GameObject\ExpItem\ExpItem.h" />
     <ClInclude Include="Application\GameObject\Player\Player.h" />
     <ClInclude Include="Application\GameObject\Player\PlayerStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponManager.h" />

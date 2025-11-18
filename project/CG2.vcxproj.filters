@@ -61,6 +61,8 @@
     <ClCompile Include="Engine\System\Utility\MathFunction\MathFunction.cpp" />
     <ClCompile Include="Engine\System\Utility\Quaternion\QuaternionFunction.cpp" />
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
+    <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
+    <ClCompile Include="Application\GameObject\ExpItem\ExpItem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -142,6 +144,8 @@
     <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleDataStruct.h" />
+    <ClInclude Include="Application\CollisionManager\CollisionManager.h" />
+    <ClInclude Include="Application\GameObject\ExpItem\ExpItem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
