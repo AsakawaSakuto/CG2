@@ -3,6 +3,7 @@
 
 #include "ParticleDescriptorAllocator.h" 
 #include "Engine/System/DirectXCommon/ExeColor.h"
+#include "TextureManager.h"
 
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../PSOManager/PSOManager.h"
@@ -33,7 +34,6 @@ void DirectXCommon::Initialize(WinApp* winApp) {
     CreateImgui();
 #endif
 
-    // 追加: PSOManagerの初期化
     PSOManager::GetInstance().Initialize(this);
 }
 
@@ -306,10 +306,7 @@ void DirectXCommon::PreDraw() {
         return;
     }
     // これから書き込むバックバッファのインデックスを取得
-    backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
-
-    // TransitionBarrierの設定 *backBufferIndexを取得した直後、RenderTargetを設定する前に行う
-    // バックバッファの番号取得
+    // TransitionBarrierの設定 * backBufferIndexを取得した直後、RenderTargetを設定する前に行う
     backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
     // 今回のバリアはTransition
@@ -545,6 +542,25 @@ ParticleDescriptorAllocator& DirectXCommon::GetModelAlloc() {
         modelAllocInitialized_ = true;
     }
     return *modelAlloc_;
+}
+
+uint32_t DirectXCommon::GetTotalUsedSRVCount() const {
+    uint32_t totalUsed = 0;
+
+    // テクスチャマネージャーの使用数
+    totalUsed += static_cast<uint32_t>(TextureManager::GetInstance()->GetTextureCount());
+
+    // パーティクルアロケータの使用数
+    if (particleAllocInitialized_ && particleAlloc_) {
+        totalUsed += particleAlloc_->GetUsedCount();
+    }
+
+    // モデルアロケータの使用数
+    if (modelAllocInitialized_ && modelAlloc_) {
+        totalUsed += modelAlloc_->GetUsedCount();
+    }
+
+    return totalUsed;
 }
 
 void DirectXCommon::ResizeToWindow() {

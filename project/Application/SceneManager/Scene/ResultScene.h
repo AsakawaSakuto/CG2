@@ -20,6 +20,8 @@ private:
 	void CleanupResources();
 
 private:
+	unique_ptr<Sprite> pushA_ = make_unique<Sprite>();
+
 	// AppContext
 	AppContext* ctx_ = nullptr;
 

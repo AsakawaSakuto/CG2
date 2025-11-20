@@ -180,6 +180,7 @@ public:
 	/// <param name="animation">アニメーションがコピーされ、設定したアニメーションを行うようになる</param>
 	void SetAnimationData(Animation animation) { animationData_ = animation; }
 
+	void UseLight(bool use) { materialData_->enableLighting = use; }
 private:
 
 	// モデルジオメトリ共有キャッシュ
@@ -196,6 +197,15 @@ private:
 		std::string textureName;                               // 使用テクスチャ名
 		uint32_t textureIndex = 0;                             // テクスチャインデックス
 		float boundingRadius = 1.0f;                           // バウンディング半径
+		DirectXCommon* dxCommon = nullptr;                     // SRV解放用
+		
+		// デストラクタでSRVを返却
+		~GeometryCache() {
+			if (dxCommon && skinClusterIndex != 0 && !skinClusterData.paletteResource) {
+				// スキニング使用時のみ返却
+				dxCommon->GetModelAlloc().Free(skinClusterIndex);
+			}
+		}
 	};
 	static std::unordered_map<std::string, std::shared_ptr<GeometryCache>> s_geometryCache_;
 

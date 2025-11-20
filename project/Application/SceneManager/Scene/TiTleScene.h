@@ -28,5 +28,4 @@ private:
 	DebugCamera debugCamera_;
 
 	unique_ptr<TitleSceneUI> titleUI_ = make_unique<TitleSceneUI>();
-
 };

@@ -24,6 +24,12 @@ Model::~Model() {
 	if (skinClusterSrvIndex_ != 0 && dxCommon_ != nullptr) {
 		dxCommon_->GetModelAlloc().Free(skinClusterSrvIndex_);
 	}
+
+	// 他のマップされたリソースもアンマップ
+	if (materialResource_ && materialData_) {
+		materialResource_->Unmap(0, nullptr);
+		materialData_ = nullptr;
+	}
 }
 
 void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {

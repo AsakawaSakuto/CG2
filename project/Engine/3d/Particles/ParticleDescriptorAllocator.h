@@ -15,6 +15,12 @@ public:
 
     void Free(uint32_t index);
 
+    // 使用中のSRV数を取得
+    uint32_t GetUsedCount() const { return (next_ - begin_) - static_cast<uint32_t>(free_.size()); }
+    
+    // 総容量を取得
+    uint32_t GetCapacity() const { return end_ - begin_ + 1; }
+
 private:
     DirectXCommon* dx_ = nullptr;
     uint32_t begin_ = 0, end_ = 0;

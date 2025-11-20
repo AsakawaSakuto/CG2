@@ -16,6 +16,5 @@ private:
 
 private:
     unique_ptr<Model> model_ = make_unique<Model>();
-
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
 };

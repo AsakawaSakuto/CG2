@@ -4,8 +4,6 @@
 #include <filesystem>
 #include <comdef.h>
 #include <windows.h>
-
-// Add missing includes
 #include "TextureManager.h"
 #include "Logger.h"
 
@@ -14,6 +12,9 @@ SceneManager::SceneManager() {
     for (int i = 0; i < sceneNum; i++) {
         sceneArr_[i] = nullptr;
     }
+
+    currentSceneNo_ = SCENE::TITLE; 
+    prevSceneNo_ = currentSceneNo_;
 }
 
 SceneManager::~SceneManager() {
@@ -24,21 +25,12 @@ SceneManager::~SceneManager() {
 void SceneManager::CleanupAllScenes() {
     for (int i = 0; i < sceneNum; i++) {
         if (sceneArr_[i]) {
-            // デバッグ：どのシーンを削除するかログ出力
-            #ifdef _DEBUG
-            OutputDebugStringA(("Cleaning up scene " + std::to_string(i) + "\n").c_str());
-            #endif
             sceneArr_[i].reset();
         }
     }
 }
 
 std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
-    #ifdef _DEBUG
-    OutputDebugStringA(("Creating scene " + std::to_string(static_cast<int>(sceneNo)) + "\n").c_str());
-    #endif
-
-    try {
         switch (sceneNo) {
         case SCENE::TEST:
             return std::make_unique<TestScene>();
@@ -54,14 +46,6 @@ std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
             #endif
             return nullptr;
         }
-    }
-    catch (const std::exception& e) {
-        e;
-        #ifdef _DEBUG
-        OutputDebugStringA(("Scene creation failed: " + std::string(e.what()) + "\n").c_str());
-        #endif
-        return nullptr;
-    }
 }
 
 int SceneManager::Run() {
@@ -73,7 +57,7 @@ int SceneManager::Run() {
 	winApp_ = std::make_unique<WinApp>();
 
     // 各種初期化
-    winApp_->Initialize(L"Engine");
+    winApp_->Initialize(L"GigaBonk");
     
     // exeのアイコン設定
     winApp_->SetIconFromTexture("resources/image/icon.png");
@@ -122,97 +106,98 @@ int SceneManager::Run() {
             appContext_->dxCommon.ResizeToWindow();
         }
 
-        // シーン切り替えチェック
-        SCENE nextSceneNo = SCENE::TEST;
-        if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
-            nextSceneNo = sceneArr_[static_cast<int>(currentSceneNo_)]->GetSceneNo();
-        } else {
-            running = false;
-            break;
+        // F10キー: SRV使用状況をデバッグログに出力
+        if (GetAsyncKeyState(VK_F10) & 1) {
+            uint32_t totalUsed = appContext_->dxCommon.GetTotalUsedSRVCount();
+            char buffer[256];
+            sprintf_s(buffer, "=== SRV Usage Report ===\n");
+            OutputDebugStringA(buffer);
+            
+            sprintf_s(buffer, "Total SRVs Used: %u / %u\n", totalUsed, DirectXCommon::kMaxSRVCount_);
+            OutputDebugStringA(buffer);
+            
+            // テクスチャ詳細
+            uint32_t textureCount = static_cast<uint32_t>(TextureManager::GetInstance()->GetTextureCount());
+            sprintf_s(buffer, "  - Textures: %u (Range: %u-%u)\n", 
+                      textureCount, 
+                      DirectXCommon::kTextureSRVBegin, 
+                      DirectXCommon::kTextureSRVEnd);
+            OutputDebugStringA(buffer);
+            
+            // パーティクル詳細
+            auto& particleAlloc = appContext_->dxCommon.GetParticleAlloc();
+            sprintf_s(buffer, "  - Particles: %u / %u (Range: %u-%u)\n", 
+                      particleAlloc.GetUsedCount(),
+                      particleAlloc.GetCapacity(),
+                      DirectXCommon::kParticleSRVBegin, 
+                      DirectXCommon::kParticleSRVEnd);
+            OutputDebugStringA(buffer);
+            
+            // モデル詳細
+            auto& modelAlloc = appContext_->dxCommon.GetModelAlloc();
+            sprintf_s(buffer, "  - Models (Skinning): %u / %u (Range: %u-%u)\n", 
+                      modelAlloc.GetUsedCount(),
+                      modelAlloc.GetCapacity(),
+                      DirectXCommon::kModelSRVBegin, 
+                      DirectXCommon::kModelSRVEnd);
+            OutputDebugStringA(buffer);
+            
+            sprintf_s(buffer, "========================\n");
+            OutputDebugStringA(buffer);
         }
+
+        // シーン切り替えチェック
+        auto curIndex = static_cast<int>(currentSceneNo_);
+        SCENE nextSceneNo = sceneArr_[curIndex]->GetSceneNo();
 
         if (nextSceneNo != currentSceneNo_) {
 
-            // シーン切り替え処理
+            // 古いシーン破棄
             prevSceneNo_ = currentSceneNo_;
-            
-            // 現在のシーンを完全に削除
-            if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
-                sceneArr_[static_cast<int>(currentSceneNo_)].reset();
-                sceneArr_[static_cast<int>(currentSceneNo_)] = nullptr;
-                
-                // ガベージコレクションを強制実行
-                #ifdef _DEBUG
-                // TextureManagerのリソース状況をチェック
-                OutputDebugStringA("Forcing garbage collection...\n");
-                #endif
-            }
-            
-            // 新しいシーン番号を設定
+            sceneArr_[curIndex].reset();
+
+            // 新しいシーン作成
             currentSceneNo_ = nextSceneNo;
-            
-            // 新しいシーンを作成
-            sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
-            
-            // 新しいシーンの初期化
-            if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
-                sceneArr_[static_cast<int>(currentSceneNo_)]->SetAppContext(appContext_.get());
-                
-                try {
-                    sceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();
-                    #ifdef _DEBUG
-                    OutputDebugStringA("Scene initialization completed successfully\n");
-                    #endif
-                }
-                catch (const std::exception& e) {
-                    e;
-                    #ifdef _DEBUG
-                    OutputDebugStringA(("Scene initialization failed: " + std::string(e.what()) + "\n").c_str());
-                    #endif
-                }
+            curIndex = static_cast<int>(currentSceneNo_);
+            sceneArr_[curIndex] = CreateScene(currentSceneNo_);
+
+            // 新しいシーン初期化
+            if (sceneArr_[curIndex]) {
+                sceneArr_[curIndex]->SetAppContext(appContext_.get());
+                sceneArr_[curIndex]->Initialize();
             } else {
-                #ifdef _DEBUG
-                OutputDebugStringA("Failed to create new scene\n");
-                #endif
+                // 生成失敗したら落とすなりエラー処理
+                running = false;
+                OutputDebugStringA("Failed to generate new scene\n");
+                break;
             }
         }
 
-        // 更新・描画
-        if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
-            try {
-				// シーンの更新処理
-                sceneArr_[static_cast<int>(currentSceneNo_)]->Update();
+        // ここからは毎フレーム必ず通す処理
+        curIndex = static_cast<int>(currentSceneNo_);
 
-				// 描画前処理
-                appContext_->dxCommon.PreDraw();
+        // 更新
+        sceneArr_[curIndex]->Update();
 
-				// シーンの描画処理,SpriteやModel,Particle等
-                sceneArr_[static_cast<int>(currentSceneNo_)]->Draw();
+        // 描画前
+        appContext_->dxCommon.PreDraw();
 
-                #ifdef USE_IMGUI
-                
-                // フレームの先頭でImguiにここからフレームが始まる旨を告げる
-                ImGui_ImplDX12_NewFrame();
-                ImGui_ImplWin32_NewFrame();
-                ImGui::NewFrame();
+        // 描画
+        sceneArr_[curIndex]->Draw();
 
-                sceneArr_[static_cast<int>(currentSceneNo_)]->DrawSceneName();
-                sceneArr_[static_cast<int>(currentSceneNo_)]->DrawImGui();
+#ifdef USE_IMGUI
+        ImGui_ImplDX12_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
 
-                // Imguiの内部コマンドを生成する
-                ImGui::Render();
+        sceneArr_[curIndex]->DrawSceneName();
+        sceneArr_[curIndex]->DrawImGui();
 
-                #endif
+        ImGui::Render();
+#endif
 
-				// 描画後処理
-                appContext_->dxCommon.PostDraw();
-            } catch (const std::exception& e) {
-                e;
-                #ifdef _DEBUG
-                OutputDebugStringA(("Scene update/draw error: " + std::string(e.what()) + "\n").c_str());
-                #endif
-            }
-        }
+        // 描画後（Present含むはず）
+        appContext_->dxCommon.PostDraw();
     }
 
     // 終了処理

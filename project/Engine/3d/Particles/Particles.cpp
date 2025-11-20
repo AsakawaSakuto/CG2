@@ -1021,3 +1021,14 @@ void Particles::CreateMaterialResource() {
 
 	materialResource_->Unmap(0, nullptr);
 }
+
+Particles::~Particles() {
+	// 確保したSRV/UAVインデックスを返却
+	if (dxCommon_) {
+		ParticleDescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
+		alloc.Free(idxSrvParticles_);
+		alloc.Free(idxUavParticles_);
+		alloc.Free(idxUavFreeListIndex_);
+		alloc.Free(idxUavFreeList_);
+	}
+}

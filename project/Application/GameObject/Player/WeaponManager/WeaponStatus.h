@@ -1,6 +1,12 @@
 #pragma once
 #include "Engine/system/Utility/GameTimer/GameTimer.h"
 
+enum class WeaponType {
+	BulletType = 0,
+	AreaType = 1,
+	DirectType = 2,
+};
+
 /// <summary>
 /// プレイヤーが装備する武器のステータス構造体
 /// </summary>
@@ -17,4 +23,5 @@ struct WeaponStatus {
 	int bounceCount;         // 跳弾する回数
 	float nockBackPower;     // ノックバックさせる力
 	float durationTime;      // 持続時間
+	WeaponType weaponType;   // 武器のタイプ
 };

@@ -91,6 +91,9 @@ public:
     ParticleDescriptorAllocator& GetParticleAlloc();
     ParticleDescriptorAllocator& GetModelAlloc();
 
+    // SRV使用状況を取得するメソッド
+    uint32_t GetTotalUsedSRVCount() const;
+
 private:
 
     std::unique_ptr<ParticleDescriptorAllocator> particleAlloc_;
@@ -172,7 +175,7 @@ private:
 #endif
 
     // DirectXの描画前処理
-    UINT backBufferIndex_;
+    UINT backBufferIndex_ = 0;
     D3D12_RESOURCE_BARRIER barrier_;
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
 

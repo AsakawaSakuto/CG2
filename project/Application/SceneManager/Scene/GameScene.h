@@ -43,4 +43,6 @@ private:
 
 	// 衝突判定マネージャー
 	unique_ptr<CollisionManager> collisionManager_ = make_unique<CollisionManager>();
+
+	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
 };

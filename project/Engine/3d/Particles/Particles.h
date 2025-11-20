@@ -48,6 +48,11 @@ public:
 	void Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle = 1, const std::string& TextureName = "circle");
 
 	/// <summary>
+	/// デストラクタ - 確保したSRV/UAVインデックスを解放
+	/// </summary>
+	~Particles();
+
+	/// <summary>
 	/// パーティクルの更新
 	/// </summary>
 	void Update();
