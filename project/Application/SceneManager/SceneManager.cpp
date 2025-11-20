@@ -13,59 +13,45 @@ SceneManager::SceneManager() {
         sceneArr_[i] = nullptr;
     }
 
-    currentSceneNo_ = SCENE::TEST; 
+    currentSceneNo_ = SCENE::TEST;
     prevSceneNo_ = currentSceneNo_;
 }
 
 SceneManager::~SceneManager() {
-    // 明示的な解放処理
-    CleanupAllScenes();
-}
-
-void SceneManager::CleanupAllScenes() {
-    for (int i = 0; i < sceneNum; i++) {
-        if (sceneArr_[i]) {
-            sceneArr_[i].reset();
-        }
-    }
-}
-
-std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
-        switch (sceneNo) {
-        case SCENE::TEST:
-            return std::make_unique<TestScene>();
-        case SCENE::TITLE:
-            return std::make_unique<TitleScene>();
-        case SCENE::GAME:
-            return std::make_unique<GameScene>();
-        case SCENE::RESULT:
-            return std::make_unique<ResultScene>();
-        default:
-            #ifdef _DEBUG
-            OutputDebugStringA("Invalid scene number\n");
-            #endif
-            return nullptr;
-        }
 }
 
 int SceneManager::Run() {
+
+    // 初期化処理
+    Initialize();
+
+    // 更新と描画
+    Update();
+
+    // 終了処理
+    Finalize();
+
+    return 0;
+}
+
+void SceneManager::Initialize() {
     // COM初期化
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
     // ヒープ上にAppContextを生成
     appContext_ = std::make_unique<AppContext>();
-	winApp_ = std::make_unique<WinApp>();
+    winApp_ = std::make_unique<WinApp>();
 
     // 各種初期化
-    winApp_->Initialize(L"GigaBonk");
-    
+    winApp_->Initialize(L"TD-2-2");
+
     // exeのアイコン設定
     winApp_->SetIconFromTexture("resources/image/icon.png");
-    
+
     winApp_->EnableResize(false);
     appContext_->dxCommon.Initialize(winApp_.get());
     TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);
-    Logger::Initialize(); 
+    Logger::Initialize();
     std::filesystem::create_directory("logs");
     appContext_->input.Initialize(winApp_.get());
     appContext_->gamePad.Initialize();
@@ -76,7 +62,9 @@ int SceneManager::Run() {
         sceneArr_[static_cast<int>(currentSceneNo_)]->SetAppContext(appContext_.get());
         sceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();
     }
+}
 
+void SceneManager::Update() {
     MSG msg = {};
     bool running = true;
 
@@ -97,54 +85,7 @@ int SceneManager::Run() {
         appContext_->input.Update();
         appContext_->gamePad.Update();
 
-        if (GetAsyncKeyState(VK_F11) & 1) {
-            if (!winApp_->IsFullscreen()) {
-                winApp_->EnterBorderlessFullscreen();
-            } else {
-                winApp_->ExitBorderlessFullscreen();
-            }
-            appContext_->dxCommon.ResizeToWindow();
-        }
-
-        // F10キー: SRV使用状況をデバッグログに出力
-        if (GetAsyncKeyState(VK_F10) & 1) {
-            uint32_t totalUsed = appContext_->dxCommon.GetTotalUsedSRVCount();
-            char buffer[256];
-            sprintf_s(buffer, "=== SRV Usage Report ===\n");
-            OutputDebugStringA(buffer);
-            
-            sprintf_s(buffer, "Total SRVs Used: %u / %u\n", totalUsed, DirectXCommon::kMaxSRVCount_);
-            OutputDebugStringA(buffer);
-            
-            // テクスチャ詳細
-            uint32_t textureCount = static_cast<uint32_t>(TextureManager::GetInstance()->GetTextureCount());
-            sprintf_s(buffer, "  - Textures: %u (Range: %u-%u)\n", 
-                      textureCount, 
-                      DirectXCommon::kTextureSRVBegin, 
-                      DirectXCommon::kTextureSRVEnd);
-            OutputDebugStringA(buffer);
-            
-            // パーティクル詳細
-            auto& particleAlloc = appContext_->dxCommon.GetParticleAlloc();
-            sprintf_s(buffer, "  - Particles: %u / %u (Range: %u-%u)\n", 
-                      particleAlloc.GetUsedCount(),
-                      particleAlloc.GetCapacity(),
-                      DirectXCommon::kParticleSRVBegin, 
-                      DirectXCommon::kParticleSRVEnd);
-            OutputDebugStringA(buffer);
-            
-            // モデル詳細
-            auto& modelAlloc = appContext_->dxCommon.GetModelAlloc();
-            sprintf_s(buffer, "  - Models (Skinning): %u / %u (Range: %u-%u)\n", 
-                      modelAlloc.GetUsedCount(),
-                      modelAlloc.GetCapacity(),
-                      DirectXCommon::kModelSRVBegin, 
-                      DirectXCommon::kModelSRVEnd);
-            OutputDebugStringA(buffer);
-            
-            sprintf_s(buffer, "========================\n");
-            OutputDebugStringA(buffer);
-        }
+        Shortcut();
 
         // シーン切り替えチェック
         auto curIndex = static_cast<int>(currentSceneNo_);
@@ -196,13 +137,21 @@ int SceneManager::Run() {
         ImGui::Render();
 #endif
 
-        // 描画後（Present含むはず）
+        // 描画後
         appContext_->dxCommon.PostDraw();
     }
+}
 
-    // 終了処理
-    CleanupAllScenes();
-    
+void SceneManager::Finalize() {
+
+    // シーンのリセット
+    for (int i = 0; i < sceneNum; i++) {
+        if (sceneArr_[i]) {
+            sceneArr_[i].reset();
+        }
+    }
+
+    // 各種終了処理
     TextureManager::GetInstance()->Finalize();
     appContext_->dxCommon.CloseFence();
     winApp_->Finalize();
@@ -210,6 +159,69 @@ int SceneManager::Run() {
 
     // 振動のリセット
     appContext_->gamePad.SetVibration(0.0f, 0.0f, 0.0f);
+}
 
-    return 0;
+void SceneManager::Shortcut() {
+    // F11キー : フルスクリーン切替
+    if (GetAsyncKeyState(VK_F11) & 1) {
+        if (!winApp_->IsFullscreen()) {
+            winApp_->EnterBorderlessFullscreen();
+        } else {
+            winApp_->ExitBorderlessFullscreen();
+        }
+        appContext_->dxCommon.ResizeToWindow();
+    }
+
+    // F10キー : SRV使用状況をデバッグログに出力
+    if (GetAsyncKeyState(VK_F10) & 1) {
+        uint32_t totalUsed = appContext_->dxCommon.GetTotalUsedSRVCount();
+        char buffer[256];
+        sprintf_s(buffer, "=== SRV Usage Report ===\n");
+        OutputDebugStringA(buffer);
+
+        sprintf_s(buffer, "Total SRVs Used: %u / %u\n", totalUsed, DirectXCommon::kMaxSRVCount_);
+        OutputDebugStringA(buffer);
+
+        // テクスチャ詳細
+        uint32_t textureCount = static_cast<uint32_t>(TextureManager::GetInstance()->GetTextureCount());
+        sprintf_s(buffer, "  - Textures: %u (Range: %u-%u)\n",
+            textureCount,
+            DirectXCommon::kTextureSRVBegin,
+            DirectXCommon::kTextureSRVEnd);
+        OutputDebugStringA(buffer);
+
+        // パーティクル詳細
+        auto& particleAlloc = appContext_->dxCommon.GetParticleAlloc();
+        sprintf_s(buffer, "  - Particles: %u / %u (Range: %u-%u)\n",
+            particleAlloc.GetUsedCount(),
+            particleAlloc.GetCapacity(),
+            DirectXCommon::kParticleSRVBegin,
+            DirectXCommon::kParticleSRVEnd);
+        OutputDebugStringA(buffer);
+
+        // モデル詳細
+        auto& modelAlloc = appContext_->dxCommon.GetModelAlloc();
+        sprintf_s(buffer, "  - Models (Skinning): %u / %u (Range: %u-%u)\n",
+            modelAlloc.GetUsedCount(),
+            modelAlloc.GetCapacity(),
+            DirectXCommon::kModelSRVBegin,
+            DirectXCommon::kModelSRVEnd);
+        OutputDebugStringA(buffer);
+
+        sprintf_s(buffer, "========================\n");
+        OutputDebugStringA(buffer);
+    }
+}
+
+std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
+    switch (sceneNo) {
+    case SCENE::TEST:
+        return std::make_unique<TestScene>();
+    case SCENE::TITLE:
+        return std::make_unique<TitleScene>();
+    case SCENE::GAME:
+        return std::make_unique<GameScene>();
+    case SCENE::RESULT:
+        return std::make_unique<ResultScene>();
+    }
 }

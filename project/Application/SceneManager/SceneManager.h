@@ -17,14 +17,19 @@ private:
     SCENE currentSceneNo_;
     SCENE prevSceneNo_;
 
-    // プライベートヘルパーメソッド
-    void CleanupAllScenes();
     std::unique_ptr<IScene> CreateScene(SCENE sceneNo);
 
+    void Initialize();
+
+    void Update();
+
+    void Finalize();
+
+    void Shortcut();
 public:
     SceneManager();
     ~SceneManager();
     int Run();  // メインループ
     std::unique_ptr<AppContext> appContext_;
-	std::unique_ptr<WinApp> winApp_;
+    std::unique_ptr<WinApp> winApp_;
 };
