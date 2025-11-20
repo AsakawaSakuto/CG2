@@ -63,7 +63,7 @@ void GameScene::Update() {
 
 	testParticle_->Update();
 
-	if (collisionManager_->GetGoResult()) {
+	if (collisionManager_->GetGoResult() || ctx_->gamePad.TriggerButton(GamePad::X)) {
 		ChangeScene(SCENE::RESULT);
 	}
 }

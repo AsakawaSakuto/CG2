@@ -63,6 +63,7 @@
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -146,6 +147,8 @@
     <ClInclude Include="Engine\3d\Particles\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponName.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
