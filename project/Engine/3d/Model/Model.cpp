@@ -12,7 +12,7 @@ using namespace Microsoft::WRL;
 #include "../../System/PSOManager/PSOManager.h"
 #include "../Utility/GameTimer/DeltaTime.h"
 #include "../Model/Animation/Function/AnimationFunction.h"
-#include "../../3d/Particles/ParticleDescriptorAllocator.h"
+#include "../Engine/System/HeapManager/DescriptorAllocator.h"
 
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
@@ -20,11 +20,6 @@ std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_
 //"resources/uvChecker.png"
 
 Model::~Model() {
-	// アニメーション使用時にSRVインデックスを解放
-	if (skinClusterSrvIndex_ != 0 && dxCommon_ != nullptr) {
-		dxCommon_->GetModelAlloc().Free(skinClusterSrvIndex_);
-	}
-
 	// 他のマップされたリソースもアンマップ
 	if (materialResource_ && materialData_) {
 		materialResource_->Unmap(0, nullptr);

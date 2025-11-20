@@ -5,7 +5,7 @@
 
 class DirectXCommon;
 
-class ParticleDescriptorAllocator {
+class DescriptorAllocator {
 public:
 
     // [begin..end] の閉区間レンジをこのアロケータが占有

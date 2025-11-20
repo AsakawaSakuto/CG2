@@ -13,7 +13,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 
-	ParticleDescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
+	DescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
 
 	idxSrvParticles_ =      alloc.Allocate();
 	idxUavParticles_ =      alloc.Allocate();
@@ -1025,7 +1025,7 @@ void Particles::CreateMaterialResource() {
 Particles::~Particles() {
 	// 確保したSRV/UAVインデックスを返却
 	if (dxCommon_) {
-		ParticleDescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
+		DescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
 		alloc.Free(idxSrvParticles_);
 		alloc.Free(idxUavParticles_);
 		alloc.Free(idxUavFreeListIndex_);

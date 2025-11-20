@@ -1,7 +1,7 @@
 #include"DirectXCommon.h"
 #include<cassert>
 
-#include "ParticleDescriptorAllocator.h" 
+#include "../Engine/System/HeapManager/DescriptorAllocator.h" 
 #include "Engine/System/DirectXCommon/ExeColor.h"
 #include "TextureManager.h"
 
@@ -522,9 +522,9 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
 
 }
 
-ParticleDescriptorAllocator& DirectXCommon::GetParticleAlloc() {
+DescriptorAllocator& DirectXCommon::GetParticleAlloc() {
     if (!particleAlloc_) {
-        particleAlloc_ = std::make_unique<ParticleDescriptorAllocator>();
+        particleAlloc_ = std::make_unique<DescriptorAllocator>();
     }
     if (!particleAllocInitialized_) {
         particleAlloc_->Initialize(this, kParticleSRVBegin, kParticleSRVEnd);
@@ -533,9 +533,9 @@ ParticleDescriptorAllocator& DirectXCommon::GetParticleAlloc() {
     return *particleAlloc_;
 }
 
-ParticleDescriptorAllocator& DirectXCommon::GetModelAlloc() {
+DescriptorAllocator& DirectXCommon::GetModelAlloc() {
     if (!modelAlloc_) {
-        modelAlloc_ = std::make_unique<ParticleDescriptorAllocator>();
+        modelAlloc_ = std::make_unique<DescriptorAllocator>();
     }
     if (!modelAllocInitialized_) {
         modelAlloc_->Initialize(this, kModelSRVBegin, kModelSRVEnd);

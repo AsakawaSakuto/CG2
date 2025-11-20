@@ -18,6 +18,7 @@
 #include <memory>
 
 #include"DirectXCommon.h"
+#include"../Engine/System/HeapManager/DescriptorAllocator.h"
 
 #include "../Model/ModelDataStruct.h"
 
@@ -201,8 +202,8 @@ private:
 		
 		// デストラクタでSRVを返却
 		~GeometryCache() {
-			if (dxCommon && skinClusterIndex != 0 && !skinClusterData.paletteResource) {
-				// スキニング使用時のみ返却
+			if (dxCommon && skinClusterIndex != 0 && skinClusterData.paletteResource) {
+				// スキニング使用時のみ返却（paletteResourceが存在する場合）
 				dxCommon->GetModelAlloc().Free(skinClusterIndex);
 			}
 		}

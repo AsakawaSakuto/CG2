@@ -3,7 +3,7 @@
 #include"DirectXCommon.h"
 
 #include "../Particles/Struct/ParticleDataStruct.h"
-#include "ParticleDescriptorAllocator.h"
+#include "../Engine/System/HeapManager/DescriptorAllocator.h"
 #include"Json/EmitterStateLoder.h"
 
 #include <d3d12.h>

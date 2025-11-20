@@ -23,7 +23,7 @@
 #include"ConvertString.h"
 #include"CreateResource.h"
 
-class ParticleDescriptorAllocator;
+class DescriptorAllocator;
 
 class DirectXCommon
 {
@@ -88,18 +88,18 @@ public:
     uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
     uint32_t GetDescriptorSizeUAV() { return descriptorSizeUAV_; }
 
-    ParticleDescriptorAllocator& GetParticleAlloc();
-    ParticleDescriptorAllocator& GetModelAlloc();
+    DescriptorAllocator& GetParticleAlloc();
+    DescriptorAllocator& GetModelAlloc();
 
     // SRV使用状況を取得するメソッド
     uint32_t GetTotalUsedSRVCount() const;
 
 private:
 
-    std::unique_ptr<ParticleDescriptorAllocator> particleAlloc_;
+    std::unique_ptr<DescriptorAllocator> particleAlloc_;
     bool particleAllocInitialized_ = false;
 
-    std::unique_ptr<ParticleDescriptorAllocator> modelAlloc_;
+    std::unique_ptr<DescriptorAllocator> modelAlloc_;
     bool modelAllocInitialized_ = false;
 
     // 
