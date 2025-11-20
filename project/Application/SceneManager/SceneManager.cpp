@@ -223,5 +223,7 @@ std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
         return std::make_unique<GameScene>();
     case SCENE::RESULT:
         return std::make_unique<ResultScene>();
+    default:
+        return nullptr;
     }
 }
