@@ -13,7 +13,7 @@ void PSOManager::Initialize(DirectXCommon* dxCommon) {
     
     dxCommon_ = dxCommon;
     CreateRootSignatures();
-    // 事前定義PSOの作成は削除（遅延初期化に移行）
+    // 事前定義PSOの作成は削除、遅延初期化に移行
     
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
@@ -240,8 +240,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
-            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("None");
             params.rasterizerState = CreateRasterizerState("Solid_NoCull");
             params.depthStencilState.DepthEnable = FALSE; // 深度無効
@@ -252,8 +252,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
-            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Grayscale.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Grayscale.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("None");
             params.rasterizerState = CreateRasterizerState("Solid_NoCull");
             params.depthStencilState.DepthEnable = FALSE; // 深度無効
@@ -264,8 +264,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
-            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Sepia.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Sepia.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("None");
             params.rasterizerState = CreateRasterizerState("Solid_NoCull");
             params.depthStencilState.DepthEnable = FALSE; // 深度無効
@@ -276,8 +276,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
-            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Vignette.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Vignette.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("None");
             params.rasterizerState = CreateRasterizerState("Solid_NoCull");
             params.depthStencilState.DepthEnable = FALSE; // 深度無効
@@ -288,8 +288,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
-            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Invert.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Invert.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("None");
             params.rasterizerState = CreateRasterizerState("Solid_NoCull");
             params.depthStencilState.DepthEnable = FALSE; // 深度無効
@@ -300,8 +300,20 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
-            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Blur.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Blur.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+            
+        case PSOType::PostEffect_Outline:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Outline.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("None");
             params.rasterizerState = CreateRasterizerState("Solid_NoCull");
             params.depthStencilState.DepthEnable = FALSE; // 深度無効
@@ -375,7 +387,6 @@ void PSOManager::PrintCacheStats() const {
     size_t totalShaderReuses = shaderCacheHits_;
     size_t totalPSOReuses = psoCacheHits_;
     
-    // 仮定: シェーダーコンパイル1回=50ms、PSO作成1回=20ms
     size_t estimatedShaderTimeSaved = totalShaderReuses * 50;
     size_t estimatedPSOTimeSaved = totalPSOReuses * 20;
     
@@ -664,15 +675,25 @@ void PSOManager::CreateRootSignatures() {
         D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
         descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-        // DescriptorRange for SRV (t0)
-        D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-        descriptorRange[0].BaseShaderRegister = 0; // t0
-        descriptorRange[0].NumDescriptors = 1;
-        descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-        descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        // DescriptorRange for SRV (t0とt1の2つ)
+        D3D12_DESCRIPTOR_RANGE descriptorRanges[2] = {};
+        
+        // t0: Color Texture
+        descriptorRanges[0].BaseShaderRegister = 0; // t0
+        descriptorRanges[0].NumDescriptors = 1;
+        descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        
+        // t1: Depth Texture
+        descriptorRanges[1].BaseShaderRegister = 1; // t1
+        descriptorRanges[1].NumDescriptors = 1;
+        descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-        // Static Sampler for s0
-        D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+        // Static Sampler for s0 (Linear) and s1 (Point)
+        D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
+        
+        // s0: Linear Sampler (Color用)
         staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
         staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
         staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
@@ -681,23 +702,39 @@ void PSOManager::CreateRootSignatures() {
         staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
         staticSamplers[0].ShaderRegister = 0; // s0
         staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        
+        // s1: Point Sampler (Depth用)
+        staticSamplers[1].Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+        staticSamplers[1].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        staticSamplers[1].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        staticSamplers[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        staticSamplers[1].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+        staticSamplers[1].MaxLOD = D3D12_FLOAT32_MAX;
+        staticSamplers[1].ShaderRegister = 1; // s1
+        staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
         descriptionRootSignature.pStaticSamplers = staticSamplers;
         descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-        // Root Parameters (2個: テクスチャSRV + パラメータCBV)
-        D3D12_ROOT_PARAMETER rootParameters[2] = {};
+        // Root Parameters (3個: カラーテクスチャSRV + DepthテクスチャSRV + パラメータCBV)
+        D3D12_ROOT_PARAMETER rootParameters[3] = {};
         
-        // t0: Texture (PS)
+        // t0: Color Texture (PS)
         rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
         rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-        rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;
-        rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+        rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
+        rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
 
-        // b0: EffectParams (PS) - パラメータ用のCBV（オプショナル、使わないシェーダーもある）
+        // b0: EffectParams (PS) - パラメータ用のCBV
         rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
         rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
         rootParameters[1].Descriptor.ShaderRegister = 0;
+        
+        // t1: Depth Texture (PS)
+        rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
+        rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
         descriptionRootSignature.pParameters = rootParameters;
         descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -936,7 +973,7 @@ D3D12_INPUT_LAYOUT_DESC PSOManager::CreateInputLayout(const std::string& layoutT
         return inputLayoutDesc;
     } else {
 
-        // Object3D用の入力レイアウト（3要素）
+        // Object3D用の入力レイアウト
         static D3D12_INPUT_ELEMENT_DESC object3dInputElementDescs[3] = {};
 
         // Object3D, Particle用の共通入力レイアウト

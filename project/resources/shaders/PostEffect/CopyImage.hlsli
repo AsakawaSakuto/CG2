@@ -1,5 +1,3 @@
-// ポストエフェクト用共通構造体
-
 struct VertexShaderOutput
 {
     float4 position : SV_POSITION;
@@ -28,4 +26,15 @@ struct ColorEffectParams
 {
     float intensity;
     float3 padding;
+};
+
+// アウトライン効果用パラメータ
+struct OutlineParams
+{
+    float threshold;
+    float thickness;
+    float smoothness;
+    float backgroundBlend;
+    float3 edgeColor;
+    float padding;
 };

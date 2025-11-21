@@ -236,8 +236,8 @@ void DirectXCommon::CreateDescriptorHeaps() {
     // RTV用のヒープでディスクリプタの数は3 RTVはShader内で触るものではないのでShaderVisibleはfalse
     rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false); // 3に変更（SwapChain用2 + RenderTexture用1）
 
-    // DSV用のヒープでディスクリプタの数は1、DSVはShader内で触るものではないので、ShaderVisibleはfalse 03_01
-    dsvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+    // DSV用のヒープでディスクリプタの数は2、DSVはShader内で触るものではないので、ShaderVisibleはfalse
+    dsvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 2, false); // 2に変更（Main用1 + RenderTexture用1）
 }
 
 void DirectXCommon::CreateRenderTargetView() {
@@ -326,16 +326,17 @@ void DirectXCommon::PreDraw() {
     }
     else {
         // 従来の描画（SwapChainに直接描画）
-//         // これから書き込むバックバッファのインデックスを取得
-//         backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+        // これから書き込むバックバッファのインデックスを取得
+        backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
-//         // 今回のバリアはTransition
-//         barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-//         barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-//         barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
-//         barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-//         barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-//         commandList_->ResourceBarrier(1, &barrier_);
+        // 今回のバリアはTransition
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+        barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+        barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        commandList_->ResourceBarrier(1, &barrier_);
+        
         // 描画先のRTVとDSVを指定する
         dsvHandle_ = GetDsvCPUHandle(0);
         commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle_);

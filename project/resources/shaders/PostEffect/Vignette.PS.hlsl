@@ -16,7 +16,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     // テクスチャからカラーをサンプリング
     float4 texColor = gTexture.Sample(gSampler, input.texcoord);
     
-    // 画面中心からの距離を計算（0.0～1.0）
+    // 画面中心からの距離を計算
     float2 center = float2(0.5f, 0.5f);
     float dist = length(input.texcoord - center);
     

@@ -26,7 +26,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     // パラメータから値を取得
     float blurAmount = gParams.amount;
     
-    // 9タップブラー（3x3）
+    // 9タップブラー、3x3
     color += gTexture.Sample(gSampler, input.texcoord + float2(-pixelSize.x, -pixelSize.y) * blurAmount).rgb * 0.0625f;
     color += gTexture.Sample(gSampler, input.texcoord + float2(0.0f, -pixelSize.y) * blurAmount).rgb * 0.125f;
     color += gTexture.Sample(gSampler, input.texcoord + float2(pixelSize.x, -pixelSize.y) * blurAmount).rgb * 0.0625f;

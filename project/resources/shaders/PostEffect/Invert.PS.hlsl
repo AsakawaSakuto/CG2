@@ -14,8 +14,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     // テクスチャからカラーをサンプリング
     float4 texColor = gTexture.Sample(gSampler, input.texcoord);
-    
-    // 色反転（ネガポジ反転）
+
     // RGB値を反転、アルファは保持
     output.color = float4(1.0f - texColor.rgb, texColor.a);
     

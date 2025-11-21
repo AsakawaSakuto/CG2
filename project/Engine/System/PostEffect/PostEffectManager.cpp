@@ -31,13 +31,11 @@ void PostEffectManager::BeginOffscreenRendering() {
     // RenderTextureをRenderTarget状態に遷移
     renderTexture_->TransitionToRenderTarget(commandList);
 
-    // RenderTargetとDepthStencilを設定
-    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dxCommon_->GetDsvCPUHandle(0);
-    renderTexture_->SetAsRenderTarget(commandList, &dsvHandle);
+    // RenderTargetとDepthStencilを設定、RenderTexture専用のDSVを使用
+    renderTexture_->SetAsRenderTarget(commandList, nullptr);
 
-    // クリア
+    // クリア、内部でDepthもクリアされる
     renderTexture_->Clear(commandList);
-    commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void PostEffectManager::EndOffscreenRenderingAndApplyEffect(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle) {
@@ -50,10 +48,10 @@ void PostEffectManager::EndOffscreenRenderingAndApplyEffect(D3D12_CPU_DESCRIPTOR
     // RenderTextureをShaderResource状態に遷移
     renderTexture_->TransitionToShaderResource(commandList);
 
-    // SwapChainのRTVを設定（Depth無し)
+    // SwapChainのRTVを設定
     commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
-    // 背景クリア（念のため）
+    // 背景クリア
     float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
@@ -65,13 +63,32 @@ void PostEffectManager::EndOffscreenRenderingAndApplyEffect(D3D12_CPU_DESCRIPTOR
     auto rootSignature = psoManager.GetRootSignature("Offscreen");
     auto pso = psoManager.GetPSO(effectType_);
 
+    // エラーチェック：RootSignatureとPSOが有効か確認
+    if (!rootSignature) {
+        OutputDebugStringA("ERROR[PostEffectManager]: RootSignature 'Offscreen' is nullptr\n");
+        assert(false && "RootSignature 'Offscreen' is nullptr");
+        return;
+    }
+
+    if (!pso) {
+        char buffer[256];
+        sprintf_s(buffer, "ERROR[PostEffectManager]: PSO is nullptr for effectType=%d\n", static_cast<int>(effectType_));
+        OutputDebugStringA(buffer);
+        assert(false && "PSO is nullptr");
+        return;
+    }
+
     // ルートシグネチャとPSOを設定
     commandList->SetGraphicsRootSignature(rootSignature.Get());
     commandList->SetPipelineState(pso.Get());
 
-    // テクスチャとパラメータを設定
+    // カラーテクスチャとDepthテクスチャとパラメータを設定
+    // t0: カラーテクスチャ
     commandList->SetGraphicsRootDescriptorTable(0, renderTexture_->GetSRVGPUHandle());
+    // b0: パラメータ
     commandList->SetGraphicsRootConstantBufferView(1, paramResource_->GetGPUVirtualAddress());
+    // t1: Depthテクスチャ
+    commandList->SetGraphicsRootDescriptorTable(2, renderTexture_->GetDepthSRVGPUHandle());
 
     // フルスクリーン三角形を描画
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -116,6 +133,20 @@ void PostEffectManager::UpdateParams() {
         case PSOType::PostEffect_Grayscale:
             memcpy(mappedData, &params_.grayscale, sizeof(GrayscaleParams));
             break;
+        case PSOType::PostEffect_Outline:
+        {
+            // Outline用のパラメータを設定
+            if (renderTexture_) {
+                // ProjectionInverse行列を設定
+                params_.outline.projectionInverse = InverseMatrix(projectionMatrix_);
+                
+                // uvStepSizeを設定
+                params_.outline.uvStepSize[0] = 1.0f / static_cast<float>(renderTexture_->GetWidth());
+                params_.outline.uvStepSize[1] = 1.0f / static_cast<float>(renderTexture_->GetHeight());
+            }
+            memcpy(mappedData, &params_.outline, sizeof(OutlineParams));
+            break;
+        }
         default:
             // その他のエフェクトはパラメータ不要
             break;
@@ -143,7 +174,8 @@ void PostEffectManager::DrawImGui() {
         "Sepia (セピア調)",
         "Vignette (周辺減光)",
         "Invert (色反転)",
-        "Blur (ぼかし)"
+        "Blur (ぼかし)",
+        "Outline (輪郭検出)"
     };
 
     int currentEffect = static_cast<int>(effectType_);
@@ -226,6 +258,22 @@ void PostEffectManager::DrawImGui() {
             break;
         }
 
+        case PSOType::PostEffect_Outline:
+        {
+            ImGui::Text("Outline Settings");
+            ImGui::SliderFloat("Thickness", &params_.outline.thickness, 0.5f, 5.0f);
+            ImGui::SliderFloat("Depth Sensitivity", &params_.outline.depthSensitivity, 0.1f, 10.0f);
+            if (ImGui::Button("Reset##Outline")) {
+                params_.outline.thickness = 1.0f;
+                params_.outline.depthSensitivity = 1.0f;
+            }
+            ImGui::TextWrapped(
+                "Thickness: アウトラインの太さ\n"
+                "Depth Sensitivity: 深度差に対する感度（高いほど細かいエッジも検出）"
+            );
+            break;
+        }
+
         case PSOType::PostEffect_Invert:
         {
             ImGui::Text("Invert Settings");
@@ -266,6 +314,8 @@ void PostEffectManager::DrawImGui() {
         params_.vignette.smoothness = 2.0f;
         params_.blur.amount = 1.0f;
         params_.blur.sampleCount = 9;
+        params_.outline.thickness = 1.0f;
+        params_.outline.depthSensitivity = 1.0f;
     }
 
     ImGui::End();

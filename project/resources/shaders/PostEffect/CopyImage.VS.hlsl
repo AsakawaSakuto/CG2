@@ -2,7 +2,7 @@
 
 static const uint kNumVertex = 3;
 
-// フルスクリーン三角形の位置（NDC）
+// フルスクリーン三角形の位置
 static const float4 kPositions[kNumVertex] =
 {
     float4(-1.0f, 1.0f, 0.0f, 1.0f),  // 左上

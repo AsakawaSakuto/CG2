@@ -16,7 +16,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     // テクスチャからカラーをサンプリング
     float4 texColor = gTexture.Sample(gSampler, input.texcoord);
     
-    // グレースケール変換（NTSC係数を使用）
+    // グレースケール変換
     float gray = dot(texColor.rgb, float3(0.299f, 0.587f, 0.114f));
     
     // パラメータの強度に応じて元の色とグレースケールをブレンド

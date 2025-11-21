@@ -33,7 +33,7 @@ public:
     /// レンダーターゲットとして設定
     /// </summary>
     /// <param name="commandList">コマンドリスト</param>
-    /// <param name="dsvHandle">深度ステンシルビューのハンドル（オプション）</param>
+    /// <param name="dsvHandle">深度ステンシルビューのハンドル</param>
     void SetAsRenderTarget(
         Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
         const D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle = nullptr);
@@ -59,16 +59,22 @@ public:
     D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle() const { return rtvHandle_; }
     D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUHandle() const { return srvCPUHandle_; }
     D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUHandle() const { return srvGPUHandle_; }
+    D3D12_CPU_DESCRIPTOR_HANDLE GetDepthSRVCPUHandle() const { return depthSRVCPUHandle_; }
+    D3D12_GPU_DESCRIPTOR_HANDLE GetDepthSRVGPUHandle() const { return depthSRVGPUHandle_; }
     uint32_t GetWidth() const { return width_; }
     uint32_t GetHeight() const { return height_; }
 
 private:
     DirectXCommon* dxCommon_ = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> depthResource_; // Depth用リソース
     
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_{};
     D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle_{};
     D3D12_GPU_DESCRIPTOR_HANDLE srvGPUHandle_{};
+    D3D12_CPU_DESCRIPTOR_HANDLE depthSRVCPUHandle_{}; // Depth SRV CPU
+    D3D12_GPU_DESCRIPTOR_HANDLE depthSRVGPUHandle_{}; // Depth SRV GPU
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_{}; // DSV
     
     uint32_t width_ = 0;
     uint32_t height_ = 0;

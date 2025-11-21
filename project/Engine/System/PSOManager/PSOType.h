@@ -2,6 +2,7 @@
 
 // 事前定義されたPSOタイプ
 enum class PSOType {
+
     // 3Dモデル用
     Model_Solid_Normal,
     Model_Solid_Add,
@@ -25,11 +26,12 @@ enum class PSOType {
     Particle_Multiply,
     Particle_Screen,
 
-    // オフスクリーン用（ポストエフェクト）
+    // オフスクリーン用、ポストエフェクト
     PostEffect_None,
     PostEffect_Grayscale,
     PostEffect_Sepia,
     PostEffect_Vignette,
     PostEffect_Invert,
     PostEffect_Blur,
+    PostEffect_Outline,
 };

@@ -20,6 +20,7 @@ void RenderTexture::Initialize(
         clearColor_[i] = clearColor[i];
     }
 
+    // カラーテクスチャの作成
     // ResourceDesc 設定
     D3D12_RESOURCE_DESC resourceDesc{};
     resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -34,7 +35,7 @@ void RenderTexture::Initialize(
     resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET; // RTV用
 
-    // Heap は DEFAULT（VRAM）
+    // Heap は DEFAULT VRAM
     D3D12_HEAP_PROPERTIES heapProperties{};
     heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 
@@ -61,7 +62,7 @@ void RenderTexture::Initialize(
     rtvDesc.Format = format_;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-    // RTVヒープから取得（index 2を使用：SwapChainが0,1を使用しているため）
+    // RTVヒープから取得、index 2を使用：SwapChainが0,1を使用しているため
     rtvHandle_ = ::GetCPUDescriptorHandle(
         dxCommon_->GetDescriptorHeapRTV().Get(),
         dxCommon_->GetDescriptorSizeRTV(),
@@ -72,14 +73,14 @@ void RenderTexture::Initialize(
         &rtvDesc,
         rtvHandle_);
 
-    // SRV作成
+    // SRV作成（カラー用）
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = format_;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = 1;
 
-    // SRVヒープからインデックス0を使用（ImGui用のインデックスの前）
+    // SRVヒープからインデックス0を使用、ImGui用のインデックスの前
     uint32_t srvIndex = DirectXCommon::kMaxSRVCount_ - 2;
     srvCPUHandle_ = dxCommon_->GetSrvCPUHandle(srvIndex);
     srvGPUHandle_ = dxCommon_->GetSrvGPUHandle(srvIndex);
@@ -88,18 +89,59 @@ void RenderTexture::Initialize(
         resource_.Get(),
         &srvDesc,
         srvCPUHandle_);
+
+    // Depthテクスチャの作成
+    // Depthリソースを作成
+    depthResource_ = CreateDepthStencilTextureResource(dxCommon_->GetDevice().Get(), width_, height_);
+
+    // DSV作成（Depth Stencil View）
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+    dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+    // DSVハンドルを取得（index 1を使用：index 0はメインのDSV）
+    dsvHandle_ = dxCommon_->GetDsvCPUHandle(1);
+    
+    dxCommon_->GetDevice()->CreateDepthStencilView(
+        depthResource_.Get(),
+        &dsvDesc,
+        dsvHandle_);
+
+    // SRV作成（Depth用 - Shader Read用）
+    D3D12_SHADER_RESOURCE_VIEW_DESC depthSRVDesc{};
+    depthSRVDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; // Depth部分だけ読む
+    depthSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    depthSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    depthSRVDesc.Texture2D.MipLevels = 1;
+
+    // Depth SRV用のインデックス
+    uint32_t depthSRVIndex = DirectXCommon::kMaxSRVCount_ - 3;
+    depthSRVCPUHandle_ = dxCommon_->GetSrvCPUHandle(depthSRVIndex);
+    depthSRVGPUHandle_ = dxCommon_->GetSrvGPUHandle(depthSRVIndex);
+
+    dxCommon_->GetDevice()->CreateShaderResourceView(
+        depthResource_.Get(),
+        &depthSRVDesc,
+        depthSRVCPUHandle_);
 }
 
 void RenderTexture::SetAsRenderTarget(
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
     const D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle)
 {
-    commandList->OMSetRenderTargets(1, &rtvHandle_, FALSE, dsvHandle);
+    // dsvHandleが指定されていない場合は、RenderTexture専用のDSVを使用
+    if (dsvHandle) {
+        commandList->OMSetRenderTargets(1, &rtvHandle_, FALSE, dsvHandle);
+    } else {
+        commandList->OMSetRenderTargets(1, &rtvHandle_, FALSE, &dsvHandle_);
+    }
 }
 
 void RenderTexture::Clear(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList)
 {
     commandList->ClearRenderTargetView(rtvHandle_, clearColor_, 0, nullptr);
+    // Depthもクリア
+    commandList->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void RenderTexture::TransitionToShaderResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList)
