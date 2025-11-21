@@ -236,7 +236,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.blendState = CreateBlendState("Screen");
             break;
             
-        case PSOType::Offscreen_None:
+        case PSOType::PostEffect_None:
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
@@ -248,7 +248,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
-        case PSOType::Offscreen_Grayscale:
+        case PSOType::PostEffect_Grayscale:
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
@@ -260,7 +260,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
-        case PSOType::Offscreen_Sepia:
+        case PSOType::PostEffect_Sepia:
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
@@ -272,7 +272,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
-        case PSOType::Offscreen_Vignette:
+        case PSOType::PostEffect_Vignette:
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
@@ -284,7 +284,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
-        case PSOType::Offscreen_Invert:
+        case PSOType::PostEffect_Invert:
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;
@@ -296,7 +296,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
-        case PSOType::Offscreen_Blur:
+        case PSOType::PostEffect_Blur:
             params.rootSignature = GetRootSignature("Offscreen");
             params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
             params.inputLayout.NumElements = 0;

@@ -83,7 +83,9 @@ void TestScene::Draw() {
 void TestScene::DrawImGui() {
 #ifdef USE_IMGUI
 
-	ctx_->dxCommon.DrawPostEffectImGui();
+    auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+
+	postEffect->DrawImGui();
 
 	MT4_01_01();
 	MT4_01_02();

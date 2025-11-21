@@ -65,6 +65,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
     <ClCompile Include="Engine\System\HeapManager\DescriptorAllocator.cpp" />
     <ClCompile Include="Engine\System\RenderTexture\RenderTexture.cpp" />
+    <ClCompile Include="Engine\System\PostEffect\PostEffectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="Engine\System\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOType.h" />
     <ClInclude Include="Engine\System\PostEffect\PostEffectParams.h" />
+    <ClInclude Include="Engine\System\PostEffect\PostEffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
@@ -161,6 +163,5 @@
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
-    <None Include="docs\PostEffect_Usage.md" />
   </ItemGroup>
 </Project>

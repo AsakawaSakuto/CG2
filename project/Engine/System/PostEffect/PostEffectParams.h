@@ -1,7 +1,5 @@
 #pragma once
 
-// ポストエフェクトパラメータ構造体
-
 // ビネット効果のパラメータ
 struct VignetteParams {
     float strength = 0.8f;      // 効果の強さ (0.0～1.0)

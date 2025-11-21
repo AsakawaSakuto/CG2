@@ -26,10 +26,10 @@ enum class PSOType {
     Particle_Screen,
 
     // オフスクリーン用（ポストエフェクト）
-    Offscreen_None,
-    Offscreen_Grayscale,
-    Offscreen_Sepia,
-    Offscreen_Vignette,
-    Offscreen_Invert,
-    Offscreen_Blur,
+    PostEffect_None,
+    PostEffect_Grayscale,
+    PostEffect_Sepia,
+    PostEffect_Vignette,
+    PostEffect_Invert,
+    PostEffect_Blur,
 };

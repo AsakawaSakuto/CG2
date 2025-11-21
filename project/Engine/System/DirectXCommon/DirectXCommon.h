@@ -23,12 +23,9 @@
 #include"ConvertString.h"
 #include"CreateResource.h"
 
-#include "../RenderTexture/RenderTexture.h"
-#include "../PSOManager/PSOType.h"
-#include "../PostEffect/PostEffectParams.h"
-
+#include "../PostEffect/PostEffectManager.h"
 class DescriptorAllocator;
-class RenderTexture;
+class PostEffectManager;
 
 class DirectXCommon
 {
@@ -111,22 +108,8 @@ public:
     // SRV使用状況を取得するメソッド
     uint32_t GetTotalUsedSRVCount() const;
 
-    // オフスクリーンレンダリング用
-    void SetRenderTextureEnabled(bool enabled) { useRenderTexture_ = enabled; }
-    bool IsRenderTextureEnabled() const { return useRenderTexture_; }
-    
-    // ポストエフェクト設定
-    void SetPostEffectType(PSOType effectType) { postEffectType_ = effectType; }
-    PSOType GetPostEffectType() const { return postEffectType_; }
-
-    // ポストエフェクトパラメータの取得
-    PostEffectParams& GetPostEffectParams() { return postEffectParams_; }
-    const PostEffectParams& GetPostEffectParams() const { return postEffectParams_; }
-
-#ifdef USE_IMGUI
-    // ImGuiでポストエフェクト設定を表示
-    void DrawPostEffectImGui();
-#endif
+    // ポストエフェクトマネージャーを取得
+    PostEffectManager* GetPostEffectManager() { return postEffectManager_.get(); }
 
 private:
 
@@ -136,17 +119,8 @@ private:
     std::unique_ptr<DescriptorAllocator> modelAlloc_;
     bool modelAllocInitialized_ = false;
 
-    // オフスクリーンレンダリング
-    std::unique_ptr<RenderTexture> renderTexture_;
-    bool useRenderTexture_ = true; // デフォルトで有効
-    PSOType postEffectType_ = PSOType::Offscreen_None; // ポストエフェクトタイプ（デフォルトはNone）
-    PostEffectParams postEffectParams_; // ポストエフェクトパラメータ
-
-    // ポストエフェクトパラメータ用の定数バッファ
-    Microsoft::WRL::ComPtr<ID3D12Resource> postEffectParamResource_;
-    
-    void CreatePostEffectParamResource();
-    void UpdatePostEffectParams();
+    // ポストエフェクトマネージャー
+    std::unique_ptr<PostEffectManager> postEffectManager_;
 
     // 
     WinApp* winApp_ = nullptr;
