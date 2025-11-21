@@ -39,27 +39,3 @@
 
 [Log] Compile Succeeded, path:resources/shaders/PostEffect/CopyImage.PS.hlsl, profile:ps_6_0
 
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/Grayscale.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/Grayscale.PS.hlsl, profile:ps_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/Sepia.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/Sepia.PS.hlsl, profile:ps_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/Vignette.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/Vignette.PS.hlsl, profile:ps_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/Invert.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/Invert.PS.hlsl, profile:ps_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/Blur.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/Blur.PS.hlsl, profile:ps_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/Outline.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/Outline.PS.hlsl, profile:ps_6_0
-

@@ -369,7 +369,7 @@ void DirectXCommon::PostDraw() {
         // バックバッファのインデックスを取得
         backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
         
-        // SwapChainをRenderTargetに遷移
+        // SwapChainをPRESENT→RENDER_TARGETに遷移
         barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
         barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
@@ -389,13 +389,12 @@ void DirectXCommon::PostDraw() {
         ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 #endif
         
-        // SwapChainをPresentに遷移
+        // SwapChainをRENDER_TARGET→PRESENTに遷移
         barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
         barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
         commandList_->ResourceBarrier(1, &barrier_);
     }
     else {
-        // 従来の描画
 #ifdef USE_IMGUI
         ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 #endif

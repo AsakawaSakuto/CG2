@@ -57,6 +57,9 @@ void RenderTexture::Initialize(
         IID_PPV_ARGS(&resource_));
     assert(SUCCEEDED(hr));
 
+    // 初期状態を記録
+    currentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
     // RTV作成
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
     rtvDesc.Format = format_;
@@ -146,26 +149,38 @@ void RenderTexture::Clear(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> comm
 
 void RenderTexture::TransitionToShaderResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList)
 {
+    // 既にShaderResourceならバリアは不要
+    if (currentState_ == D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE) {
+        return;
+    }
+
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
     barrier.Transition.pResource = resource_.Get();
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateBefore = currentState_;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
     commandList->ResourceBarrier(1, &barrier);
+    currentState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 }
 
 void RenderTexture::TransitionToRenderTarget(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList)
 {
+    // 既にRenderTargetならバリアは不要
+    if (currentState_ == D3D12_RESOURCE_STATE_RENDER_TARGET) {
+        return;
+    }
+
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
     barrier.Transition.pResource = resource_.Get();
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.StateBefore = currentState_;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
     commandList->ResourceBarrier(1, &barrier);
+    currentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
 }

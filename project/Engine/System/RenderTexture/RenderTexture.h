@@ -80,4 +80,7 @@ private:
     uint32_t height_ = 0;
     DXGI_FORMAT format_ = DXGI_FORMAT_UNKNOWN;
     float clearColor_[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    
+    // 現在のリソース状態を追跡
+    D3D12_RESOURCE_STATES currentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
 };

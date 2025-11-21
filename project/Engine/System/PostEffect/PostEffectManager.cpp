@@ -48,7 +48,7 @@ void PostEffectManager::EndOffscreenRenderingAndApplyEffect(D3D12_CPU_DESCRIPTOR
     // RenderTextureをShaderResource状態に遷移
     renderTexture_->TransitionToShaderResource(commandList);
 
-    // SwapChainのRTVを設定
+    // SwapChainのRTVを設定（この時点でSwapChainはRENDER_TARGET状態である必要がある）
     commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
     // 背景クリア
