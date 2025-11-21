@@ -35,7 +35,7 @@ enum class PSOType {
     Model_Solid_Normal,
     Model_Solid_Add,
     Model_Wireframe_Normal,
-    Model_Alpha_Normal, // 追加: 透明モデル用（深度書き込みOFF）
+    Model_Alpha_Normal,
     
     // スキニングモデル用（新規追加）
     SkinningModel_Solid_Normal,
@@ -54,9 +54,8 @@ enum class PSOType {
     Particle_Multiply,
     Particle_Screen,
     
-    // その他
-    Triangle_Normal,
-    Sphere_Normal
+    // オフスクリーン用
+    Offscreen_None,
 };
 
 class PSOManager {
@@ -106,9 +105,6 @@ private:
     
     // 特定のPSOタイプを遅延作成（新規追加）
     Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePSOOnDemand(PSOType type);
-    
-    // 事前定義されたPSOを作成（削除予定 - 遅延初期化に移行）
-    //void CreatePredefinedPSOs();
     
     // 共通のRoot Signatureを作成
     void CreateRootSignatures();

@@ -4,6 +4,7 @@
 #include "../Engine/System/HeapManager/DescriptorAllocator.h" 
 #include "Engine/System/DirectXCommon/ExeColor.h"
 #include "TextureManager.h"
+#include "../RenderTexture/RenderTexture.h"
 
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "../PSOManager/PSOManager.h"
@@ -35,6 +36,11 @@ void DirectXCommon::Initialize(WinApp* winApp) {
 #endif
 
     PSOManager::GetInstance().Initialize(this);
+
+    // オフスクリーンレンダリング用の初期化
+    renderTexture_ = std::make_unique<RenderTexture>();
+    float clearColor[4] = { 0.15f, 0.15f, 0.15f, 1.0f };
+    renderTexture_->Initialize(this, winApp_->GetWidth(), winApp_->GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 }
 
 void DirectXCommon::CreateDevice() {
@@ -112,7 +118,7 @@ void DirectXCommon::CreateDevice() {
         // 解除の直前 01_01
         // 抑制するメッセージのID
         D3D12_MESSAGE_ID denyIds[] = {
-            // Windows11でのDXGIデバッガレイヤーとDX12デバッガレイヤーの相互作用バグによるエラーメッセージ
+            // Windows11でのDXGIデバッガレイヤーとDX12デバッガーレイヤーの相互作用バグによるエラーメッセージ
             // https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
             D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
         };
@@ -228,8 +234,8 @@ void DirectXCommon::CreateDescriptorHeaps() {
     // SRVのヒープでディスクリプタの数は128 SRVはShader内で触るものなのでShaderVisibleはftrue
     srvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount_, true);
 
-    // RTV用のヒープでディスクリプタの数は2 RTVはShader内で触るものではないのでShaderVisibleはfalse
-    rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+    // RTV用のヒープでディスクリプタの数は3 RTVはShader内で触るものではないのでShaderVisibleはfalse
+    rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false); // 3に変更（SwapChain用2 + RenderTexture用1）
 
     // DSV用のヒープでディスクリプタの数は1、DSVはShader内で触るものではないので、ShaderVisibleはfalse 03_01
     dsvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
@@ -305,70 +311,129 @@ void DirectXCommon::PreDraw() {
         OutputDebugStringA("commandList_ or swapChainResource is null!\n");
         return;
     }
-    // これから書き込むバックバッファのインデックスを取得
-    // TransitionBarrierの設定 * backBufferIndexを取得した直後、RenderTargetを設定する前に行う
-    backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
-    // 今回のバリアはTransition
-    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    // オフスクリーンレンダリングが有効な場合
+    if (useRenderTexture_ && renderTexture_) {
+        // パス1：RenderTextureに描画
+        renderTexture_->TransitionToRenderTarget(commandList_);
+        
+        // RenderTargetとDepthStencilを設定
+        dsvHandle_ = GetDsvCPUHandle(0);
+        renderTexture_->SetAsRenderTarget(commandList_, &dsvHandle_);
+        
+        // クリア
+        renderTexture_->Clear(commandList_);
+        commandList_->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+        
+        // ビューポートとシザー矩形を設定
+        commandList_->RSSetViewports(1, &viewport_);
+        commandList_->RSSetScissorRects(1, &scissorRect_);
+        
+        // 描画用のDescriptorHeapの設定
+        ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
+        commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+    }
+    else {
+        // 従来の描画（SwapChainに直接描画）
+        // これから書き込むバックバッファのインデックスを取得
+        backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
-    // Noneにしておく
-    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        // 今回のバリアはTransition
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+        barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+        barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        commandList_->ResourceBarrier(1, &barrier_);
 
-    // バリアを張る対象のリソース。現在のバックバッファに対して行う
-    barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+        // 描画先のRTVとDSVを指定する
+        dsvHandle_ = GetDsvCPUHandle(0);
+        commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle_);
 
-    // 遷移前（現在）のResourceState
-    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+        // 指定した色で画面全体をクリアする
+        float clearColor[] = { 0.15f, 0.15f, 0.15f, 1.0f };
+        commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
 
-    // 遷移後のResourceState
-    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        // 描画用のDescriptorHeapの設定
+        ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
+        commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 
-    // TransitionBarrierを指定
-    commandList_->ResourceBarrier(1, &barrier_);
+        // 指定した深度で画面全体をクリアする
+        commandList_->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-    // 描画先のRTVとDSVを指定する 03_01
-    dsvHandle_ = GetDsvCPUHandle(0);
-
-    // 描画先のRTVを設定する
-    commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], false, &dsvHandle_);
-
-    // 指定した色で画面全体をクリアする
-    // 0.1f, 0.25f, 0.5f, 1.0f
-    // 0.0f, 0.0f, 0.0f, 1.0f 
-    // 0.627f, 0.847f, 0.937f, 1.0f
-    float clearColor[] = { 0.15f, 0.15f, 0.15f, 1.0f }; // 青っぽい色、RGBAの順
-    commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
-
-    // 描画用のDescriptorHeapの設定 02_03
-    ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
-    commandList_->SetDescriptorHeaps(1, descriptorHeaps);
-
-    // 指定した深度で画面全体をクリアする 03_01
-    commandList_->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-    commandList_->RSSetViewports(1, &viewport_);          // Viewportを設定
-    commandList_->RSSetScissorRects(1, &scissorRect_);    // Scissorを設定
+        commandList_->RSSetViewports(1, &viewport_);
+        commandList_->RSSetScissorRects(1, &scissorRect_);
+    }
 }
 
 void DirectXCommon::PostDraw() {
     if (!commandList_) {
         OutputDebugStringA("commandList_ is null! PostDraw aborted.\n");
-        return; // これでクラッシュ防止（仮対応）
+        return;
     }
-    assert(commandList_ != nullptr);   
+    assert(commandList_ != nullptr);
 
+    // オフスクリーンレンダリングが有効な場合
+    if (useRenderTexture_ && renderTexture_) {
+        // パス2：RenderTextureをSwapChainにコピー
+        
+        // RenderTextureをShaderResourceに遷移
+        renderTexture_->TransitionToShaderResource(commandList_);
+        
+        // バックバッファのインデックスを取得
+        backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+        
+        // SwapChainをRenderTargetに遷移
+        barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier_.Transition.pResource = swapChainResources_[backBufferIndex_].Get();
+        barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+        barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        commandList_->ResourceBarrier(1, &barrier_);
+        
+        // SwapChainのRTVを設定（Depth無し）
+        commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex_], FALSE, nullptr);
+        
+        // 背景クリア（念のため）
+        float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex_], clearColor, 0, nullptr);
+        
+        // ビューポートとシザー矩形を設定
+        commandList_->RSSetViewports(1, &viewport_);
+        commandList_->RSSetScissorRects(1, &scissorRect_);
+        
+        // PSOManagerからRootSignatureとPSOを取得してコピー描画
+        auto& psoManager = PSOManager::GetInstance();
+        auto rootSignature = psoManager.GetRootSignature("Offscreen");
+        auto pso = psoManager.GetPSO(PSOType::Offscreen_None);
+
+        commandList_->SetGraphicsRootSignature(rootSignature.Get());
+        commandList_->SetPipelineState(pso.Get());
+        commandList_->SetGraphicsRootDescriptorTable(0, renderTexture_->GetSRVGPUHandle());
+        commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        commandList_->DrawInstanced(3, 1, 0, 0); // フルスクリーン三角形
+        
 #ifdef USE_IMGUI
-    // 諸諸の処理が終わった後にコマンドを積む、GUIは画面の最前面に映すので最後の描画
-    // ただしResourceBarrierによってD3D12_RESOURCE_STATE_RENDER_TARGET→D3D12_RESOURCE_STATE_PRESENTへ遷移させる前
-    // 実際のcommandListのImGuiの描画コマンドを積む
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
+        // ImGuiをSwapChainに描画
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
+#endif
+        
+        // SwapChainをPresentに遷移
+        barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+        commandList_->ResourceBarrier(1, &barrier_);
+    }
+    else {
+        // 従来の描画
+#ifdef USE_IMGUI
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 #endif
 
-    // TransitionBarrierを貼ってPresent状態へ遷移
-    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-    commandList_->ResourceBarrier(1, &barrier_);
+        // TransitionBarrierを貼ってPresent状態へ遷移
+        barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+        commandList_->ResourceBarrier(1, &barrier_);
+    }
 
     // コマンドリストを閉じる
     hr_ = commandList_->Close();
@@ -423,6 +488,15 @@ void DirectXCommon::UpdateFixFPS() {
     }
     // 現在の時間を記録する
     reference_ = std::chrono::steady_clock::now();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
+    uint32_t descriptorSize,
+    uint32_t index) {
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    handle.ptr += static_cast<SIZE_T>(descriptorSize) * index;
+    return handle;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSrvCPUHandle(uint32_t index) {
@@ -573,7 +647,7 @@ void DirectXCommon::ResizeToWindow() {
     }
     depthStencilResource_.Reset();
 
-    // 0指定で“現在のクライアントサイズ”に自動フィット
+    // 0指定で"現在のクライアントサイズ"に自動フィット
     const UINT bufferCount = swapChainDesc_.BufferCount ? swapChainDesc_.BufferCount : 2;
     hr_ = swapChain_->ResizeBuffers(
         bufferCount,
@@ -587,4 +661,11 @@ void DirectXCommon::ResizeToWindow() {
     CreateDepthBuffer();
     CreateViewportRect();
     CreateScissorRect();
+
+    // RenderTextureもリサイズ
+    if (renderTexture_) {
+        renderTexture_ = std::make_unique<RenderTexture>();
+        float clearColor[4] = { 0.15f, 0.15f, 0.15f, 1.0f };
+        renderTexture_->Initialize(this, winApp_->GetWidth(), winApp_->GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
+    }
 }

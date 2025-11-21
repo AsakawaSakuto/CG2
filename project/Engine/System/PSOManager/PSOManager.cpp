@@ -236,15 +236,16 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.blendState = CreateBlendState("Screen");
             break;
             
-        case PSOType::Triangle_Normal:
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
-            break;
-            
-        case PSOType::Sphere_Normal:
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+        case PSOType::Offscreen_None:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
             params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
         default:
@@ -596,6 +597,59 @@ void PSOManager::CreateRootSignatures() {
         assert(SUCCEEDED(hr));
 
         rootSignatures_["Particle"] = rootSignature;
+    }
+
+    // Offscreen(CopyImage)用のRoot Signature
+    {
+        D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+        descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+        // DescriptorRange for SRV (t0)
+        D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+        descriptorRange[0].BaseShaderRegister = 0; // t0
+        descriptorRange[0].NumDescriptors = 1;
+        descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+        // Static Sampler for s0
+        D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+        staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+        staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
+        staticSamplers[0].ShaderRegister = 0; // s0
+        staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+        descriptionRootSignature.pStaticSamplers = staticSamplers;
+        descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+
+        // Root Parameters
+        D3D12_ROOT_PARAMETER rootParameters[1] = {};
+        
+        // t0: Texture (PS)
+        rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;
+        rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+
+        descriptionRootSignature.pParameters = rootParameters;
+        descriptionRootSignature.NumParameters = _countof(rootParameters);
+
+        Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+        HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+            D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+        assert(SUCCEEDED(hr));
+
+        Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+        hr = dxCommon_->GetDevice()->CreateRootSignature(0,
+            signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+            IID_PPV_ARGS(&rootSignature));
+        assert(SUCCEEDED(hr));
+
+        rootSignatures_["Offscreen"] = rootSignature;
     }
 }
 

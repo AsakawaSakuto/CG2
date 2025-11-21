@@ -23,7 +23,10 @@
 #include"ConvertString.h"
 #include"CreateResource.h"
 
+#include "../RenderTexture/RenderTexture.h"
+
 class DescriptorAllocator;
+class RenderTexture;
 
 class DirectXCommon
 {
@@ -32,7 +35,7 @@ public:
     // DirectXの初期化
 	void Initialize(WinApp* winApp);
 
-    // DirectXの描画前処理
+    // DirectXの描画前処理（オフスクリーンレンダリング対応）
     void PreDraw();
 
     //
@@ -47,6 +50,7 @@ public:
     void WaitForGPU();
 
     void ResizeToWindow();
+    
     //
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 
@@ -74,6 +78,7 @@ public:
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRV() { return srvDescriptorHeap_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDescriptorHeapRTV() { return rtvDescriptorHeap_; }
     
     D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle(uint32_t index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle(uint32_t index);
@@ -82,6 +87,11 @@ public:
 
     D3D12_CPU_DESCRIPTOR_HANDLE GetUavCPUHandle(uint32_t index);
     D3D12_GPU_DESCRIPTOR_HANDLE GetUavGPUHandle(uint32_t index);
+    
+    D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
+        uint32_t descriptorSize,
+        uint32_t index);
 
     uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
     uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
@@ -94,6 +104,10 @@ public:
     // SRV使用状況を取得するメソッド
     uint32_t GetTotalUsedSRVCount() const;
 
+    // オフスクリーンレンダリング用
+    void SetRenderTextureEnabled(bool enabled) { useRenderTexture_ = enabled; }
+    bool IsRenderTextureEnabled() const { return useRenderTexture_; }
+
 private:
 
     std::unique_ptr<DescriptorAllocator> particleAlloc_;
@@ -101,6 +115,10 @@ private:
 
     std::unique_ptr<DescriptorAllocator> modelAlloc_;
     bool modelAllocInitialized_ = false;
+
+    // オフスクリーンレンダリング
+    std::unique_ptr<RenderTexture> renderTexture_;
+    bool useRenderTexture_ = true; // デフォルトで有効
 
     // 
     WinApp* winApp_ = nullptr;
