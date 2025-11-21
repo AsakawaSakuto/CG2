@@ -1,0 +1,47 @@
+#pragma once
+#include "Matrix4x4.h"
+
+// ビネット効果のパラメータ
+struct VignetteParams {
+    float strength = 0.8f;      // 効果の強さ      (0.0～1.0)
+    float radius = 0.7f;        // ビネット開始半径 (0.0～1.0)
+    float smoothness = 2.0f;    // エッジの滑らかさ (1.0～5.0)
+};
+
+// ブラー効果のパラメータ
+struct BlurParams {
+    float amount = 1.0f;        // ぼかしの量 (0.0～5.0)
+    int sampleCount = 9;        // サンプル数 (9 or 25)
+};
+
+// セピア効果のパラメータ
+struct SepiaParams {
+    float intensity = 1.0f;     // セピアの強度 (0.0～1.0)
+};
+
+// グレースケール効果のパラメータ
+struct GrayscaleParams {
+    float intensity = 1.0f;     // グレースケールの強度 (0.0～1.0)
+};
+
+// アウトライン効果のパラメータ（Depthベース）
+struct OutlineParams {
+    Matrix4x4 projectionInverse;  // P^-1（NDC→View変換用）
+    float uvStepSize[2];          // (1/width, 1/height)
+    float thickness;              // アウトラインの太さ (1.0～5.0)
+    float depthSensitivity;       // 深度の感度 (0.1～10.0)
+
+    OutlineParams() : thickness(1.0f), depthSensitivity(1.0f) {
+        uvStepSize[0] = 0.0f;
+        uvStepSize[1] = 0.0f;
+    }
+};
+
+// 全ポストエフェクトパラメータを統合
+struct PostEffectParams {
+    VignetteParams vignette;
+    BlurParams blur;
+    SepiaParams sepia;
+    GrayscaleParams grayscale;
+    OutlineParams outline;
+};

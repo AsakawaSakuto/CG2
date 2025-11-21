@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include "DirectXCommon.h"
+#include "PSOType.h"
 
 // PSO作成用のパラメータ構造体
 struct PSOCreateParams {
@@ -29,55 +30,25 @@ struct PSOParamsHash {
     std::size_t operator()(const PSOCreateParams& params) const;
 };
 
-// 事前定義されたPSOタイプ
-enum class PSOType {
-    // 3Dモデル用
-    Model_Solid_Normal,
-    Model_Solid_Add,
-    Model_Wireframe_Normal,
-    Model_Alpha_Normal, // 追加: 透明モデル用（深度書き込みOFF）
-    
-    // スキニングモデル用（新規追加）
-    SkinningModel_Solid_Normal,
-    SkinningModel_Solid_Add,
-    SkinningModel_Wireframe_Normal,
-    SkinningModel_Alpha_Normal,
-    
-    // スプライト用
-    Sprite_Normal,
-    
-    // パーティクル用
-    Particle_None,
-    Particle_Normal,
-    Particle_Add,
-    Particle_Subtract,
-    Particle_Multiply,
-    Particle_Screen,
-    
-    // その他
-    Triangle_Normal,
-    Sphere_Normal
-};
-
 class PSOManager {
 public:
     static PSOManager& GetInstance();
     
     void Initialize(DirectXCommon* dxCommon);
     
-    // 特定のタイプのPSOを取得（遅延初期化対応）
+    // 特定のタイプのPSOを取得、遅延初期化対応
     Microsoft::WRL::ComPtr<ID3D12PipelineState> GetPSO(PSOType type);
     
-    // カスタムパラメータでPSOを作成・取得（キャッシュ機能付き）
+    // カスタムパラメータでPSOを作成・取得、キャッシュ機能付き
     Microsoft::WRL::ComPtr<ID3D12PipelineState> GetOrCreatePSO(const PSOCreateParams& params);
     
     // 共通のRoot Signatureを取得
     Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature(const std::string& signatureType);
 
-    // シェーダーキャッシュからシェーダーを取得（新規追加）
+    // シェーダーキャッシュからシェーダーを取得
     Microsoft::WRL::ComPtr<IDxcBlob> GetOrCompileShader(const std::wstring& filePath, const wchar_t* profile);
 
-    // キャッシュ統計情報（デバッグ用）
+    // キャッシュ統計情報
     void PrintCacheStats() const;
 
 private:
@@ -95,20 +66,17 @@ private:
     // Root Signature キャッシュ
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatures_;
     
-    // シェーダーキャッシュ（新規追加）
+    // シェーダーキャッシュ
     std::unordered_map<std::wstring, Microsoft::WRL::ComPtr<IDxcBlob>> shaderCache_;
     
-    // 統計情報（新規追加）
+    // 統計情報
     mutable size_t shaderCacheHits_ = 0;
     mutable size_t shaderCacheMisses_ = 0;
     mutable size_t psoCacheHits_ = 0;
     mutable size_t psoCacheMisses_ = 0;
     
-    // 特定のPSOタイプを遅延作成（新規追加）
+    // 特定のPSOタイプを遅延作成
     Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePSOOnDemand(PSOType type);
-    
-    // 事前定義されたPSOを作成（削除予定 - 遅延初期化に移行）
-    //void CreatePredefinedPSOs();
     
     // 共通のRoot Signatureを作成
     void CreateRootSignatures();

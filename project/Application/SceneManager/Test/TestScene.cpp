@@ -69,6 +69,10 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
+
+    auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+    postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+
     cube_->Draw(camera_, cubeTransform_);
     spinCube_->Draw(camera_, spinCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
@@ -82,6 +86,12 @@ void TestScene::Draw() {
 
 void TestScene::DrawImGui() {
 #ifdef USE_IMGUI
+
+    auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+	postEffect->DrawImGui();
+
+	walkTransform_.DrawImGui("walk");
+	sneakWalkTransform_.DrawImGui("sneakWalk");
 
 	MT4_01_01();
 	MT4_01_02();

@@ -179,6 +179,8 @@
     <ClCompile Include="Engine\System\DirectXCommon\ExeColor.cpp" />
     <ClCompile Include="Engine\System\GamePad\GamePad.cpp" />
     <ClCompile Include="Engine\System\HeapManager\HeapManager.cpp" />
+    <ClCompile Include="Engine\System\PostEffect\PostEffectManager.cpp" />
+    <ClCompile Include="Engine\System\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Engine\System\Utility\MathFunction\MathFunction.cpp" />
     <ClCompile Include="Engine\System\PSOManager\PSOManager.cpp" />
     <ClCompile Include="Engine\System\Utility\ConvertString\ConvertString.cpp" />
@@ -266,6 +268,10 @@
     <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
     <ClInclude Include="Engine\System\GamePad\GamePad.h" />
     <ClInclude Include="Engine\System\HeapManager\HeapManager.h" />
+    <ClInclude Include="Engine\System\PostEffect\PostEffectManager.h" />
+    <ClInclude Include="Engine\System\PostEffect\PostEffectParams.h" />
+    <ClInclude Include="Engine\System\PSOManager\PSOType.h" />
+    <ClInclude Include="Engine\System\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\System\Utility\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />
     <ClInclude Include="Engine\System\ResourceData\BlendMode.h" />
@@ -367,6 +373,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="resources\shaders\Object3d.hlsli">

@@ -13,7 +13,6 @@
     <ClCompile Include="Application\SceneManager\SceneManager.cpp" />
     <ClCompile Include="Application\SceneManager\Test\TestScene.cpp" />
     <ClCompile Include="Engine\3d\Particles\Json\EmitterStateLoder.cpp" />
-    <ClCompile Include="Engine\3d\Particles\ParticleDescriptorAllocator.cpp" />
     <ClCompile Include="Engine\System\Audio\Audio.cpp" />
     <ClCompile Include="Engine\System\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
@@ -64,6 +63,9 @@
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
+    <ClCompile Include="Engine\System\HeapManager\DescriptorAllocator.cpp" />
+    <ClCompile Include="Engine\System\RenderTexture\RenderTexture.cpp" />
+    <ClCompile Include="Engine\System\PostEffect\PostEffectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -72,7 +74,6 @@
     <ClInclude Include="Application\SceneManager\SceneManager.h" />
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterStateLoder.h" />
-    <ClInclude Include="Engine\3d\Particles\ParticleDescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Struct\EmitterState.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\System\GamePad\GamePad.h" />
@@ -149,6 +150,11 @@
     <ClInclude Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponName.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.h" />
+    <ClInclude Include="Engine\System\HeapManager\DescriptorAllocator.h" />
+    <ClInclude Include="Engine\System\RenderTexture\RenderTexture.h" />
+    <ClInclude Include="Engine\System\PSOManager\PSOType.h" />
+    <ClInclude Include="Engine\System\PostEffect\PostEffectParams.h" />
+    <ClInclude Include="Engine\System\PostEffect\PostEffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d.hlsli" />
@@ -156,5 +162,6 @@
     <None Include="resources\shaders\Sprite\Sprite.hlsli" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
+    <None Include="docs\OffscreenRendering_Implementation.md" />
   </ItemGroup>
 </Project>
