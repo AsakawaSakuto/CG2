@@ -260,6 +260,54 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
+        case PSOType::Offscreen_Sepia:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Sepia.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+            
+        case PSOType::Offscreen_Vignette:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Vignette.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+            
+        case PSOType::Offscreen_Invert:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Invert.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+            
+        case PSOType::Offscreen_Blur:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Blur.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+            
         default:
             assert(false && "Unknown PSO type");
             break;
@@ -637,14 +685,19 @@ void PSOManager::CreateRootSignatures() {
         descriptionRootSignature.pStaticSamplers = staticSamplers;
         descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-        // Root Parameters
-        D3D12_ROOT_PARAMETER rootParameters[1] = {};
+        // Root Parameters (2個: テクスチャSRV + パラメータCBV)
+        D3D12_ROOT_PARAMETER rootParameters[2] = {};
         
         // t0: Texture (PS)
         rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
         rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
         rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;
         rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+
+        // b0: EffectParams (PS) - パラメータ用のCBV（オプショナル、使わないシェーダーもある）
+        rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[1].Descriptor.ShaderRegister = 0;
 
         descriptionRootSignature.pParameters = rootParameters;
         descriptionRootSignature.NumParameters = _countof(rootParameters);

@@ -28,4 +28,8 @@ enum class PSOType {
     // オフスクリーン用（ポストエフェクト）
     Offscreen_None,
     Offscreen_Grayscale,
+    Offscreen_Sepia,
+    Offscreen_Vignette,
+    Offscreen_Invert,
+    Offscreen_Blur,
 };

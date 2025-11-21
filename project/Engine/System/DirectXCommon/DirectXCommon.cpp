@@ -41,6 +41,9 @@ void DirectXCommon::Initialize(WinApp* winApp) {
     renderTexture_ = std::make_unique<RenderTexture>();
     float clearColor[4] = { 0.15f, 0.15f, 0.15f, 1.0f };
     renderTexture_->Initialize(this, winApp_->GetWidth(), winApp_->GetHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
+    
+    // ポストエフェクトパラメータ用の定数バッファを作成
+    CreatePostEffectParamResource();
 }
 
 void DirectXCommon::CreateDevice() {
@@ -335,7 +338,7 @@ void DirectXCommon::PreDraw() {
     }
     else {
         // 従来の描画（SwapChainに直接描画）
-        // これから書き込むバックバッファのインデックスを取得
+// これから書き込むバックバッファのインデックスを取得
         backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
         // 今回のバリアはTransition
@@ -410,6 +413,11 @@ void DirectXCommon::PostDraw() {
         commandList_->SetGraphicsRootSignature(rootSignature.Get());
         commandList_->SetPipelineState(pso.Get());
         commandList_->SetGraphicsRootDescriptorTable(0, renderTexture_->GetSRVGPUHandle());
+        
+        // パラメータを更新して設定
+        UpdatePostEffectParams();
+        commandList_->SetGraphicsRootConstantBufferView(1, postEffectParamResource_->GetGPUVirtualAddress());
+        
         commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         commandList_->DrawInstanced(3, 1, 0, 0); // フルスクリーン三角形
         
@@ -490,13 +498,181 @@ void DirectXCommon::UpdateFixFPS() {
     reference_ = std::chrono::steady_clock::now();
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
-    uint32_t descriptorSize,
-    uint32_t index) {
-    D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    handle.ptr += static_cast<SIZE_T>(descriptorSize) * index;
-    return handle;
+#ifdef USE_IMGUI
+void DirectXCommon::DrawPostEffectImGui() {
+    ImGui::Begin("Post Effect Settings");
+
+    // オフスクリーンレンダリングのON/OFF
+    bool useOffscreen = IsRenderTextureEnabled();
+    if (ImGui::Checkbox("Enable Post Effects", &useOffscreen)) {
+        SetRenderTextureEnabled(useOffscreen);
+    }
+
+    ImGui::Separator();
+
+    // ポストエフェクトタイプの選択
+    const char* effectNames[] = {
+        "None (通常)",
+        "Grayscale (白黒)",
+        "Sepia (セピア調)",
+        "Vignette (周辺減光)",
+        "Invert (色反転)",
+        "Blur (ぼかし)"
+    };
+
+    int currentEffect = static_cast<int>(postEffectType_);
+    int baseOffset = static_cast<int>(PSOType::Offscreen_None);
+    int selectedIndex = currentEffect - baseOffset;
+
+    if (selectedIndex >= 0 && selectedIndex < IM_ARRAYSIZE(effectNames)) {
+        if (ImGui::Combo("Effect Type", &selectedIndex, effectNames, IM_ARRAYSIZE(effectNames))) {
+            PSOType newEffect = static_cast<PSOType>(baseOffset + selectedIndex);
+            SetPostEffectType(newEffect);
+        }
+    }
+
+    ImGui::Separator();
+    ImGui::Text("Effect Parameters");
+    ImGui::Separator();
+
+    // 各エフェクトのパラメータ調整
+    switch (postEffectType_) {
+        case PSOType::Offscreen_Grayscale:
+        {
+            ImGui::Text("Grayscale Settings");
+            ImGui::SliderFloat("Intensity", &postEffectParams_.grayscale.intensity, 0.0f, 1.0f);
+            if (ImGui::Button("Reset##Grayscale")) {
+                postEffectParams_.grayscale.intensity = 1.0f;
+			}
+            ImGui::TextWrapped("Intensity: グレースケールの強度を調整します。\n0.0 = カラー, 1.0 = 完全な白黒");
+            break;
+        }
+
+        case PSOType::Offscreen_Sepia:
+        {
+            ImGui::Text("Sepia Settings");
+            ImGui::SliderFloat("Intensity", &postEffectParams_.sepia.intensity, 0.0f, 1.0f);
+            if (ImGui::Button("Reset##Sepia")) {
+                postEffectParams_.sepia.intensity = 1.0f;
+            }
+            ImGui::TextWrapped("Intensity: セピア調の強度を調整します。\n0.0 = カラー, 1.0 = 完全なセピア");
+            break;
+        }
+
+        case PSOType::Offscreen_Vignette:
+        {
+            ImGui::Text("Vignette Settings");
+            ImGui::SliderFloat("Strength", &postEffectParams_.vignette.strength, 0.0f, 1.0f);
+            ImGui::SliderFloat("Radius", &postEffectParams_.vignette.radius, 0.0f, 1.0f);
+            ImGui::SliderFloat("Smoothness", &postEffectParams_.vignette.smoothness, 1.0f, 5.0f);
+            if (ImGui::Button("Reset##Vignette")) {
+                postEffectParams_.vignette.strength = 0.8f;
+                postEffectParams_.vignette.radius = 0.7f;
+                postEffectParams_.vignette.smoothness = 2.0f;
+            }
+            ImGui::TextWrapped(
+                "Strength: 周辺減光の強さ\n"
+                "Radius: ビネット効果の開始位置\n"
+                "Smoothness: エッジの滑らかさ"
+            );
+            break;
+        }
+
+        case PSOType::Offscreen_Blur:
+        {
+            ImGui::Text("Blur Settings");
+            ImGui::SliderFloat("Amount", &postEffectParams_.blur.amount, 0.0f, 5.0f);
+            
+            const char* sampleItems[] = { "9 Samples (Fast)", "25 Samples (Quality)" };
+            int currentSample = (postEffectParams_.blur.sampleCount == 9) ? 0 : 1;
+            if (ImGui::Combo("Quality", &currentSample, sampleItems, IM_ARRAYSIZE(sampleItems))) {
+                postEffectParams_.blur.sampleCount = (currentSample == 0) ? 9 : 25;
+            }
+            
+            if (ImGui::Button("Reset##Blur")) {
+                postEffectParams_.blur.amount = 1.0f;
+                postEffectParams_.blur.sampleCount = 9;
+            }
+            ImGui::TextWrapped(
+                "Amount: ぼかしの強さ\n"
+                "Quality: サンプル数（多いほど綺麗だが重い）"
+            );
+            break;
+        }
+
+        case PSOType::Offscreen_Invert:
+        {
+            ImGui::Text("Invert Settings");
+            ImGui::TextWrapped("色反転エフェクトにはパラメータはありません。");
+            break;
+        }
+
+        case PSOType::Offscreen_None:
+        {
+            ImGui::Text("No Effect Selected");
+            ImGui::TextWrapped("エフェクトが選択されていません。");
+            break;
+        }
+
+        default:
+            ImGui::Text("Unknown Effect");
+            break;
+    }
+
+    ImGui::Separator();
+    
+    // 統計情報
+    if (ImGui::CollapsingHeader("Statistics")) {
+        ImGui::Text("Render Texture: %s", useOffscreen ? "Enabled" : "Disabled");
+        ImGui::Text("Current Effect: %s", effectNames[selectedIndex]);
+        ImGui::Text("Viewport: %.0f x %.0f", viewport_.Width, viewport_.Height);
+    }
+
+    // 全パラメータリセット
+    ImGui::Separator();
+    if (ImGui::Button("Reset All Parameters")) {
+        postEffectParams_.grayscale.intensity = 1.0f;
+        postEffectParams_.sepia.intensity = 1.0f;
+        postEffectParams_.vignette.strength = 0.8f;
+        postEffectParams_.vignette.radius = 0.7f;
+        postEffectParams_.vignette.smoothness = 2.0f;
+        postEffectParams_.blur.amount = 1.0f;
+        postEffectParams_.blur.sampleCount = 9;
+    }
+
+    ImGui::End();
+}
+#endif
+
+void DirectXCommon::CreatePostEffectParamResource() {
+    // ポストエフェクトパラメータ用の定数バッファを作成（最大サイズはVignetteParams）
+    postEffectParamResource_ = CreateBufferResource(device_.Get(), sizeof(PostEffectParams));
+}
+
+void DirectXCommon::UpdatePostEffectParams() {
+    // 現在のエフェクトタイプに応じてパラメータを定数バッファにコピー
+    void* mappedData = nullptr;
+    postEffectParamResource_->Map(0, nullptr, &mappedData);
+    
+    switch (postEffectType_) {
+        case PSOType::Offscreen_Vignette:
+            memcpy(mappedData, &postEffectParams_.vignette, sizeof(VignetteParams));
+            break;
+        case PSOType::Offscreen_Blur:
+            memcpy(mappedData, &postEffectParams_.blur, sizeof(BlurParams));
+            break;
+        case PSOType::Offscreen_Sepia:
+            memcpy(mappedData, &postEffectParams_.sepia, sizeof(SepiaParams));
+            break;
+        case PSOType::Offscreen_Grayscale:
+            memcpy(mappedData, &postEffectParams_.grayscale, sizeof(GrayscaleParams));
+            break;
+        default:
+            // その他のエフェクトはパラメータ不要
+            break;
+    }
+    
+    postEffectParamResource_->Unmap(0, nullptr);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSrvCPUHandle(uint32_t index) {
@@ -517,6 +693,24 @@ D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetUavCPUHandle(uint32_t index) {
 
 D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetUavGPUHandle(uint32_t index) {
     return GetGPUDescriptorHandle(uavDescriptorHeap_.Get(), descriptorSizeUAV_, index);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
+    uint32_t descriptorSize,
+    uint32_t index) {
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    handle.ptr += static_cast<SIZE_T>(descriptorSize) * index;
+    return handle;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
+    uint32_t descriptorSize,
+    uint32_t index) {
+    D3D12_GPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+    handle.ptr += static_cast<UINT64>(descriptorSize) * index;
+    return handle;
 }
 
 ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile) {

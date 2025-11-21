@@ -25,6 +25,7 @@
 
 #include "../RenderTexture/RenderTexture.h"
 #include "../PSOManager/PSOType.h"
+#include "../PostEffect/PostEffectParams.h"
 
 class DescriptorAllocator;
 class RenderTexture;
@@ -94,6 +95,11 @@ public:
         uint32_t descriptorSize,
         uint32_t index);
 
+    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,
+        uint32_t descriptorSize,
+        uint32_t index);
+
     uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
     uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
     uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
@@ -113,6 +119,15 @@ public:
     void SetPostEffectType(PSOType effectType) { postEffectType_ = effectType; }
     PSOType GetPostEffectType() const { return postEffectType_; }
 
+    // ポストエフェクトパラメータの取得
+    PostEffectParams& GetPostEffectParams() { return postEffectParams_; }
+    const PostEffectParams& GetPostEffectParams() const { return postEffectParams_; }
+
+#ifdef USE_IMGUI
+    // ImGuiでポストエフェクト設定を表示
+    void DrawPostEffectImGui();
+#endif
+
 private:
 
     std::unique_ptr<DescriptorAllocator> particleAlloc_;
@@ -124,7 +139,14 @@ private:
     // オフスクリーンレンダリング
     std::unique_ptr<RenderTexture> renderTexture_;
     bool useRenderTexture_ = true; // デフォルトで有効
-    PSOType postEffectType_ = PSOType::Offscreen_Grayscale; // ポストエフェクトタイプ
+    PSOType postEffectType_ = PSOType::Offscreen_None; // ポストエフェクトタイプ（デフォルトはNone）
+    PostEffectParams postEffectParams_; // ポストエフェクトパラメータ
+
+    // ポストエフェクトパラメータ用の定数バッファ
+    Microsoft::WRL::ComPtr<ID3D12Resource> postEffectParamResource_;
+    
+    void CreatePostEffectParamResource();
+    void UpdatePostEffectParams();
 
     // 
     WinApp* winApp_ = nullptr;

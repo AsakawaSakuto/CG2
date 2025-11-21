@@ -267,6 +267,7 @@
     <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
     <ClInclude Include="Engine\System\GamePad\GamePad.h" />
     <ClInclude Include="Engine\System\HeapManager\HeapManager.h" />
+    <ClInclude Include="Engine\System\PostEffect\PostEffectParams.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOType.h" />
     <ClInclude Include="Engine\System\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\System\Utility\MathFunction\MathFunction.h" />
@@ -371,6 +372,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="docs\OffscreenRendering_Implementation.md" />
+    <None Include="docs\PostEffect_Usage.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="resources\shaders\Object3d.hlsli">
