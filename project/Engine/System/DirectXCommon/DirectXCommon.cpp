@@ -405,7 +405,7 @@ void DirectXCommon::PostDraw() {
         // PSOManagerからRootSignatureとPSOを取得してコピー描画
         auto& psoManager = PSOManager::GetInstance();
         auto rootSignature = psoManager.GetRootSignature("Offscreen");
-        auto pso = psoManager.GetPSO(PSOType::Offscreen_None);
+        auto pso = psoManager.GetPSO(postEffectType_); // 選択されたポストエフェクトを使用
 
         commandList_->SetGraphicsRootSignature(rootSignature.Get());
         commandList_->SetPipelineState(pso.Get());

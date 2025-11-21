@@ -248,6 +248,18 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
             
+        case PSOType::Offscreen_Grayscale:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"Resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"Resources/shaders/PostEffect/Grayscale.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+            
         default:
             assert(false && "Unknown PSO type");
             break;

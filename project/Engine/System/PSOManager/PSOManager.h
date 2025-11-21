@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include "DirectXCommon.h"
+#include "PSOType.h"
 
 // PSO作成用のパラメータ構造体
 struct PSOCreateParams {
@@ -27,35 +28,6 @@ struct PSOCreateParams {
 // PSO用のハッシュ関数
 struct PSOParamsHash {
     std::size_t operator()(const PSOCreateParams& params) const;
-};
-
-// 事前定義されたPSOタイプ
-enum class PSOType {
-    // 3Dモデル用
-    Model_Solid_Normal,
-    Model_Solid_Add,
-    Model_Wireframe_Normal,
-    Model_Alpha_Normal,
-    
-    // スキニングモデル用（新規追加）
-    SkinningModel_Solid_Normal,
-    SkinningModel_Solid_Add,
-    SkinningModel_Wireframe_Normal,
-    SkinningModel_Alpha_Normal,
-    
-    // スプライト用
-    Sprite_Normal,
-    
-    // パーティクル用
-    Particle_None,
-    Particle_Normal,
-    Particle_Add,
-    Particle_Subtract,
-    Particle_Multiply,
-    Particle_Screen,
-    
-    // オフスクリーン用
-    Offscreen_None,
 };
 
 class PSOManager {

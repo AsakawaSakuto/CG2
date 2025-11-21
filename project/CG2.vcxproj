@@ -267,6 +267,7 @@
     <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
     <ClInclude Include="Engine\System\GamePad\GamePad.h" />
     <ClInclude Include="Engine\System\HeapManager\HeapManager.h" />
+    <ClInclude Include="Engine\System\PSOManager\PSOType.h" />
     <ClInclude Include="Engine\System\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\System\Utility\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />

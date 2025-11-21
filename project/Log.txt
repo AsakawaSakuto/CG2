@@ -35,7 +35,7 @@
 
 [Log] Compile Succeeded, path:Resources/shaders/PostEffect/CopyImage.VS.hlsl, profile:vs_6_0
 
-[Log] Begin CompileShader, path:Resources/shaders/PostEffect/CopyImage.PS.hlsl, profile:ps_6_0
+[Log] Begin CompileShader, path:Resources/shaders/PostEffect/Grayscale.PS.hlsl, profile:ps_6_0
 
-[Log] Compile Succeeded, path:Resources/shaders/PostEffect/CopyImage.PS.hlsl, profile:ps_6_0
+[Log] Compile Succeeded, path:Resources/shaders/PostEffect/Grayscale.PS.hlsl, profile:ps_6_0
 

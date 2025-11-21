@@ -24,6 +24,7 @@
 #include"CreateResource.h"
 
 #include "../RenderTexture/RenderTexture.h"
+#include "../PSOManager/PSOType.h"
 
 class DescriptorAllocator;
 class RenderTexture;
@@ -107,6 +108,10 @@ public:
     // オフスクリーンレンダリング用
     void SetRenderTextureEnabled(bool enabled) { useRenderTexture_ = enabled; }
     bool IsRenderTextureEnabled() const { return useRenderTexture_; }
+    
+    // ポストエフェクト設定
+    void SetPostEffectType(PSOType effectType) { postEffectType_ = effectType; }
+    PSOType GetPostEffectType() const { return postEffectType_; }
 
 private:
 
@@ -119,6 +124,7 @@ private:
     // オフスクリーンレンダリング
     std::unique_ptr<RenderTexture> renderTexture_;
     bool useRenderTexture_ = true; // デフォルトで有効
+    PSOType postEffectType_ = PSOType::Offscreen_Grayscale; // ポストエフェクトタイプ
 
     // 
     WinApp* winApp_ = nullptr;
