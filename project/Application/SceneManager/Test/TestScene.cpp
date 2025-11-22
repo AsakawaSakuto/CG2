@@ -93,6 +93,8 @@ void TestScene::DrawImGui() {
 	walkTransform_.DrawImGui("walk");
 	sneakWalkTransform_.DrawImGui("sneakWalk");
 
+	testParticle_->DrawImGui("testp");
+
 	//MT4_01_01();
 	//MT4_01_02();
 	//MT4_01_03();
