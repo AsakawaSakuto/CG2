@@ -75,7 +75,11 @@ void GameScene::Draw() {
 }
 
 void GameScene::DrawImGui() {
-	
+
+	auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	postEffect->DrawImGui();
+
 	gridModel_->DrawImGui("grid");
 
 	player_->DrawImGui();

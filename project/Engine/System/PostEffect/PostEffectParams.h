@@ -50,6 +50,24 @@ struct OutlineParams {
     }
 };
 
+// フォグ効果のパラメータ（Depthベース）
+struct FogParams {
+    Matrix4x4 projectionInverse;  // P^-1（NDC→View変換用）
+    float fogColor[3];            // フォグの色 (RGB: 0.0～1.0)
+    float fogStart;               // フォグ開始距離
+    float fogEnd;                 // フォグ終了距離（完全に霧になる距離）
+    float fogDensity;             // フォグの濃度 (0.0～1.0)
+    float padding[2];             // アライメント用パディング
+
+    FogParams() : fogStart(5.0f), fogEnd(50.0f), fogDensity(1.0f) {
+        fogColor[0] = 0.7f;       // デフォルトは薄い灰色
+        fogColor[1] = 0.7f;
+        fogColor[2] = 0.8f;
+        padding[0] = 0.0f;
+        padding[1] = 0.0f;
+    }
+};
+
 // 全ポストエフェクトパラメータを統合
 struct PostEffectParams {
     VignetteParams vignette;
@@ -58,4 +76,5 @@ struct PostEffectParams {
     GrayscaleParams grayscale;
     RadialBlurParams radialBlur;
     OutlineParams outline;
+    FogParams fog;
 };

@@ -150,6 +150,16 @@ void PostEffectManager::UpdateParams() {
             memcpy(mappedData, &params_.outline, sizeof(OutlineParams));
             break;
         }
+        case PSOType::PostEffect_Fog:
+        {
+            // Fog用のパラメータを設定
+            if (renderTexture_) {
+                // ProjectionInverse行列を設定
+                params_.fog.projectionInverse = InverseMatrix(projectionMatrix_);
+            }
+            memcpy(mappedData, &params_.fog, sizeof(FogParams));
+            break;
+        }
         default:
             // その他のエフェクトはパラメータ不要
             break;
@@ -179,7 +189,8 @@ void PostEffectManager::DrawImGui() {
         "Invert (色反転)",
         "Blur (ぼかし)",
         "Radial Blur (放射ブラー)",
-        "Outline (輪郭検出)"
+        "Outline (輪郭検出)",
+        "Fog (フォグ)"
     };
 
     int currentEffect = static_cast<int>(effectType_);
@@ -304,6 +315,30 @@ void PostEffectManager::DrawImGui() {
             break;
         }
 
+        case PSOType::PostEffect_Fog:
+        {
+            ImGui::Text("Fog Settings");
+            ImGui::ColorEdit3("Fog Color", params_.fog.fogColor);
+            ImGui::SliderFloat("Fog Start", &params_.fog.fogStart, 0.0f, 100.0f);
+            ImGui::SliderFloat("Fog End", &params_.fog.fogEnd, 0.0f, 100.0f);
+            ImGui::SliderFloat("Fog Density", &params_.fog.fogDensity, 0.0f, 1.0f);
+            if (ImGui::Button("Reset##Fog")) {
+                params_.fog.fogColor[0] = 0.7f;
+                params_.fog.fogColor[1] = 0.7f;
+                params_.fog.fogColor[2] = 0.8f;
+                params_.fog.fogStart = 5.0f;
+                params_.fog.fogEnd = 50.0f;
+                params_.fog.fogDensity = 1.0f;
+            }
+            ImGui::TextWrapped(
+                "Fog Color: フォグの色\n"
+                "Fog Start: フォグ開始距離（カメラからの距離）\n"
+                "Fog End: フォグ終了距離（完全にフォグで覆われる距離）\n"
+                "Fog Density: フォグの濃度（0.0～1.0）"
+            );
+            break;
+        }
+
         case PSOType::PostEffect_Invert:
         {
             ImGui::Text("Invert Settings");
@@ -344,6 +379,12 @@ void PostEffectManager::DrawImGui() {
         params_.outline.outlineColor[0] = 0.0f;
         params_.outline.outlineColor[1] = 0.0f;
         params_.outline.outlineColor[2] = 0.0f;
+        params_.fog.fogColor[0] = 0.7f;
+        params_.fog.fogColor[1] = 0.7f;
+        params_.fog.fogColor[2] = 0.8f;
+        params_.fog.fogStart = 5.0f;
+        params_.fog.fogEnd = 50.0f;
+        params_.fog.fogDensity = 1.0f;
     }
 
     ImGui::End();

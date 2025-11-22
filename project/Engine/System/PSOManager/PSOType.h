@@ -35,4 +35,5 @@ enum class PSOType {
     PostEffect_Blur,
     PostEffect_RadialBlur,
     PostEffect_Outline,
+    PostEffect_Fog,
 };
