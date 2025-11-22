@@ -24,6 +24,14 @@ struct GrayscaleParams {
     float intensity = 1.0f;     // グレースケールの強度 (0.0～1.0)
 };
 
+// ラジアルブラー効果のパラメータ
+struct RadialBlurParams {
+    float centerX = 0.5f;       // ブラーの中心X座標 (0.0～1.0)
+    float centerY = 0.5f;       // ブラーの中心Y座標 (0.0～1.0)
+    float strength = 0.1f;      // ブラーの強さ (0.0～1.0)
+    int sampleCount = 10;       // サンプル数 (5～20)
+};
+
 // アウトライン効果のパラメータ（Depthベース）
 struct OutlineParams {
     Matrix4x4 projectionInverse;  // P^-1（NDC→View変換用）
@@ -43,5 +51,6 @@ struct PostEffectParams {
     BlurParams blur;
     SepiaParams sepia;
     GrayscaleParams grayscale;
+    RadialBlurParams radialBlur;
     OutlineParams outline;
 };

@@ -33,5 +33,6 @@ enum class PSOType {
     PostEffect_Vignette,
     PostEffect_Invert,
     PostEffect_Blur,
+    PostEffect_RadialBlur,
     PostEffect_Outline,
 };

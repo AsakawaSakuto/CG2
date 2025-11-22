@@ -133,6 +133,9 @@ void PostEffectManager::UpdateParams() {
         case PSOType::PostEffect_Grayscale:
             memcpy(mappedData, &params_.grayscale, sizeof(GrayscaleParams));
             break;
+        case PSOType::PostEffect_RadialBlur:
+            memcpy(mappedData, &params_.radialBlur, sizeof(RadialBlurParams));
+            break;
         case PSOType::PostEffect_Outline:
         {
             // Outline用のパラメータを設定
@@ -175,6 +178,7 @@ void PostEffectManager::DrawImGui() {
         "Vignette (周辺減光)",
         "Invert (色反転)",
         "Blur (ぼかし)",
+        "Radial Blur (放射ブラー)",
         "Outline (輪郭検出)"
     };
 
@@ -258,6 +262,27 @@ void PostEffectManager::DrawImGui() {
             break;
         }
 
+        case PSOType::PostEffect_RadialBlur:
+        {
+            ImGui::Text("Radial Blur Settings");
+            ImGui::SliderFloat("Center X", &params_.radialBlur.centerX, 0.0f, 0.5f);
+            ImGui::SliderFloat("Center Y", &params_.radialBlur.centerY, 0.0f, 0.5f);
+            ImGui::SliderFloat("Strength", &params_.radialBlur.strength, 0.0f, 100.0f);
+            ImGui::SliderInt("Sample Count", &params_.radialBlur.sampleCount, 1, 100);
+            if (ImGui::Button("Reset##RadialBlur")) {
+                params_.radialBlur.centerX = 0.5f;
+                params_.radialBlur.centerY = 0.5f;
+                params_.radialBlur.strength = 0.1f;
+                params_.radialBlur.sampleCount = 10;
+            }
+            ImGui::TextWrapped(
+                "Center X/Y: ブラーの中心座標\n"
+                "Strength: ブラーの強さ\n"
+                "Sample Count: サンプル数（多いほど綺麗だが重い）"
+            );
+            break;
+        }
+
         case PSOType::PostEffect_Outline:
         {
             ImGui::Text("Outline Settings");
@@ -305,6 +330,10 @@ void PostEffectManager::DrawImGui() {
         params_.vignette.smoothness = 5.0f;
         params_.blur.amount = 1.0f;
         params_.blur.sampleCount = 9;
+        params_.radialBlur.centerX = 0.5f;
+        params_.radialBlur.centerY = 0.5f;
+        params_.radialBlur.strength = 0.1f;
+        params_.radialBlur.sampleCount = 10;
         params_.outline.thickness = 1.0f;
         params_.outline.depthSensitivity = 1.0f;
     }
