@@ -59,5 +59,5 @@ void ExpItem::Update() {
 }
 
 void ExpItem::Draw(Camera camera) {
-	if (scaleTimer_.GetProgress() > 0.1f) { model_->Draw(camera, transform_); }
+	model_->Draw(camera, transform_);
 }

@@ -90,9 +90,6 @@ void TestScene::DrawImGui() {
     auto postEffect = ctx_->dxCommon.GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	walkTransform_.DrawImGui("walk");
-	sneakWalkTransform_.DrawImGui("sneakWalk");
-
 	testParticle_->DrawImGui("testp");
 
 	//MT4_01_01();

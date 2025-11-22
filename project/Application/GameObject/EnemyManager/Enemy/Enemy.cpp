@@ -31,7 +31,7 @@ void Enemy::Update() {
 }
 
 void Enemy::Draw(Camera camera) {
-	if (drawTimer_.GetProgress() > 0.1f) { model_->Draw(camera, transform_); }
+	model_->Draw(camera, transform_);
 }
 
 void Enemy::DrawImGui() {
