@@ -14,7 +14,7 @@ void PostEffectManager::Initialize(DirectXCommon* dxCommon, uint32_t width, uint
 
     // RenderTextureの初期化
     renderTexture_ = std::make_unique<RenderTexture>();
-    float clearColor[4] = { 0.15f, 0.15f, 0.15f, 1.0f };
+    float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     renderTexture_->Initialize(dxCommon_, width, height, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 
     // パラメータ用の定数バッファを作成

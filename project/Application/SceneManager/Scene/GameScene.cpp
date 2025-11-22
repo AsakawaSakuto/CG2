@@ -27,16 +27,11 @@ void GameScene::Initialize() {
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
 
-	testPlane_->Initialize(&ctx_->dxCommon, "plane.obj");
-	testPlaneTransform_.scale = { 100.0f,1.0f,100.0f };
-	testPlaneTransform_.translate = { 0.0f,-0.5f,0.0f };
-	testPlane_->UseLight(false);
-
-	testWall_->Initialize(&ctx_->dxCommon, "wall.obj");
-	testWall_->SetTranslate({ 0.0f,-40.0f,0.0f });
-	testWallTransform_.translate = { 0.0f,-40.0f,0.0f };
-
 	testParticle_->Initialize(&ctx_->dxCommon);
+
+	gridModel_->Initialize(&ctx_->dxCommon, "grid/grid.obj");
+	gridTransform_.translate = { 0.0f,-0.5f,0.0f };
+	gridModel_->SetColor4({ 1.0f,1.0f,1.0f,0.05f });
 }
 
 void GameScene::Update() {
@@ -58,8 +53,7 @@ void GameScene::Update() {
 	camera_ = gameCamera_->GetCamera();
 	camera_.Update();
 
-	testPlane_->Update();
-	testWall_->Update();
+	gridModel_->Update();
 
 	testParticle_->Update();
 
@@ -69,8 +63,7 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	testPlane_->Draw(camera_, testPlaneTransform_);
-	testWall_->Draw(camera_, testWallTransform_);
+	gridModel_->Draw(camera_, gridTransform_);
 
 	enemyManager_->Draw(camera_);
 
@@ -83,6 +76,8 @@ void GameScene::Draw() {
 
 void GameScene::DrawImGui() {
 	
+	gridModel_->DrawImGui("grid");
+
 	player_->DrawImGui();
 
 	enemyManager_->DrawImGui();
