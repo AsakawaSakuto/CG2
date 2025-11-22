@@ -38,10 +38,15 @@ struct OutlineParams {
     float uvStepSize[2];          // (1/width, 1/height)
     float thickness;              // アウトラインの太さ (1.0～5.0)
     float depthSensitivity;       // 深度の感度 (0.1～10.0)
+    float outlineColor[3];        // アウトラインの色 (RGB: 0.0～1.0)
+    float padding;                // アライメント用パディング
 
-    OutlineParams() : thickness(1.0f), depthSensitivity(1.0f) {
+    OutlineParams() : thickness(1.0f), depthSensitivity(1.0f), padding(0.0f) {
         uvStepSize[0] = 0.0f;
         uvStepSize[1] = 0.0f;
+        outlineColor[0] = 0.0f;   // デフォルトは黒
+        outlineColor[1] = 0.0f;
+        outlineColor[2] = 0.0f;
     }
 };
 

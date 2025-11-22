@@ -12,6 +12,8 @@ cbuffer OutlineParams : register(b0)
     float2 uvStepSize;            // (1/width, 1/height)
     float thickness;              // アウトラインの太さ
     float depthSensitivity;       // 深度の感度
+    float3 outlineColor;          // アウトラインの色
+    float padding;                // パディング
 }
 
 struct PixelShaderOutput
@@ -68,7 +70,8 @@ PixelShaderOutput main(VertexShaderOutput input)
     // 元画像と合成
     float3 srcColor = gTexture.Sample(gSamplerLinear, input.texcoord).rgb;
     
-    output.color.rgb = (1.0f - weight) * srcColor;
+    // アウトライン色を適用（weightが大きいほどアウトライン色が強くなる）
+    output.color.rgb = lerp(srcColor, outlineColor, weight);
     output.color.a = 1.0f;
     
     return output;

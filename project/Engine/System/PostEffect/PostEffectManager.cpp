@@ -288,13 +288,18 @@ void PostEffectManager::DrawImGui() {
             ImGui::Text("Outline Settings");
             ImGui::SliderFloat("Thickness", &params_.outline.thickness, 0.5f, 5.0f);
             ImGui::SliderFloat("Depth Sensitivity", &params_.outline.depthSensitivity, 0.1f, 10.0f);
+            ImGui::ColorEdit3("Outline Color", params_.outline.outlineColor);
             if (ImGui::Button("Reset##Outline")) {
                 params_.outline.thickness = 1.0f;
                 params_.outline.depthSensitivity = 1.0f;
+                params_.outline.outlineColor[0] = 0.0f;
+                params_.outline.outlineColor[1] = 0.0f;
+                params_.outline.outlineColor[2] = 0.0f;
             }
             ImGui::TextWrapped(
                 "Thickness: アウトラインの太さ\n"
-                "Depth Sensitivity: 深度差に対する感度（高いほど細かいエッジも検出）"
+                "Depth Sensitivity: 深度差に対する感度（高いほど細かいエッジも検出）\n"
+                "Outline Color: アウトラインの色"
             );
             break;
         }
@@ -336,6 +341,9 @@ void PostEffectManager::DrawImGui() {
         params_.radialBlur.sampleCount = 10;
         params_.outline.thickness = 1.0f;
         params_.outline.depthSensitivity = 1.0f;
+        params_.outline.outlineColor[0] = 0.0f;
+        params_.outline.outlineColor[1] = 0.0f;
+        params_.outline.outlineColor[2] = 0.0f;
     }
 
     ImGui::End();

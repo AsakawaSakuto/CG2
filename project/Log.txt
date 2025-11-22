@@ -39,3 +39,7 @@
 
 [Log] Compile Succeeded, path:resources/shaders/PostEffect/CopyImage.PS.hlsl, profile:ps_6_0
 
+[Log] Begin CompileShader, path:resources/shaders/PostEffect/Outline.PS.hlsl, profile:ps_6_0
+
+[Log] Compile Succeeded, path:resources/shaders/PostEffect/Outline.PS.hlsl, profile:ps_6_0
+
