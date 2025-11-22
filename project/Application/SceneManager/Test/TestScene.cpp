@@ -93,11 +93,11 @@ void TestScene::DrawImGui() {
 	walkTransform_.DrawImGui("walk");
 	sneakWalkTransform_.DrawImGui("sneakWalk");
 
-	MT4_01_01();
-	MT4_01_02();
-	MT4_01_03();
-	MT4_01_04();
-    MT4_01_05();
+	//MT4_01_01();
+	//MT4_01_02();
+	//MT4_01_03();
+	//MT4_01_04();
+    //MT4_01_05();
 
 #endif
 }

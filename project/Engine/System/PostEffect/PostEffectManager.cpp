@@ -295,23 +295,14 @@ void PostEffectManager::DrawImGui() {
 
     ImGui::Separator();
 
-    // 統計情報
-    if (ImGui::CollapsingHeader("Statistics")) {
-        ImGui::Text("Render Texture: %s", enabled_ ? "Enabled" : "Disabled");
-        ImGui::Text("Current Effect: %s", effectNames[selectedIndex]);
-        if (renderTexture_) {
-            ImGui::Text("Texture Size: %u x %u", renderTexture_->GetWidth(), renderTexture_->GetHeight());
-        }
-    }
-
     // 全パラメータリセット
     ImGui::Separator();
     if (ImGui::Button("Reset All Parameters")) {
         params_.grayscale.intensity = 1.0f;
         params_.sepia.intensity = 1.0f;
-        params_.vignette.strength = 0.8f;
-        params_.vignette.radius = 0.7f;
-        params_.vignette.smoothness = 2.0f;
+        params_.vignette.strength = 1.0f;
+        params_.vignette.radius = 0.2f;
+        params_.vignette.smoothness = 5.0f;
         params_.blur.amount = 1.0f;
         params_.blur.sampleCount = 9;
         params_.outline.thickness = 1.0f;

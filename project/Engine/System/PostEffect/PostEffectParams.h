@@ -3,9 +3,9 @@
 
 // ビネット効果のパラメータ
 struct VignetteParams {
-    float strength = 0.8f;      // 効果の強さ      (0.0～1.0)
-    float radius = 0.7f;        // ビネット開始半径 (0.0～1.0)
-    float smoothness = 2.0f;    // エッジの滑らかさ (1.0～5.0)
+    float strength = 1.0f;      // 効果の強さ      (0.0～1.0)
+    float radius = 0.2f;        // ビネット開始半径 (0.0～1.0)
+    float smoothness = 5.0f;    // エッジの滑らかさ (1.0～5.0)
 };
 
 // ブラー効果のパラメータ
