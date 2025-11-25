@@ -58,7 +58,7 @@ void GameScene::Update() {
 	testParticle_->Update();
 
 	if (collisionManager_->GetGoResult() || ctx_->gamePad.TriggerButton(GamePad::X)) {
-		ChangeScene(SCENE::RESULT);
+		//ChangeScene(SCENE::RESULT);
 	}
 }
 
@@ -69,7 +69,7 @@ void GameScene::Draw() {
 
 	player_->Draw(camera_);
 
-	//testParticle_->Draw(camera_);
+	testParticle_->Draw(camera_);
 
 	collisionManager_->Draw(camera_);
 }

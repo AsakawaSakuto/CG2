@@ -1,7 +1,7 @@
 {
     "alphaFade": 1,
-    "blendMode": 1,
-    "colorFade": 0,
+    "blendMode": 5,
+    "colorFade": 1,
     "colorRandom": 0,
     "coneAngle": 0.0,
     "coneDirection": [
@@ -11,7 +11,7 @@
     ],
     "coneHeight": 0.0,
     "count": 1,
-    "emit": 0,
+    "emit": 1,
     "endColor": [
         0.9264705777168274,
         0.08174736797809601,
@@ -27,8 +27,8 @@
         0.0,
         0.0
     ],
-    "frequency": 0.10000000149011612,
-    "frequencyTime": 0.0833333358168602,
+    "frequency": 0.009999999776482582,
+    "frequencyTime": 0.0,
     "hemisphereAngle": 0.0,
     "isMove": 1,
     "kMaxParticle": 512,
@@ -53,9 +53,9 @@
         1.0
     ],
     "maxVelocity": [
-        0.10000000149011612,
-        3.0,
-        0.10000000149011612
+        2.0,
+        2.0,
+        2.0
     ],
     "minColor": [
         0.0,
@@ -70,9 +70,9 @@
         0.0
     ],
     "minVelocity": [
-        -0.10000000149011612,
-        1.0,
-        -0.10000000149011612
+        -2.0,
+        -2.0,
+        -2.0
     ],
     "normalVelocity": [
         0.0,
@@ -120,9 +120,9 @@
         0.0,
         0.0
     ],
-    "texturePath": "circle3",
+    "texturePath": "smork2",
     "translate": [
-        -0.23000000417232513,
+        -0.1899999976158142,
         2.0,
         0.0
     ],
