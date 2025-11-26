@@ -26,6 +26,7 @@ public:
 	// 武器のリストへのアクセス（const参照）
 	const std::vector<std::unique_ptr<Weapon>>& GetWeapons() const { return weapons_; }
 
+	void PostFrameCleanup();
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Weapon>> weapons_;

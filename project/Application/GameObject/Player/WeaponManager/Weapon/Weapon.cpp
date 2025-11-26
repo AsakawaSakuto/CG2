@@ -11,7 +11,7 @@ void Weapon::Initialize(AppContext* ctx) {
 	status_.size = 1.0f;
 	status_.damage = 10.0f;
 	status_.criticalRand = 10;
-	status_.moveSpeed = 10.0f;
+	status_.moveSpeed = 5.0f;
 	status_.bounceCount = 1;
 	status_.nockBackPower = 0.0f;
 	status_.durationTime = 0.0f;
@@ -50,15 +50,6 @@ void Weapon::Update() {
 	for (auto& bullet : bullets_) {
 		bullet->Update();
 	}
-
-	// 死亡した弾を削除
-	bullets_.erase(
-		std::remove_if(bullets_.begin(), bullets_.end(),
-			[](const std::unique_ptr<Bullet>& bullet) {
-				return !bullet->IsAlive();
-			}),
-		bullets_.end()
-	);
 }
 
 void Weapon::Draw(Camera camera) {
@@ -73,4 +64,15 @@ void Weapon::SetPlayerPosition(const Vector3& position) {
 
 void Weapon::SetDirectionToEnemy(const Vector3& direction) {
 	directionToEnemy_ = direction;
+}
+
+void Weapon::PostFrameCleanup() {
+	// 死亡した弾を削除
+	bullets_.erase(
+		std::remove_if(bullets_.begin(), bullets_.end(),
+			[](const std::unique_ptr<Bullet>& bullet) {
+				return !bullet->IsAlive();
+			}),
+		bullets_.end()
+	);
 }

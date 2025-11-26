@@ -27,8 +27,8 @@ public:
     virtual void Update() = 0;
     virtual void Draw() = 0;
     virtual void DrawImGui() = 0;
+    virtual void PostFrameCleanup() = 0;
     virtual ~IScene() {}
     SCENE GetSceneNo();
-
     void DrawSceneName();
 };

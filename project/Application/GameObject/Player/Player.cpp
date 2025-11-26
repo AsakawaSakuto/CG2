@@ -4,6 +4,10 @@
 #include <algorithm>
 #include <limits>
 
+void Player::PostFrameCleanup() {
+	weaponManager_->PostFrameCleanup();
+}
+
 void Player::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 	transform_.scale = { 1.0f,1.0f,1.0f };

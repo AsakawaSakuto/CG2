@@ -88,3 +88,7 @@ void GameScene::DrawImGui() {
 
 	testParticle_->DrawImGui("fire");
 }
+
+void GameScene::PostFrameCleanup() {
+	player_->PostFrameCleanup();
+}

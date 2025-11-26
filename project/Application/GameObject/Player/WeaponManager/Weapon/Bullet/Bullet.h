@@ -15,7 +15,7 @@ public:
 private:
 
 private:
-    unique_ptr<Model> model_ = make_unique<Model>();
     unique_ptr<Particles> particle_ = make_unique<Particles>();
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
+	GameTimer lifeTimer_;
 };

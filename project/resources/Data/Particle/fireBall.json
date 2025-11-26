@@ -10,7 +10,7 @@
         0.0
     ],
     "coneHeight": 0.0,
-    "count": 1,
+    "count": 10,
     "emit": 1,
     "endColor": [
         0.9264705777168274,
@@ -32,7 +32,7 @@
     "hemisphereAngle": 0.0,
     "isMove": 1,
     "kMaxParticle": 512,
-    "lifeTime": 0.5,
+    "lifeTime": 0.25,
     "lifeTimeRandom": 0,
     "lineLength": 0.0,
     "lineStart": [

@@ -31,3 +31,7 @@ void ResultScene::Draw() {
 void ResultScene::DrawImGui() {
 
 }
+
+void ResultScene::PostFrameCleanup() {
+
+}

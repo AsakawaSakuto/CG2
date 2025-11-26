@@ -316,3 +316,7 @@ void TestScene::MT4_01_05() {
     ImGui::End();
 #endif
 }
+
+void TestScene::PostFrameCleanup() {
+
+}

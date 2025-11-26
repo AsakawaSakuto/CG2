@@ -13,8 +13,8 @@ public:
 	void Update() override;
 	void Draw() override;
 	void DrawImGui() override;
+	void PostFrameCleanup() override;
 	~TestScene();
-
 private:
 
 	// リソースクリーンアップメソッド
