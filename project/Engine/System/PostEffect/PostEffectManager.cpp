@@ -14,7 +14,7 @@ void PostEffectManager::Initialize(DirectXCommon* dxCommon, uint32_t width, uint
 
     // RenderTextureの初期化
     renderTexture_ = std::make_unique<RenderTexture>();
-    float clearColor[4] = { 0.15f, 0.15f, 0.15f, 1.0f };
+    float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     renderTexture_->Initialize(dxCommon_, width, height, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 
     // パラメータ用の定数バッファを作成
@@ -133,6 +133,9 @@ void PostEffectManager::UpdateParams() {
         case PSOType::PostEffect_Grayscale:
             memcpy(mappedData, &params_.grayscale, sizeof(GrayscaleParams));
             break;
+        case PSOType::PostEffect_RadialBlur:
+            memcpy(mappedData, &params_.radialBlur, sizeof(RadialBlurParams));
+            break;
         case PSOType::PostEffect_Outline:
         {
             // Outline用のパラメータを設定
@@ -145,6 +148,16 @@ void PostEffectManager::UpdateParams() {
                 params_.outline.uvStepSize[1] = 1.0f / static_cast<float>(renderTexture_->GetHeight());
             }
             memcpy(mappedData, &params_.outline, sizeof(OutlineParams));
+            break;
+        }
+        case PSOType::PostEffect_Fog:
+        {
+            // Fog用のパラメータを設定
+            if (renderTexture_) {
+                // ProjectionInverse行列を設定
+                params_.fog.projectionInverse = InverseMatrix(projectionMatrix_);
+            }
+            memcpy(mappedData, &params_.fog, sizeof(FogParams));
             break;
         }
         default:
@@ -175,7 +188,9 @@ void PostEffectManager::DrawImGui() {
         "Vignette (周辺減光)",
         "Invert (色反転)",
         "Blur (ぼかし)",
-        "Outline (輪郭検出)"
+        "Radial Blur (放射ブラー)",
+        "Outline (輪郭検出)",
+        "Fog (フォグ)"
     };
 
     int currentEffect = static_cast<int>(effectType_);
@@ -258,18 +273,68 @@ void PostEffectManager::DrawImGui() {
             break;
         }
 
+        case PSOType::PostEffect_RadialBlur:
+        {
+            ImGui::Text("Radial Blur Settings");
+            ImGui::SliderFloat("Center X", &params_.radialBlur.centerX, 0.0f, 0.5f);
+            ImGui::SliderFloat("Center Y", &params_.radialBlur.centerY, 0.0f, 0.5f);
+            ImGui::SliderFloat("Strength", &params_.radialBlur.strength, 0.0f, 100.0f);
+            ImGui::SliderInt("Sample Count", &params_.radialBlur.sampleCount, 1, 100);
+            if (ImGui::Button("Reset##RadialBlur")) {
+                params_.radialBlur.centerX = 0.5f;
+                params_.radialBlur.centerY = 0.5f;
+                params_.radialBlur.strength = 0.1f;
+                params_.radialBlur.sampleCount = 10;
+            }
+            ImGui::TextWrapped(
+                "Center X/Y: ブラーの中心座標\n"
+                "Strength: ブラーの強さ\n"
+                "Sample Count: サンプル数（多いほど綺麗だが重い）"
+            );
+            break;
+        }
+
         case PSOType::PostEffect_Outline:
         {
             ImGui::Text("Outline Settings");
             ImGui::SliderFloat("Thickness", &params_.outline.thickness, 0.5f, 5.0f);
             ImGui::SliderFloat("Depth Sensitivity", &params_.outline.depthSensitivity, 0.1f, 10.0f);
+            ImGui::ColorEdit3("Outline Color", params_.outline.outlineColor);
             if (ImGui::Button("Reset##Outline")) {
                 params_.outline.thickness = 1.0f;
                 params_.outline.depthSensitivity = 1.0f;
+                params_.outline.outlineColor[0] = 0.0f;
+                params_.outline.outlineColor[1] = 0.0f;
+                params_.outline.outlineColor[2] = 0.0f;
             }
             ImGui::TextWrapped(
                 "Thickness: アウトラインの太さ\n"
-                "Depth Sensitivity: 深度差に対する感度（高いほど細かいエッジも検出）"
+                "Depth Sensitivity: 深度差に対する感度（高いほど細かいエッジも検出）\n"
+                "Outline Color: アウトラインの色"
+            );
+            break;
+        }
+
+        case PSOType::PostEffect_Fog:
+        {
+            ImGui::Text("Fog Settings");
+            ImGui::ColorEdit3("Fog Color", params_.fog.fogColor);
+            ImGui::SliderFloat("Fog Start", &params_.fog.fogStart, 0.0f, 100.0f);
+            ImGui::SliderFloat("Fog End", &params_.fog.fogEnd, 0.0f, 100.0f);
+            ImGui::SliderFloat("Fog Density", &params_.fog.fogDensity, 0.0f, 1.0f);
+            if (ImGui::Button("Reset##Fog")) {
+                params_.fog.fogColor[0] = 0.7f;
+                params_.fog.fogColor[1] = 0.7f;
+                params_.fog.fogColor[2] = 0.8f;
+                params_.fog.fogStart = 5.0f;
+                params_.fog.fogEnd = 50.0f;
+                params_.fog.fogDensity = 1.0f;
+            }
+            ImGui::TextWrapped(
+                "Fog Color: フォグの色\n"
+                "Fog Start: フォグ開始距離（カメラからの距離）\n"
+                "Fog End: フォグ終了距離（完全にフォグで覆われる距離）\n"
+                "Fog Density: フォグの濃度（0.0～1.0）"
             );
             break;
         }
@@ -295,27 +360,31 @@ void PostEffectManager::DrawImGui() {
 
     ImGui::Separator();
 
-    // 統計情報
-    if (ImGui::CollapsingHeader("Statistics")) {
-        ImGui::Text("Render Texture: %s", enabled_ ? "Enabled" : "Disabled");
-        ImGui::Text("Current Effect: %s", effectNames[selectedIndex]);
-        if (renderTexture_) {
-            ImGui::Text("Texture Size: %u x %u", renderTexture_->GetWidth(), renderTexture_->GetHeight());
-        }
-    }
-
     // 全パラメータリセット
     ImGui::Separator();
     if (ImGui::Button("Reset All Parameters")) {
         params_.grayscale.intensity = 1.0f;
         params_.sepia.intensity = 1.0f;
-        params_.vignette.strength = 0.8f;
-        params_.vignette.radius = 0.7f;
-        params_.vignette.smoothness = 2.0f;
+        params_.vignette.strength = 1.0f;
+        params_.vignette.radius = 0.2f;
+        params_.vignette.smoothness = 5.0f;
         params_.blur.amount = 1.0f;
         params_.blur.sampleCount = 9;
+        params_.radialBlur.centerX = 0.5f;
+        params_.radialBlur.centerY = 0.5f;
+        params_.radialBlur.strength = 0.1f;
+        params_.radialBlur.sampleCount = 10;
         params_.outline.thickness = 1.0f;
         params_.outline.depthSensitivity = 1.0f;
+        params_.outline.outlineColor[0] = 0.0f;
+        params_.outline.outlineColor[1] = 0.0f;
+        params_.outline.outlineColor[2] = 0.0f;
+        params_.fog.fogColor[0] = 0.7f;
+        params_.fog.fogColor[1] = 0.7f;
+        params_.fog.fogColor[2] = 0.8f;
+        params_.fog.fogStart = 5.0f;
+        params_.fog.fogEnd = 50.0f;
+        params_.fog.fogDensity = 1.0f;
     }
 
     ImGui::End();

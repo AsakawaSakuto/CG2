@@ -17,7 +17,7 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(&ctx_->input);
 	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
-	testParticle_->Initialize(&ctx_->dxCommon);
+	testParticle_->Initialize(&ctx_->dxCommon, 100);
 
 	testSprite_->Initialize(&ctx_->dxCommon, "icon.png", { 64.0f,64.0f });
 
@@ -90,14 +90,13 @@ void TestScene::DrawImGui() {
     auto postEffect = ctx_->dxCommon.GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	walkTransform_.DrawImGui("walk");
-	sneakWalkTransform_.DrawImGui("sneakWalk");
+	testParticle_->DrawImGui("testp");
 
-	MT4_01_01();
-	MT4_01_02();
-	MT4_01_03();
-	MT4_01_04();
-    MT4_01_05();
+	//MT4_01_01();
+	//MT4_01_02();
+	//MT4_01_03();
+	//MT4_01_04();
+    //MT4_01_05();
 
 #endif
 }
@@ -316,4 +315,8 @@ void TestScene::MT4_01_05() {
 
     ImGui::End();
 #endif
+}
+
+void TestScene::PostFrameCleanup() {
+
 }

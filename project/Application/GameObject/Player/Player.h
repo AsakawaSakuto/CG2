@@ -22,6 +22,7 @@ public:
 	// WeaponManagerへのアクセス
 	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
 
+	void PostFrameCleanup();
 private:
 
 	// 移動処理

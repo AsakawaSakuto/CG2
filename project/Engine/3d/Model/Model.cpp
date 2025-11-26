@@ -20,10 +20,35 @@ std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_
 //"resources/uvChecker.png"
 
 Model::~Model() {
-	// 他のマップされたリソースもアンマップ
+	// マップされたリソースを全てアンマップ
 	if (materialResource_ && materialData_) {
 		materialResource_->Unmap(0, nullptr);
 		materialData_ = nullptr;
+	}
+	
+	if (transformationResource_ && transformationData_) {
+		transformationResource_->Unmap(0, nullptr);
+		transformationData_ = nullptr;
+	}
+	
+	if (directionalLightResource_ && directionalLightData_) {
+		directionalLightResource_->Unmap(0, nullptr);
+		directionalLightData_ = nullptr;
+	}
+	
+	if (cameraResource_ && cameraData_) {
+		cameraResource_->Unmap(0, nullptr);
+		cameraData_ = nullptr;
+	}
+	
+	if (pointLightResource_ && pointLightData_) {
+		pointLightResource_->Unmap(0, nullptr);
+		pointLightData_ = nullptr;
+	}
+	
+	if (spotLightResource_ && spotLightData_) {
+		spotLightResource_->Unmap(0, nullptr);
+		spotLightData_ = nullptr;
 	}
 }
 

@@ -4,11 +4,17 @@
 #include <algorithm>
 #include <limits>
 
+void Player::PostFrameCleanup() {
+	weaponManager_->PostFrameCleanup();
+}
+
 void Player::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 	transform_.scale = { 1.0f,1.0f,1.0f };
 
-	model_->Initialize(&ctx_->dxCommon, "player/player.obj");
+	model_->Initialize(&ctx_->dxCommon, "animation/human/walk.gltf");
+	model_->UseLight(false);
+
 	expItemGetRange_->Initialize(&ctx_->dxCommon, "player/expItemGetRange.obj");
 	expItemGetRange_->SetTexture("resources/image/white16x16.png");
 	expItemGetRange_->SetDrawMode(true);

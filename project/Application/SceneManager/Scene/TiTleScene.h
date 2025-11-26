@@ -14,6 +14,7 @@ public:
 	void Update() override;
 	void Draw() override;
 	void DrawImGui() override;
+	void PostFrameCleanup() override;
 	~TitleScene();
 
 private:

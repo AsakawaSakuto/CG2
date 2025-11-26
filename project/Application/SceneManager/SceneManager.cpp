@@ -139,6 +139,8 @@ void SceneManager::Update() {
 
         // 描画後
         appContext_->dxCommon.PostDraw();
+
+        if (curIndex == 2) { sceneArr_[curIndex]->PostFrameCleanup(); }
     }
 }
 

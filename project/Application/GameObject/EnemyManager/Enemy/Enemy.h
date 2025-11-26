@@ -23,5 +23,5 @@ private:
 	float moveSpeed_ = 2.0f; // デフォルトの移動速度
 	float collicionRadius_ = 0.5f;
 
-	GameTimer drawTimer_;
+	GameTimer scaleTimer_;
 };

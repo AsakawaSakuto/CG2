@@ -15,6 +15,13 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 
 	DescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
 
+	// 既に初期化済みの場合は、リソース作成をスキップ
+	if (isInitialized_) {
+		// Emitterの値だけリセット
+		ResetEmitterToDefault();
+		return;
+	}
+
 	idxSrvParticles_ =      alloc.Allocate();
 	idxUavParticles_ =      alloc.Allocate();
 	idxUavFreeListIndex_ =  alloc.Allocate();
@@ -40,6 +47,18 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	kDispatchCount = num;
 
 	// Emitterのデフォルト値
+	ResetEmitterToDefault();
+
+	CreateEmitterResource();
+	CreateParticleResource();
+	CreatePerViewResource();
+	CreatePerFrameResource();
+	
+	isInitialized_ = true;
+}
+
+// 新しいヘルパー関数：Emitterをデフォルト値にリセット
+void Particles::ResetEmitterToDefault() {
 	emitter_.translate = { 0.0f, 0.0f, 0.0f };
 	emitter_.radius = 1.0f;
 	emitter_.useEmitter = 1;
@@ -83,16 +102,39 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	emitter_.alphaFade = 1;
 	emitter_.colorRandom = 1;
 	emitter_.shapeType = static_cast<uint32_t>(EmitterShapeType::POINT);
-	emitter_.texturePath = TextureName;
+	emitter_.texturePath = "";
 	emitter_.blendMode = kBlendModeAdd;
-
-	CreateEmitterResource();
-	CreateParticleResource();
-	CreatePerViewResource();
-	CreatePerFrameResource();
 }
 
 void Particles::Update() {
+
+	// バッファリセットが必要な場合、コンピュートシェーダーで即座にリセット
+	if (needsBufferReset_) {
+		// コマンドリスト上で直接初期化シェーダーを実行（GPU同期なし）
+		D3D12_RESOURCE_BARRIER toUAV = CD3DX12_RESOURCE_BARRIER::Transition(
+			particleBufferResource_.Get(),
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+		);
+		commandList_->ResourceBarrier(1, &toUAV);
+
+		commandList_->SetComputeRootSignature(csRootSignature_.Get());
+		commandList_->SetPipelineState(csInitializePipelineState_.Get());
+		commandList_->SetComputeRootUnorderedAccessView(0, particleBufferResource_->GetGPUVirtualAddress());
+		commandList_->SetComputeRootUnorderedAccessView(1, freeListIndexResource_->GetGPUVirtualAddress());
+		commandList_->SetComputeRootUnorderedAccessView(2, freeListResource_->GetGPUVirtualAddress());
+		commandList_->SetComputeRootConstantBufferView(3, emitterResource_->GetGPUVirtualAddress());
+		commandList_->Dispatch(kDispatchCount, 1, 1);
+
+		D3D12_RESOURCE_BARRIER toSRV = CD3DX12_RESOURCE_BARRIER::Transition(
+			particleBufferResource_.Get(),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE
+		);
+		commandList_->ResourceBarrier(1, &toSRV);
+
+		needsBufferReset_ = false;
+	}
 
 	// ---- カメラ関連の行列計算（PreView構造体に書き込む） ----
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_.GetScale(), camera_.GetRotate(), camera_.GetTranslate());
@@ -178,6 +220,7 @@ void Particles::Draw(Camera& useCamera) {
 
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
 	commandList_->DrawIndexedInstanced(6, kMaxParticles_, 0, 0, 0);
+
 }
 
 void Particles::DrawImGui(const char* objectName) {

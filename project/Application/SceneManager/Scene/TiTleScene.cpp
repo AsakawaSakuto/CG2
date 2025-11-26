@@ -36,3 +36,7 @@ void TitleScene::DrawImGui() {
 	
 	titleUI_->DrawImGui();
 }
+
+void TitleScene::PostFrameCleanup() {
+
+}

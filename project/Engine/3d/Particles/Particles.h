@@ -130,6 +130,17 @@ public:
 	/// </summary>
 	/// <returns>生成中の場合は true、そうでない場合は false を返す</returns>
 	bool IsPlaying() const { return isPlaying_; }
+	
+	/// <summary>
+	/// パーティクルをリセット（プール再利用時用の軽量リセット）
+	/// </summary>
+	void Reset() {
+		Stop();
+		SetEmitterPosition({0.0f, 0.0f, 0.0f});
+		SetOffSet({0.0f, 0.0f, 0.0f});
+		// 次回の描画でGPUバッファをリセット
+		needsBufferReset_ = true;
+	}
 
 	/// <summary>
 	/// JsonFileからEmitterの値を読み込む
@@ -137,7 +148,13 @@ public:
 	/// <param name="filePath">Resources->Data->Particle の中にあるJsonFileのPathを入れる「.jsonは不要」</param>
 	/// <param name="Pathの処理">"resources/Data/Particle/" + (filePath + ".json")</param>
 	void LoadJson(const std::string& filePath) {
-		jsonFilePath_ = "resources/Data/Particle/" + (filePath + ".json");
+		// 既に同じファイルを読み込んでいる場合はスキップ
+		std::string fullPath = "resources/Data/Particle/" + (filePath + ".json");
+		if (jsonFilePath_ == fullPath && isJsonLoaded_) {
+			return;
+		}
+		
+		jsonFilePath_ = fullPath;
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
 		loadToSaveName_ = filePath;
 		
@@ -155,12 +172,16 @@ public:
 				textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 			}
 		}
+		
+		isJsonLoaded_ = true;
 	};
 private:
 
 	void ExecuteInitialization();
 
 	void ResetAllParticles();
+	
+	void ResetEmitterToDefault();
 
 	Camera camera_;
 
@@ -170,6 +191,15 @@ private:
 
 	// パーティクルの再生状態
 	bool isPlaying_ = false;
+	
+	// JSON読み込み済みフラグ
+	bool isJsonLoaded_ = false;
+	
+	// 初期化済みフラグ
+	bool isInitialized_ = false;
+	
+	// バッファリセットが必要かのフラグ
+	bool needsBufferReset_ = false;
 
 	// ParticleのSRV番号
 	uint32_t idxSrvParticles_;

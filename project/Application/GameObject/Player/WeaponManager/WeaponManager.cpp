@@ -18,3 +18,9 @@ void WeaponManager::Draw(Camera camera) {
 		weapon->Draw(camera);
 	}
 }
+
+void WeaponManager::PostFrameCleanup() {
+	for (auto& weapon : weapons_) {
+		weapon->PostFrameCleanup();
+	}
+}
