@@ -1,233 +1,213 @@
 [Log] === Logger Initialized ===
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\Object3d.VS_vs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\Object3d.PS_ps_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\SkinningObject3d.VS_vs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\Particles.VS_vs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\Particles.PS_ps_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\CopyImage.VS_vs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\CopyImage.PS_ps_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/InitializeParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/EmitterParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Particles/UpdateParticle.CS.hlsl, profile:cs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Object3d.VS.hlsl, profile:vs_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
 
-[Log] Begin CompileShader, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
 
-[Log] Compile Succeeded, path:resources/shaders/Object3d.PS.hlsl, profile:ps_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/SkinningObject3d.VS.hlsl, profile:vs_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/SkinningObject3d.VS.hlsl, profile:vs_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/Particles/Particles.VS.hlsl, profile:vs_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/Particles/Particles.VS.hlsl, profile:vs_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/Particles/Particles.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/Particles/Particles.PS.hlsl, profile:ps_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/CopyImage.VS.hlsl, profile:vs_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/CopyImage.VS.hlsl, profile:vs_6_0
-
-[Log] Begin CompileShader, path:resources/shaders/PostEffect/CopyImage.PS.hlsl, profile:ps_6_0
-
-[Log] Compile Succeeded, path:resources/shaders/PostEffect/CopyImage.PS.hlsl, profile:ps_6_0
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
