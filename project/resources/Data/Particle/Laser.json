@@ -10,14 +10,14 @@
         0.0
     ],
     "coneHeight": 0.0,
-    "count": 10,
+    "count": 5,
     "emit": 1,
     "endColor": [
         0.9264705777168274,
         0.08174736797809601,
         0.0
     ],
-    "endRotateVelocity": 0.0,
+    "endRotateVelocity": -3.0,
     "endScale": [
         0.0,
         0.0
@@ -95,7 +95,7 @@
         0.0
     ],
     "ringOuterRadius": 0.0,
-    "rotateMove": 0,
+    "rotateMove": 1,
     "rotateVelocityRandom": 0,
     "scaleFade": 1,
     "scaleRandom": 0,
@@ -110,7 +110,7 @@
         0.2883506119251251,
         0.0
     ],
-    "startRotateVelocity": 0.0,
+    "startRotateVelocity": 3.0,
     "startScale": [
         0.75,
         0.75
