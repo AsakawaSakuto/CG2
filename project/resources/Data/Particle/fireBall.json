@@ -32,7 +32,7 @@
     "hemisphereAngle": 0.0,
     "isMove": 1,
     "kMaxParticle": 512,
-    "lifeTime": 0.25,
+    "lifeTime": 0.10000000149011612,
     "lifeTimeRandom": 0,
     "lineLength": 0.0,
     "lineStart": [
@@ -112,8 +112,8 @@
     ],
     "startRotateVelocity": 0.0,
     "startScale": [
-        1.0,
-        1.0
+        0.75,
+        0.75
     ],
     "startVelocity": [
         0.0,

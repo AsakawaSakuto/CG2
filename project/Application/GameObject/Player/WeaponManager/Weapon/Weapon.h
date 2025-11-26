@@ -3,10 +3,7 @@
 #include "Application/GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
 #include "Application/GameObject/Player/WeaponManager/WeaponStatus.h"
 #include "Camera.h"
-
-//#include "../Application/GameObject/Player/Player.h"
-
-//class Player;
+#include <queue>
 
 class Weapon {
 public:
@@ -23,9 +20,14 @@ public:
 	const std::vector<std::unique_ptr<Bullet>>& GetBullets() const { return bullets_; }
 
 	void PostFrameCleanup();
+	
 private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Bullet>> bullets_;
+	
+	// パーティクルオブジェクトプール
+	std::queue<std::shared_ptr<Particles>> particlePool_;
+	const size_t kMaxPoolSize_ = 20; // プールの最大サイズ
 
 	WeaponStatus status_;
 	GameTimer coolDownTimer_; // クールタイムタイマー
@@ -33,6 +35,9 @@ private:
 
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
-
-	//Player* player_ = nullptr;
+	
+	// プールからパーティクルを取得
+	std::shared_ptr<Particles> AcquireParticleFromPool();
+	// プールにパーティクルを返却
+	void ReturnParticleToPool(std::shared_ptr<Particles> particle);
 };

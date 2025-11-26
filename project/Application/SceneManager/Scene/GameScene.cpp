@@ -30,6 +30,7 @@ void GameScene::Initialize() {
 	testParticle_->Initialize(&ctx_->dxCommon);
 
 	gridModel_->Initialize(&ctx_->dxCommon, "grid/grid.obj");
+	gridModel_->SetTexture("resources/image/uvChecker.png");
 	gridTransform_.translate = { 0.0f,-0.5f,0.0f };
 	gridModel_->SetColor4({ 1.0f,1.0f,1.0f,0.05f });
 }
@@ -44,11 +45,11 @@ void GameScene::Update() {
 	gameCamera_->SetTarget(player_->GetPosition());
 	gameCamera_->Update();
 
-	enemyManager_->SetTargetPosition(player_->GetPosition());
-	enemyManager_->Update();
-	
 	// CollisionManagerで衝突判定を実行
 	collisionManager_->Update();
+
+	enemyManager_->SetTargetPosition(player_->GetPosition());
+	enemyManager_->Update();
 
 	camera_ = gameCamera_->GetCamera();
 	camera_.Update();

@@ -3,9 +3,8 @@
 void Bullet::Initialize(AppContext* ctx) {
     ctx_ = ctx;
 
-	particle_->Initialize(&ctx_->dxCommon);
-	particle_->LoadJson("fireBall");
-
+	// パーティクルは後からSetSharedParticle()で設定される
+	transform_.translate = { 0.0f,0.0f,0.0f };
 	transform_.scale = { 0.5f,0.5f,0.5f };
 
 	lifeTimer_.Start(5.0f, false);
@@ -13,10 +12,12 @@ void Bullet::Initialize(AppContext* ctx) {
 
 void Bullet::Update() {
 
-    transform_.translate += directionToEnemy_ * 50.0f * deltaTime_;
+    transform_.translate += directionToEnemy_ * 25.0f * deltaTime_;
 
-	particle_->SetEmitterPosition(transform_.translate);
-	particle_->Update();
+	if (particle_) {
+		particle_->SetEmitterPosition(transform_.translate);
+		particle_->Update();
+	}
 
 	// Sphere collider update
 	sphereCollision_.center = transform_.translate;
@@ -29,8 +30,9 @@ void Bullet::Update() {
 }
 
 void Bullet::Draw(Camera camera) {
-
-	particle_->Draw(camera);
+	if (isAlive_ && lifeTimer_.GetDuration() >= 0.2f) {
+		particle_->Draw(camera);
+	}
 }
 
 void Bullet::DrawImGui() {
