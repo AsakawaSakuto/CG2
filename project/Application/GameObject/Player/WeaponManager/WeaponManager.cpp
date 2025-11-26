@@ -1,10 +1,15 @@
 #include "WeaponManager.h"
+#include "Application/GameObject/Player/WeaponManager/WeaponName.h"
 
 void WeaponManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 	auto weapon = std::make_unique<Weapon>();
-	weapon->Initialize(ctx_);
+	weapon->Initialize(ctx_, WeaponName::FireBall);
 	weapons_.push_back(std::move(weapon));
+
+	auto weapon2 = std::make_unique<Weapon>();
+	weapon2->Initialize(ctx_, WeaponName::Laser);
+	weapons_.push_back(std::move(weapon2));
 }
 
 void WeaponManager::Update() {

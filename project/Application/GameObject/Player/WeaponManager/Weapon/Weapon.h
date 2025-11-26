@@ -2,12 +2,13 @@
 #include "Application/AppContext.h"
 #include "Application/GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
 #include "Application/GameObject/Player/WeaponManager/WeaponStatus.h"
+#include "Application/GameObject/Player/WeaponManager/WeaponName.h"
 #include "Camera.h"
 #include <queue>
 
 class Weapon {
 public:
-	void Initialize(AppContext* ctx);
+	void Initialize(AppContext* ctx, WeaponName weaponName);
 
 	void Update();
 

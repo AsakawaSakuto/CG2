@@ -1,29 +1,66 @@
 #include "Weapon.h"
 #include <algorithm>
 
-void Weapon::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
 
-	status_.cooldownTime = 2.0f;
-	status_.intervalTime = 0.2f;
-	status_.shotMaxCount = 5;
-	status_.shotNowCount = 0;
-	status_.size = 1.0f;
-	status_.damage = 10.0f;
-	status_.criticalRand = 10;
-	status_.moveSpeed = 5.0f;
-	status_.bounceCount = 1;
-	status_.nockBackPower = 0.0f;
-	status_.durationTime = 0.0f;
-	coolDownTimer_.Start(status_.cooldownTime, false);
-	
-	// パーティクルプールの初期化（重い初期化は最初の一度だけ）
-	for (size_t i = 0; i < kMaxPoolSize_; ++i) {
-		auto particle = std::make_shared<Particles>();
-		particle->Initialize(&ctx_->dxCommon);
-		particle->LoadJson("fireBall");
-		particle->Stop(); // 初期状態は停止
-		particlePool_.push(particle);
+	switch (weaponName)
+	{
+	case WeaponName::FireBall:
+		ctx_ = ctx;
+
+		status_.cooldownTime = 2.0f;
+		status_.intervalTime = 0.2f;
+		status_.shotMaxCount = 5;
+		status_.shotNowCount = 0;
+		status_.size = 1.0f;
+		status_.damage = 10.0f;
+		status_.criticalRand = 10;
+		status_.moveSpeed = 5.0f;
+		status_.bounceCount = 1;
+		status_.nockBackPower = 0.0f;
+		status_.durationTime = 0.0f;
+		coolDownTimer_.Start(status_.cooldownTime, false);
+
+		// パーティクルプールの初期化（重い初期化は最初の一度だけ）
+		for (size_t i = 0; i < kMaxPoolSize_; ++i) {
+			auto particle = std::make_shared<Particles>();
+			particle->Initialize(&ctx_->dxCommon);
+			particle->LoadJson("fireBall");
+			particle->Stop(); // 初期状態は停止
+			particlePool_.push(particle);
+		}
+		break;
+	case WeaponName::Sword:
+		break;
+	case WeaponName::Thunder:
+		break;
+	case WeaponName::Laser:
+		ctx_ = ctx;
+
+		status_.cooldownTime = 5.0f;
+		status_.intervalTime = 0.5f;
+		status_.shotMaxCount = 5;
+		status_.shotNowCount = 0;
+		status_.size = 1.0f;
+		status_.damage = 10.0f;
+		status_.criticalRand = 10;
+		status_.moveSpeed = 5.0f;
+		status_.bounceCount = 1;
+		status_.nockBackPower = 0.0f;
+		status_.durationTime = 0.0f;
+		coolDownTimer_.Start(status_.cooldownTime, false);
+
+		// パーティクルプールの初期化（重い初期化は最初の一度だけ）
+		for (size_t i = 0; i < kMaxPoolSize_; ++i) {
+			auto particle = std::make_shared<Particles>();
+			particle->Initialize(&ctx_->dxCommon);
+			particle->LoadJson("laser");
+			particle->Stop(); // 初期状態は停止
+			particlePool_.push(particle);
+		}
+		break;
+	default:
+		break;
 	}
 }
 

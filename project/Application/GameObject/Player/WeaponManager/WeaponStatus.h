@@ -21,6 +21,7 @@ struct WeaponStatus {
 	float curiticalDamage;   // 武器のクリティカルダメージ率
 	float moveSpeed;         // 武器が着弾するまでの速度
 	int bounceCount;         // 跳弾する回数
+	int penetrationCount;    // 貫通する回数
 	float nockBackPower;     // ノックバックさせる力
 	float durationTime;      // 持続時間
 	WeaponType weaponType;   // 武器のタイプ

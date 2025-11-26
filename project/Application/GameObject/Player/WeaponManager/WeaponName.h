@@ -1,7 +1,8 @@
 #pragma once
 
-enum class WeaponType {
-	Revolver, // ƒŠƒ{ƒ‹ƒo[
-	Sword,    // ƒ\[ƒh
-	Thunder   // ƒTƒ“ƒ_[
+enum class WeaponName {
+	FireBall, // ãƒªãƒœãƒ«ãƒãƒ¼
+	Sword,    // ã‚½ãƒ¼ãƒ‰
+	Thunder,  // ã‚µãƒ³ãƒ€ãƒ¼
+	Laser,    // ãƒ¬ãƒ¼ã‚¶ãƒ¼
 };
