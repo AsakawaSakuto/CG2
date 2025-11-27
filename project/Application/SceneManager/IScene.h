@@ -9,6 +9,8 @@ enum class SCENE {
     TITLE,
     GAME,
     RESULT,
+
+    COUNT,
 };
 
 class IScene {

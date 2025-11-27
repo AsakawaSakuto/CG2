@@ -207,4 +207,11 @@ private:
 
     // 記録時間(FPS固定用)
     std::chrono::steady_clock::time_point reference_;
+
+    // シェーダーキャッシュ関連のヘルパー関数
+    std::wstring GetCacheFilePath(const std::wstring& hlslPath, const wchar_t* profile);
+    bool IsHLSLNewer(const std::wstring& hlslPath, const std::wstring& cachePath);
+    Microsoft::WRL::ComPtr<IDxcBlob> LoadCachedShader(const std::wstring& cachePath);
+    void SaveShaderCache(const std::wstring& cachePath, Microsoft::WRL::ComPtr<IDxcBlob> blob);
+    Microsoft::WRL::ComPtr<IDxcBlob> CompileShaderInternal(const std::wstring& filePath, const wchar_t* profile);
 };

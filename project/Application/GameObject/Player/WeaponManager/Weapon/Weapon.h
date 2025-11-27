@@ -28,7 +28,7 @@ private:
 	
 	// パーティクルオブジェクトプール
 	std::queue<std::shared_ptr<Particles>> particlePool_;
-	const size_t kMaxPoolSize_ = 20; // プールの最大サイズ
+	const size_t kMaxPoolSize_ = 5; // プールの最大サイズ
 
 	WeaponStatus status_;
 	GameTimer coolDownTimer_; // クールタイムタイマー

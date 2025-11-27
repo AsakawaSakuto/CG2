@@ -1,6 +1,9 @@
 #include "TestScene.h"
 #include "../Quaternion/QuaternionFunction.h"
 
+#define WHITE {1.0f,1.0f,1.0f,1.0f}
+#define RED   {1.0f,0.0f,0.0f,1.0f}
+
 TestScene::~TestScene() {
     CleanupResources();
 }
@@ -44,9 +47,41 @@ void TestScene::Initialize() {
 	sneakWalkAnimation_ = LoadAnimationFile("Animation/human/sneakWalk.gltf");
 
 	testTimer_.Start(2.0f, true);
+
+	testLine_->Initialize(&ctx_->dxCommon);
 }
 
 void TestScene::Update() {
+
+    Vector3 start = { 0.0f, 0.0f, 0.0f };
+    Vector3 end = { 1.0f, 1.0f, 1.0f };
+    testLine_->AddLine(walkTransform_.translate, sneakWalkTransform_.translate);
+
+    if (Collision::IsHit(testAABB1_,testAABB2_) || 
+        Collision::IsHit(testAABB1_, testSphere_) ||
+        Collision::IsHit(testAABB2_, testSphere_)) {
+
+        testLine_->AddBox(testAABB1_, RED);
+        testLine_->AddBox(testAABB2_, RED);
+		testLine_->AddSphere(testSphere_, RED);
+        
+    } else {
+
+        testLine_->AddBox(testAABB1_, WHITE);
+        testLine_->AddBox(testAABB2_, WHITE);
+        testLine_->AddSphere(testSphere_, WHITE);
+
+    }
+
+    if (Collision::IsHit(testOBB1_, testOBB2_)) {
+        testLine_->AddBox(testOBB1_, RED);
+        testLine_->AddBox(testOBB2_, RED);
+    } else {
+        testLine_->AddBox(testOBB1_, WHITE);
+        testLine_->AddBox(testOBB2_, WHITE);
+    }
+
+	testLine_->AddGrid(20.0f, 20);
 
 	testParticle_->Update();
 
@@ -73,6 +108,8 @@ void TestScene::Draw() {
     auto postEffect = ctx_->dxCommon.GetPostEffectManager();
     postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 
+	testLine_->Draw(camera_);
+
     cube_->Draw(camera_, cubeTransform_);
     spinCube_->Draw(camera_, spinCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
@@ -91,6 +128,16 @@ void TestScene::DrawImGui() {
 	postEffect->DrawImGui();
 
 	testParticle_->DrawImGui("testp");
+
+	walkTransform_.DrawImGui("walk");
+	sneakWalkTransform_.DrawImGui("sneakWalk");
+
+	testOBB1_.DrawImGui("testOBB1");
+    testOBB2_.DrawImGui("testOBB2");
+
+    testAABB1_.DrawImGui("testAABB1");
+    testAABB2_.DrawImGui("testAABB2");
+    testSphere_.DrawImGui("testSphere");
 
 	//MT4_01_01();
 	//MT4_01_02();

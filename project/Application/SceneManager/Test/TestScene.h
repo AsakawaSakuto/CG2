@@ -1,6 +1,7 @@
 #pragma once
 #include"Application/EngineSystem.h"
 #include"Application/SceneManager/IScene.h"
+#include"Engine/System/Utility/Math/OBB.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -39,6 +40,8 @@ private:
 	unique_ptr<Model> walk_ = make_unique<Model>();
 	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
 
+	unique_ptr<Line> testLine_ = make_unique<Line>();
+
 	Transform cubeTransform_;
 	Transform spinCubeTransform_;
 	Transform simpleSkinTransform_;
@@ -52,4 +55,10 @@ private:
 
 	Camera camera_;
 	DebugCamera debugCamera_;
+
+	Sphere testSphere_;
+	AABB testAABB1_;
+	AABB testAABB2_;
+	OBB testOBB1_;
+	OBB testOBB2_;
 };

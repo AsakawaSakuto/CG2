@@ -1,8 +1,8 @@
 {
     "alphaFade": 1,
-    "blendMode": 5,
-    "colorFade": 0,
-    "colorRandom": 1,
+    "blendMode": 2,
+    "colorFade": 1,
+    "colorRandom": 0,
     "coneAngle": 0.0,
     "coneDirection": [
         0.0,
@@ -10,17 +10,17 @@
         0.0
     ],
     "coneHeight": 0.0,
-    "count": 5,
+    "count": 10,
     "emit": 1,
     "endColor": [
-        0.9264705777168274,
-        0.08174736797809601,
-        0.0
+        0.25836214423179626,
+        0.5148246884346008,
+        0.5490195751190186
     ],
     "endRotateVelocity": -3.0,
     "endScale": [
-        0.0,
-        0.0
+        0.25,
+        0.25
     ],
     "endVelocity": [
         0.0,
@@ -32,7 +32,7 @@
     "hemisphereAngle": 0.0,
     "isMove": 1,
     "kMaxParticle": 512,
-    "lifeTime": 0.5,
+    "lifeTime": 1.0,
     "lifeTimeRandom": 0,
     "lineLength": 0.0,
     "lineStart": [
@@ -41,8 +41,8 @@
         0.0
     ],
     "maxColor": [
-        0.0,
-        0.23529411852359772,
+        1.0,
+        1.0,
         1.0
     ],
     "maxLifeTime": 5.0,
@@ -53,9 +53,9 @@
         1.0
     ],
     "maxVelocity": [
-        2.0,
-        2.0,
-        2.0
+        0.0,
+        1.0,
+        0.0
     ],
     "minColor": [
         0.0,
@@ -70,9 +70,9 @@
         0.0
     ],
     "minVelocity": [
-        -2.0,
-        -2.0,
-        -2.0
+        0.0,
+        0.0,
+        0.0
     ],
     "normalVelocity": [
         0.0,
@@ -88,27 +88,27 @@
     "planeWidth": 0.0,
     "radius": 1.0,
     "ringAngle": 0.0,
-    "ringInnerRadius": 0.0,
+    "ringInnerRadius": 2.0,
     "ringNormal": [
         0.0,
         0.0,
         0.0
     ],
-    "ringOuterRadius": 0.0,
+    "ringOuterRadius": 2.0,
     "rotateMove": 1,
-    "rotateVelocityRandom": 0,
+    "rotateVelocityRandom": 1,
     "scaleFade": 1,
     "scaleRandom": 0,
-    "shapeType": 0,
+    "shapeType": 6,
     "size": [
         0.0,
         0.0,
         0.0
     ],
     "startColor": [
-        0.9803921580314636,
-        0.2883506119251251,
-        0.0
+        0.23039215803146362,
+        0.8189162015914917,
+        1.0
     ],
     "startRotateVelocity": 3.0,
     "startScale": [
@@ -120,10 +120,10 @@
         0.0,
         0.0
     ],
-    "texturePath": "box3",
+    "texturePath": "ice",
     "translate": [
-        -0.1899999976158142,
-        2.0,
+        4.429999828338623,
+        0.0,
         0.0
     ],
     "useEmitter": 1,

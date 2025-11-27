@@ -36,4 +36,7 @@ enum class PSOType {
     PostEffect_RadialBlur,
     PostEffect_Outline,
     PostEffect_Fog,
+
+    // Line用（デバッグ表示・可視化）
+    Line_Normal,
 };

@@ -1,5 +1,7 @@
 #include"DirectXCommon.h"
 #include<cassert>
+#include<filesystem>
+#include<fstream>
 
 #include "../Engine/System/HeapManager/DescriptorAllocator.h" 
 #include "Engine/System/DirectXCommon/ExeColor.h"
@@ -499,6 +501,133 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(
 }
 
 ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
+    // キャッシュファイルのパスを生成
+    std::wstring cachePath = GetCacheFilePath(filePath, profile);
+
+#ifdef _DEBUG
+    // Debugビルド: HLSLが更新されていれば再コンパイル、なければキャッシュを使用
+    if (IsHLSLNewer(filePath, cachePath)) {
+        Logger::Log(ConvertString(std::format(L"[Cache] Recompiling shader: {}\n", filePath)));
+        auto blob = CompileShaderInternal(filePath, profile);
+        SaveShaderCache(cachePath, blob);
+        return blob;
+    }
+    else {
+        Logger::Log(ConvertString(std::format(L"[Cache] Loading cached shader: {}\n", cachePath)));
+        auto blob = LoadCachedShader(cachePath);
+        if (blob) {
+            return blob;
+        }
+        // キャッシュ読み込み失敗時は再コンパイル
+        Logger::Log(ConvertString(std::format(L"[Cache] Failed to load cache, recompiling: {}\n", filePath)));
+        blob = CompileShaderInternal(filePath, profile);
+        SaveShaderCache(cachePath, blob);
+        return blob;
+    }
+#else
+    // Releaseビルド: キャッシュを優先、無い場合は警告を出して再コンパイル
+    Logger::Log(ConvertString(std::format(L"[Cache] Loading cached shader (Release): {}\n", cachePath)));
+    auto blob = LoadCachedShader(cachePath);
+    if (blob) {
+        return blob;
+    }
+    
+    // キャッシュが無い場合は警告を出して再コンパイル
+    Logger::Log(ConvertString(std::format(L"[WARNING] Shader cache not found in Release build, recompiling: {}\n", filePath)));
+    OutputDebugStringW(std::format(L"[WARNING] Missing shader cache: {}\n", cachePath).c_str());
+    
+    blob = CompileShaderInternal(filePath, profile);
+    SaveShaderCache(cachePath, blob);
+    return blob;
+#endif
+}
+
+std::wstring DirectXCommon::GetCacheFilePath(const std::wstring& hlslPath, const wchar_t* profile) {
+    // resources/shaders/cache/ ディレクトリにキャッシュを保存
+    std::filesystem::path cacheDirPath = L"resources/shaders/cache";
+    
+    // キャッシュディレクトリが存在しない場合は作成
+    if (!std::filesystem::exists(cacheDirPath)) {
+        std::filesystem::create_directories(cacheDirPath);
+    }
+    
+    // HLSL ファイル名を取得
+    std::filesystem::path hlslFilePath(hlslPath);
+    std::wstring fileName = hlslFilePath.stem().wstring();
+    
+    // プロファイル名から . を _ に置換（ファイル名として使用するため）
+    std::wstring profileStr(profile);
+    std::replace(profileStr.begin(), profileStr.end(), L'.', L'_');
+    
+    // キャッシュファイル名: <ファイル名>_<プロファイル>.cso
+    std::wstring cacheFileName = fileName + L"_" + profileStr + L".cso";
+    
+    return (cacheDirPath / cacheFileName).wstring();
+}
+
+bool DirectXCommon::IsHLSLNewer(const std::wstring& hlslPath, const std::wstring& cachePath) {
+    namespace fs = std::filesystem;
+    
+    // キャッシュファイルが存在しない場合は再コンパイルが必要
+    if (!fs::exists(cachePath)) {
+        return true;
+    }
+    
+    // タイムスタンプを比較
+    auto hlslTime = fs::last_write_time(hlslPath);
+    auto cacheTime = fs::last_write_time(cachePath);
+    
+    // HLSL が新しい場合は再コンパイルが必要
+    return hlslTime > cacheTime;
+}
+
+Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::LoadCachedShader(const std::wstring& cachePath) {
+    namespace fs = std::filesystem;
+    
+    // キャッシュファイルが存在しない場合
+    if (!fs::exists(cachePath)) {
+        return nullptr;
+    }
+    
+    // ファイルサイズを取得
+    size_t fileSize = static_cast<size_t>(fs::file_size(cachePath));
+    
+    // ファイルを読み込む
+    std::ifstream file(cachePath, std::ios::binary);
+    if (!file) {
+        return nullptr;
+    }
+    
+    // バッファに読み込み
+    std::vector<char> buffer(fileSize);
+    file.read(buffer.data(), fileSize);
+    file.close();
+    
+    // IDxcBlobEncoding を作成
+    ComPtr<IDxcBlobEncoding> blob;
+    hr_ = dxcUtils_->CreateBlob(buffer.data(), static_cast<UINT32>(fileSize), DXC_CP_ACP, &blob);
+    if (FAILED(hr_)) {
+        return nullptr;
+    }
+    
+    return blob;
+}
+
+void DirectXCommon::SaveShaderCache(const std::wstring& cachePath, Microsoft::WRL::ComPtr<IDxcBlob> blob) {
+    // ファイルに書き込む
+    std::ofstream file(cachePath, std::ios::binary);
+    if (!file) {
+        Logger::Log(ConvertString(std::format(L"[Cache] Failed to save cache: {}\n", cachePath)));
+        return;
+    }
+    
+    file.write(static_cast<const char*>(blob->GetBufferPointer()), blob->GetBufferSize());
+    file.close();
+    
+    Logger::Log(ConvertString(std::format(L"[Cache] Saved cache: {}\n", cachePath)));
+}
+
+Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShaderInternal(const std::wstring& filePath, const wchar_t* profile) {
 
 #pragma region 1 hlslファイルを読む
 
@@ -508,7 +637,11 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
     ComPtr<IDxcBlobEncoding> shaderSource;
     hr_ = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
     // 読めなかったら止める
-    assert(SUCCEEDED(hr_));
+    if (FAILED(hr_)) {
+        Logger::Log(ConvertString(std::format(L"[ERROR] Failed to load shader file: {}\n", filePath)));
+        OutputDebugStringW(std::format(L"[ERROR] Failed to load shader file: {}\n", filePath).c_str());
+        assert(SUCCEEDED(hr_));
+    }
     // 読み込んだファイルの内容を設定する
     DxcBuffer shaderSourceBuffer;
     shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
@@ -539,7 +672,11 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
     );
 
     // コンパイルエラーではなくdxcが起動できないなど致命的な状況
-    assert(SUCCEEDED(hr_));
+    if (FAILED(hr_)) {
+        Logger::Log(ConvertString(std::format(L"[ERROR] DXC compilation failed for: {}\n", filePath)));
+        OutputDebugStringW(std::format(L"[ERROR] DXC compilation failed for: {}\n", filePath).c_str());
+        assert(SUCCEEDED(hr_));
+    }
 
 #pragma endregion
 
@@ -551,6 +688,7 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
     if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
         OutputDebugStringA(shaderError->GetStringPointer()); // ←これ追加
         Logger::Log(shaderError->GetStringPointer());
+        Logger::Log(ConvertString(std::format(L"[ERROR] Shader compilation error in: {}\n", filePath)));
         // 署名：エラーメッセタイ
         assert(false);
     }
@@ -562,7 +700,11 @@ ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, cons
     // コンパイル結果から実行用のバイナリ部分を取得
     ComPtr<IDxcBlob> shaderBlob;
     hr_ = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-    assert(SUCCEEDED(hr_));
+    if (FAILED(hr_)) {
+        Logger::Log(ConvertString(std::format(L"[ERROR] Failed to get shader blob for: {}\n", filePath)));
+        OutputDebugStringW(std::format(L"[ERROR] Failed to get shader blob for: {}\n", filePath).c_str());
+        assert(SUCCEEDED(hr_));
+    }
     // 成功したらログを作成
     Logger::Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
     // もう使わないリソースを解放

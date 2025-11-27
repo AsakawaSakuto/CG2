@@ -1,0 +1,437 @@
+#include "Line.h"
+#include "Engine/System/PSOManager/PSOManager.h"
+#include "Engine/System/Utility/MathFunction/MathFunction.h"
+#include <cmath>
+#include <numbers>
+#include <cassert>
+#include <cstring>
+
+void Line::Initialize(DirectXCommon* dxCommon) {
+    dxCommon_ = dxCommon;
+    device_ = dxCommon_->GetDevice();
+    commandList_ = dxCommon_->GetCommandList();
+
+    // 頂点バッファを予め確保
+    vertices_.reserve(maxVertices_);
+
+    // リソース作成
+    CreateVertexBuffer();
+    CreateTransformBuffer();
+}
+
+Line::~Line() {
+    if (vertexBuffer_) {
+        vertexBuffer_->Unmap(0, nullptr);
+    }
+    if (transformBuffer_) {
+        transformBuffer_->Unmap(0, nullptr);
+    }
+}
+
+void Line::AddLine(const Vector3& start, const Vector3& end, const Vector4& color) {
+    // 頂点を追加
+    vertices_.push_back({ start, color });
+    vertices_.push_back({ end, color });
+}
+
+void Line::AddLines(const std::vector<Vector3>& points, const Vector4& color) {
+    if (points.size() < 2) return;
+
+    for (size_t i = 0; i < points.size() - 1; ++i) {
+        AddLine(points[i], points[i + 1], color);
+    }
+}
+
+void Line::AddGrid(float size, int divisions, const Vector4& color) {
+    float step = size / divisions;
+    float halfSize = size * 0.5f;
+
+    // X軸方向の線（Z軸に平行な線）
+    for (int i = 0; i <= divisions; ++i) {
+        float z = -halfSize + step * i;
+        
+        // 原点を通る線（X軸、Z=0）は赤色
+        Vector4 lineColor = (std::abs(z) < 0.001f) ? Vector4{ 1.0f, 0.0f, 0.0f, 1.0f } : color;
+        
+        AddLine(
+            { -halfSize, 0.0f, z },
+            { halfSize, 0.0f, z },
+            lineColor
+        );
+    }
+
+    // Z軸方向の線（X軸に平行な線）
+    for (int i = 0; i <= divisions; ++i) {
+        float x = -halfSize + step * i;
+        
+        // 原点を通る線（Z軸、X=0）は緑色
+        Vector4 lineColor = (std::abs(x) < 0.001f) ? Vector4{ 0.0f, 1.0f, 0.0f, 1.0f } : color;
+        
+        AddLine(
+            { x, 0.0f, -halfSize },
+            { x, 0.0f, halfSize },
+            lineColor
+        );
+    }
+}
+
+void Line::AddBox(const Vector3& center, const Vector3& size, const Vector4& color) {
+    Vector3 halfSize = { size.x * 0.5f, size.y * 0.5f, size.z * 0.5f };
+
+    // 8つの頂点
+    Vector3 vertices[8] = {
+        { center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z }, // 0: 左下前
+        { center.x + halfSize.x, center.y - halfSize.y, center.z - halfSize.z }, // 1: 右下前
+        { center.x + halfSize.x, center.y + halfSize.y, center.z - halfSize.z }, // 2: 右上前
+        { center.x - halfSize.x, center.y + halfSize.y, center.z - halfSize.z }, // 3: 左上前
+        { center.x - halfSize.x, center.y - halfSize.y, center.z + halfSize.z }, // 4: 左下奥
+        { center.x + halfSize.x, center.y - halfSize.y, center.z + halfSize.z }, // 5: 右下奥
+        { center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z }, // 6: 右上奥
+        { center.x - halfSize.x, center.y + halfSize.y, center.z + halfSize.z }  // 7: 左上奥
+    };
+
+    // 前面
+    AddLine(vertices[0], vertices[1], color);
+    AddLine(vertices[1], vertices[2], color);
+    AddLine(vertices[2], vertices[3], color);
+    AddLine(vertices[3], vertices[0], color);
+
+    // 背面
+    AddLine(vertices[4], vertices[5], color);
+    AddLine(vertices[5], vertices[6], color);
+    AddLine(vertices[6], vertices[7], color);
+    AddLine(vertices[7], vertices[4], color);
+
+    // 側面
+    AddLine(vertices[0], vertices[4], color);
+    AddLine(vertices[1], vertices[5], color);
+    AddLine(vertices[2], vertices[6], color);
+    AddLine(vertices[3], vertices[7], color);
+}
+
+void Line::AddBox(const AABB& aabb, const Vector4& color) {
+    // centerとsizeからワールド座標のminとmaxを計算
+    Vector3 worldMin = { 
+        aabb.center.x - aabb.size.x * 0.5f, 
+        aabb.center.y - aabb.size.y * 0.5f, 
+        aabb.center.z - aabb.size.z * 0.5f 
+    };
+    Vector3 worldMax = { 
+        aabb.center.x + aabb.size.x * 0.5f, 
+        aabb.center.y + aabb.size.y * 0.5f, 
+        aabb.center.z + aabb.size.z * 0.5f 
+    };
+    
+    // AABBのmin/maxから8つの頂点を定義
+    Vector3 vertices[8] = {
+        { worldMin.x, worldMin.y, worldMin.z }, // 0: 左下前
+        { worldMax.x, worldMin.y, worldMin.z }, // 1: 右下前
+        { worldMax.x, worldMax.y, worldMin.z }, // 2: 右上前
+        { worldMin.x, worldMax.y, worldMin.z }, // 3: 左上前
+        { worldMin.x, worldMin.y, worldMax.z }, // 4: 左下奥
+        { worldMax.x, worldMin.y, worldMax.z }, // 5: 右下奥
+        { worldMax.x, worldMax.y, worldMax.z }, // 6: 右上奥
+        { worldMin.x, worldMax.y, worldMax.z }  // 7: 左上奥
+    };
+
+    // 前面（z = min）
+    AddLine(vertices[0], vertices[1], color);
+    AddLine(vertices[1], vertices[2], color);
+    AddLine(vertices[2], vertices[3], color);
+    AddLine(vertices[3], vertices[0], color);
+
+    // 背面（z = max）
+    AddLine(vertices[4], vertices[5], color);
+    AddLine(vertices[5], vertices[6], color);
+    AddLine(vertices[6], vertices[7], color);
+    AddLine(vertices[7], vertices[4], color);
+
+    // 側面の辺（前面と背面を繋ぐ）
+    AddLine(vertices[0], vertices[4], color);
+    AddLine(vertices[1], vertices[5], color);
+    AddLine(vertices[2], vertices[6], color);
+    AddLine(vertices[3], vertices[7], color);
+}
+
+void Line::AddBox(const OBB& obb, const Vector4& color) {
+    // OBBのローカル座標系での8つの頂点を計算
+    Vector3 halfSize = { obb.size.x * 0.5f, obb.size.y * 0.5f, obb.size.z * 0.5f };
+    
+    // ローカル座標系での8つのコーナー（中心を原点とする）
+    Vector3 localVertices[8] = {
+        { -halfSize.x, -halfSize.y, -halfSize.z }, // 0: 左下前
+        {  halfSize.x, -halfSize.y, -halfSize.z }, // 1: 右下前
+        {  halfSize.x,  halfSize.y, -halfSize.z }, // 2: 右上前
+        { -halfSize.x,  halfSize.y, -halfSize.z }, // 3: 左上前
+        { -halfSize.x, -halfSize.y,  halfSize.z }, // 4: 左下奥
+        {  halfSize.x, -halfSize.y,  halfSize.z }, // 5: 右下奥
+        {  halfSize.x,  halfSize.y,  halfSize.z }, // 6: 右上奥
+        { -halfSize.x,  halfSize.y,  halfSize.z }  // 7: 左上奥
+    };
+    
+    // ワールド座標系へ変換（orientation行列を使用して回転し、centerで平行移動）
+    Vector3 worldVertices[8];
+    for (int i = 0; i < 8; ++i) {
+        // orientation[0], orientation[1], orientation[2]はそれぞれX, Y, Z軸の基底ベクトル
+        worldVertices[i] = {
+            obb.center.x + localVertices[i].x * obb.orientation[0].x + localVertices[i].y * obb.orientation[1].x + localVertices[i].z * obb.orientation[2].x,
+            obb.center.y + localVertices[i].x * obb.orientation[0].y + localVertices[i].y * obb.orientation[1].y + localVertices[i].z * obb.orientation[2].y,
+            obb.center.z + localVertices[i].x * obb.orientation[0].z + localVertices[i].y * obb.orientation[1].z + localVertices[i].z * obb.orientation[2].z
+        };
+    }
+    
+    // 前面（z = min）
+    AddLine(worldVertices[0], worldVertices[1], color);
+    AddLine(worldVertices[1], worldVertices[2], color);
+    AddLine(worldVertices[2], worldVertices[3], color);
+    AddLine(worldVertices[3], worldVertices[0], color);
+
+    // 背面（z = max）
+    AddLine(worldVertices[4], worldVertices[5], color);
+    AddLine(worldVertices[5], worldVertices[6], color);
+    AddLine(worldVertices[6], worldVertices[7], color);
+    AddLine(worldVertices[7], worldVertices[4], color);
+
+    // 側面の辺（前面と背面を繋ぐ）
+    AddLine(worldVertices[0], worldVertices[4], color);
+    AddLine(worldVertices[1], worldVertices[5], color);
+    AddLine(worldVertices[2], worldVertices[6], color);
+    AddLine(worldVertices[3], worldVertices[7], color);
+}
+
+void Line::AddSphere(const Sphere& sphere, const Vector4& color) {
+    const float pi = std::numbers::pi_v<float>;
+    const int latitudeDivisions = 4;  // 緯度の分割数（水平方向の円の数）
+    const int longitudeDivisions = 8; // 経度の分割数（垂直方向の線の数）
+
+    // 経度線（縦の円）を描画
+    for (int i = 0; i < longitudeDivisions; ++i) {
+        float longitude = (2.0f * pi * i) / longitudeDivisions;
+        
+        // Y軸周りに回転した円を描画
+        for (int j = 0; j < segments_; ++j) {
+            float latitude1 = (-pi / 2.0f) + (pi * j) / segments_;
+            float latitude2 = (-pi / 2.0f) + (pi * (j + 1)) / segments_;
+
+            Vector3 p1 = {
+                sphere.center.x + sphere.radius * std::cos(latitude1) * std::cos(longitude),
+                sphere.center.y + sphere.radius * std::sin(latitude1),
+                sphere.center.z + sphere.radius * std::cos(latitude1) * std::sin(longitude)
+            };
+            Vector3 p2 = {
+                sphere.center.x + sphere.radius * std::cos(latitude2) * std::cos(longitude),
+                sphere.center.y + sphere.radius * std::sin(latitude2),
+                sphere.center.z + sphere.radius * std::cos(latitude2) * std::sin(longitude)
+            };
+            AddLine(p1, p2, color);
+        }
+    }
+
+    // 緯度線（横の円）を描画
+    for (int i = 1; i < latitudeDivisions; ++i) {
+        float latitude = (-pi / 2.0f) + (pi * i) / latitudeDivisions;
+        float y = sphere.radius * std::sin(latitude);
+        float circleRadius = sphere.radius * std::cos(latitude);
+
+        // 各緯度での円を描画
+        for (int j = 0; j < segments_; ++j) {
+            float angle1 = (2.0f * pi * j) / segments_;
+            float angle2 = (2.0f * pi * (j + 1)) / segments_;
+
+            Vector3 p1 = {
+                sphere.center.x + circleRadius * std::cos(angle1),
+                sphere.center.y + y,
+                sphere.center.z + circleRadius * std::sin(angle1)
+            };
+            Vector3 p2 = {
+                sphere.center.x + circleRadius * std::cos(angle2),
+                sphere.center.y + y,
+                sphere.center.z + circleRadius * std::sin(angle2)
+            };
+            AddLine(p1, p2, color);
+        }
+    }
+}
+
+void Line::AddCircle(const Vector3& center, float radius, const Vector3& normal, const Vector4& color) {
+    const float pi = std::numbers::pi_v<float>;
+
+    // 法線から適当な接線ベクトルを作成
+    Vector3 tangent;
+    if (std::abs(normal.x) < 0.9f) {
+        tangent = Normalize(Cross({ 1.0f, 0.0f, 0.0f }, normal));
+    } else {
+        tangent = Normalize(Cross({ 0.0f, 1.0f, 0.0f }, normal));
+    }
+    Vector3 bitangent = Normalize(Cross(normal, tangent));
+
+    // 円を描画
+    for (int i = 0; i < segments_; ++i) {
+        float angle1 = (2.0f * pi * i) / segments_;
+        float angle2 = (2.0f * pi * (i + 1)) / segments_;
+
+        Vector3 offset1 = {
+            tangent.x * std::cos(angle1) + bitangent.x * std::sin(angle1),
+            tangent.y * std::cos(angle1) + bitangent.y * std::sin(angle1),
+            tangent.z * std::cos(angle1) + bitangent.z * std::sin(angle1)
+        };
+        Vector3 offset2 = {
+            tangent.x * std::cos(angle2) + bitangent.x * std::sin(angle2),
+            tangent.y * std::cos(angle2) + bitangent.y * std::sin(angle2),
+            tangent.z * std::cos(angle2) + bitangent.z * std::sin(angle2)
+        };
+
+        Vector3 p1 = {
+            center.x + offset1.x * radius,
+            center.y + offset1.y * radius,
+            center.z + offset1.z * radius
+        };
+        Vector3 p2 = {
+            center.x + offset2.x * radius,
+            center.y + offset2.y * radius,
+            center.z + offset2.z * radius
+        };
+
+        AddLine(p1, p2, color);
+    }
+}
+
+void Line::AddCircleXZ(const Vector3& center, float radius, const Vector4& color) {
+	AddCircle(center, radius, { 0.0f, 1.0f, 0.0f }, color);
+}
+
+void Line::AddRay(const Vector3& origin, const Vector3& direction, float length, const Vector4& color) {
+    Vector3 end = {
+        origin.x + direction.x * length,
+        origin.y + direction.y * length,
+        origin.z + direction.z * length
+    };
+    AddLine(origin, end, color);
+}
+
+void Line::Draw(Camera& camera) {
+
+    if (vertices_.empty()) return;
+
+    // 頂点バッファの更新が必要な場合は再作成
+    if (vertices_.size() * sizeof(LineVertex) > vertexBuffer_->GetDesc().Width) {
+        maxVertices_ = vertices_.size() * 2; // 余裕を持たせる
+        CreateVertexBuffer();
+    }
+
+    // 頂点データを更新
+    UpdateVertexBuffer();
+
+    // 変換行列を更新
+    Matrix4x4 viewProjectionMatrix = MultiplyMatrix(camera.GetViewMatrix(), camera.GetProjectionMatrix());
+    transformData_->viewProjection = viewProjectionMatrix;
+
+    // PSOManagerからPSOを取得
+    auto psoManager = &PSOManager::GetInstance();
+    auto pso = psoManager->GetPSO(PSOType::Line_Normal);
+    auto rootSignature = psoManager->GetRootSignature("Line");
+
+    // 描画コマンド
+    commandList_->SetGraphicsRootSignature(rootSignature.Get());
+    commandList_->SetPipelineState(pso.Get());
+
+    // プリミティブトポロジーを設定（ラインリスト）
+    commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+
+    // 頂点バッファビューを設定
+    commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
+    // 変換行列を設定
+    commandList_->SetGraphicsRootConstantBufferView(0, transformBuffer_->GetGPUVirtualAddress());
+
+    // 描画
+    commandList_->DrawInstanced(static_cast<UINT>(vertices_.size()), 1, 0, 0);
+
+	// 描画後に頂点データをクリア
+    vertices_.clear();
+}
+
+void Line::CreateVertexBuffer() {
+    // 既存のバッファがあればアンマップ
+    if (vertexBuffer_ && vertexData_) {
+        vertexBuffer_->Unmap(0, nullptr);
+        vertexData_ = nullptr;
+    }
+
+    // 頂点バッファのサイズ
+    size_t sizeInBytes = maxVertices_ * sizeof(LineVertex);
+
+    // ヒーププロパティ
+    D3D12_HEAP_PROPERTIES heapProps{};
+    heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    // リソース設定
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    resourceDesc.Width = sizeInBytes;
+    resourceDesc.Height = 1;
+    resourceDesc.DepthOrArraySize = 1;
+    resourceDesc.MipLevels = 1;
+    resourceDesc.SampleDesc.Count = 1;
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+    // リソース生成
+    HRESULT hr = device_->CreateCommittedResource(
+        &heapProps,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&vertexBuffer_)
+    );
+    assert(SUCCEEDED(hr));
+
+    // マップ
+    vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+
+    // 頂点バッファビューを作成
+    vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
+    vertexBufferView_.SizeInBytes = static_cast<UINT>(sizeInBytes);
+    vertexBufferView_.StrideInBytes = sizeof(LineVertex);
+}
+
+void Line::CreateTransformBuffer() {
+    // 既存のバッファがあればアンマップ
+    if (transformBuffer_ && transformData_) {
+        transformBuffer_->Unmap(0, nullptr);
+        transformData_ = nullptr;
+    }
+
+    // ヒーププロパティ
+    D3D12_HEAP_PROPERTIES heapProps{};
+    heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    // リソース設定
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    resourceDesc.Width = sizeof(TransformMatrix);
+    resourceDesc.Height = 1;
+    resourceDesc.DepthOrArraySize = 1;
+    resourceDesc.MipLevels = 1;
+    resourceDesc.SampleDesc.Count = 1;
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+    // リソース生成
+    HRESULT hr = device_->CreateCommittedResource(
+        &heapProps,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&transformBuffer_)
+    );
+    assert(SUCCEEDED(hr));
+
+    // マップ
+    transformBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&transformData_));
+}
+
+void Line::UpdateVertexBuffer() {
+    // 頂点データをコピー
+    std::memcpy(vertexData_, vertices_.data(), vertices_.size() * sizeof(LineVertex));
+}

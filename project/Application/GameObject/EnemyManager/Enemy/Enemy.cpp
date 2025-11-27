@@ -5,7 +5,7 @@ void Enemy::Initialize(AppContext* ctx) {
 	transform_.scale = { 1.0f,1.0f,1.0f };
 	transform_.translate = { 0.0f,0.0f,0.0f };
 
-	model_->Initialize(&ctx_->dxCommon, "enemy/enemy.obj");
+	model_->Initialize(&ctx_->dxCommon, "Animation/human/walk.gltf");
 	model_->SetUpdateFrustumCulling(false);
 	//model_->SetDrawFrustumCulling(false);
 
@@ -13,6 +13,8 @@ void Enemy::Initialize(AppContext* ctx) {
 	collicionRadius_ = 0.5f;
 
 	scaleTimer_.Start(0.5f, false);
+
+	debugLine_->Initialize(&ctx_->dxCommon);
 }
 
 void Enemy::Update() {
@@ -28,10 +30,14 @@ void Enemy::Update() {
 	sphereCollision_.radius = collicionRadius_;
 
 	scaleTimer_.Update();
+
+	debugLine_->AddSphere(sphereCollision_);
 }
 
 void Enemy::Draw(Camera camera) {
 	if (scaleTimer_.GetProgress() >= 0.1f) {
+		debugLine_->Draw(camera);
+
 		model_->Draw(camera, transform_);
 	}
 }
