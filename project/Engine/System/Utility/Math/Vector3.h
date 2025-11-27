@@ -4,7 +4,7 @@
 #include <iostream>
 
 /// <summary>
-/// 3次元ベクトルを表す構造体
+/// 3次元ベクトル
 /// </summary>
 struct Vector3 {
     float x;

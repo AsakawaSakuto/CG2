@@ -22,6 +22,7 @@
 #include "../Model/Model.h"
 #include "Particles.h"
 #include "EmitterState.h"
+#include "Engine/3d/Line/Line.h"
 
 // Math
 #include "Vector2.h"

@@ -25,6 +25,8 @@ void Player::Initialize(AppContext* ctx) {
 	landingParticle_->LoadJson("playerLanding");
 
 	weaponManager_->Initialize(ctx_);
+
+	debugLine_->Initialize(&ctx_->dxCommon);
 }
 
 void Player::Update() {
@@ -58,11 +60,16 @@ void Player::Update() {
 
 	expItemStateChangeCollision_.center = transform_.translate;
 	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
+
+	debugLine_->AddSphere(sphereCollision_);
 }
 
 void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
+
+	debugLine_->Draw(camera);
+
 	model_->Draw(camera, transform_);
 
 	expItemGetRange_->Draw(camera, expGetRangeTransform_);

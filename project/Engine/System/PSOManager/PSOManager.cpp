@@ -113,25 +113,25 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
     // タイプ別の設定
     switch (type) {
         case PSOType::Model_Solid_Normal:
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             break;
             
         case PSOType::Model_Wireframe_Normal:
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             params.rasterizerState = CreateRasterizerState("Wireframe");
             break;
             
         case PSOType::Model_Solid_Add:
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("Add");
             break;
 
         case PSOType::Model_Alpha_Normal: // 追加: 透明モデル用
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("Normal"); // アルファブレンド
             params.depthStencilState = CreateDepthStencilState("Particle"); // 深度書き込み無効
             params.rasterizerState = CreateRasterizerState("Solid_NoCull"); // 両面表示
@@ -140,39 +140,39 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
         case PSOType::SkinningModel_Solid_Normal:
             params.rootSignature = GetRootSignature("Skinning"); // Skinning専用RootSignature
             params.inputLayout = CreateInputLayout("Skinning"); // Skinning専用InputLayout
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/SkinningObject3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/SkinningObject3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             break;
             
         case PSOType::SkinningModel_Solid_Add:
             params.rootSignature = GetRootSignature("Skinning"); // Skinning専用RootSignature
             params.inputLayout = CreateInputLayout("Skinning"); // Skinning専用InputLayout
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/SkinningObject3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/SkinningObject3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("Add");
             break;
             
         case PSOType::SkinningModel_Wireframe_Normal:
             params.rootSignature = GetRootSignature("Skinning"); // Skinning専用RootSignature
             params.inputLayout = CreateInputLayout("Skinning"); // Skinning専用InputLayout
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/SkinningObject3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/SkinningObject3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             params.rasterizerState = CreateRasterizerState("Wireframe");
             break;
             
         case PSOType::SkinningModel_Alpha_Normal:
             params.rootSignature = GetRootSignature("Skinning"); // Skinning専用RootSignature
             params.inputLayout = CreateInputLayout("Skinning"); // Skinning専用InputLayout
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/SkinningObject3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/SkinningObject3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             params.blendState = CreateBlendState("Normal"); // アルファブレンド
             params.depthStencilState = CreateDepthStencilState("Particle"); // 深度書き込み無効
             params.rasterizerState = CreateRasterizerState("Solid_NoCull"); // 両面表示
             break;
             
         case PSOType::Sprite_Normal:
-            params.vertexShader = GetOrCompileShader(L"resources/shaders/Object3d.VS.hlsl", L"vs_6_0");
-            params.pixelShader = GetOrCompileShader(L"resources/shaders/Object3d.PS.hlsl", L"ps_6_0");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Model/Object3d.PS.hlsl", L"ps_6_0");
             params.depthStencilState = CreateDepthStencilState("Sprite");
             break;
             
@@ -343,7 +343,17 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthEnable = FALSE; // 深度無効
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
-            
+
+        case PSOType::Line_Normal:
+            params.rootSignature = GetRootSignature("Line");
+            params.inputLayout = CreateInputLayout("Line");
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/Line/Line.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/Line/Line.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("Normal");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState = CreateDepthStencilState("Normal");
+            params.topologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+            break;
         default:
             assert(false && "Unknown PSO type");
             break;
@@ -777,6 +787,37 @@ void PSOManager::CreateRootSignatures() {
 
         rootSignatures_["Offscreen"] = rootSignature;
     }
+
+    // Line用のRoot Signature（シンプル: b0のみ）
+    {
+        D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+        descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+        // Root Parameters (1個: ViewProjection行列のみ)
+        D3D12_ROOT_PARAMETER rootParameters[1] = {};
+        
+        // b0: ViewProjection Matrix (VS)
+        rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+        rootParameters[0].Descriptor.ShaderRegister = 0;
+
+        descriptionRootSignature.pParameters = rootParameters;
+        descriptionRootSignature.NumParameters = _countof(rootParameters);
+
+        Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+        HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+            D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+        assert(SUCCEEDED(hr));
+
+        Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+        hr = dxCommon_->GetDevice()->CreateRootSignature(0,
+            signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+            IID_PPV_ARGS(&rootSignature));
+        assert(SUCCEEDED(hr));
+
+        rootSignatures_["Line"] = rootSignature;
+    }
 }
 
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOInternal(const PSOCreateParams& params) {
@@ -941,7 +982,34 @@ D3D12_DEPTH_STENCIL_DESC PSOManager::CreateDepthStencilState(const std::string& 
 
 D3D12_INPUT_LAYOUT_DESC PSOManager::CreateInputLayout(const std::string& layoutType) {
 
-    if (layoutType == "Skinning") {
+    if (layoutType == "Line") {
+
+        // Line用の入力レイアウト（2要素: POSITION + COLOR）
+        static D3D12_INPUT_ELEMENT_DESC lineInputElementDescs[2] = {};
+
+        // POSITION
+        lineInputElementDescs[0].SemanticName = "POSITION";
+        lineInputElementDescs[0].SemanticIndex = 0;
+        lineInputElementDescs[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        lineInputElementDescs[0].InputSlot = 0;
+        lineInputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+        lineInputElementDescs[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+        lineInputElementDescs[0].InstanceDataStepRate = 0;
+
+        // COLOR
+        lineInputElementDescs[1].SemanticName = "COLOR";
+        lineInputElementDescs[1].SemanticIndex = 0;
+        lineInputElementDescs[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        lineInputElementDescs[1].InputSlot = 0;
+        lineInputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+        lineInputElementDescs[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+        lineInputElementDescs[1].InstanceDataStepRate = 0;
+
+        D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
+        inputLayoutDesc.pInputElementDescs = lineInputElementDescs;
+        inputLayoutDesc.NumElements = _countof(lineInputElementDescs);
+        return inputLayoutDesc;
+    } else if (layoutType == "Skinning") {
 
         // Skinning用の入力レイアウト（5要素: 通常の3つ + WEIGHT + INDEX）
         static D3D12_INPUT_ELEMENT_DESC skinningInputElementDescs[5] = {};

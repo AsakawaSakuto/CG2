@@ -44,9 +44,20 @@ void TestScene::Initialize() {
 	sneakWalkAnimation_ = LoadAnimationFile("Animation/human/sneakWalk.gltf");
 
 	testTimer_.Start(2.0f, true);
+
+	testLine_->Initialize(&ctx_->dxCommon);
 }
 
 void TestScene::Update() {
+
+    Vector3 start = { 0.0f, 0.0f, 0.0f };
+    Vector3 end = { 1.0f, 1.0f, 1.0f };
+    testLine_->AddLine(walkTransform_.translate, sneakWalkTransform_.translate);
+
+    testLine_->AddBox(testAABB_, { 1.0f, 1.0f, 1.0f, 1.0f });
+	testLine_->AddSphere(testSphere_);
+
+	testLine_->AddGrid(20.0f, 20);
 
 	testParticle_->Update();
 
@@ -73,6 +84,8 @@ void TestScene::Draw() {
     auto postEffect = ctx_->dxCommon.GetPostEffectManager();
     postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 
+	testLine_->Draw(camera_);
+
     cube_->Draw(camera_, cubeTransform_);
     spinCube_->Draw(camera_, spinCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
@@ -91,6 +104,12 @@ void TestScene::DrawImGui() {
 	postEffect->DrawImGui();
 
 	testParticle_->DrawImGui("testp");
+
+	walkTransform_.DrawImGui("walk");
+	sneakWalkTransform_.DrawImGui("sneakWalk");
+
+	testAABB_.DrawImGui("testAABB");
+	testSphere_.DrawImGui("testSphere");
 
 	//MT4_01_01();
 	//MT4_01_02();

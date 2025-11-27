@@ -4,6 +4,7 @@
 #include"Sphere.h"
 #include"Transform.h"
 #include"Camera.h"
+#include"Engine/3d/Line/Line.h"
 
 class BaseGameObject {
 protected:
@@ -14,6 +15,8 @@ protected:
 	Transform transform_;
     AABB aabbCollision_;
 	Sphere sphereCollision_;
+
+	std::unique_ptr<Line> debugLine_ = std::make_unique<Line>();
 public:
     virtual void Initialize(AppContext* ctx) = 0;
     virtual void Update() = 0;

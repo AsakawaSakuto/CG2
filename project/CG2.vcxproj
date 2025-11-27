@@ -169,6 +169,7 @@
     <ClCompile Include="Application\SceneManager\Scene\ResultScene.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\TiTleScene.cpp" />
     <ClCompile Include="Application\SceneManager\Test\TestScene.cpp" />
+    <ClCompile Include="Engine\3d\Line\Line.cpp" />
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Engine\System\HeapManager\DescriptorAllocator.cpp" />
     <ClCompile Include="Engine\3d\Particles\Json\EmitterStateLoder.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="Application\SceneManager\Scene\ResultScene.h" />
     <ClInclude Include="Application\SceneManager\Scene\TiTleScene.h" />
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
+    <ClInclude Include="Engine\3d\Line\Line.h" />
     <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
     <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
@@ -335,12 +337,12 @@
     <ClInclude Include="Engine\System\Utility\Random\Random.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
+    <FxCompile Include="resources\shaders\Model\Object3d.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Object3d.VS.hlsl">
+    <FxCompile Include="resources\shaders\Model\Object3d.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
@@ -373,10 +375,11 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="docs\Line_Usage.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
-    <None Include="resources\shaders\Object3d.hlsli">
+    <None Include="resources\shaders\Model\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>

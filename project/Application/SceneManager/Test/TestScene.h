@@ -39,6 +39,8 @@ private:
 	unique_ptr<Model> walk_ = make_unique<Model>();
 	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
 
+	unique_ptr<Line> testLine_ = make_unique<Line>();
+
 	Transform cubeTransform_;
 	Transform spinCubeTransform_;
 	Transform simpleSkinTransform_;
@@ -52,4 +54,7 @@ private:
 
 	Camera camera_;
 	DebugCamera debugCamera_;
+
+	Sphere testSphere_;
+	AABB testAABB_;
 };
