@@ -31,8 +31,11 @@ void GameScene::Initialize() {
 
 	gridModel_->Initialize(&ctx_->dxCommon, "grid/grid.obj");
 	gridModel_->SetTexture("resources/image/uvChecker.png");
+	gridModel_->UseLight(false);
+	gridModel_->SetColor4({ 0.0f,0.0f,0.0f,1.0f });
 	gridTransform_.translate = { 0.0f,-0.5f,0.0f };
-	gridModel_->SetColor4({ 1.0f,1.0f,1.0f,0.05f });
+
+	testLine_->Initialize(&ctx_->dxCommon);
 }
 
 void GameScene::Update() {
@@ -61,9 +64,13 @@ void GameScene::Update() {
 	if (collisionManager_->GetGoResult() || ctx_->gamePad.TriggerButton(GamePad::X)) {
 		//ChangeScene(SCENE::RESULT);
 	}
+
+	testLine_->AddGrid(100.0f, 20);
 }
 
 void GameScene::Draw() {
+	testLine_->Draw(camera_);
+
 	gridModel_->Draw(camera_, gridTransform_);
 
 	enemyManager_->Draw(camera_);

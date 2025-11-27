@@ -166,6 +166,5 @@
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
-    <None Include="docs\Line_Usage.md" />
   </ItemGroup>
 </Project>

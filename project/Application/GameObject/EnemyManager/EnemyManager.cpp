@@ -4,7 +4,7 @@
 
 void EnemyManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
-	spawnTimer_.Start(0.5f, true);
+	spawnTimer_.Start(0.25f, true);
 
 	dieParticle_ = std::make_unique<Particles>();
 	dieParticle_->Initialize(&ctx_->dxCommon);
@@ -12,7 +12,7 @@ void EnemyManager::Initialize(AppContext* ctx) {
 }
 
 void EnemyManager::Update() {
-	if (enemies_.size() < 300) {
+	if (enemies_.size() < 50) {
 		spawnTimer_.Update();
 
 		if (spawnTimer_.IsFinished()) {

@@ -2,6 +2,12 @@
 #include "Application/EngineSystem.h"
 #include "Application/GameObject/BaseGameObject.h"
 
+enum class BulletType {
+    None,
+    Penetration,
+    Bounce,
+};
+
 class Bullet : public BaseGameObject {
 public:
     void Initialize(AppContext* ctx) override;
@@ -11,32 +17,55 @@ public:
 
     void SetPosition(const Vector3& position);
     void SetDirectionToEnemy(const Vector3& direction);
-    
-    void StopParticle() {
-        if (particle_) {
-            particle_->Stop();
-        }
-	}
+	void SetSpeed(float speed) { speed_ = speed; }
 
-    // 共有パーティクルを設定
-    void SetSharedParticle(std::shared_ptr<Particles> particle) {
-        particle_ = particle;
-        if (particle_) {
-            // パーティクルの位置を現在のBullet位置に設定してから再生
-			particle_->Stop();
-            particle_->SetEmitterPosition(transform_.translate);
-            particle_->Play(true); // ワンショット再生
+	BulletType GetBulletType() const { return bulletType_; }
+
+    void LoadJson(const std::string& filePath, const std::string& filePath2 = "none") {
+        particle_->LoadJson(filePath);
+        particle2_->LoadJson(filePath2);
+    }
+
+    // 貫通カウント関連
+    void SetPenetrationCount(int count) { penetrationCount_ = count; }
+    void DecrementPenetrationCount() { 
+        if (penetrationCount_ > 0) {
+            penetrationCount_--;
         }
     }
-    
-    // パーティクルを解放して返す（プール返却用）
-    std::shared_ptr<Particles> ReleaseParticle() {
-        return std::move(particle_);
+
+    // 反射カウント関連
+    void SetBounceCount(int count) { bounceCount_ = count; }
+    void DecrementBounceCount() {
+        if (bounceCount_ > 0) {
+            bounceCount_--;
+
+            Random rand;
+			int n = rand.Int(0,2);
+
+            if (n == 0) {
+                directionToEnemy_.x *= -1.0f;
+            }
+
+            if (n == 1) {
+                directionToEnemy_.z *= -1.0f;
+            }
+
+            if (n == 2) {
+                directionToEnemy_.x *= -1.0f;
+                directionToEnemy_.z *= -1.0f;
+            }
+        }
     }
 
 private:
-    // shared_ptrに変更して共有可能にする
-    std::shared_ptr<Particles> particle_;
+	unique_ptr<Particles> particle_ = make_unique<Particles>();
+    unique_ptr<Particles> particle2_ = make_unique<Particles>();
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
 	GameTimer lifeTimer_;
+    int penetrationCount_ = 0; // 貫通カウント
+    int bounceCount_ = 0;
+
+	float speed_ = 25.0f;
+	BulletType bulletType_ = BulletType::None;
 };

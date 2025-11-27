@@ -376,7 +376,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="docs\Line_Usage.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />

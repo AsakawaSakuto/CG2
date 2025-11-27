@@ -58,7 +58,7 @@ public:
     /// <param name="size">グリッドサイズ</param>
     /// <param name="divisions">分割数</param>
     /// <param name="color">色（デフォルト：白）</param>
-    void AddGrid(float size = 10.0f, int divisions = 10, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+    void AddGrid(float size = 10.0f, int divisions = 10, const Vector4& color = { 0.25f, 0.25f, 0.25f, 1.0f });
 
     /// <summary>
     /// ボックス（中心とサイズで指定）描画

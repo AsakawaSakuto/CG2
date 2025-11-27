@@ -26,19 +26,11 @@ private:
 	AppContext* ctx_;
 	std::vector<std::unique_ptr<Bullet>> bullets_;
 	
-	// パーティクルオブジェクトプール
-	std::queue<std::shared_ptr<Particles>> particlePool_;
-	const size_t kMaxPoolSize_ = 5; // プールの最大サイズ
-
+	WeaponName weaponName_;
 	WeaponStatus status_;
 	GameTimer coolDownTimer_; // クールタイムタイマー
 	GameTimer intervalTimer_; // 攻撃間隔タイマー
 
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
-	
-	// プールからパーティクルを取得
-	std::shared_ptr<Particles> AcquireParticleFromPool();
-	// プールにパーティクルを返却
-	void ReturnParticleToPool(std::shared_ptr<Particles> particle);
 };

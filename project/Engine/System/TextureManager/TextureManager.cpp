@@ -81,9 +81,14 @@ Vector2 TextureManager::GetTextureSize(const std::string& filePath) {
             [&](const TextureData& data) {
                 return data.filePath == filePath;
             });
+        
+        // ★★★ ロード後も見つからない場合は緊急処理 ★★★
+        if (it == textureDatas_.end()) {
+            Logger::Error("FATAL: Texture not found after loading: " + filePath);
+            // デフォルトサイズを返す（クラッシュ防止）
+            return Vector2{ 1.0f, 1.0f };
+        }
     }
-
-    assert(it != textureDatas_.end() && "Texture not found after loading");
     
     return Vector2{
         static_cast<float>(it->matadata.width),
@@ -116,7 +121,9 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     std::wstring filePathW = ConvertString(filePath);
 
     if (!std::filesystem::exists(filePathW)) {
-        Logger::Log("File not found: " + filePath);
+        Logger::Error("Texture file not found: " + filePath);
+        // ★★★ ファイルが存在しない場合は処理を中断 ★★★
+        return;
     }
 
     HRESULT hr = DirectX::LoadFromWICFile(
@@ -124,7 +131,11 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         DirectX::WIC_FLAGS_FORCE_SRGB,
         nullptr,
         image);
-    assert(SUCCEEDED(hr));
+    
+    if (FAILED(hr)) {
+        Logger::Error("Failed to load texture (WIC): " + filePath);
+        return; // ★★★ 読み込み失敗時は処理を中断 ★★★
+    }
 
     // ミップマップ生成
     DirectX::ScratchImage mipImages{};
@@ -135,7 +146,11 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         DirectX::TEX_FILTER_SRGB,
         0,
         mipImages);
-    assert(SUCCEEDED(hr));
+    
+    if (FAILED(hr)) {
+        Logger::Error("Failed to generate mipmaps: " + filePath);
+        return; // ★★★ ミップマップ生成失敗時は処理を中断 ★★★
+    }
 
     // 新規テクスチャデータを追加
     textureDatas_.emplace_back();

@@ -1,8 +1,9 @@
 #pragma once
 
 enum class WeaponName {
-	FireBall, // リボルバー
+	FireBall, // ファイヤーボール
+	Laser,    // レーザー
+	Runa,     // ルナ
 	Sword,    // ソード
 	Thunder,  // サンダー
-	Laser,    // レーザー
 };

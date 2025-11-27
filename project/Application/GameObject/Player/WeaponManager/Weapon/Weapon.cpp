@@ -3,10 +3,12 @@
 
 void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
 
-	switch (weaponName)
+	ctx_ = ctx;
+	weaponName_ = weaponName;
+
+	switch (weaponName_)
 	{
 	case WeaponName::FireBall:
-		ctx_ = ctx;
 
 		status_.cooldownTime = 2.0f;
 		status_.intervalTime = 0.2f;
@@ -15,87 +17,58 @@ void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
 		status_.size = 1.0f;
 		status_.damage = 10.0f;
 		status_.criticalRand = 10;
-		status_.moveSpeed = 5.0f;
-		status_.bounceCount = 1;
+		status_.moveSpeed = 15.0f;
+		status_.bounceCount = 0;
+		status_.penetrationCount = 0;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
-		// パーティクルプールの初期化（重い初期化は最初の一度だけ）
-		for (size_t i = 0; i < kMaxPoolSize_; ++i) {
-			auto particle = std::make_shared<Particles>();
-			particle->Initialize(&ctx_->dxCommon);
-			particle->LoadJson("fireBall");
-			particle->Stop(); // 初期状態は停止
-			particlePool_.push(particle);
-		}
 		break;
-	case WeaponName::Sword:
-		break;
-	case WeaponName::Thunder:
-		break;
+
 	case WeaponName::Laser:
-		ctx_ = ctx;
 
 		status_.cooldownTime = 5.0f;
 		status_.intervalTime = 0.5f;
-		status_.shotMaxCount = 5;
+		status_.shotMaxCount = 1;
 		status_.shotNowCount = 0;
 		status_.size = 1.0f;
 		status_.damage = 10.0f;
 		status_.criticalRand = 10;
-		status_.moveSpeed = 5.0f;
-		status_.bounceCount = 1;
+		status_.moveSpeed = 20.0f;
+		status_.bounceCount = 0;
+		status_.penetrationCount = 99;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
-		// パーティクルプールの初期化（重い初期化は最初の一度だけ）
-		for (size_t i = 0; i < kMaxPoolSize_; ++i) {
-			auto particle = std::make_shared<Particles>();
-			particle->Initialize(&ctx_->dxCommon);
-			particle->LoadJson("laser");
-			particle->Stop(); // 初期状態は停止
-			particlePool_.push(particle);
-		}
+		break;
+
+	case WeaponName::Runa:
+
+		status_.cooldownTime = 3.0f;
+		status_.intervalTime = 1.0f;
+		status_.shotMaxCount = 2;
+		status_.shotNowCount = 0;
+		status_.size = 1.0f;
+		status_.damage = 10.0f;
+		status_.criticalRand = 10;
+		status_.moveSpeed = 7.5f;
+		status_.bounceCount = 3;
+		status_.penetrationCount = 0;
+		status_.nockBackPower = 0.0f;
+		status_.durationTime = 0.0f;
+		coolDownTimer_.Start(status_.cooldownTime, false);
+
+		break;
+
+	case WeaponName::Sword:
+		break;
+	case WeaponName::Thunder:
 		break;
 	default:
 		break;
 	}
-}
-
-std::shared_ptr<Particles> Weapon::AcquireParticleFromPool() {
-	std::shared_ptr<Particles> particle;
-	
-	if (!particlePool_.empty()) {
-		particle = particlePool_.front();
-		particlePool_.pop();
-	} else {
-		// プールが空の場合は新規作成（通常は発生しないが、念のため）
-		particle = std::make_shared<Particles>();
-		particle->Initialize(&ctx_->dxCommon);
-		particle->LoadJson("fireBall");
-	}
-	
-	// パーティクルの状態を完全にリセット（軽量版）
-	particle->Reset();
-	
-	return particle;
-}
-
-void Weapon::ReturnParticleToPool(std::shared_ptr<Particles> particle) {
-	if (!particle) {
-		return; // nullチェック
-	}
-	
-	// パーティクルを完全にリセット
-	particle->Reset();
-	
-	// プールサイズの上限チェック
-	if (particlePool_.size() < kMaxPoolSize_) {
-		particlePool_.push(particle);
-	}
-	// 上限を超えた場合は破棄される（shared_ptrなので自動削除）
 }
 
 void Weapon::Update() {
@@ -114,8 +87,21 @@ void Weapon::Update() {
 		bullet->Initialize(ctx_);
 		bullet->SetPosition(playerPosition_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
-		// プールからパーティクルを取得
-		bullet->SetSharedParticle(AcquireParticleFromPool());
+		bullet->SetSpeed(status_.moveSpeed);
+		switch (weaponName_)
+		{
+		case WeaponName::FireBall:
+			bullet->LoadJson("fireBall", "fireBall2");
+			break;
+		case WeaponName::Laser:
+			bullet->LoadJson("laser", "laser2");
+			bullet->SetPenetrationCount(status_.penetrationCount);
+			break;
+		case WeaponName::Runa:
+			bullet->LoadJson("runa","runa2");
+			bullet->SetBounceCount(status_.bounceCount);
+			break;
+		}
 		bullets_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
@@ -153,8 +139,6 @@ void Weapon::PostFrameCleanup() {
 	auto it = bullets_.begin();
 	while (it != bullets_.end()) {
 		if (!(*it)->IsAlive()) {
-			// パーティクルをプールに返却
-			ReturnParticleToPool((*it)->ReleaseParticle());
 			it = bullets_.erase(it);
 		} else {
 			++it;

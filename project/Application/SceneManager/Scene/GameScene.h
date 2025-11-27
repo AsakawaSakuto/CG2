@@ -43,4 +43,6 @@ private:
 	unique_ptr<CollisionManager> collisionManager_ = make_unique<CollisionManager>();
 
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
+
+	unique_ptr<Line> testLine_ = make_unique<Line>();
 };
