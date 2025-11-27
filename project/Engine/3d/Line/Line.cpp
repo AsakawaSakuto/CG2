@@ -110,16 +110,16 @@ void Line::AddBox(const Vector3& center, const Vector3& size, const Vector4& col
 }
 
 void Line::AddBox(const AABB& aabb, const Vector4& color) {
-    // centerを基準にワールド座標のminとmaxを計算
+    // centerとsizeからワールド座標のminとmaxを計算
     Vector3 worldMin = { 
-        aabb.center.x + aabb.min.x, 
-        aabb.center.y + aabb.min.y, 
-        aabb.center.z + aabb.min.z 
+        aabb.center.x - aabb.size.x * 0.5f, 
+        aabb.center.y - aabb.size.y * 0.5f, 
+        aabb.center.z - aabb.size.z * 0.5f 
     };
     Vector3 worldMax = { 
-        aabb.center.x + aabb.max.x, 
-        aabb.center.y + aabb.max.y, 
-        aabb.center.z + aabb.max.z 
+        aabb.center.x + aabb.size.x * 0.5f, 
+        aabb.center.y + aabb.size.y * 0.5f, 
+        aabb.center.z + aabb.size.z * 0.5f 
     };
     
     // AABBのmin/maxから8つの頂点を定義
@@ -153,61 +153,103 @@ void Line::AddBox(const AABB& aabb, const Vector4& color) {
     AddLine(vertices[3], vertices[7], color);
 }
 
+void Line::AddBox(const OBB& obb, const Vector4& color) {
+    // OBBのローカル座標系での8つの頂点を計算
+    Vector3 halfSize = { obb.size.x * 0.5f, obb.size.y * 0.5f, obb.size.z * 0.5f };
+    
+    // ローカル座標系での8つのコーナー（中心を原点とする）
+    Vector3 localVertices[8] = {
+        { -halfSize.x, -halfSize.y, -halfSize.z }, // 0: 左下前
+        {  halfSize.x, -halfSize.y, -halfSize.z }, // 1: 右下前
+        {  halfSize.x,  halfSize.y, -halfSize.z }, // 2: 右上前
+        { -halfSize.x,  halfSize.y, -halfSize.z }, // 3: 左上前
+        { -halfSize.x, -halfSize.y,  halfSize.z }, // 4: 左下奥
+        {  halfSize.x, -halfSize.y,  halfSize.z }, // 5: 右下奥
+        {  halfSize.x,  halfSize.y,  halfSize.z }, // 6: 右上奥
+        { -halfSize.x,  halfSize.y,  halfSize.z }  // 7: 左上奥
+    };
+    
+    // ワールド座標系へ変換（orientation行列を使用して回転し、centerで平行移動）
+    Vector3 worldVertices[8];
+    for (int i = 0; i < 8; ++i) {
+        // orientation[0], orientation[1], orientation[2]はそれぞれX, Y, Z軸の基底ベクトル
+        worldVertices[i] = {
+            obb.center.x + localVertices[i].x * obb.orientation[0].x + localVertices[i].y * obb.orientation[1].x + localVertices[i].z * obb.orientation[2].x,
+            obb.center.y + localVertices[i].x * obb.orientation[0].y + localVertices[i].y * obb.orientation[1].y + localVertices[i].z * obb.orientation[2].y,
+            obb.center.z + localVertices[i].x * obb.orientation[0].z + localVertices[i].y * obb.orientation[1].z + localVertices[i].z * obb.orientation[2].z
+        };
+    }
+    
+    // 前面（z = min）
+    AddLine(worldVertices[0], worldVertices[1], color);
+    AddLine(worldVertices[1], worldVertices[2], color);
+    AddLine(worldVertices[2], worldVertices[3], color);
+    AddLine(worldVertices[3], worldVertices[0], color);
+
+    // 背面（z = max）
+    AddLine(worldVertices[4], worldVertices[5], color);
+    AddLine(worldVertices[5], worldVertices[6], color);
+    AddLine(worldVertices[6], worldVertices[7], color);
+    AddLine(worldVertices[7], worldVertices[4], color);
+
+    // 側面の辺（前面と背面を繋ぐ）
+    AddLine(worldVertices[0], worldVertices[4], color);
+    AddLine(worldVertices[1], worldVertices[5], color);
+    AddLine(worldVertices[2], worldVertices[6], color);
+    AddLine(worldVertices[3], worldVertices[7], color);
+}
+
 void Line::AddSphere(const Sphere& sphere, const Vector4& color) {
     const float pi = std::numbers::pi_v<float>;
+    const int latitudeDivisions = 4;  // 緯度の分割数（水平方向の円の数）
+    const int longitudeDivisions = 8; // 経度の分割数（垂直方向の線の数）
 
-    // _XY平面の円
-    for (int i = 0; i < segments_; ++i) {
-        float angle1 = (2.0f * pi * i) / segments_;
-        float angle2 = (2.0f * pi * (i + 1)) / segments_;
+    // 経度線（縦の円）を描画
+    for (int i = 0; i < longitudeDivisions; ++i) {
+        float longitude = (2.0f * pi * i) / longitudeDivisions;
+        
+        // Y軸周りに回転した円を描画
+        for (int j = 0; j < segments_; ++j) {
+            float latitude1 = (-pi / 2.0f) + (pi * j) / segments_;
+            float latitude2 = (-pi / 2.0f) + (pi * (j + 1)) / segments_;
 
-        Vector3 p1 = {
-            sphere.center.x + sphere.radius * std::cos(angle1),
-            sphere.center.y + sphere.radius * std::sin(angle1),
-            sphere.center.z
-        };
-        Vector3 p2 = {
-            sphere.center.x + sphere.radius * std::cos(angle2),
-            sphere.center.y + sphere.radius * std::sin(angle2),
-            sphere.center.z
-        };
-        AddLine(p1, p2, color);
+            Vector3 p1 = {
+                sphere.center.x + sphere.radius * std::cos(latitude1) * std::cos(longitude),
+                sphere.center.y + sphere.radius * std::sin(latitude1),
+                sphere.center.z + sphere.radius * std::cos(latitude1) * std::sin(longitude)
+            };
+            Vector3 p2 = {
+                sphere.center.x + sphere.radius * std::cos(latitude2) * std::cos(longitude),
+                sphere.center.y + sphere.radius * std::sin(latitude2),
+                sphere.center.z + sphere.radius * std::cos(latitude2) * std::sin(longitude)
+            };
+            AddLine(p1, p2, color);
+        }
     }
 
-    // _XZ平面の円
-    for (int i = 0; i < segments_; ++i) {
-        float angle1 = (2.0f * pi * i) / segments_;
-        float angle2 = (2.0f * pi * (i + 1)) / segments_;
+    // 緯度線（横の円）を描画
+    for (int i = 1; i < latitudeDivisions; ++i) {
+        float latitude = (-pi / 2.0f) + (pi * i) / latitudeDivisions;
+        float y = sphere.radius * std::sin(latitude);
+        float circleRadius = sphere.radius * std::cos(latitude);
 
-        Vector3 p1 = {
-            sphere.center.x + sphere.radius * std::cos(angle1),
-            sphere.center.y,
-            sphere.center.z + sphere.radius * std::sin(angle1)
-        };
-        Vector3 p2 = {
-            sphere.center.x + sphere.radius * std::cos(angle2),
-            sphere.center.y,
-            sphere.center.z + sphere.radius * std::sin(angle2)
-        };
-        AddLine(p1, p2, color);
-    }
+        // 各緯度での円を描画
+        for (int j = 0; j < segments_; ++j) {
+            float angle1 = (2.0f * pi * j) / segments_;
+            float angle2 = (2.0f * pi * (j + 1)) / segments_;
 
-    // YZ平面の円
-    for (int i = 0; i < segments_; ++i) {
-        float angle1 = (2.0f * pi * i) / segments_;
-        float angle2 = (2.0f * pi * (i + 1)) / segments_;
-
-        Vector3 p1 = {
-            sphere.center.x,
-            sphere.center.y + sphere.radius * std::cos(angle1),
-            sphere.center.z + sphere.radius * std::sin(angle1)
-        };
-        Vector3 p2 = {
-            sphere.center.x,
-            sphere.center.y + sphere.radius * std::cos(angle2),
-            sphere.center.z + sphere.radius * std::sin(angle2)
-        };
-        AddLine(p1, p2, color);
+            Vector3 p1 = {
+                sphere.center.x + circleRadius * std::cos(angle1),
+                sphere.center.y + y,
+                sphere.center.z + circleRadius * std::sin(angle1)
+            };
+            Vector3 p2 = {
+                sphere.center.x + circleRadius * std::cos(angle2),
+                sphere.center.y + y,
+                sphere.center.z + circleRadius * std::sin(angle2)
+            };
+            AddLine(p1, p2, color);
+        }
     }
 }
 
@@ -252,6 +294,10 @@ void Line::AddCircle(const Vector3& center, float radius, const Vector3& normal,
 
         AddLine(p1, p2, color);
     }
+}
+
+void Line::AddCircleXZ(const Vector3& center, float radius, const Vector4& color) {
+	AddCircle(center, radius, { 0.0f, 1.0f, 0.0f }, color);
 }
 
 void Line::AddRay(const Vector3& origin, const Vector3& direction, float length, const Vector4& color) {

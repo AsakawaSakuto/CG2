@@ -157,6 +157,7 @@
     <ClInclude Include="Engine\System\PostEffect\PostEffectParams.h" />
     <ClInclude Include="Engine\System\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\3d\Line\Line.h" />
+    <ClInclude Include="Engine\System\Utility\Math\OBB.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

@@ -290,6 +290,7 @@
     <ClInclude Include="Engine\System\Utility\Easing\Easing.h" />
     <ClInclude Include="Engine\System\Utility\GameTimer\GameTimer.h" />
     <ClInclude Include="Engine\System\Utility\Math\AABB.h" />
+    <ClInclude Include="Engine\System\Utility\Math\OBB.h" />
     <ClInclude Include="Engine\System\Utility\Math\Plane.h" />
     <ClInclude Include="Engine\System\Utility\Quaternion\Quaternion.h" />
     <ClInclude Include="Engine\System\Utility\Math\Segment.h" />

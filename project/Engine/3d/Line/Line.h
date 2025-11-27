@@ -11,6 +11,7 @@
 #include "Vector3.h"
 #include "Sphere.h"
 #include "AABB.h"
+#include "OBB.h"
 
 /// <summary>
 /// 3D空間に線を描画するクラス（デバッグ表示、UI、可視化用）
@@ -75,6 +76,13 @@ public:
     void AddBox(const AABB& aabb, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
     /// <summary>
+    /// ボックス（OBB）描画
+    /// </summary>
+    /// <param name="obb">OBB構造体</param>
+    /// <param name="color">色（デフォルト：白）</param>
+    void AddBox(const OBB& obb, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
+    /// <summary>
     /// 球体（ワイヤーフレーム）描画
     /// </summary>
     /// <param name="center">中心座標</param>
@@ -90,6 +98,15 @@ public:
     /// <param name="normal">法線方向</param>
     /// <param name="color">色（デフォルト：白）</param>
     void AddCircle(const Vector3& center, float radius, const Vector3& normal, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
+    /// <summary>
+    /// XZ平面、円描画
+    /// </summary>
+    /// <param name="center">中心座標</param>
+    /// <param name="radius">半径</param>
+    /// <param name="normal">法線方向</param>
+    /// <param name="color">色（デフォルト：白）</param>
+    void AddCircleXZ(const Vector3& center, float radius, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
     /// <summary>
     /// レイ（半直線）描画

@@ -62,6 +62,7 @@ void Player::Update() {
 	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
 
 	debugLine_->AddSphere(sphereCollision_);
+	debugLine_->AddCircleXZ(transform_.translate, expItemStateChangeRadius_);
 }
 
 void Player::Draw(Camera camera) {
@@ -72,7 +73,7 @@ void Player::Draw(Camera camera) {
 
 	model_->Draw(camera, transform_);
 
-	expItemGetRange_->Draw(camera, expGetRangeTransform_);
+	//expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
 	weaponManager_->Draw(camera);
 

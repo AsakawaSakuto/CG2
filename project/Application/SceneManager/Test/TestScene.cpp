@@ -1,6 +1,9 @@
 #include "TestScene.h"
 #include "../Quaternion/QuaternionFunction.h"
 
+#define WHITE {1.0f,1.0f,1.0f,1.0f}
+#define RED   {1.0f,0.0f,0.0f,1.0f}
+
 TestScene::~TestScene() {
     CleanupResources();
 }
@@ -54,8 +57,29 @@ void TestScene::Update() {
     Vector3 end = { 1.0f, 1.0f, 1.0f };
     testLine_->AddLine(walkTransform_.translate, sneakWalkTransform_.translate);
 
-    testLine_->AddBox(testAABB_, { 1.0f, 1.0f, 1.0f, 1.0f });
-	testLine_->AddSphere(testSphere_);
+    if (Collision::IsHit(testAABB1_,testAABB2_) || 
+        Collision::IsHit(testAABB1_, testSphere_) ||
+        Collision::IsHit(testAABB2_, testSphere_)) {
+
+        testLine_->AddBox(testAABB1_, RED);
+        testLine_->AddBox(testAABB2_, RED);
+		testLine_->AddSphere(testSphere_, RED);
+        
+    } else {
+
+        testLine_->AddBox(testAABB1_, WHITE);
+        testLine_->AddBox(testAABB2_, WHITE);
+        testLine_->AddSphere(testSphere_, WHITE);
+
+    }
+
+    if (Collision::IsHit(testOBB1_, testOBB2_)) {
+        testLine_->AddBox(testOBB1_, RED);
+        testLine_->AddBox(testOBB2_, RED);
+    } else {
+        testLine_->AddBox(testOBB1_, WHITE);
+        testLine_->AddBox(testOBB2_, WHITE);
+    }
 
 	testLine_->AddGrid(20.0f, 20);
 
@@ -108,8 +132,12 @@ void TestScene::DrawImGui() {
 	walkTransform_.DrawImGui("walk");
 	sneakWalkTransform_.DrawImGui("sneakWalk");
 
-	testAABB_.DrawImGui("testAABB");
-	testSphere_.DrawImGui("testSphere");
+	testOBB1_.DrawImGui("testOBB1");
+    testOBB2_.DrawImGui("testOBB2");
+
+    testAABB1_.DrawImGui("testAABB1");
+    testAABB2_.DrawImGui("testAABB2");
+    testSphere_.DrawImGui("testSphere");
 
 	//MT4_01_01();
 	//MT4_01_02();

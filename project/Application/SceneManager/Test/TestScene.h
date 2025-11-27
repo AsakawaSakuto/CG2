@@ -1,6 +1,7 @@
 #pragma once
 #include"Application/EngineSystem.h"
 #include"Application/SceneManager/IScene.h"
+#include"Engine/System/Utility/Math/OBB.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -56,5 +57,8 @@ private:
 	DebugCamera debugCamera_;
 
 	Sphere testSphere_;
-	AABB testAABB_;
+	AABB testAABB1_;
+	AABB testAABB2_;
+	OBB testOBB1_;
+	OBB testOBB2_;
 };
