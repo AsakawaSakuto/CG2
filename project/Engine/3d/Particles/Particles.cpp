@@ -230,50 +230,50 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::Begin(objectName);
 
 	// Play/Stop control buttons
-	if (ImGui::Button("Play (Loop)")) {
+	if (ImGui::Button("再生 (ループ)")) {
 		Play(true);
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Play (Once)")) {
+	if (ImGui::Button("再生 (1回)")) {
 		Play(false);
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Stop")) {
+	if (ImGui::Button("停止")) {
 		Stop();
 	}
 
 	// 現在の再生状態を表示
-	ImGui::Text("Status: %s", isPlaying_ ? "Playing" : "Stopped");
+	ImGui::Text("状態: %s", isPlaying_ ? "再生中" : "停止中");
 
 	ImGui::Separator();
 
 	// BlendMode選択コンボボックスを追加
 	const char* blendModeNames[] = {
-		"None",
-		"Normal", 
-		"Add",
-		"Subtract",
-		"Multiply",
-		"Screen"
+		"None (なし)",
+		"Normal (通常)", 
+		"Add (加算)",
+		"Subtract (減算)",
+		"Multily (乗算)",
+		"Screen (スクリーン)"
 	};
 	int currentBlendMode = static_cast<int>(emitter_.blendMode);
-	if (ImGui::Combo("Blend Mode", &currentBlendMode, blendModeNames, IM_ARRAYSIZE(blendModeNames))) {
+	if (ImGui::Combo("ブレンドモード", &currentBlendMode, blendModeNames, IM_ARRAYSIZE(blendModeNames))) {
 		emitter_.blendMode = static_cast<BlendMode>(currentBlendMode);
 		blendMode_ = emitter_.blendMode; // 内部のblendMode_も更新
 	}
 
 	ImGui::Separator();
 
-	if (EmitterStateLoader::InputText("File Name", loadToSaveName_)) {
+	if (EmitterStateLoader::InputText("JSONファイル名", loadToSaveName_)) {
 		// 入力が変更されたらここに来る
 		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
 	}
 
-	if (ImGui::Button("Load to Json")) {
+	if (ImGui::Button("JSONから読み込み")) {
 		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
 		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
 		
@@ -295,25 +295,25 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Save to Json")) {
+	if (ImGui::Button("JSONに保存")) {
 		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
 		EmitterStateLoader::Save(jsonFilePath_, emitter_);
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Generate to Json")) {
+	if (ImGui::Button("JSON生成")) {
 		EmitterStateLoader::SaveToCurrentDir(emitter_, loadToSaveName_);
 	}
 
 	ImGui::Separator();
 
-	if (EmitterStateLoader::InputText("texture Name", emitter_.texturePath)) {
+	if (EmitterStateLoader::InputText("テクスチャ名", emitter_.texturePath)) {
 		// 入力が変更されたらここに来る
 		printf("Texture Name Changed to: %s\n", emitter_.texturePath.c_str());
 	}
 
-	if (ImGui::Button("Load Texture")) {
+	if (ImGui::Button("テクスチャ読み込み")) {
 		// すでに同じテクスチャなら処理をスキップ
 		std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
 		if (textureName_ == newTextureName) {
@@ -328,32 +328,32 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
-	ImGui::DragFloat3("Translate", &emitter_.translate.x, 0.01f);
+	ImGui::DragFloat3("位置", &emitter_.translate.x, 0.01f);
 
-	ImGui::DragFloat3("OffSet", &offset_.x, 0.01f);
+	ImGui::DragFloat3("オフセット", &offset_.x, 0.01f);
 	
 	// Emitter Shape Selection
 	const char* shapeNames[] = { 
-		"Point", 
-		"Line", 
-		"Sphere (Volume)", 
-		"Sphere (Surface)", 
-		"Box (Volume)", 
-		"Box (Surface)", 
-		"Ring (XZ Plane)", 
-		"Ring (XY Plane)", 
-		"Ring (YZ Plane)",
-		"Cone (Volume)",
-		"Cone (Surface)",
-		"Hemisphere (Volume)",
-		"Hemisphere (Surface)",
-		"Plane (Angle Volume)",
-		"Plane (Angle Edges)",
-		"Ring (Angle Volume)",
-		"Ring (Angle Edge)"
+		"点", 
+		"線", 
+		"球 (内部)", 
+		"球 (表面)", 
+		"箱 (内部)", 
+		"箱 (表面)", 
+		"リング (XZ平面)", 
+		"リング (XY平面)", 
+		"リング (YZ平面)",
+		"円錐 (内部)",
+		"円錐 (表面)",
+		"半球 (内部)",
+		"半球 (表面)",
+		"平面 (角度範囲)",
+		"平面 (エッジ)",
+		"リング (角度範囲)",
+		"リング (角度エッジ)"
 	};
 	int currentShape = static_cast<int>(emitter_.shapeType);
-	if (ImGui::Combo("Emitter Shape", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
+	if (ImGui::Combo("エミッター形状", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
 		emitter_.shapeType = static_cast<uint32_t>(currentShape);
 	}
 	
@@ -363,49 +363,49 @@ void Particles::DrawImGui(const char* objectName) {
 		case EmitterShapeType::POINT:
 		{
 			// Point emitter has no additional parameters
-			ImGui::Text("Point emitter - particles spawn at exact position");
+			ImGui::Text("点エミッター - 正確な位置で生成");
 			break;
 		}
 		
 		case EmitterShapeType::LINE:
 		{
-			ImGui::DragFloat3("Line Start", &emitter_.lineStart.x, 0.01f);
-			ImGui::DragFloat3("Line Direction", &emitter_.size.x, 0.01f);
-			ImGui::DragFloat("Line Length", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("線の開始位置", &emitter_.lineStart.x, 0.01f);
+			ImGui::DragFloat3("線の方向", &emitter_.size.x, 0.01f);
+			ImGui::DragFloat("線の長さ", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
 			break;
 		}
 		
 		case EmitterShapeType::SPHERE_VOLUME:
 		case EmitterShapeType::SPHERE_SURFACE:
 		{
-			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
 			if (static_cast<EmitterShapeType>(emitter_.shapeType) == EmitterShapeType::SPHERE_SURFACE) {
-				ImGui::Text("Surface only - particles spawn on sphere surface");
+				ImGui::Text("表面のみ - 球の表面で生成");
 			} else {
-				ImGui::Text("Volume - particles spawn inside sphere");
+				ImGui::Text("内部 - 球の内部で生成");
 			}
 			break;
 		}
 		
 		case EmitterShapeType::BOX_VOLUME:
 		{
-			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("Volume - particles spawn inside box");
+			ImGui::DragFloat3("箱のサイズ", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("内部 - 箱の内部で生成");
 			break;
 		}
 		
 		case EmitterShapeType::BOX_SURFACE:
 		{
-			ImGui::DragFloat3("Box Size", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("Surface only - particles spawn on box faces");
+			ImGui::DragFloat3("箱のサイズ", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("表面のみ - 箱の表面で生成");
 			break;
 		}
 		
 		case EmitterShapeType::RING_XZ:
 		{
-			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("Ring in XZ plane (horizontal)");
+			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("XZ平面のリング (水平)");
 			// Ensure inner radius is not larger than outer radius
 			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
@@ -415,9 +415,9 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::RING_XY:
 		{
-			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("Ring in XY plane (vertical facing forward)");
+			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("XY平面のリング (垂直・前向き)");
 			// Ensure inner radius is not larger than outer radius
 			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
@@ -427,9 +427,9 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::RING_YZ:
 		{
-			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("Ring in YZ plane (vertical facing right)");
+			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::Text("YZ平面のリング (垂直・右向き)");
 			// Ensure inner radius is not larger than outer radius
 			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
@@ -439,10 +439,10 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::CONE_VOLUME:
 		{
-			ImGui::DragFloat("Cone Angle", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat("Cone Height", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("Cone Direction", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("Volume - particles spawn inside cone");
+			ImGui::DragFloat("円錐角度", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat("円錐高さ", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("円錐方向", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("内部 - 円錐の内部で生成");
 			// Normalize direction vector
 			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
 			                      emitter_.coneDirection.y * emitter_.coneDirection.y + 
@@ -457,10 +457,10 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::CONE_SURFACE:
 		{
-			ImGui::DragFloat("Cone Angle", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat("Cone Height", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("Cone Direction", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("Surface only - particles spawn on cone surface");
+			ImGui::DragFloat("円錐角度", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat("円錐高さ", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("円錐方向", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("表面のみ - 円錐の表面で生成");
 			// Normalize direction vector
 			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
 			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
@@ -475,10 +475,10 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::HEMISPHERE_VOLUME:
 		{
-			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
-			ImGui::DragFloat("Hemisphere Angle", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat3("Direction", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("Volume - particles spawn inside hemisphere");
+			ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			ImGui::DragFloat("半球角度", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat3("方向", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("内部 - 半球の内部で生成");
 			// Normalize direction vector
 			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
 			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
@@ -493,10 +493,10 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::HEMISPHERE_SURFACE:
 		{
-			ImGui::DragFloat("Radius", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
-			ImGui::DragFloat("Hemisphere Angle", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat3("Direction", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("Surface only - particles spawn on hemisphere surface");
+			ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+			ImGui::DragFloat("半球角度", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
+			ImGui::DragFloat3("方向", &emitter_.coneDirection.x, 0.01f);
+			ImGui::Text("表面のみ - 半球の表面で生成");
 			// Normalize direction vector
 			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
 			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
@@ -511,10 +511,10 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::PLANE_ANGLE:
 		{
-			ImGui::DragFloat("Plane Width", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat("Plane Height", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat3("Plane Normal", &emitter_.planeNormal.x, 0.01f);
-			ImGui::Text("Volume - particles spawn on plane surface");
+			ImGui::DragFloat("平面幅", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat("平面高さ", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat3("平面法線", &emitter_.planeNormal.x, 0.01f);
+			ImGui::Text("範囲 - 平面上で生成");
 			// Normalize normal vector
 			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
 			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
@@ -529,10 +529,10 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::PLANE_ANGLE_EDGE:
 		{
-			ImGui::DragFloat("Plane Width", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat("Plane Height", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat3("Plane Normal", &emitter_.planeNormal.x, 0.01f);
-			ImGui::Text("Edges only - particles spawn on plane edges");
+			ImGui::DragFloat("平面幅", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat("平面高さ", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
+			ImGui::DragFloat3("平面法線", &emitter_.planeNormal.x, 0.01f);
+			ImGui::Text("エッジのみ - 平面のエッジで生成");
 			// Normalize normal vector
 			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
 			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
@@ -547,11 +547,11 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::RING_ANGLE:
 		{
-			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("Ring Normal", &emitter_.ringNormal.x, 0.01f);
-			ImGui::DragFloat("Ring Angle", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
-			ImGui::Text("Volume - particles spawn in ring area");
+			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("リング法線", &emitter_.ringNormal.x, 0.01f);
+			ImGui::DragFloat("リング角度", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
+			ImGui::Text("範囲 - リング範囲内で生成");
 			// Ensure inner radius is not larger than outer radius
 			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
@@ -570,11 +570,11 @@ void Particles::DrawImGui(const char* objectName) {
 		
 		case EmitterShapeType::RING_ANGLE_EDGE:
 		{
-			ImGui::DragFloat("Inner Radius", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("Outer Radius", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("Ring Normal", &emitter_.ringNormal.x, 0.01f);
-			ImGui::DragFloat("Ring Angle", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
-			ImGui::Text("Edge only - particles spawn on ring circumference");
+			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+			ImGui::DragFloat3("リング法線", &emitter_.ringNormal.x, 0.01f);
+			ImGui::DragFloat("リング角度", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
+			ImGui::Text("エッジのみ - リングの円周上で生成");
 			// Ensure inner radius is not larger than outer radius
 			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
 				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
@@ -594,87 +594,87 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
-	ImGui::Checkbox("UseEmitter", reinterpret_cast<bool*>(&emitter_.useEmitter));
-	ImGui::Checkbox("Emit", reinterpret_cast<bool*>(&emitter_.emit));
-	ImGui::DragInt("Count", reinterpret_cast<int*>(&emitter_.count), 1, 0, kMaxParticles_);
+	ImGui::Checkbox("エミッター使用", reinterpret_cast<bool*>(&emitter_.useEmitter));
+	ImGui::Checkbox("放出", reinterpret_cast<bool*>(&emitter_.emit));
+	ImGui::DragInt("放出数", reinterpret_cast<int*>(&emitter_.count), 1, 0, kMaxParticles_);
 
 	ImGui::Separator();
 
-	ImGui::DragFloat("Frequency", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat("FrequencyTime", &emitter_.frequencyTime, 0.01f, 0.0f, 10.0f);  // frequencyTimerをfrequencyTimeに修正
+	ImGui::DragFloat("放出頻度", &emitter_.frequency, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("頻度タイマー", &emitter_.frequencyTime, 0.01f, 0.0f, 10.0f);
 
 	ImGui::Separator();
 
-	ImGui::Checkbox("EnableMove", reinterpret_cast<bool*>(&emitter_.isMove));
-	ImGui::DragFloat3("normalVelocity", &emitter_.normalVelocity.x, 0.01f);
-	ImGui::Checkbox("VelocityRandom", reinterpret_cast<bool*>(&emitter_.velocityRandom));
+	ImGui::Checkbox("移動有効", reinterpret_cast<bool*>(&emitter_.isMove));
+	ImGui::DragFloat3("通常速度", &emitter_.normalVelocity.x, 0.01f);
+	ImGui::Checkbox("速度ランダム", reinterpret_cast<bool*>(&emitter_.velocityRandom));
 	if (emitter_.velocityRandom) {
-		ImGui::DragFloat3("MinVelocity", &emitter_.minVelocity.x, 0.01f);
-		ImGui::DragFloat3("MaxVelocity", &emitter_.maxVelocity.x, 0.01f);
+		ImGui::DragFloat3("最小速度", &emitter_.minVelocity.x, 0.01f);
+		ImGui::DragFloat3("最大速度", &emitter_.maxVelocity.x, 0.01f);
 	}
 
 	ImGui::Separator();
 
-	ImGui::Checkbox("ScaleFade", reinterpret_cast<bool*>(&emitter_.scaleFade));
-	ImGui::DragFloat2("StartScale", &emitter_.startScale.x, 0.01f, 0.0f, 10.0f);
-	ImGui::DragFloat2("EndScale", &emitter_.endScale.x, 0.01f, 0.0f, 10.0f);
+	ImGui::Checkbox("スケールフェード", reinterpret_cast<bool*>(&emitter_.scaleFade));
+	ImGui::DragFloat2("開始スケール", &emitter_.startScale.x, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat2("終了スケール", &emitter_.endScale.x, 0.01f, 0.0f, 10.0f);
 
-	ImGui::Checkbox("ScaleRandom", reinterpret_cast<bool*>(&emitter_.scaleRandom));
+	ImGui::Checkbox("スケールランダム", reinterpret_cast<bool*>(&emitter_.scaleRandom));
 	if (emitter_.scaleRandom) {
-		ImGui::DragFloat3("MinScale", &emitter_.minScale.x, 0.01f, 0.0f, 10.0f);
-		ImGui::DragFloat3("MaxScale", &emitter_.maxScale.x, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat3("最小スケール", &emitter_.minScale.x, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat3("最大スケール", &emitter_.maxScale.x, 0.01f, 0.0f, 10.0f);
 	}
 
 	ImGui::Separator();
 
-	ImGui::Checkbox("RotateMove", reinterpret_cast<bool*>(&emitter_.rotateMove));
-	ImGui::DragFloat("RightRotateVelocity", &emitter_.startRotateVelocity, 0.01f);
-	ImGui::DragFloat("LeftRotateVelocity", &emitter_.endRotateVelocity, 0.01f);
+	ImGui::Checkbox("回転移動", reinterpret_cast<bool*>(&emitter_.rotateMove));
+	ImGui::DragFloat("右回転速度", &emitter_.startRotateVelocity, 0.01f);
+	ImGui::DragFloat("左回転速度", &emitter_.endRotateVelocity, 0.01f);
 
-	ImGui::Checkbox("RotateVelocityRandom", reinterpret_cast<bool*>(&emitter_.rotateVelocityRandom));
+	ImGui::Checkbox("回転速度ランダム", reinterpret_cast<bool*>(&emitter_.rotateVelocityRandom));
 	if (emitter_.rotateVelocityRandom) {
-		ImGui::DragFloat("MinRotateVelocity", &emitter_.minRotateVelocity, 0.01f);
-		ImGui::DragFloat("MaxRotateVelocity", &emitter_.maxRotateVelocity, 0.01f);
+		ImGui::DragFloat("最小回転速度", &emitter_.minRotateVelocity, 0.01f);
+		ImGui::DragFloat("最大回転速度", &emitter_.maxRotateVelocity, 0.01f);
 	}
 
 	ImGui::Separator();
 
-	ImGui::Checkbox("EnableAlphaFade", reinterpret_cast<bool*>(&emitter_.alphaFade));
-	ImGui::Checkbox("EnableColorFade", reinterpret_cast<bool*>(&emitter_.colorFade));
+	ImGui::Checkbox("アルファフェード有効", reinterpret_cast<bool*>(&emitter_.alphaFade));
+	ImGui::Checkbox("カラーフェード有効", reinterpret_cast<bool*>(&emitter_.colorFade));
 
-	ImGui::ColorEdit3("StartColor", &emitter_.startColor.x);
-	ImGui::ColorEdit3("EndColor", &emitter_.endColor.x);
+	ImGui::ColorEdit3("開始色", &emitter_.startColor.x);
+	ImGui::ColorEdit3("終了色", &emitter_.endColor.x);
 
-	ImGui::Checkbox("ColorRandom", reinterpret_cast<bool*>(&emitter_.colorRandom));
+	ImGui::Checkbox("カラーランダム", reinterpret_cast<bool*>(&emitter_.colorRandom));
 	if (emitter_.colorRandom) {
-		ImGui::ColorEdit3("MinColor", &emitter_.minColor.x);
-		ImGui::ColorEdit3("MaxColor", &emitter_.maxColor.x);
+		ImGui::ColorEdit3("最小色", &emitter_.minColor.x);
+		ImGui::ColorEdit3("最大色", &emitter_.maxColor.x);
 	}
 
 	ImGui::Separator();
 
-	ImGui::DragFloat("LifeTime", &emitter_.lifeTime, 0.01f, 0.0f, 100.0f);
-	ImGui::Checkbox("LifeTimeRandom", reinterpret_cast<bool*>(&emitter_.lifeTimeRandom));
+	ImGui::DragFloat("寿命", &emitter_.lifeTime, 0.01f, 0.0f, 100.0f);
+	ImGui::Checkbox("寿命ランダム", reinterpret_cast<bool*>(&emitter_.lifeTimeRandom));
 	if (emitter_.lifeTimeRandom) {
-		ImGui::DragFloat("MinLifeTime", &emitter_.minLifeTime, 0.01f, 0.0f, 100.0f);
-		ImGui::DragFloat("MaxLifeTime", &emitter_.maxLifeTime, 0.01f, 0.0f, 100.0f);
+		ImGui::DragFloat("最小寿命", &emitter_.minLifeTime, 0.01f, 0.0f, 100.0f);
+		ImGui::DragFloat("最大寿命", &emitter_.maxLifeTime, 0.01f, 0.0f, 100.0f);
 	}
 
 	ImGui::Separator();
 
-	ImGui::Checkbox("useGravity", reinterpret_cast<bool*>(&emitter_.useGravity));
-	ImGui::DragFloat("gravity", &emitter_.gravityY, 0.01f, 0.0f, 100.0f);
-	ImGui::DragFloat("acceleration", &emitter_.accelerationY, 0.01f, 0.0f, 100.0f);
+	ImGui::Checkbox("重力使用", reinterpret_cast<bool*>(&emitter_.useGravity));
+	ImGui::DragFloat("重力", &emitter_.gravityY, 0.01f, 0.0f, 100.0f);
+	ImGui::DragFloat("加速度", &emitter_.accelerationY, 0.01f, 0.0f, 100.0f);
 
 	ImGui::Separator();
 
 	// デバッグ情報表示
-	ImGui::Text("DEBUG INFO");
-	ImGui::Text("Max Particles: %u", kMaxParticles_);
-	ImGui::Text("Dispatch Count: %u", kDispatchCount);
+	ImGui::Text("デバッグ情報");
+	ImGui::Text("最大パーティクル数: %u", kMaxParticles_);
+	ImGui::Text("ディスパッチ数: %u", kDispatchCount);
 
 	// パーティクル強制リセット
-	if (ImGui::Button("Force Reset All Particles")) {
+	if (ImGui::Button("全パーティクル強制リセット")) {
 		// 初期化シェーダーを再実行してパーティクルをリセット
 		ResetAllParticles();
 	}

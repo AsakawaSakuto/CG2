@@ -304,6 +304,29 @@ void DirectXCommon::CreateImgui() {
         srvDescriptorHeap_.Get(),
         srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
         srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
+
+    // 日本語フォントの設定
+    ImGuiIO& io = ImGui::GetIO();
+    const char* fontPath = "C:/Windows/Fonts/YuGothB.ttc";
+
+    if (std::filesystem::exists(fontPath)) {
+        ImFontConfig config;
+        config.SizePixels = 14.0f;
+        
+        ImFont* font = io.Fonts->AddFontFromFileTTF(
+            fontPath,
+            config.SizePixels,
+            &config,
+            io.Fonts->GetGlyphRangesJapanese());
+
+        if (font) {
+            io.FontDefault = font;
+            io.FontGlobalScale = 1.0f;
+            io.Fonts->Build();
+        }
+    } else {
+        OutputDebugStringA("フォントファイルが存在しません: YuGothB.ttc\n");
+    }
 }
 #endif
 
