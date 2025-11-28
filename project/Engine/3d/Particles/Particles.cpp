@@ -1075,3 +1075,40 @@ Particles::~Particles() {
 		alloc.Free(idxUavFreeList_);
 	}
 }
+
+void Particles::LoadJson(const std::string& filePath) {
+	// 既に同じファイルを読み込んでいる場合はスキップ
+	std::string fullPath = "resources/Data/Particle/" + (filePath + ".json");
+	if (jsonFilePath_ == fullPath && isJsonLoaded_) {
+		return;
+	}
+	
+	jsonFilePath_ = fullPath;
+	
+	// 完全なコピーで読み込み
+	EmitterState loadedState = EmitterStateLoader::Load(jsonFilePath_);
+	emitter_ = loadedState;  // 構造体全体をコピー
+	
+	loadToSaveName_ = filePath;
+	
+	// JSONから読み込んだBlendModeを内部変数にも反映
+	blendMode_ = emitter_.blendMode;
+	
+	// texturePath をローカル変数に完全コピー
+	if (!emitter_.texturePath.empty()) {
+		// 安全なコピーを作成
+		std::string texturePathCopy = emitter_.texturePath;
+		std::string newTextureName = "resources/image/particle/" + texturePathCopy + ".png";
+		
+		if (textureName_ != newTextureName) {
+			// 先にメンバ変数に代入
+			textureName_ = newTextureName;
+			
+			// メンバ変数を使用（安全）
+			TextureManager::GetInstance()->LoadTexture(textureName_);
+			textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+		}
+	}
+	
+	isJsonLoaded_ = true;
+}

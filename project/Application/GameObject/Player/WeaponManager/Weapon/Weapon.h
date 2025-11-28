@@ -28,6 +28,10 @@ private:
 	
 	WeaponName weaponName_;
 	WeaponStatus status_;
+
+	EmitterState emitterState1_;
+	EmitterState emitterState2_;
+
 	GameTimer coolDownTimer_; // クールタイムタイマー
 	GameTimer intervalTimer_; // 攻撃間隔タイマー
 

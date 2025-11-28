@@ -82,7 +82,7 @@ Vector2 TextureManager::GetTextureSize(const std::string& filePath) {
                 return data.filePath == filePath;
             });
         
-        // ★★★ ロード後も見つからない場合は緊急処理 ★★★
+        // ロード後も見つからない場合は緊急処理
         if (it == textureDatas_.end()) {
             Logger::Error("FATAL: Texture not found after loading: " + filePath);
             // デフォルトサイズを返す（クラッシュ防止）
@@ -111,18 +111,25 @@ Vector2 TextureManager::GetTextureSizeByIndex(uint32_t textureIndex) {
 }
 
 void TextureManager::LoadTexture(const std::string& filePath) {
-    // 重複チェックは最初にやる
-    if (texturePathToIndex_.contains(filePath)) {
-        return; // すでに読み込み済み
+    // 先に filePath の完全コピーを作成
+    std::string safeFilePath = filePath;
+    
+    OutputDebugStringA(("Loading texture: " + safeFilePath + "\n").c_str());
+    
+    // 重複チェック（コピーした文字列で）
+    if (texturePathToIndex_.contains(safeFilePath)) {
+        OutputDebugStringA("  -> Already loaded\n");
+        return;
     }
+    
+    OutputDebugStringA(("  -> New texture, index=" + std::to_string(textureDatas_.size()) + "\n").c_str());
 
     // ファイルから読み込み
     DirectX::ScratchImage image{};
-    std::wstring filePathW = ConvertString(filePath);
+    std::wstring filePathW = ConvertString(safeFilePath);
 
     if (!std::filesystem::exists(filePathW)) {
-        Logger::Error("Texture file not found: " + filePath);
-        // ★★★ ファイルが存在しない場合は処理を中断 ★★★
+        Logger::Error("Texture file not found: " + safeFilePath);
         return;
     }
 
@@ -133,8 +140,8 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         image);
     
     if (FAILED(hr)) {
-        Logger::Error("Failed to load texture (WIC): " + filePath);
-        return; // ★★★ 読み込み失敗時は処理を中断 ★★★
+        Logger::Error("Failed to load texture (WIC): " + safeFilePath);
+        return;
     }
 
     // ミップマップ生成
@@ -148,24 +155,32 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         mipImages);
     
     if (FAILED(hr)) {
-        Logger::Error("Failed to generate mipmaps: " + filePath);
-        return; // ★★★ ミップマップ生成失敗時は処理を中断 ★★★
+        Logger::Error("Failed to generate mipmaps: " + safeFilePath);
+        return;
     }
 
-    // 新規テクスチャデータを追加
+    // 先に index を確保
+    uint32_t index = static_cast<uint32_t>(textureDatas_.size());
+    
+    // 先に map に登録（これで safeFilePath の寿命が保証される）
+    texturePathToIndex_[safeFilePath] = index;
+    
+    // その後で textureData を追加
     textureDatas_.emplace_back();
     TextureData& textureData = textureDatas_.back();
 
-    textureData.filePath = filePath;
+    // map の key から取得（安全）
+    auto it = texturePathToIndex_.find(safeFilePath);
+    assert(it != texturePathToIndex_.end());
+    textureData.filePath = it->first;  // map の key を参照（寿命が保証される）
+    
     textureData.matadata = mipImages.GetMetadata();
     textureData.resource = CreateTextureResource(device_.Get(), textureData.matadata);
     UploadTextureData(textureData.resource.Get(), mipImages);
 
     // SRV登録位置を計算
-    uint32_t index = static_cast<uint32_t>(textureDatas_.size() - 1);
     uint32_t srvIndex = index + kSRVIndexTop_;
     
-    // // ★テクスチャ領域の上限を超えない保証（超えたら即落として原因を洗う）
     assert(srvIndex >= DirectXCommon::kTextureSRVBegin);
     assert(srvIndex <= DirectXCommon::kTextureSRVEnd && "Texture SRV range exceeded. Increase range or free slots.");
 
@@ -186,7 +201,4 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = UINT(textureData.matadata.mipLevels);
     device_->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
-
-    // パス → インデックスの登録を忘れずに
-    texturePathToIndex_[filePath] = index;
 }
