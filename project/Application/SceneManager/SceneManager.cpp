@@ -131,6 +131,8 @@ void SceneManager::Update() {
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
+        //ImGui::DockSpaceOverViewport();
+
         sceneArr_[curIndex]->DrawSceneName();
         sceneArr_[curIndex]->DrawImGui();
 

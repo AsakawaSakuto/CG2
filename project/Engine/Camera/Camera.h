@@ -77,7 +77,7 @@ public:
 			// 地面ギリギリの角度を計算
 			float maxAllowedSin = (minHeight - target_.y) / distance_;
 			// sinの値を-1.0～1.0の範囲に制限
-			maxAllowedSin = (std::max)(-1.0f, std::min(1.0f, maxAllowedSin));
+			maxAllowedSin = (std::max)(-1.0f, (std::min)(1.0f, maxAllowedSin));
 			float maxAllowedAngle = std::asin(maxAllowedSin);
 			
 			// 現在の角度が既に制限値に達している場合、下方向への変更を無視

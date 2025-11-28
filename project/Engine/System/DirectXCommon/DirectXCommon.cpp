@@ -299,7 +299,7 @@ void DirectXCommon::CreateImgui() {
     
     // ドッキング機能を有効化
     ImGuiIO& io = ImGui::GetIO();
-    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(winApp_->GetHWND());
