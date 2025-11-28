@@ -12,6 +12,7 @@
 #include "Sphere.h"
 #include "AABB.h"
 #include "OBB.h"
+#include "OvalSphere.h"
 
 /// <summary>
 /// 3D空間に線を描画するクラス（デバッグ表示、UI、可視化用）
@@ -91,6 +92,13 @@ public:
     void AddSphere(const Sphere& sphere, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
     /// <summary>
+    /// 楕円球体（ワイヤーフレーム）描画
+    /// </summary>
+    /// <param name="ovalSphere">楕円球体構造体</param>
+    /// <param name="color">色（デフォルト：白）</param>
+    void AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
+    /// <summary>
     /// 円描画
     /// </summary>
     /// <param name="center">中心座標</param>
@@ -154,4 +162,8 @@ private:
 
 	// 円の分割数
 	int segments_ = 16;
+
+	// 球体描画用の分割数
+    const int latitudeDivisions_ = 8;   // 緯度の分割数（水平方向の円の数）
+    const int longitudeDivisions_ = 16; // 経度の分割数（垂直方向の線の数）
 };

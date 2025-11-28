@@ -15,6 +15,10 @@ void WeaponManager::Initialize(AppContext* ctx) {
 	auto weapon3 = std::make_unique<Weapon>();
 	weapon3->Initialize(ctx_, WeaponName::Runa);
 	weapons_.push_back(std::move(weapon3));
+
+	auto weapon4 = std::make_unique<Weapon>();
+	weapon4->Initialize(ctx_, WeaponName::BubbleArea);
+	weapons_.push_back(std::move(weapon4));
 }
 
 void WeaponManager::Update() {

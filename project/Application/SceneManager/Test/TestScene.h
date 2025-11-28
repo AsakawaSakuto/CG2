@@ -2,6 +2,7 @@
 #include"Application/EngineSystem.h"
 #include"Application/SceneManager/IScene.h"
 #include"Engine/System/Utility/Math/OBB.h"
+#include"Engine/System/Utility/Math/OvalSphere.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -61,4 +62,5 @@ private:
 	AABB testAABB2_;
 	OBB testOBB1_;
 	OBB testOBB2_;
+	OvalSphere testOvalSphere_;
 };

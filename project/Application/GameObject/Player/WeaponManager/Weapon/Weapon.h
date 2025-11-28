@@ -1,11 +1,15 @@
 #pragma once
 #include "Application/AppContext.h"
 #include "Application/GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
+#include "Application/GameObject/Player/WeaponManager/Weapon/Area/area.h"
 #include "Application/GameObject/Player/WeaponManager/WeaponStatus.h"
 #include "Application/GameObject/Player/WeaponManager/WeaponName.h"
 #include "Camera.h"
 #include <queue>
 
+/// <summary>
+/// Update関数をラムダ式にして、Enumでそれに応じたUpdate関数を持ってくるやり方を冬休みにやる
+/// </summary>
 class Weapon {
 public:
 	void Initialize(AppContext* ctx, WeaponName weaponName);
@@ -23,9 +27,18 @@ public:
 	void PostFrameCleanup();
 	
 private:
+
+	void BulletTypeUpdate();
+
+	void AreaTypeUpdate();
+
+	void DirectTypeUpdate();
+private:
 	AppContext* ctx_;
+
 	std::vector<std::unique_ptr<Bullet>> bullets_;
-	
+	std::vector<std::unique_ptr<Area>> areas_;
+
 	WeaponName weaponName_;
 	WeaponStatus status_;
 

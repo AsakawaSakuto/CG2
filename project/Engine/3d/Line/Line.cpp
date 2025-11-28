@@ -201,12 +201,10 @@ void Line::AddBox(const OBB& obb, const Vector4& color) {
 
 void Line::AddSphere(const Sphere& sphere, const Vector4& color) {
     const float pi = std::numbers::pi_v<float>;
-    const int latitudeDivisions = 4;  // 緯度の分割数（水平方向の円の数）
-    const int longitudeDivisions = 8; // 経度の分割数（垂直方向の線の数）
 
     // 経度線（縦の円）を描画
-    for (int i = 0; i < longitudeDivisions; ++i) {
-        float longitude = (2.0f * pi * i) / longitudeDivisions;
+    for (int i = 0; i < longitudeDivisions_; ++i) {
+        float longitude = (2.0f * pi * i) / longitudeDivisions_;
         
         // Y軸周りに回転した円を描画
         for (int j = 0; j < segments_; ++j) {
@@ -228,8 +226,8 @@ void Line::AddSphere(const Sphere& sphere, const Vector4& color) {
     }
 
     // 緯度線（横の円）を描画
-    for (int i = 1; i < latitudeDivisions; ++i) {
-        float latitude = (-pi / 2.0f) + (pi * i) / latitudeDivisions;
+    for (int i = 1; i < latitudeDivisions_; ++i) {
+        float latitude = (-pi / 2.0f) + (pi * i) / latitudeDivisions_;
         float y = sphere.radius * std::sin(latitude);
         float circleRadius = sphere.radius * std::cos(latitude);
 
@@ -247,6 +245,63 @@ void Line::AddSphere(const Sphere& sphere, const Vector4& color) {
                 sphere.center.x + circleRadius * std::cos(angle2),
                 sphere.center.y + y,
                 sphere.center.z + circleRadius * std::sin(angle2)
+            };
+            AddLine(p1, p2, color);
+        }
+    }
+}
+
+void Line::AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color) {
+    const float pi = std::numbers::pi_v<float>;
+
+    // 経度線（縦の円）を描画 - 各軸の半径を考慮した楕円
+    for (int i = 0; i < longitudeDivisions_; ++i) {
+        float longitude = (2.0f * pi * i) / longitudeDivisions_;
+
+        // Y軸周りに回転した楕円を描画
+        for (int j = 0; j < segments_; ++j) {
+            float latitude1 = (-pi / 2.0f) + (pi * j) / segments_;
+            float latitude2 = (-pi / 2.0f) + (pi * (j + 1)) / segments_;
+
+            // 楕円の方程式を使用して各軸の半径を適用
+            Vector3 p1 = {
+                ovalSphere.center.x + ovalSphere.radius.x * std::cos(latitude1) * std::cos(longitude),
+                ovalSphere.center.y + ovalSphere.radius.y * std::sin(latitude1),
+                ovalSphere.center.z + ovalSphere.radius.z * std::cos(latitude1) * std::sin(longitude)
+            };
+            Vector3 p2 = {
+                ovalSphere.center.x + ovalSphere.radius.x * std::cos(latitude2) * std::cos(longitude),
+                ovalSphere.center.y + ovalSphere.radius.y * std::sin(latitude2),
+                ovalSphere.center.z + ovalSphere.radius.z * std::cos(latitude2) * std::sin(longitude)
+            };
+            AddLine(p1, p2, color);
+        }
+    }
+
+    // 緯度線（横の円）を描画 - 各軸の半径を考慮した楕円
+    for (int i = 1; i < latitudeDivisions_; ++i) {
+        float latitude = (-pi / 2.0f) + (pi * i) / latitudeDivisions_;
+        float y = ovalSphere.radius.y * std::sin(latitude);
+
+        // 楕円の断面での半径を計算
+        float cosLatitude = std::cos(latitude);
+        float circleRadiusX = ovalSphere.radius.x * cosLatitude;
+        float circleRadiusZ = ovalSphere.radius.z * cosLatitude;
+
+        // 各緯度での楕円を描画
+        for (int j = 0; j < segments_; ++j) {
+            float angle1 = (2.0f * pi * j) / segments_;
+            float angle2 = (2.0f * pi * (j + 1)) / segments_;
+
+            Vector3 p1 = {
+                ovalSphere.center.x + circleRadiusX * std::cos(angle1),
+                ovalSphere.center.y + y,
+                ovalSphere.center.z + circleRadiusZ * std::sin(angle1)
+            };
+            Vector3 p2 = {
+                ovalSphere.center.x + circleRadiusX * std::cos(angle2),
+                ovalSphere.center.y + y,
+                ovalSphere.center.z + circleRadiusZ * std::sin(angle2)
             };
             AddLine(p1, p2, color);
         }

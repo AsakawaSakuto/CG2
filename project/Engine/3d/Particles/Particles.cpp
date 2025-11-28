@@ -943,7 +943,7 @@ void Particles::UpdateParticle() {
 void Particles::CreateEmitterResource() {
 
 	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_UPLOAD);
-	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(EmitterState));
+	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(EmitterStateGPU)); // ✅ サイズ変更
 
 	device_->CreateCommittedResource(
 		&heapProps,
@@ -970,12 +970,19 @@ void Particles::UpdateEmitter() {
 
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.translate = emitter_.translate + offset_;
+	
+	// BlendModeをuint32_tに変換してGPU構造体に格納
+	emitter_.blendModeValue = static_cast<uint32_t>(emitter_.blendMode);
 
-	// Unmapは不要。UploadHeapの場合、毎フレームマップしっぱなしでOK
-	EmitterState* mappedEmitter = nullptr;
+	// EmitterStateをマップしてGPU互換部分のみをコピー
+	EmitterStateGPU* mappedEmitter = nullptr;
 	emitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter));
-	// ここで値をコピーまたは書き換え
-	*mappedEmitter = emitter_; // 構造体ごとコピー
+	
+	// PODデータ（EmitterStateGPU）のみをコピー
+	memcpy(mappedEmitter, static_cast<EmitterStateGPU*>(&emitter_), sizeof(EmitterStateGPU));
+	
+	// Unmapを追加（リソースリークを防ぐ）
+	emitterResource_->Unmap(0, nullptr);
 }
 
 void Particles::CreatePerFrameResource() {

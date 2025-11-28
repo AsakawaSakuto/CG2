@@ -39,6 +39,11 @@ void Bullet::Update() {
 
 	lifeTimer_.Update();
 
+	if (lifeTimer_.GetProgress() >= 0.9f) {
+		particle_->Stop();
+		particle2_->Stop();
+	}
+
 	if (lifeTimer_.IsFinished()) {
 		Dead();
 	}

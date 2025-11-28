@@ -22,6 +22,7 @@ void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
 		status_.penetrationCount = 0;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
+		status_.weaponType = WeaponType::BulletType;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
@@ -40,6 +41,7 @@ void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
 		status_.penetrationCount = 99;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
+		status_.weaponType = WeaponType::BulletType;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
@@ -58,6 +60,26 @@ void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
 		status_.penetrationCount = 0;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
+		status_.weaponType = WeaponType::BulletType;
+		coolDownTimer_.Start(status_.cooldownTime, false);
+
+		break;
+
+	case WeaponName::BubbleArea:
+
+		status_.cooldownTime = 10.0f;
+		status_.intervalTime = 1.0f;
+		status_.shotMaxCount = 1;
+		status_.shotNowCount = 0;
+		status_.size = 1.0f;
+		status_.damage = 10.0f;
+		status_.criticalRand = 10;
+		status_.moveSpeed = 0.0f;
+		status_.bounceCount = 0;
+		status_.penetrationCount = 0;
+		status_.nockBackPower = 0.0f;
+		status_.durationTime = 0.0f;
+		status_.weaponType = WeaponType::AreaType;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
@@ -73,6 +95,57 @@ void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
 
 void Weapon::Update() {
 
+	switch (status_.weaponType) {
+	case WeaponType::BulletType:
+
+		BulletTypeUpdate();
+
+		break;
+	case WeaponType::AreaType:
+
+		AreaTypeUpdate();
+
+		break;
+	case WeaponType::DirectType:
+
+		DirectTypeUpdate();
+
+		break;
+	}
+
+}
+
+void Weapon::Draw(Camera camera) {
+	for (auto& bullet : bullets_) {
+		bullet->Draw(camera);
+	}
+
+	for (auto& area : areas_) {
+		area->Draw(camera);
+	}
+}
+
+void Weapon::SetPlayerPosition(const Vector3& position) {
+	playerPosition_ = position;
+}
+
+void Weapon::SetDirectionToEnemy(const Vector3& direction) {
+	directionToEnemy_ = direction;
+}
+
+void Weapon::PostFrameCleanup() {
+	// 死亡した弾を削除し、パーティクルをプールに返却
+	auto it = bullets_.begin();
+	while (it != bullets_.end()) {
+		if (!(*it)->IsAlive()) {
+			it = bullets_.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
+void Weapon::BulletTypeUpdate() {
 	// クールタイムが終了している場合
 	if (coolDownTimer_.IsFinished()) {
 		if (!intervalTimer_.IsActive()) {
@@ -98,7 +171,7 @@ void Weapon::Update() {
 			bullet->SetPenetrationCount(status_.penetrationCount);
 			break;
 		case WeaponName::Runa:
-			bullet->LoadJson("runa","runa2");
+			bullet->LoadJson("runa", "runa2");
 			bullet->SetBounceCount(status_.bounceCount);
 			break;
 		}
@@ -120,28 +193,45 @@ void Weapon::Update() {
 	}
 }
 
-void Weapon::Draw(Camera camera) {
-	for (auto& bullet : bullets_) {
-		bullet->Draw(camera);
-	}
-}
+void Weapon::AreaTypeUpdate() {
 
-void Weapon::SetPlayerPosition(const Vector3& position) {
-	playerPosition_ = position;
-}
-
-void Weapon::SetDirectionToEnemy(const Vector3& direction) {
-	directionToEnemy_ = direction;
-}
-
-void Weapon::PostFrameCleanup() {
-	// 死亡した弾を削除し、パーティクルをプールに返却
-	auto it = bullets_.begin();
-	while (it != bullets_.end()) {
-		if (!(*it)->IsAlive()) {
-			it = bullets_.erase(it);
-		} else {
-			++it;
+	// クールタイムが終了している場合
+	if (coolDownTimer_.IsFinished()) {
+		if (!intervalTimer_.IsActive()) {
+			intervalTimer_.Start(status_.intervalTime, true);
+			coolDownTimer_.Reset();
 		}
 	}
+
+	if (intervalTimer_.IsFinished()) {
+
+		auto area = std::make_unique<Area>();
+		area->Initialize(ctx_);
+		switch (weaponName_)
+		{
+		case WeaponName::BubbleArea:
+			area->LoadJson("bubbleArea");
+			break;
+		}
+		areas_.push_back(std::move(area));
+
+		status_.shotNowCount++;
+		if (status_.shotNowCount >= status_.shotMaxCount) {
+			status_.shotNowCount = 0;
+			intervalTimer_.Reset();
+			coolDownTimer_.Start(status_.cooldownTime, false);
+		}
+	}
+
+	coolDownTimer_.Update();
+	intervalTimer_.Update();
+
+	for (auto& area : areas_) {
+		area->SetPosition(playerPosition_);
+		area->Update();
+	}
+
+}
+
+void Weapon::DirectTypeUpdate() {
 }

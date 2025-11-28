@@ -28,9 +28,11 @@ void GameScene::Initialize() {
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
 
 	testParticle_->Initialize(&ctx_->dxCommon);
+	dustParticle_->Initialize(&ctx_->dxCommon);
+	dustParticle_->LoadJson("dust");
 
 	gridModel_->Initialize(&ctx_->dxCommon, "grid/grid.obj");
-	gridModel_->SetTexture("resources/image/uvChecker.png");
+	gridModel_->SetTexture("resources/image/white16x16.png");
 	gridModel_->UseLight(false);
 	gridModel_->SetColor4({ 0.0f,0.0f,0.0f,1.0f });
 	gridTransform_.translate = { 0.0f,-0.5f,0.0f };
@@ -60,6 +62,7 @@ void GameScene::Update() {
 	gridModel_->Update();
 
 	testParticle_->Update();
+	dustParticle_->Update();
 
 	if (collisionManager_->GetGoResult() || ctx_->gamePad.TriggerButton(GamePad::X)) {
 		//ChangeScene(SCENE::RESULT);
@@ -78,6 +81,7 @@ void GameScene::Draw() {
 	player_->Draw(camera_);
 
 	testParticle_->Draw(camera_);
+	dustParticle_->Draw(camera_);
 
 	collisionManager_->Draw(camera_);
 }

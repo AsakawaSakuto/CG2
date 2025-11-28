@@ -48,6 +48,10 @@ void TestScene::Initialize() {
 
 	testTimer_.Start(2.0f, true);
 
+	// 楕円球体の初期化
+	testOvalSphere_.center = { 0.0f, 0.0f, 5.0f };
+	testOvalSphere_.radius = { 2.0f, 1.0f, 1.5f };
+
 	testLine_->Initialize(&ctx_->dxCommon);
 }
 
@@ -57,6 +61,7 @@ void TestScene::Update() {
     Vector3 end = { 1.0f, 1.0f, 1.0f };
     testLine_->AddLine(walkTransform_.translate, sneakWalkTransform_.translate);
 
+    // AABB同士とSphereとの衝突判定
     if (Collision::IsHit(testAABB1_,testAABB2_) || 
         Collision::IsHit(testAABB1_, testSphere_) ||
         Collision::IsHit(testAABB2_, testSphere_)) {
@@ -73,6 +78,7 @@ void TestScene::Update() {
 
     }
 
+    // OBB同士の衝突判定
     if (Collision::IsHit(testOBB1_, testOBB2_)) {
         testLine_->AddBox(testOBB1_, RED);
         testLine_->AddBox(testOBB2_, RED);
@@ -80,6 +86,19 @@ void TestScene::Update() {
         testLine_->AddBox(testOBB1_, WHITE);
         testLine_->AddBox(testOBB2_, WHITE);
     }
+
+	// 楕円球体の衝突判定テスト
+	Vector4 ovalSphereColor = WHITE;
+	if (Collision::IsHit(testOvalSphere_, testSphere_) ||
+		Collision::IsHit(testOvalSphere_, testAABB1_) ||
+		Collision::IsHit(testOvalSphere_, testAABB2_) ||
+		Collision::IsHit(testOvalSphere_, testOBB1_) ||
+		Collision::IsHit(testOvalSphere_, testOBB2_)) {
+		ovalSphereColor = RED;
+	}
+
+	// 楕円球体を描画
+	testLine_->AddOvalSphere(testOvalSphere_, ovalSphereColor);
 
 	testLine_->AddGrid(20.0f, 20);
 
@@ -138,6 +157,7 @@ void TestScene::DrawImGui() {
     testAABB1_.DrawImGui("testAABB1");
     testAABB2_.DrawImGui("testAABB2");
     testSphere_.DrawImGui("testSphere");
+    testOvalSphere_.DrawImGui("testOvalSphere");
 
 	//MT4_01_01();
 	//MT4_01_02();
