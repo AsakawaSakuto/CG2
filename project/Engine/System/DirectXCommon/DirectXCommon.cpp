@@ -296,6 +296,11 @@ void DirectXCommon::CreateImgui() {
         // こういうもんである
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    
+    // ドッキング機能を有効化
+    ImGuiIO& io = ImGui::GetIO();
+    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(winApp_->GetHWND());
     ImGui_ImplDX12_Init(device_.Get(),
@@ -306,7 +311,6 @@ void DirectXCommon::CreateImgui() {
         srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
 
     // 日本語フォントの設定
-    ImGuiIO& io = ImGui::GetIO();
     const char* fontPath = "C:/Windows/Fonts/YuGothB.ttc";
 
     if (std::filesystem::exists(fontPath)) {
