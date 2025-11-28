@@ -88,18 +88,16 @@ void GameScene::Draw() {
 
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
-	auto postEffect = ctx_->dxCommon.GetPostEffectManager();
-	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	postEffect->DrawImGui();
+	//auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	//postEffect->DrawImGui();
 #endif // USE_IMGUI
 
-	gridModel_->DrawImGui("grid");
+	//gridModel_->DrawImGui("grid");
+	//player_->DrawImGui();
+	//enemyManager_->DrawImGui();
 
-	player_->DrawImGui();
-
-	enemyManager_->DrawImGui();
-
-	testParticle_->DrawImGui("fire");
+	testParticle_->DrawImGui("TestParticle");
 }
 
 void GameScene::PostFrameCleanup() {

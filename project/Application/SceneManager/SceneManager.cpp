@@ -43,7 +43,7 @@ void SceneManager::Initialize() {
     winApp_ = std::make_unique<WinApp>();
 
     // 各種初期化
-    winApp_->Initialize(L"GigaBonk");
+    winApp_->Initialize(L"LE2A_01_アサカワ_サクト");
 
     // exeのアイコン設定
     winApp_->SetIconFromTexture("resources/image/icon.png");
