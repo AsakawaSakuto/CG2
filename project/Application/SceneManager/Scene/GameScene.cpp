@@ -27,7 +27,7 @@ void GameScene::Initialize() {
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
 
-	testParticle_->Initialize(&ctx_->dxCommon);
+	testParticle_->Initialize(&ctx_->dxCommon, 200);
 	dustParticle_->Initialize(&ctx_->dxCommon);
 	dustParticle_->LoadJson("dust");
 

@@ -22,7 +22,7 @@ void TestScene::Initialize() {
 
 	testParticle_->Initialize(&ctx_->dxCommon, 100);
 
-	testSprite_->Initialize(&ctx_->dxCommon, "icon.png", { 64.0f,64.0f });
+	testSprite_->Initialize(&ctx_->dxCommon, "icon/fireBall.png", { 64.0f,64.0f });
 
 	cube_->Initialize(&ctx_->dxCommon, "cube.obj");
     cubeTransform_.translate = { -1.5f,2.5f,0.0f };
@@ -158,6 +158,8 @@ void TestScene::DrawImGui() {
     testAABB2_.DrawImGui("testAABB2");
     testSphere_.DrawImGui("testSphere");
     testOvalSphere_.DrawImGui("testOvalSphere");
+
+    testSprite_->DrawImGui("testSprite");
 
 	//MT4_01_01();
 	//MT4_01_02();

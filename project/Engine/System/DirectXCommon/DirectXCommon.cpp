@@ -293,7 +293,7 @@ void DirectXCommon::CreateShaderCompiler() {
 #ifdef USE_IMGUI
 void DirectXCommon::CreateImgui() {
     // ImGuiの初期化。詳細はさして重要ではないので解説は省略する。
-        // こういうもんである
+    // こういうもんである
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     

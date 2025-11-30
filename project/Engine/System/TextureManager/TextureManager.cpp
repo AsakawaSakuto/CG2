@@ -133,9 +133,10 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         return;
     }
 
+    // sRGB変換を無効化（リニア色空間で読み込む）
     HRESULT hr = DirectX::LoadFromWICFile(
         filePathW.c_str(),
-        DirectX::WIC_FLAGS_FORCE_SRGB,
+        DirectX::WIC_FLAGS_NONE,  // WIC_FLAGS_FORCE_SRGBを削除
         nullptr,
         image);
     
@@ -144,13 +145,13 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         return;
     }
 
-    // ミップマップ生成
+    // ミップマップ生成（リニアフィルタに変更）
     DirectX::ScratchImage mipImages{};
     hr = DirectX::GenerateMipMaps(
         image.GetImages(),
         image.GetImageCount(),
         image.GetMetadata(),
-        DirectX::TEX_FILTER_SRGB,
+        DirectX::TEX_FILTER_DEFAULT,  // TEX_FILTER_SRGBをDEFAULTに変更
         0,
         mipImages);
     
