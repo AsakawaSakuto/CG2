@@ -828,3 +828,37 @@ void DirectXCommon::ResizeToWindow() {
         postEffectManager_->Resize(winApp_->GetWidth(), winApp_->GetHeight());
     }
 }
+
+void DirectXCommon::ClearShaderCache() {
+    namespace fs = std::filesystem;
+    
+    // キャッシュディレクトリのパス
+    fs::path cacheDirPath = L"resources/shaders/cache";
+    
+    // ディレクトリが存在しない場合は何もしない
+    if (!fs::exists(cacheDirPath)) {
+        Logger::Log("[Cache] Cache directory does not exist, skipping cleanup.\n");
+        return;
+    }
+    
+    try {
+        // ディレクトリ内の全ての.csoファイルを削除
+        int deletedCount = 0;
+        for (const auto& entry : fs::directory_iterator(cacheDirPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == L".cso") {
+                fs::remove(entry.path());
+                deletedCount++;
+                Logger::Log(ConvertString(std::format(L"[Cache] Deleted: {}\n", entry.path().wstring())));
+            }
+        }
+        
+        if (deletedCount > 0) {
+            Logger::Log(std::format("[Cache] Cleared {} shader cache file(s).\n", deletedCount));
+        } else {
+            Logger::Log("[Cache] No shader cache files to delete.\n");
+        }
+    }
+    catch (const fs::filesystem_error& e) {
+        Logger::Log(std::format("[Cache] Error while clearing cache: {}\n", e.what()));
+    }
+}

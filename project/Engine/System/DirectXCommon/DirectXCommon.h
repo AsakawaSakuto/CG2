@@ -50,6 +50,9 @@ public:
 
     void ResizeToWindow();
     
+    // シェーダーキャッシュファイルを全て削除する
+    void ClearShaderCache();
+    
     //
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 

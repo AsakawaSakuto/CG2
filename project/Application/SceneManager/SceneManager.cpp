@@ -155,21 +155,25 @@ void SceneManager::Update() {
 
 void SceneManager::Finalize() {
 
-    // シーンのリセット
-    for (int i = 0; i < sceneNum; i++) {
-        if (sceneArr_[i]) {
-            sceneArr_[i].reset();
-        }
-    }
+	// シーンのリセット
+	for (int i = 0; i < sceneNum; i++) {
+		if (sceneArr_[i]) {
+			sceneArr_[i].reset();
+		}
+	}
 
-    // 各種終了処理
-    TextureManager::GetInstance()->Finalize();
-    appContext_->dxCommon.CloseFence();
-    winApp_->Finalize();
-    CoUninitialize();
+	// 各種終了処理
+	TextureManager::GetInstance()->Finalize();
+	
+	// シェーダーキャッシュを削除
+	appContext_->dxCommon.ClearShaderCache();
+	
+	appContext_->dxCommon.CloseFence();
+	winApp_->Finalize();
+	CoUninitialize();
 
-    // 振動のリセット
-    appContext_->gamePad.SetVibration(0.0f, 0.0f, 0.0f);
+	// 振動のリセット
+	appContext_->gamePad.SetVibration(0.0f, 0.0f, 0.0f);
 }
 
 void SceneManager::Shortcut() {
