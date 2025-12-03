@@ -31,12 +31,6 @@ void GameScene::Initialize() {
 	dustParticle_->Initialize(&ctx_->dxCommon);
 	dustParticle_->LoadJson("dust");
 
-	gridModel_->Initialize(&ctx_->dxCommon, "grid/grid.obj");
-	gridModel_->SetTexture("resources/image/white16x16.png");
-	gridModel_->UseLight(false);
-	gridModel_->SetColor4({ 0.0f,0.0f,0.0f,1.0f });
-	gridTransform_.translate = { 0.0f,-0.5f,0.0f };
-
 	testLine_->Initialize(&ctx_->dxCommon);
 }
 
@@ -59,8 +53,6 @@ void GameScene::Update() {
 	camera_ = gameCamera_->GetCamera();
 	camera_.Update();
 
-	gridModel_->Update();
-
 	testParticle_->Update();
 	dustParticle_->Update();
 
@@ -73,8 +65,6 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 	testLine_->Draw(camera_);
-
-	gridModel_->Draw(camera_, gridTransform_);
 
 	enemyManager_->Draw(camera_);
 
