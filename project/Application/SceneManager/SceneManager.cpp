@@ -6,6 +6,7 @@
 #include <windows.h>
 #include "TextureManager.h"
 #include "Logger.h"
+#include "Engine/System/Utility/GameTimer/DeltaTime.h" // パス修正
 
 SceneManager::SceneManager() {
     // シーン配列は初期化時には空にする
@@ -135,6 +136,12 @@ void SceneManager::Update() {
 
         sceneArr_[curIndex]->DrawSceneName();
         sceneArr_[curIndex]->DrawImGui();
+
+        // FPS表示（ImGui）
+        ImGui::Begin("Performance");
+        ImGui::Text("FPS: %.1f", GetFPS());
+        ImGui::Text("DeltaTime: %.4f ms", GetDeltaTime() * 1000.0f);
+        ImGui::End();
 
         ImGui::Render();
 #endif

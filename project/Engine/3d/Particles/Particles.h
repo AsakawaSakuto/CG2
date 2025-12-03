@@ -25,6 +25,7 @@
 #include "Camera.h"
 #include "BlendMode.h"
 #include "EmitterState.h"
+#include "Engine/System/Utility/GameTimer/DeltaTime.h" // パス修正
 
 #include <random>
 #include <numbers>
@@ -197,8 +198,6 @@ private:
 	// 現在のブレンドモード
 	BlendMode blendMode_;
 	
-	// 1フレームあたりの固定デルタタイム
-	const float kDeltaTime_ = 1.0f / 60.0f;
 
 	float totalTime_ = 0.0f;
 
@@ -264,7 +263,7 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
 
 	// リソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;           // 頂点
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;           // 項点
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;            // インデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;         // マテリアル
 

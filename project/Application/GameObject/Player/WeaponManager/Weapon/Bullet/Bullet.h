@@ -14,6 +14,9 @@ public:
     void Update() override;
     void Draw(Camera camera) override;
     void DrawImGui() override;
+    
+    // デストラクタを追加（unique_ptrの確実な解放を保証）
+    ~Bullet() override = default;
 
     void SetPosition(const Vector3& position);
     void SetDirectionToEnemy(const Vector3& direction);

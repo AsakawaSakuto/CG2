@@ -143,6 +143,16 @@ void Weapon::PostFrameCleanup() {
 			++it;
 		}
 	}
+	
+	// 死亡したエリアを削除
+	auto areaIt = areas_.begin();
+	while (areaIt != areas_.end()) {
+		if (!(*areaIt)->IsAlive()) {
+			areaIt = areas_.erase(areaIt);
+		} else {
+			++areaIt;
+		}
+	}
 }
 
 void Weapon::BulletTypeUpdate() {

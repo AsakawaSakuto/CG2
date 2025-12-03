@@ -6,7 +6,7 @@ namespace {
 }
 
 void Logger::Initialize() {
-    logFile.open("Log.txt", std::ios::out);
+    logFile.open("Log.Log", std::ios::out);
     Log("=== Logger Initialized ===");
 }
 

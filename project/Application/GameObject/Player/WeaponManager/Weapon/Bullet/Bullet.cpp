@@ -9,6 +9,8 @@ void Bullet::Initialize(AppContext* ctx) {
 
 	lifeTimer_.Start(10.0f, false);
 
+	// 初回のみリソース確保、2回目以降はリセットのみ
+	// （Particlesクラス内部で isInitialized_ フラグを使用して判定）
 	particle_->Initialize(&ctx_->dxCommon);
 	particle2_->Initialize(&ctx_->dxCommon);
 

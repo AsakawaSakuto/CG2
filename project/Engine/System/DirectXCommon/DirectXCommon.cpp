@@ -6,6 +6,7 @@
 #include "../Engine/System/HeapManager/DescriptorAllocator.h" 
 #include "Engine/System/DirectXCommon/ExeColor.h"
 #include "TextureManager.h"
+#include "Engine/System/Utility/GameTimer/DeltaTime.h" // パス修正
 
 
 // 修正: PSOManagerをインクルード（相対パス修正）
@@ -442,8 +443,12 @@ void DirectXCommon::PostDraw() {
     ID3D12CommandList* commandLists[] = { commandList_.Get() };
     commandQueue_->ExecuteCommandLists(1, commandLists);
 
-    // 画面に表示
+    // 画面に表示（VSync有効 = 1, VSync無効 = 0）
+    // 60FPS固定の場合はVSyncを有効にすることを推奨
     swapChain_->Present(1, 0);
+
+    // DeltaTimeを更新（フレーム計測）
+    DeltaTime::GetInstance().Update();
 
     WaitForGPU();
 
@@ -453,8 +458,8 @@ void DirectXCommon::PostDraw() {
     hr_ = commandList_->Reset(commandAllocator_.Get(), nullptr);
     assert(SUCCEEDED(hr_));
 
-    // FPS固定
-    UpdateFixFPS();
+    // FPS固定（VSync無効時のみ有効）
+    // UpdateFixFPS(); // ← VSync有効の場合は不要なのでコメントアウト
 }
 
 void DirectXCommon::InitializeFixFPS() {
@@ -479,7 +484,15 @@ void DirectXCommon::UpdateFixFPS() {
 
     // 1/60秒（よりわずかに短い時間）経っていない場合
     if (elapsed < kMinCheckTime) {
-        // 1/60秒経過するまで微小なスリープを繰り返す
+        // 効率的な待機：残り時間に応じてスリープ時間を調整
+        auto remainingTime = kMinTime - elapsed;
+        
+        // 残り時間が1ms以上ある場合は大きめにスリープ
+        if (remainingTime.count() > 1000) {
+            std::this_thread::sleep_for(std::chrono::microseconds(remainingTime.count() / 2));
+        }
+        
+        // 最後の微調整はスピンロック
         while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
             // 1マイクロ秒スリープ
             std::this_thread::sleep_for(std::chrono::microseconds(1));

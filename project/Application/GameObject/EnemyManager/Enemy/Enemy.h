@@ -8,6 +8,7 @@ public:
     void Update() override;
     void Draw(Camera camera) override;
     void DrawImGui() override;
+    ~Enemy() override = default; // デストラクタを追加（unique_ptrの確実な解放を保証）
 
 	void SetPosition(const Vector3& position) { transform_.translate = position; }
 

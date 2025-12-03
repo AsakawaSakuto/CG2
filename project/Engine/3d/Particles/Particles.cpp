@@ -19,6 +19,8 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	if (isInitialized_) {
 		// Emitterの値だけリセット
 		ResetEmitterToDefault();
+		// バッファリセットフラグを立てる（次回Update時にGPUバッファをクリア）
+		needsBufferReset_ = true;
 		return;
 	}
 
@@ -960,7 +962,7 @@ void Particles::CreateEmitterResource() {
 void Particles::UpdateEmitter() {
 	// このemitterSphereをCBufferとしてGPUへ転送
 	if (emitter_.useEmitter) {
-		emitter_.frequencyTime += kDeltaTime_;  // frequencyTimerをfrequencyTimeに修正
+		emitter_.frequencyTime += GetDeltaTime();  // kDeltaTime_からGetDeltaTime()に変更
 	}
 
 	if (emitter_.frequency <= emitter_.frequencyTime) {
@@ -1002,12 +1004,12 @@ void Particles::CreatePerFrameResource() {
 
 void Particles::UpdatePerFrame() {
 	frameIndex++;
-	totalTime_ += kDeltaTime_;
+	totalTime_ += GetDeltaTime();  // kDeltaTime_からGetDeltaTime()に変更
 	// フレームごとに
 	PerFrame* mapped = nullptr;
 	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
 	mapped->time = totalTime_;      // 例えば経過時間など
-	mapped->deltaTime = kDeltaTime_;  // フレームごとの経過時間
+	mapped->deltaTime = GetDeltaTime();  // kDeltaTime_からGetDeltaTime()に変更
 	mapped->index = frameIndex;
 	mapped->pad1 = 0.0f;            // パディングを初期化
 }

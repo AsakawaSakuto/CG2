@@ -9,6 +9,8 @@ public:
     void Draw(Camera camera) override;
     void DrawImGui() override;
 
+    ~Area() override = default;
+
     void SetPosition(const Vector3& position) { transform_.translate = position; }
 
     void LoadJson(const std::string& filePath, const std::string& filePath2 = "none") {
