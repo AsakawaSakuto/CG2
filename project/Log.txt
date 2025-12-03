@@ -5,6 +5,48 @@
 
 [Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
 [Log] [Cache] Loading cached shader (Release): resources/shaders/cache\Line.VS_vs_6_0.cso
 
 [Log] [Cache] Loading cached shader (Release): resources/shaders/cache\Line.PS_ps_6_0.cso
@@ -22,4 +64,1446 @@
 [Log] [Cache] Loading cached shader (Release): resources/shaders/cache\CopyImage.VS_vs_6_0.cso
 
 [Log] [Cache] Loading cached shader (Release): resources/shaders/cache\CopyImage.PS_ps_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Error] Texture file not found: resources/model/weapon/C:/Users/k024g/OneDrive/デスクトップ/CG2/project/resources/image/Particle/magic.png
+[Error] Texture file not found: resources/model/weapon/C:/Users/k024g/OneDrive/デスクトップ/CG2/project/resources/image/Particle/magic.png
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\InitializeParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\EmitterParticle.CS_cs_6_0.cso
+
+[Log] [Cache] Loading cached shader (Release): resources/shaders/cache\UpdateParticle.CS_cs_6_0.cso
 

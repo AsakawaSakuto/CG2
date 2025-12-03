@@ -49,8 +49,8 @@ void TestScene::Initialize() {
 	testTimer_.Start(2.0f, true);
 
 	// 楕円球体の初期化
-	testOvalSphere_.center = { 0.0f, 0.0f, 5.0f };
-	testOvalSphere_.radius = { 2.0f, 1.0f, 1.5f };
+	testOvalSphere_.center = { 0.0f, 0.0f, 0.0f };
+	testOvalSphere_.radius = { 1.5f, 1.0f, 1.5f };
 
 	testLine_->Initialize(&ctx_->dxCommon);
 }
@@ -61,51 +61,9 @@ void TestScene::Update() {
     Vector3 end = { 1.0f, 1.0f, 1.0f };
     testLine_->AddLine(walkTransform_.translate, sneakWalkTransform_.translate);
 
-    // AABB同士とSphereとの衝突判定
-    if (Collision::IsHit(testAABB1_,testAABB2_) || 
-        Collision::IsHit(testAABB1_, testSphere_) ||
-        Collision::IsHit(testAABB2_, testSphere_)) {
-
-        testLine_->AddBox(testAABB1_, RED);
-        testLine_->AddBox(testAABB2_, RED);
-		testLine_->AddSphere(testSphere_, RED);
-        
-    } else {
-
-        testLine_->AddBox(testAABB1_, WHITE);
-        testLine_->AddBox(testAABB2_, WHITE);
-        testLine_->AddSphere(testSphere_, WHITE);
-
-    }
-
-    // OBB同士の衝突判定
-    if (Collision::IsHit(testOBB1_, testOBB2_)) {
-        testLine_->AddBox(testOBB1_, RED);
-        testLine_->AddBox(testOBB2_, RED);
-    } else {
-        testLine_->AddBox(testOBB1_, WHITE);
-        testLine_->AddBox(testOBB2_, WHITE);
-    }
-
-	// 楕円球体の衝突判定テスト
-	Vector4 ovalSphereColor = WHITE;
-	if (Collision::IsHit(testOvalSphere_, testSphere_) ||
-		Collision::IsHit(testOvalSphere_, testAABB1_) ||
-		Collision::IsHit(testOvalSphere_, testAABB2_) ||
-		Collision::IsHit(testOvalSphere_, testOBB1_) ||
-		Collision::IsHit(testOvalSphere_, testOBB2_)) {
-		ovalSphereColor = RED;
-	}
-
-	// 楕円球体を描画
-	testLine_->AddOvalSphere(testOvalSphere_, ovalSphereColor);
-
 	testLine_->AddGrid(20.0f, 20);
 
 	testParticle_->Update();
-
-    cubeTransform_.translate.x = Easing::Lerp(-1.5f, 1.5f, testTimer_.GetProgress(), Easing::Type::EaseInBack);
-    spinCubeTransform_.translate.x = Easing::Lerp_GAB(-1.5f, 1.5f, testTimer_.GetProgress(), Easing::Type::Linear, Easing::Type::EaseOutBounce);
 
 	cube_->Update();
 	spinCube_->Update();
@@ -146,26 +104,18 @@ void TestScene::DrawImGui() {
     auto postEffect = ctx_->dxCommon.GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	testParticle_->DrawImGui("testp");
-
-	walkTransform_.DrawImGui("walk");
-	sneakWalkTransform_.DrawImGui("sneakWalk");
-
-	testOBB1_.DrawImGui("testOBB1");
-    testOBB2_.DrawImGui("testOBB2");
-
-    testAABB1_.DrawImGui("testAABB1");
-    testAABB2_.DrawImGui("testAABB2");
+	testOBB_.DrawImGui("testOBB");
+    testAABB_.DrawImGui("testAABB");
     testSphere_.DrawImGui("testSphere");
     testOvalSphere_.DrawImGui("testOvalSphere");
 
     testSprite_->DrawImGui("testSprite");
 
-	//MT4_01_01();
-	//MT4_01_02();
-	//MT4_01_03();
-	//MT4_01_04();
-    //MT4_01_05();
+	MT4_01_01();
+	MT4_01_02();
+	MT4_01_03();
+	MT4_01_04();
+    MT4_01_05();
 
 #endif
 }

@@ -9,8 +9,8 @@
 
 // 楕円球体
 struct OvalSphere {
-	Vector3 center; // 中心点
-	Vector3 radius; // 半径
+	Vector3 center = { 0.0f,0.0f,0.0f }; // 中心点
+	Vector3 radius = { 1.0f,1.0f,1.0f }; // 半径
 
 #ifdef USE_IMGUI
 	/// <summary>

@@ -11,6 +11,8 @@ void Bullet::Initialize(AppContext* ctx) {
 
 	particle_->Initialize(&ctx_->dxCommon);
 	particle2_->Initialize(&ctx_->dxCommon);
+
+	debugLine_->Initialize(&ctx_->dxCommon);
 }
 
 void Bullet::Update() {
@@ -29,6 +31,7 @@ void Bullet::Update() {
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = 0.5f;
 
+	debugLine_->AddSphere(sphereCollision_);
 	
 	particle_->SetEmitterPosition(transform_.translate);
 	particle_->Update();
@@ -51,6 +54,7 @@ void Bullet::Update() {
 
 void Bullet::Draw(Camera camera) {
 	if (isAlive_ && lifeTimer_.GetDuration() >= 0.2f) {
+		debugLine_->Draw(camera);
 		particle_->Draw(camera);
 		particle2_->Draw(camera);
 	}

@@ -9,8 +9,8 @@
 
 // 球体
 struct Sphere {
-	Vector3 center; // 中心点
-	float radius;   // 半径
+	Vector3 center = { 0.0f,0.0f,0.0f }; // 中心点
+	float radius = 1.0f;                 // 半径
 
 #ifdef USE_IMGUI
 	/// <summary>
