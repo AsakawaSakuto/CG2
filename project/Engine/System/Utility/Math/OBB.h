@@ -9,10 +9,10 @@
 #endif
 
 struct OBB {
-	Vector3 center;         // 中心点
-	Vector3 size;           // 各辺の長さ
-	Vector3 rotate;         // 回転角
-	Vector3 orientation[3]; // 座標軸 正規化 直交必須
+	Vector3 center = { 0.0f,0.0f,0.0f }; // 中心点
+	Vector3 size = { 1.0f,1.0f,1.0f };   // 各辺の長さ
+	Vector3 rotate = { 0.0f,0.0f,0.0f }; // 回転角
+	Vector3 orientation[3];              // 座標軸 正規化 直交必須
 
 	/// <summary>
 	/// 回転角から座標軸を更新

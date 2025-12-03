@@ -1,11 +1,15 @@
 #pragma once
 #include "Application/AppContext.h"
 #include "Application/GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
+#include "Application/GameObject/Player/WeaponManager/Weapon/Area/area.h"
 #include "Application/GameObject/Player/WeaponManager/WeaponStatus.h"
 #include "Application/GameObject/Player/WeaponManager/WeaponName.h"
 #include "Camera.h"
 #include <queue>
 
+/// <summary>
+/// Update関数をラムダ式にして、Enumでそれに応じたUpdate関数を持ってくるやり方を冬休みにやる
+/// </summary>
 class Weapon {
 public:
 	void Initialize(AppContext* ctx, WeaponName weaponName);
@@ -23,22 +27,27 @@ public:
 	void PostFrameCleanup();
 	
 private:
-	AppContext* ctx_;
-	std::vector<std::unique_ptr<Bullet>> bullets_;
-	
-	// パーティクルオブジェクトプール
-	std::queue<std::shared_ptr<Particles>> particlePool_;
-	const size_t kMaxPoolSize_ = 5; // プールの最大サイズ
 
+	void BulletTypeUpdate();
+
+	void AreaTypeUpdate();
+
+	void DirectTypeUpdate();
+private:
+	AppContext* ctx_;
+
+	std::vector<std::unique_ptr<Bullet>> bullets_;
+	std::vector<std::unique_ptr<Area>> areas_;
+
+	WeaponName weaponName_;
 	WeaponStatus status_;
+
+	EmitterState emitterState1_;
+	EmitterState emitterState2_;
+
 	GameTimer coolDownTimer_; // クールタイムタイマー
 	GameTimer intervalTimer_; // 攻撃間隔タイマー
 
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
-	
-	// プールからパーティクルを取得
-	std::shared_ptr<Particles> AcquireParticleFromPool();
-	// プールにパーティクルを返却
-	void ReturnParticleToPool(std::shared_ptr<Particles> particle);
 };

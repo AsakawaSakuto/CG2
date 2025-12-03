@@ -67,6 +67,7 @@
     <ClCompile Include="Engine\System\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Engine\System\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="Engine\3d\Line\Line.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -158,6 +159,8 @@
     <ClInclude Include="Engine\System\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\3d\Line\Line.h" />
     <ClInclude Include="Engine\System\Utility\Math\OBB.h" />
+    <ClInclude Include="Engine\System\Utility\Math\OvalSphere.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -166,6 +169,5 @@
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
-    <None Include="docs\Line_Usage.md" />
   </ItemGroup>
 </Project>

@@ -96,14 +96,28 @@ void CollisionManager::CheckBulletEnemyCollision() {
 
 				// 弾と敵の衝突判定
 				if (Collision::IsHit(bulletSphere, enemySphere)) {
-					// 衝突した敵と弾を死亡状態にする
-
+					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->SetEmitterPosition(enemy->GetPosition());
 					enemyDieParticle_->Play(false);
 
-					enemy->Dead();
-					bullet->Dead();
-					break; // この弾は当たったので次の弾へ
+					switch (bullet->GetBulletType())
+					{
+					case BulletType::None:
+						// 通常弾なので弾も消滅
+						enemy->Dead();
+						bullet->Dead();
+						break;
+					case BulletType::Penetration:
+						// 貫通するので次の敵のチェックを続ける
+						enemy->Dead();
+						bullet->DecrementPenetrationCount();
+						break;
+					case BulletType::Bounce:
+						// 反射するので次の敵のチェックを続ける
+						enemy->Dead();
+						bullet->DecrementBounceCount();
+						break;
+					}
 				}
 			}
 		}

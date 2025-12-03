@@ -12,7 +12,7 @@ void GameTimer::Update() {
     loopedThisFrame_ = false;
     finished_ = false;
 
-    float scaledDeltaTime = deltaTime_ * timeScale_;
+    float scaledDeltaTime = GetDeltaTime() * timeScale_; // deltaTime_からGetDeltaTime()に変更
 
     currentTime_ += scaledDeltaTime;
     if (currentTime_ >= duration_) {

@@ -7,23 +7,48 @@ void Bullet::Initialize(AppContext* ctx) {
 	transform_.translate = { 0.0f,0.0f,0.0f };
 	transform_.scale = { 0.5f,0.5f,0.5f };
 
-	lifeTimer_.Start(5.0f, false);
+	lifeTimer_.Start(10.0f, false);
+
+	// 初回のみリソース確保、2回目以降はリセットのみ
+	// （Particlesクラス内部で isInitialized_ フラグを使用して判定）
+	particle_->Initialize(&ctx_->dxCommon);
+	particle2_->Initialize(&ctx_->dxCommon);
+
+	debugLine_->Initialize(&ctx_->dxCommon);
 }
 
 void Bullet::Update() {
 
-    transform_.translate += directionToEnemy_ * 25.0f * deltaTime_;
-
-	if (particle_) {
-		particle_->SetEmitterPosition(transform_.translate);
-		particle_->Update();
+	if (penetrationCount_ > 0) {
+		bulletType_ = BulletType::Penetration;
+	} else if (bounceCount_ > 0) {
+		bulletType_ = BulletType::Bounce;
+	} else {
+		bulletType_ = BulletType::None;
 	}
+
+    transform_.translate += directionToEnemy_ * speed_ * deltaTime_;
 
 	// Sphere collider update
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = 0.5f; // Radius matched to bullet's size
+	sphereCollision_.radius = 0.5f;
+
+	debugLine_->AddSphere(sphereCollision_);
+	
+	particle_->SetEmitterPosition(transform_.translate);
+	particle_->Update();
+
+	particle2_->SetEmitterPosition(transform_.translate);
+	particle2_->Update();
+
 
 	lifeTimer_.Update();
+
+	if (lifeTimer_.GetProgress() >= 0.9f) {
+		particle_->Stop();
+		particle2_->Stop();
+	}
+
 	if (lifeTimer_.IsFinished()) {
 		Dead();
 	}
@@ -31,7 +56,9 @@ void Bullet::Update() {
 
 void Bullet::Draw(Camera camera) {
 	if (isAlive_ && lifeTimer_.GetDuration() >= 0.2f) {
+		debugLine_->Draw(camera);
 		particle_->Draw(camera);
+		particle2_->Draw(camera);
 	}
 }
 

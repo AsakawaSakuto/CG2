@@ -5,7 +5,7 @@ void Enemy::Initialize(AppContext* ctx) {
 	transform_.scale = { 1.0f,1.0f,1.0f };
 	transform_.translate = { 0.0f,0.0f,0.0f };
 
-	model_->Initialize(&ctx_->dxCommon, "Animation/human/walk.gltf");
+	model_->Initialize(&ctx_->dxCommon, "Animation/human/lowWalk.gltf");
 	model_->SetUpdateFrustumCulling(false);
 	//model_->SetDrawFrustumCulling(false);
 

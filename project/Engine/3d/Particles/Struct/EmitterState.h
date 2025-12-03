@@ -28,9 +28,9 @@ enum class EmitterShapeType : uint32_t {
 };
 
 /// <summary>
-/// Emitterの値を保持する構造体
+/// GPU互換のEmitter構造体（PODデータのみ）
 /// </summary>
-struct EmitterState {
+struct EmitterStateGPU {
 	Vector3 translate;
 	float radius;
 	
@@ -129,7 +129,15 @@ struct EmitterState {
 	uint32_t useGravity;
 	float gravityY;
 	float accelerationY;
+	
+	uint32_t blendModeValue; // BlendModeをuint32_tとして格納
+	float pad20[3];
+};
 
-	std::string texturePath;
-	BlendMode blendMode = kBlendModeAdd; // BlendModeフィールドを追加
+/// <summary>
+/// Emitterの値を保持する構造体（CPU側で使用）
+/// </summary>
+struct EmitterState : public EmitterStateGPU {
+	std::string texturePath;  // CPU専用
+	BlendMode blendMode = kBlendModeAdd; // CPU専用
 };

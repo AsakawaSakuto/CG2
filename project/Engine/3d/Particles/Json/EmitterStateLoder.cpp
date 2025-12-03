@@ -145,11 +145,20 @@ EmitterState EmitterStateLoader::Load(const std::string& filePath) {
     state.ringAngle = data.value("ringAngle", 0.0f);
     state.ringNormal = data.value("ringNormal", Vector3{ 0.0f, 1.0f, 0.0f });
     
-    // テクスチャパス
-    state.texturePath = data.value("texturePath", std::string(""));
+    // テクスチャパスを確実に std::string としてコピー
+    if (data.contains("texturePath") && !data["texturePath"].is_null()) {
+        // get<std::string>() で明示的にコピー
+        state.texturePath = data["texturePath"].get<std::string>();
+    } else {
+        state.texturePath = "";  // 空文字列を明示的に設定
+    }
 
-    // BlendMode
-    state.blendMode = data.value("blendMode", kBlendModeAdd);
+    // BlendMode も確実にコピー
+    if (data.contains("blendMode") && !data["blendMode"].is_null()) {
+        state.blendMode = static_cast<BlendMode>(data["blendMode"].get<int>());
+    } else {
+        state.blendMode = kBlendModeAdd;  // デフォルト値
+    }
 
     return state;
 }

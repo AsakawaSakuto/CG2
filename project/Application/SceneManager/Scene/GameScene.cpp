@@ -27,12 +27,17 @@ void GameScene::Initialize() {
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
 
-	testParticle_->Initialize(&ctx_->dxCommon);
+	testParticle_->Initialize(&ctx_->dxCommon, 200);
+	dustParticle_->Initialize(&ctx_->dxCommon);
+	dustParticle_->LoadJson("dust");
 
 	gridModel_->Initialize(&ctx_->dxCommon, "grid/grid.obj");
-	gridModel_->SetTexture("resources/image/uvChecker.png");
+	gridModel_->SetTexture("resources/image/white16x16.png");
+	gridModel_->UseLight(false);
+	gridModel_->SetColor4({ 0.0f,0.0f,0.0f,1.0f });
 	gridTransform_.translate = { 0.0f,-0.5f,0.0f };
-	gridModel_->SetColor4({ 1.0f,1.0f,1.0f,0.05f });
+
+	testLine_->Initialize(&ctx_->dxCommon);
 }
 
 void GameScene::Update() {
@@ -57,13 +62,18 @@ void GameScene::Update() {
 	gridModel_->Update();
 
 	testParticle_->Update();
+	dustParticle_->Update();
 
 	if (collisionManager_->GetGoResult() || ctx_->gamePad.TriggerButton(GamePad::X)) {
 		//ChangeScene(SCENE::RESULT);
 	}
+
+	testLine_->AddGrid(100.0f, 20);
 }
 
 void GameScene::Draw() {
+	testLine_->Draw(camera_);
+
 	gridModel_->Draw(camera_, gridTransform_);
 
 	enemyManager_->Draw(camera_);
@@ -71,24 +81,23 @@ void GameScene::Draw() {
 	player_->Draw(camera_);
 
 	testParticle_->Draw(camera_);
+	dustParticle_->Draw(camera_);
 
 	collisionManager_->Draw(camera_);
 }
 
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
-	auto postEffect = ctx_->dxCommon.GetPostEffectManager();
-	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	postEffect->DrawImGui();
+	//auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	//postEffect->DrawImGui();
 #endif // USE_IMGUI
 
-	gridModel_->DrawImGui("grid");
+	//gridModel_->DrawImGui("grid");
+	//player_->DrawImGui();
+	//enemyManager_->DrawImGui();
 
-	player_->DrawImGui();
-
-	enemyManager_->DrawImGui();
-
-	testParticle_->DrawImGui("fire");
+	testParticle_->DrawImGui("TestParticle");
 }
 
 void GameScene::PostFrameCleanup() {

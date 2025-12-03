@@ -1,0 +1,131 @@
+{
+    "alphaFade": 0,
+    "blendMode": 2,
+    "colorFade": 0,
+    "colorRandom": 0,
+    "coneAngle": 0.0,
+    "coneDirection": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "coneHeight": 0.0,
+    "count": 0,
+    "emit": 0,
+    "endColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "endRotateVelocity": 0.0,
+    "endScale": [
+        0.0,
+        0.0
+    ],
+    "endVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "frequency": 1.0,
+    "frequencyTime": 0.0,
+    "hemisphereAngle": 0.0,
+    "isMove": 0,
+    "kMaxParticle": 512,
+    "lifeTime": 0.0,
+    "lifeTimeRandom": 0,
+    "lineLength": 0.0,
+    "lineStart": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "maxColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "maxLifeTime": 5.0,
+    "maxRotateVelocity": 1.0,
+    "maxScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "maxVelocity": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "minColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "minLifeTime": 1.0,
+    "minRotateVelocity": -1.0,
+    "minScale": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "minVelocity": [
+        -1.0,
+        -1.0,
+        -1.0
+    ],
+    "normalVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "planeHeight": 0.0,
+    "planeNormal": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "planeWidth": 0.0,
+    "radius": 1.0,
+    "ringAngle": 0.0,
+    "ringInnerRadius": 0.0,
+    "ringNormal": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "ringOuterRadius": 0.0,
+    "rotateMove": 0,
+    "rotateVelocityRandom": 0,
+    "scaleFade": 0,
+    "scaleRandom": 0,
+    "shapeType": 0,
+    "size": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "startColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "startRotateVelocity": 0.0,
+    "startScale": [
+        0.0,
+        0.0
+    ],
+    "startVelocity": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "texturePath": "",
+    "translate": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "useEmitter": 0,
+    "velocityRandom": 0
+}

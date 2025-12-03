@@ -2,6 +2,7 @@
 #include"Application/EngineSystem.h"
 #include"Application/SceneManager/IScene.h"
 #include"Engine/System/Utility/Math/OBB.h"
+#include"Engine/System/Utility/Math/OvalSphere.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -56,9 +57,8 @@ private:
 	Camera camera_;
 	DebugCamera debugCamera_;
 
+	AABB testAABB_;
+	OBB testOBB_;
 	Sphere testSphere_;
-	AABB testAABB1_;
-	AABB testAABB2_;
-	OBB testOBB1_;
-	OBB testOBB2_;
+	OvalSphere testOvalSphere_;
 };

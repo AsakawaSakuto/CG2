@@ -160,6 +160,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\GameUI\BaseUI.cpp" />
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />
@@ -291,6 +293,7 @@
     <ClInclude Include="Engine\System\Utility\GameTimer\GameTimer.h" />
     <ClInclude Include="Engine\System\Utility\Math\AABB.h" />
     <ClInclude Include="Engine\System\Utility\Math\OBB.h" />
+    <ClInclude Include="Engine\System\Utility\Math\OvalSphere.h" />
     <ClInclude Include="Engine\System\Utility\Math\Plane.h" />
     <ClInclude Include="Engine\System\Utility\Quaternion\Quaternion.h" />
     <ClInclude Include="Engine\System\Utility\Math\Segment.h" />
@@ -376,7 +379,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="docs\Line_Usage.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />

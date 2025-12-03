@@ -9,12 +9,12 @@
 
 // 球体
 struct Sphere {
-	Vector3 center; // 中心点
-	float radius;   // 半径
+	Vector3 center = { 0.0f,0.0f,0.0f }; // 中心点
+	float radius = 1.0f;                 // 半径
 
 #ifdef USE_IMGUI
 	/// <summary>
-	/// AABBの値をImGuiで編集する
+	/// 球体の値をImGuiで編集する
 	/// </summary>
 	/// <param name="name">適切な名前を入力</param>
 	void DrawImGui(const char* name) {

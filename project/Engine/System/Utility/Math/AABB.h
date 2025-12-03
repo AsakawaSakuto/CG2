@@ -8,8 +8,8 @@
 #endif
 
 struct AABB {
-	Vector3 center; // 中心点
-	Vector3 size;   // 各辺の長さ
+	Vector3 center = { 0.0f,0.0f,0.0f }; // 中心点
+	Vector3 size = { 1.0f,1.0f,1.0f };   // 各辺の長さ
 
 #ifdef USE_IMGUI
 	/// <summary>

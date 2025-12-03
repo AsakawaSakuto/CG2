@@ -25,6 +25,7 @@
 #include "Camera.h"
 #include "BlendMode.h"
 #include "EmitterState.h"
+#include "Engine/System/Utility/GameTimer/DeltaTime.h" // パス修正
 
 #include <random>
 #include <numbers>
@@ -147,34 +148,9 @@ public:
 	/// </summary>
 	/// <param name="filePath">Resources->Data->Particle の中にあるJsonFileのPathを入れる「.jsonは不要」</param>
 	/// <param name="Pathの処理">"resources/Data/Particle/" + (filePath + ".json")</param>
-	void LoadJson(const std::string& filePath) {
-		// 既に同じファイルを読み込んでいる場合はスキップ
-		std::string fullPath = "resources/Data/Particle/" + (filePath + ".json");
-		if (jsonFilePath_ == fullPath && isJsonLoaded_) {
-			return;
-		}
-		
-		jsonFilePath_ = fullPath;
-		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
-		loadToSaveName_ = filePath;
-		
-		// JSONから読み込んだBlendModeを内部変数にも反映
-		blendMode_ = emitter_.blendMode;
-		
-		// JSONから読み込んだテクスチャパスを適用
-		if (!emitter_.texturePath.empty()) {
-			std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
-			if (textureName_ != newTextureName) {
-				textureName_ = newTextureName;
-				// テクスチャファイル読み込み
-				TextureManager::GetInstance()->LoadTexture(textureName_);
-				// 読み込んだテクスチャの番号を取得
-				textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
-			}
-		}
-		
-		isJsonLoaded_ = true;
-	};
+	void LoadJson(const std::string& filePath);
+
+	void SetEmitterState(EmitterState emitter) { emitter_ = emitter; }
 private:
 
 	void ExecuteInitialization();
@@ -222,8 +198,6 @@ private:
 	// 現在のブレンドモード
 	BlendMode blendMode_;
 	
-	// 1フレームあたりの固定デルタタイム
-	const float kDeltaTime_ = 1.0f / 60.0f;
 
 	float totalTime_ = 0.0f;
 
@@ -256,9 +230,9 @@ private:
 	void CreatePerFrameResource();
 	void UpdatePerFrame();
 
+	EmitterState emitter_ = {};
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterRangeResource_;
-	EmitterState emitter_ = {};
 	void CreateEmitterResource();
 	void UpdateEmitter();
 
@@ -289,7 +263,7 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
 
 	// リソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;           // 頂点
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;           // 項点
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;            // インデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;         // マテリアル
 

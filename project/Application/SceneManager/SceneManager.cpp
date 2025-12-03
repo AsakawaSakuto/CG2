@@ -6,6 +6,7 @@
 #include <windows.h>
 #include "TextureManager.h"
 #include "Logger.h"
+#include "Engine/System/Utility/GameTimer/DeltaTime.h" // パス修正
 
 SceneManager::SceneManager() {
     // シーン配列は初期化時には空にする
@@ -43,7 +44,7 @@ void SceneManager::Initialize() {
     winApp_ = std::make_unique<WinApp>();
 
     // 各種初期化
-    winApp_->Initialize(L"TD-2-2");
+    winApp_->Initialize(L"LE2A_01_アサカワ_サクト");
 
     // exeのアイコン設定
     winApp_->SetIconFromTexture("resources/image/icon.png");
@@ -131,8 +132,16 @@ void SceneManager::Update() {
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
+        //ImGui::DockSpaceOverViewport();
+
         sceneArr_[curIndex]->DrawSceneName();
         sceneArr_[curIndex]->DrawImGui();
+
+        // FPS表示（ImGui）
+        ImGui::Begin("Performance");
+        ImGui::Text("FPS: %.1f", GetFPS());
+        ImGui::Text("DeltaTime: %.4f ms", GetDeltaTime() * 1000.0f);
+        ImGui::End();
 
         ImGui::Render();
 #endif
@@ -164,6 +173,11 @@ void SceneManager::Finalize() {
 }
 
 void SceneManager::Shortcut() {
+    // ESCキー : 終了
+    if (GetAsyncKeyState(VK_ESCAPE) & 1) {
+        PostQuitMessage(0);
+    }
+
     // F11キー : フルスクリーン切替
     if (GetAsyncKeyState(VK_F11) & 1) {
         if (!winApp_->IsFullscreen()) {
