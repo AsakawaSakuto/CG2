@@ -2,12 +2,12 @@
 
 void Enemy::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
-	transform_.scale = { 1.0f,1.0f,1.0f };
+	transform_.scale = { 0.0f,0.0f,0.0f };
 	transform_.translate = { 0.0f,0.0f,0.0f };
 
 	model_->Initialize(&ctx_->dxCommon, "Animation/human/lowWalk.gltf");
 	model_->SetUpdateFrustumCulling(false);
-	//model_->SetDrawFrustumCulling(false);
+	model_->SetDrawFrustumCulling(true);
 
 	moveSpeed_ = 2.0f;
 	collicionRadius_ = 0.5f;
