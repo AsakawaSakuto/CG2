@@ -74,6 +74,10 @@ void SceneManager::Update() {
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             if (msg.message == WM_QUIT) {
                 running = false;
+
+                // シェーダーキャッシュを削除
+                appContext_->dxCommon.ClearShaderCache();
+
                 break;
             }
             TranslateMessage(&msg);

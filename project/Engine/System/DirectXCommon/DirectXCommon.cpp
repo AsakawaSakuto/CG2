@@ -353,8 +353,7 @@ void DirectXCommon::PreDraw() {
         // 描画用のDescriptorHeapの設定
         ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
         commandList_->SetDescriptorHeaps(1, descriptorHeaps);
-    }
-    else {
+    } else {
         // 従来の描画（SwapChainに直接描画）
         // これから書き込むバックバッファのインデックスを取得
         backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
