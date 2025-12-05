@@ -21,6 +21,11 @@ class Sprite
 public:
 
 	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Sprite();
+
+	/// <summary>
 	/// Spriteの初期化
 	/// </summary>
 	/// <param name="dxCommon">dxCommonを渡す</param>

@@ -8,6 +8,51 @@ using namespace Microsoft::WRL;
 // PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 
+Sprite::~Sprite() {
+	// マップされたリソースを全てアンマップ
+	if (vertexResource_ && vertexData_) {
+		vertexResource_->Unmap(0, nullptr);
+		vertexData_ = nullptr;
+	}
+	
+	if (indexResource_ && indexData_) {
+		indexResource_->Unmap(0, nullptr);
+		indexData_ = nullptr;
+	}
+	
+	if (materialResource_ && materialData_) {
+		// 注意: CreateMaterialResourceでUnmapしているが、描画時に再度Mapされている可能性がある
+		// 安全のためチェック
+		materialResource_->Unmap(0, nullptr);
+		materialData_ = nullptr;
+	}
+	
+	if (transformationResource_ && transformationData_) {
+		transformationResource_->Unmap(0, nullptr);
+		transformationData_ = nullptr;
+	}
+	
+	if (directionalLightResource_ && directionalLightData_) {
+		directionalLightResource_->Unmap(0, nullptr);
+		directionalLightData_ = nullptr;
+	}
+	
+	if (cameraResource_ && cameraData_) {
+		cameraResource_->Unmap(0, nullptr);
+		cameraData_ = nullptr;
+	}
+	
+	if (pointLightResource_ && pointLightData_) {
+		pointLightResource_->Unmap(0, nullptr);
+		pointLightData_ = nullptr;
+	}
+	
+	if (spotLightResource_ && spotLightData_) {
+		spotLightResource_->Unmap(0, nullptr);
+		spotLightData_ = nullptr;
+	}
+}
+
 void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position, Vector2 scale) {
 
 	dxCommon_ = dxCommon;
@@ -227,8 +272,7 @@ void Sprite::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = false;
 	materialData_->uvTransformMatrix = MakeIdentityMatrix();
-
-	materialResource_->Unmap(0, nullptr);
+	// マップしたままにする（Update()で書き込みを行うため）
 }
 
 void Sprite::CreateTransformationResource() {

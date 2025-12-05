@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "Logger.h"
 #include "Engine/System/Utility/GameTimer/DeltaTime.h" // パス修正
+#include "Engine/3d/Model/Model.h" // Model::Finalize用
 
 SceneManager::SceneManager() {
     // シーン配列は初期化時には空にする
@@ -161,18 +162,33 @@ void SceneManager::Finalize() {
     // 振動のリセット
     appContext_->gamePad.SetVibration(0.0f, 0.0f, 0.0f);
 
-    // シーンのリセット
+    // シーンのリセット（最初にシーンを解放してGPUリソースを減らす）
     for (int i = 0; i < sceneNum; i++) {
         if (sceneArr_[i]) {
             sceneArr_[i].reset();
         }
     }
 
+    // GPUの完了を待機（リソース解放前に）
+    appContext_->dxCommon.WaitForGPU();
+
+    // Modelの静的キャッシュを解放
+    Model::Finalize();
+
+    // TextureManagerのリソースを解放
     TextureManager::GetInstance()->Finalize();
     
+    // フェンスイベントを閉じる（デストラクタでも行うが念のため）
     appContext_->dxCommon.CloseFence();
 
+    // appContext_はunique_ptrなので、ここでデストラクタが呼ばれる前に
+    // 明示的にリセットして、DirectXCommonのデストラクタを呼び出す
+    appContext_.reset();
+
+    // WinAppの終了処理
     winApp_->Finalize();
+    
+    // COM終了
     CoUninitialize();
 }
 

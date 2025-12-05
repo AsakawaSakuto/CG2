@@ -36,6 +36,9 @@ public:
     
     void Initialize(DirectXCommon* dxCommon);
     
+    // リソースの解放（アプリケーション終了時に呼び出す）
+    void Finalize();
+    
     // 特定のタイプのPSOを取得、遅延初期化対応
     Microsoft::WRL::ComPtr<ID3D12PipelineState> GetPSO(PSOType type);
     

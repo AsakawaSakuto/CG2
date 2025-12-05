@@ -18,6 +18,69 @@
 
 using namespace Microsoft::WRL;
 
+DirectXCommon::~DirectXCommon() {
+    // GPUの処理完了を待機
+    WaitForGPU();
+    
+#ifdef USE_IMGUI
+    // ImGuiのシャットダウン
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+#endif
+    
+    // PSOManagerのリソースを解放
+    PSOManager::GetInstance().Finalize();
+    
+    // ポストエフェクトマネージャーを解放
+    postEffectManager_.reset();
+    
+    // アロケーターを解放
+    particleAlloc_.reset();
+    modelAlloc_.reset();
+    
+    // フェンスイベントを閉じる
+    if (fenceEvent_) {
+        CloseHandle(fenceEvent_);
+        fenceEvent_ = nullptr;
+    }
+    
+    // ComPtrは自動的にリソースを解放するが、順序を明示的に制御
+    // コマンドリスト関連
+    commandList_.Reset();
+    commandAllocator_.Reset();
+    commandQueue_.Reset();
+    fence_.Reset();
+    
+    // 描画リソース
+    for (int i = 0; i < 2; ++i) {
+        swapChainResources_[i].Reset();
+    }
+    depthStencilResource_.Reset();
+    
+    // デスクリプタヒープ
+    srvDescriptorHeap_.Reset();
+    rtvDescriptorHeap_.Reset();
+    dsvDescriptorHeap_.Reset();
+    uavDescriptorHeap_.Reset();
+    
+    // スワップチェイン
+    swapChain_.Reset();
+    
+    // シェーダーコンパイラ
+    includeHandler_.Reset();
+    dxcCompiler_.Reset();
+    dxcUtils_.Reset();
+    
+    // デバイス関連（最後に解放）
+    useAdapter_.Reset();
+    dxgiFactory_.Reset();
+    debugController_.Reset();
+    device_.Reset();
+    
+    OutputDebugStringA("DirectXCommon::~DirectXCommon completed - All resources released\n");
+}
+
 void DirectXCommon::Initialize(WinApp* winApp) {
     // NULL
     assert(winApp);
@@ -165,7 +228,10 @@ void DirectXCommon::CreateCommand() {
 }
 
 void DirectXCommon::CloseFence() {
-    CloseHandle(fenceEvent_);
+    if (fenceEvent_) {
+        CloseHandle(fenceEvent_);
+        fenceEvent_ = nullptr;  // 閉じた後はnullptrにする
+    }
 }
 
 void DirectXCommon::ResetCommand() {

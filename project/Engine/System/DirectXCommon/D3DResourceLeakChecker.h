@@ -1,7 +1,7 @@
 #pragma once
 
-class D3ResourceLeakChecker
+class D3DResourceLeakChecker
 {
 public:
-	~D3ResourceLeakChecker();
+	~D3DResourceLeakChecker();
 };
