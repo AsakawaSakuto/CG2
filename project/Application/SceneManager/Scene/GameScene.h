@@ -46,5 +46,8 @@ private:
 
 	unique_ptr<Particles> dustParticle_ = make_unique<Particles>();
 
+	unique_ptr<Sprite> text_;
+	GameTimer textMoveTimer_;
+
 	unique_ptr<Line> testLine_ = make_unique<Line>();
 };

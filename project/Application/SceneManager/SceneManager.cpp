@@ -15,7 +15,7 @@ SceneManager::SceneManager() {
         sceneArr_[i] = nullptr;
     }
 
-    currentSceneNo_ = SCENE::TEST;
+    currentSceneNo_ = SCENE::TITLE;
     prevSceneNo_ = currentSceneNo_;
 }
 
@@ -77,7 +77,7 @@ void SceneManager::Update() {
                 running = false;
 
                 // シェーダーキャッシュを削除
-                //appContext_->dxCommon.ClearShaderCache();
+                appContext_->dxCommon.ClearShaderCache();
 
                 break;
             }

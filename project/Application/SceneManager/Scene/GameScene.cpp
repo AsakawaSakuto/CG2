@@ -32,6 +32,10 @@ void GameScene::Initialize() {
 	dustParticle_->LoadJson("dust");
 
 	testLine_->Initialize(&ctx_->dxCommon);
+
+	text_ = make_unique<Sprite>();
+	text_->Initialize(&ctx_->dxCommon, "UI/game/text.png", { 0.0f, 0.0f }, { 1.0f, 1.0f });
+	textMoveTimer_.Start(2.0f, false);
 }
 
 void GameScene::Update() {
@@ -61,6 +65,12 @@ void GameScene::Update() {
 	}
 
 	testLine_->AddGrid(100.0f, 20);
+
+	if (textMoveTimer_.IsActive()) {
+		text_->SetPosition({ Easing::Lerp(1780.0f, -500.0f, textMoveTimer_.GetProgress(),Easing::Type::EaseOutInSine), 360.0f });
+		textMoveTimer_.Update();
+	}
+	text_->Update();
 }
 
 void GameScene::Draw() {
@@ -74,6 +84,8 @@ void GameScene::Draw() {
 	dustParticle_->Draw(camera_);
 
 	collisionManager_->Draw(camera_);
+
+	text_->Draw();
 }
 
 void GameScene::DrawImGui() {
