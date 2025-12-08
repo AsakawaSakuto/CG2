@@ -5,6 +5,7 @@
 #include"Application/GameCameraCntroller/GameCameraController.h"
 #include"Application/GameObject/EnemyManager/EnemyManager.h"
 #include"Application/CollisionManager/CollisionManager.h"
+#include"Engine/2d/BitmapFont/BitmapFont.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -50,4 +51,11 @@ private:
 	GameTimer textMoveTimer_;
 
 	unique_ptr<Line> testLine_ = make_unique<Line>();
+
+	// ビットマップフォント（数字表示用）
+	unique_ptr<BitmapFont> scoreFont_ = make_unique<BitmapFont>();
+	unique_ptr<BitmapFont> timeFont_ = make_unique<BitmapFont>();
+	float gameTime_ = 0.0f;
+	int score_ = 0;
+	GameTimer gameTimer_;
 };

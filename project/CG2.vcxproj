@@ -170,6 +170,7 @@
     <ClCompile Include="Application\SceneManager\Scene\ResultScene.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\TiTleScene.cpp" />
     <ClCompile Include="Application\SceneManager\Test\TestScene.cpp" />
+    <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
     <ClCompile Include="Engine\3d\Line\Line.cpp" />
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Engine\System\HeapManager\DescriptorAllocator.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="Application\SceneManager\Scene\ResultScene.h" />
     <ClInclude Include="Application\SceneManager\Scene\TiTleScene.h" />
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
+    <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
     <ClInclude Include="Engine\3d\Line\Line.h" />
     <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
     <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
@@ -380,6 +382,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="docs\OffscreenRendering_Implementation.md" />
+    <None Include="Engine\2d\BitmapFont\README.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="resources\shaders\Model\Object3d.hlsli">

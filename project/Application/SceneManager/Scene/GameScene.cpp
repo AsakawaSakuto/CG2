@@ -36,6 +36,18 @@ void GameScene::Initialize() {
 	text_ = make_unique<Sprite>();
 	text_->Initialize(&ctx_->dxCommon, "UI/game/text.png", { 0.0f, 0.0f }, { 1.0f, 1.0f });
 	textMoveTimer_.Start(2.0f, false);
+
+	// ビットマップフォントの初期化
+	scoreFont_->Initialize(&ctx_->dxCommon, "number/");
+	scoreFont_->SetScale({ 0.5f, 0.5f });
+	scoreFont_->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f }); // 黄色
+
+	timeFont_->Initialize(&ctx_->dxCommon, "number/");
+	timeFont_->SetScale({ 0.6f, 0.6f });
+	timeFont_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f }); // 白色
+
+	gameTime_ = 0.0f;
+	score_ = 0;
 }
 
 void GameScene::Update() {
@@ -71,6 +83,19 @@ void GameScene::Update() {
 		textMoveTimer_.Update();
 	}
 	text_->Update();
+
+	// ゲーム時間を更新
+	gameTime_ += 1.0f / 60.0f; // 仮に60FPSとして計算
+
+	// スコアを更新（例：テスト用に毎フレーム1増加）
+	// score_++;
+
+	// ビットマップフォントの更新
+	scoreFont_->SetNumber(score_, { 100.0f, 50.0f }, 35.0f);
+	scoreFont_->Update();
+
+	timeFont_->SetTime(gameTime_, { 1100.0f, 50.0f }, 60.0f);
+	timeFont_->Update();
 }
 
 void GameScene::Draw() {
@@ -86,6 +111,10 @@ void GameScene::Draw() {
 	collisionManager_->Draw(camera_);
 
 	text_->Draw();
+
+	// ビットマップフォントの描画
+	scoreFont_->Draw();
+	timeFont_->Draw();
 }
 
 void GameScene::DrawImGui() {
