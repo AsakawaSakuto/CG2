@@ -69,6 +69,7 @@
     <ClCompile Include="Engine\3d\Line\Line.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.cpp" />
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
+    <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="Engine\System\Utility\Math\OvalSphere.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.h" />
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
+    <ClInclude Include="Engine\2d\Gauge\Gauge.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

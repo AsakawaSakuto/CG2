@@ -1,7 +1,15 @@
 #pragma once
 
 struct PlayerStatus {
+	// HP関連
 	int maxHP_ = 100;          // 最大体力
+	int currentHP_ = 100;      // 現在の体力
+
+	// 経験値関連
+	int currentExp_ = 0;       // 現在の経験値
+	int expToNextLevel_ = 100; // 次のレベルまでに必要な経験値
+	int level_ = 1;            // 現在のレベル
+
 	// HPリジェネの値
 	// 獲得するお金の倍率
 	// 獲得するXPの倍率

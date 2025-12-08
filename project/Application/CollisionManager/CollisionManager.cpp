@@ -153,6 +153,7 @@ void CollisionManager::CheckExpItemPlayerCollision() {
 
 			expItemGetParticle_->SetEmitterPosition(player_->GetPosition());
 			expItemGetParticle_->Play(false);
+			player_->AddExp(5);
 
 			expItem->Dead();
 		}

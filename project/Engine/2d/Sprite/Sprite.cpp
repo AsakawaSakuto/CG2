@@ -210,6 +210,26 @@ void Sprite::SetTexture(const std::string& textureName) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
+void Sprite::SetAnchorPoint(const Vector2& anchor) {
+	anchorPoint = anchor;
+	
+	// 頂点データが既に作成されている場合、再計算
+	if (vertexData_) {
+		float width = size_.x;
+		float height = size_.y;
+
+		float left = 0.0f - anchorPoint.x * size_.x;
+		float right = 1.0f - anchorPoint.x * size_.x;
+		float top = 0.0f - anchorPoint.y * size_.y;
+		float bottom = 1.0f - anchorPoint.y * size_.y;
+
+		vertexData_[0].position = { left, bottom + height, 0.0f, 1.0f };  // 左下
+		vertexData_[1].position = { left, top, 0.0f, 1.0f };              // 左上
+		vertexData_[2].position = { right + width, bottom + height, 0.0f, 1.0f }; // 右下
+		vertexData_[3].position = { right + width, top, 0.0f, 1.0f };     // 右上
+	}
+}
+
 void Sprite::CreateVertexResource() {
 	// 頂点リソース
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * 4);

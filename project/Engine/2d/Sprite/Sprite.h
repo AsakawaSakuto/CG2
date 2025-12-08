@@ -98,6 +98,12 @@ public:
 	/// <param name="textureName">resources/image/" 以降のPathを渡す</param>
 	void SetTexture(const std::string& textureName);
 
+	/// <summary>
+	/// アンカーポイントを設定
+	/// </summary>
+	/// <param name="anchor">アンカーポイント（0.0～1.0）</param>
+	void SetAnchorPoint(const Vector2& anchor);
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	HRESULT hr_;

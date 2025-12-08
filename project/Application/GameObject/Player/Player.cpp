@@ -27,6 +27,11 @@ void Player::Initialize(AppContext* ctx) {
 	weaponManager_->Initialize(ctx_);
 
 	debugLine_->Initialize(&ctx_->dxCommon);
+
+	// ステータスの初期化
+	status_.currentHP_ = status_.maxHP_;
+	status_.currentExp_ = 0;
+	status_.level_ = 1;
 }
 
 void Player::Update() {
@@ -276,4 +281,20 @@ float Player::GetDistanceToNearestEnemy() const {
 	}
 
 	return vectorToNearest.Length();
+}
+
+void Player::SetCurrentHP(int hp) {
+	status_.currentHP_ = std::clamp(hp, 0, status_.maxHP_);
+}
+
+void Player::AddExp(int exp) {
+	status_.currentExp_ += exp;
+	
+	// レベルアップチェック
+	while (status_.currentExp_ >= status_.expToNextLevel_) {
+		status_.currentExp_ -= status_.expToNextLevel_;
+		status_.level_++;
+		// 次のレベルに必要な経験値を増やす（例：1.5倍）
+		status_.expToNextLevel_ = static_cast<int>(status_.expToNextLevel_ * 1.1f);
+	}
 }
