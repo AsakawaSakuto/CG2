@@ -20,8 +20,19 @@ void TextureManager::Initialize(DirectXCommon* dxCommon) {
 }
 
 void TextureManager::Finalize() {
+    // テクスチャリソースをクリア
+    textureDatas_.clear();
+    texturePathToIndex_.clear();
+    
+    // デバイス参照をクリア
+    device_.Reset();
+    dxCommon_ = nullptr;
+    
+    // インスタンスを削除
 	delete instance;
 	instance = nullptr;
+    
+    OutputDebugStringA("TextureManager::Finalize completed - All textures released\n");
 }
 
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath) {

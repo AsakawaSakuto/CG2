@@ -39,6 +39,11 @@ class Model {
 public:
 	
 	/// <summary>
+	/// 静的リソースのクリーンアップ（アプリケーション終了時に呼び出す）
+	/// </summary>
+	static void Finalize();
+
+	/// <summary>
 	/// Modelの初期化
 	/// </summary>
 	/// <param name="dxCommon">dxCommonを渡す</param>

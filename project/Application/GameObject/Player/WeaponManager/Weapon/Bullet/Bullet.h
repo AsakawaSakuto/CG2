@@ -36,7 +36,7 @@ public:
             penetrationCount_--;
         }
     }
-
+    
     // 反射カウント関連
     void SetBounceCount(int count) { bounceCount_ = count; }
     void DecrementBounceCount() {

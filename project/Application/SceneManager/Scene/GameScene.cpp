@@ -14,6 +14,8 @@ void GameScene::Initialize() {
 	ChangeScene(SCENE::GAME);
 
 	gameCamera_->Initialize(ctx_);
+
+	player_ = make_unique<Player>();
 	player_->Initialize(ctx_);
 
 	enemyManager_->Initialize(ctx_);
@@ -32,11 +34,75 @@ void GameScene::Initialize() {
 	dustParticle_->LoadJson("dust");
 
 	testLine_->Initialize(&ctx_->dxCommon);
+
+	lv_ = make_unique<Sprite>();
+	lv_->Initialize(&ctx_->dxCommon, "UI/game/lv.png", { 70.0f, 110.0f }, { 0.7f, 0.7f });
+
+	lvText_ = make_unique<Sprite>();
+	lvText_->Initialize(&ctx_->dxCommon, "UI/game/lvText.png", { 140.0f, 180.0f }, { 0.35f, 0.5f } );
+
+	fireBallIcon_ = make_unique<Sprite>();
+	fireBallIcon_->Initialize(&ctx_->dxCommon, "icon/FireBall.png", { 275.0f, 175.0f }, { 1.5f, 1.5f });
+
+	leaserIcon_ = make_unique<Sprite>();
+	leaserIcon_->Initialize(&ctx_->dxCommon, "icon/leaser.png", { 330.0f, 175.0f }, { 1.5f, 1.5f });
+
+	runaIcon_ = make_unique<Sprite>();
+	runaIcon_->Initialize(&ctx_->dxCommon, "icon/Runa.png", { 385.0f, 175.0f }, { 1.5f, 1.5f });
+
+	text_ = make_unique<Sprite>();
+	text_->Initialize(&ctx_->dxCommon, "UI/game/text.png", { 0.0f, 0.0f }, { 1.0f, 1.0f });
+	textMoveTimer_.Start(2.0f, false);
+
+	// ビットマップフォントの初期化
+	timeFont_ = make_unique<BitmapFont>();
+	timeFont_->Initialize(&ctx_->dxCommon, "number/");
+	timeFont_->SetScale({ 0.6f, 0.6f });
+	timeFont_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f }); // 白色
+
+	playerHPFont_ = make_unique<BitmapFont>();
+	playerHPFont_->Initialize(&ctx_->dxCommon, "number/");
+	playerHPFont_->SetScale({ 0.4f, 0.4f });
+	playerHPFont_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f }); // 赤色
+
+	playerLv_ = make_unique<BitmapFont>();
+	playerLv_->Initialize(&ctx_->dxCommon, "number/");
+	playerLv_->SetScale({ 0.4f, 0.4f });
+
+	// HPゲージの初期化
+	hpGauge_ = make_unique<Gauge>();
+	hpGauge_->Initialize(&ctx_->dxCommon, { 38.0f, 21.0f }, { 125.0f, 20.0f }, static_cast<float>(player_->GetMaxHP()));
+	hpGauge_->SetGaugeColor({ 0.0f, 1.0f, 0.0f, 1.0f }); // 緑色
+	hpGauge_->SetBackgroundColor({ 0.3f, 0.0f, 0.0f, 1.0f }); // 暗い赤
+
+	// 経験値ゲージの初期化
+	expGauge_ = make_unique<Gauge>();
+	expGauge_->Initialize(&ctx_->dxCommon, { 0.0f, 670.0f }, { 427.0f, 20.0f }, static_cast<float>(player_->GetExpToNextLevel()));
+	expGauge_->SetGaugeColor({ 0.0f, 0.8f, 1.0f, 1.0f }); // シアン色
+	expGauge_->SetBackgroundColor({ 0.1f, 0.1f, 0.3f, 1.0f }); // 暗い青
+
+	gameTime_ = 0.0f;
+	score_ = 0;
 }
 
 void GameScene::Update() {
 	if (ctx_->gamePad.TriggerButton(GamePad::START)) {
 		ChangeScene(SCENE::TITLE);
+	}
+
+	// テスト用：Bボタンでダメージ（HP減少）
+	if (ctx_->gamePad.TriggerButton(GamePad::B)) {
+		player_->SetCurrentHP(player_->GetCurrentHP() - 10);
+	}
+
+	// テスト用：Yボタンで回復（HP増加）
+	if (ctx_->gamePad.TriggerButton(GamePad::Y)) {
+		player_->SetCurrentHP(player_->GetCurrentHP() + 10);
+	}
+
+	// テスト用：Lボタンで経験値取得
+	if (ctx_->gamePad.TriggerButton(GamePad::L)) {
+		player_->AddExp(20);
 	}
 
 	player_->Update();
@@ -61,6 +127,45 @@ void GameScene::Update() {
 	}
 
 	testLine_->AddGrid(100.0f, 20);
+
+	if (textMoveTimer_.IsActive()) {
+		text_->SetPosition({ Easing::Lerp(1780.0f, -500.0f, textMoveTimer_.GetProgress(),Easing::Type::EaseOutInSine), 360.0f });
+		textMoveTimer_.Update();
+	}
+
+	text_->Update();
+	lv_->Update();
+	lvText_->Update();
+	fireBallIcon_->Update();
+	leaserIcon_->Update();
+	runaIcon_->Update();
+
+	// ゲーム時間を更新
+	gameTime_ += 1.0f / 60.0f; // 仮に60FPSとして計算
+
+	// スコアを更新（例：テスト用に毎フレーム1増加）
+	// score_++;
+
+	// ビットマップフォントの更新
+
+	timeFont_->SetTime(gameTime_, { 1100.0f, 50.0f }, 60.0f);
+	timeFont_->Update();
+
+	playerHPFont_->SetNumber(player_->GetCurrentHP(), { 215.0f,50.0f }, 60.0f);
+	playerHPFont_->Update();
+
+	playerLv_->SetNumber(player_->GetLevel(), {122.0f,112.0f}, 55.0f);
+	playerLv_->SetScale({0.5f,0.5f});
+	playerLv_->Update();
+
+	// ゲージの更新
+	hpGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentHP()));
+	hpGauge_->SetMaxValue(static_cast<float>(player_->GetMaxHP()));
+	hpGauge_->Update();
+
+	expGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentExp()));
+	expGauge_->SetMaxValue(static_cast<float>(player_->GetExpToNextLevel()));
+	expGauge_->Update();
 }
 
 void GameScene::Draw() {
@@ -74,6 +179,22 @@ void GameScene::Draw() {
 	dustParticle_->Draw(camera_);
 
 	collisionManager_->Draw(camera_);
+
+	text_->Draw();
+	lv_->Draw();
+	lvText_->Draw();
+	fireBallIcon_->Draw();
+	leaserIcon_->Draw();
+	runaIcon_->Draw();
+
+	// ゲージの描画
+	hpGauge_->Draw();
+	expGauge_->Draw();
+
+	// ビットマップフォントの描画
+	timeFont_->Draw();
+	playerHPFont_->Draw();
+	playerLv_->Draw();
 }
 
 void GameScene::DrawImGui() {

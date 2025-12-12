@@ -23,6 +23,28 @@ void PSOManager::Initialize(DirectXCommon* dxCommon) {
     OutputDebugStringA(buffer);
 }
 
+void PSOManager::Finalize() {
+    // キャッシュ統計を出力
+    PrintCacheStats();
+    
+    // シェーダーキャッシュをクリア
+    shaderCache_.clear();
+    
+    // カスタムPSOキャッシュをクリア
+    customPSOCache_.clear();
+    
+    // 事前定義済みPSOキャッシュをクリア
+    predefindedPSOs_.clear();
+    
+    // RootSignatureキャッシュをクリア
+    rootSignatures_.clear();
+    
+    // 参照をクリア
+    dxCommon_ = nullptr;
+    
+    OutputDebugStringA("PSOManager::Finalize completed - All cached resources released\n");
+}
+
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::GetPSO(PSOType type) {
     // キャッシュチェック
     auto it = predefindedPSOs_.find(type);

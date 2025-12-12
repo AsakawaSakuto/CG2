@@ -23,6 +23,44 @@ public:
 	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
 
 	void PostFrameCleanup();
+
+	// === ステータス取得メソッド ===
+	
+	/// <summary>
+	/// 現在のHPを取得
+	/// </summary>
+	int GetCurrentHP() const { return status_.currentHP_; }
+
+	/// <summary>
+	/// 最大HPを取得
+	/// </summary>
+	int GetMaxHP() const { return status_.maxHP_; }
+
+	/// <summary>
+	/// 現在の経験値を取得
+	/// </summary>
+	int GetCurrentExp() const { return status_.currentExp_; }
+
+	/// <summary>
+	/// 次のレベルまでに必要な経験値を取得
+	/// </summary>
+	int GetExpToNextLevel() const { return status_.expToNextLevel_; }
+
+	/// <summary>
+	/// 現在のレベルを取得
+	/// </summary>
+	int GetLevel() const { return status_.level_; }
+
+	/// <summary>
+	/// HPを設定（ダメージ・回復用）
+	/// </summary>
+	void SetCurrentHP(int hp);
+
+	/// <summary>
+	/// 経験値を追加
+	/// </summary>
+	void AddExp(int exp);
+
 private:
 
 	// 移動処理

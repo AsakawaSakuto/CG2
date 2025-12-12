@@ -17,6 +17,15 @@ using namespace Microsoft::WRL;
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
 
+void Model::Finalize() {
+	// 静的ジオメトリキャッシュをクリア
+	// shared_ptrが全て解放されることで、各GeometryCacheのデストラクタが呼ばれ、
+	// リソース（頂点バッファ、インデックスバッファ等）が解放される
+	s_geometryCache_.clear();
+	
+	OutputDebugStringA("Model::Finalize completed - Geometry cache cleared\n");
+}
+
 //"resources/uvChecker.png"
 
 Model::~Model() {

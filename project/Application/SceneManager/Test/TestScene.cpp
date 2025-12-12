@@ -109,13 +109,15 @@ void TestScene::DrawImGui() {
     testSphere_.DrawImGui("testSphere");
     testOvalSphere_.DrawImGui("testOvalSphere");
 
-    testSprite_->DrawImGui("testSprite");
+	testParticle_->DrawImGui("testParticle");
 
-	MT4_01_01();
-	MT4_01_02();
-	MT4_01_03();
-	MT4_01_04();
-    MT4_01_05();
+    //testSprite_->DrawImGui("testSprite");
+
+	//MT4_01_01();
+	//MT4_01_02();
+	//MT4_01_03();
+	//MT4_01_04();
+    //MT4_01_05();
 
 #endif
 }

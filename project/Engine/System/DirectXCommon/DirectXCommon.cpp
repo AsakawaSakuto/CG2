@@ -18,6 +18,69 @@
 
 using namespace Microsoft::WRL;
 
+DirectXCommon::~DirectXCommon() {
+    // GPUの処理完了を待機
+    WaitForGPU();
+    
+#ifdef USE_IMGUI
+    // ImGuiのシャットダウン
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+#endif
+    
+    // PSOManagerのリソースを解放
+    PSOManager::GetInstance().Finalize();
+    
+    // ポストエフェクトマネージャーを解放
+    postEffectManager_.reset();
+    
+    // アロケーターを解放
+    particleAlloc_.reset();
+    modelAlloc_.reset();
+    
+    // フェンスイベントを閉じる
+    if (fenceEvent_) {
+        CloseHandle(fenceEvent_);
+        fenceEvent_ = nullptr;
+    }
+    
+    // ComPtrは自動的にリソースを解放するが、順序を明示的に制御
+    // コマンドリスト関連
+    commandList_.Reset();
+    commandAllocator_.Reset();
+    commandQueue_.Reset();
+    fence_.Reset();
+    
+    // 描画リソース
+    for (int i = 0; i < 2; ++i) {
+        swapChainResources_[i].Reset();
+    }
+    depthStencilResource_.Reset();
+    
+    // デスクリプタヒープ
+    srvDescriptorHeap_.Reset();
+    rtvDescriptorHeap_.Reset();
+    dsvDescriptorHeap_.Reset();
+    uavDescriptorHeap_.Reset();
+    
+    // スワップチェイン
+    swapChain_.Reset();
+    
+    // シェーダーコンパイラ
+    includeHandler_.Reset();
+    dxcCompiler_.Reset();
+    dxcUtils_.Reset();
+    
+    // デバイス関連（最後に解放）
+    useAdapter_.Reset();
+    dxgiFactory_.Reset();
+    debugController_.Reset();
+    device_.Reset();
+    
+    OutputDebugStringA("DirectXCommon::~DirectXCommon completed - All resources released\n");
+}
+
 void DirectXCommon::Initialize(WinApp* winApp) {
     // NULL
     assert(winApp);
@@ -165,7 +228,10 @@ void DirectXCommon::CreateCommand() {
 }
 
 void DirectXCommon::CloseFence() {
-    CloseHandle(fenceEvent_);
+    if (fenceEvent_) {
+        CloseHandle(fenceEvent_);
+        fenceEvent_ = nullptr;  // 閉じた後はnullptrにする
+    }
 }
 
 void DirectXCommon::ResetCommand() {
@@ -353,8 +419,7 @@ void DirectXCommon::PreDraw() {
         // 描画用のDescriptorHeapの設定
         ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
         commandList_->SetDescriptorHeaps(1, descriptorHeaps);
-    }
-    else {
+    } else {
         // 従来の描画（SwapChainに直接描画）
         // これから書き込むバックバッファのインデックスを取得
         backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
@@ -826,5 +891,39 @@ void DirectXCommon::ResizeToWindow() {
     // PostEffectManagerのRenderTextureもリサイズ
     if (postEffectManager_) {
         postEffectManager_->Resize(winApp_->GetWidth(), winApp_->GetHeight());
+    }
+}
+
+void DirectXCommon::ClearShaderCache() {
+    namespace fs = std::filesystem;
+    
+    // キャッシュディレクトリのパス
+    fs::path cacheDirPath = L"resources/shaders/cache";
+    
+    // ディレクトリが存在しない場合は何もしない
+    if (!fs::exists(cacheDirPath)) {
+        Logger::Log("[Cache] Cache directory does not exist, skipping cleanup.\n");
+        return;
+    }
+    
+    try {
+        // ディレクトリ内の全ての.csoファイルを削除
+        int deletedCount = 0;
+        for (const auto& entry : fs::directory_iterator(cacheDirPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == L".cso") {
+                fs::remove(entry.path());
+                deletedCount++;
+                Logger::Log(ConvertString(std::format(L"[Cache] Deleted: {}\n", entry.path().wstring())));
+            }
+        }
+        
+        if (deletedCount > 0) {
+            Logger::Log(std::format("[Cache] Cleared {} shader cache file(s).\n", deletedCount));
+        } else {
+            Logger::Log("[Cache] No shader cache files to delete.\n");
+        }
+    }
+    catch (const fs::filesystem_error& e) {
+        Logger::Log(std::format("[Cache] Error while clearing cache: {}\n", e.what()));
     }
 }

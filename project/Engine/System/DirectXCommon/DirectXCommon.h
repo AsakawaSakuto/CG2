@@ -4,13 +4,12 @@
 #include <wrl.h>
 #include <wrl/client.h>
 #include "externals/DirectXTex/DirectXTex.h"
-#pragma comment(lib, "dxcompiler.lib")
 #include <dxgidebug.h>
-#pragma comment(lib,"dxguid.lib")
 #include <dxcapi.h>                  
-#pragma comment(lib,"dxcompiler.lib")
 #include <chrono>
 #include <thread>
+#include <timeapi.h>
+#include "D3DResourceLeakChecker.h"
 
 #ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"           
@@ -30,6 +29,8 @@ class PostEffectManager;
 class DirectXCommon
 {
 public:
+    // デストラクタ - リソースを適切な順序で解放
+    ~DirectXCommon();
 
     // DirectXの初期化
 	void Initialize(WinApp* winApp);
@@ -49,6 +50,9 @@ public:
     void WaitForGPU();
 
     void ResizeToWindow();
+    
+    // シェーダーキャッシュファイルを全て削除する
+    void ClearShaderCache();
     
     //
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
@@ -112,6 +116,8 @@ public:
     PostEffectManager* GetPostEffectManager() { return postEffectManager_.get(); }
 
 private:
+
+    D3DResourceLeakChecker d3dResourceLeakChecker_;
 
     std::unique_ptr<DescriptorAllocator> particleAlloc_;
     bool particleAllocInitialized_ = false;

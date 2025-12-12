@@ -8,6 +8,51 @@ using namespace Microsoft::WRL;
 // PSOManagerをインクルード（相対パス修正）
 #include "../../System/PSOManager/PSOManager.h"
 
+Sprite::~Sprite() {
+	// マップされたリソースを全てアンマップ
+	if (vertexResource_ && vertexData_) {
+		vertexResource_->Unmap(0, nullptr);
+		vertexData_ = nullptr;
+	}
+	
+	if (indexResource_ && indexData_) {
+		indexResource_->Unmap(0, nullptr);
+		indexData_ = nullptr;
+	}
+	
+	if (materialResource_ && materialData_) {
+		// 注意: CreateMaterialResourceでUnmapしているが、描画時に再度Mapされている可能性がある
+		// 安全のためチェック
+		materialResource_->Unmap(0, nullptr);
+		materialData_ = nullptr;
+	}
+	
+	if (transformationResource_ && transformationData_) {
+		transformationResource_->Unmap(0, nullptr);
+		transformationData_ = nullptr;
+	}
+	
+	if (directionalLightResource_ && directionalLightData_) {
+		directionalLightResource_->Unmap(0, nullptr);
+		directionalLightData_ = nullptr;
+	}
+	
+	if (cameraResource_ && cameraData_) {
+		cameraResource_->Unmap(0, nullptr);
+		cameraData_ = nullptr;
+	}
+	
+	if (pointLightResource_ && pointLightData_) {
+		pointLightResource_->Unmap(0, nullptr);
+		pointLightData_ = nullptr;
+	}
+	
+	if (spotLightResource_ && spotLightData_) {
+		spotLightResource_->Unmap(0, nullptr);
+		spotLightData_ = nullptr;
+	}
+}
+
 void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position, Vector2 scale) {
 
 	dxCommon_ = dxCommon;
@@ -165,6 +210,26 @@ void Sprite::SetTexture(const std::string& textureName) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
+void Sprite::SetAnchorPoint(const Vector2& anchor) {
+	anchorPoint = anchor;
+	
+	// 頂点データが既に作成されている場合、再計算
+	if (vertexData_) {
+		float width = size_.x;
+		float height = size_.y;
+
+		float left = 0.0f - anchorPoint.x * size_.x;
+		float right = 1.0f - anchorPoint.x * size_.x;
+		float top = 0.0f - anchorPoint.y * size_.y;
+		float bottom = 1.0f - anchorPoint.y * size_.y;
+
+		vertexData_[0].position = { left, bottom + height, 0.0f, 1.0f };  // 左下
+		vertexData_[1].position = { left, top, 0.0f, 1.0f };              // 左上
+		vertexData_[2].position = { right + width, bottom + height, 0.0f, 1.0f }; // 右下
+		vertexData_[3].position = { right + width, top, 0.0f, 1.0f };     // 右上
+	}
+}
+
 void Sprite::CreateVertexResource() {
 	// 頂点リソース
 	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * 4);
@@ -227,8 +292,7 @@ void Sprite::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
 	materialData_->enableLighting = false;
 	materialData_->uvTransformMatrix = MakeIdentityMatrix();
-
-	materialResource_->Unmap(0, nullptr);
+	// マップしたままにする（Update()で書き込みを行うため）
 }
 
 void Sprite::CreateTransformationResource() {

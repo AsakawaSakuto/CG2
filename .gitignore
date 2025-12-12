@@ -1,6 +1,6 @@
 /generated/
 *.vs/
-*.user
 *.cso
 *.txt
 *.Log
+*.user

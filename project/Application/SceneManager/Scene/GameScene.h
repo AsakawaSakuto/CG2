@@ -5,6 +5,8 @@
 #include"Application/GameCameraCntroller/GameCameraController.h"
 #include"Application/GameObject/EnemyManager/EnemyManager.h"
 #include"Application/CollisionManager/CollisionManager.h"
+#include"Engine/2d/BitmapFont/BitmapFont.h"
+#include"Engine/2d/Gauge/Gauge.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -34,7 +36,7 @@ private:
 	Transform gridTransform_;
 
 	// プレイヤー関連のクラス
-	unique_ptr<Player> player_ = make_unique<Player>();
+	unique_ptr<Player> player_;
 	unique_ptr<GameCameraController> gameCamera_ = make_unique<GameCameraController>();
 
 	unique_ptr<EnemyManager> enemyManager_ = make_unique<EnemyManager>();
@@ -46,5 +48,27 @@ private:
 
 	unique_ptr<Particles> dustParticle_ = make_unique<Particles>();
 
+	unique_ptr<Sprite> text_;
+	unique_ptr<Sprite> lv_;
+	unique_ptr<Sprite> lvText_;
+	unique_ptr<Sprite> fireBallIcon_;
+	unique_ptr<Sprite> leaserIcon_;
+	unique_ptr<Sprite> runaIcon_;
+
+	GameTimer textMoveTimer_;
+
 	unique_ptr<Line> testLine_ = make_unique<Line>();
+
+	// ビットマップフォント（数字表示用）
+	unique_ptr<BitmapFont> timeFont_;
+	unique_ptr<BitmapFont> playerHPFont_;
+	unique_ptr<BitmapFont> playerLv_;
+
+	float gameTime_ = 0.0f;
+	int score_ = 0;
+	GameTimer gameTimer_;
+
+	// ゲージ（HP・経験値表示用）
+	unique_ptr<Gauge> hpGauge_;
+	unique_ptr<Gauge> expGauge_;
 };

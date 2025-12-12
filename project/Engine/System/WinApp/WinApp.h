@@ -23,7 +23,7 @@ public:
 
     void SetTitle(const std::wstring& title);
 
-    // // 既存：クライアント領域サイズを返す関数はそのまま
+    // クライアント領域サイズを返す関数はそのまま
     void GetClientSize(uint32_t& width, uint32_t& height) const;
 
     void EnableResize(bool enable);
@@ -33,13 +33,13 @@ public:
     void SetIconFromTexture(const std::string& texturePath);
     void SetIconFromTexture(const std::wstring& texturePath);
 
-    // // 既定サイズ（初期ウィンドウ作成にのみ使用）
+    // 既定サイズ（初期ウィンドウ作成にのみ使用）
     static const int32_t kClientWidth_ = 1280;
     static const int32_t kClientHeight_ = 720;
 
-    // // ★ここを"動的取得"に変更（ハードコード返却を廃止）
-    int32_t GetWidth()  const { RECT rc{}; GetClientRect(hwnd_, &rc); return rc.right - rc.left; }   // //
-    int32_t GetHeight() const { RECT rc{}; GetClientRect(hwnd_, &rc); return rc.bottom - rc.top; }   // //
+    // "動的取得"に変更（ハードコード返却を廃止）
+    int32_t GetWidth()  const { RECT rc{}; GetClientRect(hwnd_, &rc); return rc.right - rc.left; }
+    int32_t GetHeight() const { RECT rc{}; GetClientRect(hwnd_, &rc); return rc.bottom - rc.top; }
 
     short GetWheelDelta() const { return wheelDelta_; }
     void  AddWheelDelta(short delta) { wheelDelta_ += delta; }
@@ -54,10 +54,10 @@ public:
     LONG GetMouseY() const { return mouseY_; }
     void SetMousePosition(LONG x, LONG y) { mouseX_ = x; mouseY_ = y; }
 
-    // // ★追加：ボーダーレス・フルスクリーン制御API
-    bool IsFullscreen() const { return isFullscreen_; }        // //
-    void EnterBorderlessFullscreen();                           // //
-    void ExitBorderlessFullscreen();                            // //
+    // ボーダーレス・フルスクリーン制御API
+    bool IsFullscreen() const { return isFullscreen_; }
+    void EnterBorderlessFullscreen();
+    void ExitBorderlessFullscreen();
 private:
     HWND hwnd_ = {};
     WNDCLASS wc_ = {};
@@ -78,9 +78,9 @@ private:
     void SetWindowIcon();
     void CleanupIcons();
 
-    // // ★追加：フルスクリーン復帰用の保存値
-    bool  isFullscreen_ = false;    // //
-    DWORD windowStyle_ = 0;         // //
-    DWORD windowExStyle_ = 0;       // //
-    RECT  windowRectBeforeFS_{};    // //
+    // フルスクリーン復帰用の保存値
+    bool  isFullscreen_ = false; 
+    DWORD windowStyle_ = 0;      
+    DWORD windowExStyle_ = 0;    
+    RECT  windowRectBeforeFS_{}; 
 };
