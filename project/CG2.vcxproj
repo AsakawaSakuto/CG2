@@ -186,6 +186,9 @@
     <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Engine\Math\MathFunction\MathFunction.cpp" />
     <ClCompile Include="Engine\Core\PSOManager\PSOManager.cpp" />
+    <ClCompile Include="Engine\Utility\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Utility\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Utility\Binary\Data\BinaryOutput.cpp" />
     <ClCompile Include="Engine\Utility\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Engine\Core\CreateResource\CreateResource.cpp" />
     <ClCompile Include="Engine\Core\DirectXCommon\D3DResourceLeakChecker.cpp" />
@@ -280,6 +283,10 @@
     <ClInclude Include="Engine\OffScreen\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\Math\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOManager.h" />
+    <ClInclude Include="Engine\Utility\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Utility\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Utility\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Utility\Binary\Data\Value.h" />
     <ClInclude Include="Engine\Utility\BlendMode\BlendMode.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Audio\AudioData.h" />
