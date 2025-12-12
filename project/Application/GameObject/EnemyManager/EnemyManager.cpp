@@ -1,6 +1,6 @@
-#include "EnemyManager.h"
-#include "Engine/System/Utility/Collision/Collision.h"
 #include <algorithm>
+#include "EnemyManager.h"
+#include "Utility/Collision/Collision.h"
 
 void EnemyManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;

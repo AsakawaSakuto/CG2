@@ -1,10 +1,10 @@
 #pragma once
-#include"Application/AppContext.h"
-#include"AABB.h"
-#include"Sphere.h"
-#include"Transform.h"
-#include"Camera.h"
-#include"Engine/3d/Line/Line.h"
+#include "AppContext.h"
+#include "Utility/Collision/Type/AABB.h"
+#include "Utility/Collision/Type/Sphere.h"
+#include "Utility/Transform/Transform.h"
+#include "Camera/Camera.h"
+#include "3d/Line/Line.h"
 
 class BaseGameObject {
 protected:

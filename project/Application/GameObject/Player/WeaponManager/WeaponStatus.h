@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/system/Utility/GameTimer/GameTimer.h"
+#include "Utility/GameTimer/GameTimer.h"
 
 enum class WeaponType {
 	BulletType = 0,

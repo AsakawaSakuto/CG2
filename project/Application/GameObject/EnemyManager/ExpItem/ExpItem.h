@@ -1,6 +1,6 @@
 #pragma once
-#include "Application/EngineSystem.h"
-#include "Application/GameObject/BaseGameObject.h"
+#include "EngineSystem.h"
+#include "GameObject/BaseGameObject.h"
 
 class ExpItem : public BaseGameObject {
 public:

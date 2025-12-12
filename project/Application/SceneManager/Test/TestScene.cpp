@@ -1,5 +1,4 @@
 #include "TestScene.h"
-#include "../Quaternion/QuaternionFunction.h"
 
 #define WHITE {1.0f,1.0f,1.0f,1.0f}
 #define RED   {1.0f,0.0f,0.0f,1.0f}

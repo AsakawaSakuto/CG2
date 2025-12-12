@@ -1,8 +1,8 @@
 #pragma once
-#include "Transform.h"
-#include "Matrix4x4.h"
-#include "Camera.h"
-#include "Input.h"
+#include "Utility/Transform/Transform.h"
+#include "Math/Type/Matrix4x4.h"
+#include "Camera/Camera.h"
+#include "Input/Input.h"
 
 class DebugCamera : public Camera {
 public:

@@ -1,10 +1,10 @@
 #pragma once
-#include "Transform.h"
-#include "Matrix4x4.h"
-#include "MatrixFunction.h"
-#include "Vector4.h"
-#include "Vector3.h"
-#include "Vector2.h"
+#include "Utility/Transform/Transform.h"
+#include "Math/Type/Matrix4x4.h"
+#include "Math/MatrixFunction/MatrixFunction.h"
+#include "Math/Type/Vector4.h"
+#include "Math/Type/Vector3.h"
+#include "Math/Type/Vector2.h"
 #include <string>
 #include <vector>
 #include <map>

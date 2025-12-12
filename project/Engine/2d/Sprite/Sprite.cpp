@@ -1,12 +1,12 @@
-#include"Sprite.h"
-#include"WinApp.h"
+#include "Sprite.h"
+#include "Core/WinApp/WinApp.h"
 
-#include<cassert>
+#include <cassert>
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
-// PSOManagerをインクルード（相対パス修正）
-#include "../../System/PSOManager/PSOManager.h"
+// PSOManagerをインクルード
+#include "Core/PSOManager/PSOManager.h"
 
 Sprite::~Sprite() {
 	// マップされたリソースを全てアンマップ
@@ -288,8 +288,7 @@ void Sprite::CreateMaterialResource() {
 	materialResource_ = CreateBufferResource(device_.Get(), sizeof(ModelMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-	// 今回は赤を書き込んでみる（position に赤、texcoord は使わないなら 0.0）
-	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
+	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData_->enableLighting = false;
 	materialData_->uvTransformMatrix = MakeIdentityMatrix();
 	// マップしたままにする（Update()で書き込みを行うため）

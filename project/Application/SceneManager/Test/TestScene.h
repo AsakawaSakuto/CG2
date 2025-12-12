@@ -1,8 +1,8 @@
 #pragma once
-#include"Application/EngineSystem.h"
-#include"Application/SceneManager/IScene.h"
-#include"Engine/System/Utility/Math/OBB.h"
-#include"Engine/System/Utility/Math/OvalSphere.h"
+#include"EngineSystem.h"
+#include"SceneManager/IScene.h"
+#include"Utility/Collision/Type/OBB.h"
+#include"Utility/Collision/Type/OvalSphere.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;

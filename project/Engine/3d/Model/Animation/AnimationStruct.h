@@ -1,7 +1,7 @@
 #pragma once
-#include "../Quaternion/Quaternion.h"
-#include "../Math/Vector3.h"
-#include "./Transform.h"
+#include "Math/Type/Quaternion.h"
+#include "Math/Type/Vector3.h"
+#include "Utility/Transform/Transform.h"
 #include <vector>
 #include <map>
 #include <cassert> 

@@ -1,10 +1,10 @@
 #include "CollisionManager.h"
-#include "Application/GameObject/Player/Player.h"
-#include "Application/GameObject/EnemyManager/EnemyManager.h"
-#include "Application/GameObject/Player/WeaponManager/WeaponManager.h"
-#include "Application/GameObject/Player/WeaponManager/Weapon/Weapon.h"
-#include "Application/GameObject/Player/WeaponManager/Weapon/Bullet/Bullet.h"
-#include "Engine/System/Utility/Collision/Collision.h"
+#include "GameObject/Player/Player.h"
+#include "GameObject/EnemyManager/EnemyManager.h"
+#include "GameObject/Player/WeaponManager/WeaponManager.h"
+#include "GameObject/Player/WeaponManager/Weapon/Weapon.h"
+#include "GameObject/Player/WeaponManager/Weapon/Bullet/Bullet.h"
+#include "Utility/Collision/Collision.h"
 
 void CollisionManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;

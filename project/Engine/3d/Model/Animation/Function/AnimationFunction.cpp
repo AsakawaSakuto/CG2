@@ -1,7 +1,7 @@
 #include "AnimationFunction.h"
-#include "../MatrixFunction/MatrixFunction.h"
-#include "../Quaternion/QuaternionFunction.h"
-#include "../Easing/Easing.h"
+#include "Math/MatrixFunction/MatrixFunction.h"
+#include "Math/Quaternion/QuaternionFunction.h"
+#include "Utility/Easing/Easing.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

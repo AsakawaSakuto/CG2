@@ -2,7 +2,7 @@
 #include <algorithm>
 
 #ifdef USE_IMGUI
-#include "externals/imgui/imgui.h"
+#include "imgui.h"
 #endif
 
 void Gauge::Initialize(DirectXCommon* dxCommon, const Vector2& position, const Vector2& size, float maxValue) {

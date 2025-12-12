@@ -1,6 +1,6 @@
 #pragma once
-#include "Application/GameObject/EnemyManager/Enemy/Enemy.h"
-#include "Application/GameObject/EnemyManager/ExpItem/ExpItem.h"
+#include "GameObject/EnemyManager/Enemy/Enemy.h"
+#include "GameObject/EnemyManager/ExpItem/ExpItem.h"
 
 class EnemyManager {
 public:

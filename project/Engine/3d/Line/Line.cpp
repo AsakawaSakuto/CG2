@@ -1,6 +1,6 @@
 #include "Line.h"
-#include "Engine/System/PSOManager/PSOManager.h"
-#include "Engine/System/Utility/MathFunction/MathFunction.h"
+#include "Core/PSOManager/PSOManager.h"
+#include "Math/MathFunction/MathFunction.h"
 #include <cmath>
 #include <numbers>
 #include <cassert>

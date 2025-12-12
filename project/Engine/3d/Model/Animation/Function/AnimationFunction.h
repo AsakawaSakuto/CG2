@@ -1,10 +1,10 @@
 #pragma once
-#include "../Math/Vector3.h"
-#include "../Math/Matrix4x4.h"
-#include "../Quaternion/Quaternion.h"
-#include "../Model/Animation/AnimationStruct.h"
-#include "../Model/ModelDataStruct.h"
-#include "../Utility/CreateResource/CreateResource.h"
+#include "Math/Type/Vector3.h"
+#include "Math/Type/Matrix4x4.h"
+#include "Math/Type/Quaternion.h"
+#include "3d/Model/Animation/AnimationStruct.h"
+#include "3d/Model/ModelDataStruct.h"
+#include "Core/CreateResource/CreateResource.h"
 #include <vector>
 #include <cassert> 
 #include <d3d12.h>

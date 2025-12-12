@@ -4,15 +4,15 @@
 #include <vector>
 #include <memory>
 
-#include "DirectXCommon.h"
-#include "Camera.h"
-#include "MatrixFunction.h"
-#include "Transform.h"
-#include "Vector3.h"
-#include "Sphere.h"
-#include "AABB.h"
-#include "OBB.h"
-#include "OvalSphere.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Camera/Camera.h"
+#include "Math/MatrixFunction/MatrixFunction.h"
+#include "Utility/Transform/Transform.h"
+#include "Math/Type/Vector3.h"
+#include "Utility/Collision/Type/AABB.h"
+#include "Utility/Collision/Type/OBB.h"
+#include "Utility/Collision/Type/Sphere.h"
+#include "Utility/Collision/Type/OvalSphere.h"
 
 /// <summary>
 /// 3D空間に線を描画するクラス（デバッグ表示、UI、可視化用）
