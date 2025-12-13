@@ -266,10 +266,6 @@ void Model::Update() {
 		}
 	}
 
-	transform_.scale.x = std::clamp(transform_.scale.x, 0.0f, 100.0f);
-	transform_.scale.y = std::clamp(transform_.scale.y, 0.0f, 100.0f);
-	transform_.scale.z = std::clamp(transform_.scale.z, 0.0f, 100.0f);
-
 	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
 
 	// 行列の内容を更新

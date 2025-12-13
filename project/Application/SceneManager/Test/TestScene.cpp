@@ -110,6 +110,8 @@ void TestScene::DrawImGui() {
 
 	testParticle_->DrawImGui("testParticle");
 
+    debugCamera_.DrawImgui();
+
     //testSprite_->DrawImGui("testSprite");
 
 	//MT4_01_01();

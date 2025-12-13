@@ -72,6 +72,7 @@
     <ClCompile Include="Engine\Utility\Binary\BinaryManager.cpp" />
     <ClCompile Include="Engine\Utility\Binary\Data\BinaryOutput.cpp" />
     <ClCompile Include="Engine\Utility\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Engine\Utility\Binary\Data\Value.h" />
     <ClInclude Include="Engine\Utility\Binary\Data\BinaryOutput.h" />
     <ClInclude Include="Engine\Utility\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

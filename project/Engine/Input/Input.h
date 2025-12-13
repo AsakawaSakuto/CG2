@@ -23,13 +23,16 @@ public:
 	// 左右押下状態（Push）
 	bool PushMouseButtonL() const { return isMouseL_; }
 	bool PushMouseButtonR() const { return isMouseR_; }
+	bool PushMouseButtonM() const { return isMouseM_; }
 
 	// 左右トリガー状態（Trigger）
 	bool TriggerMouseButtonL() const { return (isMouseL_ && !preMouseL_); }
 	bool TriggerMouseButtonR() const { return (isMouseR_ && !preMouseR_); }
+	bool TriggerMouseButtonM() const { return (isMouseM_ && !preMouseM_); }
 
 	bool ReleaseMouseButtonL() const;
 	bool ReleaseMouseButtonR() const;
+	bool ReleaseMouseButtonM() const;
 
 	void SetMousePosition(LONG x, LONG y);
 	Vector2 GetMouseDelta() const;
@@ -46,8 +49,10 @@ private:
 
 	bool isMouseL_ = false;
 	bool isMouseR_ = false;
+	bool isMouseM_ = false;
 	bool preMouseL_ = false;
 	bool preMouseR_ = false;
+	bool preMouseM_ = false;
 
 	Vector2 currentMousePos_ = {};
 	Vector2 previousMousePos_ = {};

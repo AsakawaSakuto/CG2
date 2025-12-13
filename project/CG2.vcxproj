@@ -174,6 +174,7 @@
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
     <ClCompile Include="Engine\3d\Line\Line.cpp" />
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
+    <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
     <ClCompile Include="Engine\3d\Particle\Json\EmitterStateLoder.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
     <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
+    <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
     <ClInclude Include="Engine\3d\Particle\Json\EmitterStateLoder.h" />

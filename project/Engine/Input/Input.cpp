@@ -53,8 +53,10 @@ void Input::Update() {
     // ===== マウスボタン（WinApp依存をやめてグローバル取得） =====
     preMouseL_ = isMouseL_;
     preMouseR_ = isMouseR_;
+    preMouseM_ = isMouseM_;
     isMouseL_ = (::GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
     isMouseR_ = (::GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0;
+    isMouseM_ = (::GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0;
 
     // ===== ホイール（これはメッセージ由来のまま） =====
     wheelDelta_ = static_cast<float>(winApp_->GetWheelDelta()) / WHEEL_DELTA;
@@ -87,3 +89,4 @@ Vector2 Input::GetMouseDelta() const {
 // 前フレームは押していて、今フレームは押していない → リリース
 bool Input::ReleaseMouseButtonL() const { return preMouseL_ && !isMouseL_; }
 bool Input::ReleaseMouseButtonR() const { return preMouseR_ && !isMouseR_; }
+bool Input::ReleaseMouseButtonM() const { return preMouseM_ && !isMouseM_; }
