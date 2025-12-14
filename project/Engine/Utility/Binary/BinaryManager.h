@@ -37,12 +37,27 @@ public:
 	/// <returns>新たに生成したValue配列</returns>
 	std::vector<std::shared_ptr<ValueBase>> Read(std::string fileName);
 
+	/// <summary>
+	/// データの保存先パスを変更する
+	/// </summary>
+	/// <param name="path"></param>
+	void SetBasePath(std::string path) {
+		basePath = path;
+	}
+
+	/// <summary>
+	/// データの保存先パスを取得する
+	/// </summary>
+	/// <returns>現在のベースパス</returns>
+	std::string GetBasePath() const {
+		return basePath;
+	}
 private:
 
 	std::unique_ptr<BinaryInput> input;
 	std::unique_ptr<BinaryOutput> output;
 	std::vector<std::shared_ptr<ValueBase>> values;
 
-	inline static const std::string basePath = "resources/Binary/"; // データの保存先パス
+	inline static std::string basePath = "resources/Binary/"; // データの保存先パス
 
 };

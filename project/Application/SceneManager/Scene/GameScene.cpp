@@ -31,7 +31,7 @@ void GameScene::Initialize() {
 
 	testParticle_->Initialize(&ctx_->dxCommon, 200);
 	dustParticle_->Initialize(&ctx_->dxCommon);
-	dustParticle_->LoadJson("dust");
+	dustParticle_->LoadBinary("dust");
 
 	testLine_->Initialize(&ctx_->dxCommon);
 

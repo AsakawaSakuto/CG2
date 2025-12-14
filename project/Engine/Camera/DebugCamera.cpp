@@ -10,24 +10,39 @@ DebugCamera::DebugCamera() {
 	moveSpeedMultiplier = 1.0f;
 	rotateSpeedMultiplier = 1.0f;
 	scrollSpeed = 1.0f;
-	
-	// デフォルトは原点注視モード
+
 	cameraMode_ = CameraMode::OrbitAroundOrigin;
-	
-	// Blender式カメラの初期設定
-	targetPosition_ = { 0.0f, 0.0f, 0.0f }; // 原点を注視
-	distance_ = 30.0f;                       // 距離
-	horizontalAngle_ = 0.0f;                 // 水平角度
-	verticalAngle_ = 0.3f;                   // 垂直角度（少し上から）
-	
-	// 初期位置を計算
+
+	targetPosition_ = { 0.0f, 0.0f, 0.0f };
+	distance_ = 30.0f;
+
+	horizontalAngle_ = 3.135f; // 画像の値に寄せる（ほぼπ）
+	verticalAngle_ = 0.200f;   // 少し上から見下ろす
+
 	UpdateCameraPositionOrbit();
-	
+
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = InverseMatrix(worldMatrix_);
-	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), nearClip_, farClip_);
+	projectionMatrix_ = MakePerspectiveFovMatrix(
+		fovY_,
+		static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_),
+		nearClip_, farClip_);
 	viewProjectionMatrix_ = MultiplyMatrix(viewMatrix_, projectionMatrix_);
+
+	binaryManager_ = std::make_unique<BinaryManager>();
+
+	auto data = binaryManager_->Read(binaryFileName_);
+	int index = 0;
+
+	if (data.size() < index + 3) {
+		return;
+	}
+
+	scrollSpeed = BinaryManager::Reverse<float>(data[index++]);
+	moveSpeedMultiplier = BinaryManager::Reverse<float>(data[index++]);
+	rotateSpeedMultiplier = BinaryManager::Reverse<float>(data[index++]);
 }
+
 
 void DebugCamera::Update() {
 #ifdef USE_IMGUI
@@ -149,8 +164,8 @@ void DebugCamera::Update() {
 		if (cameraMode_ == CameraMode::OrbitAroundOrigin) {
 			targetPosition_ = { 0.0f, 0.0f, 0.0f };
 			distance_ = 30.0f;
-			horizontalAngle_ = 0.0f;
-			verticalAngle_ = 0.3f;
+			horizontalAngle_ = 3.14159f;
+			verticalAngle_ = 0.0f;
 			UpdateCameraPositionOrbit();
 		} else {
 			transform_.translate = { 0.0f, 2.0f, -30.0f };
@@ -226,27 +241,23 @@ void DebugCamera::UpdateCameraPositionOrbit() {
 	transform_.rotate = { pitch, yaw, 0.0f };
 }
 
-void DebugCamera::UpdateCameraPositionFree() {
-	// 自由回転モードでは transform_ を直接使用するため、特に処理なし
-}
-
 void DebugCamera::DrawImgui() {
 #ifdef USE_IMGUI
-	ImGui::Begin("DebugCamera Control");
+	ImGui::Begin("デバッグカメラ操作");
 
-	ImGui::Text("Controls:");
-	ImGui::Text("- Toggle Mode: T Key");
-	ImGui::Text("- Rotate: Middle Mouse Button + Drag");
-	ImGui::Text("- Pan: Shift + Middle Mouse Button + Drag");
-	ImGui::Text("- Zoom/Move: Mouse Wheel");
-	ImGui::Text("- Reset: R Key");
-	
+	ImGui::Text("操作方法:");
+	ImGui::Text("- モード切り替え: Tキー");
+	ImGui::Text("- 回転: 中ボタン押しながらドラッグ");
+	ImGui::Text("- 平行移動(パン): Shift + 中ボタン押しながらドラッグ");
+	ImGui::Text("- ズーム/移動: マウスホイール");
+	ImGui::Text("- リセット: Rキー");
+
 	ImGui::Separator();
-	
+
 	// モード選択
-	const char* modeNames[] = { "Orbit Around Origin", "Free Rotation" };
+	const char* modeNames[] = { "原点の周りを周回", "自由回転" };
 	int currentMode = static_cast<int>(cameraMode_);
-	if (ImGui::Combo("Camera Mode", &currentMode, modeNames, 2)) {
+	if (ImGui::Combo("カメラモード", &currentMode, modeNames, 2)) {
 		cameraMode_ = static_cast<CameraMode>(currentMode);
 		if (cameraMode_ == CameraMode::OrbitAroundOrigin) {
 			// 原点注視モードに切り替わった時、パラメータを再計算
@@ -262,36 +273,39 @@ void DebugCamera::DrawImgui() {
 			}
 		}
 	}
-	
+
 	ImGui::Separator();
-	
+
 	if (cameraMode_ == CameraMode::OrbitAroundOrigin) {
-		ImGui::Text("=== Orbit Mode ===");
-		ImGui::DragFloat3("Target Position", &targetPosition_.x, 0.1f);
-		ImGui::DragFloat("Distance", &distance_, 0.1f, 1.0f, 100.0f);
-		ImGui::DragFloat("Horizontal Angle", &horizontalAngle_, 0.01f);
-		ImGui::DragFloat("Vertical Angle", &verticalAngle_, 0.01f, -1.5f, 1.5f);
+		ImGui::Text("=== 周回モード ===");
+		ImGui::DragFloat3("注視点の位置", &targetPosition_.x, 0.1f);
+		ImGui::DragFloat("距離", &distance_, 0.1f, 1.0f, 100.0f);
+		ImGui::DragFloat("水平角", &horizontalAngle_, 0.01f);
+		ImGui::DragFloat("垂直角", &verticalAngle_, 0.01f, -1.5f, 1.5f);
 	} else {
-		ImGui::Text("=== Free Mode ===");
+		ImGui::Text("=== 自由モード ===");
 	}
 
 	ImGui::Separator();
-	
-	ImGui::DragFloat3("Camera Position", &transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("Camera Rotation", &transform_.rotate.x, 0.01f);
+
+	ImGui::DragFloat3("カメラ位置", &transform_.translate.x, 0.01f);
+	ImGui::DragFloat3("カメラ回転", &transform_.rotate.x, 0.01f);
 
 	ImGui::Separator();
 
-	ImGui::DragFloat("Move Multiplier", &moveSpeedMultiplier, 0.01f, 0.1f, 10.0f);
-	ImGui::DragFloat("Rotate Multiplier", &rotateSpeedMultiplier, 0.01f, 0.1f, 10.0f);
-	ImGui::DragFloat("Scroll Speed", &scrollSpeed, 0.1f, 0.1f, 10.0f);
+	ImGui::DragFloat("移動速度倍率", &moveSpeedMultiplier, 0.01f, 0.1f, 10.0f);
+	ImGui::DragFloat("回転速度倍率", &rotateSpeedMultiplier, 0.01f, 0.1f, 10.0f);
+	ImGui::DragFloat("スクロール速度", &scrollSpeed, 0.1f, 0.1f, 10.0f);
+	if (ImGui::Button("上記の3点の値を保存")) {
+		Save();
+	}
 
-	if (ImGui::Button("Reset")) {
+	if (ImGui::Button("リセット")) {
 		if (cameraMode_ == CameraMode::OrbitAroundOrigin) {
 			targetPosition_ = { 0.0f, 0.0f, 0.0f };
 			distance_ = 30.0f;
-			horizontalAngle_ = 0.0f;
-			verticalAngle_ = 0.3f;
+			horizontalAngle_ = 3.14159f;
+			verticalAngle_ = 0.0f;
 		} else {
 			transform_.translate = { 0.0f, 2.0f, -30.0f };
 			transform_.rotate = { 0.0f, 0.0f, 0.0f };
@@ -299,5 +313,14 @@ void DebugCamera::DrawImgui() {
 	}
 
 	ImGui::End();
+
 #endif
+}
+
+void DebugCamera::Save() {
+	binaryManager_->RegistOutput(scrollSpeed);
+	binaryManager_->RegistOutput(moveSpeedMultiplier);
+	binaryManager_->RegistOutput(rotateSpeedMultiplier);
+
+	binaryManager_->Write(binaryFileName_);
 }

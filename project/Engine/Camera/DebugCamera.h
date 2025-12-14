@@ -3,6 +3,7 @@
 #include "Math/Type/Matrix4x4.h"
 #include "Camera/Camera.h"
 #include "Input/Input.h"
+#include "Utility/Binary/BinaryManager.h"
 
 class DebugCamera : public Camera {
 public:
@@ -25,6 +26,9 @@ public:
 	void ToggleCameraMode();
 
 private:
+
+	void Save();
+
 	Input* input_ = nullptr;
 	float scrollSpeed;
 	float moveSpeedMultiplier;
@@ -34,12 +38,14 @@ private:
 	CameraMode cameraMode_;
 	
 	// Blender式カメラ用（原点注視モード）
-	Vector3 targetPosition_; // 注視点（原点）
+	Vector3 targetPosition_;  // 注視点（原点）
 	float distance_;          // 注視点からの距離
 	float horizontalAngle_;   // 水平角度
 	float verticalAngle_;     // 垂直角度
 	
 	// カメラ位置を計算
 	void UpdateCameraPositionOrbit();    // 原点注視モード
-	void UpdateCameraPositionFree();     // 自由回転モード
+
+	std::unique_ptr<BinaryManager> binaryManager_;
+	const std::string binaryFileName_ = "debugCameraState";
 };

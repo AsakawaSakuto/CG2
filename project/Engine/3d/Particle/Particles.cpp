@@ -1,6 +1,7 @@
 #include "Particles.h"
 #include "../Model/Model.h"
 #include <cassert>
+#include <filesystem>  // ディレクトリ作成用に追加
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
@@ -12,6 +13,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
+
+	// BinaryManagerの初期化（初回のみ）
+	if (!binaryManager_) {
+		binaryManager_ = std::make_unique<BinaryManager>();
+		binaryManager_->SetBasePath("resources/Binary/Particle/");
+	}
 
 	DescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
 
@@ -59,7 +66,6 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	isInitialized_ = true;
 }
 
-// 新しいヘルパー関数：Emitterをデフォルト値にリセット
 void Particles::ResetEmitterToDefault() {
 	emitter_.translate = { 0.0f, 0.0f, 0.0f };
 	emitter_.radius = 1.0f;
@@ -272,49 +278,36 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
-	if (EmitterStateLoader::InputText("JSONファイル名", loadToSaveName_)) {
-		// 入力が変更されたらここに来る
-		printf("Generate Name Changed to: %s\n", loadToSaveName_.c_str());
+	// ファイル名入力
+	static char fileNameBuffer[256] = "temp";
+	strncpy_s(fileNameBuffer, loadToSaveName_.c_str(), sizeof(fileNameBuffer));
+	if (ImGui::InputText("ファイル名", fileNameBuffer, sizeof(fileNameBuffer))) {
+		loadToSaveName_ = fileNameBuffer;
 	}
 
-	if (ImGui::Button("JSONから読み込み")) {
-		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
-		emitter_ = EmitterStateLoader::Load(jsonFilePath_);
-		
-		// JSONから読み込んだBlendModeを内部変数にも反映
-		blendMode_ = emitter_.blendMode;
-
-		// JSONから読み込んだテクスチャパスを適用
-		if (!emitter_.texturePath.empty()) {
-			std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
-			if (textureName_ != newTextureName) {
-				textureName_ = newTextureName;
-				// テクスチャファイル読み込み
-				TextureManager::GetInstance()->LoadTexture(textureName_);
-				// 読み込んだテクスチャの番号を取得
-				textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
-			}
-		}
+	if (ImGui::Button("読み込み")) {
+		LoadFromBinary(loadToSaveName_);
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("JSONに保存")) {
-		jsonFilePath_ = "resources/Data/Particle/" + (loadToSaveName_ + ".json");
-		EmitterStateLoader::Save(jsonFilePath_, emitter_);
+	if (ImGui::Button("保存")) {
+		SaveToBinary(loadToSaveName_);
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("JSON生成")) {
-		EmitterStateLoader::SaveToCurrentDir(emitter_, loadToSaveName_);
+	if (ImGui::Button("新規作成")) {
+		CreateNewBinaryFile(loadToSaveName_);
 	}
 
 	ImGui::Separator();
 
-	if (EmitterStateLoader::InputText("テクスチャ名", emitter_.texturePath)) {
-		// 入力が変更されたらここに来る
-		printf("Texture Name Changed to: %s\n", emitter_.texturePath.c_str());
+	// テクスチャ名入力
+	static char textureNameBuffer[256] = "";
+	strncpy_s(textureNameBuffer, emitter_.texturePath.c_str(), sizeof(textureNameBuffer));
+	if (ImGui::InputText("テクスチャ名", textureNameBuffer, sizeof(textureNameBuffer))) {
+		emitter_.texturePath = textureNameBuffer;
 	}
 
 	if (ImGui::Button("テクスチャ読み込み")) {
@@ -1087,39 +1080,202 @@ Particles::~Particles() {
 	}
 }
 
-void Particles::LoadJson(const std::string& filePath) {
-	// 既に同じファイルを読み込んでいる場合はスキップ
-	std::string fullPath = "resources/Data/Particle/" + (filePath + ".json");
-	if (jsonFilePath_ == fullPath && isJsonLoaded_) {
+void Particles::LoadBinary(const std::string& filePath) {
+	LoadFromBinary(filePath);
+}
+
+void Particles::SaveToBinary(const std::string& filePath) {
+	// ディレクトリが存在しない場合は作成
+	std::filesystem::path fullPath = binaryManager_->GetBasePath() + filePath;
+	std::filesystem::path directory = fullPath.parent_path();
+	
+	if (!directory.empty() && !std::filesystem::exists(directory)) {
+		try {
+			std::filesystem::create_directories(directory);
+			printf("[INFO] Created directory: %s\n", directory.string().c_str());
+		} catch (const std::filesystem::filesystem_error& e) {
+			printf("[ERROR] Failed to create directory: %s\n", e.what());
+			return;
+		}
+	}
+
+	// EmitterStateの各フィールドをBinaryManagerに登録
+	binaryManager_->RegistOutput(emitter_.translate);
+	binaryManager_->RegistOutput(emitter_.radius);
+	binaryManager_->RegistOutput(emitter_.useEmitter);
+	binaryManager_->RegistOutput(emitter_.emit);
+	binaryManager_->RegistOutput(emitter_.count);
+	binaryManager_->RegistOutput(emitter_.frequency);
+	binaryManager_->RegistOutput(emitter_.frequencyTime);
+	binaryManager_->RegistOutput(Vector2{emitter_.startScale.x, emitter_.startScale.y});
+	binaryManager_->RegistOutput(Vector2{emitter_.endScale.x, emitter_.endScale.y});
+	binaryManager_->RegistOutput(emitter_.scaleFade);
+	binaryManager_->RegistOutput(emitter_.scaleRandom);
+	binaryManager_->RegistOutput(emitter_.minScale);
+	binaryManager_->RegistOutput(emitter_.maxScale);
+	binaryManager_->RegistOutput(emitter_.rotateMove);
+	binaryManager_->RegistOutput(emitter_.startRotateVelocity);
+	binaryManager_->RegistOutput(emitter_.endRotateVelocity);
+	binaryManager_->RegistOutput(emitter_.rotateVelocityRandom);
+	binaryManager_->RegistOutput(emitter_.minRotateVelocity);
+	binaryManager_->RegistOutput(emitter_.maxRotateVelocity);
+	binaryManager_->RegistOutput(emitter_.alphaFade);
+	binaryManager_->RegistOutput(emitter_.colorFade);
+	binaryManager_->RegistOutput(emitter_.startColor);
+	binaryManager_->RegistOutput(emitter_.endColor);
+	binaryManager_->RegistOutput(emitter_.colorRandom);
+	binaryManager_->RegistOutput(emitter_.minColor);
+	binaryManager_->RegistOutput(emitter_.maxColor);
+	binaryManager_->RegistOutput(emitter_.isMove);
+	binaryManager_->RegistOutput(emitter_.startVelocity);
+	binaryManager_->RegistOutput(emitter_.endVelocity);
+	binaryManager_->RegistOutput(emitter_.velocityRandom);
+	binaryManager_->RegistOutput(emitter_.minVelocity);
+	binaryManager_->RegistOutput(emitter_.maxVelocity);
+	binaryManager_->RegistOutput(emitter_.normalVelocity);
+	binaryManager_->RegistOutput(emitter_.lifeTime);
+	binaryManager_->RegistOutput(emitter_.lifeTimeRandom);
+	binaryManager_->RegistOutput(emitter_.minLifeTime);
+	binaryManager_->RegistOutput(emitter_.maxLifeTime);
+	binaryManager_->RegistOutput(emitter_.shapeType);
+	binaryManager_->RegistOutput(emitter_.size);
+	binaryManager_->RegistOutput(emitter_.lineStart);
+	binaryManager_->RegistOutput(emitter_.lineLength);
+	binaryManager_->RegistOutput(emitter_.ringInnerRadius);
+	binaryManager_->RegistOutput(emitter_.ringOuterRadius);
+	binaryManager_->RegistOutput(emitter_.coneAngle);
+	binaryManager_->RegistOutput(emitter_.coneHeight);
+	binaryManager_->RegistOutput(emitter_.coneDirection);
+	binaryManager_->RegistOutput(emitter_.hemisphereAngle);
+	binaryManager_->RegistOutput(emitter_.planeNormal);
+	binaryManager_->RegistOutput(emitter_.planeWidth);
+	binaryManager_->RegistOutput(emitter_.planeHeight);
+	binaryManager_->RegistOutput(emitter_.ringAngle);
+	binaryManager_->RegistOutput(emitter_.ringNormal);
+	binaryManager_->RegistOutput(emitter_.useGravity);
+	binaryManager_->RegistOutput(emitter_.gravityY);
+	binaryManager_->RegistOutput(emitter_.accelerationY);
+	binaryManager_->RegistOutput(static_cast<uint32_t>(emitter_.blendMode));
+	binaryManager_->RegistOutput(emitter_.texturePath);
+
+	// バイナリファイルに書き込み
+	binaryManager_->Write(filePath);
+	
+	printf("[INFO] Emitter state saved to binary: %s\n", filePath.c_str());
+}
+
+void Particles::CreateNewBinaryFile(const std::string& filePath) {
+	// ディレクトリが存在しない場合は作成
+	std::filesystem::path fullPath = binaryManager_->GetBasePath() + filePath;
+	std::filesystem::path directory = fullPath.parent_path();
+	
+	if (!directory.empty() && !std::filesystem::exists(directory)) {
+		try {
+			std::filesystem::create_directories(directory);
+			printf("[INFO] Created directory: %s\n", directory.string().c_str());
+		} catch (const std::filesystem::filesystem_error& e) {
+			printf("[ERROR] Failed to create directory: %s\n", e.what());
+			return;
+		}
+	}
+
+	// デフォルト値でバイナリファイルを作成
+	SaveToBinary(filePath);
+	printf("[INFO] Created new binary file: %s\n", filePath.c_str());
+}
+
+void Particles::LoadFromBinary(const std::string& filePath) {
+	// バイナリファイルから読み込み
+	auto values = binaryManager_->Read(filePath);
+	
+	if (values.empty()) {
+		printf("[WARNING] Failed to load binary file: %s\n", filePath.c_str());
 		return;
 	}
-	
-	jsonFilePath_ = fullPath;
-	
-	// 完全なコピーで読み込み
-	EmitterState loadedState = EmitterStateLoader::Load(jsonFilePath_);
-	emitter_ = loadedState;  // 構造体全体をコピー
-	
-	loadToSaveName_ = filePath;
-	
-	// JSONから読み込んだBlendModeを内部変数にも反映
+
+	// 読み込んだ値を順番に取得して適用
+	size_t index = 0;
+	if (index < values.size()) emitter_.translate = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.radius = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.useEmitter = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.emit = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.count = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.frequency = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.frequencyTime = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) {
+		Vector2 startScale = BinaryManager::Reverse<Vector2>(values[index++]);
+		emitter_.startScale.x = startScale.x;
+		emitter_.startScale.y = startScale.y;
+	}
+	if (index < values.size()) {
+		Vector2 endScale = BinaryManager::Reverse<Vector2>(values[index++]);
+		emitter_.endScale.x = endScale.x;
+		emitter_.endScale.y = endScale.y;
+	}
+	if (index < values.size()) emitter_.scaleFade = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.scaleRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minScale = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.maxScale = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.rotateMove = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.startRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.endRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.rotateVelocityRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.maxRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.alphaFade = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.colorFade = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.startColor = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.endColor = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.colorRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minColor = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.maxColor = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.isMove = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.startVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.endVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.velocityRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.maxVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.normalVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.lifeTime = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.lifeTimeRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minLifeTime = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.maxLifeTime = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.shapeType = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.size = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.lineStart = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.lineLength = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringInnerRadius = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringOuterRadius = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.coneAngle = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.coneHeight = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.coneDirection = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.hemisphereAngle = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.planeNormal = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.planeWidth = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.planeHeight = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringAngle = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringNormal = BinaryManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.useGravity = BinaryManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.gravityY = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.accelerationY = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.blendMode = static_cast<BlendMode>(BinaryManager::Reverse<uint32_t>(values[index++]));
+	if (index < values.size()) emitter_.texturePath = BinaryManager::Reverse<std::string>(values[index++]);
+
+	// BlendModeを内部変数にも反映
 	blendMode_ = emitter_.blendMode;
-	
-	// texturePath をローカル変数に完全コピー
+
+	// テクスチャパスが存在する場合、テクスチャを読み込む
 	if (!emitter_.texturePath.empty()) {
-		// 安全なコピーを作成
-		std::string texturePathCopy = emitter_.texturePath;
-		std::string newTextureName = "resources/image/particle/" + texturePathCopy + ".png";
-		
+		std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
 		if (textureName_ != newTextureName) {
-			// 先にメンバ変数に代入
 			textureName_ = newTextureName;
-			
-			// メンバ変数を使用（安全）
 			TextureManager::GetInstance()->LoadTexture(textureName_);
 			textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 		}
 	}
+
+	loadToSaveName_ = filePath;
+	isBinaryLoaded_ = true;
 	
-	isJsonLoaded_ = true;
+	printf("[INFO] Emitter state loaded from binary: %s\n", filePath.c_str());
 }

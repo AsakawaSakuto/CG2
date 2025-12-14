@@ -1,12 +1,10 @@
 #pragma once
 #pragma region Include
 
-// 標準C++ライブラリ
 #include <memory>
 #include <random>
 #include <numbers>
 
-// Windows/DirectXライブラリ
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
@@ -17,34 +15,21 @@
 #pragma comment(lib, "dxcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 
-// 外部ライブラリ
 #include "DirectXTex.h"
-
-// Engine - 基礎型
 #include "Math/Type/Vector3.h"
 #include "Math/Type/Vector4.h"
 #include "Math/Type/Matrix4x4.h"
-
-// Engine - ユーティリティ
 #include "Utility/Transform/Transform.h"
 #include "Utility/BlendMode/BlendMode.h"
 #include "Utility/GameTimer/DeltaTime.h"
-
-// Engine - 数学関数
+#include "Utility/Binary/BinaryManager.h"
 #include "Math/MatrixFunction/MatrixFunction.h"
-
-// Engine - Core機能
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Core/HeapManager/DescriptorAllocator.h"
 #include "Core/TextureManager/TextureManager.h"
-
-// Engine - カメラ
 #include "Camera/Camera.h"
-
-// Engine - パーティクル関連
 #include "3d/Particle/Struct/ParticleDataStruct.h"
 #include "3d/Particle/Struct/EmitterState.h"
-#include "3d/Particle/Json/EmitterStateLoder.h"
 
 #pragma endregion
 
@@ -80,7 +65,7 @@ public:
 	void Draw(Camera& useCamera);
 
 	/// <summary>
-	/// ImGuiでパラメータを操作 「JsonFileの生成＋保存＋読み込みをできる」
+	/// ImGuiでパラメータを操作 「BinaryFileの生成＋保存＋読み込みをできる」
 	/// </summary>
 	/// <param name="objectName">表示する名前を入力</param>
 	void DrawImGui(const char* objectName);
@@ -159,11 +144,10 @@ public:
 	}
 
 	/// <summary>
-	/// JsonFileからEmitterの値を読み込む
+	/// BinaryFileからEmitterの値を読み込む
 	/// </summary>
-	/// <param name="filePath">Resources->Data->Particle の中にあるJsonFileのPathを入れる「.jsonは不要」</param>
-	/// <param name="Pathの処理">"resources/Data/Particle/" + (filePath + ".json")</param>
-	void LoadJson(const std::string& filePath);
+	/// <param name="filePath">Resources->Binary->Particle の中にあるBinaryFileのPathを入れる（拡張子不要）</param>
+	void LoadBinary(const std::string& filePath);
 
 	void SetEmitterState(EmitterState emitter) { emitter_ = emitter; }
 private:
@@ -174,17 +158,21 @@ private:
 	
 	void ResetEmitterToDefault();
 
+	// BinaryManagerでの保存・読み込み用のヘルパー関数
+	void SaveToBinary(const std::string& filePath);
+	void LoadFromBinary(const std::string& filePath);
+	void CreateNewBinaryFile(const std::string& filePath);
+
 	Camera camera_;
 
-	std::string jsonFilePath_;
+	std::unique_ptr<BinaryManager> binaryManager_;
 	std::string loadToSaveName_ = "temp";
-	std::string generateName = "emitterData";
 
 	// パーティクルの再生状態
 	bool isPlaying_ = false;
 	
-	// JSON読み込み済みフラグ
-	bool isJsonLoaded_ = false;
+	// Binary読み込み済みフラグ
+	bool isBinaryLoaded_ = false;
 	
 	// 初期化済みフラグ
 	bool isInitialized_ = false;
@@ -198,7 +186,7 @@ private:
 	uint32_t idxUavFreeListIndex_;
 	uint32_t idxUavFreeList_;
 
-	// 描画可能な最大パーティクル数 // 1048576*2048 // 16384*32
+	// 描画可能な最大パーティクル数
 	uint32_t kMaxParticles_;
 	
 	// Dispatchを実行する回数
@@ -213,7 +201,6 @@ private:
 	// 現在のブレンドモード
 	BlendMode blendMode_;
 	
-
 	float totalTime_ = 0.0f;
 
 	bool isMove_ = false;
@@ -221,6 +208,7 @@ private:
 	float emitterSpeed_ = 0.0f;
 
 	Vector3 offset_ = {};
+	
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferResource_;

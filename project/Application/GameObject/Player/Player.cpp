@@ -20,9 +20,9 @@ void Player::Initialize(AppContext* ctx) {
 	expItemGetRange_->SetDrawMode(true);
 
 	moveParticle_->Initialize(&ctx_->dxCommon);
-	moveParticle_->LoadJson("playerMove");
+	moveParticle_->LoadBinary("playerMove");
 	landingParticle_->Initialize(&ctx_->dxCommon);
-	landingParticle_->LoadJson("playerLanding");
+	landingParticle_->LoadBinary("playerLanding");
 
 	weaponManager_->Initialize(ctx_);
 
