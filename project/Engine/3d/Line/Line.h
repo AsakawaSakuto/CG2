@@ -98,6 +98,13 @@ public:
     /// <param name="color">色（デフォルト：白）</param>
     void AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="position"></param>
+	/// <param name="color"></param>
+	void AddPoint(const Vector3& position, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
     /// <summary>
     /// 円描画
     /// </summary>

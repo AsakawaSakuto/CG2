@@ -240,22 +240,29 @@ namespace Collision
 
     /// <summary>
     /// OvalSphere × Sphere 判定
-    /// 球体の中心から楕円球体表面への最短距離で判定
+    /// 球体の中心から楕円球体表面への最短距離で判定（回転対応）
     /// </summary>
     inline bool IsHit(const OvalSphere& ovalSphere, const Sphere& sphere)
     {
-        // 楕円球体の中心から球体中心への差分ベクトル
-        Vector3 diff = {
+        // 球の中心を楕円球体のローカル座標系に変換
+        Vector3 centerDiff = {
             sphere.center.x - ovalSphere.center.x,
             sphere.center.y - ovalSphere.center.y,
             sphere.center.z - ovalSphere.center.z
         };
 
-        // 楕円座標系に変換（各軸を半径で正規化）
+        // 楕円球体の各軸に投影してローカル座標を求める
+        Vector3 localCenter = {
+            centerDiff * ovalSphere.orientation[0],
+            centerDiff * ovalSphere.orientation[1],
+            centerDiff * ovalSphere.orientation[2]
+        };
+
+        // ローカル座標系で楕円座標系に変換（各軸を半径で正規化）
         Vector3 normalizedDiff = {
-            diff.x / ovalSphere.radius.x,
-            diff.y / ovalSphere.radius.y,
-            diff.z / ovalSphere.radius.z
+            localCenter.x / ovalSphere.radius.x,
+            localCenter.y / ovalSphere.radius.y,
+            localCenter.z / ovalSphere.radius.z
         };
 
         // 正規化された空間での距離
@@ -275,11 +282,18 @@ namespace Collision
             normalizedDiff.z / normalizedDistance
         };
 
-        // 楕円表面の点をワールド座標に戻す
+        // 楕円表面の点をローカル座標に戻す
+        Vector3 localSurfacePoint = {
+            normalizedSurfacePoint.x * ovalSphere.radius.x,
+            normalizedSurfacePoint.y * ovalSphere.radius.y,
+            normalizedSurfacePoint.z * ovalSphere.radius.z
+        };
+
+        // ローカル座標からワールド座標に変換
         Vector3 surfacePoint = {
-            ovalSphere.center.x + normalizedSurfacePoint.x * ovalSphere.radius.x,
-            ovalSphere.center.y + normalizedSurfacePoint.y * ovalSphere.radius.y,
-            ovalSphere.center.z + normalizedSurfacePoint.z * ovalSphere.radius.z
+            ovalSphere.center.x + localSurfacePoint.x * ovalSphere.orientation[0].x + localSurfacePoint.y * ovalSphere.orientation[1].x + localSurfacePoint.z * ovalSphere.orientation[2].x,
+            ovalSphere.center.y + localSurfacePoint.x * ovalSphere.orientation[0].y + localSurfacePoint.y * ovalSphere.orientation[1].y + localSurfacePoint.z * ovalSphere.orientation[2].y,
+            ovalSphere.center.z + localSurfacePoint.x * ovalSphere.orientation[0].z + localSurfacePoint.y * ovalSphere.orientation[1].z + localSurfacePoint.z * ovalSphere.orientation[2].z
         };
 
         // 球の中心から楕円表面の最近点までの距離
@@ -306,7 +320,7 @@ namespace Collision
 
     /// <summary>
     /// OvalSphere × AABB 判定
-    /// 楕円球体の各軸での最近点を求めて判定
+    /// 楕円球体の各軸での最近点を求めて判定（回転対応）
     /// </summary>
     inline bool IsHit(const OvalSphere& ovalSphere, const AABB& aabb)
     {
@@ -322,7 +336,7 @@ namespace Collision
             aabb.center.z + aabb.size.z * 0.5f
         };
 
-        // AABBに対する楕円球体の最近点を求める
+        // AABBに対する楕円球体の中心の最近点を求める
         Vector3 closestPoint = {
             std::clamp(ovalSphere.center.x, aabbMin.x, aabbMax.x),
             std::clamp(ovalSphere.center.y, aabbMin.y, aabbMax.y),
@@ -336,10 +350,17 @@ namespace Collision
             closestPoint.z - ovalSphere.center.z
         };
 
+        // 差分を楕円球体のローカル座標系に変換
+        Vector3 localDiff = {
+            diff * ovalSphere.orientation[0],
+            diff * ovalSphere.orientation[1],
+            diff * ovalSphere.orientation[2]
+        };
+
         // 楕円の方程式で判定: (x/a)² + (y/b)² + (z/c)² <= 1
-        float ellipseValue = (diff.x * diff.x) / (ovalSphere.radius.x * ovalSphere.radius.x) +
-                           (diff.y * diff.y) / (ovalSphere.radius.y * ovalSphere.radius.y) +
-                           (diff.z * diff.z) / (ovalSphere.radius.z * ovalSphere.radius.z);
+        float ellipseValue = (localDiff.x * localDiff.x) / (ovalSphere.radius.x * ovalSphere.radius.x) +
+                           (localDiff.y * localDiff.y) / (ovalSphere.radius.y * ovalSphere.radius.y) +
+                           (localDiff.z * localDiff.z) / (ovalSphere.radius.z * ovalSphere.radius.z);
 
         return ellipseValue <= 1.0f;
     }
@@ -354,10 +375,17 @@ namespace Collision
 
     /// <summary>
     /// OvalSphere × OBB 判定
-    /// 楕円球体をOBBのローカル座標系に変換して判定
+    /// 楕円球体をOBBのローカル座標系に変換して判定（回転対応）
     /// </summary>
     inline bool IsHit(const OvalSphere& ovalSphere, const OBB& obb)
     {
+        // OBBのローカル空間での半サイズ
+        Vector3 halfSize = {
+            obb.size.x * 0.5f,
+            obb.size.y * 0.5f,
+            obb.size.z * 0.5f
+        };
+
         // 楕円球体の中心をOBBのローカル座標系に変換
         Vector3 centerDiff = {
             ovalSphere.center.x - obb.center.x,
@@ -366,24 +394,17 @@ namespace Collision
         };
 
         // OBBの各軸に投影してローカル座標を求める
-        Vector3 localCenter = {
+        Vector3 localOvalCenter = {
             centerDiff * obb.orientation[0],
             centerDiff * obb.orientation[1],
             centerDiff * obb.orientation[2]
         };
 
-        // OBBのローカル空間での半サイズ
-        Vector3 halfSize = {
-            obb.size.x * 0.5f,
-            obb.size.y * 0.5f,
-            obb.size.z * 0.5f
-        };
-
         // ローカル空間での最近点を求める
         Vector3 closestLocal = {
-            std::clamp(localCenter.x, -halfSize.x, halfSize.x),
-            std::clamp(localCenter.y, -halfSize.y, halfSize.y),
-            std::clamp(localCenter.z, -halfSize.z, halfSize.z)
+            std::clamp(localOvalCenter.x, -halfSize.x, halfSize.x),
+            std::clamp(localOvalCenter.y, -halfSize.y, halfSize.y),
+            std::clamp(localOvalCenter.z, -halfSize.z, halfSize.z)
         };
 
         // 最近点をワールド座標に戻す
@@ -400,10 +421,17 @@ namespace Collision
             closestWorld.z - ovalSphere.center.z
         };
 
+        // 差分を楕円球体のローカル座標系に変換
+        Vector3 localDiff = {
+            diff * ovalSphere.orientation[0],
+            diff * ovalSphere.orientation[1],
+            diff * ovalSphere.orientation[2]
+        };
+
         // 楕円の方程式で判定: (x/a)² + (y/b)² + (z/c)² <= 1
-        float ellipseValue = (diff.x * diff.x) / (ovalSphere.radius.x * ovalSphere.radius.x) +
-                           (diff.y * diff.y) / (ovalSphere.radius.y * ovalSphere.radius.y) +
-                           (diff.z * diff.z) / (ovalSphere.radius.z * ovalSphere.radius.z);
+        float ellipseValue = (localDiff.x * localDiff.x) / (ovalSphere.radius.x * ovalSphere.radius.x) +
+                           (localDiff.y * localDiff.y) / (ovalSphere.radius.y * ovalSphere.radius.y) +
+                           (localDiff.z * localDiff.z) / (ovalSphere.radius.z * ovalSphere.radius.z);
 
         return ellipseValue <= 1.0f;
     }
@@ -418,7 +446,7 @@ namespace Collision
 
     /// <summary>
     /// OvalSphere × OvalSphere 判定
-    /// 2つの楕円球体同士の衝突判定（近似解法）
+    /// 2つの楕円球体同士の衝突判定（回転対応）
     /// </summary>
     inline bool IsHit(const OvalSphere& a, const OvalSphere& b)
     {
@@ -429,13 +457,40 @@ namespace Collision
             b.center.z - a.center.z
         };
 
-        // 各軸での正規化された距離を計算
-        // 保守的な判定のため、各楕円体の半径の和を使用
-        float normalizedDistanceSq = 
-            (diff.x * diff.x) / ((a.radius.x + b.radius.x) * (a.radius.x + b.radius.x)) +
-            (diff.y * diff.y) / ((a.radius.y + b.radius.y) * (a.radius.y + b.radius.y)) +
-            (diff.z * diff.z) / ((a.radius.z + b.radius.z) * (a.radius.z + b.radius.z));
+        // 楕円球体Aのローカル座標系での距離を計算
+        Vector3 localDiffA = {
+            diff * a.orientation[0],
+            diff * a.orientation[1],
+            diff * a.orientation[2]
+        };
 
-        return normalizedDistanceSq <= 1.0f;
+        // 楕円球体Bのローカル座標系での距離を計算（逆方向）
+        Vector3 diffInverse = {
+            a.center.x - b.center.x,
+            a.center.y - b.center.y,
+            a.center.z - b.center.z
+        };
+
+        Vector3 localDiffB = {
+            diffInverse * b.orientation[0],
+            diffInverse * b.orientation[1],
+            diffInverse * b.orientation[2]
+        };
+
+        // 各楕円体のローカル空間での正規化距離
+        float normalizedDistanceA = 
+            (localDiffA.x * localDiffA.x) / (a.radius.x * a.radius.x) +
+            (localDiffA.y * localDiffA.y) / (a.radius.y * a.radius.y) +
+            (localDiffA.z * localDiffA.z) / (a.radius.z * a.radius.z);
+
+        float normalizedDistanceB = 
+            (localDiffB.x * localDiffB.x) / (b.radius.x * b.radius.x) +
+            (localDiffB.y * localDiffB.y) / (b.radius.y * b.radius.y) +
+            (localDiffB.z * localDiffB.z) / (b.radius.z * b.radius.z);
+
+        // どちらか一方の楕円内に相手の中心がある場合は衝突
+        // または距離が十分近い場合（保守的な判定）
+        return (normalizedDistanceA <= 1.0f) || (normalizedDistanceB <= 1.0f) || 
+               ((normalizedDistanceA + normalizedDistanceB) * 0.5f <= 1.0f);
     }
 }

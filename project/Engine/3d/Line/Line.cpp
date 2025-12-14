@@ -263,17 +263,30 @@ void Line::AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color) {
             float latitude1 = (-pi / 2.0f) + (pi * j) / segments_;
             float latitude2 = (-pi / 2.0f) + (pi * (j + 1)) / segments_;
 
-            // 楕円の方程式を使用して各軸の半径を適用
+            // ローカル座標系での楕円の点を計算
+            Vector3 localP1 = {
+                ovalSphere.radius.x * std::cos(latitude1) * std::cos(longitude),
+                ovalSphere.radius.y * std::sin(latitude1),
+                ovalSphere.radius.z * std::cos(latitude1) * std::sin(longitude)
+            };
+            Vector3 localP2 = {
+                ovalSphere.radius.x * std::cos(latitude2) * std::cos(longitude),
+                ovalSphere.radius.y * std::sin(latitude2),
+                ovalSphere.radius.z * std::cos(latitude2) * std::sin(longitude)
+            };
+
+            // ローカル座標からワールド座標へ変換（orientationで回転 + centerで平行移動）
             Vector3 p1 = {
-                ovalSphere.center.x + ovalSphere.radius.x * std::cos(latitude1) * std::cos(longitude),
-                ovalSphere.center.y + ovalSphere.radius.y * std::sin(latitude1),
-                ovalSphere.center.z + ovalSphere.radius.z * std::cos(latitude1) * std::sin(longitude)
+                ovalSphere.center.x + localP1.x * ovalSphere.orientation[0].x + localP1.y * ovalSphere.orientation[1].x + localP1.z * ovalSphere.orientation[2].x,
+                ovalSphere.center.y + localP1.x * ovalSphere.orientation[0].y + localP1.y * ovalSphere.orientation[1].y + localP1.z * ovalSphere.orientation[2].y,
+                ovalSphere.center.z + localP1.x * ovalSphere.orientation[0].z + localP1.y * ovalSphere.orientation[1].z + localP1.z * ovalSphere.orientation[2].z
             };
             Vector3 p2 = {
-                ovalSphere.center.x + ovalSphere.radius.x * std::cos(latitude2) * std::cos(longitude),
-                ovalSphere.center.y + ovalSphere.radius.y * std::sin(latitude2),
-                ovalSphere.center.z + ovalSphere.radius.z * std::cos(latitude2) * std::sin(longitude)
+                ovalSphere.center.x + localP2.x * ovalSphere.orientation[0].x + localP2.y * ovalSphere.orientation[1].x + localP2.z * ovalSphere.orientation[2].x,
+                ovalSphere.center.y + localP2.x * ovalSphere.orientation[0].y + localP2.y * ovalSphere.orientation[1].y + localP2.z * ovalSphere.orientation[2].y,
+                ovalSphere.center.z + localP2.x * ovalSphere.orientation[0].z + localP2.y * ovalSphere.orientation[1].z + localP2.z * ovalSphere.orientation[2].z
             };
+
             AddLine(p1, p2, color);
         }
     }
@@ -293,16 +306,30 @@ void Line::AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color) {
             float angle1 = (2.0f * pi * j) / segments_;
             float angle2 = (2.0f * pi * (j + 1)) / segments_;
 
+            // ローカル座標系での楕円の点を計算
+            Vector3 localP1 = {
+                circleRadiusX * std::cos(angle1),
+                y,
+                circleRadiusZ * std::sin(angle1)
+            };
+            Vector3 localP2 = {
+                circleRadiusX * std::cos(angle2),
+                y,
+                circleRadiusZ * std::sin(angle2)
+            };
+
+            // ローカル座標からワールド座標へ変換（orientationで回転 + centerで平行移動）
             Vector3 p1 = {
-                ovalSphere.center.x + circleRadiusX * std::cos(angle1),
-                ovalSphere.center.y + y,
-                ovalSphere.center.z + circleRadiusZ * std::sin(angle1)
+                ovalSphere.center.x + localP1.x * ovalSphere.orientation[0].x + localP1.y * ovalSphere.orientation[1].x + localP1.z * ovalSphere.orientation[2].x,
+                ovalSphere.center.y + localP1.x * ovalSphere.orientation[0].y + localP1.y * ovalSphere.orientation[1].y + localP1.z * ovalSphere.orientation[2].y,
+                ovalSphere.center.z + localP1.x * ovalSphere.orientation[0].z + localP1.y * ovalSphere.orientation[1].z + localP1.z * ovalSphere.orientation[2].z
             };
             Vector3 p2 = {
-                ovalSphere.center.x + circleRadiusX * std::cos(angle2),
-                ovalSphere.center.y + y,
-                ovalSphere.center.z + circleRadiusZ * std::sin(angle2)
+                ovalSphere.center.x + localP2.x * ovalSphere.orientation[0].x + localP2.y * ovalSphere.orientation[1].x + localP2.z * ovalSphere.orientation[2].x,
+                ovalSphere.center.y + localP2.x * ovalSphere.orientation[0].y + localP2.y * ovalSphere.orientation[1].y + localP2.z * ovalSphere.orientation[2].y,
+                ovalSphere.center.z + localP2.x * ovalSphere.orientation[0].z + localP2.y * ovalSphere.orientation[1].z + localP2.z * ovalSphere.orientation[2].z
             };
+
             AddLine(p1, p2, color);
         }
     }
@@ -353,6 +380,11 @@ void Line::AddCircle(const Vector3& center, float radius, const Vector3& normal,
 
 void Line::AddCircleXZ(const Vector3& center, float radius, const Vector4& color) {
 	AddCircle(center, radius, { 0.0f, 1.0f, 0.0f }, color);
+}
+
+void Line::AddPoint(const Vector3& position, const Vector4& color) {
+	Sphere pointSphere = { position, 0.1f }; // 小さな球として点を表現
+    AddSphere(pointSphere, color);
 }
 
 void Line::AddRay(const Vector3& origin, const Vector3& direction, float length, const Vector4& color) {

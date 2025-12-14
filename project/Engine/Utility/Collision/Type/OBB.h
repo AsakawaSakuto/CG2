@@ -49,10 +49,6 @@ struct OBB {
 		ImGui::DragFloat3("size", &size.x, 0.01f);
 		ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 
-		//ImGui::DragFloat3("orientation[0]", &orientation[0].x, 0.01f);
-		//ImGui::DragFloat3("orientation[1]", &orientation[1].x, 0.01f);
-		//ImGui::DragFloat3("orientation[2]", &orientation[2].x, 0.01f);
-
 		if (ImGui::Button("Reset")) {
 			center = { 0.0f,0.0f,0.0f };
 			size = { 1.0f,1.0f,1.0f };
