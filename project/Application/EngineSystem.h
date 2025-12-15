@@ -18,6 +18,7 @@
 
 // Object
 #include "2d/Sprite/Sprite.h"
+#include "2d/BitmapFont/BitmapFont.h"
 #include "3d/Model/Model.h"
 #include "3d/Particle/Particles.h"
 #include "3d/Particle/Struct/EmitterState.h"

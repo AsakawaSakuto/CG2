@@ -62,4 +62,7 @@ private:
 	Sphere testSphere_;
 	OvalSphere testOvalSphere_;
 	Plane testPlane_;
+
+	BitmapFont bitmapFont_;
+	int setValue_ = 0;
 };

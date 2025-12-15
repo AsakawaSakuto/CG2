@@ -14,7 +14,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 
-	// BinaryManagerの初期化（初回のみ）
+	// BinaryManagerの初期化
 	if (!binaryManager_) {
 		binaryManager_ = std::make_unique<BinaryManager>();
 		binaryManager_->SetBasePath("resources/Binary/Particle/");

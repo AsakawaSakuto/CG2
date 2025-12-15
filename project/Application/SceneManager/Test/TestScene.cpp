@@ -54,6 +54,8 @@ void TestScene::Initialize() {
 	testOvalSphere_.UpdateOrientation();
 
 	testLine_->Initialize(&ctx_->dxCommon);
+
+	bitmapFont_.Initialize(&ctx_->dxCommon);
 }
 
 void TestScene::Update() {
@@ -122,6 +124,8 @@ void TestScene::Update() {
     camera_ = debugCamera_;
 	camera_.Update();
 	debugCamera_.Update();
+
+    bitmapFont_.SetNumber(setValue_);
 }
 
 void TestScene::Draw() {
@@ -140,6 +144,8 @@ void TestScene::Draw() {
 	testParticle_->Draw(camera_);
 
 	testSprite_->Draw();
+
+	bitmapFont_.Draw();
 }
 
 void TestScene::DrawImGui() {
@@ -158,6 +164,14 @@ void TestScene::DrawImGui() {
 	testParticle_->DrawImGui("testParticle");
 
     debugCamera_.DrawImgui();
+
+	ImGui::Begin("Set Number");
+
+    ImGui::DragInt("Value", &setValue_, 1, 0, 999999);
+
+	ImGui::End();
+
+	bitmapFont_.DrawImGui("bitmapFont");
 
     //testSprite_->DrawImGui("testSprite");
 

@@ -129,7 +129,7 @@ void GameScene::Update() {
 
 	// ビットマップフォントの更新
 
-	timeFont_->SetTime(gameTime_, { 1100.0f, 50.0f }, 60.0f);
+	/*timeFont_->SetTime(gameTime_, { 1100.0f, 50.0f }, 60.0f);
 	timeFont_->Update();
 
 	playerHPFont_->SetNumber(player_->GetCurrentHP(), { 215.0f,50.0f }, 60.0f);
@@ -137,7 +137,7 @@ void GameScene::Update() {
 
 	playerLv_->SetNumber(player_->GetLevel(), {122.0f,112.0f}, 55.0f);
 	playerLv_->SetScale({0.5f,0.5f});
-	playerLv_->Update();
+	playerLv_->Update();*/
 
 	// ゲージの更新
 	hpGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentHP()));
