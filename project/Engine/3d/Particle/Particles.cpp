@@ -24,7 +24,6 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& filePath,
 	// 既に初期化済みの場合は、リソース作成をスキップ
 	if (isInitialized_) {
 		// Emitterの値だけリセット
-		ResetEmitterToDefault();
 		// バッファリセットフラグを立てる（次回Update時にGPUバッファをクリア）
 		needsBufferReset_ = true;
 		return;

@@ -103,7 +103,7 @@ void DebugCamera::Update() {
 			distance_ -= wheel * scrollSpeed * moveSpeedMultiplier;
 			// 距離を制限
 			if (distance_ < 1.0f) distance_ = 1.0f;
-			if (distance_ > 100.0f) distance_ = 100.0f;
+			if (distance_ > 1000.0f) distance_ = 1000.0f;
 		}
 
 		UpdateCameraPositionOrbit();

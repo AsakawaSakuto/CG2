@@ -19,7 +19,7 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(ctx_->keyConfig.GetInput());
 	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
-	testParticle_->Initialize(&ctx_->dxCommon);
+	testParticle_->Initialize(&ctx_->dxCommon, "temp");
 
 	testSprite_->Initialize(&ctx_->dxCommon, "icon/fireBall.png", { 64.0f,64.0f });
 
