@@ -9,8 +9,9 @@
 
 // 平面を表す構造体
 struct Plane {
+	Vector3 center;   // 平面の中心座標
 	Vector3 normal;   // 平面の法線
-	float distance;   // 原点からの距離
+	float size; 
 
 #ifdef USE_IMGUI
 	/// <summary>
@@ -20,12 +21,14 @@ struct Plane {
 	void DrawImGui(const char* name) {
 		ImGui::Begin(name);
 
-		ImGui::DragFloat3("normal", &normal.x, 0.01f);
-		ImGui::DragFloat("distance", &distance, 0.01f);
+		ImGui::DragFloat3("center", &center.x, 0.01f);
+		ImGui::DragFloat3("normal", &normal.x, 0.01f, -1.0f, 1.0f);
+		ImGui::DragFloat("size", &size, 0.01f);
 
 		if (ImGui::Button("Reset")) {
 			normal = { 0.0f,1.0f,0.0f };
-			distance = 0.0f;
+			center = { 0.0f,0.0f,0.0f };
+			size = 1.0f;
 		}
 
 		ImGui::End();

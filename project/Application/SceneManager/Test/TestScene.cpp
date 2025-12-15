@@ -102,6 +102,8 @@ void TestScene::Update() {
 	testLine_->AddOvalSphere(testOvalSphere_, ovalSphereColor);
 	testLine_->AddBox(testAABB_, aabbColor);
 	testLine_->AddBox(testOBB_, obbColor);
+    
+    testLine_->AddPlane(testPlane_);
 
 	testLine_->AddGrid(20.0f, 20);
 
@@ -150,6 +152,8 @@ void TestScene::DrawImGui() {
     testAABB_.DrawImGui("testAABB");
     testSphere_.DrawImGui("testSphere");
     testOvalSphere_.DrawImGui("testOvalSphere");
+
+    testPlane_.DrawImGui("testPlane");
 
 	testParticle_->DrawImGui("testParticle");
 

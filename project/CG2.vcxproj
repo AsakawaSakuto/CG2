@@ -176,7 +176,6 @@
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
-    <ClCompile Include="Engine\3d\Particle\Json\EmitterStateLoder.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
@@ -272,7 +271,6 @@
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
-    <ClInclude Include="Engine\3d\Particle\Json\EmitterStateLoder.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\EmitterState.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
@@ -294,6 +292,7 @@
     <ClInclude Include="Engine\Audio\AudioData.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Utility\Collision\Collision.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />
     <ClInclude Include="Engine\Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\Core\CreateResource\CreateResource.h" />
     <ClInclude Include="Engine\Core\DirectXCommon\D3DResourceLeakChecker.h" />

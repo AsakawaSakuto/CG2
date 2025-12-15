@@ -46,7 +46,6 @@
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
-    <ClCompile Include="Engine\3d\Particle\Json\EmitterStateLoder.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Audio\MasterVolume.cpp" />
@@ -122,7 +121,6 @@
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
     <ClInclude Include="Engine\2d\Gauge\Gauge.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
-    <ClInclude Include="Engine\3d\Particle\Json\EmitterStateLoder.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\EmitterState.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Engine\Audio\MasterVolume.h" />
@@ -173,6 +171,7 @@
     <ClInclude Include="Engine\Utility\Binary\Data\BinaryOutput.h" />
     <ClInclude Include="Engine\Utility\Binary\Data\BinaryInput.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

@@ -16,7 +16,7 @@ protected:
     AABB aabbCollision_;
 	Sphere sphereCollision_;
 
-	std::unique_ptr<Line> debugLine_ = std::make_unique<Line>();
+	std::unique_ptr<Line3d> debugLine_ = std::make_unique<Line3d>();
 public:
     virtual void Initialize(AppContext* ctx) = 0;
     virtual void Update() = 0;

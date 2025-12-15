@@ -6,7 +6,7 @@
 #include <cassert>
 #include <cstring>
 
-void Line::Initialize(DirectXCommon* dxCommon) {
+void Line3d::Initialize(DirectXCommon* dxCommon) {
     dxCommon_ = dxCommon;
     device_ = dxCommon_->GetDevice();
     commandList_ = dxCommon_->GetCommandList();
@@ -19,7 +19,7 @@ void Line::Initialize(DirectXCommon* dxCommon) {
     CreateTransformBuffer();
 }
 
-Line::~Line() {
+Line3d::~Line3d() {
     if (vertexBuffer_) {
         vertexBuffer_->Unmap(0, nullptr);
     }
@@ -28,13 +28,13 @@ Line::~Line() {
     }
 }
 
-void Line::AddLine(const Vector3& start, const Vector3& end, const Vector4& color) {
+void Line3d::AddLine(const Vector3& start, const Vector3& end, const Vector4& color) {
     // 頂点を追加
     vertices_.push_back({ start, color });
     vertices_.push_back({ end, color });
 }
 
-void Line::AddLines(const std::vector<Vector3>& points, const Vector4& color) {
+void Line3d::AddLines(const std::vector<Vector3>& points, const Vector4& color) {
     if (points.size() < 2) return;
 
     for (size_t i = 0; i < points.size() - 1; ++i) {
@@ -42,7 +42,7 @@ void Line::AddLines(const std::vector<Vector3>& points, const Vector4& color) {
     }
 }
 
-void Line::AddGrid(float size, int divisions, const Vector4& color) {
+void Line3d::AddGrid(float size, int divisions, const Vector4& color) {
     float step = size / divisions;
     float halfSize = size * 0.5f;
 
@@ -75,7 +75,7 @@ void Line::AddGrid(float size, int divisions, const Vector4& color) {
     }
 }
 
-void Line::AddBox(const Vector3& center, const Vector3& size, const Vector4& color) {
+void Line3d::AddBox(const Vector3& center, const Vector3& size, const Vector4& color) {
     Vector3 halfSize = { size.x * 0.5f, size.y * 0.5f, size.z * 0.5f };
 
     // 8つの頂点
@@ -109,7 +109,7 @@ void Line::AddBox(const Vector3& center, const Vector3& size, const Vector4& col
     AddLine(vertices[3], vertices[7], color);
 }
 
-void Line::AddBox(const AABB& aabb, const Vector4& color) {
+void Line3d::AddBox(const AABB& aabb, const Vector4& color) {
     // centerとsizeからワールド座標のminとmaxを計算
     Vector3 worldMin = { 
         aabb.center.x - aabb.size.x * 0.5f, 
@@ -153,7 +153,7 @@ void Line::AddBox(const AABB& aabb, const Vector4& color) {
     AddLine(vertices[3], vertices[7], color);
 }
 
-void Line::AddBox(const OBB& obb, const Vector4& color) {
+void Line3d::AddBox(const OBB& obb, const Vector4& color) {
     // OBBのローカル座標系での8つの頂点を計算
     Vector3 halfSize = { obb.size.x * 0.5f, obb.size.y * 0.5f, obb.size.z * 0.5f };
     
@@ -199,7 +199,7 @@ void Line::AddBox(const OBB& obb, const Vector4& color) {
     AddLine(worldVertices[3], worldVertices[7], color);
 }
 
-void Line::AddSphere(const Sphere& sphere, const Vector4& color) {
+void Line3d::AddSphere(const Sphere& sphere, const Vector4& color) {
     const float pi = std::numbers::pi_v<float>;
 
     // 経度線（縦の円）を描画
@@ -251,7 +251,7 @@ void Line::AddSphere(const Sphere& sphere, const Vector4& color) {
     }
 }
 
-void Line::AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color) {
+void Line3d::AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color) {
     const float pi = std::numbers::pi_v<float>;
 
     // 経度線（縦の円）を描画 - 各軸の半径を考慮した楕円
@@ -335,7 +335,7 @@ void Line::AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color) {
     }
 }
 
-void Line::AddCircle(const Vector3& center, float radius, const Vector3& normal, const Vector4& color) {
+void Line3d::AddCircle(const Vector3& center, float radius, const Vector3& normal, const Vector4& color) {
     const float pi = std::numbers::pi_v<float>;
 
     // 法線から適当な接線ベクトルを作成
@@ -378,16 +378,16 @@ void Line::AddCircle(const Vector3& center, float radius, const Vector3& normal,
     }
 }
 
-void Line::AddCircleXZ(const Vector3& center, float radius, const Vector4& color) {
+void Line3d::AddCircleXZ(const Vector3& center, float radius, const Vector4& color) {
 	AddCircle(center, radius, { 0.0f, 1.0f, 0.0f }, color);
 }
 
-void Line::AddPoint(const Vector3& position, const Vector4& color) {
+void Line3d::AddPoint(const Vector3& position, const Vector4& color) {
 	Sphere pointSphere = { position, 0.1f }; // 小さな球として点を表現
     AddSphere(pointSphere, color);
 }
 
-void Line::AddRay(const Vector3& origin, const Vector3& direction, float length, const Vector4& color) {
+void Line3d::AddRay(const Vector3& origin, const Vector3& direction, float length, const Vector4& color) {
     Vector3 end = {
         origin.x + direction.x * length,
         origin.y + direction.y * length,
@@ -396,7 +396,88 @@ void Line::AddRay(const Vector3& origin, const Vector3& direction, float length,
     AddLine(origin, end, color);
 }
 
-void Line::Draw(Camera& camera) {
+void Line3d::AddSegment(const Segment& segment, const Vector4& color) {
+    // Segmentは origin（始点）と diff（終点への差分ベクトル）で定義される
+    Vector3 start = segment.origin;
+    Vector3 end = {
+        segment.origin.x + segment.diff.x,
+        segment.origin.y + segment.diff.y,
+        segment.origin.z + segment.diff.z
+    };
+    AddLine(start, end, color);
+}
+
+void Line3d::AddLine(const Line& line, const Vector4& color) {
+    // Line構造体は start（始点）と end（終点）で定義される
+    AddLine(line.start, line.end, color);
+}
+
+void Line3d::AddPlane(const Plane& plane, int divisions, const Vector4& color) {
+    // 平面の法線から、平面上の2つの接線ベクトルを計算
+    Vector3 tangent;
+    Vector3 bitangent;
+
+    // 法線から適当な接線ベクトルを作成
+    if (std::abs(plane.normal.x) < 0.9f) {
+        tangent = Normalize(Cross({ 1.0f, 0.0f, 0.0f }, plane.normal));
+    } else {
+        tangent = Normalize(Cross({ 0.0f, 1.0f, 0.0f }, plane.normal));
+    }
+    bitangent = Normalize(Cross(plane.normal, tangent));
+
+    // 平面の中心を使用
+    Vector3 planeOrigin = plane.center;
+
+    // グリッドを描画
+    float step = plane.size / divisions;
+    float halfSize = plane.size * 0.5f;
+
+    // 接線方向（tangent）に平行な線を描画
+    for (int i = 0; i <= divisions; ++i) {
+        float offset = -halfSize + step * i;
+        
+        Vector3 start = {
+            planeOrigin.x + tangent.x * (-halfSize) + bitangent.x * offset,
+            planeOrigin.y + tangent.y * (-halfSize) + bitangent.y * offset,
+            planeOrigin.z + tangent.z * (-halfSize) + bitangent.z * offset
+        };
+        Vector3 end = {
+            planeOrigin.x + tangent.x * halfSize + bitangent.x * offset,
+            planeOrigin.y + tangent.y * halfSize + bitangent.y * offset,
+            planeOrigin.z + tangent.z * halfSize + bitangent.z * offset
+        };
+        
+        AddLine(start, end, color);
+    }
+
+    // 従接線方向（bitangent）に平行な線を描画
+    for (int i = 0; i <= divisions; ++i) {
+        float offset = -halfSize + step * i;
+        
+        Vector3 start = {
+            planeOrigin.x + tangent.x * offset + bitangent.x * (-halfSize),
+            planeOrigin.y + tangent.y * offset + bitangent.y * (-halfSize),
+            planeOrigin.z + tangent.z * offset + bitangent.z * (-halfSize)
+        };
+        Vector3 end = {
+            planeOrigin.x + tangent.x * offset + bitangent.x * halfSize,
+            planeOrigin.y + tangent.y * offset + bitangent.y * halfSize,
+            planeOrigin.z + tangent.z * offset + bitangent.z * halfSize
+        };
+        
+        AddLine(start, end, color);
+    }
+
+    // 法線ベクトルを表示（視覚化用、オプショナル）
+    Vector3 normalEnd = {
+        planeOrigin.x + plane.normal.x * 2.0f,
+        planeOrigin.y + plane.normal.y * 2.0f,
+        planeOrigin.z + plane.normal.z * 2.0f
+    };
+    AddLine(planeOrigin, normalEnd, { 1.0f, 1.0f, 0.0f, 1.0f }); // 法線は黄色で表示
+}
+
+void Line3d::Draw(Camera& camera) {
 
     if (vertices_.empty()) return;
 
@@ -438,7 +519,7 @@ void Line::Draw(Camera& camera) {
     vertices_.clear();
 }
 
-void Line::CreateVertexBuffer() {
+void Line3d::CreateVertexBuffer() {
     // 既存のバッファがあればアンマップ
     if (vertexBuffer_ && vertexData_) {
         vertexBuffer_->Unmap(0, nullptr);
@@ -482,7 +563,7 @@ void Line::CreateVertexBuffer() {
     vertexBufferView_.StrideInBytes = sizeof(LineVertex);
 }
 
-void Line::CreateTransformBuffer() {
+void Line3d::CreateTransformBuffer() {
     // 既存のバッファがあればアンマップ
     if (transformBuffer_ && transformData_) {
         transformBuffer_->Unmap(0, nullptr);
@@ -518,7 +599,7 @@ void Line::CreateTransformBuffer() {
     transformBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&transformData_));
 }
 
-void Line::UpdateVertexBuffer() {
+void Line3d::UpdateVertexBuffer() {
     // 頂点データをコピー
     std::memcpy(vertexData_, vertices_.data(), vertices_.size() * sizeof(LineVertex));
 }

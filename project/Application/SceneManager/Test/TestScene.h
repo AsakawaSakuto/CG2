@@ -41,7 +41,7 @@ private:
 	unique_ptr<Model> walk_ = make_unique<Model>();
 	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
 
-	unique_ptr<Line> testLine_ = make_unique<Line>();
+	unique_ptr<Line3d> testLine_ = make_unique<Line3d>();
 
 	Transform cubeTransform_;
 	Transform spinCubeTransform_;
@@ -61,4 +61,5 @@ private:
 	OBB testOBB_;
 	Sphere testSphere_;
 	OvalSphere testOvalSphere_;
+	Plane testPlane_;
 };

@@ -13,11 +13,14 @@
 #include "Utility/Collision/Type/OBB.h"
 #include "Utility/Collision/Type/Sphere.h"
 #include "Utility/Collision/Type/OvalSphere.h"
+#include "Utility/Collision/Type/Plane.h"
+#include "Utility/Collision/Type/Segment.h"
+#include "Utility/Collision/Type/LineStruct.h"
 
 /// <summary>
 /// 3D空間に線を描画するクラス（デバッグ表示、UI、可視化用）
 /// </summary>
-class Line {
+class Line3d {
 public:
     /// <summary>
     /// 線の頂点データ
@@ -36,7 +39,7 @@ public:
     /// <summary>
     /// デストラクタ
     /// </summary>
-    ~Line();
+    ~Line3d();
 
     /// <summary>
     /// 線を追加（2点指定）
@@ -131,6 +134,29 @@ public:
     /// <param name="length">長さ</param>
     /// <param name="color">色（デフォルト：白）</param>
     void AddRay(const Vector3& origin, const Vector3& direction, float length, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
+    /// <summary>
+    /// 線分（Segment）描画
+    /// </summary>
+    /// <param name="segment">線分構造体</param>
+    /// <param name="color">色（デフォルト：白）</param>
+    void AddSegment(const Segment& segment, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
+    /// <summary>
+    /// 直線（Line）描画
+    /// </summary>
+    /// <param name="line">直線構造体</param>
+    /// <param name="color">色（デフォルト：白）</param>
+    void AddLine(const Line& line, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+
+    /// <summary>
+    /// 平面（Plane）描画（グリッド表示）
+    /// </summary>
+    /// <param name="plane">平面構造体</param>
+    /// <param name="size">グリッドサイズ（デフォルト：10.0f）</param>
+    /// <param name="divisions">グリッド分割数（デフォルト：10）</param>
+    /// <param name="color">色（デフォルト：白）</param>
+    void AddPlane(const Plane& plane, int divisions = 10, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
     /// <summary>
     /// 描画
