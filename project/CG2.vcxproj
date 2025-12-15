@@ -180,8 +180,9 @@
     <ClCompile Include="Engine\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Audio\MasterVolume.cpp" />
-    <ClCompile Include="Engine\Input\GamePad.cpp" />
+    <ClCompile Include="Engine\KeyConfig\InputDevice\GamePad.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\HeapManager.cpp" />
+    <ClCompile Include="Engine\KeyConfig\KeyConfig.cpp" />
     <ClCompile Include="Engine\OffScreen\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Engine\Math\MathFunction\MathFunction.cpp" />
@@ -222,7 +223,7 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\KeyConfig\InputDevice\Input.cpp" />
     <ClCompile Include="Engine\Core\Logger\Logger.cpp" />
     <ClCompile Include="Engine\3d\Particle\Particles.cpp" />
     <ClCompile Include="main.cpp">
@@ -276,8 +277,9 @@
     <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\Audio\MasterVolume.h" />
-    <ClInclude Include="Engine\Input\GamePad.h" />
+    <ClInclude Include="Engine\KeyConfig\InputDevice\GamePad.h" />
     <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
+    <ClInclude Include="Engine\KeyConfig\KeyConfig.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectParams.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOType.h" />
@@ -335,7 +337,7 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\KeyConfig\InputDevice\Input.h" />
     <ClInclude Include="Engine\Core\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixFunction\MatrixFunction.h" />
     <ClInclude Include="Engine\3d\Model\Model.h" />

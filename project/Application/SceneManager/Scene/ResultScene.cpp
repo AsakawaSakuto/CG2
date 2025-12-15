@@ -17,7 +17,7 @@ void ResultScene::Initialize() {
 }
 
 void ResultScene::Update() {
-	if (ctx_->gamePad.TriggerButton(GamePad::A)) {
+	if (ctx_->keyConfig.TriggerAction(Action::CONFIRM)) {
 		ChangeScene(SCENE::TITLE);
 	}
 

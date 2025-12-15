@@ -60,11 +60,11 @@ void EnemyManager::Update() {
 		enemy->Update();
 	}
 
-	if (ctx_->input.TriggerKey(DIK_P)) {
+	/*if (ctx_->input.TriggerKey(DIK_P)) {
 		for (auto& expItem : expItems_) {
 			expItem->StateChange();
 		}
-	}
+	}*/
 
 	for (auto& expItem : expItems_) {
 		expItem->Update();

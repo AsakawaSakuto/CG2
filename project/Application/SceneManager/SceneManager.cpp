@@ -55,8 +55,16 @@ void SceneManager::Initialize() {
     TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);
     Logger::Initialize();
     std::filesystem::create_directory("logs");
-    appContext_->input.Initialize(winApp_.get());
-    appContext_->gamePad.Initialize();
+
+	input_ = std::make_unique<Input>();
+    input_->Initialize(winApp_.get());
+
+	gamePad_ = std::make_unique<GamePad>();
+    gamePad_->Initialize();
+
+    // InputConfigの初期化
+    appContext_->keyConfig.Initialize();
+    appContext_->keyConfig.SetInputDevices(input_.get(), gamePad_.get());
 
     // 初期シーンを作成
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
@@ -88,8 +96,8 @@ void SceneManager::Update() {
         if (!running) break;
 
         // 入力更新（共通処理）
-        appContext_->input.Update();
-        appContext_->gamePad.Update();
+        input_->Update();
+        gamePad_->Update();
 
         Shortcut();
 
@@ -160,7 +168,7 @@ void SceneManager::Update() {
 
 void SceneManager::Finalize() {
     // 振動のリセット
-    appContext_->gamePad.SetVibration(0.0f, 0.0f, 0.0f);
+    gamePad_->SetVibration(0.0f, 0.0f, 0.0f);
 
     // シーンのリセット（最初にシーンを解放してGPUリソースを減らす）
     for (int i = 0; i < sceneNum; i++) {

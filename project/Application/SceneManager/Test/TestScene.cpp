@@ -16,7 +16,7 @@ void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 void TestScene::Initialize() {
     CleanupResources();
 	camera_.SetPosition({ 0.0f, 2.5f, -20.0f });
-	debugCamera_.SetInput(&ctx_->input);
+	debugCamera_.SetInput(ctx_->keyConfig.GetInput());
 	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
 	testParticle_->Initialize(&ctx_->dxCommon, 100);

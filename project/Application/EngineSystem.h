@@ -7,7 +7,7 @@
 
 // Include
 #include "Core/WinApp/WinApp.h"
-#include "Input/Input.h"
+#include "KeyConfig/KeyConfig.h"
 #include "Camera/Camera.h"
 #include "Audio/Audio.h"
 #include "Camera/DebugCamera.h"
@@ -15,7 +15,6 @@
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Core/DirectXCommon/D3DResourceLeakChecker.h"
 #include "Core/TextureManager/TextureManager.h"
-#include "Input/GamePad.h"
 
 // Object
 #include "2d/Sprite/Sprite.h"

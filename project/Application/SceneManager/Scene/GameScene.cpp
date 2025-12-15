@@ -86,23 +86,8 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	if (ctx_->gamePad.TriggerButton(GamePad::START)) {
+	if (ctx_->keyConfig.TriggerAction(Action::PAUSE)) {
 		ChangeScene(SCENE::TITLE);
-	}
-
-	// テスト用：Bボタンでダメージ（HP減少）
-	if (ctx_->gamePad.TriggerButton(GamePad::B)) {
-		player_->SetCurrentHP(player_->GetCurrentHP() - 10);
-	}
-
-	// テスト用：Yボタンで回復（HP増加）
-	if (ctx_->gamePad.TriggerButton(GamePad::Y)) {
-		player_->SetCurrentHP(player_->GetCurrentHP() + 10);
-	}
-
-	// テスト用：Lボタンで経験値取得
-	if (ctx_->gamePad.TriggerButton(GamePad::L)) {
-		player_->AddExp(20);
 	}
 
 	player_->Update();
@@ -121,10 +106,6 @@ void GameScene::Update() {
 
 	testParticle_->Update();
 	dustParticle_->Update();
-
-	if (collisionManager_->GetGoResult() || ctx_->gamePad.TriggerButton(GamePad::X)) {
-		//ChangeScene(SCENE::RESULT);
-	}
 
 	testLine_->AddGrid(100.0f, 20);
 
