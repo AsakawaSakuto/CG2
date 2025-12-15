@@ -22,7 +22,7 @@
 #include "Utility/Transform/Transform.h"
 #include "Utility/BlendMode/BlendMode.h"
 #include "Utility/GameTimer/DeltaTime.h"
-#include "Utility/Binary/BinaryManager.h"
+#include "Utility/FileFormat/Json/JsonManager.h"
 #include "Math/MatrixFunction/MatrixFunction.h"
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Core/HeapManager/DescriptorAllocator.h"
@@ -46,7 +46,7 @@ public:
 	/// <param name="dxCommon">dxCommonを渡す</param>
 	/// <param name="TextureName">使用するTextureのPathを入れる「デフォルトでCircle」</param>
 	/// <param name="maxParticle">整数値＊512粒のパーティクルを扱えるようになる</param>
-	void Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle = 1, const std::string& TextureName = "circle");
+	void Initialize(DirectXCommon* dxCommon, const std::string& filePath = "temp", const uint32_t maxParticle = 1);
 
 	/// <summary>
 	/// デストラクタ - 確保したSRV/UAVインデックスを解放
@@ -144,10 +144,10 @@ public:
 	}
 
 	/// <summary>
-	/// BinaryFileからEmitterの値を読み込む
+	/// JsonFileからEmitterの値を読み込む
 	/// </summary>
-	/// <param name="filePath">Resources->Binary->Particle の中にあるBinaryFileのPathを入れる（拡張子不要）</param>
-	void LoadBinary(const std::string& filePath);
+	/// <param name="filePath">Resources->Json->Particle の中にあるJsonFileのPathを入れる（拡張子不要）</param>
+	void LoadJson(const std::string& filePath);
 
 	void SetEmitterState(EmitterState emitter) { emitter_ = emitter; }
 private:
@@ -156,23 +156,21 @@ private:
 
 	void ResetAllParticles();
 	
-	void ResetEmitterToDefault();
-
-	// BinaryManagerでの保存・読み込み用のヘルパー関数
-	void SaveToBinary(const std::string& filePath);
-	void LoadFromBinary(const std::string& filePath);
-	void CreateNewBinaryFile(const std::string& filePath);
+	// JsonManagerでの保存・読み込み用のヘルパー関数
+	void SaveToJson(const std::string& filePath);
+	void LoadFromJson(const std::string& filePath);
+	void CreateNewJsonFile(const std::string& filePath);
 
 	Camera camera_;
 
-	std::unique_ptr<BinaryManager> binaryManager_;
+	std::unique_ptr<JsonManager> jsonManager_;
 	std::string loadToSaveName_ = "temp";
 
 	// パーティクルの再生状態
 	bool isPlaying_ = false;
 	
-	// Binary読み込み済みフラグ
-	bool isBinaryLoaded_ = false;
+	// Json読み込み済みフラグ
+	bool isJsonLoaded_ = false;
 	
 	// 初期化済みフラグ
 	bool isInitialized_ = false;

@@ -187,9 +187,9 @@
     <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Engine\Math\MathFunction\MathFunction.cpp" />
     <ClCompile Include="Engine\Core\PSOManager\PSOManager.cpp" />
-    <ClCompile Include="Engine\Utility\Binary\BinaryManager.cpp" />
-    <ClCompile Include="Engine\Utility\Binary\Data\BinaryInput.cpp" />
-    <ClCompile Include="Engine\Utility\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Binary\Data\BinaryOutput.cpp" />
     <ClCompile Include="Engine\Utility\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Engine\Core\CreateResource\CreateResource.cpp" />
     <ClCompile Include="Engine\Core\DirectXCommon\D3DResourceLeakChecker.cpp" />
@@ -202,6 +202,9 @@
     <ClCompile Include="Engine\Utility\Easing\Easing.cpp" />
     <ClCompile Include="Engine\Utility\GameTimer\GameTimer.cpp" />
     <ClCompile Include="Engine\Math\Quaternion\QuaternionFunction.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonInput.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Json\JsonManager.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -286,10 +289,10 @@
     <ClInclude Include="Engine\OffScreen\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\Math\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOManager.h" />
-    <ClInclude Include="Engine\Utility\Binary\BinaryManager.h" />
-    <ClInclude Include="Engine\Utility\Binary\Data\BinaryInput.h" />
-    <ClInclude Include="Engine\Utility\Binary\Data\BinaryOutput.h" />
-    <ClInclude Include="Engine\Utility\Binary\Data\Value.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\Value.h" />
     <ClInclude Include="Engine\Utility\BlendMode\BlendMode.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Audio\AudioData.h" />
@@ -301,6 +304,9 @@
     <ClInclude Include="Engine\Core\DirectXCommon\D3DResourceLeakChecker.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Utility\GameTimer\DeltaTime.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonInput.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Json\JsonManager.h" />
     <ClInclude Include="Engine\Utility\Light\DirectionalLight.h" />
     <ClInclude Include="Engine\Core\DirectXCommon\DirectXCommon.h" />
     <ClInclude Include="Engine\Utility\Easing\Easing.h" />
@@ -393,6 +399,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="docs\JsonManager_Usage.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />

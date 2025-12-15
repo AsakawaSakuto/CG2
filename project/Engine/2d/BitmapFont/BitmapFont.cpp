@@ -1,7 +1,7 @@
 #include "BitmapFont.h"
 #include <algorithm>
 #include <cmath>
-#include <filesystem>  // ディレクトリ作成用に追加
+#include <filesystem>
 
 #ifdef USE_IMGUI
 #include "imgui.h"           
@@ -9,14 +9,14 @@
 #include "imgui_impl_win32.h"
 #endif
 
-void BitmapFont::Initialize(DirectXCommon* dxCommon, const std::string& binaryPath, const std::string& numberImageFolder) {
+void BitmapFont::Initialize(DirectXCommon* dxCommon, const std::string& jsonPath, const std::string& numberImageFolder) {
 	dxCommon_ = dxCommon;
 	numberImageFolder_ = numberImageFolder;
 
-	// BinaryManagerの初期化（初回のみ）
-	if (!binaryManager_) {
-		binaryManager_ = std::make_unique<BinaryManager>();
-		binaryManager_->SetBasePath("resources/Binary/BitmapFont/");
+	// JsonManagerの初期化（初回のみ）
+	if (!jsonManager_) {
+		jsonManager_ = std::make_unique<JsonManager>();
+		jsonManager_->SetBasePath("resources/Data/Json/BitmapFont/");
 	}
 
 	// 各桁用の0-9の数字スプライトを初期化
@@ -40,7 +40,7 @@ void BitmapFont::Initialize(DirectXCommon* dxCommon, const std::string& binaryPa
 	percentSprite_ = std::make_unique<Sprite>();
 	percentSprite_->Initialize(dxCommon_, numberImageFolder_ + "parcent.png");
 
-	LoadFromBinary(binaryPath);
+	LoadFromJson(jsonPath);
 }
 
 void BitmapFont::Draw() {
@@ -91,7 +91,7 @@ void BitmapFont::SetNumber(int value) {
 	}
 
 	// 数字を桁ごとに分解
-	std::vector<int> digitList = SplitDigits(value);
+std::vector<int> digitList = SplitDigits(value);
 
 	// 桁数が最大桁数を超える場合は切り詰める
 	if (digitList.size() > kMaxDigits) {
@@ -375,19 +375,19 @@ void BitmapFont::DrawImGui(const char* name) {
 	}
 
 	if (ImGui::Button("読み込み")) {
-		LoadFromBinary(loadToSaveName_);
+		LoadFromJson(loadToSaveName_);
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("保存")) {
-		SaveToBinary(loadToSaveName_);
+		SaveToJson(loadToSaveName_);
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("新規作成")) {
-		CreateNewBinaryFile(loadToSaveName_);
+		CreateNewJsonFile(loadToSaveName_);
 	}
 
 	ImGui::Separator();
@@ -411,13 +411,13 @@ void BitmapFont::DrawImGui(const char* name) {
 	ImGui::End();
 }
 
-void BitmapFont::LoadBinary(const std::string& filePath) {
-	LoadFromBinary(filePath);
+void BitmapFont::LoadJson(const std::string& filePath) {
+	LoadFromJson(filePath);
 }
 
-void BitmapFont::SaveToBinary(const std::string& filePath) {
+void BitmapFont::SaveToJson(const std::string& filePath) {
 	// ディレクトリが存在しない場合は作成
-	std::filesystem::path fullPath = binaryManager_->GetBasePath() + filePath;
+	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
 	std::filesystem::path directory = fullPath.parent_path();
 	
 	if (!directory.empty() && !std::filesystem::exists(directory)) {
@@ -430,23 +430,23 @@ void BitmapFont::SaveToBinary(const std::string& filePath) {
 		}
 	}
 
-	// BitmapFontの各フィールドをBinaryManagerに登録
-	binaryManager_->RegistOutput(position_);
-	binaryManager_->RegistOutput(scale_);
-	binaryManager_->RegistOutput(spaceWidth_);
-	binaryManager_->RegistOutput(color_);
-	binaryManager_->RegistOutput(showPercent_);
-	binaryManager_->RegistOutput(static_cast<uint32_t>(alignment_));
-	binaryManager_->RegistOutput(percentOffset_);
-	binaryManager_->RegistOutput(percentScale_);
+	// BitmapFontの各フィールドをJsonManagerに登録
+	jsonManager_->RegistOutput(position_, "position");
+	jsonManager_->RegistOutput(scale_, "scale");
+	jsonManager_->RegistOutput(spaceWidth_, "spaceWidth");
+	jsonManager_->RegistOutput(color_, "color");
+	jsonManager_->RegistOutput(showPercent_, "showPercent");
+	jsonManager_->RegistOutput(static_cast<uint32_t>(alignment_), "alignment");
+	jsonManager_->RegistOutput(percentOffset_, "percentOffset");
+	jsonManager_->RegistOutput(percentScale_, "percentScale");
 
-	// バイナリファイルに書き込み
-	binaryManager_->Write(filePath);
+	// JSONファイルに書き込み
+	jsonManager_->Write(filePath);
 }
 
-void BitmapFont::CreateNewBinaryFile(const std::string& filePath) {
+void BitmapFont::CreateNewJsonFile(const std::string& filePath) {
 	// ディレクトリが存在しない場合は作成
-	std::filesystem::path fullPath = binaryManager_->GetBasePath() + filePath;
+	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
 	std::filesystem::path directory = fullPath.parent_path();
 	
 	if (!directory.empty() && !std::filesystem::exists(directory)) {
@@ -459,29 +459,31 @@ void BitmapFont::CreateNewBinaryFile(const std::string& filePath) {
 		}
 	}
 
-	// デフォルト値でバイナリファイルを作成
-	SaveToBinary(filePath);
+	// デフォルト値でJSONファイルを作成
+	SaveToJson(filePath);
 }
 
-void BitmapFont::LoadFromBinary(const std::string& filePath) {
-	// バイナリファイルから読み込み
-	auto values = binaryManager_->Read(filePath);
+void BitmapFont::LoadFromJson(const std::string& filePath) {
+	// JSONファイルから読み込み
+	auto values = jsonManager_->Read(filePath);
 	
 	if (values.empty()) {
-		printf("[WARNING] Failed to load binary file: %s\n", filePath.c_str());
+		printf("[WARNING] Failed to load JSON file: %s.json\n", filePath.c_str());
 		return;
 	}
 
 	// 読み込んだ値を順番に取得して適用
 	size_t index = 0;
-	if (index < values.size()) position_ = BinaryManager::Reverse<Vector2>(values[index++]);
-	if (index < values.size()) scale_ = BinaryManager::Reverse<Vector2>(values[index++]);
-	if (index < values.size()) spaceWidth_ = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) color_ = BinaryManager::Reverse<Vector4>(values[index++]);
-	if (index < values.size()) showPercent_ = BinaryManager::Reverse<bool>(values[index++]);
-	if (index < values.size()) alignment_ = static_cast<Alignment>(BinaryManager::Reverse<uint32_t>(values[index++]));
-	if (index < values.size()) percentOffset_ = BinaryManager::Reverse<Vector2>(values[index++]);
-	if (index < values.size()) percentScale_ = BinaryManager::Reverse<Vector2>(values[index++]);
+	if (index < values.size()) {
+		position_ = JsonManager::Reverse<Vector2>(values[index++]);
+		scale_ = JsonManager::Reverse<Vector2>(values[index++]);
+		spaceWidth_ = JsonManager::Reverse<float>(values[index++]);
+		color_ = JsonManager::Reverse<Vector4>(values[index++]);
+		showPercent_ = JsonManager::Reverse<bool>(values[index++]);
+		alignment_ = static_cast<Alignment>(JsonManager::Reverse<uint32_t>(values[index++]));
+		percentOffset_ = JsonManager::Reverse<Vector2>(values[index++]);
+		percentScale_ = JsonManager::Reverse<Vector2>(values[index++]);
+	}
 
 	loadToSaveName_ = filePath;
 }

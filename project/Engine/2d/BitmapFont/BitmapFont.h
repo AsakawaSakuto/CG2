@@ -2,7 +2,7 @@
 #include "2d/Sprite/Sprite.h"
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Math/Type/Vector2.h"
-#include "Utility/Binary/BinaryManager.h"
+#include "Utility/FileFormat/Json/JsonManager.h"
 
 #include <memory>
 #include <vector>
@@ -45,10 +45,10 @@ public:
 	void DrawImGui(const char* name);
 
 	/// <summary>
-	/// BinaryFileからBitmapFontの設定を読み込む
+	/// JsonFileからBitmapFontの設定を読み込む
 	/// </summary>
-	/// <param name="filePath">Resources->Binary->BitmapFont の中にあるBinaryFileのPathを入れる（拡張子不要）</param>
-	void LoadBinary(const std::string& filePath);
+	/// <param name="filePath">Resources->Json->BitmapFont の中にあるJsonFileのPathを入れる（拡張子不要）</param>
+	void LoadJson(const std::string& filePath);
 
 	/// <summary>
 	/// 整数値を表示
@@ -110,22 +110,22 @@ public:
 private:
 
 	/// <summary>
-	/// BinaryFileに設定を保存
+	/// JsonFileに設定を保存
 	/// </summary>
 	/// <param name="filePath">保存先のファイルパス（拡張子不要）</param>
-	void SaveToBinary(const std::string& filePath);
+	void SaveToJson(const std::string& filePath);
 
 	/// <summary>
-	/// BinaryFileから設定を読み込み
+	/// JsonFileから設定を読み込み
 	/// </summary>
 	/// <param name="filePath">読み込み元のファイルパス（拡張子不要）</param>
-	void LoadFromBinary(const std::string& filePath);
+	void LoadFromJson(const std::string& filePath);
 
 	/// <summary>
-	/// 新規BinaryFileを作成
+	/// 新規JsonFileを作成
 	/// </summary>
 	/// <param name="filePath">作成するファイルパス（拡張子不要）</param>
-	void CreateNewBinaryFile(const std::string& filePath);
+	void CreateNewJsonFile(const std::string& filePath);
 
 	/// <summary>
 	/// 整数を桁ごとに分解
@@ -177,6 +177,6 @@ private:
 
 	std::string numberImageFolder_;
 
-	std::unique_ptr<BinaryManager> binaryManager_;
+	std::unique_ptr<JsonManager> jsonManager_;
 	std::string loadToSaveName_ = "filePath";
 };

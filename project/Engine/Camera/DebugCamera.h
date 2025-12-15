@@ -3,7 +3,7 @@
 #include "Math/Type/Matrix4x4.h"
 #include "Camera/Camera.h"
 #include "KeyConfig/InputDevice/Input.h"
-#include "Utility/Binary/BinaryManager.h"
+#include "Utility/FileFormat/Binary/BinaryManager.h"
 
 class DebugCamera : public Camera {
 public:

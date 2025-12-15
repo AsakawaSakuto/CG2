@@ -8,7 +8,7 @@ void EnemyManager::Initialize(AppContext* ctx) {
 
 	dieParticle_ = std::make_unique<Particles>();
 	dieParticle_->Initialize(&ctx_->dxCommon);
-	dieParticle_->LoadBinary("EnemyDie");
+	dieParticle_->LoadJson("EnemyDie");
 }
 
 void EnemyManager::Update() {

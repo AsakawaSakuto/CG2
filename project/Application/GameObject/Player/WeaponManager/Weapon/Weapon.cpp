@@ -174,14 +174,14 @@ void Weapon::BulletTypeUpdate() {
 		switch (weaponName_)
 		{
 		case WeaponName::FireBall:
-			bullet->LoadBinary("fireBall", "fireBall2");
+			bullet->LoadJson("fireBall", "fireBall2");
 			break;
 		case WeaponName::Laser:
-			bullet->LoadBinary("laser", "laser2");
+			bullet->LoadJson("laser", "laser2");
 			bullet->SetPenetrationCount(status_.penetrationCount);
 			break;
 		case WeaponName::Runa:
-			bullet->LoadBinary("runa", "runa2");
+			bullet->LoadJson("runa", "runa2");
 			bullet->SetBounceCount(status_.bounceCount);
 			break;
 		}
@@ -220,7 +220,7 @@ void Weapon::AreaTypeUpdate() {
 		switch (weaponName_)
 		{
 		case WeaponName::BubbleArea:
-			area->LoadBinary("bubbleArea");
+			area->LoadJson("bubbleArea");
 			break;
 		}
 		areas_.push_back(std::move(area));

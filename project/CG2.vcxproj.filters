@@ -49,7 +49,6 @@
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Audio\MasterVolume.cpp" />
-    <ClCompile Include="Engine\Input\GamePad.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\HeapManager.cpp" />
     <ClCompile Include="Engine\OffScreen\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
@@ -62,16 +61,21 @@
     <ClCompile Include="Engine\Utility\Easing\Easing.cpp" />
     <ClCompile Include="Engine\Utility\GameTimer\GameTimer.cpp" />
     <ClCompile Include="Engine\Math\Quaternion\QuaternionFunction.cpp" />
-    <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Core\Logger\Logger.cpp" />
     <ClCompile Include="Engine\3d\Particle\Particles.cpp" />
     <ClCompile Include="Engine\Math\MatrixFunction\MatrixFunction.cpp" />
     <ClCompile Include="Engine\Core\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\Core\WinApp\WinApp.cpp" />
-    <ClCompile Include="Engine\Utility\Binary\BinaryManager.cpp" />
-    <ClCompile Include="Engine\Utility\Binary\Data\BinaryOutput.cpp" />
-    <ClCompile Include="Engine\Utility\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
+    <ClCompile Include="Engine\KeyConfig\InputDevice\GamePad.cpp" />
+    <ClCompile Include="Engine\KeyConfig\KeyConfig.cpp" />
+    <ClCompile Include="Engine\KeyConfig\InputDevice\Input.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Json\JsonManager.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.cpp" />
+    <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -124,7 +128,6 @@
     <ClInclude Include="Engine\3d\Particle\Struct\EmitterState.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Engine\Audio\MasterVolume.h" />
-    <ClInclude Include="Engine\Input\GamePad.h" />
     <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectParams.h" />
@@ -152,7 +155,6 @@
     <ClInclude Include="Engine\Utility\Collision\Type\Segment.h" />
     <ClInclude Include="Engine\Utility\Collision\Type\Sphere.h" />
     <ClInclude Include="Engine\Math\Quaternion\QuaternionFunction.h" />
-    <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Core\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixFunction\MatrixFunction.h" />
     <ClInclude Include="Engine\Core\TextureManager\TextureManager.h" />
@@ -166,13 +168,19 @@
     <ClInclude Include="Engine\Utility\Light\PointLight.h" />
     <ClInclude Include="Engine\Utility\Light\SpotLight.h" />
     <ClInclude Include="Engine\Utility\Random\Random.h" />
-    <ClInclude Include="Engine\Utility\Binary\BinaryManager.h" />
-    <ClInclude Include="Engine\Utility\Binary\Data\Value.h" />
-    <ClInclude Include="Engine\Utility\Binary\Data\BinaryOutput.h" />
-    <ClInclude Include="Engine\Utility\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\Value.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
     <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />
     <ClInclude Include="Engine\Camera\Frustum.h" />
+    <ClInclude Include="Engine\KeyConfig\InputDevice\GamePad.h" />
+    <ClInclude Include="Engine\KeyConfig\KeyConfig.h" />
+    <ClInclude Include="Engine\KeyConfig\InputDevice\Input.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Json\JsonManager.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.h" />
+    <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonInput.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -181,5 +189,6 @@
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
+    <None Include="docs\JsonManager_Usage.md" />
   </ItemGroup>
 </Project>

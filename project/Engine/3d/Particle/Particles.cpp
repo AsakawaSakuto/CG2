@@ -8,17 +8,16 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "Core/PSOManager/PSOManager.h"
 
-void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, const std::string& TextureName) {
+void Particles::Initialize(DirectXCommon* dxCommon, const std::string& filePath, const uint32_t maxParticle) {
 	// DX共通クラスからデバイス・コマンドリストを取得
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 
-	// BinaryManagerの初期化
-	if (!binaryManager_) {
-		binaryManager_ = std::make_unique<BinaryManager>();
-		binaryManager_->SetBasePath("resources/Binary/Particle/");
-	}
+	// JsonManagerの初期化
+	jsonManager_ = std::make_unique<JsonManager>();
+	jsonManager_->SetBasePath("resources/Data/Json/Particle/");
+	LoadJson(filePath);
 
 	DescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
 
@@ -40,7 +39,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	blendMode_ = kBlendModeAdd;
 
 	// テクスチャ名を保持しておく
-	textureName_ = "resources/image/particle/" + TextureName + ".png";
+	textureName_ = "resources/image/particle/circle.png";
 
 	// テクスチャマネージャー初期化とテクスチャの読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
@@ -55,63 +54,12 @@ void Particles::Initialize(DirectXCommon* dxCommon, const uint32_t maxParticle, 
 	uint32_t num = kMaxParticles_ / 512;
 	kDispatchCount = num;
 
-	// Emitterのデフォルト値
-	ResetEmitterToDefault();
-
 	CreateEmitterResource();
 	CreateParticleResource();
 	CreatePerViewResource();
 	CreatePerFrameResource();
 	
 	isInitialized_ = true;
-}
-
-void Particles::ResetEmitterToDefault() {
-	emitter_.translate = { 0.0f, 0.0f, 0.0f };
-	emitter_.radius = 1.0f;
-	emitter_.useEmitter = 1;
-	emitter_.emit = 0;
-	emitter_.count = 1;
-	emitter_.kMaxParticle = kMaxParticles_;
-	emitter_.frequency = 0.1f;
-	emitter_.frequencyTime = 0.0f;
-	emitter_.startScale = { 1.0f, 1.0f };
-	emitter_.endScale = { 0.0f, 0.0f };
-	emitter_.scaleFade = 0;
-	emitter_.scaleRandom = 0;
-	emitter_.minScale = { 0.0f, 0.0f, 0.0f };
-	emitter_.maxScale = { 1.0f, 1.0f, 1.0f };
-	emitter_.rotateMove = 0;
-	emitter_.startRotateVelocity = 0.0f;
-	emitter_.endRotateVelocity = 0.0f;
-	emitter_.rotateVelocityRandom = 0;
-	emitter_.minRotateVelocity = -1.0f;
-	emitter_.maxRotateVelocity = 1.0f;
-	emitter_.alphaFade = 0;
-	emitter_.colorFade = 0;
-	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
-	emitter_.endColor = { 1.0f, 0.0f, 0.0f };
-	emitter_.colorRandom = 0;
-	emitter_.minColor = { 0.0f, 0.0f, 0.0f };
-	emitter_.maxColor = { 1.0f, 1.0f, 1.0f };
-	emitter_.isMove = 0;
-	emitter_.startVelocity = { 0.0f, 0.0f, 0.0f };
-	emitter_.endVelocity = { 0.0f, 0.0f, 0.0f };
-	emitter_.velocityRandom = 0;
-	emitter_.minVelocity = { -1.0f, -1.0f, -1.0f };
-	emitter_.maxVelocity = { 1.0f, 1.0f, 1.0f };
-	emitter_.lifeTime = 5.0f;
-	emitter_.lifeTimeRandom = 0;
-	emitter_.minLifeTime = 1.0f;
-	emitter_.maxLifeTime = 5.0f;
-	emitter_.isMove = 1;
-	emitter_.velocityRandom = 1;
-	emitter_.scaleFade = 1;
-	emitter_.alphaFade = 1;
-	emitter_.colorRandom = 1;
-	emitter_.shapeType = static_cast<uint32_t>(EmitterShapeType::POINT);
-	emitter_.texturePath = "";
-	emitter_.blendMode = kBlendModeAdd;
 }
 
 void Particles::Update() {
@@ -286,19 +234,19 @@ void Particles::DrawImGui(const char* objectName) {
 	}
 
 	if (ImGui::Button("読み込み")) {
-		LoadFromBinary(loadToSaveName_);
+		LoadFromJson(loadToSaveName_);
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("保存")) {
-		SaveToBinary(loadToSaveName_);
+		SaveToJson(loadToSaveName_);
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("新規作成")) {
-		CreateNewBinaryFile(loadToSaveName_);
+		CreateNewJsonFile(loadToSaveName_);
 	}
 
 	ImGui::Separator();
@@ -1080,13 +1028,13 @@ Particles::~Particles() {
 	}
 }
 
-void Particles::LoadBinary(const std::string& filePath) {
-	LoadFromBinary(filePath);
+void Particles::LoadJson(const std::string& filePath) {
+	LoadFromJson(filePath);
 }
 
-void Particles::SaveToBinary(const std::string& filePath) {
+void Particles::SaveToJson(const std::string& filePath) {
 	// ディレクトリが存在しない場合は作成
-	std::filesystem::path fullPath = binaryManager_->GetBasePath() + filePath;
+	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
 	std::filesystem::path directory = fullPath.parent_path();
 	
 	if (!directory.empty() && !std::filesystem::exists(directory)) {
@@ -1099,74 +1047,72 @@ void Particles::SaveToBinary(const std::string& filePath) {
 		}
 	}
 
-	// EmitterStateの各フィールドをBinaryManagerに登録
-	binaryManager_->RegistOutput(emitter_.translate);
-	binaryManager_->RegistOutput(emitter_.radius);
-	binaryManager_->RegistOutput(emitter_.useEmitter);
-	binaryManager_->RegistOutput(emitter_.emit);
-	binaryManager_->RegistOutput(emitter_.count);
-	binaryManager_->RegistOutput(emitter_.frequency);
-	binaryManager_->RegistOutput(emitter_.frequencyTime);
-	binaryManager_->RegistOutput(Vector2{emitter_.startScale.x, emitter_.startScale.y});
-	binaryManager_->RegistOutput(Vector2{emitter_.endScale.x, emitter_.endScale.y});
-	binaryManager_->RegistOutput(emitter_.scaleFade);
-	binaryManager_->RegistOutput(emitter_.scaleRandom);
-	binaryManager_->RegistOutput(emitter_.minScale);
-	binaryManager_->RegistOutput(emitter_.maxScale);
-	binaryManager_->RegistOutput(emitter_.rotateMove);
-	binaryManager_->RegistOutput(emitter_.startRotateVelocity);
-	binaryManager_->RegistOutput(emitter_.endRotateVelocity);
-	binaryManager_->RegistOutput(emitter_.rotateVelocityRandom);
-	binaryManager_->RegistOutput(emitter_.minRotateVelocity);
-	binaryManager_->RegistOutput(emitter_.maxRotateVelocity);
-	binaryManager_->RegistOutput(emitter_.alphaFade);
-	binaryManager_->RegistOutput(emitter_.colorFade);
-	binaryManager_->RegistOutput(emitter_.startColor);
-	binaryManager_->RegistOutput(emitter_.endColor);
-	binaryManager_->RegistOutput(emitter_.colorRandom);
-	binaryManager_->RegistOutput(emitter_.minColor);
-	binaryManager_->RegistOutput(emitter_.maxColor);
-	binaryManager_->RegistOutput(emitter_.isMove);
-	binaryManager_->RegistOutput(emitter_.startVelocity);
-	binaryManager_->RegistOutput(emitter_.endVelocity);
-	binaryManager_->RegistOutput(emitter_.velocityRandom);
-	binaryManager_->RegistOutput(emitter_.minVelocity);
-	binaryManager_->RegistOutput(emitter_.maxVelocity);
-	binaryManager_->RegistOutput(emitter_.normalVelocity);
-	binaryManager_->RegistOutput(emitter_.lifeTime);
-	binaryManager_->RegistOutput(emitter_.lifeTimeRandom);
-	binaryManager_->RegistOutput(emitter_.minLifeTime);
-	binaryManager_->RegistOutput(emitter_.maxLifeTime);
-	binaryManager_->RegistOutput(emitter_.shapeType);
-	binaryManager_->RegistOutput(emitter_.size);
-	binaryManager_->RegistOutput(emitter_.lineStart);
-	binaryManager_->RegistOutput(emitter_.lineLength);
-	binaryManager_->RegistOutput(emitter_.ringInnerRadius);
-	binaryManager_->RegistOutput(emitter_.ringOuterRadius);
-	binaryManager_->RegistOutput(emitter_.coneAngle);
-	binaryManager_->RegistOutput(emitter_.coneHeight);
-	binaryManager_->RegistOutput(emitter_.coneDirection);
-	binaryManager_->RegistOutput(emitter_.hemisphereAngle);
-	binaryManager_->RegistOutput(emitter_.planeNormal);
-	binaryManager_->RegistOutput(emitter_.planeWidth);
-	binaryManager_->RegistOutput(emitter_.planeHeight);
-	binaryManager_->RegistOutput(emitter_.ringAngle);
-	binaryManager_->RegistOutput(emitter_.ringNormal);
-	binaryManager_->RegistOutput(emitter_.useGravity);
-	binaryManager_->RegistOutput(emitter_.gravityY);
-	binaryManager_->RegistOutput(emitter_.accelerationY);
-	binaryManager_->RegistOutput(static_cast<uint32_t>(emitter_.blendMode));
-	binaryManager_->RegistOutput(emitter_.texturePath);
+	// EmitterStateの各フィールドをJsonManagerに登録
+	jsonManager_->RegistOutput(emitter_.translate, "translate");
+	jsonManager_->RegistOutput(emitter_.radius, "radius");
+	jsonManager_->RegistOutput(emitter_.useEmitter, "useEmitter");
+	jsonManager_->RegistOutput(emitter_.emit, "emit");
+	jsonManager_->RegistOutput(emitter_.count, "count");
+	jsonManager_->RegistOutput(emitter_.frequency, "frequency");
+	jsonManager_->RegistOutput(emitter_.frequencyTime, "frequencyTime");
+	jsonManager_->RegistOutput(Vector2{emitter_.startScale.x, emitter_.startScale.y}, "startScale");
+	jsonManager_->RegistOutput(Vector2{emitter_.endScale.x, emitter_.endScale.y}, "endScale");
+	jsonManager_->RegistOutput(emitter_.scaleFade, "scaleFade");
+	jsonManager_->RegistOutput(emitter_.scaleRandom, "scaleRandom");
+	jsonManager_->RegistOutput(emitter_.minScale, "minScale");
+	jsonManager_->RegistOutput(emitter_.maxScale, "maxScale");
+	jsonManager_->RegistOutput(emitter_.rotateMove, "rotateMove");
+	jsonManager_->RegistOutput(emitter_.startRotateVelocity, "startRotateVelocity");
+	jsonManager_->RegistOutput(emitter_.endRotateVelocity, "endRotateVelocity");
+	jsonManager_->RegistOutput(emitter_.rotateVelocityRandom, "rotateVelocityRandom");
+	jsonManager_->RegistOutput(emitter_.minRotateVelocity, "minRotateVelocity");
+	jsonManager_->RegistOutput(emitter_.maxRotateVelocity, "maxRotateVelocity");
+	jsonManager_->RegistOutput(emitter_.alphaFade, "alphaFade");
+	jsonManager_->RegistOutput(emitter_.colorFade, "colorFade");
+	jsonManager_->RegistOutput(emitter_.startColor, "startColor");
+	jsonManager_->RegistOutput(emitter_.endColor, "endColor");
+	jsonManager_->RegistOutput(emitter_.colorRandom, "colorRandom");
+	jsonManager_->RegistOutput(emitter_.minColor, "minColor");
+	jsonManager_->RegistOutput(emitter_.maxColor, "maxColor");
+	jsonManager_->RegistOutput(emitter_.isMove, "isMove");
+	jsonManager_->RegistOutput(emitter_.startVelocity, "startVelocity");
+	jsonManager_->RegistOutput(emitter_.endVelocity, "endVelocity");
+	jsonManager_->RegistOutput(emitter_.velocityRandom, "velocityRandom");
+	jsonManager_->RegistOutput(emitter_.minVelocity, "minVelocity");
+	jsonManager_->RegistOutput(emitter_.maxVelocity, "maxVelocity");
+	jsonManager_->RegistOutput(emitter_.normalVelocity, "normalVelocity");
+	jsonManager_->RegistOutput(emitter_.lifeTime, "lifeTime");
+	jsonManager_->RegistOutput(emitter_.lifeTimeRandom, "lifeTimeRandom");
+	jsonManager_->RegistOutput(emitter_.minLifeTime, "minLifeTime");
+	jsonManager_->RegistOutput(emitter_.maxLifeTime, "maxLifeTime");
+	jsonManager_->RegistOutput(emitter_.shapeType, "shapeType");
+	jsonManager_->RegistOutput(emitter_.size, "size");
+	jsonManager_->RegistOutput(emitter_.lineStart, "lineStart");
+	jsonManager_->RegistOutput(emitter_.lineLength, "lineLength");
+	jsonManager_->RegistOutput(emitter_.ringInnerRadius, "ringInnerRadius");
+	jsonManager_->RegistOutput(emitter_.ringOuterRadius, "ringOuterRadius");
+	jsonManager_->RegistOutput(emitter_.coneAngle, "coneAngle");
+	jsonManager_->RegistOutput(emitter_.coneHeight, "coneHeight");
+	jsonManager_->RegistOutput(emitter_.coneDirection, "coneDirection");
+	jsonManager_->RegistOutput(emitter_.hemisphereAngle, "hemisphereAngle");
+	jsonManager_->RegistOutput(emitter_.planeNormal, "planeNormal");
+	jsonManager_->RegistOutput(emitter_.planeWidth, "planeWidth");
+	jsonManager_->RegistOutput(emitter_.planeHeight, "planeHeight");
+	jsonManager_->RegistOutput(emitter_.ringAngle, "ringAngle");
+	jsonManager_->RegistOutput(emitter_.ringNormal, "ringNormal");
+	jsonManager_->RegistOutput(emitter_.useGravity, "useGravity");
+	jsonManager_->RegistOutput(emitter_.gravityY, "gravityY");
+	jsonManager_->RegistOutput(emitter_.accelerationY, "accelerationY");
+	jsonManager_->RegistOutput(static_cast<uint32_t>(emitter_.blendMode), "blendMode");
+	jsonManager_->RegistOutput(emitter_.texturePath, "texturePath");
 
-	// バイナリファイルに書き込み
-	binaryManager_->Write(filePath);
-	
-	printf("[INFO] Emitter state saved to binary: %s\n", filePath.c_str());
+	// JSONファイルに書き込み
+	jsonManager_->Write(filePath);
 }
 
-void Particles::CreateNewBinaryFile(const std::string& filePath) {
+void Particles::CreateNewJsonFile(const std::string& filePath) {
 	// ディレクトリが存在しない場合は作成
-	std::filesystem::path fullPath = binaryManager_->GetBasePath() + filePath;
+	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
 	std::filesystem::path directory = fullPath.parent_path();
 	
 	if (!directory.empty() && !std::filesystem::exists(directory)) {
@@ -1179,87 +1125,93 @@ void Particles::CreateNewBinaryFile(const std::string& filePath) {
 		}
 	}
 
-	// デフォルト値でバイナリファイルを作成
-	SaveToBinary(filePath);
-	printf("[INFO] Created new binary file: %s\n", filePath.c_str());
+	// デフォルト値でJSONファイルを作成
+	SaveToJson(filePath);
 }
 
-void Particles::LoadFromBinary(const std::string& filePath) {
-	// バイナリファイルから読み込み
-	auto values = binaryManager_->Read(filePath);
+void Particles::LoadFromJson(const std::string& filePath) {
+	// JSONファイルから読み込み
+	auto values = jsonManager_->Read(filePath);
 	
 	if (values.empty()) {
-		printf("[WARNING] Failed to load binary file: %s\n", filePath.c_str());
+		printf("[WARNING] Failed to load JSON file: %s\n", filePath.c_str());
 		return;
 	}
 
-	// 読み込んだ値を順番に取得して適用
+	// 読み込んだ値をマップに変換して名前でアクセスしやすくする
+	std::unordered_map<std::string, std::shared_ptr<ValueBase>> valueMap;
+	for (const auto& value : values) {
+		// ValueBaseから名前を取得する方法が必要（JsonManagerの実装に依存）
+		// 仮定: valueには名前情報が含まれている
+	}
+
+	// 各フィールドを順番に取得して適用
 	size_t index = 0;
-	if (index < values.size()) emitter_.translate = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.radius = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.useEmitter = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.emit = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.count = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.frequency = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.frequencyTime = BinaryManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.translate = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.radius = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.useEmitter = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.emit = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.count = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.frequency = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.frequencyTime = JsonManager::Reverse<float>(values[index++]);
 	if (index < values.size()) {
-		Vector2 startScale = BinaryManager::Reverse<Vector2>(values[index++]);
+		Vector2 startScale = JsonManager::Reverse<Vector2>(values[index++]);
 		emitter_.startScale.x = startScale.x;
 		emitter_.startScale.y = startScale.y;
 	}
 	if (index < values.size()) {
-		Vector2 endScale = BinaryManager::Reverse<Vector2>(values[index++]);
+		Vector2 endScale = JsonManager::Reverse<Vector2>(values[index++]);
 		emitter_.endScale.x = endScale.x;
 		emitter_.endScale.y = endScale.y;
 	}
-	if (index < values.size()) emitter_.scaleFade = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.scaleRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minScale = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.maxScale = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.rotateMove = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.startRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.endRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.rotateVelocityRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.maxRotateVelocity = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.alphaFade = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.colorFade = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.startColor = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.endColor = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.colorRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minColor = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.maxColor = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.isMove = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.startVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.endVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.velocityRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.maxVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.normalVelocity = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.lifeTime = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.lifeTimeRandom = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minLifeTime = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.maxLifeTime = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.shapeType = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.size = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.lineStart = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.lineLength = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringInnerRadius = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringOuterRadius = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.coneAngle = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.coneHeight = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.coneDirection = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.hemisphereAngle = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.planeNormal = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.planeWidth = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.planeHeight = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringAngle = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringNormal = BinaryManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.useGravity = BinaryManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.gravityY = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.accelerationY = BinaryManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.blendMode = static_cast<BlendMode>(BinaryManager::Reverse<uint32_t>(values[index++]));
-	if (index < values.size()) emitter_.texturePath = BinaryManager::Reverse<std::string>(values[index++]);
+	if (index < values.size()) emitter_.scaleFade = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.scaleRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minScale = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.maxScale = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.rotateMove = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.startRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.endRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.rotateVelocityRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.maxRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.alphaFade = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.colorFade = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.startColor = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.endColor = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.colorRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minColor = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.maxColor = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.isMove = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.startVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.endVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.velocityRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.maxVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.normalVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.lifeTime = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.lifeTimeRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.minLifeTime = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.maxLifeTime = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.shapeType = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.size = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.lineStart = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.lineLength = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringInnerRadius = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringOuterRadius = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.coneAngle = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.coneHeight = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.coneDirection = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.hemisphereAngle = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.planeNormal = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.planeWidth = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.planeHeight = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringAngle = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.ringNormal = JsonManager::Reverse<Vector3>(values[index++]);
+	if (index < values.size()) emitter_.useGravity = JsonManager::Reverse<uint32_t>(values[index++]);
+	if (index < values.size()) emitter_.gravityY = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.accelerationY = JsonManager::Reverse<float>(values[index++]);
+	if (index < values.size()) emitter_.blendMode = static_cast<BlendMode>(JsonManager::Reverse<uint32_t>(values[index++]));
+	if (index < values.size()) emitter_.texturePath = JsonManager::Reverse<std::string>(values[index++]);
 
 	// BlendModeを内部変数にも反映
 	blendMode_ = emitter_.blendMode;
@@ -1275,7 +1227,5 @@ void Particles::LoadFromBinary(const std::string& filePath) {
 	}
 
 	loadToSaveName_ = filePath;
-	isBinaryLoaded_ = true;
-	
-	printf("[INFO] Emitter state loaded from binary: %s\n", filePath.c_str());
+	isJsonLoaded_ = true;
 }
