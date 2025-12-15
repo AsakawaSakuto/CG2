@@ -9,7 +9,7 @@ void IScene::Quit() {
 void IScene::DrawSceneName() {
 #ifdef  USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(0, 0));     // 左上に固定
-	ImGui::SetNextWindowSize(ImVec2(100, 50)); // 任意のサイズ
+	ImGui::SetNextWindowSize(ImVec2(150, 75)); // 任意のサイズ
 	ImGui::SetNextWindowBgAlpha(0.5f);         // 背景透明度（0.0f〜1.0f）
 	ImGui::Begin("SceneName", nullptr,
 		ImGuiWindowFlags_NoMove |            // 移動不可
@@ -36,6 +36,18 @@ void IScene::DrawSceneName() {
 		break;
 	}
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+
+	if (ImGui::TreeNode("シーンの切り替え")) {
+
+		if (ImGui::Button("TEST")) { ChangeScene(SCENE::TEST); }
+		if (ImGui::Button("TITLE")) { ChangeScene(SCENE::TITLE); }
+		if (ImGui::Button("GAME")) { ChangeScene(SCENE::GAME); }
+		if (ImGui::Button("RESULT")) { ChangeScene(SCENE::RESULT); }
+		if (ImGui::Button("QUIT")) { Quit(); }
+
+		ImGui::TreePop();
+	}
+
 	ImGui::End();
 #endif //  USE_IMGUI
 }

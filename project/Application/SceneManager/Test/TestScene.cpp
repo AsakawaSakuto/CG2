@@ -1,5 +1,4 @@
 #include "TestScene.h"
-#include "../Quaternion/QuaternionFunction.h"
 
 #define WHITE {1.0f,1.0f,1.0f,1.0f}
 #define RED   {1.0f,0.0f,0.0f,1.0f}
@@ -51,6 +50,8 @@ void TestScene::Initialize() {
 	// 楕円球体の初期化
 	testOvalSphere_.center = { 0.0f, 0.0f, 0.0f };
 	testOvalSphere_.radius = { 1.5f, 1.0f, 1.5f };
+	testOvalSphere_.rotate = { 0.0f, 0.0f, 0.0f };
+	testOvalSphere_.UpdateOrientation();
 
 	testLine_->Initialize(&ctx_->dxCommon);
 }
@@ -60,6 +61,49 @@ void TestScene::Update() {
     Vector3 start = { 0.0f, 0.0f, 0.0f };
     Vector3 end = { 1.0f, 1.0f, 1.0f };
     testLine_->AddLine(walkTransform_.translate, sneakWalkTransform_.translate);
+
+	// 回転を適用（orientation行列を更新）
+	testOBB_.UpdateOrientation();
+	testOvalSphere_.UpdateOrientation();
+
+	// 当たり判定チェック
+	bool sphereHit = false;
+	bool ovalSphereHit = false;
+	bool aabbHit = false;
+	bool obbHit = false;
+
+	// Sphere との衝突判定
+	sphereHit = Collision::IsHit(testSphere_, testOvalSphere_) ||
+	            Collision::IsHit(testSphere_, testAABB_) ||
+	            Collision::IsHit(testSphere_, testOBB_);
+
+	// OvalSphere との衝突判定
+	ovalSphereHit = Collision::IsHit(testOvalSphere_, testSphere_) ||
+	                Collision::IsHit(testOvalSphere_, testAABB_) ||
+	                Collision::IsHit(testOvalSphere_, testOBB_);
+
+	// AABB との衝突判定
+	aabbHit = Collision::IsHit(testAABB_, testSphere_) ||
+	          Collision::IsHit(testAABB_, testOvalSphere_) ||
+	          Collision::IsHit(testAABB_, testOBB_);
+
+	// OBB との衝突判定
+	obbHit = Collision::IsHit(testOBB_, testSphere_) ||
+	         Collision::IsHit(testOBB_, testOvalSphere_) ||
+	         Collision::IsHit(testOBB_, testAABB_);
+
+	// 衝突状態に応じて色を設定して描画
+	Vector4 sphereColor = sphereHit ? Vector4 RED : Vector4 WHITE;
+	Vector4 ovalSphereColor = ovalSphereHit ? Vector4 RED : Vector4 WHITE;
+	Vector4 aabbColor = aabbHit ? Vector4 RED : Vector4 WHITE;
+	Vector4 obbColor = obbHit ? Vector4 RED : Vector4 WHITE;
+
+	testLine_->AddSphere(testSphere_, sphereColor);
+	testLine_->AddOvalSphere(testOvalSphere_, ovalSphereColor);
+	testLine_->AddBox(testAABB_, aabbColor);
+	testLine_->AddBox(testOBB_, obbColor);
+    
+    testLine_->AddPlane(testPlane_);
 
 	testLine_->AddGrid(20.0f, 20);
 
@@ -109,7 +153,11 @@ void TestScene::DrawImGui() {
     testSphere_.DrawImGui("testSphere");
     testOvalSphere_.DrawImGui("testOvalSphere");
 
+    testPlane_.DrawImGui("testPlane");
+
 	testParticle_->DrawImGui("testParticle");
+
+    debugCamera_.DrawImgui();
 
     //testSprite_->DrawImGui("testSprite");
 

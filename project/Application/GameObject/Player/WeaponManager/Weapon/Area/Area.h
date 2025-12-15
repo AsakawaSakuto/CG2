@@ -1,6 +1,6 @@
 #pragma once
-#include "Application/EngineSystem.h"
-#include "Application/GameObject/BaseGameObject.h"
+#include "EngineSystem.h"
+#include "GameObject/BaseGameObject.h"
 
 class Area : public BaseGameObject {
 public:
@@ -13,9 +13,9 @@ public:
 
     void SetPosition(const Vector3& position) { transform_.translate = position; }
 
-    void LoadJson(const std::string& filePath, const std::string& filePath2 = "none") {
-        particle_->LoadJson(filePath);
-        particle2_->LoadJson(filePath2);
+    void LoadBinary(const std::string& filePath, const std::string& filePath2 = "none") {
+        particle_->LoadBinary(filePath);
+        particle2_->LoadBinary(filePath2);
     }
 
 private:

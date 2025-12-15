@@ -3,40 +3,40 @@
 #include <memory>
 
 #include "AppContext.h"
-#include "Application/SceneManager/IScene.h"
+#include "SceneManager/IScene.h"
 
 // Include
-#include "WinApp.h"
-#include "Input.h"
-#include "Camera.h"
-#include "Audio.h"
-#include "DebugCamera.h"
-#include "ConvertString.h"
-#include "DirectXCommon.h"
-#include "D3DResourceLeakChecker.h"
-#include "TextureManager.h"
-#include "GamePad.h"
+#include "Core/WinApp/WinApp.h"
+#include "Input/Input.h"
+#include "Camera/Camera.h"
+#include "Audio/Audio.h"
+#include "Camera/DebugCamera.h"
+#include "Utility/ConvertString/ConvertString.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Core/DirectXCommon/D3DResourceLeakChecker.h"
+#include "Core/TextureManager/TextureManager.h"
+#include "Input/GamePad.h"
 
 // Object
-#include "Sprite.h"
-#include "../Model/Model.h"
-#include "Particles.h"
-#include "EmitterState.h"
-#include "Engine/3d/Line/Line.h"
+#include "2d/Sprite/Sprite.h"
+#include "3d/Model/Model.h"
+#include "3d/Particle/Particles.h"
+#include "3d/Particle/Struct/EmitterState.h"
+#include "3d/Line/Line.h"
 
 // Math
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector4.h"
-#include "Matrix4x4.h"
-#include "Engine/System/Utility/Math/Sphere.h"
-#include "Engine/System/Utility/Math/AABB.h"
+#include "Math/Type/Vector2.h"
+#include "Math/Type/Vector3.h"
+#include "Math/Type/Vector4.h"
+#include "Math/Type/Matrix4x4.h"
+#include "Utility/Collision/Type/Sphere.h"
+#include "Utility/Collision/Type/AABB.h"
 
 // Utility
-#include "Engine/system/Utility/Random/Random.h"
-#include "Engine/system/Utility/Easing/Easing.h"
-#include "Engine/system/Utility/GameTimer/GameTimer.h"
-#include "Engine/System/Utility/Collision/Collision.h"
+#include "Utility/Random/Random.h"
+#include "Utility/Easing/Easing.h"
+#include "Utility/GameTimer/GameTimer.h"
+#include "Utility/Collision/Collision.h"
 
 using std::unique_ptr;
 using std::make_unique;

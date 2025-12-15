@@ -1,19 +1,18 @@
 #pragma once
 #define NOMINMAX
-#include "Transform.h"
-#include "Matrix4x4.h"
-#include "MatrixFunction.h"
-#include "Vector3.h"
-#include "Engine/System/Utility/Math/Plane.h"
+#include "Utility/Transform/Transform.h"
+#include "Utility/Collision/Type/Plane.h"
 
-#include "WinApp.h"
+#include "Math/Type/Vector3.h"
+#include "Math/Type/Matrix4x4.h"
+#include "Math/MatrixFunction/MatrixFunction.h"
+
+#include "Core/WinApp/WinApp.h"
+
+#include "Frustum.h"
+
 #include <cmath>
 #include <algorithm>
-
-// フラスタム構造体
-struct Frustum {
-	Plane planes[6]; // 6つの平面（左、右、上、下、近、遠）
-};
 
 class Camera {
 public:

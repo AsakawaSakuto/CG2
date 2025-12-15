@@ -1,8 +1,8 @@
 #pragma once
-#include"Application/EngineSystem.h"
-#include"Application/SceneManager/IScene.h"
-#include"Engine/System/Utility/Math/OBB.h"
-#include"Engine/System/Utility/Math/OvalSphere.h"
+#include"EngineSystem.h"
+#include"SceneManager/IScene.h"
+#include"Utility/Collision/Type/OBB.h"
+#include"Utility/Collision/Type/OvalSphere.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -41,7 +41,7 @@ private:
 	unique_ptr<Model> walk_ = make_unique<Model>();
 	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
 
-	unique_ptr<Line> testLine_ = make_unique<Line>();
+	unique_ptr<Line3d> testLine_ = make_unique<Line3d>();
 
 	Transform cubeTransform_;
 	Transform spinCubeTransform_;
@@ -61,4 +61,5 @@ private:
 	OBB testOBB_;
 	Sphere testSphere_;
 	OvalSphere testOvalSphere_;
+	Plane testPlane_;
 };

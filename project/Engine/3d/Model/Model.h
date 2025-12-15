@@ -8,29 +8,28 @@
 
 #pragma comment(lib, "dxcompiler.lib")
 #pragma comment(lib,"dxguid.lib")
-#pragma comment(lib,"dxcompiler.lib")
 
-#include "externals/DirectXTex/DirectXTex.h"
+#include "DirectXTex.h"
 
 #include <cmath>
 #include <numbers>
 #include <unordered_map>
 #include <memory>
 
-#include"DirectXCommon.h"
-#include"../Engine/System/HeapManager/DescriptorAllocator.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Core/HeapManager/DescriptorAllocator.h"
 
-#include "../Model/ModelDataStruct.h"
+#include "3d/Model/ModelDataStruct.h"
 
-#include"Transform.h"
-#include"DirectionalLight.h"
-#include"PointLight.h"
-#include"SpotLight.h"
+#include "Utility/Transform/Transform.h"
+#include "Utility/Light/DirectionalLight.h"
+#include "Utility/Light/PointLight.h"
+#include "Utility/Light/SpotLight.h"
 
-#include"TextureManager.h"
-#include"Camera.h"
-#include"CameraForGPU.h"
-#include"MatrixFunction.h"
+#include "Core/TextureManager/TextureManager.h"
+#include "Camera/Camera.h"
+#include "Camera/CameraForGPU.h"
+#include "Math/MatrixFunction/MatrixFunction.h"
 
 /// <summary>
 /// 3Dモデルクラス
@@ -40,7 +39,7 @@ public:
 	
 	/// <summary>
 	/// 静的リソースのクリーンアップ（アプリケーション終了時に呼び出す）
-	/// </summary>
+/// </summary>
 	static void Finalize();
 
 	/// <summary>

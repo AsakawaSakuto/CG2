@@ -4,10 +4,10 @@
 #include <filesystem>
 #include <comdef.h>
 #include <windows.h>
-#include "TextureManager.h"
-#include "Logger.h"
-#include "Engine/System/Utility/GameTimer/DeltaTime.h" // パス修正
-#include "Engine/3d/Model/Model.h" // Model::Finalize用
+#include "Core/TextureManager/TextureManager.h"
+#include "Core/Logger/Logger.h"
+#include "Utility/GameTimer/DeltaTime.h"
+#include "3d/Model/Model.h"
 
 SceneManager::SceneManager() {
     // シーン配列は初期化時には空にする

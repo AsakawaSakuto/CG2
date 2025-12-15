@@ -1,10 +1,10 @@
 #pragma once
-#include "Application/AppContext.h"
-#include "Application/GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
-#include "Application/GameObject/Player/WeaponManager/Weapon/Area/area.h"
-#include "Application/GameObject/Player/WeaponManager/WeaponStatus.h"
-#include "Application/GameObject/Player/WeaponManager/WeaponName.h"
-#include "Camera.h"
+#include "AppContext.h"
+#include "GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
+#include "GameObject/Player/WeaponManager/Weapon/Area/area.h"
+#include "GameObject/Player/WeaponManager/WeaponStatus.h"
+#include "GameObject/Player/WeaponManager/WeaponName.h"
+#include "Camera/Camera.h"
 #include <queue>
 
 /// <summary>

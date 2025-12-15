@@ -1,8 +1,8 @@
 #pragma once
-#include"WinApp.h"
-#include"DirectXCommon.h"
-#include"Input.h"
-#include"GamePad.h"
+#include "Core/WinApp/WinApp.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Input/Input.h"
+#include "Input/GamePad.h"
 
 struct AppContext {
 	DirectXCommon dxCommon;

@@ -1,6 +1,6 @@
 #pragma once
-#include "Application/GameUI/BaseUI.h"
-#include "Application/EngineSystem.h"
+#include "GameUI/BaseUI.h"
+#include "EngineSystem.h"
 
 class TitleSceneUI : public BaseUI {
 public:

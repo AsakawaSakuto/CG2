@@ -1,6 +1,6 @@
 #pragma once
-#include "Application/GameObject/BaseGameObject.h"
-#include "Application/EngineSystem.h"
+#include "GameObject/BaseGameObject.h"
+#include "EngineSystem.h"
 
 class Enemy : public BaseGameObject {
 public:

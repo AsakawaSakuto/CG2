@@ -1,5 +1,5 @@
 #include "WeaponManager.h"
-#include "Application/GameObject/Player/WeaponManager/WeaponName.h"
+#include "GameObject/Player/WeaponManager/WeaponName.h"
 
 void WeaponManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;

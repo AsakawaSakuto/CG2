@@ -1,12 +1,12 @@
 #pragma once
-#include"Application/EngineSystem.h"
-#include"Application/SceneManager/IScene.h"
-#include"Application/GameObject/Player/player.h"
-#include"Application/GameCameraCntroller/GameCameraController.h"
-#include"Application/GameObject/EnemyManager/EnemyManager.h"
-#include"Application/CollisionManager/CollisionManager.h"
-#include"Engine/2d/BitmapFont/BitmapFont.h"
-#include"Engine/2d/Gauge/Gauge.h"
+#include "EngineSystem.h"
+#include "SceneManager/IScene.h"
+#include "GameObject/Player/player.h"
+#include "GameCameraCntroller/GameCameraController.h"
+#include "GameObject/EnemyManager/EnemyManager.h"
+#include "CollisionManager/CollisionManager.h"
+#include "2d/BitmapFont/BitmapFont.h"
+#include "2d/Gauge/Gauge.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -57,7 +57,7 @@ private:
 
 	GameTimer textMoveTimer_;
 
-	unique_ptr<Line> testLine_ = make_unique<Line>();
+	unique_ptr<Line3d> testLine_ = make_unique<Line3d>();
 
 	// ビットマップフォント（数字表示用）
 	unique_ptr<BitmapFont> timeFont_;

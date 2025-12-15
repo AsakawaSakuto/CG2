@@ -1,6 +1,6 @@
 #pragma once
-#include"Application/EngineSystem.h"
-#include"Application/SceneManager/IScene.h"
+#include"EngineSystem.h"
+#include"SceneManager/IScene.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;

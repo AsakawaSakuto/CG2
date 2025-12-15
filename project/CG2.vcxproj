@@ -80,7 +80,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;$(ProjectDir)Engine\System\GamePad;$(ProjectDir)SceneObject\Character\Player;$(ProjectDir)SceneObject\SkyBox;$(ProjectDir)SceneObject\Fade;$(ProjectDir)externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Application;$(ProjectDir)externals\imgui;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,7 +105,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;$(ProjectDir)Engine\System\GamePad;$(ProjectDir)SceneObject\Character\Player;$(ProjectDir)SceneObject\SkyBox;$(ProjectDir)SceneObject\Fade;$(ProjectDir)externals;$(ProjectDir)SceneObject\Ranking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Application;$(ProjectDir)externals\imgui;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>USE_IMGUI;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -132,7 +132,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\2d\Sprite;$(ProjectDir)Engine\3d\Object3d;$(ProjectDir)Engine\Camera;$(ProjectDir)Engine\System\DirectXCommon;$(ProjectDir)Engine\System\Input;$(ProjectDir)Engine\System\WinApp;$(ProjectDir)Engine\System\ResourceData;$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\System\Utility\Math;$(ProjectDir)Engine\System\Utility\Logger;$(ProjectDir)Engine\System\Utility\MatrixFunction;$(ProjectDir)Engine\System\Utility\CreateResource;$(ProjectDir)Engine\System\Utility\ConvertString;$(ProjectDir)Engine\System\Audio;$(ProjectDir)Engine\3d\Sphere;$(ProjectDir)Scene;$(ProjectDir)Engine\2d\Triangle;$(ProjectDir)Engine\3d\Particles;$(ProjectDir)externals\assimp\include;$(ProjectDir)Engine\3d\Particles\Struct;$(ProjectDir)Engine\3d\Object3d\Struct;$(ProjectDir)Engine\System\GamePad;$(ProjectDir)SceneObject\Character\Player;$(ProjectDir)SceneObject\SkyBox;$(ProjectDir)SceneObject\Fade;$(ProjectDir)externals;$(ProjectDir)SceneObject\Ranking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Application;$(ProjectDir)externals\imgui;$(ProjectDir)externals\assimp\include;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -174,31 +174,33 @@
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
     <ClCompile Include="Engine\3d\Line\Line.cpp" />
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
-    <ClCompile Include="Engine\System\HeapManager\DescriptorAllocator.cpp" />
-    <ClCompile Include="Engine\3d\Particles\Json\EmitterStateLoder.cpp" />
-    <ClCompile Include="Engine\System\Audio\Audio.cpp" />
-    <ClCompile Include="Engine\System\Audio\AudioData.cpp" />
+    <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
+    <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
+    <ClCompile Include="Engine\Audio\Audio.cpp" />
+    <ClCompile Include="Engine\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
-    <ClCompile Include="Engine\System\Audio\MasterVolume.cpp" />
-    <ClCompile Include="Engine\System\DirectXCommon\ExeColor.cpp" />
-    <ClCompile Include="Engine\System\GamePad\GamePad.cpp" />
-    <ClCompile Include="Engine\System\HeapManager\HeapManager.cpp" />
-    <ClCompile Include="Engine\System\PostEffect\PostEffectManager.cpp" />
-    <ClCompile Include="Engine\System\RenderTexture\RenderTexture.cpp" />
-    <ClCompile Include="Engine\System\Utility\MathFunction\MathFunction.cpp" />
-    <ClCompile Include="Engine\System\PSOManager\PSOManager.cpp" />
-    <ClCompile Include="Engine\System\Utility\ConvertString\ConvertString.cpp" />
-    <ClCompile Include="Engine\System\Utility\CreateResource\CreateResource.cpp" />
-    <ClCompile Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.cpp" />
+    <ClCompile Include="Engine\Audio\MasterVolume.cpp" />
+    <ClCompile Include="Engine\Input\GamePad.cpp" />
+    <ClCompile Include="Engine\Core\HeapManager\HeapManager.cpp" />
+    <ClCompile Include="Engine\OffScreen\PostEffect\PostEffectManager.cpp" />
+    <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
+    <ClCompile Include="Engine\Math\MathFunction\MathFunction.cpp" />
+    <ClCompile Include="Engine\Core\PSOManager\PSOManager.cpp" />
+    <ClCompile Include="Engine\Utility\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Utility\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Utility\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Utility\ConvertString\ConvertString.cpp" />
+    <ClCompile Include="Engine\Core\CreateResource\CreateResource.cpp" />
+    <ClCompile Include="Engine\Core\DirectXCommon\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\3d\Object3d;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\3d\Object3d;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Development|x64'">$(ProjectDir)Engine\System\TextureManager;$(ProjectDir)Engine\3d\Object3d;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Engine\System\DirectXCommon\DirectXCommon.cpp" />
-    <ClCompile Include="Engine\System\Utility\Easing\Easing.cpp" />
-    <ClCompile Include="Engine\System\Utility\GameTimer\GameTimer.cpp" />
-    <ClCompile Include="Engine\System\Utility\Quaternion\QuaternionFunction.cpp" />
+    <ClCompile Include="Engine\Core\DirectXCommon\DirectXCommon.cpp" />
+    <ClCompile Include="Engine\Utility\Easing\Easing.cpp" />
+    <ClCompile Include="Engine\Utility\GameTimer\GameTimer.cpp" />
+    <ClCompile Include="Engine\Math\Quaternion\QuaternionFunction.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -220,18 +222,18 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Engine\System\Input\Input.cpp" />
-    <ClCompile Include="Engine\System\Utility\Logger\Logger.cpp" />
-    <ClCompile Include="Engine\3d\Particles\Particles.cpp" />
+    <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Core\Logger\Logger.cpp" />
+    <ClCompile Include="Engine\3d\Particle\Particles.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
     </ClCompile>
-    <ClCompile Include="Engine\System\Utility\MatrixFunction\MatrixFunction.cpp" />
+    <ClCompile Include="Engine\Math\MatrixFunction\MatrixFunction.cpp" />
     <ClCompile Include="Engine\3d\Model\Model.cpp" />
     <ClCompile Include="Engine\2d\Sprite\Sprite.cpp" />
-    <ClCompile Include="Engine\System\TextureManager\TextureManager.cpp" />
-    <ClCompile Include="Engine\System\WinApp\WinApp.cpp" />
+    <ClCompile Include="Engine\Core\TextureManager\TextureManager.cpp" />
+    <ClCompile Include="Engine\Core\WinApp\WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\AppContext.h" />
@@ -266,43 +268,49 @@
     <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
     <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
-    <ClInclude Include="Engine\System\HeapManager\DescriptorAllocator.h" />
+    <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
+    <ClInclude Include="Engine\Camera\Frustum.h" />
+    <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
-    <ClInclude Include="Engine\3d\Particles\Json\EmitterStateLoder.h" />
-    <ClInclude Include="Engine\3d\Particles\Struct\EmitterState.h" />
-    <ClInclude Include="Engine\3d\Particles\Struct\ParticleDataStruct.h" />
+    <ClInclude Include="Engine\3d\Particle\Struct\EmitterState.h" />
+    <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
-    <ClInclude Include="Engine\System\Audio\MasterVolume.h" />
-    <ClInclude Include="Engine\System\DirectXCommon\ExeColor.h" />
-    <ClInclude Include="Engine\System\GamePad\GamePad.h" />
-    <ClInclude Include="Engine\System\HeapManager\HeapManager.h" />
-    <ClInclude Include="Engine\System\PostEffect\PostEffectManager.h" />
-    <ClInclude Include="Engine\System\PostEffect\PostEffectParams.h" />
-    <ClInclude Include="Engine\System\PSOManager\PSOType.h" />
-    <ClInclude Include="Engine\System\RenderTexture\RenderTexture.h" />
-    <ClInclude Include="Engine\System\Utility\MathFunction\MathFunction.h" />
-    <ClInclude Include="Engine\System\PSOManager\PSOManager.h" />
-    <ClInclude Include="Engine\System\ResourceData\BlendMode.h" />
-    <ClInclude Include="Engine\System\Audio\Audio.h" />
-    <ClInclude Include="Engine\System\Audio\AudioData.h" />
+    <ClInclude Include="Engine\Audio\MasterVolume.h" />
+    <ClInclude Include="Engine\Input\GamePad.h" />
+    <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
+    <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
+    <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectParams.h" />
+    <ClInclude Include="Engine\Core\PSOManager\PSOType.h" />
+    <ClInclude Include="Engine\OffScreen\RenderTexture\RenderTexture.h" />
+    <ClInclude Include="Engine\Math\MathFunction\MathFunction.h" />
+    <ClInclude Include="Engine\Core\PSOManager\PSOManager.h" />
+    <ClInclude Include="Engine\Utility\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Utility\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Utility\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Utility\Binary\Data\Value.h" />
+    <ClInclude Include="Engine\Utility\BlendMode\BlendMode.h" />
+    <ClInclude Include="Engine\Audio\Audio.h" />
+    <ClInclude Include="Engine\Audio\AudioData.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
-    <ClInclude Include="Engine\System\Utility\Collision\Collision.h" />
-    <ClInclude Include="Engine\System\Utility\ConvertString\ConvertString.h" />
-    <ClInclude Include="Engine\System\Utility\CreateResource\CreateResource.h" />
-    <ClInclude Include="Engine\System\DirectXCommon\D3DResourceLeakChecker.h" />
+    <ClInclude Include="Engine\Utility\Collision\Collision.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />
+    <ClInclude Include="Engine\Utility\ConvertString\ConvertString.h" />
+    <ClInclude Include="Engine\Core\CreateResource\CreateResource.h" />
+    <ClInclude Include="Engine\Core\DirectXCommon\D3DResourceLeakChecker.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
-    <ClInclude Include="Engine\System\ResourceData\DirectionalLight.h" />
-    <ClInclude Include="Engine\System\DirectXCommon\DirectXCommon.h" />
-    <ClInclude Include="Engine\System\Utility\Easing\Easing.h" />
-    <ClInclude Include="Engine\System\Utility\GameTimer\GameTimer.h" />
-    <ClInclude Include="Engine\System\Utility\Math\AABB.h" />
-    <ClInclude Include="Engine\System\Utility\Math\OBB.h" />
-    <ClInclude Include="Engine\System\Utility\Math\OvalSphere.h" />
-    <ClInclude Include="Engine\System\Utility\Math\Plane.h" />
-    <ClInclude Include="Engine\System\Utility\Quaternion\Quaternion.h" />
-    <ClInclude Include="Engine\System\Utility\Math\Segment.h" />
-    <ClInclude Include="Engine\System\Utility\Math\Sphere.h" />
-    <ClInclude Include="Engine\System\Utility\Quaternion\QuaternionFunction.h" />
+    <ClInclude Include="Engine\Utility\GameTimer\DeltaTime.h" />
+    <ClInclude Include="Engine\Utility\Light\DirectionalLight.h" />
+    <ClInclude Include="Engine\Core\DirectXCommon\DirectXCommon.h" />
+    <ClInclude Include="Engine\Utility\Easing\Easing.h" />
+    <ClInclude Include="Engine\Utility\GameTimer\GameTimer.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\AABB.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\OBB.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\OvalSphere.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\Plane.h" />
+    <ClInclude Include="Engine\Math\Type\Quaternion.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\Segment.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\Sphere.h" />
+    <ClInclude Include="Engine\Math\Quaternion\QuaternionFunction.h" />
     <ClInclude Include="externals\imgui\imconfig.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -327,22 +335,22 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Engine\System\Input\Input.h" />
-    <ClInclude Include="Engine\System\Utility\Logger\Logger.h" />
-    <ClInclude Include="Engine\System\Utility\MatrixFunction\MatrixFunction.h" />
+    <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\Core\Logger\Logger.h" />
+    <ClInclude Include="Engine\Math\MatrixFunction\MatrixFunction.h" />
     <ClInclude Include="Engine\3d\Model\Model.h" />
     <ClInclude Include="Engine\2d\Sprite\Sprite.h" />
-    <ClInclude Include="Engine\System\TextureManager\TextureManager.h" />
-    <ClInclude Include="Engine\System\ResourceData\Transform.h" />
-    <ClInclude Include="Engine\System\Utility\Math\Vector2.h" />
-    <ClInclude Include="Engine\System\Utility\Math\Vector4.h" />
-    <ClInclude Include="Engine\System\Utility\Math\Vector3.h" />
-    <ClInclude Include="Engine\System\WinApp\WinApp.h" />
-    <ClInclude Include="Engine\System\Utility\Math\Matrix4x4.h" />
-    <ClInclude Include="Engine\3d\Particles\Particles.h" />
-    <ClInclude Include="Engine\System\ResourceData\PointLight.h" />
-    <ClInclude Include="Engine\System\ResourceData\SpotLight.h" />
-    <ClInclude Include="Engine\System\Utility\Random\Random.h" />
+    <ClInclude Include="Engine\Core\TextureManager\TextureManager.h" />
+    <ClInclude Include="Engine\Utility\Transform\Transform.h" />
+    <ClInclude Include="Engine\Math\Type\Vector2.h" />
+    <ClInclude Include="Engine\Math\Type\Vector4.h" />
+    <ClInclude Include="Engine\Math\Type\Vector3.h" />
+    <ClInclude Include="Engine\Core\WinApp\WinApp.h" />
+    <ClInclude Include="Engine\Math\Type\Matrix4x4.h" />
+    <ClInclude Include="Engine\3d\Particle\Particles.h" />
+    <ClInclude Include="Engine\Utility\Light\PointLight.h" />
+    <ClInclude Include="Engine\Utility\Light\SpotLight.h" />
+    <ClInclude Include="Engine\Utility\Random\Random.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Model\Object3d.PS.hlsl">
@@ -384,7 +392,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="docs\OffscreenRendering_Implementation.md" />
-    <None Include="Engine\2d\BitmapFont\README.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="resources\shaders\Model\Object3d.hlsli">

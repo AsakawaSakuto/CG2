@@ -1,7 +1,7 @@
 #pragma once
-#include"Application/EngineSystem.h"
-#include"Application/SceneManager/IScene.h"
-#include"Application/GameUI/TitleSceneUI/TitleSceneUI.h"
+#include"EngineSystem.h"
+#include"SceneManager/IScene.h"
+#include"GameUI/TitleSceneUI/TitleSceneUI.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;

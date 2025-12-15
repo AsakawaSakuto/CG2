@@ -1,14 +1,14 @@
 #pragma once
-#include "../Model/ModelDataStruct.h"
+#include "3d/Model/ModelDataStruct.h"
 
-#include "DirectXCommon.h"
-#include "Transform.h"
-#include "DirectionalLight.h"
-#include "TextureManager.h"
-#include "MatrixFunction.h"
-#include "CameraForGPU.h"
-#include "SpotLight.h"
-#include "PointLight.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Utility/Transform/Transform.h"
+#include "Core/TextureManager/TextureManager.h"
+#include "Math/MatrixFunction/MatrixFunction.h"
+#include "Camera/CameraForGPU.h"
+#include "Utility/Light/DirectionalLight.h"
+#include "Utility/Light/SpotLight.h"
+#include "Utility/Light/PointLight.h"
 
 #include <cmath>
 #include <numbers>

@@ -1,8 +1,8 @@
 #pragma once
-#include "Application/GameObject/BaseGameObject.h"
-#include "Application/EngineSystem.h"
+#include "GameObject/BaseGameObject.h"
+#include "EngineSystem.h"
 #include "playerStatus.h"
-#include "Application/GameObject/Player/WeaponManager/WeaponManager.h"
+#include "GameObject/Player/WeaponManager/WeaponManager.h"
 
 // 前方宣言
 class EnemyManager;

@@ -2,9 +2,9 @@
 #include <cmath>
 
 #ifdef USE_IMGUI
-#include "externals/imgui/imgui.h"           
-#include "externals/imgui/imgui_impl_dx12.h" 
-#include "externals/imgui/imgui_impl_win32.h"
+#include "imgui.h"           
+#include "imgui_impl_dx12.h" 
+#include "imgui_impl_win32.h"
 #endif
 
 Camera::Camera() {
@@ -147,14 +147,16 @@ void Camera::UpdateFrustum() {
 bool Camera::IsInFrustum(const Vector3& position, float radius) const {
 	// 各フラスタム平面に対してオブジェクトが範囲内にあるかチェック
 	for (int i = 0; i < 6; i++) {
-		float distance = 
+		// 点から平面までの符号付き距離を計算
+		// d = dot(normal, point) + distance
+		float dist = 
 			frustum_.planes[i].normal.x * position.x +
 			frustum_.planes[i].normal.y * position.y +
 			frustum_.planes[i].normal.z * position.z +
 			frustum_.planes[i].distance;
 			
-		// オブジェクトが平面の外側にある場合（距離がマイナス値で、その絶対値が半径より大きい）
-		if (distance < -radius) {
+		// オブジェクトが平面の外側にある場合
+		if (dist < -radius) {
 			return false; // フラスタム外
 		}
 	}
@@ -182,9 +184,9 @@ Vector3 Camera::GetWorldPosition() {
 	// ワールド座標を入れる変数
 	Vector3 worldPos;
 	// ワールド行列の平行移動成分を取得（ワールド座標）
-	worldPos.x = worldMatrix_.m[3][0];
-	worldPos.y = worldMatrix_.m[3][1];
-	worldPos.z = worldMatrix_.m[3][2];
+// 	worldPos.x = worldMatrix_.m[3][0];
+// 	worldPos.y = worldMatrix_.m[3][1];
+// 	worldPos.z = worldMatrix_.m[3][2];
 
 	return worldPos;
 }

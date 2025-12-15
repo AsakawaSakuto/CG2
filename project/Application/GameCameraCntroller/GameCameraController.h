@@ -1,6 +1,6 @@
 #pragma once
-#include "Camera.h"
-#include "Application/AppContext.h"
+#include "Camera/Camera.h"
+#include "AppContext.h"
 #include <cmath>
 
 class GameCameraController

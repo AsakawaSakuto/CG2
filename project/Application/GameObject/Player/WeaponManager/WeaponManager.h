@@ -1,7 +1,7 @@
 #pragma once
-#include "Application/AppContext.h"
-#include "Application/GameObject/Player/WeaponManager/Weapon/Weapon.h"
-#include "Camera.h"
+#include "AppContext.h"
+#include "GameObject/Player/WeaponManager/Weapon/Weapon.h"
+#include "Camera/Camera.h"
 
 class WeaponManager {
 public:

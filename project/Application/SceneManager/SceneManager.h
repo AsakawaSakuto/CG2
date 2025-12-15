@@ -1,10 +1,10 @@
 #pragma once
 #include"IScene.h"
-#include"Application/SceneManager/Test/TestScene.h"
+#include"SceneManager/Test/TestScene.h"
 
-#include"Application/SceneManager/Scene/TiTleScene.h"
-#include"Application/SceneManager/Scene/GameScene.h"
-#include"Application/SceneManager/Scene/ResultScene.h"
+#include"SceneManager/Scene/TiTleScene.h"
+#include"SceneManager/Scene/GameScene.h"
+#include"SceneManager/Scene/ResultScene.h"
 
 #include<memory>
 
