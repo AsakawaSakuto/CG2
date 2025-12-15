@@ -8,13 +8,11 @@
 #include "Math/MatrixFunction/MatrixFunction.h"
 
 #include "Core/WinApp/WinApp.h"
+
+#include "Frustum.h"
+
 #include <cmath>
 #include <algorithm>
-
-// フラスタム構造体
-struct Frustum {
-	Plane planes[6]; // 6つの平面（左、右、上、下、近、遠）
-};
 
 class Camera {
 public:

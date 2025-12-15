@@ -269,6 +269,7 @@
     <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
+    <ClInclude Include="Engine\Camera\Frustum.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\EmitterState.h" />

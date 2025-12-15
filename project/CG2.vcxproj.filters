@@ -172,6 +172,7 @@
     <ClInclude Include="Engine\Utility\Binary\Data\BinaryInput.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
     <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />
+    <ClInclude Include="Engine\Camera\Frustum.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
