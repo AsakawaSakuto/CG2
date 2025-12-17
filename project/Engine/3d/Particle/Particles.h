@@ -30,6 +30,7 @@
 #include "Camera/Camera.h"
 #include "3d/Particle/Struct/ParticleDataStruct.h"
 #include "3d/Particle/Struct/EmitterState.h"
+#include "3d/Line/Line.h"
 
 #pragma endregion
 
@@ -104,12 +105,13 @@ public:
 	/// パーティクルの生成開始
 	/// </summary>
 	/// <param name="isLoop">trueならループ生成、falseなら一回だけ生成</param>
-	void Play(bool isLoop = true) { 
+	void Play(bool isLoop = true) {
 		if (isLoop) {
 			emitter_.frequencyTime = emitter_.frequency;
 			emitter_.useEmitter = true;
 			isPlaying_ = true;
-		} else {
+		}
+		else {
 			emitter_.frequencyTime = emitter_.frequency;
 			emitter_.useEmitter = false;
 			isPlaying_ = false;
@@ -119,8 +121,8 @@ public:
 	/// <summary>
 	/// パーティクルの生成停止
 	/// </summary>
-	void Stop() { 
-		emitter_.useEmitter = false; 
+	void Stop() {
+		emitter_.useEmitter = false;
 		emitter_.emit = false;
 		emitter_.frequencyTime = 0.0f;
 		isPlaying_ = false;
@@ -131,14 +133,14 @@ public:
 	/// </summary>
 	/// <returns>生成中の場合は true、そうでない場合は false を返す</returns>
 	bool IsPlaying() const { return isPlaying_; }
-	
+
 	/// <summary>
 	/// パーティクルをリセット（プール再利用時用の軽量リセット） 
 	/// </summary>
 	void Reset() {
 		Stop();
-		SetEmitterPosition({0.0f, 0.0f, 0.0f});
-		SetOffSet({0.0f, 0.0f, 0.0f});
+		SetEmitterPosition({ 0.0f, 0.0f, 0.0f });
+		SetOffSet({ 0.0f, 0.0f, 0.0f });
 		// 次回の描画でGPUバッファをリセット
 		needsBufferReset_ = true;
 	}
@@ -149,13 +151,19 @@ public:
 	/// <param name="filePath">Resources->Json->Particle の中にあるJsonFileのPathを入れる（拡張子不要）</param>
 	void LoadJson(const std::string& filePath);
 
+	/// <summary>
+	/// エミッター形状の可視化（内部のLine3dを使用してワイヤーフレーム表示）
+	/// </summary>
+	/// <param name="color">描画色（デフォルト：黄色）</param>
+	void DrawEmitterShape(Line3d* line3d, const Vector4& color = { 1.0f,1.0f,0.0f,1.0f });
+
 	void SetEmitterState(EmitterState emitter) { emitter_ = emitter; }
 private:
 
 	void ExecuteInitialization();
 
 	void ResetAllParticles();
-	
+
 	// JsonManagerでの保存・読み込み用のヘルパー関数
 	void SaveToJson(const std::string& filePath);
 	void LoadFromJson(const std::string& filePath);
@@ -168,13 +176,13 @@ private:
 
 	// パーティクルの再生状態
 	bool isPlaying_ = false;
-	
+
 	// Json読み込み済みフラグ
 	bool isJsonLoaded_ = false;
-	
+
 	// 初期化済みフラグ
 	bool isInitialized_ = false;
-	
+
 	// バッファリセットが必要かのフラグ
 	bool needsBufferReset_ = false;
 
@@ -186,10 +194,10 @@ private:
 
 	// 描画可能な最大パーティクル数
 	uint32_t kMaxParticles_;
-	
+
 	// Dispatchを実行する回数
 	uint32_t kDispatchCount;
-	
+
 	// GPU側に送るインスタンス情報
 	ParticleDataCS* particleDataCS_ = nullptr;
 
@@ -198,7 +206,7 @@ private:
 
 	// 現在のブレンドモード
 	BlendMode blendMode_;
-	
+
 	float totalTime_ = 0.0f;
 
 	bool isMove_ = false;
@@ -206,7 +214,10 @@ private:
 	float emitterSpeed_ = 0.0f;
 
 	Vector3 offset_ = {};
-	
+
+	// エミッター形状可視化用のLine3d（内部で保持）
+	std::unique_ptr<Line3d> line3d_;
+
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleBufferResource_;

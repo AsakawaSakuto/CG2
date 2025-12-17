@@ -17,7 +17,35 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& filePath,
 	// JsonManagerの初期化
 	jsonManager_ = std::make_unique<JsonManager>();
 	jsonManager_->SetBasePath("resources/Data/Json/Particle/");
-	LoadJson(filePath);
+
+	line3d_ = std::make_unique<Line3d>();
+	line3d_->Initialize(dxCommon_);
+
+	// エミッターのデフォルト値を設定
+	emitter_ = {}; // ゼロ初期化
+	emitter_.translate = { 0.0f, 0.0f, 0.0f };
+	emitter_.radius = 1.0f;
+	emitter_.shapeType = static_cast<uint32_t>(EmitterShapeType::POINT);
+	emitter_.blendMode = kBlendModeAdd;
+	emitter_.texturePath = "circle"; // デフォルトテクスチャ
+	emitter_.startScale = { 1.0f, 1.0f };
+	emitter_.endScale = { 1.0f, 1.0f };
+	emitter_.lifeTime = 3.0f;
+	emitter_.frequency = 0.5f;
+	emitter_.count = 10;
+	emitter_.planeNormal = { 0.0f, 1.0f, 0.0f }; // デフォルト法線（上向き）
+	emitter_.size = { 1.0f, 1.0f, 1.0f };
+	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
+	emitter_.endColor = { 1.0f, 1.0f, 1.0f };
+
+	// JSONファイルの読み込みを試行（失敗してもデフォルト値で続行）
+	try {
+		LoadJson(filePath);
+	}
+	catch (const std::exception& e) {
+		printf("[WARNING] Failed to load particle JSON '%s': %s\n", filePath.c_str(), e.what());
+		printf("[INFO] Using default particle settings.\n");
+	}
 
 	DescriptorAllocator& alloc = dxCommon_->GetParticleAlloc();
 
@@ -29,10 +57,10 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& filePath,
 		return;
 	}
 
-	idxSrvParticles_ =      alloc.Allocate();
-	idxUavParticles_ =      alloc.Allocate();
-	idxUavFreeListIndex_ =  alloc.Allocate();
-	idxUavFreeList_ =       alloc.Allocate();
+	idxSrvParticles_ = alloc.Allocate();
+	idxUavParticles_ = alloc.Allocate();
+	idxUavFreeListIndex_ = alloc.Allocate();
+	idxUavFreeList_ = alloc.Allocate();
 
 	// ブレンドモードを加算合成に初期化
 	blendMode_ = kBlendModeAdd;
@@ -57,7 +85,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& filePath,
 	CreateParticleResource();
 	CreatePerViewResource();
 	CreatePerFrameResource();
-	
+
 	isInitialized_ = true;
 }
 
@@ -178,6 +206,11 @@ void Particles::Draw(Camera& useCamera) {
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
 	commandList_->DrawIndexedInstanced(6, kMaxParticles_, 0, 0, 0);
 
+	DrawEmitterShape(line3d_.get());
+	
+	if (emitter_.enableVisualization) {
+		line3d_->Draw(camera_);
+	}
 }
 
 void Particles::DrawImGui(const char* objectName) {
@@ -211,7 +244,7 @@ void Particles::DrawImGui(const char* objectName) {
 	// BlendMode選択コンボボックスを追加
 	const char* blendModeNames[] = {
 		"None (なし)",
-		"Normal (通常)", 
+		"Normal (通常)",
 		"Add (加算)",
 		"Subtract (減算)",
 		"Multily (乗算)",
@@ -275,265 +308,123 @@ void Particles::DrawImGui(const char* objectName) {
 	ImGui::DragFloat3("位置", &emitter_.translate.x, 0.01f);
 
 	ImGui::DragFloat3("オフセット", &offset_.x, 0.01f);
-	
+
 	// Emitter Shape Selection
-	const char* shapeNames[] = { 
-		"点", 
-		"線", 
-		"球 (内部)", 
-		"球 (表面)", 
-		"箱 (内部)", 
-		"箱 (表面)", 
-		"リング (XZ平面)", 
-		"リング (XY平面)", 
-		"リング (YZ平面)",
-		"円錐 (内部)",
-		"円錐 (表面)",
-		"半球 (内部)",
-		"半球 (表面)",
-		"平面 (角度範囲)",
-		"平面 (エッジ)",
-		"リング (角度範囲)",
-		"リング (角度エッジ)"
+	const char* shapeNames[] = {
+		"点 (POINT)",
+		"線 (LINE)",
+		"球 (SPHERE)",
+		"箱 (BOX)",
+		"平面 (PLANE)",
+		"リング (RING)"
 	};
 	int currentShape = static_cast<int>(emitter_.shapeType);
 	if (ImGui::Combo("エミッター形状", &currentShape, shapeNames, IM_ARRAYSIZE(shapeNames))) {
 		emitter_.shapeType = static_cast<uint32_t>(currentShape);
 	}
-	
+
+	// Spawn on edge flag
+	ImGui::Checkbox("エッジ上に生成", reinterpret_cast<bool*>(&emitter_.spawnOnEdge));
+
+	// Visualization flag
+	ImGui::Checkbox("形状を可視化", reinterpret_cast<bool*>(&emitter_.enableVisualization));
+
 	// Shape-specific parameters
 	switch (static_cast<EmitterShapeType>(emitter_.shapeType))
 	{
-		case EmitterShapeType::POINT:
-		{
-			// Point emitter has no additional parameters
-			ImGui::Text("点エミッター - 正確な位置で生成");
-			break;
+	case EmitterShapeType::POINT:
+	{
+		// Point emitter has no additional parameters
+		ImGui::Text("点エミッター - 正確な位置で生成");
+		break;
+	}
+
+	case EmitterShapeType::LINE:
+	{
+		ImGui::DragFloat3("線の開始位置", &emitter_.lineStart.x, 0.01f);
+		ImGui::DragFloat3("線の方向", &emitter_.size.x, 0.01f);
+		ImGui::DragFloat("線の長さ", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
+		if (emitter_.spawnOnEdge) {
+			ImGui::Text("エッジモード - 線の両端のみで生成");
 		}
-		
-		case EmitterShapeType::LINE:
-		{
-			ImGui::DragFloat3("線の開始位置", &emitter_.lineStart.x, 0.01f);
-			ImGui::DragFloat3("線の方向", &emitter_.size.x, 0.01f);
-			ImGui::DragFloat("線の長さ", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
-			break;
+		else {
+			ImGui::Text("線上の任意の位置で生成");
 		}
-		
-		case EmitterShapeType::SPHERE_VOLUME:
-		case EmitterShapeType::SPHERE_SURFACE:
-		{
-			ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
-			if (static_cast<EmitterShapeType>(emitter_.shapeType) == EmitterShapeType::SPHERE_SURFACE) {
-				ImGui::Text("表面のみ - 球の表面で生成");
-			} else {
-				ImGui::Text("内部 - 球の内部で生成");
-			}
-			break;
+		break;
+	}
+
+	case EmitterShapeType::SPHERE:
+	{
+		ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
+		if (emitter_.spawnOnEdge) {
+			ImGui::Text("エッジモード - 球の表面のみで生成");
 		}
-		
-		case EmitterShapeType::BOX_VOLUME:
-		{
-			ImGui::DragFloat3("箱のサイズ", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("内部 - 箱の内部で生成");
-			break;
+		else {
+			ImGui::Text("球の内部で生成");
 		}
-		
-		case EmitterShapeType::BOX_SURFACE:
-		{
-			ImGui::DragFloat3("箱のサイズ", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("表面のみ - 箱の表面で生成");
-			break;
+		break;
+	}
+
+	case EmitterShapeType::BOX:
+	{
+		ImGui::DragFloat3("箱のサイズ", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
+		if (emitter_.spawnOnEdge) {
+			ImGui::Text("エッジモード - 箱の辺上のみで生成");
 		}
-		
-		case EmitterShapeType::RING_XZ:
-		{
-			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("XZ平面のリング (水平)");
-			// Ensure inner radius is not larger than outer radius
-			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
-				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
-			}
-			break;
+		else {
+			ImGui::Text("箱の内部で生成");
 		}
-		
-		case EmitterShapeType::RING_XY:
-		{
-			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("XY平面のリング (垂直・前向き)");
-			// Ensure inner radius is not larger than outer radius
-			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
-				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
-			}
-			break;
+		break;
+	}
+
+	case EmitterShapeType::PLANE:
+	{
+		ImGui::DragFloat3("平面のサイズ", &emitter_.size.x, 0.01f, 0.01f, 100.0f);
+		ImGui::DragFloat3("平面法線", &emitter_.planeNormal.x, 0.01f);
+		// Normalize normal vector
+		float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x +
+			emitter_.planeNormal.y * emitter_.planeNormal.y +
+			emitter_.planeNormal.z * emitter_.planeNormal.z);
+		if (normalLength > 0.001f) {
+			emitter_.planeNormal.x /= normalLength;
+			emitter_.planeNormal.y /= normalLength;
+			emitter_.planeNormal.z /= normalLength;
 		}
-		
-		case EmitterShapeType::RING_YZ:
-		{
-			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::Text("YZ平面のリング (垂直・右向き)");
-			// Ensure inner radius is not larger than outer radius
-			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
-				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
-			}
-			break;
+		if (emitter_.spawnOnEdge) {
+			ImGui::Text("エッジモード - 平面の境界線上のみで生成");
 		}
-		
-		case EmitterShapeType::CONE_VOLUME:
-		{
-			ImGui::DragFloat("円錐角度", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat("円錐高さ", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("円錐方向", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("内部 - 円錐の内部で生成");
-			// Normalize direction vector
-			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
-			                      emitter_.coneDirection.y * emitter_.coneDirection.y + 
-			                      emitter_.coneDirection.z * emitter_.coneDirection.z);
-			if (dirLength > 0.001f) {
-				emitter_.coneDirection.x /= dirLength;
-				emitter_.coneDirection.y /= dirLength;
-				emitter_.coneDirection.z /= dirLength;
-			}
-			break;
+		else {
+			ImGui::Text("平面内の任意の位置で生成");
 		}
-		
-		case EmitterShapeType::CONE_SURFACE:
-		{
-			ImGui::DragFloat("円錐角度", &emitter_.coneAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat("円錐高さ", &emitter_.coneHeight, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("円錐方向", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("表面のみ - 円錐の表面で生成");
-			// Normalize direction vector
-			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
-			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
-			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
-			if (dirLength > 0.001f) {
-				emitter_.coneDirection.x /= dirLength;
-				emitter_.coneDirection.y /= dirLength;
-				emitter_.coneDirection.z /= dirLength;
-			}
-			break;
+		break;
+	}
+
+	case EmitterShapeType::RING:
+	{
+		ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
+		ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
+		ImGui::DragFloat3("リング法線", &emitter_.planeNormal.x, 0.01f);
+		// Ensure inner radius is not larger than outer radius
+		if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
+			emitter_.ringInnerRadius = emitter_.ringOuterRadius;
 		}
-		
-		case EmitterShapeType::HEMISPHERE_VOLUME:
-		{
-			ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
-			ImGui::DragFloat("半球角度", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat3("方向", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("内部 - 半球の内部で生成");
-			// Normalize direction vector
-			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
-			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
-			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
-			if (dirLength > 0.001f) {
-				emitter_.coneDirection.x /= dirLength;
-				emitter_.coneDirection.y /= dirLength;
-				emitter_.coneDirection.z /= dirLength;
-			}
-			break;
+		// Normalize normal vector
+		float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x +
+			emitter_.planeNormal.y * emitter_.planeNormal.y +
+			emitter_.planeNormal.z * emitter_.planeNormal.z);
+		if (normalLength > 0.001f) {
+			emitter_.planeNormal.x /= normalLength;
+			emitter_.planeNormal.y /= normalLength;
+			emitter_.planeNormal.z /= normalLength;
 		}
-		
-		case EmitterShapeType::HEMISPHERE_SURFACE:
-		{
-			ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
-			ImGui::DragFloat("半球角度", &emitter_.hemisphereAngle, 1.0f, 0.0f, 180.0f);
-			ImGui::DragFloat3("方向", &emitter_.coneDirection.x, 0.01f);
-			ImGui::Text("表面のみ - 半球の表面で生成");
-			// Normalize direction vector
-			float dirLength = sqrt(emitter_.coneDirection.x * emitter_.coneDirection.x + 
-			                       emitter_.coneDirection.y * emitter_.coneDirection.y + 
-			                       emitter_.coneDirection.z * emitter_.coneDirection.z);
-			if (dirLength > 0.001f) {
-				emitter_.coneDirection.x /= dirLength;
-				emitter_.coneDirection.y /= dirLength;
-				emitter_.coneDirection.z /= dirLength;
-			}
-			break;
+		if (emitter_.spawnOnEdge) {
+			ImGui::Text("エッジモード - リングの円周上のみで生成");
 		}
-		
-		case EmitterShapeType::PLANE_ANGLE:
-		{
-			ImGui::DragFloat("平面幅", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat("平面高さ", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat3("平面法線", &emitter_.planeNormal.x, 0.01f);
-			ImGui::Text("範囲 - 平面上で生成");
-			// Normalize normal vector
-			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
-			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
-			                         emitter_.planeNormal.z * emitter_.planeNormal.z);
-			if (normalLength > 0.001f) {
-				emitter_.planeNormal.x /= normalLength;
-				emitter_.planeNormal.y /= normalLength;
-				emitter_.planeNormal.z /= normalLength;
-			}
-			break;
+		else {
+			ImGui::Text("リング範囲内の任意の位置で生成");
 		}
-		
-		case EmitterShapeType::PLANE_ANGLE_EDGE:
-		{
-			ImGui::DragFloat("平面幅", &emitter_.planeWidth, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat("平面高さ", &emitter_.planeHeight, 0.01f, 0.01f, 100.0f);
-			ImGui::DragFloat3("平面法線", &emitter_.planeNormal.x, 0.01f);
-			ImGui::Text("エッジのみ - 平面のエッジで生成");
-			// Normalize normal vector
-			float normalLength = sqrt(emitter_.planeNormal.x * emitter_.planeNormal.x + 
-			                         emitter_.planeNormal.y * emitter_.planeNormal.y + 
-			                         emitter_.planeNormal.z * emitter_.planeNormal.z);
-			if (normalLength > 0.001f) {
-				emitter_.planeNormal.x /= normalLength;
-				emitter_.planeNormal.y /= normalLength;
-				emitter_.planeNormal.z /= normalLength;
-			}
-			break;
-		}
-		
-		case EmitterShapeType::RING_ANGLE:
-		{
-			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("リング法線", &emitter_.ringNormal.x, 0.01f);
-			ImGui::DragFloat("リング角度", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
-			ImGui::Text("範囲 - リング範囲内で生成");
-			// Ensure inner radius is not larger than outer radius
-			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
-				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
-			}
-			// Normalize normal vector
-			float normalLength = sqrt(emitter_.ringNormal.x * emitter_.ringNormal.x + 
-			                         emitter_.ringNormal.y * emitter_.ringNormal.y + 
-			                         emitter_.ringNormal.z * emitter_.ringNormal.z);
-			if (normalLength > 0.001f) {
-				emitter_.ringNormal.x /= normalLength;
-				emitter_.ringNormal.y /= normalLength;
-				emitter_.ringNormal.z /= normalLength;
-			}
-			break;
-		}
-		
-		case EmitterShapeType::RING_ANGLE_EDGE:
-		{
-			ImGui::DragFloat("内側半径", &emitter_.ringInnerRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat("外側半径", &emitter_.ringOuterRadius, 0.01f, 0.0f, 100.0f);
-			ImGui::DragFloat3("リング法線", &emitter_.ringNormal.x, 0.01f);
-			ImGui::DragFloat("リング角度", &emitter_.ringAngle, 1.0f, 0.0f, 360.0f);
-			ImGui::Text("エッジのみ - リングの円周上で生成");
-			// Ensure inner radius is not larger than outer radius
-			if (emitter_.ringInnerRadius > emitter_.ringOuterRadius) {
-				emitter_.ringInnerRadius = emitter_.ringOuterRadius;
-			}
-			// Normalize normal vector
-			float normalLength = sqrt(emitter_.ringNormal.x * emitter_.ringNormal.x + 
-			                         emitter_.ringNormal.y * emitter_.ringNormal.y + 
-			                         emitter_.ringNormal.z * emitter_.ringNormal.z);
-			if (normalLength > 0.001f) {
-				emitter_.ringNormal.x /= normalLength;
-				emitter_.ringNormal.y /= normalLength;
-				emitter_.ringNormal.z /= normalLength;
-			}
-			break;
-		}
+		break;
+	}
 	}
 
 	ImGui::Separator();
@@ -695,7 +586,7 @@ void Particles::CreateParticleResource() {
 	//----------------------------------------------------------------//
 
 	// freeListIndex u1
-    D3D12_RESOURCE_DESC counterDesc2 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(int32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	D3D12_RESOURCE_DESC counterDesc2 = CD3DX12_RESOURCE_DESC::Buffer(sizeof(int32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
 	device_->CreateCommittedResource(
 		&heapProp, D3D12_HEAP_FLAG_NONE, &counterDesc2,
@@ -778,7 +669,7 @@ void Particles::CreateParticleResource() {
 	csEmitterDesc.CS = { csEmitterBlob->GetBufferPointer(), csEmitterBlob->GetBufferSize() };
 	device_->CreateComputePipelineState(&csEmitterDesc, IID_PPV_ARGS(&csEmitterPipelineState_));
 
-	// --- 動作用CS（EmitterParticle.CS.hlsl） ---
+	// --- 動用途CS（EmitterParticle.CS.hlsl） ---
 	ComPtr<IDxcBlob> csUpdateBlob = dxCommon_->CompileShader(L"resources/shaders/Particles/UpdateParticle.CS.hlsl", L"cs_6_0");
 	D3D12_COMPUTE_PIPELINE_STATE_DESC csUpdateDesc = {};
 	csUpdateDesc.pRootSignature = csRootSignature_.Get();
@@ -858,9 +749,9 @@ void Particles::UpdateParticle() {
 	commandList_->Dispatch(1, 1, 1);
 
 	D3D12_RESOURCE_BARRIER bs[] = {
-    CD3DX12_RESOURCE_BARRIER::UAV(particleBufferResource_.Get()),
-    CD3DX12_RESOURCE_BARRIER::UAV(freeListIndexResource_.Get()),
-    CD3DX12_RESOURCE_BARRIER::UAV(freeListResource_.Get()),
+	CD3DX12_RESOURCE_BARRIER::UAV(particleBufferResource_.Get()),
+	CD3DX12_RESOURCE_BARRIER::UAV(freeListIndexResource_.Get()),
+	CD3DX12_RESOURCE_BARRIER::UAV(freeListResource_.Get()),
 	};
 	commandList_->ResourceBarrier(_countof(bs), bs);
 
@@ -908,23 +799,24 @@ void Particles::UpdateEmitter() {
 	if (emitter_.frequency <= emitter_.frequencyTime) {
 		emitter_.frequencyTime = 0.0f;
 		emitter_.emit = true;
-	} else {
+	}
+	else {
 		emitter_.emit = false;
 	}
 
 	emitter_.kMaxParticle = kMaxParticles_;
 	emitter_.translate = emitter_.translate + offset_;
-	
+
 	// BlendModeをuint32_tに変換してGPU構造体に格納
 	emitter_.blendModeValue = static_cast<uint32_t>(emitter_.blendMode);
 
 	// EmitterStateをマップしてGPU互換部分のみをコピー
 	EmitterStateGPU* mappedEmitter = nullptr;
 	emitterResource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedEmitter));
-	
+
 	// PODデータ（EmitterStateGPU）のみをコピー
 	memcpy(mappedEmitter, static_cast<EmitterStateGPU*>(&emitter_), sizeof(EmitterStateGPU));
-	
+
 	// Unmapを追加（リソースリークを防ぐ）
 	emitterResource_->Unmap(0, nullptr);
 }
@@ -1035,12 +927,13 @@ void Particles::SaveToJson(const std::string& filePath) {
 	// ディレクトリが存在しない場合は作成
 	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
 	std::filesystem::path directory = fullPath.parent_path();
-	
+
 	if (!directory.empty() && !std::filesystem::exists(directory)) {
 		try {
 			std::filesystem::create_directories(directory);
 			printf("[INFO] Created directory: %s\n", directory.string().c_str());
-		} catch (const std::filesystem::filesystem_error& e) {
+		}
+		catch (const std::filesystem::filesystem_error& e) {
 			printf("[ERROR] Failed to create directory: %s\n", e.what());
 			return;
 		}
@@ -1054,8 +947,8 @@ void Particles::SaveToJson(const std::string& filePath) {
 	jsonManager_->RegistOutput(emitter_.count, "count");
 	jsonManager_->RegistOutput(emitter_.frequency, "frequency");
 	jsonManager_->RegistOutput(emitter_.frequencyTime, "frequencyTime");
-	jsonManager_->RegistOutput(Vector2{emitter_.startScale.x, emitter_.startScale.y}, "startScale");
-	jsonManager_->RegistOutput(Vector2{emitter_.endScale.x, emitter_.endScale.y}, "endScale");
+	jsonManager_->RegistOutput(Vector2{ emitter_.startScale.x, emitter_.startScale.y }, "startScale");
+	jsonManager_->RegistOutput(Vector2{ emitter_.endScale.x, emitter_.endScale.y }, "endScale");
 	jsonManager_->RegistOutput(emitter_.scaleFade, "scaleFade");
 	jsonManager_->RegistOutput(emitter_.scaleRandom, "scaleRandom");
 	jsonManager_->RegistOutput(emitter_.minScale, "minScale");
@@ -1090,15 +983,9 @@ void Particles::SaveToJson(const std::string& filePath) {
 	jsonManager_->RegistOutput(emitter_.lineLength, "lineLength");
 	jsonManager_->RegistOutput(emitter_.ringInnerRadius, "ringInnerRadius");
 	jsonManager_->RegistOutput(emitter_.ringOuterRadius, "ringOuterRadius");
-	jsonManager_->RegistOutput(emitter_.coneAngle, "coneAngle");
-	jsonManager_->RegistOutput(emitter_.coneHeight, "coneHeight");
-	jsonManager_->RegistOutput(emitter_.coneDirection, "coneDirection");
-	jsonManager_->RegistOutput(emitter_.hemisphereAngle, "hemisphereAngle");
 	jsonManager_->RegistOutput(emitter_.planeNormal, "planeNormal");
-	jsonManager_->RegistOutput(emitter_.planeWidth, "planeWidth");
-	jsonManager_->RegistOutput(emitter_.planeHeight, "planeHeight");
-	jsonManager_->RegistOutput(emitter_.ringAngle, "ringAngle");
-	jsonManager_->RegistOutput(emitter_.ringNormal, "ringNormal");
+	jsonManager_->RegistOutput(emitter_.spawnOnEdge, "spawnOnEdge");
+	jsonManager_->RegistOutput(emitter_.enableVisualization, "enableVisualization");
 	jsonManager_->RegistOutput(emitter_.useGravity, "useGravity");
 	jsonManager_->RegistOutput(emitter_.gravityY, "gravityY");
 	jsonManager_->RegistOutput(emitter_.accelerationY, "accelerationY");
@@ -1113,12 +1000,13 @@ void Particles::CreateNewJsonFile(const std::string& filePath) {
 	// ディレクトリが存在しない場合は作成
 	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
 	std::filesystem::path directory = fullPath.parent_path();
-	
+
 	if (!directory.empty() && !std::filesystem::exists(directory)) {
 		try {
 			std::filesystem::create_directories(directory);
 			printf("[INFO] Created directory: %s\n", directory.string().c_str());
-		} catch (const std::filesystem::filesystem_error& e) {
+		}
+		catch (const std::filesystem::filesystem_error& e) {
 			printf("[ERROR] Failed to create directory: %s\n", e.what());
 			return;
 		}
@@ -1129,102 +1017,297 @@ void Particles::CreateNewJsonFile(const std::string& filePath) {
 }
 
 void Particles::LoadFromJson(const std::string& filePath) {
-	// JSONファイルから読み込み
-	auto values = jsonManager_->Read(filePath);
-	
-	if (values.empty()) {
-		printf("[WARNING] Failed to load JSON file: %s\n", filePath.c_str());
-		return;
-	}
+	try {
+		// JSONファイルから読み込み
+		auto values = jsonManager_->Read(filePath);
 
-	// 読み込んだ値をマップに変換して名前でアクセスしやすくする
-	std::unordered_map<std::string, std::shared_ptr<ValueBase>> valueMap;
-	for (const auto& value : values) {
-		// ValueBaseから名前を取得する方法が必要（JsonManagerの実装に依存）
-		// 仮定: valueには名前情報が含まれている
-	}
-
-	// 各フィールドを順番に取得して適用
-	size_t index = 0;
-	if (index < values.size()) emitter_.translate = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.radius = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.useEmitter = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.emit = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.count = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.frequency = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.frequencyTime = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) {
-		Vector2 startScale = JsonManager::Reverse<Vector2>(values[index++]);
-		emitter_.startScale.x = startScale.x;
-		emitter_.startScale.y = startScale.y;
-	}
-	if (index < values.size()) {
-		Vector2 endScale = JsonManager::Reverse<Vector2>(values[index++]);
-		emitter_.endScale.x = endScale.x;
-		emitter_.endScale.y = endScale.y;
-	}
-	if (index < values.size()) emitter_.scaleFade = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.scaleRandom = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minScale = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.maxScale = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.rotateMove = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.startRotateVelocity = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.endRotateVelocity = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.rotateVelocityRandom = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minRotateVelocity = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.maxRotateVelocity = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.alphaFade = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.colorFade = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.startColor = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.endColor = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.colorRandom = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minColor = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.maxColor = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.isMove = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.startVelocity = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.endVelocity = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.velocityRandom = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minVelocity = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.maxVelocity = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.normalVelocity = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.lifeTime = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.lifeTimeRandom = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.minLifeTime = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.maxLifeTime = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.shapeType = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.size = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.lineStart = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.lineLength = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringInnerRadius = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringOuterRadius = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.coneAngle = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.coneHeight = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.coneDirection = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.hemisphereAngle = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.planeNormal = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.planeWidth = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.planeHeight = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringAngle = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.ringNormal = JsonManager::Reverse<Vector3>(values[index++]);
-	if (index < values.size()) emitter_.useGravity = JsonManager::Reverse<uint32_t>(values[index++]);
-	if (index < values.size()) emitter_.gravityY = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.accelerationY = JsonManager::Reverse<float>(values[index++]);
-	if (index < values.size()) emitter_.blendMode = static_cast<BlendMode>(JsonManager::Reverse<uint32_t>(values[index++]));
-	if (index < values.size()) emitter_.texturePath = JsonManager::Reverse<std::string>(values[index++]);
-
-	// BlendModeを内部変数にも反映
-	blendMode_ = emitter_.blendMode;
-
-	// テクスチャパスが存在する場合、テクスチャを読み込む
-	if (!emitter_.texturePath.empty()) {
-		std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
-		if (textureName_ != newTextureName) {
-			textureName_ = newTextureName;
-			TextureManager::GetInstance()->LoadTexture(textureName_);
-			textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+		if (values.empty()) {
+			printf("[WARNING] Failed to load JSON file or file is empty: %s\n", filePath.c_str());
+			printf("[INFO] Using default emitter settings.\n");
+			return; // 早期リターン
 		}
+
+		// 各フィールドを順番に取得して適用（try-catchで保護）
+		size_t index = 0;
+
+		try {
+			if (index < values.size()) emitter_.translate = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.radius = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.useEmitter = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.emit = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.count = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.frequency = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.frequencyTime = JsonManager::Reverse<float>(values[index++]);
+
+			if (index < values.size()) {
+				Vector2 startScale = JsonManager::Reverse<Vector2>(values[index++]);
+				emitter_.startScale.x = startScale.x;
+				emitter_.startScale.y = startScale.y;
+			}
+			if (index < values.size()) {
+				Vector2 endScale = JsonManager::Reverse<Vector2>(values[index++]);
+				emitter_.endScale.x = endScale.x;
+				emitter_.endScale.y = endScale.y;
+			}
+
+			if (index < values.size()) emitter_.scaleFade = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.scaleRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.minScale = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.maxScale = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.rotateMove = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.startRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.endRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.rotateVelocityRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.minRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.maxRotateVelocity = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.alphaFade = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.colorFade = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.startColor = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.endColor = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.colorRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.minColor = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.maxColor = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.isMove = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.startVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.endVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.velocityRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.minVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.maxVelocity = JsonManager::Reverse<Vector3>(values[index++]); // ✅ Fixed
+			if (index < values.size()) emitter_.normalVelocity = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.lifeTime = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.lifeTimeRandom = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.minLifeTime = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.maxLifeTime = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.shapeType = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.size = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.lineStart = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.lineLength = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.ringInnerRadius = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.ringOuterRadius = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.planeNormal = JsonManager::Reverse<Vector3>(values[index++]);
+			if (index < values.size()) emitter_.spawnOnEdge = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.enableVisualization = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.useGravity = JsonManager::Reverse<uint32_t>(values[index++]);
+			if (index < values.size()) emitter_.gravityY = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.accelerationY = JsonManager::Reverse<float>(values[index++]);
+			if (index < values.size()) emitter_.blendMode = static_cast<BlendMode>(JsonManager::Reverse<uint32_t>(values[index++]));
+
+			// texturePath は最後に取得（例外が発生しやすい）
+			if (index < values.size()) {
+				std::string tempPath = JsonManager::Reverse<std::string>(values[index++]);
+				if (!tempPath.empty() && tempPath.length() < 256) { // サイズチェック
+					emitter_.texturePath = tempPath;
+				}
+				else {
+					printf("[WARNING] Invalid texture path in JSON, using default.\n");
+					emitter_.texturePath = "circle";
+				}
+			}
+		}
+		catch (const std::length_error& e) {
+			printf("[ERROR] Length error while parsing JSON: %s\n", e.what());
+			printf("[INFO] Partially loaded settings. Some fields may use default values.\n");
+			// 部分的にロードされた状態で続行
+		}
+		catch (const std::exception& e) {
+			printf("[ERROR] Error while parsing JSON field at index %zu: %s\n", index, e.what());
+			printf("[INFO] Using default values for remaining fields.\n");
+		}
+
+		// BlendModeを内部変数にも反映
+		blendMode_ = emitter_.blendMode;
+
+		// テクスチャパスが存在する場合、テクスチャを読み込む
+		if (!emitter_.texturePath.empty()) {
+			try {
+				std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
+				if (textureName_ != newTextureName) {
+					textureName_ = newTextureName;
+					TextureManager::GetInstance()->LoadTexture(textureName_);
+					textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+				}
+			}
+			catch (const std::exception& e) {
+				printf("[ERROR] Failed to load texture '%s': %s\n", emitter_.texturePath.c_str(), e.what());
+				printf("[INFO] Using default texture.\n");
+			}
+		}
+
+		loadToSaveName_ = filePath;
+		isJsonLoaded_ = true;
+
+	}
+	catch (const std::exception& e) {
+		printf("[ERROR] Critical error in LoadFromJson: %s\n", e.what());
+		printf("[INFO] Using default emitter settings.\n");
+		// デフォルト値はInitialize関数で既に設定済み
+	}
+}
+
+void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
+	if (!line3d || !emitter_.enableVisualization) return;
+
+	Vector3 emitterPos = emitter_.translate + offset_;
+
+	switch (static_cast<EmitterShapeType>(emitter_.shapeType)) {
+	case EmitterShapeType::POINT:
+	{
+		// 点を小さな球で表現
+		line3d->AddPoint(emitterPos, color);
+		break;
 	}
 
-	loadToSaveName_ = filePath;
-	isJsonLoaded_ = true;
+	case EmitterShapeType::LINE:
+	{
+		// 線分を描画
+		Vector3 start = {
+			emitterPos.x + emitter_.lineStart.x,
+			emitterPos.y + emitter_.lineStart.y,
+			emitterPos.z + emitter_.lineStart.z
+		};
+		Vector3 direction = Normalize(emitter_.size);
+		Vector3 end = {
+			start.x + direction.x * emitter_.lineLength,
+			start.y + direction.y * emitter_.lineLength,
+			start.z + direction.z * emitter_.lineLength
+		};
+		line3d->AddLine(start, end, color);
+
+		// エッジモードの場合、端点を強調表示
+		if (emitter_.spawnOnEdge) {
+			line3d->AddPoint(start, { 1.0f, 0.0f, 0.0f, 1.0f }); // 赤
+			line3d->AddPoint(end, { 1.0f, 0.0f, 0.0f, 1.0f });   // 赤
+		}
+		break;
+	}
+
+	case EmitterShapeType::SPHERE:
+	{
+		// 球を描画
+		Sphere sphere = { emitterPos, emitter_.radius };
+		line3d->AddSphere(sphere, color);
+
+		// エッジモード（表面のみ）の場合、色を変える
+		if (emitter_.spawnOnEdge) {
+			// 複数の円を描画して表面を強調
+			line3d->AddCircle(emitterPos, emitter_.radius, { 1.0f, 0.0f, 0.0f }, color);
+			line3d->AddCircle(emitterPos, emitter_.radius, { 0.0f, 1.0f, 0.0f }, color);
+			line3d->AddCircle(emitterPos, emitter_.radius, { 0.0f, 0.0f, 1.0f }, color);
+		}
+		break;
+	}
+
+	case EmitterShapeType::BOX:
+	{
+		// 箱を描画
+		line3d->AddBox(emitterPos, emitter_.size, color);
+
+		// エッジモードの場合、辺を強調表示
+		if (emitter_.spawnOnEdge) {
+			// 12本の辺を太く表示するために、もう一度描画
+			line3d->AddBox(emitterPos, emitter_.size, { 1.0f, 0.5f, 0.0f, 1.0f });
+		}
+		break;
+	}
+
+	case EmitterShapeType::PLANE:
+	{
+		// 平面の向きから接線ベクトルを計算
+		Vector3 tangent;
+		Vector3 bitangent;
+
+		if (std::abs(emitter_.planeNormal.x) < 0.9f) {
+			tangent = Normalize(Cross({ 1.0f, 0.0f, 0.0f }, emitter_.planeNormal));
+		}
+		else {
+			tangent = Normalize(Cross({ 0.0f, 1.0f, 0.0f }, emitter_.planeNormal));
+		}
+		bitangent = Normalize(Cross(emitter_.planeNormal, tangent));
+
+		// 平面の4隅の頂点を計算
+		float halfWidth = emitter_.size.x * 0.5f;
+		float halfHeight = emitter_.size.y * 0.5f;
+
+		Vector3 corners[4] = {
+			{ emitterPos.x + tangent.x * (-halfWidth) + bitangent.x * (-halfHeight),
+			  emitterPos.y + tangent.y * (-halfWidth) + bitangent.y * (-halfHeight),
+			  emitterPos.z + tangent.z * (-halfWidth) + bitangent.z * (-halfHeight) },
+			{ emitterPos.x + tangent.x * halfWidth + bitangent.x * (-halfHeight),
+			  emitterPos.y + tangent.y * halfWidth + bitangent.y * (-halfHeight),
+			  emitterPos.z + tangent.z * halfWidth + bitangent.z * (-halfHeight) },
+			{ emitterPos.x + tangent.x * halfWidth + bitangent.x * halfHeight,
+			  emitterPos.y + tangent.y * halfWidth + bitangent.y * halfHeight,
+			  emitterPos.z + tangent.z * halfWidth + bitangent.z * halfHeight },
+			{ emitterPos.x + tangent.x * (-halfWidth) + bitangent.x * halfHeight,
+			  emitterPos.y + tangent.y * (-halfWidth) + bitangent.y * halfHeight,
+			  emitterPos.z + tangent.z * (-halfWidth) + bitangent.z * halfHeight }
+		};
+
+		// 境界線を描画
+		line3d->AddLine(corners[0], corners[1], color);
+		line3d->AddLine(corners[1], corners[2], color);
+		line3d->AddLine(corners[2], corners[3], color);
+		line3d->AddLine(corners[3], corners[0], color);
+
+		// エッジモードでない場合、内部のグリッドを描画
+		if (!emitter_.spawnOnEdge) {
+			// 対角線を追加して平面を示す
+			line3d->AddLine(corners[0], corners[2], Vector4{ color.x * 0.5f, color.y * 0.5f, color.z * 0.5f, color.w });
+			line3d->AddLine(corners[1], corners[3], Vector4{ color.x * 0.5f, color.y * 0.5f, color.z * 0.5f, color.w });
+		}
+
+		// 法線ベクトルを表示
+		Vector3 normalEnd = {
+			emitterPos.x + emitter_.planeNormal.x * 2.0f,
+			emitterPos.y + emitter_.planeNormal.y * 2.0f,
+			emitterPos.z + emitter_.planeNormal.z * 2.0f
+		};
+		line3d->AddLine(emitterPos, normalEnd, { 0.0f, 1.0f, 1.0f, 1.0f }); // シアン色で法線表示
+		break;
+	}
+
+	case EmitterShapeType::RING:
+	{
+		// 内側と外側の円を描画
+		line3d->AddCircle(emitterPos, emitter_.ringInnerRadius, emitter_.planeNormal, color);
+		line3d->AddCircle(emitterPos, emitter_.ringOuterRadius, emitter_.planeNormal, color);
+
+		// エッジモードでない場合、リング範囲を示す線を追加
+		if (!emitter_.spawnOnEdge) {
+			// 接線ベクトルを計算
+			Vector3 tangent;
+			if (std::abs(emitter_.planeNormal.x) < 0.9f) {
+				tangent = Normalize(Cross({ 1.0f, 0.0f, 0.0f }, emitter_.planeNormal));
+			}
+			else {
+				tangent = Normalize(Cross({ 0.0f, 1.0f, 0.0f }, emitter_.planeNormal));
+			}
+
+			// 4方向に半径線を描画してリング範囲を示す
+			for (int i = 0; i < 4; i++) {
+				float angle = std::numbers::pi_v<float> *0.5f * i;
+				Vector3 bitangent = Normalize(Cross(emitter_.planeNormal, tangent));
+				Vector3 dir = {
+					tangent.x * std::cos(angle) + bitangent.x * std::sin(angle),
+					tangent.y * std::cos(angle) + bitangent.y * std::sin(angle),
+					tangent.z * std::cos(angle) + bitangent.z * std::sin(angle)
+				};
+
+				Vector3 innerPoint = {
+					emitterPos.x + dir.x * emitter_.ringInnerRadius,
+					emitterPos.y + dir.y * emitter_.ringInnerRadius,
+					emitterPos.z + dir.z * emitter_.ringInnerRadius
+				};
+				Vector3 outerPoint = {
+					emitterPos.x + dir.x * emitter_.ringOuterRadius,
+					emitterPos.y + dir.y * emitter_.ringOuterRadius,
+					emitterPos.z + dir.z * emitter_.ringOuterRadius
+				};
+
+				line3d->AddLine(innerPoint, outerPoint, Vector4{ color.x * 0.5f, color.y * 0.5f, color.z * 0.5f, color.w });
+			}
+		}
+		break;
+	}
+	}
 }

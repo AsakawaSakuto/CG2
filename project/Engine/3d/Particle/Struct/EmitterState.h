@@ -8,23 +8,12 @@
 /// Emitterの形状タイプ
 /// </summary>
 enum class EmitterShapeType : uint32_t {
-	POINT = 0,
-	LINE = 1,
-	SPHERE_VOLUME = 2,
-	SPHERE_SURFACE = 3,
-	BOX_VOLUME = 4,
-	BOX_SURFACE = 5,
-	RING_XZ = 6,
-	RING_XY = 7,
-	RING_YZ = 8,
-	CONE_VOLUME = 9,
-	CONE_SURFACE = 10,
-	HEMISPHERE_VOLUME = 11,
-	HEMISPHERE_SURFACE = 12,
-	PLANE_ANGLE = 13,
-	PLANE_ANGLE_EDGE = 14,
-	RING_ANGLE = 15,
-	RING_ANGLE_EDGE = 16
+	POINT = 0,   // 点
+	LINE = 1,    // 線
+	SPHERE = 2,  // 球
+	BOX = 3,     // 箱
+	PLANE = 4,   // 平面
+	RING = 5,    // リング
 };
 
 /// <summary>
@@ -33,7 +22,7 @@ enum class EmitterShapeType : uint32_t {
 struct EmitterStateGPU {
 	Vector3 translate;
 	float radius;
-	
+
 	uint32_t useEmitter;
 	uint32_t emit;
 	uint32_t count;
@@ -83,7 +72,7 @@ struct EmitterStateGPU {
 
 	uint32_t isMove;
 	float pad13[3];
-	
+
 	Vector3 startVelocity;
 	float pad14;
 
@@ -105,33 +94,28 @@ struct EmitterStateGPU {
 	uint32_t lifeTimeRandom;
 	float minLifeTime;
 	float maxLifeTime;
-	
+
 	uint32_t shapeType;
 	Vector3 size;
-	
+
 	Vector3 lineStart;
 	float lineLength;
-	
+
 	float ringInnerRadius;
 	float ringOuterRadius;
-	
-	float coneAngle;
-	float coneHeight;
-	Vector3 coneDirection;
-	float hemisphereAngle;
-	
+	float pad21[2];
+
 	Vector3 planeNormal;
-	float planeWidth;
-	float planeHeight;
-	float ringAngle;
-	Vector3 ringNormal;
-	
+	float pad22;
+
+	uint32_t spawnOnEdge;      // エッジ上に生成するか (0: 内部/表面全体, 1: エッジのみ)
+	uint32_t enableVisualization; // 可視化を有効にするか (0: 無効, 1: 有効)
 	uint32_t useGravity;
+	uint32_t blendModeValue; // BlendModeをuint32_tとして格納
+
 	float gravityY;
 	float accelerationY;
-	
-	uint32_t blendModeValue; // BlendModeをuint32_tとして格納
-	float pad20[3];
+	float pad23[2];
 };
 
 /// <summary>
