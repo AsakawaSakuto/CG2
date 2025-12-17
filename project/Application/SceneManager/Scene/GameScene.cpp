@@ -71,13 +71,13 @@ void GameScene::Initialize() {
 
 	// HPゲージの初期化
 	hpGauge_ = make_unique<Gauge>();
-	hpGauge_->Initialize(&ctx_->dxCommon, { 38.0f, 21.0f }, { 125.0f, 20.0f }, static_cast<float>(player_->GetMaxHP()));
+	hpGauge_->Initialize(&ctx_->dxCommon);
 	hpGauge_->SetGaugeColor({ 0.0f, 1.0f, 0.0f, 1.0f }); // 緑色
 	hpGauge_->SetBackgroundColor({ 0.3f, 0.0f, 0.0f, 1.0f }); // 暗い赤
 
 	// 経験値ゲージの初期化
 	expGauge_ = make_unique<Gauge>();
-	expGauge_->Initialize(&ctx_->dxCommon, { 0.0f, 670.0f }, { 427.0f, 20.0f }, static_cast<float>(player_->GetExpToNextLevel()));
+	expGauge_->Initialize(&ctx_->dxCommon);
 	expGauge_->SetGaugeColor({ 0.0f, 0.8f, 1.0f, 1.0f }); // シアン色
 	expGauge_->SetBackgroundColor({ 0.1f, 0.1f, 0.3f, 1.0f }); // 暗い青
 
@@ -140,13 +140,8 @@ void GameScene::Update() {
 	playerLv_->Update();*/
 
 	// ゲージの更新
-	hpGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentHP()));
-	hpGauge_->SetMaxValue(static_cast<float>(player_->GetMaxHP()));
-	hpGauge_->Update();
-
-	expGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentExp()));
-	expGauge_->SetMaxValue(static_cast<float>(player_->GetExpToNextLevel()));
-	expGauge_->Update();
+	hpGauge_->Update(player_->GetCurrentHP(), player_->GetMaxHP());
+	expGauge_->Update(player_->GetCurrentExp(), player_->GetExpToNextLevel());
 }
 
 void GameScene::Draw() {

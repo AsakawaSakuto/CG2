@@ -114,7 +114,7 @@ private:
 	Transform2D uvTransform_ = {};
 
 	Vector2 size_ = {};
-	Vector2 anchorPoint = { 0.5f,0.5f };
+	Vector2 anchorPoint_ = { 0.5f,0.5f };
 
 	std::string textureName_;
 

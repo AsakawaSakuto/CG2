@@ -205,6 +205,14 @@
     <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonInput.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\JsonManager.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ConsoleWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\HierarchyWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiDebugSystem.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiHelper.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\InspectorWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\SceneViewWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\StatsWindow.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -307,6 +315,14 @@
     <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonInput.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\JsonManager.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ConsoleWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\HierarchyWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiDebugSystem.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiHelper.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiManager.h" />
+    <ClInclude Include="Engine\Utility\ImGui\InspectorWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\SceneViewWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\StatsWindow.h" />
     <ClInclude Include="Engine\Utility\Light\DirectionalLight.h" />
     <ClInclude Include="Engine\Core\DirectXCommon\DirectXCommon.h" />
     <ClInclude Include="Engine\Utility\Easing\Easing.h" />
@@ -402,6 +418,9 @@
     <None Include="docs\JsonManager_Usage.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
+    <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
+    <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
+    <None Include="Engine\Utility\ImGui\README.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="resources\shaders\Model\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

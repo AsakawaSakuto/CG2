@@ -3,6 +3,7 @@
 #include"SceneManager/IScene.h"
 #include"Utility/Collision/Type/OBB.h"
 #include"Utility/Collision/Type/OvalSphere.h"
+#include"2d/Gauge/Gauge.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -42,6 +43,10 @@ private:
 	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
 
 	unique_ptr<Line3d> testLine_ = make_unique<Line3d>();
+
+	unique_ptr<Gauge> testGauge_ = make_unique<Gauge>();
+	float currentGaugeValue_ = 0.0f;
+	float maxGaugeValue_ = 100.0f;
 
 	Transform cubeTransform_;
 	Transform spinCubeTransform_;

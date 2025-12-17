@@ -56,6 +56,8 @@ void TestScene::Initialize() {
 	testLine_->Initialize(&ctx_->dxCommon);
 
 	bitmapFont_.Initialize(&ctx_->dxCommon);
+
+    testGauge_->Initialize(&ctx_->dxCommon);
 }
 
 void TestScene::Update() {
@@ -126,6 +128,8 @@ void TestScene::Update() {
 	debugCamera_.Update();
 
     bitmapFont_.SetNumber(setValue_);
+
+    testGauge_->Update(currentGaugeValue_, maxGaugeValue_);
 }
 
 void TestScene::Draw() {
@@ -146,6 +150,8 @@ void TestScene::Draw() {
 	testSprite_->Draw();
 
 	bitmapFont_.Draw();
+
+	testGauge_->Draw();
 }
 
 void TestScene::DrawImGui() {
@@ -154,12 +160,11 @@ void TestScene::DrawImGui() {
     auto postEffect = ctx_->dxCommon.GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	testOBB_.DrawImGui("testOBB");
-    testAABB_.DrawImGui("testAABB");
-    testSphere_.DrawImGui("testSphere");
-    testOvalSphere_.DrawImGui("testOvalSphere");
-
-    testPlane_.DrawImGui("testPlane");
+	//testOBB_.DrawImGui("testOBB");
+    //testAABB_.DrawImGui("testAABB");
+    //testSphere_.DrawImGui("testSphere");
+    //testOvalSphere_.DrawImGui("testOvalSphere");
+    //testPlane_.DrawImGui("testPlane");
 
 	testParticle_->DrawImGui("testParticle");
 
@@ -169,9 +174,15 @@ void TestScene::DrawImGui() {
 
     ImGui::DragInt("Value", &setValue_, 1, 0, 999999);
 
+	ImGui::DragFloat("Test Float", &currentGaugeValue_, 0.1f, 0.0f, 100.0f);
+
+	ImGui::DragFloat("Max Float", &maxGaugeValue_, 0.1f, 1.0f, 1000.0f);
+
 	ImGui::End();
 
 	bitmapFont_.DrawImGui("bitmapFont");
+
+	testGauge_->DrawImGui("testGauge");
 
     //testSprite_->DrawImGui("testSprite");
 

@@ -368,7 +368,7 @@ void BitmapFont::DrawImGui(const char* name) {
 	ImGui::Begin(name);
 
 	// ファイル名入力
-	static char fileNameBuffer[256] = "temp";
+	static char fileNameBuffer[256] = "filePath";
 	strncpy_s(fileNameBuffer, loadToSaveName_.c_str(), sizeof(fileNameBuffer));
 	if (ImGui::InputText("ファイル名", fileNameBuffer, sizeof(fileNameBuffer))) {
 		loadToSaveName_ = fileNameBuffer;
@@ -485,5 +485,5 @@ void BitmapFont::LoadFromJson(const std::string& filePath) {
 		percentScale_ = JsonManager::Reverse<Vector2>(values[index++]);
 	}
 
-	loadToSaveName_ = filePath;
+	//loadToSaveName_ = filePath;
 }
