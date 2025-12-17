@@ -16,10 +16,10 @@ void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
 void TestScene::Initialize() {
     CleanupResources();
 	camera_.SetPosition({ 0.0f, 2.5f, -20.0f });
-	debugCamera_.SetInput(&ctx_->input);
+	debugCamera_.SetInput(ctx_->keyConfig.GetInput());
 	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
-	testParticle_->Initialize(&ctx_->dxCommon, 100);
+	testParticle_->Initialize(&ctx_->dxCommon, "temp");
 
 	testSprite_->Initialize(&ctx_->dxCommon, "icon/fireBall.png", { 64.0f,64.0f });
 
@@ -54,6 +54,8 @@ void TestScene::Initialize() {
 	testOvalSphere_.UpdateOrientation();
 
 	testLine_->Initialize(&ctx_->dxCommon);
+
+	bitmapFont_.Initialize(&ctx_->dxCommon);
 }
 
 void TestScene::Update() {
@@ -122,6 +124,8 @@ void TestScene::Update() {
     camera_ = debugCamera_;
 	camera_.Update();
 	debugCamera_.Update();
+
+    bitmapFont_.SetNumber(setValue_);
 }
 
 void TestScene::Draw() {
@@ -140,6 +144,8 @@ void TestScene::Draw() {
 	testParticle_->Draw(camera_);
 
 	testSprite_->Draw();
+
+	bitmapFont_.Draw();
 }
 
 void TestScene::DrawImGui() {
@@ -158,6 +164,14 @@ void TestScene::DrawImGui() {
 	testParticle_->DrawImGui("testParticle");
 
     debugCamera_.DrawImgui();
+
+	ImGui::Begin("Set Number");
+
+    ImGui::DragInt("Value", &setValue_, 1, 0, 999999);
+
+	ImGui::End();
+
+	bitmapFont_.DrawImGui("bitmapFont");
 
     //testSprite_->DrawImGui("testSprite");
 

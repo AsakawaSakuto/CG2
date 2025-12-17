@@ -2,8 +2,8 @@
 #include "Utility/Transform/Transform.h"
 #include "Math/Type/Matrix4x4.h"
 #include "Camera/Camera.h"
-#include "Input/Input.h"
-#include "Utility/Binary/BinaryManager.h"
+#include "KeyConfig/InputDevice/Input.h"
+#include "Utility/FileFormat/Binary/BinaryManager.h"
 
 class DebugCamera : public Camera {
 public:

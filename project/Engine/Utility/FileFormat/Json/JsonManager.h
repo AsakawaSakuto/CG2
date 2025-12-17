@@ -1,20 +1,20 @@
 #pragma once
 #include <memory>
-#include "Data/BinaryOutput.h"
-#include "Data/BinaryInput.h"
+#include "Data/JsonOutput.h"
+#include "Data/JsonInput.h"
 #include <string>
 #include <vector>
 
 //std::vectorと、std::stringやstd::vectorを含むクラス以外の型に対応
 
 /// <summary>
-/// Assets/Binの中身をバイナリ形式で色々するクラス
+/// Assets/Jsonの中身をJSON形式で色々するクラス
 /// </summary>
-class BinaryManager {
+class JsonManager {
 public:
 
-	BinaryManager();
-	~BinaryManager();
+	JsonManager();
+	~JsonManager();
 
 	template<typename T>
 	void RegistOutput(T value, std::string name = "") {
@@ -52,12 +52,13 @@ public:
 	std::string GetBasePath() const {
 		return basePath;
 	}
+
 private:
 
-	std::unique_ptr<BinaryInput> input;
-	std::unique_ptr<BinaryOutput> output;
+	std::unique_ptr<JsonInput> input;
+	std::unique_ptr<JsonOutput> output;
 	std::vector<std::shared_ptr<ValueBase>> values;
 
-	inline static std::string basePath = "resources/Binary/"; // データの保存先パス
+	std::string basePath = "resources/Data/Json/"; // データの保存先パス（インスタンスごと）
 
 };

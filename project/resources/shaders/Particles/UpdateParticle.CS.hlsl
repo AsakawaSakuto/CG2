@@ -11,7 +11,8 @@ ConstantBuffer<PerFrame> gPerFrame : register(b6);
 // 768以下
 [numthreads(512, 1, 1)]
 
-void main( uint3 DTid : SV_DispatchThreadID ) {
+void main(uint3 DTid : SV_DispatchThreadID)
+{
     uint particleIndex = DTid.x;
     if (particleIndex < gEmitter.kMaxParticle)
     {
@@ -39,7 +40,19 @@ void main( uint3 DTid : SV_DispatchThreadID ) {
                 }
 
                 gParticles[particleIndex].translate += delta;
-            } else {
+                
+                // 重力の適用
+                if (gEmitter.useGravity != 0)
+                {
+                    // 重力による加速度を速度に加算
+                    gParticles[particleIndex].velocity.y -= gEmitter.gravityY * gPerFrame.deltaTime;
+                    
+                    // 加速度による速度変化
+                    gParticles[particleIndex].velocity.y += gEmitter.accelerationY * gPerFrame.deltaTime;
+                }
+            }
+            else
+            {
                 // エミッタ自体の移動に追従
                 gParticles[particleIndex].translate = gEmitter.translate;
             }

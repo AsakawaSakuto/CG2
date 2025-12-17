@@ -10,11 +10,11 @@ void CollisionManager::Initialize(AppContext* ctx) {
 	ctx_ = ctx;
 
 	enemyDieParticle_->Initialize(&ctx_->dxCommon);
-	enemyDieParticle_->LoadBinary("EnemyDie");
+	enemyDieParticle_->LoadJson("EnemyDie");
 	enemyDieParticle_->Stop();
 
 	expItemGetParticle_->Initialize(&ctx_->dxCommon);
-	expItemGetParticle_->LoadBinary("expItemGet");
+	expItemGetParticle_->LoadJson("expItemGet");
 	expItemGetParticle_->Stop();
 }
 

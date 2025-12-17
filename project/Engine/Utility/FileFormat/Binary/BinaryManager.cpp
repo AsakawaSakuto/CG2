@@ -10,6 +10,10 @@ BinaryManager::~BinaryManager() {
 }
 
 void BinaryManager::Write(std::string fileName) {
+	// ファイル名に.bin拡張子がない場合は追加
+	if (fileName.size() < 4 || fileName.substr(fileName.size() - 4) != ".bin") {
+		fileName += ".bin";
+	}
 
 	std::ofstream file(basePath + fileName, std::ios::binary);
 
@@ -27,6 +31,10 @@ void BinaryManager::Write(std::string fileName) {
 }
 
 std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName) {
+	// ファイル名に.bin拡張子がない場合は追加
+	if (fileName.size() < 4 || fileName.substr(fileName.size() - 4) != ".bin") {
+		fileName += ".bin";
+	}
 
 	std::ifstream file(basePath + fileName, std::ios::binary);
 	if (!file.is_open()) {

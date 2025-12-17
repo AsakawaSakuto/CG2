@@ -8,7 +8,7 @@ void EnemyManager::Initialize(AppContext* ctx) {
 
 	dieParticle_ = std::make_unique<Particles>();
 	dieParticle_->Initialize(&ctx_->dxCommon);
-	dieParticle_->LoadBinary("EnemyDie");
+	dieParticle_->LoadJson("EnemyDie");
 }
 
 void EnemyManager::Update() {
@@ -60,11 +60,11 @@ void EnemyManager::Update() {
 		enemy->Update();
 	}
 
-	if (ctx_->input.TriggerKey(DIK_P)) {
+	/*if (ctx_->input.TriggerKey(DIK_P)) {
 		for (auto& expItem : expItems_) {
 			expItem->StateChange();
 		}
-	}
+	}*/
 
 	for (auto& expItem : expItems_) {
 		expItem->Update();

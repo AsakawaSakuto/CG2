@@ -20,9 +20,9 @@ void Player::Initialize(AppContext* ctx) {
 	expItemGetRange_->SetDrawMode(true);
 
 	moveParticle_->Initialize(&ctx_->dxCommon);
-	moveParticle_->LoadBinary("playerMove");
+	moveParticle_->LoadJson("playerMove");
 	landingParticle_->Initialize(&ctx_->dxCommon);
-	landingParticle_->LoadBinary("playerLanding");
+	landingParticle_->LoadJson("playerLanding");
 
 	weaponManager_->Initialize(ctx_);
 
@@ -110,14 +110,33 @@ void Player::DrawImGui() {
 }
 
 void Player::Move() {
-	// 左スティックの入力を取得
-	float leftStickX = ctx_->gamePad.LeftStickX();
-	float leftStickY = ctx_->gamePad.LeftStickY();
-
+	// KeyConfigを使って移動入力を取得
+	KeyConfig::Vector2D moveInput = { 0.0f, 0.0f };
+	
+	// GamePadが接続されている場合、スティック入力を取得
+	if (ctx_->keyConfig.IsGamePadConnected()) {
+		moveInput = ctx_->keyConfig.GetActionVector2D(Action::MOVE_STICK);
+	} else {
+		// GamePadが接続されていないか、スティック入力がほぼゼロの場合、キーボード入力を確認
+		// 各方向の入力を確認
+		if (ctx_->keyConfig.PushAction(Action::MOVE_UP)) {
+			moveInput.y += 1.0f;
+		}
+		if (ctx_->keyConfig.PushAction(Action::MOVE_DOWN)) {
+			moveInput.y -= 1.0f;
+		}
+		if (ctx_->keyConfig.PushAction(Action::MOVE_RIGHT)) {
+			moveInput.x += 1.0f;
+		}
+		if (ctx_->keyConfig.PushAction(Action::MOVE_LEFT)) {
+			moveInput.x -= 1.0f;
+		}
+	}
+	
 	// スティックの入力があるかチェック
-	if (std::abs(leftStickX) > 0.01f || std::abs(leftStickY) > 0.01f) {
+	if (std::abs(moveInput.x) > 0.01f || std::abs(moveInput.y) > 0.01f) {
 		// カメラから移動方向ベクトルを計算
-		Vector3 moveDirection = CalculateCameraMoveDirection(leftStickX, leftStickY);
+		Vector3 moveDirection = CalculateCameraMoveDirection(moveInput.x, moveInput.y);
 
 		// 移動量を計算
 		Vector3 movement = {
@@ -209,7 +228,7 @@ void Player::Jump() {
 	}
 
 	// Aボタンでジャンプ
-	if (ctx_->gamePad.TriggerButton(GamePad::A)) {
+	if (ctx_->keyConfig.TriggerAction(Action::CONFIRM)) {
 		if (status_.currentJumpCount_ < status_.jumpCanCount_) {
 			status_.velocity_Y_ = status_.jumpPower_;
 			status_.currentJumpCount_++;

@@ -1,11 +1,13 @@
-struct VertexShaderOutput {
+struct VertexShaderOutput
+{
     float4 position : SV_POSITION;
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
     float4 color : COLOR0;
 };
 
-struct Particle {
+struct Particle
+{
     float3 scale;
     float pad1;
     
@@ -31,26 +33,17 @@ struct Particle {
     float pad7;
 };
 
-// Emitter shape types
+// Emitter shape types - must match EmitterShapeType enum in C++
 #define EMITTER_SHAPE_POINT 0
 #define EMITTER_SHAPE_LINE 1
-#define EMITTER_SHAPE_SPHERE_VOLUME 2
-#define EMITTER_SHAPE_SPHERE_SURFACE 3
-#define EMITTER_SHAPE_BOX_VOLUME 4
-#define EMITTER_SHAPE_BOX_SURFACE 5
-#define EMITTER_SHAPE_RING_XZ 6
-#define EMITTER_SHAPE_RING_XY 7
-#define EMITTER_SHAPE_RING_YZ 8
-#define EMITTER_SHAPE_CONE_VOLUME 9
-#define EMITTER_SHAPE_CONE_SURFACE 10
-#define EMITTER_SHAPE_HEMISPHERE_VOLUME 11
-#define EMITTER_SHAPE_HEMISPHERE_SURFACE 12
-#define EMITTER_SHAPE_PLANE_ANGLE 13
-#define EMITTER_SHAPE_PLANE_ANGLE_EDGE 14
-#define EMITTER_SHAPE_RING_ANGLE 15
-#define EMITTER_SHAPE_RING_ANGLE_EDGE 16
+#define EMITTER_SHAPE_SPHERE 2
+#define EMITTER_SHAPE_BOX 3
+#define EMITTER_SHAPE_PLANE 4
+#define EMITTER_SHAPE_RING 5
 
-struct EmitterSphere {
+// EmitterSphere structure - must match EmitterStateGPU in C++
+struct EmitterSphere
+{
     float3 translate;
     float radius;
 	
@@ -134,32 +127,37 @@ struct EmitterSphere {
     
     float ringInnerRadius;
     float ringOuterRadius;
-    
-    float coneAngle;
-    float coneHeight;
-    float3 coneDirection;
-    float hemisphereAngle;
+    float2 pad21;
     
     float3 planeNormal;
-    float planeWidth;
-    float planeHeight;
-    float ringAngle;
-    float3 ringNormal;
+    float pad22;
+    
+    uint spawnOnEdge; // エッジ上に生成するか (0: 内部/表面全体, 1: エッジのみ)
+    uint enableVisualization; // 可視化を有効にするか (0: 無効, 1: 有効)
+    uint useGravity;
+    uint blendModeValue; // BlendModeをuint32_tとして格納
+    
+    float gravityY;
+    float accelerationY;
+    float2 pad23;
 };
 
-struct PerView {
+struct PerView
+{
     float4x4 viewProjection;
     float4x4 billboardMatrix;
 };
 
-struct PerFrame {
+struct PerFrame
+{
     float time;
     float deltaTime;
     uint index;
-    float pad1;  // 16バイト境界に合わせるためのパディング
+    float pad1; // 16バイト境界に合わせるためのパディング
 };
 
-class RandomGenerator {
+class RandomGenerator
+{
     float3 seed;
 
     float3 rand3dTo3d(float3 s)
@@ -209,35 +207,35 @@ float3 GeneratePointPosition(uint baseSeed, float3 center)
     return center;
 }
 
-// Line emitter - generates position along a line
-float3 GenerateLinePosition(uint baseSeed, float3 start, float3 direction, float length)
+// Line emitter - generates position along a line or at endpoints
+float3 GenerateLinePosition(uint baseSeed, EmitterSphere emitter)
 {
-    float t = RandomFloat(baseSeed);
-    return start + normalize(direction) * length * t;
+    float3 start = emitter.translate + emitter.lineStart;
+    float3 direction = normalize(emitter.size);
+    
+    if (emitter.spawnOnEdge != 0)
+    {
+        // Spawn at endpoints only
+        float choice = RandomFloat(baseSeed + 10);
+        if (choice < 0.5f)
+        {
+            return start; // Start point
+        }
+        else
+        {
+            return start + direction * emitter.lineLength; // End point
+        }
+    }
+    else
+    {
+        // Spawn along the line
+        float t = RandomFloat(baseSeed);
+        return start + direction * emitter.lineLength * t;
+    }
 }
 
-// Sphere volume emitter (original sphere function)
-float3 GenerateSpherePosition(uint baseSeed)
-{
-    float u = RandomFloat(baseSeed + 0);
-    float v = RandomFloat(baseSeed + 1);
-    float w = RandomFloat(baseSeed + 2);
-
-    float theta = 2.0f * 3.14159265f * u;
-    float phi = acos(2.0f * v - 1.0f);
-    float r = pow(w, 1.0f / 3.0f);
-
-    float sinPhi = sin(phi);
-
-    return float3(
-        r * sinPhi * cos(theta),
-        r * sinPhi * sin(theta),
-        r * cos(phi)
-    );
-}
-
-// Sphere volume emitter with custom center and radius
-float3 GenerateSpherePositionCustom(uint baseSeed, float3 center, float radius)
+// Sphere emitter - generates position in volume or on surface
+float3 GenerateSpherePosition(uint baseSeed, EmitterSphere emitter)
 {
     float u = RandomFloat(baseSeed + 0);
     float v = RandomFloat(baseSeed + 1);
@@ -251,337 +249,83 @@ float3 GenerateSpherePositionCustom(uint baseSeed, float3 center, float radius)
                         cosPhi,
                         sinPhi * sin(theta));
 
-    float r = radius * pow(w, 1.0f / 3.0f);
-
-    return center + r * dir;
-}
-
-// Sphere surface emitter - generates position on sphere surface only
-float3 GenerateSphereSurfacePosition(uint baseSeed, float3 center, float radius)
-{
-    float u = RandomFloat(baseSeed + 0);
-    float v = RandomFloat(baseSeed + 1);
-
-    float theta = 2.0f * 3.14159265f * u;
-    float cosPhi = 1.0f - 2.0f * v;
-    float sinPhi = sqrt(max(0.0f, 1.0f - cosPhi * cosPhi));
-
-    float3 dir = float3(sinPhi * cos(theta),
-                        cosPhi,
-                        sinPhi * sin(theta));
-
-    return center + radius * dir;
-}
-
-// Box emitter - generates position within a box
-float3 GenerateBoxPosition(uint baseSeed, float3 center, float3 size)
-{
-    float x = RandomFloat(baseSeed + 0) - 0.5f;
-    float y = RandomFloat(baseSeed + 1) - 0.5f;
-    float z = RandomFloat(baseSeed + 2) - 0.5f;
-
-    return center + float3(x * size.x, y * size.y, z * size.z);
-}
-
-// Box surface emitter - generates position only on box surface
-float3 GenerateBoxSurfacePosition(uint baseSeed, float3 center, float3 size)
-{
-    // Choose which face to spawn on (6 faces)
-    uint faceIndex = uint(RandomFloat(baseSeed + 3) * 6.0f);
-    
-    float x, y, z;
-    
-    switch (faceIndex)
+    float r;
+    if (emitter.spawnOnEdge != 0)
     {
-        case 0: // Front face (+Z)
-            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
-            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
-            z = size.z * 0.5f;
-            break;
-        case 1: // Back face (-Z)
-            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
-            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
-            z = -size.z * 0.5f;
-            break;
-        case 2: // Right face (+X)
-            x = size.x * 0.5f;
-            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
-            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
-            break;
-        case 3: // Left face (-X)
-            x = -size.x * 0.5f;
-            y = (RandomFloat(baseSeed + 1) - 0.5f) * size.y;
-            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
-            break;
-        case 4: // Top face (+Y)
-            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
-            y = size.y * 0.5f;
-            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
-            break;
-        default: // Bottom face (-Y)
-            x = (RandomFloat(baseSeed + 0) - 0.5f) * size.x;
-            y = -size.y * 0.5f;
-            z = (RandomFloat(baseSeed + 2) - 0.5f) * size.z;
-            break;
+        // Spawn on surface only
+        r = emitter.radius;
     }
-    
-    return center + float3(x, y, z);
-}
-
-// Ring emitter - generates position on a ring (circle)
-float3 GenerateRingPosition(uint baseSeed, float3 center, float innerRadius, float outerRadius, float3 normal)
-{
-    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
-    float radiusLerp = RandomFloat(baseSeed + 1);
-    float radius = lerp(innerRadius, outerRadius, radiusLerp);
-
-    // Generate position in XZ plane first
-    float3 localPos = float3(cos(angle) * radius, 0.0f, sin(angle) * radius);
-    
-    // If normal is not (0,1,0), we need to rotate the ring
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    if (abs(dot(normal, up)) < 0.999f)
+    else
     {
-        float3 right = normalize(cross(up, normal));
-        float3 forward = cross(normal, right);
-        localPos = localPos.x * right + localPos.y * normal + localPos.z * forward;
+        // Spawn in volume
+        r = emitter.radius * pow(w, 1.0f / 3.0f);
     }
 
-    return center + localPos;
+    return emitter.translate + r * dir;
 }
 
-// RING_XY emitter - generates position on a ring in the XY plane
-float3 GenerateRingXYPosition(uint baseSeed, float3 center, float innerRadius, float outerRadius)
+// Box emitter - generates position in volume, on surface, or on edges
+float3 GenerateBoxPosition(uint baseSeed, EmitterSphere emitter)
 {
-    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
-    float radiusLerp = RandomFloat(baseSeed + 1);
-    float radius = lerp(innerRadius, outerRadius, radiusLerp);
-
-    // Generate position in XY plane (Z = 0)
-    float3 localPos = float3(cos(angle) * radius, sin(angle) * radius, 0.0f);
-
-    return center + localPos;
-}
-
-// RING_YZ emitter - generates position on a ring in the YZ plane
-float3 GenerateRingYZPosition(uint baseSeed, float3 center, float innerRadius, float outerRadius)
-{
-    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
-    float radiusLerp = RandomFloat(baseSeed + 1);
-    float radius = lerp(innerRadius, outerRadius, radiusLerp);
-
-    // Generate position in YZ plane (X = 0)
-    float3 localPos = float3(0.0f, cos(angle) * radius, sin(angle) * radius);
-
-    return center + localPos;
-}
-
-// Cone emitter - generates position within a cone volume
-float3 GenerateConePosition(uint baseSeed, float3 center, float3 direction, float angle, float height)
-{
-    // Convert angle from degrees to radians
-    float angleRad = angle * 3.14159265f / 180.0f;
-    float maxRadius = tan(angleRad) * height;
-    
-    // Random height along the cone
-    float t = RandomFloat(baseSeed + 0);
-    float currentHeight = height * t;
-    
-    // Random radius at this height (cone gets wider as height increases)
-    float currentMaxRadius = maxRadius * t;
-    float radiusRandom = RandomFloat(baseSeed + 1);
-    float currentRadius = currentMaxRadius * sqrt(radiusRandom); // sqrt for uniform distribution
-    
-    // Random angle around the cone axis
-    float theta = RandomFloat(baseSeed + 2) * 2.0f * 3.14159265f;
-    
-    // Generate local position in cone space (assuming direction is +Y)
-    float3 localPos = float3(
-        cos(theta) * currentRadius,
-        currentHeight,
-        sin(theta) * currentRadius
-    );
-    
-    // Create rotation matrix to align with cone direction
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedDir = normalize(direction);
-    
-    // If direction is not up, rotate the local position
-    if (abs(dot(normalizedDir, up)) < 0.999f)
+    if (emitter.spawnOnEdge != 0)
     {
-        float3 right = normalize(cross(up, normalizedDir));
-        float3 forward = cross(normalizedDir, right);
-        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
-    }
-    else if (dot(normalizedDir, up) < 0.0f)
-    {
-        // Direction is down, flip Y
-        localPos.y = -localPos.y;
-    }
-    
-    return center + localPos;
-}
-
-// Cone surface emitter - generates position only on cone surface
-float3 GenerateConeSurfacePosition(uint baseSeed, float3 center, float3 direction, float angle, float height)
-{
-    // Convert angle from degrees to radians
-    float angleRad = angle * 3.14159265f / 180.0f;
-    float maxRadius = tan(angleRad) * height;
-    
-    // Choose between cone surface or base
-    float surfaceChoice = RandomFloat(baseSeed + 3);
-    float3 localPos;
-    
-    if (surfaceChoice < 0.8f) // 80% chance for cone surface
-    {
-        // Random height along the cone
-        float t = RandomFloat(baseSeed + 0);
-        float currentHeight = height * t;
+        // Spawn on edges only (12 edges of a box)
+        uint edgeIndex = uint(RandomFloat(baseSeed + 10) * 12.0f);
+        float t = RandomFloat(baseSeed + 0) - 0.5f; // [-0.5, 0.5]
         
-        // Radius at this height
-        float currentRadius = maxRadius * t;
+        float halfX = emitter.size.x * 0.5f;
+        float halfY = emitter.size.y * 0.5f;
+        float halfZ = emitter.size.z * 0.5f;
         
-        // Random angle around the cone axis
-        float theta = RandomFloat(baseSeed + 2) * 2.0f * 3.14159265f;
+        float3 pos;
         
-        localPos = float3(
-            cos(theta) * currentRadius,
-            currentHeight,
-            sin(theta) * currentRadius
-        );
+        // Bottom 4 edges
+        if (edgeIndex == 0)
+            pos = float3(t * emitter.size.x, -halfY, -halfZ);
+        else if (edgeIndex == 1)
+            pos = float3(t * emitter.size.x, -halfY, halfZ);
+        else if (edgeIndex == 2)
+            pos = float3(-halfX, -halfY, t * emitter.size.z);
+        else if (edgeIndex == 3)
+            pos = float3(halfX, -halfY, t * emitter.size.z);
+        // Top 4 edges
+        else if (edgeIndex == 4)
+            pos = float3(t * emitter.size.x, halfY, -halfZ);
+        else if (edgeIndex == 5)
+            pos = float3(t * emitter.size.x, halfY, halfZ);
+        else if (edgeIndex == 6)
+            pos = float3(-halfX, halfY, t * emitter.size.z);
+        else if (edgeIndex == 7)
+            pos = float3(halfX, halfY, t * emitter.size.z);
+        // Vertical 4 edges
+        else if (edgeIndex == 8)
+            pos = float3(-halfX, t * emitter.size.y, -halfZ);
+        else if (edgeIndex == 9)
+            pos = float3(halfX, t * emitter.size.y, -halfZ);
+        else if (edgeIndex == 10)
+            pos = float3(-halfX, t * emitter.size.y, halfZ);
+        else
+            pos = float3(halfX, t * emitter.size.y, halfZ);
+            
+        return emitter.translate + pos;
     }
-    else // 20% chance for base
+    else
     {
-        // Random position on the base circle
-        float theta = RandomFloat(baseSeed + 2) * 2.0f * 3.14159265f;
-        float radiusRandom = RandomFloat(baseSeed + 1);
-        float baseRadius = maxRadius * sqrt(radiusRandom);
+        // Spawn in volume
+        float x = (RandomFloat(baseSeed + 0) - 0.5f) * emitter.size.x;
+        float y = (RandomFloat(baseSeed + 1) - 0.5f) * emitter.size.y;
+        float z = (RandomFloat(baseSeed + 2) - 0.5f) * emitter.size.z;
         
-        localPos = float3(
-            cos(theta) * baseRadius,
-            height,
-            sin(theta) * baseRadius
-        );
+        return emitter.translate + float3(x, y, z);
     }
-    
-    // Create rotation matrix to align with cone direction
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedDir = normalize(direction);
-    
-    // If direction is not up, rotate the local position
-    if (abs(dot(normalizedDir, up)) < 0.999f)
-    {
-        float3 right = normalize(cross(up, normalizedDir));
-        float3 forward = cross(normalizedDir, right);
-        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
-    }
-    else if (dot(normalizedDir, up) < 0.0f)
-    {
-        // Direction is down, flip Y
-        localPos.y = -localPos.y;
-    }
-    
-    return center + localPos;
 }
 
-// Hemisphere emitter - generates position within a hemisphere volume
-float3 GenerateHemispherePosition(uint baseSeed, float3 center, float3 direction, float radius, float angle)
+// Plane emitter - generates position on plane or on edges
+float3 GeneratePlanePosition(uint baseSeed, EmitterSphere emitter)
 {
-    // Convert angle from degrees to radians
-    float angleRad = angle * 3.14159265f / 180.0f;
-    float maxCosTheta = cos(angleRad);
-    
-    // Generate random spherical coordinates within the hemisphere
-    float u = RandomFloat(baseSeed + 0);
-    float v = RandomFloat(baseSeed + 1);
-    float w = RandomFloat(baseSeed + 2);
-    
-    // Constrain theta to hemisphere angle
-    float cosTheta = lerp(maxCosTheta, 1.0f, u);
-    float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
-    float phi = 2.0f * 3.14159265f * v;
-    
-    // Random radius within hemisphere
-    float r = radius * pow(w, 1.0f / 3.0f);
-    
-    // Generate local position in hemisphere space (assuming direction is +Y)
-    float3 localPos = float3(
-        r * sinTheta * cos(phi),
-        r * cosTheta,
-        r * sinTheta * sin(phi)
-    );
-    
-    // Rotate to align with hemisphere direction
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedDir = normalize(direction);
-    
-    if (abs(dot(normalizedDir, up)) < 0.999f)
-    {
-        float3 right = normalize(cross(up, normalizedDir));
-        float3 forward = cross(normalizedDir, right);
-        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
-    }
-    else if (dot(normalizedDir, up) < 0.0f)
-    {
-        // Direction is down, flip Y
-        localPos.y = -localPos.y;
-    }
-    
-    return center + localPos;
-}
-
-// Hemisphere surface emitter - generates position only on hemisphere surface
-float3 GenerateHemisphereSurfacePosition(uint baseSeed, float3 center, float3 direction, float radius, float angle)
-{
-    // Convert angle from degrees to radians
-    float angleRad = angle * 3.14159265f / 180.0f;
-    float maxCosTheta = cos(angleRad);
-    
-    // Generate random spherical coordinates on the hemisphere surface
-    float u = RandomFloat(baseSeed + 0);
-    float v = RandomFloat(baseSeed + 1);
-    
-    // Constrain theta to hemisphere angle
-    float cosTheta = lerp(maxCosTheta, 1.0f, u);
-    float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
-    float phi = 2.0f * 3.14159265f * v;
-    
-    // Generate local position on hemisphere surface (assuming direction is +Y)
-    float3 localPos = float3(
-        radius * sinTheta * cos(phi),
-        radius * cosTheta,
-        radius * sinTheta * sin(phi)
-    );
-    
-    // Rotate to align with hemisphere direction
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedDir = normalize(direction);
-    
-    if (abs(dot(normalizedDir, up)) < 0.999f)
-    {
-        float3 right = normalize(cross(up, normalizedDir));
-        float3 forward = cross(normalizedDir, right);
-        localPos = localPos.x * right + localPos.y * normalizedDir + localPos.z * forward;
-    }
-    else if (dot(normalizedDir, up) < 0.0f)
-    {
-        // Direction is down, flip Y
-        localPos.y = -localPos.y;
-    }
-    
-    return center + localPos;
-}
-
-// Plane angle emitter - generates position on an oriented plane surface
-float3 GeneratePlaneAnglePosition(uint baseSeed, float3 center, float3 normal, float width, float height)
-{
-    float u = RandomFloat(baseSeed + 0) - 0.5f; // [-0.5, 0.5]
-    float v = RandomFloat(baseSeed + 1) - 0.5f; // [-0.5, 0.5]
-    
     // Create orthogonal basis vectors from the normal
+    float3 normalizedNormal = normalize(emitter.planeNormal);
     float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedNormal = normalize(normal);
     
     // If normal is parallel to up, use right vector instead
     if (abs(dot(normalizedNormal, up)) > 0.999f)
@@ -592,62 +336,48 @@ float3 GeneratePlaneAnglePosition(uint baseSeed, float3 center, float3 normal, f
     float3 right = normalize(cross(up, normalizedNormal));
     float3 forward = cross(normalizedNormal, right);
     
-    // Generate position on plane
-    float3 localPos = right * (u * width) + forward * (v * height);
+    float halfWidth = emitter.size.x * 0.5f;
+    float halfHeight = emitter.size.y * 0.5f;
     
-    return center + localPos;
+    if (emitter.spawnOnEdge != 0)
+    {
+        // Spawn on edges only (4 edges of the plane rectangle)
+        uint edgeIndex = uint(RandomFloat(baseSeed + 10) * 4.0f);
+        float t = RandomFloat(baseSeed + 0) - 0.5f; // [-0.5, 0.5]
+        
+        float3 localPos;
+        
+        if (edgeIndex == 0) // Top edge
+            localPos = right * (t * emitter.size.x) + forward * halfHeight;
+        else if (edgeIndex == 1) // Bottom edge
+            localPos = right * (t * emitter.size.x) + forward * (-halfHeight);
+        else if (edgeIndex == 2) // Right edge
+            localPos = right * halfWidth + forward * (t * emitter.size.y);
+        else // Left edge
+            localPos = right * (-halfWidth) + forward * (t * emitter.size.y);
+            
+        return emitter.translate + localPos;
+    }
+    else
+    {
+        // Spawn on plane surface
+        float u = RandomFloat(baseSeed + 0) - 0.5f; // [-0.5, 0.5]
+        float v = RandomFloat(baseSeed + 1) - 0.5f; // [-0.5, 0.5]
+        
+        float3 localPos = right * (u * emitter.size.x) + forward * (v * emitter.size.y);
+        
+        return emitter.translate + localPos;
+    }
 }
 
-// Plane angle edge emitter - generates position only on plane edges
-float3 GeneratePlaneAngleEdgePosition(uint baseSeed, float3 center, float3 normal, float width, float height)
-{
-    // Choose which edge to spawn on (4 edges)
-    uint edgeIndex = uint(RandomFloat(baseSeed + 2) * 4.0f);
-    
-    // Create orthogonal basis vectors from the normal
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedNormal = normalize(normal);
-    
-    if (abs(dot(normalizedNormal, up)) > 0.999f)
-    {
-        up = float3(1.0f, 0.0f, 0.0f);
-    }
-    
-    float3 right = normalize(cross(up, normalizedNormal));
-    float3 forward = cross(normalizedNormal, right);
-    
-    float u = RandomFloat(baseSeed + 0) - 0.5f; // [-0.5, 0.5]
-    float3 localPos;
-    
-    switch (edgeIndex)
-    {
-        case 0: // Top edge
-            localPos = right * (u * width) + forward * (height * 0.5f);
-            break;
-        case 1: // Bottom edge
-            localPos = right * (u * width) + forward * (-height * 0.5f);
-            break;
-        case 2: // Right edge
-            localPos = right * (width * 0.5f) + forward * (u * height);
-            break;
-        default: // Left edge
-            localPos = right * (-width * 0.5f) + forward * (u * height);
-            break;
-    }
-    
-    return center + localPos;
-}
-
-// Ring angle emitter - generates position in a rotatable ring area
-float3 GenerateRingAnglePosition(uint baseSeed, float3 center, float3 normal, float innerRadius, float outerRadius)
+// Ring emitter - generates position in ring area or on circumferences
+float3 GenerateRingPosition(uint baseSeed, EmitterSphere emitter)
 {
     float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
-    float radiusLerp = RandomFloat(baseSeed + 1);
-    float radius = lerp(innerRadius, outerRadius, radiusLerp);
     
     // Create orthogonal basis vectors from the normal
+    float3 normalizedNormal = normalize(emitter.planeNormal);
     float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedNormal = normalize(normal);
     
     if (abs(dot(normalizedNormal, up)) > 0.999f)
     {
@@ -656,38 +386,33 @@ float3 GenerateRingAnglePosition(uint baseSeed, float3 center, float3 normal, fl
     
     float3 right = normalize(cross(up, normalizedNormal));
     float3 forward = cross(normalizedNormal, right);
+    
+    float radius;
+    
+    if (emitter.spawnOnEdge != 0)
+    {
+        // Spawn on circumferences only (inner or outer)
+        float choice = RandomFloat(baseSeed + 10);
+        if (choice < 0.5f)
+        {
+            radius = emitter.ringInnerRadius;
+        }
+        else
+        {
+            radius = emitter.ringOuterRadius;
+        }
+    }
+    else
+    {
+        // Spawn in ring area
+        float radiusLerp = RandomFloat(baseSeed + 1);
+        radius = lerp(emitter.ringInnerRadius, emitter.ringOuterRadius, radiusLerp);
+    }
     
     // Generate position in ring plane
     float3 localPos = right * (cos(angle) * radius) + forward * (sin(angle) * radius);
     
-    return center + localPos;
-}
-
-// Ring angle edge emitter - generates position only on ring circumference
-float3 GenerateRingAngleEdgePosition(uint baseSeed, float3 center, float3 normal, float innerRadius, float outerRadius)
-{
-    float angle = RandomFloat(baseSeed + 0) * 2.0f * 3.14159265f;
-    
-    // Choose between inner or outer circumference
-    float edgeChoice = RandomFloat(baseSeed + 2);
-    float radius = (edgeChoice < 0.5f) ? innerRadius : outerRadius;
-    
-    // Create orthogonal basis vectors from the normal
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 normalizedNormal = normalize(normal);
-    
-    if (abs(dot(normalizedNormal, up)) > 0.999f)
-    {
-        up = float3(1.0f, 0.0f, 0.0f);
-    }
-    
-    float3 right = normalize(cross(up, normalizedNormal));
-    float3 forward = cross(normalizedNormal, right);
-    
-    // Generate position on ring circumference
-    float3 localPos = right * (cos(angle) * radius) + forward * (sin(angle) * radius);
-    
-    return center + localPos;
+    return emitter.translate + localPos;
 }
 
 // Universal position generator based on emitter type
@@ -699,55 +424,22 @@ float3 GenerateEmitterPosition(uint baseSeed, EmitterSphere emitter)
             return GeneratePointPosition(baseSeed, emitter.translate);
             
         case EMITTER_SHAPE_LINE:
-            return GenerateLinePosition(baseSeed, emitter.lineStart, emitter.size, emitter.lineLength);
+            return GenerateLinePosition(baseSeed, emitter);
             
-        case EMITTER_SHAPE_SPHERE_VOLUME:
-            return GenerateSpherePositionCustom(baseSeed, emitter.translate, emitter.radius);
+        case EMITTER_SHAPE_SPHERE:
+            return GenerateSpherePosition(baseSeed, emitter);
             
-        case EMITTER_SHAPE_SPHERE_SURFACE:
-            return GenerateSphereSurfacePosition(baseSeed, emitter.translate, emitter.radius);
+        case EMITTER_SHAPE_BOX:
+            return GenerateBoxPosition(baseSeed, emitter);
             
-        case EMITTER_SHAPE_BOX_VOLUME:
-            return GenerateBoxPosition(baseSeed, emitter.translate, emitter.size);
+        case EMITTER_SHAPE_PLANE:
+            return GeneratePlanePosition(baseSeed, emitter);
             
-        case EMITTER_SHAPE_RING_XZ:
-            return GenerateRingPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius, float3(0.0f, 1.0f, 0.0f));
-            
-        case EMITTER_SHAPE_BOX_SURFACE:
-            return GenerateBoxSurfacePosition(baseSeed, emitter.translate, emitter.size);
-            
-        case EMITTER_SHAPE_RING_XY:
-            return GenerateRingXYPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius);
-            
-        case EMITTER_SHAPE_RING_YZ:
-            return GenerateRingYZPosition(baseSeed, emitter.translate, emitter.ringInnerRadius, emitter.ringOuterRadius);
-            
-        case EMITTER_SHAPE_CONE_VOLUME:
-            return GenerateConePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.coneAngle, emitter.coneHeight);
-            
-        case EMITTER_SHAPE_CONE_SURFACE:
-            return GenerateConeSurfacePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.coneAngle, emitter.coneHeight);
-            
-        case EMITTER_SHAPE_HEMISPHERE_VOLUME:
-            return GenerateHemispherePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.radius, emitter.hemisphereAngle);
-            
-        case EMITTER_SHAPE_HEMISPHERE_SURFACE:
-            return GenerateHemisphereSurfacePosition(baseSeed, emitter.translate, emitter.coneDirection, emitter.radius, emitter.hemisphereAngle);
-            
-        case EMITTER_SHAPE_PLANE_ANGLE:
-            return GeneratePlaneAnglePosition(baseSeed, emitter.translate, emitter.planeNormal, emitter.planeWidth, emitter.planeHeight);
-            
-        case EMITTER_SHAPE_PLANE_ANGLE_EDGE:
-            return GeneratePlaneAngleEdgePosition(baseSeed, emitter.translate, emitter.planeNormal, emitter.planeWidth, emitter.planeHeight);
-            
-        case EMITTER_SHAPE_RING_ANGLE:
-            return GenerateRingAnglePosition(baseSeed, emitter.translate, emitter.ringNormal, emitter.ringInnerRadius, emitter.ringOuterRadius);
-            
-        case EMITTER_SHAPE_RING_ANGLE_EDGE:
-            return GenerateRingAngleEdgePosition(baseSeed, emitter.translate, emitter.ringNormal, emitter.ringInnerRadius, emitter.ringOuterRadius);
+        case EMITTER_SHAPE_RING:
+            return GenerateRingPosition(baseSeed, emitter);
             
         default:
-            return GenerateSpherePositionCustom(baseSeed, emitter.translate, emitter.radius);
+            return emitter.translate; // Fallback to point
     }
 }
 

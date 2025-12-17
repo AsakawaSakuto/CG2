@@ -2,6 +2,7 @@
 #include "2d/Sprite/Sprite.h"
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Math/Type/Vector2.h"
+#include "Utility/FileFormat/Json/JsonManager.h"
 
 #include <memory>
 #include <vector>
@@ -14,6 +15,14 @@
 class BitmapFont {
 public:
 	/// <summary>
+	/// 数字の配置方向
+	/// </summary>
+	enum class Alignment {
+		Left,   // 左から右へ（右に伸びる）
+		Right   // 右から左へ（左に伸びる）
+	};
+
+	/// <summary>
 	/// デストラクタ
 	/// </summary>
 	~BitmapFont() = default;
@@ -23,12 +32,7 @@ public:
 	/// </summary>
 	/// <param name="dxCommon">DirectXCommonのポインタ</param>
 	/// <param name="numberImageFolder">数字画像フォルダのパス（デフォルト: "number/"）</param>
-	void Initialize(DirectXCommon* dxCommon, const std::string& numberImageFolder = "number/");
-
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	void Update();
+	void Initialize(DirectXCommon* dxCommon, const std::string& binaryPath = "temp", const std::string& numberImageFolder = "BitmapFont/");
 
 	/// <summary>
 	/// 描画処理
@@ -36,12 +40,24 @@ public:
 	void Draw();
 
 	/// <summary>
+	/// ImGui描画処理
+	/// </summary>
+	void DrawImGui(const char* name);
+
+	/// <summary>
+	/// JsonFileからBitmapFontの設定を読み込む
+	/// </summary>
+	/// <param name="filePath">Resources->Json->BitmapFont の中にあるJsonFileのPathを入れる（拡張子不要）</param>
+	void LoadJson(const std::string& filePath);
+
+	/// <summary>
 	/// 整数値を表示
 	/// </summary>
 	/// <param name="value">表示する整数値</param>
 	/// <param name="position">表示位置（左端）</param>
 	/// <param name="digitSpacing">数字間の間隔</param>
-	void SetNumber(int value, const Vector2& position, float digitSpacing = 40.0f);
+	/// <param name="showPercent">パーセント記号を表示するかどうか</param>
+	void SetNumber(int value);
 
 	/// <summary>
 	/// 浮動小数点数を表示
@@ -50,7 +66,8 @@ public:
 	/// <param name="position">表示位置（左端）</param>
 	/// <param name="decimalPlaces">小数点以下の桁数</param>
 	/// <param name="digitSpacing">数字間の間隔</param>
-	void SetFloat(float value, const Vector2& position, int decimalPlaces = 2, float digitSpacing = 40.0f);
+	/// <param name="showPercent">パーセント記号を表示するかどうか</param>
+	void SetFloat(float value, int decimalPlaces = 2, bool showPercent = false);
 
 	/// <summary>
 	/// 時間を表示（MM:SS形式）
@@ -58,7 +75,7 @@ public:
 	/// <param name="seconds">表示する秒数</param>
 	/// <param name="position">表示位置（左端）</param>
 	/// <param name="digitSpacing">数字間の間隔</param>
-	void SetTime(float seconds, const Vector2& position, float digitSpacing = 40.0f);
+	void SetTime(float seconds);
 
 	/// <summary>
 	/// スケールを設定
@@ -73,10 +90,47 @@ public:
 	void SetColor(const Vector4& color) { color_ = color; }
 
 	/// <summary>
+	/// 配置方向を設定
+	/// </summary>
+	/// <param name="alignment">配置方向</param>
+	void SetAlignment(Alignment alignment) { alignment_ = alignment; }
+
+	/// <summary>
 	/// 数字のサイズを取得
 	/// </summary>
 	/// <returns>数字1つのサイズ</returns>
 	Vector2 GetDigitSize() const;
+
+	/// <summary>
+	/// パーセント記号の表示を設定
+	/// </summary>
+	/// <param name="show">表示するかどうか</param>
+	void SetShowPercent(bool show) { showPercent_ = show; }
+
+private:
+
+	/// <summary>
+	/// JsonFileに設定を保存
+	/// </summary>
+	/// <param name="filePath">保存先のファイルパス（拡張子不要）</param>
+	void SaveToJson(const std::string& filePath);
+
+	/// <summary>
+	/// JsonFileから設定を読み込み
+	/// </summary>
+	/// <param name="filePath">読み込み元のファイルパス（拡張子不要）</param>
+	void LoadFromJson(const std::string& filePath);
+
+	/// <summary>
+	/// 新規JsonFileを作成
+	/// </summary>
+	/// <param name="filePath">作成するファイルパス（拡張子不要）</param>
+	void CreateNewJsonFile(const std::string& filePath);
+
+	/// <summary>
+	/// 整数を桁ごとに分解
+	/// </summary>
+	std::vector<int> SplitDigits(int value) const;
 
 private:
 	static const int kMaxDigits = 10; // 最大桁数
@@ -95,6 +149,9 @@ private:
 	// ドットスプライト（小数点用）
 	std::unique_ptr<Sprite> dotSprite_;
 
+	// パーセントスプライト（パーセント記号用）
+	std::unique_ptr<Sprite> percentSprite_;
+
 	// 表示する桁のリスト
 	struct Digit {
 		int digitIndex;      // 桁のインデックス（0が一番左）
@@ -102,16 +159,24 @@ private:
 		Vector2 position;    // 表示位置
 		bool isColon;        // コロンかどうか
 		bool isDot;          // ドットかどうか
+		bool isPercent;      // パーセント記号かどうか
 	};
 	std::vector<Digit> digits_;
 
+	// 表示設定
+	Vector2 position_ = { 0.0f, 0.0f };
 	Vector2 scale_ = { 1.0f, 1.0f };
+	float spaceWidth_ = 20.0f;
 	Vector4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+	bool showPercent_ = false;
+	Alignment alignment_ = Alignment::Left;
+
+	// パーセント記号専用の設定
+	Vector2 percentOffset_ = { 0.0f, 0.0f };  // パーセント記号の位置オフセット
+	Vector2 percentScale_ = { 1.0f, 1.0f };   // パーセント記号専用のスケール
 
 	std::string numberImageFolder_;
 
-	/// <summary>
-	/// 整数を桁ごとに分解
-	/// </summary>
-	std::vector<int> SplitDigits(int value) const;
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::string loadToSaveName_ = "filePath";
 };

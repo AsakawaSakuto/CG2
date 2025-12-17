@@ -1,10 +1,11 @@
 #include "DebugCamera.h"
+#include <cmath>
+
 #ifdef USE_IMGUI
 #include "imgui.h"           
 #include "imgui_impl_dx12.h" 
 #include "imgui_impl_win32.h"
 #endif
-#include <cmath>
 
 DebugCamera::DebugCamera() {
 	moveSpeedMultiplier = 1.0f;
@@ -102,7 +103,7 @@ void DebugCamera::Update() {
 			distance_ -= wheel * scrollSpeed * moveSpeedMultiplier;
 			// 距離を制限
 			if (distance_ < 1.0f) distance_ = 1.0f;
-			if (distance_ > 100.0f) distance_ = 100.0f;
+			if (distance_ > 1000.0f) distance_ = 1000.0f;
 		}
 
 		UpdateCameraPositionOrbit();

@@ -17,11 +17,11 @@ void TitleSceneUI::Update() {
 	{
 	case TitleSceneUI::TitleSelectState::PLAY:
 
-		if (ctx_->gamePad.TriggerButton(GamePad::DOWN_BOTTON)) {
+		if (ctx_->keyConfig.TriggerAction(Action::CELECT_DOWN)) {
 			selectState_ = TitleSelectState::QUIT;
 		}
 
-		if (ctx_->gamePad.TriggerButton(GamePad::A) || ctx_->input.TriggerKey(DIK_SPACE)) {
+		if (ctx_->keyConfig.TriggerAction(Action::CONFIRM)) {
 			isPlay_ = true;
 		}
 
@@ -31,11 +31,11 @@ void TitleSceneUI::Update() {
 		break;
 	case TitleSceneUI::TitleSelectState::QUIT:
 
-		if (ctx_->gamePad.TriggerButton(GamePad::UP_BOTTON)) {
+		if (ctx_->keyConfig.TriggerAction(Action::CELECT_UP)) {
 			selectState_ = TitleSelectState::PLAY;
 		}
 
-		if (ctx_->gamePad.TriggerButton(GamePad::A)) {
+		if (ctx_->keyConfig.TriggerAction(Action::CONFIRM)) {
 			isQuit_ = true;
 		}
 

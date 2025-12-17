@@ -29,9 +29,9 @@ void GameScene::Initialize() {
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
 
-	testParticle_->Initialize(&ctx_->dxCommon, 200);
+	testParticle_->Initialize(&ctx_->dxCommon);
 	dustParticle_->Initialize(&ctx_->dxCommon);
-	dustParticle_->LoadBinary("dust");
+	dustParticle_->LoadJson("dust");
 
 	testLine_->Initialize(&ctx_->dxCommon);
 
@@ -86,23 +86,8 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	if (ctx_->gamePad.TriggerButton(GamePad::START)) {
+	if (ctx_->keyConfig.TriggerAction(Action::PAUSE)) {
 		ChangeScene(SCENE::TITLE);
-	}
-
-	// テスト用：Bボタンでダメージ（HP減少）
-	if (ctx_->gamePad.TriggerButton(GamePad::B)) {
-		player_->SetCurrentHP(player_->GetCurrentHP() - 10);
-	}
-
-	// テスト用：Yボタンで回復（HP増加）
-	if (ctx_->gamePad.TriggerButton(GamePad::Y)) {
-		player_->SetCurrentHP(player_->GetCurrentHP() + 10);
-	}
-
-	// テスト用：Lボタンで経験値取得
-	if (ctx_->gamePad.TriggerButton(GamePad::L)) {
-		player_->AddExp(20);
 	}
 
 	player_->Update();
@@ -121,10 +106,6 @@ void GameScene::Update() {
 
 	testParticle_->Update();
 	dustParticle_->Update();
-
-	if (collisionManager_->GetGoResult() || ctx_->gamePad.TriggerButton(GamePad::X)) {
-		//ChangeScene(SCENE::RESULT);
-	}
 
 	testLine_->AddGrid(100.0f, 20);
 
@@ -148,7 +129,7 @@ void GameScene::Update() {
 
 	// ビットマップフォントの更新
 
-	timeFont_->SetTime(gameTime_, { 1100.0f, 50.0f }, 60.0f);
+	/*timeFont_->SetTime(gameTime_, { 1100.0f, 50.0f }, 60.0f);
 	timeFont_->Update();
 
 	playerHPFont_->SetNumber(player_->GetCurrentHP(), { 215.0f,50.0f }, 60.0f);
@@ -156,7 +137,7 @@ void GameScene::Update() {
 
 	playerLv_->SetNumber(player_->GetLevel(), {122.0f,112.0f}, 55.0f);
 	playerLv_->SetScale({0.5f,0.5f});
-	playerLv_->Update();
+	playerLv_->Update();*/
 
 	// ゲージの更新
 	hpGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentHP()));
