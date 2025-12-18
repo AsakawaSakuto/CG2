@@ -1,5 +1,7 @@
 #include "Sprite.h"
 #include "Core/WinApp/WinApp.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 
 #include <cassert>
 #pragma comment(lib,"d3d12.lib")
@@ -53,7 +55,14 @@ Sprite::~Sprite() {
 	}
 }
 
-void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position, Vector2 scale) {
+void Sprite::Initialize(const std::string& fileName, Vector2 position, Vector2 scale) {
+	// ServiceLocatorからDirectXCommonを取得
+	DirectXCommon* dxCommon = ServiceLocator::GetDXCommon();
+	
+	if (!dxCommon) {
+		// エラー処理：DirectXCommonが登録されていない場合
+		throw std::runtime_error("DirectXCommon is not registered in ServiceLocator. Call ServiceLocator::Provide(dxCommon) first.");
+	}
 
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
@@ -106,10 +115,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Ve
 void Sprite::Update() {
 
 	//Sprite用のWorldViewProjectionMatrixを作る
-	Matrix4x4 worldMatrix = MakeAffineMatrix(
-		{ transform2D_.scale.x,transform2D_.scale.y,0.0f }, 
-		{ 0.0f, 0.0f, transform2D_.rotate}, 
-		{ transform2D_.translate.x, transform2D_.translate.y, 0.0f });
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ transform2D_.scale.x,transform2D_.scale.y,0.0f }, { 0.0f, 0.0f, transform2D_.rotate }, { transform2D_.translate.x, transform2D_.translate.y, 0.0f });
 	Matrix4x4 viewMatrix = MakeIdentityMatrix();
 	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth_), static_cast<float>(WinApp::kClientHeight_), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrixSprite = MultiplyMatrix(worldMatrix, MultiplyMatrix(viewMatrix, projectionMatrixSprite));
@@ -134,6 +140,7 @@ void Sprite::Update() {
 }
 
 void Sprite::Draw() {
+
 	// PSOManagerからRootSignatureとPSOを取得
 	auto& psoManager = PSOManager::GetInstance();
 	auto rootSignature = psoManager.GetRootSignature("Object3D");
@@ -211,17 +218,17 @@ void Sprite::SetTexture(const std::string& textureName) {
 }
 
 void Sprite::SetAnchorPoint(const Vector2& anchor) {
-	anchorPoint = anchor;
+	anchorPoint_ = anchor;
 	
 	// 頂点データが既に作成されている場合、再計算
 	if (vertexData_) {
 		float width = size_.x;
 		float height = size_.y;
 
-		float left = 0.0f - anchorPoint.x * size_.x;
-		float right = 1.0f - anchorPoint.x * size_.x;
-		float top = 0.0f - anchorPoint.y * size_.y;
-		float bottom = 1.0f - anchorPoint.y * size_.y;
+		float left = 0.0f - anchorPoint_.x * size_.x;
+		float right = 1.0f - anchorPoint_.x * size_.x;
+		float top = 0.0f - anchorPoint_.y * size_.y;
+		float bottom = 1.0f - anchorPoint_.y * size_.y;
 
 		vertexData_[0].position = { left, bottom + height, 0.0f, 1.0f };  // 左下
 		vertexData_[1].position = { left, top, 0.0f, 1.0f };              // 左上
@@ -244,10 +251,10 @@ void Sprite::CreateVertexResource() {
 	float width = size_.x;
 	float height = size_.y;
 
-	float left = 0.0f - anchorPoint.x * size_.x;
-	float right = 1.0f - anchorPoint.x * size_.x;
-	float top = 0.0f - anchorPoint.y * size_.y;
-	float bottom = 1.0f - anchorPoint.y * size_.y;
+	float left = 0.0f - anchorPoint_.x * size_.x;
+	float right = 1.0f - anchorPoint_.x * size_.x;
+	float top = 0.0f - anchorPoint_.y * size_.y;
+	float bottom = 1.0f - anchorPoint_.y * size_.y;
 
 	vertexData_[0].position = { left,bottom + height,0.0f,1.0f };  // 左下
 	vertexData_[1].position = { left,top,0.0f,1.0f };     // 左上

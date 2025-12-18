@@ -33,8 +33,7 @@ public:
     /// <summary>
     /// 初期化
     /// </summary>
-    /// <param name="dxCommon">DirectXCommon</param>
-    void Initialize(DirectXCommon* dxCommon);
+    void Initialize();
 
     /// <summary>
     /// デストラクタ

@@ -10,7 +10,7 @@ class CollisionManager
 {
 public:
 	
-	void Initialize(AppContext* ctx);
+	void Initialize();
 
 	void Update();
 
@@ -35,8 +35,6 @@ private:
 private:
 
 	bool goResult_ = false;
-
-	AppContext* ctx_ = nullptr;
 
 	Player* player_ = nullptr;
 	EnemyManager* enemyManager_ = nullptr;

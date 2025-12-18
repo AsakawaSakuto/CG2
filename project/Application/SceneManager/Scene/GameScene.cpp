@@ -8,76 +8,74 @@ void GameScene::CleanupResources() {
 
 }
 
-void GameScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
-
 void GameScene::Initialize() {
 	ChangeScene(SCENE::GAME);
 
-	gameCamera_->Initialize(ctx_);
+	gameCamera_->Initialize();
 
 	player_ = make_unique<Player>();
-	player_->Initialize(ctx_);
+	player_->Initialize();
 
-	enemyManager_->Initialize(ctx_);
+	enemyManager_->Initialize();
 
 	// プレイヤーにEnemyManagerへの参照を設定
 	player_->SetEnemyManager(enemyManager_.get());
 
 	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
-	collisionManager_->Initialize(ctx_);
+	collisionManager_->Initialize();
 	collisionManager_->SetPlayer(player_.get());
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
 
-	testParticle_->Initialize(&ctx_->dxCommon);
-	dustParticle_->Initialize(&ctx_->dxCommon);
+	testParticle_->Initialize();
+	dustParticle_->Initialize();
 	dustParticle_->LoadJson("dust");
 
-	testLine_->Initialize(&ctx_->dxCommon);
+	testLine_->Initialize();
 
 	lv_ = make_unique<Sprite>();
-	lv_->Initialize(&ctx_->dxCommon, "UI/game/lv.png", { 70.0f, 110.0f }, { 0.7f, 0.7f });
+	lv_->Initialize("UI/game/lv.png", { 70.0f, 110.0f }, { 0.7f, 0.7f });
 
 	lvText_ = make_unique<Sprite>();
-	lvText_->Initialize(&ctx_->dxCommon, "UI/game/lvText.png", { 140.0f, 180.0f }, { 0.35f, 0.5f } );
+	lvText_->Initialize("UI/game/lvText.png", { 140.0f, 180.0f }, { 0.35f, 0.5f } );
 
 	fireBallIcon_ = make_unique<Sprite>();
-	fireBallIcon_->Initialize(&ctx_->dxCommon, "icon/FireBall.png", { 275.0f, 175.0f }, { 1.5f, 1.5f });
+	fireBallIcon_->Initialize("icon/FireBall.png", { 275.0f, 175.0f }, { 1.5f, 1.5f });
 
 	leaserIcon_ = make_unique<Sprite>();
-	leaserIcon_->Initialize(&ctx_->dxCommon, "icon/leaser.png", { 330.0f, 175.0f }, { 1.5f, 1.5f });
+	leaserIcon_->Initialize("icon/leaser.png", { 330.0f, 175.0f }, { 1.5f, 1.5f });
 
 	runaIcon_ = make_unique<Sprite>();
-	runaIcon_->Initialize(&ctx_->dxCommon, "icon/Runa.png", { 385.0f, 175.0f }, { 1.5f, 1.5f });
+	runaIcon_->Initialize("icon/Runa.png", { 385.0f, 175.0f }, { 1.5f, 1.5f });
 
 	text_ = make_unique<Sprite>();
-	text_->Initialize(&ctx_->dxCommon, "UI/game/text.png", { 0.0f, 0.0f }, { 1.0f, 1.0f });
+	text_->Initialize("UI/game/text.png", { 0.0f, 0.0f }, { 1.0f, 1.0f });
 	textMoveTimer_.Start(2.0f, false);
 
 	// ビットマップフォントの初期化
 	timeFont_ = make_unique<BitmapFont>();
-	timeFont_->Initialize(&ctx_->dxCommon, "number/");
+	timeFont_->Initialize("number/");
 	timeFont_->SetScale({ 0.6f, 0.6f });
 	timeFont_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f }); // 白色
 
 	playerHPFont_ = make_unique<BitmapFont>();
-	playerHPFont_->Initialize(&ctx_->dxCommon, "number/");
+	playerHPFont_->Initialize("number/");
 	playerHPFont_->SetScale({ 0.4f, 0.4f });
 	playerHPFont_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f }); // 赤色
 
 	playerLv_ = make_unique<BitmapFont>();
-	playerLv_->Initialize(&ctx_->dxCommon, "number/");
+	playerLv_->Initialize("number/");
 	playerLv_->SetScale({ 0.4f, 0.4f });
 
 	// HPゲージの初期化
 	hpGauge_ = make_unique<Gauge>();
-	hpGauge_->Initialize(&ctx_->dxCommon, { 38.0f, 21.0f }, { 125.0f, 20.0f }, static_cast<float>(player_->GetMaxHP()));
+	hpGauge_->Initialize();
 	hpGauge_->SetGaugeColor({ 0.0f, 1.0f, 0.0f, 1.0f }); // 緑色
 	hpGauge_->SetBackgroundColor({ 0.3f, 0.0f, 0.0f, 1.0f }); // 暗い赤
 
 	// 経験値ゲージの初期化
 	expGauge_ = make_unique<Gauge>();
-	expGauge_->Initialize(&ctx_->dxCommon, { 0.0f, 670.0f }, { 427.0f, 20.0f }, static_cast<float>(player_->GetExpToNextLevel()));
+	expGauge_->Initialize();
 	expGauge_->SetGaugeColor({ 0.0f, 0.8f, 1.0f, 1.0f }); // シアン色
 	expGauge_->SetBackgroundColor({ 0.1f, 0.1f, 0.3f, 1.0f }); // 暗い青
 
@@ -86,7 +84,7 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	if (ctx_->keyConfig.TriggerAction(Action::PAUSE)) {
+	if (MyInput::Trigger(Action::PAUSE)) {
 		ChangeScene(SCENE::TITLE);
 	}
 
@@ -140,13 +138,8 @@ void GameScene::Update() {
 	playerLv_->Update();*/
 
 	// ゲージの更新
-	hpGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentHP()));
-	hpGauge_->SetMaxValue(static_cast<float>(player_->GetMaxHP()));
-	hpGauge_->Update();
-
-	expGauge_->SetCurrentValue(static_cast<float>(player_->GetCurrentExp()));
-	expGauge_->SetMaxValue(static_cast<float>(player_->GetExpToNextLevel()));
-	expGauge_->Update();
+	hpGauge_->Update(player_->GetCurrentHP(), player_->GetMaxHP());
+	expGauge_->Update(player_->GetCurrentExp(), player_->GetExpToNextLevel());
 }
 
 void GameScene::Draw() {

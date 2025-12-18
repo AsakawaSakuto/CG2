@@ -1,6 +1,5 @@
 #pragma once
 #include "2d/Sprite/Sprite.h"
-#include "Core/DirectXCommon/DirectXCommon.h"
 #include "Math/Type/Vector2.h"
 #include "Utility/FileFormat/Json/JsonManager.h"
 
@@ -8,6 +7,9 @@
 #include <vector>
 #include <string>
 #include <array>
+
+// 前方宣言
+class DirectXCommon;
 
 /// <summary>
 /// ビットマップフォントクラス（数字0-9を表示）
@@ -30,9 +32,9 @@ public:
 	/// <summary>
 	/// ビットマップフォントの初期化
 	/// </summary>
-	/// <param name="dxCommon">DirectXCommonのポインタ</param>
-	/// <param name="numberImageFolder">数字画像フォルダのパス（デフォルト: "number/"）</param>
-	void Initialize(DirectXCommon* dxCommon, const std::string& binaryPath = "temp", const std::string& numberImageFolder = "BitmapFont/");
+	/// <param name="binaryPath">バイナリパス</param>
+	/// <param name="numberImageFolder">数字画像フォルダのパス（デフォルト: "BitmapFont/"）</param>
+	void Initialize(const std::string& binaryPath = "temp", const std::string& numberImageFolder = "BitmapFont/");
 
 	/// <summary>
 	/// 描画処理

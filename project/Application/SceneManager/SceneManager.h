@@ -6,8 +6,8 @@
 #include"SceneManager/Scene/GameScene.h"
 #include"SceneManager/Scene/ResultScene.h"
 
-#include"KeyConfig/InputDevice/Input.h"
-#include"KeyConfig/InputDevice/GamePad.h"
+#include"Input/InputDevice/Input.h"
+#include"Input/InputDevice/GamePad.h"
 
 #include<memory>
 
@@ -32,9 +32,12 @@ private:
 public:
     SceneManager();
     ~SceneManager();
-    int Run();  // メインループ
-    std::unique_ptr<AppContext> appContext_;
+
+    // メインループ
+    int Run(); 
+   
     std::unique_ptr<WinApp> winApp_;
+    std::unique_ptr<DirectXCommon> dxCommon_;
     std::unique_ptr<Input> input_;
     std::unique_ptr<GamePad> gamePad_;
 };

@@ -2,12 +2,11 @@
 #include "EnemyManager.h"
 #include "Utility/Collision/Collision.h"
 
-void EnemyManager::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void EnemyManager::Initialize() {
 	spawnTimer_.Start(0.25f, true);
 
 	dieParticle_ = std::make_unique<Particles>();
-	dieParticle_->Initialize(&ctx_->dxCommon);
+	dieParticle_->Initialize();
 	dieParticle_->LoadJson("EnemyDie");
 }
 
@@ -17,7 +16,7 @@ void EnemyManager::Update() {
 
 		if (spawnTimer_.IsFinished()) {
 			auto enemy = std::make_unique<Enemy>();
-			enemy->Initialize(ctx_);
+			enemy->Initialize();
 
 			int i = random_.Int(0, 1);
 			int j = random_.Int(0, 1);
@@ -77,7 +76,7 @@ void EnemyManager::Update() {
 			dieParticle_->Play(false);
 
 			auto expItem = std::make_unique<ExpItem>();
-			expItem->Initialize(ctx_);
+			expItem->Initialize();
 			expItem->SetPosition((*it)->GetPosition());
 			expItems_.push_back(std::move(expItem));
 
@@ -122,7 +121,7 @@ void EnemyManager::DrawImGui() {
 	
 	if (ImGui::Button("Spawn Enemy Now")) {
 		auto enemy = std::make_unique<Enemy>();
-		enemy->Initialize(ctx_);
+		enemy->Initialize();
 		enemies_.push_back(std::move(enemy));
 	}
 	

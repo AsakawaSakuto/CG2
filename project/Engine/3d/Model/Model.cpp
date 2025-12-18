@@ -10,6 +10,7 @@ using namespace Microsoft::WRL;
 
 #include "Core/PSOManager/PSOManager.h"
 #include "Core/HeapManager/DescriptorAllocator.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 #include "Utility/GameTimer/DeltaTime.h"
 #include "3d/Model/Animation/Function/AnimationFunction.h"
 
@@ -60,7 +61,8 @@ Model::~Model() {
 	}
 }
 
-void Model::Initialize(DirectXCommon* dxCommon,  const std::string& modelPath) {
+void Model::Initialize(const std::string& modelPath) {
+	DirectXCommon* dxCommon = ServiceLocator::GetDXCommon();
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();

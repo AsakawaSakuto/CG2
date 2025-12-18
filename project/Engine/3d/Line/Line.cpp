@@ -1,4 +1,6 @@
 #include "Line.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 #include "Core/PSOManager/PSOManager.h"
 #include "Math/MathFunction/MathFunction.h"
 #include <cmath>
@@ -6,8 +8,15 @@
 #include <cassert>
 #include <cstring>
 
-void Line3d::Initialize(DirectXCommon* dxCommon) {
-    dxCommon_ = dxCommon;
+void Line3d::Initialize() {
+    // ServiceLocatorからDirectXCommonを取得
+    dxCommon_ = ServiceLocator::GetDXCommon();
+    
+    if (!dxCommon_) {
+        // エラー処理：DirectXCommonが登録されていない場合
+        throw std::runtime_error("DirectXCommon is not registered in ServiceLocator. Call ServiceLocator::Provide(dxCommon) first.");
+    }
+    
     device_ = dxCommon_->GetDevice();
     commandList_ = dxCommon_->GetCommandList();
 

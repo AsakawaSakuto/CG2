@@ -2,11 +2,27 @@
 #include "2d/Sprite/Sprite.h"
 #include "Math/Type/Vector2.h"
 #include "Math/Type/Vector4.h"
+#include "Utility/Easing/Easing.h"
+#include "Utility/FileFormat/Json/JsonManager.h"
 #include <memory>
+#include <vector>
+
+// 前方宣言
+class DirectXCommon;
+
+/// <summary>
+/// ゲージの伸びる方向
+/// </summary>
+enum class GaugeDirection {
+	Right,  // 左から右に伸びる
+	Left,   // 右から左に伸びる
+	Up,     // 下から上に伸びる
+	Down    // 上から下に伸びる
+};
 
 /// <summary>
 /// ゲージクラス（HPや経験値などのバー表示用）
-/// white2x2.pngを使用してゲージを描画
+/// white1x1.pngを使用してゲージを描画
 /// </summary>
 class Gauge {
 public:
@@ -23,16 +39,14 @@ public:
 	/// <summary>
 	/// ゲージの初期化
 	/// </summary>
-	/// <param name="dxCommon">DirectXCommonへのポインタ</param>
-	/// <param name="position">ゲージの位置（左上基準）</param>
-	/// <param name="size">ゲージの最大サイズ（幅、高さ）</param>
-	/// <param name="maxValue">ゲージの最大値</param>
-	void Initialize(DirectXCommon* dxCommon, const Vector2& position, const Vector2& size, float maxValue = 100.0f);
+	/// <param name="Path">JSONパス</param>
+	void Initialize(const std::string& Path = "temp");
 
 	/// <summary>
 	/// ゲージの更新
 	/// </summary>
-	void Update();
+	void Update(float currenValue, float maxValue);
+	void Update(int currenValue, int maxValue);
 
 	/// <summary>
 	/// ゲージの描画
@@ -46,16 +60,6 @@ public:
 	void DrawImGui(const char* name);
 
 	// === Setter ===
-
-	/// <summary>
-	/// 現在値を設定（0 ～ maxValue の範囲）
-	/// </summary>
-	void SetCurrentValue(float value);
-
-	/// <summary>
-	/// 最大値を設定
-	/// </summary>
-	void SetMaxValue(float maxValue);
 
 	/// <summary>
 	/// ゲージの位置を設定
@@ -78,66 +82,93 @@ public:
 	void SetGaugeColor(const Vector4& color);
 
 	/// <summary>
-	/// 枠を表示するかどうか
+	/// ゲージのグラデーション開始色を設定
 	/// </summary>
-	void SetShowBorder(bool show);
+	void SetGaugeStartColor(const Vector4& color);
 
 	/// <summary>
-	/// 枠の色を設定
+	/// ゲージのグラデーション終了色を設定
 	/// </summary>
-	void SetBorderColor(const Vector4& color);
+	void SetGaugeEndColor(const Vector4& color);
 
 	/// <summary>
-	/// 枠の太さを設定
+	/// グラデーションを有効/無効にする
 	/// </summary>
-	void SetBorderThickness(float thickness);
+	void SetGradientEnabled(bool enabled);
+
+	/// <summary>
+	/// グラデーション分割数を設定
+	/// </summary>
+	void SetGradientSegments(int segments);
+
+	/// <summary>
+	/// ゲージの伸びる方向を設定
+	/// </summary>
+	void SetDirection(GaugeDirection direction);
 
 	// === Getter ===
-
-	/// <summary>
-	/// 現在値を取得
-	/// </summary>
-	float GetCurrentValue() const { return currentValue_; }
-
-	/// <summary>
-	/// 最大値を取得
-	/// </summary>
-	float GetMaxValue() const { return maxValue_; }
 
 	/// <summary>
 	/// ゲージの割合を取得（0.0f ～ 1.0f）
 	/// </summary>
 	float GetRatio() const;
 
-private:
 	/// <summary>
-	/// スプライトの位置とスケールを更新
+	/// ゲージの伸びる方向を取得
 	/// </summary>
-	void UpdateSprites();
+	GaugeDirection GetDirection() const { return direction_; }
+
+	/// <summary>
+	/// グラデーションが有効かどうかを取得
+	/// </summary>
+	bool IsGradientEnabled() const { return useGradient_; }
 
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 
 	// ゲージパーツ
 	std::unique_ptr<Sprite> background_;  // 背景
-	std::unique_ptr<Sprite> gauge_;       // ゲージ本体
-	std::unique_ptr<Sprite> borderTop_;   // 枠（上）
-	std::unique_ptr<Sprite> borderBottom_;// 枠（下）
-	std::unique_ptr<Sprite> borderLeft_;  // 枠（左）
-	std::unique_ptr<Sprite> borderRight_; // 枠（右）
+	std::unique_ptr<Sprite> gauge_;       // ゲージ本体（単色用）
+	std::vector<std::unique_ptr<Sprite>> gradientSegments_; // グラデーション用のセグメント
 
 	// ゲージのパラメータ
 	Vector2 position_ = { 0.0f, 0.0f };  // 位置（左上基準）
-	Vector2 size_ = { 200.0f, 20.0f };   // サイズ（幅、高さ）
+	Vector2 size_ = { 0.0f, 0.0f };      // サイズ（幅、高さ）
 	float currentValue_ = 100.0f;        // 現在値
 	float maxValue_ = 100.0f;            // 最大値
 
 	// 色設定
-	Vector4 backgroundColor_ = { 0.2f, 0.2f, 0.2f, 1.0f }; // 背景色（暗いグレー）
-	Vector4 gaugeColor_ = { 0.0f, 1.0f, 0.0f, 1.0f };      // ゲージ色（緑）
-	Vector4 borderColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };     // 枠色（白）
+	Vector4 backgroundColor_ = { 0.2f, 0.2f, 0.2f, 1.0f }; // 背景色
+	Vector4 gaugeColor_ = { 0.0f, 1.0f, 0.0f, 1.0f };      // ゲージ色（単色用）
+	
+	// グラデーション設定
+	bool useGradient_ = false;                              // グラデーションを使用するか
+	Vector4 gaugeStartColor_ = { 0.0f, 1.0f, 0.0f, 1.0f };  // グラデーション開始色
+	Vector4 gaugeEndColor_ = { 1.0f, 0.0f, 0.0f, 1.0f };    // グラデーション終了色
+	int numGradientSegments_ = 100;                         // グラデーション分割数
+	int maxGradientSegments_ = 100;                         // グラデーション分割数の上限
 
-	// 枠の設定
-	bool showBorder_ = false;     // 枠を表示するか
-	float borderThickness_ = 2.0f; // 枠の太さ
+	// 背景を描画するかどうか
+	bool drawBackground_ = true; 
+
+	// ゲージの伸びる方向
+	GaugeDirection direction_ = GaugeDirection::Right;
+
+	// 内部ヘルパー関数
+	void InitializeGradientSegments();
+
+	/// <summary>
+	/// JsonFileに設定を保存
+	/// </summary>
+	/// <param name="filePath">保存先のファイルパス（拡張子不要）</param>
+	void SaveToJson(const std::string& filePath);
+
+	/// <summary>
+	/// JsonFileから設定を読み込み
+	/// </summary>
+	/// <param name="filePath">読み込み元のファイルパス（拡張子不要）</param>
+	void LoadFromJson(const std::string& filePath);
+
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::string loadToSaveName_ = "filePath";
 };

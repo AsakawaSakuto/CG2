@@ -180,9 +180,10 @@
     <ClCompile Include="Engine\Audio\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Audio\MasterVolume.cpp" />
-    <ClCompile Include="Engine\KeyConfig\InputDevice\GamePad.cpp" />
+    <ClCompile Include="Engine\Core\ServiceLocator\ServiceLocator.cpp" />
+    <ClCompile Include="Engine\Input\InputDevice\GamePad.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\HeapManager.cpp" />
-    <ClCompile Include="Engine\KeyConfig\KeyConfig.cpp" />
+    <ClCompile Include="Engine\Input\KeyConfig.cpp" />
     <ClCompile Include="Engine\OffScreen\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Engine\Math\MathFunction\MathFunction.cpp" />
@@ -205,6 +206,14 @@
     <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonInput.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\JsonManager.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ConsoleWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\HierarchyWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiDebugSystem.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiHelper.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\InspectorWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\SceneViewWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\StatsWindow.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -226,7 +235,7 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Engine\KeyConfig\InputDevice\Input.cpp" />
+    <ClCompile Include="Engine\Input\InputDevice\Input.cpp" />
     <ClCompile Include="Engine\Core\Logger\Logger.cpp" />
     <ClCompile Include="Engine\3d\Particle\Particles.cpp" />
     <ClCompile Include="main.cpp">
@@ -240,7 +249,6 @@
     <ClCompile Include="Engine\Core\WinApp\WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\AppContext.h" />
     <ClInclude Include="Application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="Application\EngineSystem.h" />
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
@@ -280,9 +288,10 @@
     <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
     <ClInclude Include="Engine\Audio\MasterVolume.h" />
-    <ClInclude Include="Engine\KeyConfig\InputDevice\GamePad.h" />
+    <ClInclude Include="Engine\Core\ServiceLocator\ServiceLocator.h" />
+    <ClInclude Include="Engine\Input\InputDevice\GamePad.h" />
     <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
-    <ClInclude Include="Engine\KeyConfig\KeyConfig.h" />
+    <ClInclude Include="Engine\Input\KeyConfig.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectParams.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOType.h" />
@@ -307,6 +316,14 @@
     <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonInput.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\JsonManager.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ConsoleWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\HierarchyWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiDebugSystem.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiHelper.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiManager.h" />
+    <ClInclude Include="Engine\Utility\ImGui\InspectorWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\SceneViewWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\StatsWindow.h" />
     <ClInclude Include="Engine\Utility\Light\DirectionalLight.h" />
     <ClInclude Include="Engine\Core\DirectXCommon\DirectXCommon.h" />
     <ClInclude Include="Engine\Utility\Easing\Easing.h" />
@@ -343,7 +360,7 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Engine\KeyConfig\InputDevice\Input.h" />
+    <ClInclude Include="Engine\Input\InputDevice\Input.h" />
     <ClInclude Include="Engine\Core\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixFunction\MatrixFunction.h" />
     <ClInclude Include="Engine\3d\Model\Model.h" />
@@ -402,6 +419,9 @@
     <None Include="docs\JsonManager_Usage.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
+    <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
+    <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
+    <None Include="Engine\Utility\ImGui\README.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="resources\shaders\Model\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

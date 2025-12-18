@@ -1,16 +1,15 @@
 #include "Area.h"
 
-void Area::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void Area::Initialize() {
 
 	// パーティクルは後からSetSharedParticle()で設定される
 	transform_.translate = { 0.0f,0.0f,0.0f };
 	transform_.scale = { 3.2f,3.2f,3.2f };
 
-	particle_->Initialize(&ctx_->dxCommon);
-	particle2_->Initialize(&ctx_->dxCommon);
+	particle_->Initialize();
+	particle2_->Initialize();
 
-	model_->Initialize(&ctx_->dxCommon, "weapon/area.obj");
+	model_->Initialize("weapon/area.obj");
 	model_->SetTexture("resources/model/weapon/magic.png");
 	model_->SetColor3({ 0.529f, 0.808f, 0.922f });
 

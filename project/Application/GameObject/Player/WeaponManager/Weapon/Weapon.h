@@ -1,5 +1,4 @@
 #pragma once
-#include "AppContext.h"
 #include "GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
 #include "GameObject/Player/WeaponManager/Weapon/Area/area.h"
 #include "GameObject/Player/WeaponManager/WeaponStatus.h"
@@ -12,7 +11,7 @@
 /// </summary>
 class Weapon {
 public:
-	void Initialize(AppContext* ctx, WeaponName weaponName);
+	void Initialize(WeaponName weaponName);
 
 	void Update();
 
@@ -34,7 +33,6 @@ private:
 
 	void DirectTypeUpdate();
 private:
-	AppContext* ctx_;
 
 	std::vector<std::unique_ptr<Bullet>> bullets_;
 	std::vector<std::unique_ptr<Area>> areas_;

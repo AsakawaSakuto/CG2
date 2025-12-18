@@ -6,6 +6,7 @@
 #include <windows.h>
 #include "Core/TextureManager/TextureManager.h"
 #include "Core/Logger/Logger.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 #include "Utility/GameTimer/DeltaTime.h"
 #include "3d/Model/Model.h"
 
@@ -40,36 +41,37 @@ void SceneManager::Initialize() {
     // COM初期化
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-    // ヒープ上にAppContextを生成
-    appContext_ = std::make_unique<AppContext>();
+	// WinAppの初期化
     winApp_ = std::make_unique<WinApp>();
-
-    // 各種初期化
     winApp_->Initialize(L"LE2A_01_アサカワ_サクト");
 
     // exeのアイコン設定
     winApp_->SetIconFromTexture("resources/image/icon.png");
-
     winApp_->EnableResize(false);
-    appContext_->dxCommon.Initialize(winApp_.get());
-    TextureManager::GetInstance()->Initialize(&appContext_->dxCommon);
+
+	dxCommon_ = std::make_unique<DirectXCommon>();
+	dxCommon_->Initialize(winApp_.get());
+    
+    // ServiceLocatorにDirectXCommonを登録
+    ServiceLocator::Provide(dxCommon_.get());
+    
+    TextureManager::GetInstance()->Initialize(dxCommon_.get());
     Logger::Initialize();
     std::filesystem::create_directory("logs");
 
+    // 入力関連の初期化
 	input_ = std::make_unique<Input>();
     input_->Initialize(winApp_.get());
 
 	gamePad_ = std::make_unique<GamePad>();
     gamePad_->Initialize();
 
-    // InputConfigの初期化
-    appContext_->keyConfig.Initialize();
-    appContext_->keyConfig.SetInputDevices(input_.get(), gamePad_.get());
+    KeyConfig::GetInstance()->Initialize();
+    KeyConfig::GetInstance()->SetInputDevices(input_.get(), gamePad_.get());
 
     // 初期シーンを作成
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
     if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
-        sceneArr_[static_cast<int>(currentSceneNo_)]->SetAppContext(appContext_.get());
         sceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();
     }
 }
@@ -85,7 +87,7 @@ void SceneManager::Update() {
                 running = false;
 
                 // シェーダーキャッシュを削除
-                appContext_->dxCommon.ClearShaderCache();
+                dxCommon_->ClearShaderCache();
 
                 break;
             }
@@ -118,7 +120,6 @@ void SceneManager::Update() {
 
             // 新しいシーン初期化
             if (sceneArr_[curIndex]) {
-                sceneArr_[curIndex]->SetAppContext(appContext_.get());
                 sceneArr_[curIndex]->Initialize();
             } else {
                 // 生成失敗したら落とすなりエラー処理
@@ -135,7 +136,7 @@ void SceneManager::Update() {
         sceneArr_[curIndex]->Update();
 
         // 描画前
-        appContext_->dxCommon.PreDraw();
+        dxCommon_->PreDraw();
 
         // 描画
         sceneArr_[curIndex]->Draw();
@@ -160,7 +161,7 @@ void SceneManager::Update() {
 #endif
 
         // 描画後
-        appContext_->dxCommon.PostDraw();
+        dxCommon_->PostDraw();
 
         if (curIndex == 2) { sceneArr_[curIndex]->PostFrameCleanup(); }
     }
@@ -178,7 +179,7 @@ void SceneManager::Finalize() {
     }
 
     // GPUの完了を待機（リソース解放前に）
-    appContext_->dxCommon.WaitForGPU();
+    dxCommon_->WaitForGPU();
 
     // Modelの静的キャッシュを解放
     Model::Finalize();
@@ -187,11 +188,7 @@ void SceneManager::Finalize() {
     TextureManager::GetInstance()->Finalize();
     
     // フェンスイベントを閉じる（デストラクタでも行うが念のため）
-    appContext_->dxCommon.CloseFence();
-
-    // appContext_はunique_ptrなので、ここでデストラクタが呼ばれる前に
-    // 明示的にリセットして、DirectXCommonのデストラクタを呼び出す
-    appContext_.reset();
+    dxCommon_->CloseFence();
 
     // WinAppの終了処理
     winApp_->Finalize();
@@ -213,12 +210,12 @@ void SceneManager::Shortcut() {
         } else {
             winApp_->ExitBorderlessFullscreen();
         }
-        appContext_->dxCommon.ResizeToWindow();
+        dxCommon_->ResizeToWindow();
     }
 
     // F10キー : SRV使用状況をデバッグログに出力
     if (GetAsyncKeyState(VK_F10) & 1) {
-        uint32_t totalUsed = appContext_->dxCommon.GetTotalUsedSRVCount();
+        uint32_t totalUsed = dxCommon_->GetTotalUsedSRVCount();
         char buffer[256];
         sprintf_s(buffer, "=== SRV Usage Report ===\n");
         OutputDebugStringA(buffer);
@@ -235,7 +232,7 @@ void SceneManager::Shortcut() {
         OutputDebugStringA(buffer);
 
         // パーティクル詳細
-        auto& particleAlloc = appContext_->dxCommon.GetParticleAlloc();
+        auto& particleAlloc = dxCommon_->GetParticleAlloc();
         sprintf_s(buffer, "  - Particles: %u / %u (Range: %u-%u)\n",
             particleAlloc.GetUsedCount(),
             particleAlloc.GetCapacity(),
@@ -244,7 +241,7 @@ void SceneManager::Shortcut() {
         OutputDebugStringA(buffer);
 
         // モデル詳細
-        auto& modelAlloc = appContext_->dxCommon.GetModelAlloc();
+        auto& modelAlloc = dxCommon_->GetModelAlloc();
         sprintf_s(buffer, "  - Models (Skinning): %u / %u (Range: %u-%u)\n",
             modelAlloc.GetUsedCount(),
             modelAlloc.GetCapacity(),

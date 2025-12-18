@@ -1,4 +1,5 @@
 #include "TestScene.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 
 #define WHITE {1.0f,1.0f,1.0f,1.0f}
 #define RED   {1.0f,0.0f,0.0f,1.0f}
@@ -11,34 +12,32 @@ void TestScene::CleanupResources() {
 
 }
 
-void TestScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
-
 void TestScene::Initialize() {
     CleanupResources();
 	camera_.SetPosition({ 0.0f, 2.5f, -20.0f });
-	debugCamera_.SetInput(ctx_->keyConfig.GetInput());
+	debugCamera_.SetInput(MyInput::GetInput());
 	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
-	testParticle_->Initialize(&ctx_->dxCommon, "temp");
+	testParticle_->Initialize("temp");
 
-	testSprite_->Initialize(&ctx_->dxCommon, "icon/fireBall.png", { 64.0f,64.0f });
+	testSprite_->Initialize("icon/fireBall.png", { 64.0f,64.0f });
 
-	cube_->Initialize(&ctx_->dxCommon, "cube.obj");
+	cube_->Initialize("cube.obj");
     cubeTransform_.translate = { -1.5f,2.5f,0.0f };
 
-	spinCube_->Initialize(&ctx_->dxCommon, "Animation/cube/AnimatedCube.gltf");
+	spinCube_->Initialize("Animation/cube/AnimatedCube.gltf");
     spinCubeTransform_.translate = { 1.5f,4.5f,0.0f };
 	spinCubeTransform_.scale = { 0.5f,0.5f,0.5f };
 
-	simpleSkin_->Initialize(&ctx_->dxCommon, "Animation/SimpleSkin/SimpleSkin.gltf");
+	simpleSkin_->Initialize("Animation/SimpleSkin/SimpleSkin.gltf");
 	simpleSkinTransform_.rotate = { 0.0f,3.12f,0.0f };
 	simpleSkinTransform_.translate = { -3.0f,0.0f,0.0f };
 
-    walk_->Initialize(&ctx_->dxCommon, "Animation/human/Walk.gltf");
+    walk_->Initialize("Animation/human/Walk.gltf");
     walkTransform_.rotate = { 0.0f,3.12f,0.0f };
     walkTransform_.translate = { 0.0f,0.0f,0.0f };
 
-    sneakWalk_->Initialize(&ctx_->dxCommon, "Animation/human/sneakWalk.gltf");
+    sneakWalk_->Initialize("Animation/human/sneakWalk.gltf");
     sneakWalkTransform_.rotate = { 0.0f, 3.12f,0.0f };
     sneakWalkTransform_.translate = { 3.0f,0.0f,0.0f };
 
@@ -53,9 +52,11 @@ void TestScene::Initialize() {
 	testOvalSphere_.rotate = { 0.0f, 0.0f, 0.0f };
 	testOvalSphere_.UpdateOrientation();
 
-	testLine_->Initialize(&ctx_->dxCommon);
+	testLine_->Initialize();
 
-	bitmapFont_.Initialize(&ctx_->dxCommon);
+	bitmapFont_.Initialize();
+
+    testGauge_->Initialize();
 }
 
 void TestScene::Update() {
@@ -126,11 +127,13 @@ void TestScene::Update() {
 	debugCamera_.Update();
 
     bitmapFont_.SetNumber(setValue_);
+
+    testGauge_->Update(currentGaugeValue_, maxGaugeValue_);
 }
 
 void TestScene::Draw() {
 
-    auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+    auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
     postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 
 	testLine_->Draw(camera_);
@@ -146,20 +149,21 @@ void TestScene::Draw() {
 	testSprite_->Draw();
 
 	bitmapFont_.Draw();
+
+	testGauge_->Draw();
 }
 
 void TestScene::DrawImGui() {
 #ifdef USE_IMGUI
 
-    auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+    auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	testOBB_.DrawImGui("testOBB");
-    testAABB_.DrawImGui("testAABB");
-    testSphere_.DrawImGui("testSphere");
-    testOvalSphere_.DrawImGui("testOvalSphere");
-
-    testPlane_.DrawImGui("testPlane");
+	//testOBB_.DrawImGui("testOBB");
+    //testAABB_.DrawImGui("testAABB");
+    //testSphere_.DrawImGui("testSphere");
+    //testOvalSphere_.DrawImGui("testOvalSphere");
+    //testPlane_.DrawImGui("testPlane");
 
 	testParticle_->DrawImGui("testParticle");
 
@@ -169,9 +173,15 @@ void TestScene::DrawImGui() {
 
     ImGui::DragInt("Value", &setValue_, 1, 0, 999999);
 
+	ImGui::DragFloat("Test Float", &currentGaugeValue_, 0.1f, 0.0f, 100.0f);
+
+	ImGui::DragFloat("Max Float", &maxGaugeValue_, 0.1f, 1.0f, 1000.0f);
+
 	ImGui::End();
 
 	bitmapFont_.DrawImGui("bitmapFont");
+
+	testGauge_->DrawImGui("testGauge");
 
     //testSprite_->DrawImGui("testSprite");
 

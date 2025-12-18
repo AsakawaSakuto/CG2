@@ -1,12 +1,11 @@
 #pragma once
 #include "Camera/Camera.h"
-#include "AppContext.h"
 #include <cmath>
 
 class GameCameraController
 {
 public:
-	void Initialize(AppContext* ctx);
+	void Initialize();
 	void Update();
 	
 	// TPS機能
@@ -17,6 +16,5 @@ public:
 
 private:
 	Camera camera_;
-	AppContext* ctx_ = nullptr;
 	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
 };

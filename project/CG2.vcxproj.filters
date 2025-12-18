@@ -70,15 +70,23 @@
     <ClCompile Include="Engine\Utility\FileFormat\Binary\Data\BinaryOutput.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
-    <ClCompile Include="Engine\KeyConfig\InputDevice\GamePad.cpp" />
-    <ClCompile Include="Engine\KeyConfig\KeyConfig.cpp" />
-    <ClCompile Include="Engine\KeyConfig\InputDevice\Input.cpp" />
+    <ClCompile Include="Engine\Input\InputDevice\GamePad.cpp" />
+    <ClCompile Include="Engine\Input\KeyConfig.cpp" />
+    <ClCompile Include="Engine\Input\InputDevice\Input.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\JsonManager.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonInput.cpp" />
+    <ClCompile Include="Engine\Core\ServiceLocator\ServiceLocator.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ConsoleWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\HierarchyWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiDebugSystem.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiHelper.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\InspectorWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\SceneViewWindow.cpp" />
+    <ClCompile Include="Engine\Utility\ImGui\StatsWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\AppContext.h" />
     <ClInclude Include="Application\EngineSystem.h" />
     <ClInclude Include="Application\SceneManager\IScene.h" />
     <ClInclude Include="Application\SceneManager\SceneManager.h" />
@@ -175,12 +183,21 @@
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
     <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />
     <ClInclude Include="Engine\Camera\Frustum.h" />
-    <ClInclude Include="Engine\KeyConfig\InputDevice\GamePad.h" />
-    <ClInclude Include="Engine\KeyConfig\KeyConfig.h" />
-    <ClInclude Include="Engine\KeyConfig\InputDevice\Input.h" />
+    <ClInclude Include="Engine\Input\InputDevice\GamePad.h" />
+    <ClInclude Include="Engine\Input\KeyConfig.h" />
+    <ClInclude Include="Engine\Input\InputDevice\Input.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\JsonManager.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonInput.h" />
+    <ClInclude Include="Engine\Core\ServiceLocator\ServiceLocator.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ConsoleWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\HierarchyWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiDebugSystem.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiHelper.h" />
+    <ClInclude Include="Engine\Utility\ImGui\ImGuiManager.h" />
+    <ClInclude Include="Engine\Utility\ImGui\InspectorWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\SceneViewWindow.h" />
+    <ClInclude Include="Engine\Utility\ImGui\StatsWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -190,5 +207,8 @@
     <None Include="resources\json\ranking.json" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="docs\JsonManager_Usage.md" />
+    <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
+    <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
+    <None Include="Engine\Utility\ImGui\README.md" />
   </ItemGroup>
 </Project>

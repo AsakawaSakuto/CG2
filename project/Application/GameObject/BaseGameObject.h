@@ -1,5 +1,4 @@
 #pragma once
-#include "AppContext.h"
 #include "Utility/Collision/Type/AABB.h"
 #include "Utility/Collision/Type/Sphere.h"
 #include "Utility/Transform/Transform.h"
@@ -8,7 +7,6 @@
 
 class BaseGameObject {
 protected:
-    AppContext* ctx_;
 
     bool isAlive_ = true;
 
@@ -18,7 +16,7 @@ protected:
 
 	std::unique_ptr<Line3d> debugLine_ = std::make_unique<Line3d>();
 public:
-    virtual void Initialize(AppContext* ctx) = 0;
+    virtual void Initialize() = 0;
     virtual void Update() = 0;
     virtual void Draw(Camera camera) = 0;
     virtual void DrawImGui() {};

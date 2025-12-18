@@ -52,11 +52,20 @@ struct InputBinding {
 	InputBinding(InputSource src, GamePad::DownStick dir) : source(src), key(0), stickDirection(dir) {}
 };
 
-// キーコンフィグ管理クラス
+// キーコンフィグ管理クラス（シングルトン）
 class KeyConfig {
 public:
-	KeyConfig() = default;
-	~KeyConfig() = default;
+	// シングルトンインスタンス取得
+	static KeyConfig* GetInstance() {
+		static KeyConfig instance;
+		return &instance;
+	}
+
+	// コピー・ムーブ禁止
+	KeyConfig(const KeyConfig&) = delete;
+	KeyConfig& operator=(const KeyConfig&) = delete;
+	KeyConfig(KeyConfig&&) = delete;
+	KeyConfig& operator=(KeyConfig&&) = delete;
 
 	// 初期化
 	void Initialize();
@@ -103,6 +112,9 @@ public:
 	Input* GetInput() const { return input_; }
 	GamePad* GetGamePad() const { return gamePad_; }
 private:
+	KeyConfig() = default;
+	~KeyConfig() = default;
+
 	Input* input_ = nullptr;
 	GamePad* gamePad_ = nullptr;
 
@@ -119,3 +131,43 @@ private:
 	float GetBindingValue(const InputBinding& binding) const;
 	Vector2D GetBindingVector2D(const InputBinding& binding) const;
 };
+
+// ======================================
+// グローバルヘルパー関数（短縮呼び出し用）
+// ======================================
+namespace MyInput {
+	// Trigger判定（押した瞬間）
+	inline bool Trigger(Action action) {
+		return KeyConfig::GetInstance()->TriggerAction(action);
+	}
+
+	// Push判定（押し続けている）
+	inline bool Push(Action action) {
+		return KeyConfig::GetInstance()->PushAction(action);
+	}
+
+	// Release判定（離した瞬間")
+	inline bool Release(Action action) {
+		return KeyConfig::GetInstance()->ReleaseAction(action);
+	}
+
+	// アナログ値取得（0.0〜1.0）
+	inline float Value(Action action) {
+		return KeyConfig::GetInstance()->GetActionValue(action);
+	}
+
+	// 2D入力取得（-1.0〜1.0）
+	inline KeyConfig::Vector2D GetVector2D(Action action) {
+		return KeyConfig::GetInstance()->GetActionVector2D(action);
+	}
+
+	// 入力デバイス取得
+	inline Input* GetInput() {
+		return KeyConfig::GetInstance()->GetInput();
+	}
+
+	// ゲームパッドを接続しているか取得
+	inline bool UseGamePad() {
+		return KeyConfig::GetInstance()->IsGamePadConnected();
+	}
+}

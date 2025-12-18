@@ -1,7 +1,6 @@
 #pragma once
 #include "3d/Model/ModelDataStruct.h"
 
-#include "Core/DirectXCommon/DirectXCommon.h"
 #include "Utility/Transform/Transform.h"
 #include "Core/TextureManager/TextureManager.h"
 #include "Math/MatrixFunction/MatrixFunction.h"
@@ -12,6 +11,9 @@
 
 #include <cmath>
 #include <numbers>
+
+// 前方宣言
+class DirectXCommon;
 
 /// <summary>
 /// 2Dスプライトクラス
@@ -28,11 +30,10 @@ public:
 	/// <summary>
 	/// Spriteの初期化
 	/// </summary>
-	/// <param name="dxCommon">dxCommonを渡す</param>
 	/// <param name="fileName">"resources/image/" 以降のPathを渡す</param>
 	/// <param name="position">Vector2型でスクリーン座標を設定(任意)</param>
 	/// <param name="scale">Vector2型でScaleを設定(任意)</param>
-	void Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position = { 0.0f,0.0f }, Vector2 scale = { 1.0f,1.0f });
+	void Initialize(const std::string& fileName, Vector2 position = { 0.0f,0.0f }, Vector2 scale = { 1.0f,1.0f });
 
 	/// <summary>
 	/// 行列計算などの更新
@@ -114,7 +115,7 @@ private:
 	Transform2D uvTransform_ = {};
 
 	Vector2 size_ = {};
-	Vector2 anchorPoint = { 0.5f,0.5f };
+	Vector2 anchorPoint_ = { 0.5f,0.5f };
 
 	std::string textureName_;
 

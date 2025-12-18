@@ -8,7 +8,6 @@ using std::make_unique;
 
 class ResultScene : public IScene {
 public:
-	void SetAppContext(AppContext* ctx) override;
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
@@ -22,9 +21,6 @@ private:
 
 private:
 	unique_ptr<Sprite> pushA_ = make_unique<Sprite>();
-
-	// AppContext
-	AppContext* ctx_ = nullptr;
 
 	Camera camera_;
 	DebugCamera debugCamera_;

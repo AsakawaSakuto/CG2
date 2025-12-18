@@ -1,9 +1,8 @@
 #include "ExpItem.h"
 
-void ExpItem::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void ExpItem::Initialize() {
 
-	model_->Initialize(&ctx_->dxCommon, "Animation/ExpItem/ExpItem.gltf");
+	model_->Initialize("Animation/ExpItem/ExpItem.gltf");
 	model_->SetTexture("resources/image/white16x16.png");
 	model_->SetColor3({ 166.0f / 255.0f,245.0f / 255.0f,233.0f / 255.0f });
 

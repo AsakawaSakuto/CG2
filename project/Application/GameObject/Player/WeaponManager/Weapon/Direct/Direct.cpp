@@ -1,12 +1,11 @@
 #include "Direct.h"
 
-void Direct::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void Direct::Initialize() {
 
 	transform_.translate = { 0.0f,0.0f,0.0f };
 
-	particle_->Initialize(&ctx_->dxCommon);
-	particle2_->Initialize(&ctx_->dxCommon);
+	particle_->Initialize();
+	particle2_->Initialize();
 
 	lifeTimer_.Start(10.0f, false);
 }

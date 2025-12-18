@@ -156,19 +156,30 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         return;
     }
 
-    // ミップマップ生成（リニアフィルタに変更）
+    // ミップマップの参照を保持する変数
+    const DirectX::ScratchImage* finalImage = &image;
     DirectX::ScratchImage mipImages{};
-    hr = DirectX::GenerateMipMaps(
-        image.GetImages(),
-        image.GetImageCount(),
-        image.GetMetadata(),
-        DirectX::TEX_FILTER_DEFAULT,  // TEX_FILTER_SRGBをDEFAULTに変更
-        0,
-        mipImages);
-    
-    if (FAILED(hr)) {
-        Logger::Error("Failed to generate mipmaps: " + safeFilePath);
-        return;
+
+    // テクスチャが1x1ピクセルより大きい場合のみミップマップを生成
+    const DirectX::TexMetadata& metadata = image.GetMetadata();
+    if (metadata.width > 1 || metadata.height > 1) {
+        // ミップマップ生成（リニアフィルタに変更）
+        hr = DirectX::GenerateMipMaps(
+            image.GetImages(),
+            image.GetImageCount(),
+            image.GetMetadata(),
+            DirectX::TEX_FILTER_DEFAULT,  // TEX_FILTER_SRGBをDEFAULTに変更
+            0,
+            mipImages);
+        
+        if (FAILED(hr)) {
+            Logger::Error("Failed to generate mipmaps: " + safeFilePath);
+            return;
+        }
+        finalImage = &mipImages;
+    } else {
+        // 1x1ピクセルの場合はミップマップ生成をスキップ
+        OutputDebugStringA("  -> Skipping mipmap generation for 1x1 texture\n");
     }
 
     // 先に index を確保
@@ -186,9 +197,9 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     assert(it != texturePathToIndex_.end());
     textureData.filePath = it->first;  // map の key を参照（寿命が保証される）
     
-    textureData.matadata = mipImages.GetMetadata();
+    textureData.matadata = finalImage->GetMetadata();
     textureData.resource = CreateTextureResource(device_.Get(), textureData.matadata);
-    UploadTextureData(textureData.resource.Get(), mipImages);
+    UploadTextureData(textureData.resource.Get(), *finalImage);
 
     // SRV登録位置を計算
     uint32_t srvIndex = index + kSRVIndexTop_;

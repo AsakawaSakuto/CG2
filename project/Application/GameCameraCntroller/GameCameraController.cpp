@@ -1,9 +1,7 @@
 #include "GameCameraController.h"
+#include "Input/KeyConfig.h"
 
-void GameCameraController::Initialize(AppContext* ctx) {
-	// AppContextを保存
-	ctx_ = ctx;
-	
+void GameCameraController::Initialize() {
 	// カメラの初期設定
 	camera_.SetTarget({0.0f, 0.0f, 0.0f});   // デフォルトターゲット
 	camera_.SetDistance(30.0f);              // デフォルト距離
@@ -11,10 +9,9 @@ void GameCameraController::Initialize(AppContext* ctx) {
 }
 
 void GameCameraController::Update() {
-	if (!ctx_) return;
 
 	// KeyConfigを使ってカメラ操作の入力を取得
-	auto cameraInput = ctx_->keyConfig.GetActionVector2D(Action::CAMERA_LOOK);
+	auto cameraInput = MyInput::GetVector2D(Action::CAMERA_LOOK);
 
 	// 感度設定
 	const float horizontalSensitivity = 0.05f;  // 水平方向の感度

@@ -4,7 +4,7 @@
 
 class Area : public BaseGameObject {
 public:
-    void Initialize(AppContext* ctx) override;
+    void Initialize() override;
     void Update() override;
     void Draw(Camera camera) override;
     void DrawImGui() override;

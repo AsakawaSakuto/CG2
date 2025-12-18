@@ -31,6 +31,8 @@
 #include "Camera/CameraForGPU.h"
 #include "Math/MatrixFunction/MatrixFunction.h"
 
+class DirectXCommon;
+
 /// <summary>
 /// 3Dモデルクラス
 /// </summary>
@@ -47,7 +49,7 @@ public:
 	/// </summary>
 	/// <param name="dxCommon">dxCommonを渡す</param>
 	/// <param name="ModelPath">"resources/model/" 以降のPathを渡す</param>
-	void Initialize(DirectXCommon* dxCommon, const std::string& ModelPath);
+	void Initialize(const std::string& ModelPath);
 
 	// デストラクタ
 	~Model();
