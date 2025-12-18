@@ -11,7 +11,6 @@ using std::make_unique;
 
 class TestScene : public IScene {
 public:
-	void SetAppContext(AppContext* ctx) override;
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
@@ -29,8 +28,6 @@ private:
 	void MT4_01_04();
 	void MT4_01_05();
 private:
-	// AppContext
-	AppContext* ctx_ = nullptr;
 
 	unique_ptr<Sprite> testSprite_ = make_unique<Sprite>();
 

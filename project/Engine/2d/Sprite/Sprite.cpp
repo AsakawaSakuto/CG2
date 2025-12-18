@@ -1,5 +1,7 @@
 #include "Sprite.h"
 #include "Core/WinApp/WinApp.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 
 #include <cassert>
 #pragma comment(lib,"d3d12.lib")
@@ -53,7 +55,14 @@ Sprite::~Sprite() {
 	}
 }
 
-void Sprite::Initialize(DirectXCommon* dxCommon, const std::string& fileName, Vector2 position, Vector2 scale) {
+void Sprite::Initialize(const std::string& fileName, Vector2 position, Vector2 scale) {
+	// ServiceLocatorからDirectXCommonを取得
+	DirectXCommon* dxCommon = ServiceLocator::GetDXCommon();
+	
+	if (!dxCommon) {
+		// エラー処理：DirectXCommonが登録されていない場合
+		throw std::runtime_error("DirectXCommon is not registered in ServiceLocator. Call ServiceLocator::Provide(dxCommon) first.");
+	}
 
 	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();

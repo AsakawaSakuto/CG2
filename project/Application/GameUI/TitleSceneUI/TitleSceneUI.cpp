@@ -3,12 +3,11 @@
 TitleSceneUI::~TitleSceneUI() {
 }
 
-void TitleSceneUI::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void TitleSceneUI::Initialize() {
 
-	playUI_->Initialize(&ctx_->dxCommon, "UI/title/playUI.png", { 640.0f,440.0f }, { 0.5f,0.5f });
-	quitUI_->Initialize(&ctx_->dxCommon, "UI/title/quitUI.png", { 640.0f,600.0f }, { 0.5f,0.5f });
-	titleLogoUI_->Initialize(&ctx_->dxCommon, "UI/title/titlelogo.png", { 640.0f,200.0f });
+	playUI_->Initialize("UI/title/playUI.png", { 640.0f,440.0f }, { 0.5f,0.5f });
+	quitUI_->Initialize("UI/title/quitUI.png", { 640.0f,600.0f }, { 0.5f,0.5f });
+	titleLogoUI_->Initialize("UI/title/titlelogo.png", { 640.0f,200.0f });
 }
 
 void TitleSceneUI::Update() {
@@ -17,11 +16,11 @@ void TitleSceneUI::Update() {
 	{
 	case TitleSceneUI::TitleSelectState::PLAY:
 
-		if (ctx_->keyConfig.TriggerAction(Action::CELECT_DOWN)) {
+		if (MyInput::Trigger(Action::CELECT_DOWN)) {
 			selectState_ = TitleSelectState::QUIT;
 		}
 
-		if (ctx_->keyConfig.TriggerAction(Action::CONFIRM)) {
+		if (MyInput::Trigger(Action::CONFIRM)) {
 			isPlay_ = true;
 		}
 
@@ -31,11 +30,11 @@ void TitleSceneUI::Update() {
 		break;
 	case TitleSceneUI::TitleSelectState::QUIT:
 
-		if (ctx_->keyConfig.TriggerAction(Action::CELECT_UP)) {
+		if (MyInput::Trigger(Action::CELECT_UP)) {
 			selectState_ = TitleSelectState::PLAY;
 		}
 
-		if (ctx_->keyConfig.TriggerAction(Action::CONFIRM)) {
+		if (MyInput::Trigger(Action::CONFIRM)) {
 			isQuit_ = true;
 		}
 

@@ -2,12 +2,11 @@
 #include <filesystem>
 #include <memory>
 
-#include "AppContext.h"
 #include "SceneManager/IScene.h"
 
 // Include
 #include "Core/WinApp/WinApp.h"
-#include "KeyConfig/KeyConfig.h"
+#include "Input/KeyConfig.h"
 #include "Camera/Camera.h"
 #include "Audio/Audio.h"
 #include "Camera/DebugCamera.h"

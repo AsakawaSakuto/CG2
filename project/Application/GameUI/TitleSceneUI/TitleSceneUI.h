@@ -4,7 +4,7 @@
 
 class TitleSceneUI : public BaseUI {
 public:
-	void Initialize(AppContext* ctx) override;
+	void Initialize() override;
 	void Update() override;
 	void Draw() override;
 	void DrawImGui() override;

@@ -4,7 +4,7 @@
 
 class EnemyManager {
 public:
-	void Initialize(AppContext* ctx);
+	void Initialize();
 
 	void Update();
 
@@ -20,7 +20,6 @@ public:
 
 private:
 
-	AppContext* ctx_;
 	std::vector<std::unique_ptr<Enemy>> enemies_;
 	std::vector<std::unique_ptr<ExpItem>> expItems_;
 	GameTimer spawnTimer_;

@@ -1,9 +1,8 @@
 #include "Weapon.h"
 #include <algorithm>
 
-void Weapon::Initialize(AppContext* ctx, WeaponName weaponName) {
+void Weapon::Initialize(WeaponName weaponName) {
 
-	ctx_ = ctx;
 	weaponName_ = weaponName;
 
 	switch (weaponName_)
@@ -167,7 +166,7 @@ void Weapon::BulletTypeUpdate() {
 	if (intervalTimer_.IsFinished()) {
 
 		auto bullet = std::make_unique<Bullet>();
-		bullet->Initialize(ctx_);
+		bullet->Initialize();
 		bullet->SetPosition(playerPosition_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetSpeed(status_.moveSpeed);
@@ -216,7 +215,7 @@ void Weapon::AreaTypeUpdate() {
 	if (intervalTimer_.IsFinished()) {
 
 		auto area = std::make_unique<Area>();
-		area->Initialize(ctx_);
+		area->Initialize();
 		switch (weaponName_)
 		{
 		case WeaponName::BubbleArea:

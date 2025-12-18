@@ -6,14 +6,13 @@
 #include "GameObject/Player/WeaponManager/Weapon/Bullet/Bullet.h"
 #include "Utility/Collision/Collision.h"
 
-void CollisionManager::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void CollisionManager::Initialize() {
 
-	enemyDieParticle_->Initialize(&ctx_->dxCommon);
+	enemyDieParticle_->Initialize();
 	enemyDieParticle_->LoadJson("EnemyDie");
 	enemyDieParticle_->Stop();
 
-	expItemGetParticle_->Initialize(&ctx_->dxCommon);
+	expItemGetParticle_->Initialize();
 	expItemGetParticle_->LoadJson("expItemGet");
 	expItemGetParticle_->Stop();
 }

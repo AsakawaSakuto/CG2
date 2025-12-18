@@ -1,7 +1,6 @@
 #include "bullet.h"
 
-void Bullet::Initialize(AppContext* ctx) {
-    ctx_ = ctx;
+void Bullet::Initialize() {
 
 	// パーティクルは後からSetSharedParticle()で設定される
 	transform_.translate = { 0.0f,0.0f,0.0f };
@@ -11,10 +10,10 @@ void Bullet::Initialize(AppContext* ctx) {
 
 	// 初回のみリソース確保、2回目以降はリセットのみ
 	// （Particlesクラス内部で isInitialized_ フラグを使用して判定）
-	particle_->Initialize(&ctx_->dxCommon);
-	particle2_->Initialize(&ctx_->dxCommon);
+	particle_->Initialize();
+	particle2_->Initialize();
 
-	debugLine_->Initialize(&ctx_->dxCommon);
+	debugLine_->Initialize();
 }
 
 void Bullet::Update() {

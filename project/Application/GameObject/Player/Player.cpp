@@ -8,25 +8,25 @@ void Player::PostFrameCleanup() {
 	weaponManager_->PostFrameCleanup();
 }
 
-void Player::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void Player::Initialize() {
+
 	transform_.scale = { 1.0f,1.0f,1.0f };
 
-	model_->Initialize(&ctx_->dxCommon, "animation/human/walk.gltf");
+	model_->Initialize("animation/human/walk.gltf");
 	model_->UseLight(false);
 
-	expItemGetRange_->Initialize(&ctx_->dxCommon, "player/expItemGetRange.obj");
+	expItemGetRange_->Initialize("player/expItemGetRange.obj");
 	expItemGetRange_->SetTexture("resources/image/white16x16.png");
 	expItemGetRange_->SetDrawMode(true);
 
-	moveParticle_->Initialize(&ctx_->dxCommon);
+	moveParticle_->Initialize();
 	moveParticle_->LoadJson("playerMove");
-	landingParticle_->Initialize(&ctx_->dxCommon);
+	landingParticle_->Initialize();
 	landingParticle_->LoadJson("playerLanding");
 
-	weaponManager_->Initialize(ctx_);
+	weaponManager_->Initialize();
 
-	debugLine_->Initialize(&ctx_->dxCommon);
+	debugLine_->Initialize();
 
 	// ステータスの初期化
 	status_.currentHP_ = status_.maxHP_;
@@ -114,21 +114,21 @@ void Player::Move() {
 	KeyConfig::Vector2D moveInput = { 0.0f, 0.0f };
 	
 	// GamePadが接続されている場合、スティック入力を取得
-	if (ctx_->keyConfig.IsGamePadConnected()) {
-		moveInput = ctx_->keyConfig.GetActionVector2D(Action::MOVE_STICK);
+	if (MyInput::UseGamePad()) {
+		moveInput = MyInput::GetVector2D(Action::MOVE_STICK);
 	} else {
 		// GamePadが接続されていないか、スティック入力がほぼゼロの場合、キーボード入力を確認
 		// 各方向の入力を確認
-		if (ctx_->keyConfig.PushAction(Action::MOVE_UP)) {
+		if (MyInput::Push(Action::MOVE_UP)) {
 			moveInput.y += 1.0f;
 		}
-		if (ctx_->keyConfig.PushAction(Action::MOVE_DOWN)) {
+		if (MyInput::Push(Action::MOVE_DOWN)) {
 			moveInput.y -= 1.0f;
 		}
-		if (ctx_->keyConfig.PushAction(Action::MOVE_RIGHT)) {
+		if (MyInput::Push(Action::MOVE_RIGHT)) {
 			moveInput.x += 1.0f;
 		}
-		if (ctx_->keyConfig.PushAction(Action::MOVE_LEFT)) {
+		if (MyInput::Push(Action::MOVE_LEFT)) {
 			moveInput.x -= 1.0f;
 		}
 	}
@@ -228,7 +228,7 @@ void Player::Jump() {
 	}
 
 	// Aボタンでジャンプ
-	if (ctx_->keyConfig.TriggerAction(Action::CONFIRM)) {
+	if (MyInput::Trigger(Action::CONFIRM)) {
 		if (status_.currentJumpCount_ < status_.jumpCanCount_) {
 			status_.velocity_Y_ = status_.jumpPower_;
 			status_.currentJumpCount_++;

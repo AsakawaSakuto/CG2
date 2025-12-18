@@ -7,6 +7,9 @@
 #include <memory>
 #include <vector>
 
+// 前方宣言
+class DirectXCommon;
+
 /// <summary>
 /// ゲージの伸びる方向
 /// </summary>
@@ -36,11 +39,8 @@ public:
 	/// <summary>
 	/// ゲージの初期化
 	/// </summary>
-	/// <param name="dxCommon">DirectXCommonへのポインタ</param>
-	/// <param name="position">ゲージの位置（左上基準）</param>
-	/// <param name="size">ゲージの最大サイズ（幅、高さ）</param>
-	/// <param name="maxValue">ゲージの最大値</param>
-	void Initialize(DirectXCommon* dxCommon, const std::string& Path = "temp");
+	/// <param name="Path">JSONパス</param>
+	void Initialize(const std::string& Path = "temp");
 
 	/// <summary>
 	/// ゲージの更新

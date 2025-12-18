@@ -1,12 +1,20 @@
 #include "Gauge.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 #include <algorithm>
 
 #ifdef USE_IMGUI
 #include "imgui.h"
 #endif
 
-void Gauge::Initialize(DirectXCommon* dxCommon, const std::string& Path) {
-	dxCommon_ = dxCommon;
+void Gauge::Initialize(const std::string& Path) {
+	// ServiceLocatorからDirectXCommonを取得
+	dxCommon_ = ServiceLocator::GetDXCommon();
+	
+	if (!dxCommon_) {
+		// エラー処理：DirectXCommonが登録されていない場合
+		throw std::runtime_error("DirectXCommon is not registered in ServiceLocator. Call ServiceLocator::Provide(dxCommon) first.");
+	}
 
 	// JsonManagerの初期化（初回のみ）
 	if (!jsonManager_) {
@@ -17,13 +25,13 @@ void Gauge::Initialize(DirectXCommon* dxCommon, const std::string& Path) {
 
 	// 背景スプライトの初期化
 	background_ = std::make_unique<Sprite>();
-	background_->Initialize(dxCommon, "white1x1.png");
+	background_->Initialize("white1x1.png");
 	background_->SetColor(backgroundColor_);
 	background_->SetAnchorPoint({ 0.0f, 0.0f }); // 左上基準
 
 	// ゲージスプライトの初期化（単色用）
 	gauge_ = std::make_unique<Sprite>();
-	gauge_->Initialize(dxCommon, "white1x1.png");
+	gauge_->Initialize("white1x1.png");
 	gauge_->SetColor(gaugeColor_);
 	gauge_->SetAnchorPoint({ 0.0f, 0.0f }); // 左上基準
 
@@ -311,7 +319,7 @@ void Gauge::InitializeGradientSegments() {
 	
 	for (int i = 0; i < maxGradientSegments_; ++i) {
 		gradientSegments_[i] = std::make_unique<Sprite>();
-		gradientSegments_[i]->Initialize(dxCommon_, "white1x1.png");
+		gradientSegments_[i]->Initialize("white1x1.png");
 		gradientSegments_[i]->SetAnchorPoint({ 0.0f, 0.0f });
 	}
 }

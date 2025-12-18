@@ -1,11 +1,10 @@
 #pragma once
-#include "AppContext.h"
 #include "GameObject/Player/WeaponManager/Weapon/Weapon.h"
 #include "Camera/Camera.h"
 
 class WeaponManager {
 public:
-	void Initialize(AppContext* ctx);
+	void Initialize();
 
 	void Update();
 
@@ -28,6 +27,5 @@ public:
 
 	void PostFrameCleanup();
 private:
-	AppContext* ctx_;
 	std::vector<std::unique_ptr<Weapon>> weapons_;
 };

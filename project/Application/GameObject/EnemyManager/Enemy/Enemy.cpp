@@ -1,11 +1,11 @@
 #include "Enemy.h"
 
-void Enemy::Initialize(AppContext* ctx) {
-	ctx_ = ctx;
+void Enemy::Initialize() {
+	
 	transform_.scale = { 0.0f,0.0f,0.0f };
 	transform_.translate = { 0.0f,0.0f,0.0f };
 
-	model_->Initialize(&ctx_->dxCommon, "Animation/human/lowWalk.gltf");
+	model_->Initialize("Animation/human/lowWalk.gltf");
 	model_->SetUpdateFrustumCulling(false);
 	model_->SetDrawFrustumCulling(true);
 
@@ -14,7 +14,7 @@ void Enemy::Initialize(AppContext* ctx) {
 
 	scaleTimer_.Start(0.5f, false);
 
-	debugLine_->Initialize(&ctx_->dxCommon);
+	debugLine_->Initialize();
 }
 
 void Enemy::Update() {

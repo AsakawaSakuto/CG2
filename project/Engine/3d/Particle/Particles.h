@@ -44,10 +44,9 @@ public:
 	/// <summary>
 	/// パーティクルの初期化
 	/// </summary>
-	/// <param name="dxCommon">dxCommonを渡す</param>
-	/// <param name="TextureName">使用するTextureのPathを入れる「デフォルトでCircle」</param>
+	/// <param name="filePath">JSONファイルパス</param>
 	/// <param name="maxParticle">整数値＊512粒のパーティクルを扱えるようになる</param>
-	void Initialize(DirectXCommon* dxCommon, const std::string& filePath = "temp", const uint32_t maxParticle = 1);
+	void Initialize(const std::string& filePath = "temp", const uint32_t maxParticle = 1);
 
 	/// <summary>
 	/// デストラクタ - 確保したSRV/UAVインデックスを解放

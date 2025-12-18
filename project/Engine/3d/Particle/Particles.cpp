@@ -1,5 +1,7 @@
 #include "Particles.h"
 #include "../Model/Model.h"
+#include "Core/DirectXCommon/DirectXCommon.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 #include <cassert>
 #include <filesystem>  // ディレクトリ作成用に追加
 #pragma comment(lib,"d3d12.lib")
@@ -8,9 +10,16 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "Core/PSOManager/PSOManager.h"
 
-void Particles::Initialize(DirectXCommon* dxCommon, const std::string& filePath, const uint32_t maxParticle) {
+void Particles::Initialize(const std::string& filePath, const uint32_t maxParticle) {
+	// ServiceLocatorからDirectXCommonを取得
+	dxCommon_ = ServiceLocator::GetDXCommon();
+	
+	if (!dxCommon_) {
+		// エラー処理：DirectXCommonが登録されていない場合
+		throw std::runtime_error("DirectXCommon is not registered in ServiceLocator. Call ServiceLocator::Provide(dxCommon) first.");
+	}
+	
 	// DX共通クラスからデバイス・コマンドリストを取得
-	dxCommon_ = dxCommon;
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
 
@@ -19,7 +28,7 @@ void Particles::Initialize(DirectXCommon* dxCommon, const std::string& filePath,
 	jsonManager_->SetBasePath("resources/Data/Json/Particle/");
 
 	line3d_ = std::make_unique<Line3d>();
-	line3d_->Initialize(dxCommon_);
+	line3d_->Initialize();
 
 	// エミッターのデフォルト値を設定
 	emitter_ = {}; // ゼロ初期化

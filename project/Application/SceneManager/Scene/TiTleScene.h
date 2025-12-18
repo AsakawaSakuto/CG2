@@ -9,7 +9,6 @@ using std::make_unique;
 
 class TitleScene : public IScene {
 public:
-	void SetAppContext(AppContext* ctx) override;
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
@@ -22,8 +21,6 @@ private:
 	void CleanupResources();
 
 private:
-	// AppContext
-	AppContext* ctx_ = nullptr;
 
 	Camera camera_;
 	DebugCamera debugCamera_;

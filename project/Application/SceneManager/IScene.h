@@ -1,5 +1,5 @@
 #pragma once
-#include"AppContext.h"
+#include <iostream>
 
 using std::unique_ptr;
 using std::make_unique;
@@ -17,14 +17,11 @@ class IScene {
 protected:
     SCENE nowSceneName_ = SCENE::TEST;
 
-    // AppContext
-    AppContext* ctx_ = nullptr;
-
 	void ChangeScene(SCENE nextSceneName) { nowSceneName_ = nextSceneName; }
 
     void Quit();
 public:
-    virtual void SetAppContext(AppContext* ctx) = 0;
+
     virtual void Initialize() = 0;
     virtual void Update() = 0;
     virtual void Draw() = 0;

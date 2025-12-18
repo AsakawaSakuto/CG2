@@ -8,12 +8,10 @@ void TitleScene::CleanupResources() {
 
 }
 
-void TitleScene::SetAppContext(AppContext* ctx) { ctx_ = ctx; }
-
 void TitleScene::Initialize() {
 	ChangeScene(SCENE::TITLE);
 
-	titleUI_->Initialize(ctx_);
+	titleUI_->Initialize();
 }
 
 void TitleScene::Update() {

@@ -1,4 +1,5 @@
 #include "BitmapFont.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -9,8 +10,15 @@
 #include "imgui_impl_win32.h"
 #endif
 
-void BitmapFont::Initialize(DirectXCommon* dxCommon, const std::string& jsonPath, const std::string& numberImageFolder) {
-	dxCommon_ = dxCommon;
+void BitmapFont::Initialize(const std::string& jsonPath, const std::string& numberImageFolder) {
+	// ServiceLocatorからDirectXCommonを取得
+	dxCommon_ = ServiceLocator::GetDXCommon();
+	
+	if (!dxCommon_) {
+		// エラー処理：DirectXCommonが登録されていない場合
+		throw std::runtime_error("DirectXCommon is not registered in ServiceLocator. Call ServiceLocator::Provide(dxCommon) first.");
+	}
+	
 	numberImageFolder_ = numberImageFolder;
 
 	// JsonManagerの初期化（初回のみ）
@@ -24,21 +32,21 @@ void BitmapFont::Initialize(DirectXCommon* dxCommon, const std::string& jsonPath
 		for (int i = 0; i < 10; ++i) {
 			digitSprites_[digitIndex].sprites[i] = std::make_unique<Sprite>();
 			std::string imagePath = numberImageFolder_ + std::to_string(i) + ".png";
-			digitSprites_[digitIndex].sprites[i]->Initialize(dxCommon_, imagePath);
+			digitSprites_[digitIndex].sprites[i]->Initialize(imagePath);
 		}
 	}
 
 	// コロンスプライトを初期化
 	colonSprite_ = std::make_unique<Sprite>();
-	colonSprite_->Initialize(dxCommon_, numberImageFolder_ + "colon.png");
+	colonSprite_->Initialize(numberImageFolder_ + "colon.png");
 
 	// ドットスプライトを初期化（オプション、画像がある場合）
 	dotSprite_ = std::make_unique<Sprite>();
-	dotSprite_->Initialize(dxCommon_, numberImageFolder_ + "dot.png");
+	dotSprite_->Initialize(numberImageFolder_ + "dot.png");
 
 	// パーセントスプライトを初期化
 	percentSprite_ = std::make_unique<Sprite>();
-	percentSprite_->Initialize(dxCommon_, numberImageFolder_ + "parcent.png");
+	percentSprite_->Initialize(numberImageFolder_ + "parcent.png");
 
 	LoadFromJson(jsonPath);
 }
