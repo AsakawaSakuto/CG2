@@ -19,7 +19,7 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(MyInput::GetInput());
 	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
-	testParticle_->Initialize("temp");
+    testParticle_->Initialize("temp", 1000);
 
 	testSprite_->Initialize("icon/fireBall.png", { 64.0f,64.0f });
 
