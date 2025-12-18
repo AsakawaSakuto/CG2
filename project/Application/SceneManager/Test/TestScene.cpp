@@ -1,5 +1,6 @@
 #include "TestScene.h"
 #include "Core/ServiceLocator/ServiceLocator.h"
+#include "Audio/AudioManager.h"
 
 #define WHITE {1.0f,1.0f,1.0f,1.0f}
 #define RED   {1.0f,0.0f,0.0f,1.0f}
@@ -60,6 +61,19 @@ void TestScene::Initialize() {
 }
 
 void TestScene::Update() {
+
+    if (MyInput::TriggerKey(DIK_1)) {
+        MyAudio::PlaySE(SE_Variation::KAWAII);
+    }
+    if (MyInput::TriggerKey(DIK_2)) {
+        MyAudio::PlaySE(SE_Variation::OU);
+    }
+    if (MyInput::TriggerKey(DIK_3)) {
+        MyAudio::PlaySE(SE_Variation::KIRAKIRA);
+    }
+    if (MyInput::TriggerKey(DIK_4)) {
+        MyAudio::PlaySE(SE_Variation::DON);
+    }
 
     Vector3 start = { 0.0f, 0.0f, 0.0f };
     Vector3 end = { 1.0f, 1.0f, 1.0f };

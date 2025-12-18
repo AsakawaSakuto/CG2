@@ -170,4 +170,9 @@ namespace MyInput {
 	inline bool UseGamePad() {
 		return KeyConfig::GetInstance()->IsGamePadConnected();
 	}
+
+	// Trigger（Key）判定
+	inline bool TriggerKey(uint32_t key) {
+		return KeyConfig::GetInstance()->GetInput()->TriggerKey(key);
+	}
 }

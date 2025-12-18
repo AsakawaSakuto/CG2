@@ -9,6 +9,7 @@
 #include "Core/ServiceLocator/ServiceLocator.h"
 #include "Utility/GameTimer/DeltaTime.h"
 #include "3d/Model/Model.h"
+#include "Audio/AudioManager.h"
 
 SceneManager::SceneManager() {
     // シーン配列は初期化時には空にする
@@ -69,6 +70,8 @@ void SceneManager::Initialize() {
     KeyConfig::GetInstance()->Initialize();
     KeyConfig::GetInstance()->SetInputDevices(input_.get(), gamePad_.get());
 
+	AudioManager::GetInstance()->Initialize();
+
     // 初期シーンを作成
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
     if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
@@ -100,6 +103,8 @@ void SceneManager::Update() {
         // 入力更新（共通処理）
         input_->Update();
         gamePad_->Update();
+
+		AudioManager::GetInstance()->Update();
 
         Shortcut();
 
@@ -187,6 +192,9 @@ void SceneManager::Finalize() {
     // TextureManagerのリソースを解放
     TextureManager::GetInstance()->Finalize();
     
+	//
+    AudioManager::GetInstance()->Finalize();
+
     // フェンスイベントを閉じる（デストラクタでも行うが念のため）
     dxCommon_->CloseFence();
 
