@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "Core/WinApp/WinApp.h"
 
 using std::unique_ptr;
 using std::make_unique;

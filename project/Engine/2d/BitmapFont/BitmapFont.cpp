@@ -373,6 +373,7 @@ std::vector<int> BitmapFont::SplitDigits(int value) const {
 }
 
 void BitmapFont::DrawImGui(const char* name) {
+#ifdef USE_IMGUI
 	ImGui::Begin(name);
 
 	// ファイル名入力
@@ -417,6 +418,7 @@ void BitmapFont::DrawImGui(const char* name) {
 	ImGui::ColorEdit4("色", &color_.x);
 
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void BitmapFont::LoadJson(const std::string& filePath) {
