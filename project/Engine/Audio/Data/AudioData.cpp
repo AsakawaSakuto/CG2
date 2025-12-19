@@ -1,6 +1,6 @@
 // AudioData.cpp
-// // WAV直読み ＋ Media FoundationでMP3→PCM16デコード。
-// // 生成したPCMはstd::vectorで所有。リンクにはmfplat/mfreadwrite/mfuuidが必要。
+// WAV直読み ＋ Media FoundationでMP3→PCM16デコード。
+// 生成したPCMはstd::vectorで所有。リンクにはmfplat/mfreadwrite/mfuuidが必要。
 
 #include "AudioData.h"
 #include <fstream>
@@ -78,7 +78,7 @@ SoundData SoundLoadWave(const std::string& filePath) {
     assert(format.chunk.size <= (int)sizeof(format.fmt));
     file.read(reinterpret_cast<char*>(&format.fmt), format.chunk.size);
 
-    // // dataチャンクまでスキップ（JUNK等に対応）
+    // dataチャンクまでスキップ（JUNK等に対応）
     ChunkHeader data{};
     for (;;) {
         file.read(reinterpret_cast<char*>(&data), sizeof(data));

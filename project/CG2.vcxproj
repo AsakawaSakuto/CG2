@@ -175,12 +175,12 @@
     <ClCompile Include="Engine\3d\Line\Line.cpp" />
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
+    <ClCompile Include="Engine\3d\Particle\ParticlePlayManager.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
-    <ClCompile Include="Engine\Audio\Audio.cpp" />
-    <ClCompile Include="Engine\Audio\AudioData.cpp" />
+    <ClCompile Include="Engine\Audio\Data\Audio.cpp" />
+    <ClCompile Include="Engine\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
-    <ClCompile Include="Engine\Audio\MasterVolume.cpp" />
     <ClCompile Include="Engine\Core\ServiceLocator\ServiceLocator.cpp" />
     <ClCompile Include="Engine\Input\InputDevice\GamePad.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\HeapManager.cpp" />
@@ -282,6 +282,7 @@
     <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
+    <ClInclude Include="Engine\3d\Particle\ParticlePlayManager.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Camera\Frustum.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
@@ -289,7 +290,6 @@
     <ClInclude Include="Engine\3d\Particle\Struct\EmitterState.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
     <ClInclude Include="Engine\Camera\CameraForGPU.h" />
-    <ClInclude Include="Engine\Audio\MasterVolume.h" />
     <ClInclude Include="Engine\Core\ServiceLocator\ServiceLocator.h" />
     <ClInclude Include="Engine\Input\InputDevice\GamePad.h" />
     <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
@@ -305,8 +305,8 @@
     <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryOutput.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\Value.h" />
     <ClInclude Include="Engine\Utility\BlendMode\BlendMode.h" />
-    <ClInclude Include="Engine\Audio\Audio.h" />
-    <ClInclude Include="Engine\Audio\AudioData.h" />
+    <ClInclude Include="Engine\Audio\Data\Audio.h" />
+    <ClInclude Include="Engine\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Utility\Collision\Collision.h" />
     <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />

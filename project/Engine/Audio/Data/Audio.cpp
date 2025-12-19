@@ -1,5 +1,5 @@
 // Audio.cpp
-// // AudioX実装。XAudio2エンジンとマスターボイスを作成し、PCM共有→インスタンス再生。
+// AudioX実装。XAudio2エンジンとマスターボイスを作成し、PCM共有→インスタンス再生。
 
 #include "Audio.h"
 #include <cassert>
@@ -15,10 +15,10 @@ void AudioX::Initialize(const std::string& filePath) {
     assert(SUCCEEDED(hr) && "CreateMasteringVoice failed");
     mastering_.reset(mv);
 
-    SoundData sd = SoundLoadAudio(filePath); // // WAVでもMP3でもOK
+    SoundData sd = SoundLoadAudio(filePath); // WAVでもMP3でもOK
     wfex_ = sd.wfex;
 
-    // // PCM共有用に移し替え
+    // PCM共有用に移し替え
     pcmShared_ = std::make_shared<std::vector<BYTE>>(std::move(sd.pcm));
 }
 
@@ -45,13 +45,13 @@ void AudioX::Update() {
 }
 
 void AudioX::Reset() {
-    // // まず全インスタンス停止→破棄
+    // まず全インスタンス停止→破棄
     for (auto& a : actives_) {
         if (a) a->Stop();
     }
     actives_.clear();
 
-    // // 共有PCM破棄（他所で共有されていれば自動延命される）
+    // 共有PCM破棄（他所で共有されていれば自動延命される）
     pcmShared_.reset();
 
     mastering_.reset();
@@ -59,7 +59,7 @@ void AudioX::Reset() {
 }
 
 void AudioX::SetVolume(float volume) {
-    // // クランプ（0.0f～1.0fの範囲）
+    // クランプ（0.0f～1.0fの範囲）
     if (volume < 0.0f) volume = 0.0f;
     if (volume > 1.0f) volume = 1.0f;
     for (auto& a : actives_) {
@@ -70,13 +70,13 @@ void AudioX::SetVolume(float volume) {
 }
 
 void AudioX::StopAll() {
-    // // 再生中のボイスを即停止→キュー破棄
+    // 再生中のボイスを即停止→キュー破棄
     for (auto& a : actives_) {
         if (a) a->Stop();
     }
-    // // DestroyVoice は unique_ptr のデリータが実行
+    // DestroyVoice は unique_ptr のデリータが実行
     actives_.clear();
-    // // PCM(pcmShared_)とXAudio2は残るので、すぐ PlayAudio() し直せる
+    // PCM(pcmShared_)とXAudio2は残るので、すぐ PlayAudio() し直せる
 }
 
 void AudioX::StopLatest() {

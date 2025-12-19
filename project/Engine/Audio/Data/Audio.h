@@ -12,7 +12,7 @@
 #pragma comment(lib, "xaudio2.lib")
 #include <cassert>
 
-// // DestroyVoice専用デリータ
+// DestroyVoice専用デリータ
 struct SourceVoiceDeleter {
     void operator()(IXAudio2SourceVoice* v) const noexcept {
         if (!v) return;
@@ -31,23 +31,23 @@ struct MasteringVoiceDeleter {
 using UniqueSourceVoice = std::unique_ptr<IXAudio2SourceVoice, SourceVoiceDeleter>;
 using UniqueMasteringVoice = std::unique_ptr<IXAudio2MasteringVoice, MasteringVoiceDeleter>;
 
-// // 1回の再生インスタンス（同一PCMを共有）
+// 1回の再生インスタンス（同一PCMを共有）
 class ClipInstance {
 public:
-    // // PCM共有バッファを共有所有する
+    // PCM共有バッファを共有所有する
     std::shared_ptr<const std::vector<BYTE>> pcm_;
     WAVEFORMATEX wfex_{};
     UniqueSourceVoice voice_{ nullptr };
     bool loop_ = false;
 
-    // // 再生開始（volume範囲は0.0f～1.0f）
+    // 再生開始（volume範囲は0.0f～1.0f）
     void Play(IXAudio2* xa, float volume = 1.0f) {
         IXAudio2SourceVoice* raw = nullptr;
         HRESULT hr = xa->CreateSourceVoice(&raw, &wfex_);
         assert(SUCCEEDED(hr));
         voice_.reset(raw);
         
-        // // 音量設定（0.0f～1.0fの範囲にクランプ）
+        // 音量設定（0.0f～1.0fの範囲にクランプ）
         if (volume < 0.0f) volume = 0.0f;
         if (volume > 1.0f) volume = 1.0f;
         voice_->SetVolume(volume);
@@ -69,7 +69,7 @@ public:
         assert(SUCCEEDED(hr));
     }
 
-    // // 終了判定
+    // 終了判定
     bool Finished() const {
         if (!voice_) return true;
         XAUDIO2_VOICE_STATE st{};
@@ -77,7 +77,7 @@ public:
         return st.BuffersQueued == 0;
     }
 
-    // // 明示停止
+    // 明示停止
     void Stop() {
         if (!voice_) return;
         voice_->Stop(0);
@@ -87,19 +87,19 @@ public:
 
 class AudioX {
 public:
-    // // filePath(.wav/.mp3)を読み込み（PCM16へ）。以後PlayAudioで再生。
+    // filePath(.wav/.mp3)を読み込み（PCM16へ）。以後PlayAudioで再生。
     void Initialize(const std::string& filePath);
 
-    // // 再生。loop=trueで無限ループ。複数回呼ぶと同時再生可能。volume範囲は0.0f～1.0f
+    // 再生。loop=trueで無限ループ。複数回呼ぶと同時再生可能。volume範囲は0.0f～1.0f
     void PlayAudio(float volume = 1.0f, bool loop = false);
 
-    // // 毎フレーム呼ぶ。終了済みインスタンスの破棄を行う。
+    // 毎フレーム呼ぶ。終了済みインスタンスの破棄を行う。
     void Update();
 
-    // // すべて停止して後始末
+    // すべて停止して後始末
     void Reset();
 
-    // // 全インスタンスに音量を適用（0.0f～1.0f）
+    // 全インスタンスに音量を適用（0.0f～1.0f）
     void SetVolume(float volume);
 
     // 再生中の全インスタンスを即時停止して破棄（PCMとXAudio2は残す）
@@ -119,10 +119,10 @@ private:
     Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
     UniqueMasteringVoice mastering_{ nullptr };
 
-    // // 読み込んだPCMの共有所有
+    // 読み込んだPCMの共有所有
     std::shared_ptr<std::vector<BYTE>> pcmShared_{};
     WAVEFORMATEX wfex_{};
 
-    // // 再生中インスタンス
+    // 再生中インスタンス
     std::vector<std::unique_ptr<ClipInstance>> actives_;
 };

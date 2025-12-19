@@ -8,7 +8,7 @@
 #include "Core/WinApp/WinApp.h"
 #include "Input/KeyConfig.h"
 #include "Camera/Camera.h"
-#include "Audio/Audio.h"
+#include "Audio/AudioManager.h"
 #include "Camera/DebugCamera.h"
 #include "Utility/ConvertString/ConvertString.h"
 #include "Core/DirectXCommon/DirectXCommon.h"
