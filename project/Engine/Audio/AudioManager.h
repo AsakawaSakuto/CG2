@@ -23,12 +23,6 @@ enum class BGM_List {
     Count
 };
 
-enum class FadeState {
-    None,
-    FadingOut,
-    FadingIn
-};
-
 class AudioManager {
 public:
 

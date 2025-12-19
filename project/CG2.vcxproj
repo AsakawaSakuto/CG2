@@ -300,6 +300,7 @@
     <ClInclude Include="Engine\OffScreen\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\Math\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOManager.h" />
+    <ClInclude Include="Engine\Utility\Easing\Type\EaseType.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryOutput.h" />

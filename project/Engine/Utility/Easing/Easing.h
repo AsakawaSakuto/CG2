@@ -7,99 +7,18 @@
 #include "Math/Type/Vector2.h"
 #include "Math/Type/Vector3.h"
 
-// イージング実装の際に参考にしたサイト
-// https://aketama.work/easing-list
+#include "type/EaseType.h"
 
 /// <summary>
 /// 汎用イージング関数群 float, Vector2, Vector3 対応
 /// </summary>
 namespace Easing {
 
-    /// <summary>
-    /// イージングタイプ
-    /// </summary>
-    enum class Type {
-
-        // 等速
-
-        Linear,
-
-        // Quadratic
-
-        EaseInQuad,
-        EaseOutQuad,
-        EaseInOutQuad,
-        EaseOutInQuad,
-
-        // Cubic
-
-        EaseInCubic,
-        EaseOutCubic,
-        EaseInOutCubic,
-        EaseOutInCubic,
-
-        // Quartic
-
-        EaseInQuart,
-        EaseOutQuart,
-        EaseInOutQuart,
-        EaseOutInQuart,
-
-        // Quintic
-
-        EaseInQuint,
-        EaseOutQuint,
-        EaseInOutQuint,
-        EaseOutInQuint,
-
-        // Sine
-
-        EaseInSine,
-        EaseOutSine,
-        EaseInOutSine,
-        EaseOutInSine,
-
-        // Exponential
-
-        EaseInExpo,
-        EaseOutExpo,
-        EaseInOutExpo,
-        EaseOutInExpo,
-
-        // Circular
-
-        EaseInCirc,
-        EaseOutCirc,
-        EaseInOutCirc,
-        EaseOutInCirc,
-
-        // Back
-
-        EaseInBack,
-        EaseOutBack,
-        EaseInOutBack,
-        EaseOutInBack,
-
-        // Elastic
-
-        EaseInElastic,
-        EaseOutElastic,
-        EaseInOutElastic,
-        EaseOutInElastic,
-
-        // Bounce
-
-        EaseInBounce,
-        EaseOutBounce,
-        EaseInOutBounce,
-        EaseOutInBounce
-    };
-
     /// @brief イージング関数を適用
     /// @param t 進行状況 0.0～1.0
     /// @param type イージングタイプ
     /// @return イージング適用済み値 0.0～1.0
-    float Apply(float t, Type type);
+    float Apply(float t, EaseType type);
 
     /// @brief 任意型の補間 Start -> End
     /// @param start      開始ベクトル/値
@@ -107,7 +26,7 @@ namespace Easing {
     /// @param t            進行状況 0.0～1.0
     /// @param goType イージングタイプ
     template<typename T>
-    T Lerp(const T& start, const T& end, float t, Type type = Type::Linear) {
+    T Lerp(const T& start, const T& end, float t, EaseType type = EaseType::Linear) {
         float easedT = Apply(t, type);
         return start + (end - start) * easedT;
     }
@@ -120,7 +39,7 @@ namespace Easing {
     /// @param backType 帰りのイージング
     template<typename T>
     T Lerp_GAB(const T& start, const T& end, float t,
-        Type goType = Type::Linear, Type backType = Type::Linear) {
+        EaseType goType = EaseType::Linear, EaseType backType = EaseType::Linear) {
 
         // 0〜1 に Clamp
         t = std::clamp(t, 0.0f, 1.0f);

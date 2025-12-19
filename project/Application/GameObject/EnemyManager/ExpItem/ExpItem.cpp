@@ -15,7 +15,7 @@ void ExpItem::Update() {
 
 	transform_.scale = Easing::Lerp(
 		Vector3({0.0f,0.0f,0.0f}), Vector3({ 0.5f,0.5f,0.5f }),
-		scaleTimer_.GetProgress(), Easing::Type::EaseOutBack);
+		scaleTimer_.GetProgress(), EaseType::EaseOutBack);
 
 	if (state_ == State::MOVE) {
 		// .xz平面でターゲット位置への方向ベクトルを計算（yは無視）
