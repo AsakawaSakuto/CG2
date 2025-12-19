@@ -153,7 +153,7 @@ void Player::Move() {
 	// スティックの入力があるかチェック
 	if (std::abs(moveInput.x) > 0.01f || std::abs(moveInput.y) > 0.01f) {
 		// カメラから移動方向ベクトルを計算
-		Vector3 moveDirection = CalculateCameraMoveDirection(moveInput.x, moveInput.y);
+		Vector3 moveDirection = CalculateCameraMoveDirection(moveInput.x * -1.0f, moveInput.y * -1.0f);
 
 		// 移動量を計算
 		Vector3 movement = {
@@ -182,32 +182,25 @@ void Player::Move() {
 
 Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 	
-	// カメラとプレイヤーの位置を取得
-	Vector3 cameraPos = camera_.GetWorldPosition();
-	Vector3 playerPos = transform_.translate;
+	// カメラの水平角度を取得（Y軸周りの回転）
+	float cameraHorizontalAngle = camera_.GetHorizontalAngle();
 	
-	// プレイヤーからカメラへの方向ベクトル
-	Vector3 playerToCamera = {
-		cameraPos.x - playerPos.x,
-		0.0f, // Y成分は無視
-		cameraPos.z - playerPos.z
-	};
+	// カメラの水平角度から前方向と右方向を計算
+	// カメラの水平角度が0の時、カメラはZ軸正の方向を向いている
+	// 左スティックを上に倒す（stickY > 0）→ カメラの向いている方向に移動
 	
-	// 正規化してカメラ方向ベクトルにする
-	Vector3 cameraDirection = playerToCamera.Normalize();
-	
-	// カメラの向いている方向 = カメラ方向の逆
+	// 前方向（カメラが向いている方向）
 	Vector3 forward = {
-		-cameraDirection.x,  // カメラ方向の逆
-		0.0f,                // Y成分は無視
-		-cameraDirection.z   // カメラ方向の逆
+		std::sin(cameraHorizontalAngle),   // X成分
+		0.0f,                               // Y成分は無視（水平移動のみ）
+		std::cos(cameraHorizontalAngle)    // Z成分
 	};
 	
-	// 右方向は前方向を90度時計回りに回転
+	// 右方向（前方向を90度時計回りに回転）
 	Vector3 right = {
-		forward.z,   // 前方のZ成分を右方向のX成分に
-		0.0f,        // Y成分は無視
-		-forward.x   // 前方のX成分の逆を右方向のZ成分に
+		std::cos(cameraHorizontalAngle),   // X成分
+		0.0f,                               // Y成分は無視
+		-std::sin(cameraHorizontalAngle)   // Z成分
 	};
 	
 	// スティック入力に応じて移動方向を計算
