@@ -23,7 +23,7 @@
   {
     "name": "count",
     "type": 7,
-    "value": 500
+    "value": 200
   },
   {
     "name": "frequency",
@@ -216,49 +216,19 @@
     "value": 0.000000
   },
   {
-    "name": "coneAngle",
-    "type": 2,
-    "value": 0.000000
-  },
-  {
-    "name": "coneHeight",
-    "type": 2,
-    "value": 0.000000
-  },
-  {
-    "name": "coneDirection",
-    "type": 17,
-    "value": [0.000000, 0.000000, 0.000000]
-  },
-  {
-    "name": "hemisphereAngle",
-    "type": 2,
-    "value": 0.000000
-  },
-  {
     "name": "planeNormal",
     "type": 17,
     "value": [0.000000, 0.000000, 0.000000]
   },
   {
-    "name": "planeWidth",
-    "type": 2,
-    "value": 0.000000
+    "name": "spawnOnEdge",
+    "type": 7,
+    "value": 0
   },
   {
-    "name": "planeHeight",
-    "type": 2,
-    "value": 0.000000
-  },
-  {
-    "name": "ringAngle",
-    "type": 2,
-    "value": 0.000000
-  },
-  {
-    "name": "ringNormal",
-    "type": 17,
-    "value": [0.000000, 0.000000, 0.000000]
+    "name": "enableVisualization",
+    "type": 7,
+    "value": 0
   },
   {
     "name": "useGravity",
@@ -283,7 +253,7 @@
   {
     "name": "texturePath",
     "type": 4,
-    "value": ""
+    "value": "circle"
   }
   ]
 }

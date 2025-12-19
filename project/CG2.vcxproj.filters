@@ -46,9 +46,8 @@
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
-    <ClCompile Include="Engine\Audio\Audio.cpp" />
-    <ClCompile Include="Engine\Audio\AudioData.cpp" />
-    <ClCompile Include="Engine\Audio\MasterVolume.cpp" />
+    <ClCompile Include="Engine\Audio\Data\Audio.cpp" />
+    <ClCompile Include="Engine\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\HeapManager.cpp" />
     <ClCompile Include="Engine\OffScreen\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
@@ -85,6 +84,8 @@
     <ClCompile Include="Engine\Utility\ImGui\InspectorWindow.cpp" />
     <ClCompile Include="Engine\Utility\ImGui\SceneViewWindow.cpp" />
     <ClCompile Include="Engine\Utility\ImGui\StatsWindow.cpp" />
+    <ClCompile Include="Engine\Audio\AudioManager.cpp" />
+    <ClCompile Include="Engine\3d\Particle\ParticlePlayManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -135,7 +136,6 @@
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\EmitterState.h" />
     <ClInclude Include="Engine\3d\Particle\Struct\ParticleDataStruct.h" />
-    <ClInclude Include="Engine\Audio\MasterVolume.h" />
     <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectParams.h" />
@@ -144,8 +144,8 @@
     <ClInclude Include="Engine\Math\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOManager.h" />
     <ClInclude Include="Engine\Utility\BlendMode\BlendMode.h" />
-    <ClInclude Include="Engine\Audio\Audio.h" />
-    <ClInclude Include="Engine\Audio\AudioData.h" />
+    <ClInclude Include="Engine\Audio\Data\Audio.h" />
+    <ClInclude Include="Engine\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Utility\Collision\Collision.h" />
     <ClInclude Include="Engine\Utility\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\Core\CreateResource\CreateResource.h" />
@@ -198,6 +198,8 @@
     <ClInclude Include="Engine\Utility\ImGui\InspectorWindow.h" />
     <ClInclude Include="Engine\Utility\ImGui\SceneViewWindow.h" />
     <ClInclude Include="Engine\Utility\ImGui\StatsWindow.h" />
+    <ClInclude Include="Engine\Audio\AudioManager.h" />
+    <ClInclude Include="Engine\3d\Particle\ParticlePlayManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

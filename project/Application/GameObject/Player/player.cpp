@@ -116,8 +116,25 @@ void Player::Move() {
 	// GamePadが接続されている場合、スティック入力を取得
 	if (MyInput::UseGamePad()) {
 		moveInput = MyInput::GetVector2D(Action::MOVE_STICK);
+		
+		// スティック入力がほぼゼロの場合、キーボード入力も確認
+		if (std::abs(moveInput.x) < 0.01f && std::abs(moveInput.y) < 0.01f) {
+			// 各方向の入力を確認
+			if (MyInput::Push(Action::MOVE_UP)) {
+				moveInput.y += 1.0f;
+			}
+			if (MyInput::Push(Action::MOVE_DOWN)) {
+				moveInput.y -= 1.0f;
+			}
+			if (MyInput::Push(Action::MOVE_RIGHT)) {
+				moveInput.x += 1.0f;
+			}
+			if (MyInput::Push(Action::MOVE_LEFT)) {
+				moveInput.x -= 1.0f;
+			}
+		}
 	} else {
-		// GamePadが接続されていないか、スティック入力がほぼゼロの場合、キーボード入力を確認
+		// GamePadが接続されていない場合、キーボード入力を確認
 		// 各方向の入力を確認
 		if (MyInput::Push(Action::MOVE_UP)) {
 			moveInput.y += 1.0f;

@@ -1106,8 +1106,7 @@ void Particles::LoadFromJson(const std::string& filePath) {
 				std::string tempPath = JsonManager::Reverse<std::string>(values[index++]);
 				if (!tempPath.empty() && tempPath.length() < 256) { // サイズチェック
 					emitter_.texturePath = tempPath;
-				}
-				else {
+				} else {
 					printf("[WARNING] Invalid texture path in JSON, using default.\n");
 					emitter_.texturePath = "circle";
 				}

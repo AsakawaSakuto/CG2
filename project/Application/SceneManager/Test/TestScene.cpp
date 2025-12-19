@@ -1,5 +1,6 @@
 #include "TestScene.h"
 #include "Core/ServiceLocator/ServiceLocator.h"
+#include "Audio/AudioManager.h"
 
 #define WHITE {1.0f,1.0f,1.0f,1.0f}
 #define RED   {1.0f,0.0f,0.0f,1.0f}
@@ -18,7 +19,7 @@ void TestScene::Initialize() {
 	debugCamera_.SetInput(MyInput::GetInput());
 	debugCamera_.SetPosition({ 0.0f, 2.5f, -20.0f });
 
-	testParticle_->Initialize("temp");
+    testParticle_->Initialize("temp", 1000);
 
 	testSprite_->Initialize("icon/fireBall.png", { 64.0f,64.0f });
 
@@ -57,9 +58,24 @@ void TestScene::Initialize() {
 	bitmapFont_.Initialize();
 
     testGauge_->Initialize();
+
+    MyAudio::PlayBGM(BGM_List::TEST, 0.0f);
 }
 
 void TestScene::Update() {
+
+    if (MyInput::TriggerKey(DIK_1)) {
+        MyAudio::PlaySE(SE_List::KAWAII, 0.1f);
+    }
+    if (MyInput::TriggerKey(DIK_2)) {
+        MyAudio::PlaySE(SE_List::OU, 0.1f);
+    }
+    if (MyInput::TriggerKey(DIK_3)) {
+        MyAudio::PlaySE(SE_List::KIRAKIRA, 0.1f);
+    }
+    if (MyInput::TriggerKey(DIK_4)) {
+        MyAudio::PlaySE(SE_List::DON, 0.1f);
+    }
 
     Vector3 start = { 0.0f, 0.0f, 0.0f };
     Vector3 end = { 1.0f, 1.0f, 1.0f };
