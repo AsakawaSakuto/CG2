@@ -26,8 +26,6 @@ void Player::Initialize() {
 
 	weaponManager_->Initialize();
 
-	debugLine_->Initialize();
-
 	// ステータスの初期化
 	status_.currentHP_ = status_.maxHP_;
 	status_.currentExp_ = 0;
@@ -50,10 +48,8 @@ void Player::Update() {
 	model_->Update();
 	expItemGetRange_->Update();
 
-	moveParticle_->SetEmitterPosition(transform_.translate);
 	moveParticle_->SetOffSet({ 0.0f, -0.2f, 0.0f });
 	moveParticle_->Update();
-	landingParticle_->SetEmitterPosition(transform_.translate);
 	landingParticle_->Update();
 
 	weaponManager_->SetDirectionToEnemy(directionToEnemy_);
@@ -66,15 +62,17 @@ void Player::Update() {
 	expItemStateChangeCollision_.center = transform_.translate;
 	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
 
-	debugLine_->AddSphere(sphereCollision_);
-	debugLine_->AddCircleXZ(transform_.translate, expItemStateChangeRadius_);
+	MyDebugLine::AddShape(sphereCollision_);
+	Circle expCircle = {};
+	expCircle.center = { transform_.translate.x ,transform_.translate.y + 0.1f ,transform_.translate.z };
+	expCircle.radius = expItemStateChangeRadius_;
+	expCircle.normal = { 0.0f,1.0f,0.0f };
+	MyDebugLine::AddShape(expCircle);
 }
 
 void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
-
-	debugLine_->Draw(camera);
 
 	model_->Draw(camera, transform_);
 
@@ -111,7 +109,7 @@ void Player::DrawImGui() {
 
 void Player::Move() {
 	// KeyConfigを使って移動入力を取得
-	KeyConfig::Vector2D moveInput = { 0.0f, 0.0f };
+	InputManager::Vector2D moveInput = { 0.0f, 0.0f };
 	
 	// GamePadが接続されている場合、スティック入力を取得
 	if (MyInput::UseGamePad()) {
@@ -153,7 +151,7 @@ void Player::Move() {
 	// スティックの入力があるかチェック
 	if (std::abs(moveInput.x) > 0.01f || std::abs(moveInput.y) > 0.01f) {
 		// カメラから移動方向ベクトルを計算
-		Vector3 moveDirection = CalculateCameraMoveDirection(moveInput.x, moveInput.y);
+		Vector3 moveDirection = CalculateCameraMoveDirection(moveInput.x * -1.0f, moveInput.y * -1.0f);
 
 		// 移動量を計算
 		Vector3 movement = {
@@ -173,7 +171,7 @@ void Player::Move() {
 		}
 		
 		if (!moveParticle_->IsPlaying()) {
-			moveParticle_->Play();
+			moveParticle_->Play(transform_.translate, false);
 		}
 	} else {
 		moveParticle_->Stop();
@@ -182,32 +180,25 @@ void Player::Move() {
 
 Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 	
-	// カメラとプレイヤーの位置を取得
-	Vector3 cameraPos = camera_.GetWorldPosition();
-	Vector3 playerPos = transform_.translate;
+	// カメラの水平角度を取得（Y軸周りの回転）
+	float cameraHorizontalAngle = camera_.GetHorizontalAngle();
 	
-	// プレイヤーからカメラへの方向ベクトル
-	Vector3 playerToCamera = {
-		cameraPos.x - playerPos.x,
-		0.0f, // Y成分は無視
-		cameraPos.z - playerPos.z
-	};
+	// カメラの水平角度から前方向と右方向を計算
+	// カメラの水平角度が0の時、カメラはZ軸正の方向を向いている
+	// 左スティックを上に倒す（stickY > 0）→ カメラの向いている方向に移動
 	
-	// 正規化してカメラ方向ベクトルにする
-	Vector3 cameraDirection = playerToCamera.Normalize();
-	
-	// カメラの向いている方向 = カメラ方向の逆
+	// 前方向（カメラが向いている方向）
 	Vector3 forward = {
-		-cameraDirection.x,  // カメラ方向の逆
-		0.0f,                // Y成分は無視
-		-cameraDirection.z   // カメラ方向の逆
+		std::sin(cameraHorizontalAngle),   // X成分
+		0.0f,                               // Y成分は無視（水平移動のみ）
+		std::cos(cameraHorizontalAngle)    // Z成分
 	};
 	
-	// 右方向は前方向を90度時計回りに回転
+	// 右方向（前方向を90度時計回りに回転）
 	Vector3 right = {
-		forward.z,   // 前方のZ成分を右方向のX成分に
-		0.0f,        // Y成分は無視
-		-forward.x   // 前方のX成分の逆を右方向のZ成分に
+		std::cos(cameraHorizontalAngle),   // X成分
+		0.0f,                               // Y成分は無視
+		-std::sin(cameraHorizontalAngle)   // Z成分
 	};
 	
 	// スティック入力に応じて移動方向を計算
@@ -238,7 +229,7 @@ void Player::Jump() {
 		// 着地した瞬間の判定（前フレームで空中にいて、今フレームで地面に接触）
 		if (!wasGrounded_) {
 			// 着地した瞬間の処理
-			landingParticle_->Play(false);
+			landingParticle_->Play(transform_.translate, false);
 		}
 	} else {
 		isGrounded_ = false;

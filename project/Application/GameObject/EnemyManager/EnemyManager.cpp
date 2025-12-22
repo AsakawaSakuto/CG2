@@ -72,8 +72,7 @@ void EnemyManager::Update() {
 	// 死亡した敵を削除し、その位置でパーティクルを再生
 	for (auto it = enemies_.begin(); it != enemies_.end();) {
 		if (!(*it)->IsAlive()) {
-			dieParticle_->SetEmitterPosition((*it)->GetPosition());
-			dieParticle_->Play(false);
+			dieParticle_->Play((*it)->GetPosition(), false);
 
 			auto expItem = std::make_unique<ExpItem>();
 			expItem->Initialize();

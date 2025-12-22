@@ -13,7 +13,7 @@ void Bullet::Initialize() {
 	particle_->Initialize();
 	particle2_->Initialize();
 
-	debugLine_->Initialize();
+	//MyParticle::Play(Particle_List::FireBall1, transform_.translate, true);
 }
 
 void Bullet::Update() {
@@ -32,7 +32,7 @@ void Bullet::Update() {
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = 0.5f;
 
-	debugLine_->AddSphere(sphereCollision_);
+	MyDebugLine::AddShape(sphereCollision_);
 	
 	particle_->SetEmitterPosition(transform_.translate);
 	particle_->Update();
@@ -40,6 +40,7 @@ void Bullet::Update() {
 	particle2_->SetEmitterPosition(transform_.translate);
 	particle2_->Update();
 
+	//MyParticle::SetEmitterPosition(Particle_List::FireBall1, transform_.translate);
 
 	lifeTimer_.Update();
 
@@ -55,9 +56,8 @@ void Bullet::Update() {
 
 void Bullet::Draw(Camera camera) {
 	if (isAlive_ && lifeTimer_.GetDuration() >= 0.2f) {
-		debugLine_->Draw(camera);
-		particle_->Draw(camera);
-		particle2_->Draw(camera);
+		//particle_->Draw(camera);
+		//particle2_->Draw(camera);
 	}
 }
 

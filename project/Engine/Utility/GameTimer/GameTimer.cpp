@@ -81,7 +81,7 @@ float GameTimer::GetReverseProgress() const {
     return 1.0f - GetProgress();
 }
 
-float GameTimer::GetEasedProgress(Easing::Type easingType) const {
+float GameTimer::GetEasedProgress(EaseType easingType) const {
     float progress = GetProgress();
     return Easing::Apply(progress, easingType);
 }

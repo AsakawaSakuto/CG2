@@ -55,8 +55,8 @@ void Area::Update() {
 void Area::Draw(Camera camera) {
 	if (isAlive_) {
 		model_->Draw(camera, transform_);
-		particle_->Draw(camera);
-		particle2_->Draw(camera);
+		//particle_->Draw(camera);
+		//particle2_->Draw(camera);
 	}
 }
 

@@ -53,19 +53,19 @@ struct InputBinding {
 };
 
 // キーコンフィグ管理クラス（シングルトン）
-class KeyConfig {
+class InputManager {
 public:
 	// シングルトンインスタンス取得
-	static KeyConfig* GetInstance() {
-		static KeyConfig instance;
+	static InputManager* GetInstance() {
+		static InputManager instance;
 		return &instance;
 	}
 
 	// コピー・ムーブ禁止
-	KeyConfig(const KeyConfig&) = delete;
-	KeyConfig& operator=(const KeyConfig&) = delete;
-	KeyConfig(KeyConfig&&) = delete;
-	KeyConfig& operator=(KeyConfig&&) = delete;
+	InputManager(const InputManager&) = delete;
+	InputManager& operator=(const InputManager&) = delete;
+	InputManager(InputManager&&) = delete;
+	InputManager& operator=(InputManager&&) = delete;
 
 	// 初期化
 	void Initialize();
@@ -112,8 +112,8 @@ public:
 	Input* GetInput() const { return input_; }
 	GamePad* GetGamePad() const { return gamePad_; }
 private:
-	KeyConfig() = default;
-	~KeyConfig() = default;
+	InputManager() = default;
+	~InputManager() = default;
 
 	Input* input_ = nullptr;
 	GamePad* gamePad_ = nullptr;
@@ -131,48 +131,3 @@ private:
 	float GetBindingValue(const InputBinding& binding) const;
 	Vector2D GetBindingVector2D(const InputBinding& binding) const;
 };
-
-// ======================================
-// グローバルヘルパー関数（短縮呼び出し用）
-// ======================================
-namespace MyInput {
-	// Trigger判定（押した瞬間）
-	inline bool Trigger(Action action) {
-		return KeyConfig::GetInstance()->TriggerAction(action);
-	}
-
-	// Push判定（押し続けている）
-	inline bool Push(Action action) {
-		return KeyConfig::GetInstance()->PushAction(action);
-	}
-
-	// Release判定（離した瞬間")
-	inline bool Release(Action action) {
-		return KeyConfig::GetInstance()->ReleaseAction(action);
-	}
-
-	// アナログ値取得（0.0〜1.0）
-	inline float Value(Action action) {
-		return KeyConfig::GetInstance()->GetActionValue(action);
-	}
-
-	// 2D入力取得（-1.0〜1.0）
-	inline KeyConfig::Vector2D GetVector2D(Action action) {
-		return KeyConfig::GetInstance()->GetActionVector2D(action);
-	}
-
-	// 入力デバイス取得
-	inline Input* GetInput() {
-		return KeyConfig::GetInstance()->GetInput();
-	}
-
-	// ゲームパッドを接続しているか取得
-	inline bool UseGamePad() {
-		return KeyConfig::GetInstance()->IsGamePadConnected();
-	}
-
-	// Trigger（Key）判定
-	inline bool TriggerKey(uint32_t key) {
-		return KeyConfig::GetInstance()->GetInput()->TriggerKey(key);
-	}
-}

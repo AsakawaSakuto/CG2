@@ -10,15 +10,17 @@ using namespace Microsoft::WRL;
 // 修正: PSOManagerをインクルード（相対パス修正）
 #include "Core/PSOManager/PSOManager.h"
 
+#include "3d/Line/MyDebugLine.h"
+
 void Particles::Initialize(const std::string& filePath, const uint32_t maxParticle) {
 	// ServiceLocatorからDirectXCommonを取得
 	dxCommon_ = ServiceLocator::GetDXCommon();
-	
+
 	if (!dxCommon_) {
 		// エラー処理：DirectXCommonが登録されていない場合
 		throw std::runtime_error("DirectXCommon is not registered in ServiceLocator. Call ServiceLocator::Provide(dxCommon) first.");
 	}
-	
+
 	// DX共通クラスからデバイス・コマンドリストを取得
 	device_ = dxCommon_->GetDevice();
 	commandList_ = dxCommon_->GetCommandList();
@@ -26,9 +28,6 @@ void Particles::Initialize(const std::string& filePath, const uint32_t maxPartic
 	// JsonManagerの初期化
 	jsonManager_ = std::make_unique<JsonManager>();
 	jsonManager_->SetBasePath("resources/Data/Json/Particle/");
-
-	line3d_ = std::make_unique<Line3d>();
-	line3d_->Initialize();
 
 	// エミッターのデフォルト値を設定
 	emitter_ = {}; // ゼロ初期化
@@ -50,8 +49,7 @@ void Particles::Initialize(const std::string& filePath, const uint32_t maxPartic
 	// JSONファイルの読み込みを試行（失敗してもデフォルト値で続行）
 	try {
 		LoadJson(filePath);
-	}
-	catch (const std::exception& e) {
+	} catch (const std::exception& e) {
 		printf("[WARNING] Failed to load particle JSON '%s': %s\n", filePath.c_str(), e.what());
 		printf("[INFO] Using default particle settings.\n");
 	}
@@ -215,11 +213,7 @@ void Particles::Draw(Camera& useCamera) {
 	// DrawIndexedInstanced(インデックス数, インスタンス数, 開始インデックス, ベース頂点, 開始インスタンス)
 	commandList_->DrawIndexedInstanced(6, kMaxParticles_, 0, 0, 0);
 
-	DrawEmitterShape(line3d_.get());
-	
-	if (emitter_.enableVisualization) {
-		line3d_->Draw(camera_);
-	}
+	DrawEmitterShape();
 }
 
 void Particles::DrawImGui(const char* objectName) {
@@ -230,13 +224,13 @@ void Particles::DrawImGui(const char* objectName) {
 
 	// Play/Stop control buttons
 	if (ImGui::Button("再生 (ループ)")) {
-		Play(true);
+		Play(emitter_.translate, true);
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("再生 (1回)")) {
-		Play(false);
+		Play(emitter_.translate, false);
 	}
 
 	ImGui::SameLine();
@@ -355,8 +349,7 @@ void Particles::DrawImGui(const char* objectName) {
 		ImGui::DragFloat("線の長さ", &emitter_.lineLength, 0.01f, 0.0f, 100.0f);
 		if (emitter_.spawnOnEdge) {
 			ImGui::Text("エッジモード - 線の両端のみで生成");
-		}
-		else {
+		} else {
 			ImGui::Text("線上の任意の位置で生成");
 		}
 		break;
@@ -367,8 +360,7 @@ void Particles::DrawImGui(const char* objectName) {
 		ImGui::DragFloat("半径", &emitter_.radius, 0.01f, 0.0f, 1000.0f);
 		if (emitter_.spawnOnEdge) {
 			ImGui::Text("エッジモード - 球の表面のみで生成");
-		}
-		else {
+		} else {
 			ImGui::Text("球の内部で生成");
 		}
 		break;
@@ -379,8 +371,7 @@ void Particles::DrawImGui(const char* objectName) {
 		ImGui::DragFloat3("箱のサイズ", &emitter_.size.x, 0.01f, 0.0f, 100.0f);
 		if (emitter_.spawnOnEdge) {
 			ImGui::Text("エッジモード - 箱の辺上のみで生成");
-		}
-		else {
+		} else {
 			ImGui::Text("箱の内部で生成");
 		}
 		break;
@@ -401,8 +392,7 @@ void Particles::DrawImGui(const char* objectName) {
 		}
 		if (emitter_.spawnOnEdge) {
 			ImGui::Text("エッジモード - 平面の境界線上のみで生成");
-		}
-		else {
+		} else {
 			ImGui::Text("平面内の任意の位置で生成");
 		}
 		break;
@@ -428,8 +418,7 @@ void Particles::DrawImGui(const char* objectName) {
 		}
 		if (emitter_.spawnOnEdge) {
 			ImGui::Text("エッジモード - リングの円周上のみで生成");
-		}
-		else {
+		} else {
 			ImGui::Text("リング範囲内の任意の位置で生成");
 		}
 		break;
@@ -808,8 +797,7 @@ void Particles::UpdateEmitter() {
 	if (emitter_.frequency <= emitter_.frequencyTime) {
 		emitter_.frequencyTime = 0.0f;
 		emitter_.emit = true;
-	}
-	else {
+	} else {
 		emitter_.emit = false;
 	}
 
@@ -941,8 +929,7 @@ void Particles::SaveToJson(const std::string& filePath) {
 		try {
 			std::filesystem::create_directories(directory);
 			printf("[INFO] Created directory: %s\n", directory.string().c_str());
-		}
-		catch (const std::filesystem::filesystem_error& e) {
+		} catch (const std::filesystem::filesystem_error& e) {
 			printf("[ERROR] Failed to create directory: %s\n", e.what());
 			return;
 		}
@@ -1014,8 +1001,7 @@ void Particles::CreateNewJsonFile(const std::string& filePath) {
 		try {
 			std::filesystem::create_directories(directory);
 			printf("[INFO] Created directory: %s\n", directory.string().c_str());
-		}
-		catch (const std::filesystem::filesystem_error& e) {
+		} catch (const std::filesystem::filesystem_error& e) {
 			printf("[ERROR] Failed to create directory: %s\n", e.what());
 			return;
 		}
@@ -1111,13 +1097,11 @@ void Particles::LoadFromJson(const std::string& filePath) {
 					emitter_.texturePath = "circle";
 				}
 			}
-		}
-		catch (const std::length_error& e) {
+		} catch (const std::length_error& e) {
 			printf("[ERROR] Length error while parsing JSON: %s\n", e.what());
 			printf("[INFO] Partially loaded settings. Some fields may use default values.\n");
 			// 部分的にロードされた状態で続行
-		}
-		catch (const std::exception& e) {
+		} catch (const std::exception& e) {
 			printf("[ERROR] Error while parsing JSON field at index %zu: %s\n", index, e.what());
 			printf("[INFO] Using default values for remaining fields.\n");
 		}
@@ -1134,8 +1118,7 @@ void Particles::LoadFromJson(const std::string& filePath) {
 					TextureManager::GetInstance()->LoadTexture(textureName_);
 					textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 				}
-			}
-			catch (const std::exception& e) {
+			} catch (const std::exception& e) {
 				printf("[ERROR] Failed to load texture '%s': %s\n", emitter_.texturePath.c_str(), e.what());
 				printf("[INFO] Using default texture.\n");
 			}
@@ -1144,16 +1127,16 @@ void Particles::LoadFromJson(const std::string& filePath) {
 		loadToSaveName_ = filePath;
 		isJsonLoaded_ = true;
 
-	}
-	catch (const std::exception& e) {
+	} catch (const std::exception& e) {
 		printf("[ERROR] Critical error in LoadFromJson: %s\n", e.what());
 		printf("[INFO] Using default emitter settings.\n");
 		// デフォルト値はInitialize関数で既に設定済み
 	}
 }
 
-void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
-	if (!line3d || !emitter_.enableVisualization) return;
+void Particles::DrawEmitterShape() {
+	if (!emitter_.enableVisualization) return;
+	Vector4 color = { 1.0f, 1.0f, 0.0f, 1.0f };
 
 	Vector3 emitterPos = emitter_.translate + offset_;
 
@@ -1161,7 +1144,8 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 	case EmitterShapeType::POINT:
 	{
 		// 点を小さな球で表現
-		line3d->AddPoint(emitterPos, color);
+		Sphere pointSphere = { emitterPos, 0.1f }; // 半径0.1の小さな球
+		MyDebugLine::AddShape(pointSphere, color);
 		break;
 	}
 
@@ -1179,13 +1163,11 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 			start.y + direction.y * emitter_.lineLength,
 			start.z + direction.z * emitter_.lineLength
 		};
-		line3d->AddLine(start, end, color);
 
-		// エッジモードの場合、端点を強調表示
-		if (emitter_.spawnOnEdge) {
-			line3d->AddPoint(start, { 1.0f, 0.0f, 0.0f, 1.0f }); // 赤
-			line3d->AddPoint(end, { 1.0f, 0.0f, 0.0f, 1.0f });   // 赤
-		}
+		Line line = { start, end };
+
+		MyDebugLine::AddShape(line, color);
+
 		break;
 	}
 
@@ -1193,28 +1175,17 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 	{
 		// 球を描画
 		Sphere sphere = { emitterPos, emitter_.radius };
-		line3d->AddSphere(sphere, color);
+		MyDebugLine::AddShape(sphere, color);
 
-		// エッジモード（表面のみ）の場合、色を変える
-		if (emitter_.spawnOnEdge) {
-			// 複数の円を描画して表面を強調
-			line3d->AddCircle(emitterPos, emitter_.radius, { 1.0f, 0.0f, 0.0f }, color);
-			line3d->AddCircle(emitterPos, emitter_.radius, { 0.0f, 1.0f, 0.0f }, color);
-			line3d->AddCircle(emitterPos, emitter_.radius, { 0.0f, 0.0f, 1.0f }, color);
-		}
 		break;
 	}
 
 	case EmitterShapeType::BOX:
 	{
 		// 箱を描画
-		line3d->AddBox(emitterPos, emitter_.size, color);
+		AABB box = { emitterPos, emitter_.size };
+		MyDebugLine::AddShape(box, color);
 
-		// エッジモードの場合、辺を強調表示
-		if (emitter_.spawnOnEdge) {
-			// 12本の辺を太く表示するために、もう一度描画
-			line3d->AddBox(emitterPos, emitter_.size, { 1.0f, 0.5f, 0.0f, 1.0f });
-		}
 		break;
 	}
 
@@ -1226,8 +1197,7 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 
 		if (std::abs(emitter_.planeNormal.x) < 0.9f) {
 			tangent = Normalize(Cross({ 1.0f, 0.0f, 0.0f }, emitter_.planeNormal));
-		}
-		else {
+		} else {
 			tangent = Normalize(Cross({ 0.0f, 1.0f, 0.0f }, emitter_.planeNormal));
 		}
 		bitangent = Normalize(Cross(emitter_.planeNormal, tangent));
@@ -1252,17 +1222,15 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 		};
 
 		// 境界線を描画
-		line3d->AddLine(corners[0], corners[1], color);
-		line3d->AddLine(corners[1], corners[2], color);
-		line3d->AddLine(corners[2], corners[3], color);
-		line3d->AddLine(corners[3], corners[0], color);
-
-		// エッジモードでない場合、内部のグリッドを描画
-		if (!emitter_.spawnOnEdge) {
-			// 対角線を追加して平面を示す
-			line3d->AddLine(corners[0], corners[2], Vector4{ color.x * 0.5f, color.y * 0.5f, color.z * 0.5f, color.w });
-			line3d->AddLine(corners[1], corners[3], Vector4{ color.x * 0.5f, color.y * 0.5f, color.z * 0.5f, color.w });
-		}
+		Line line[4];
+		line[0] = { corners[0], corners[1] };
+		line[1] = { corners[1], corners[2] };
+		line[2] = { corners[2], corners[3] };
+		line[3] = { corners[3], corners[0] };
+		MyDebugLine::AddShape(line[0], color);
+		MyDebugLine::AddShape(line[1], color);
+		MyDebugLine::AddShape(line[2], color);
+		MyDebugLine::AddShape(line[3], color);
 
 		// 法線ベクトルを表示
 		Vector3 normalEnd = {
@@ -1270,15 +1238,20 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 			emitterPos.y + emitter_.planeNormal.y * 2.0f,
 			emitterPos.z + emitter_.planeNormal.z * 2.0f
 		};
-		line3d->AddLine(emitterPos, normalEnd, { 0.0f, 1.0f, 1.0f, 1.0f }); // シアン色で法線表示
+
+		Line line2 = { emitterPos, normalEnd };
+
+		MyDebugLine::AddShape(line2, { 0.0f, 1.0f, 1.0f, 1.0f }); // シアン色で法線表示
 		break;
 	}
 
 	case EmitterShapeType::RING:
 	{
 		// 内側と外側の円を描画
-		line3d->AddCircle(emitterPos, emitter_.ringInnerRadius, emitter_.planeNormal, color);
-		line3d->AddCircle(emitterPos, emitter_.ringOuterRadius, emitter_.planeNormal, color);
+		Circle outerCircle = { emitterPos, emitter_.ringOuterRadius, emitter_.planeNormal };
+		Circle innerCircle = { emitterPos, emitter_.ringInnerRadius, emitter_.planeNormal };
+		MyDebugLine::AddShape(outerCircle, color);
+		MyDebugLine::AddShape(innerCircle, color);
 
 		// エッジモードでない場合、リング範囲を示す線を追加
 		if (!emitter_.spawnOnEdge) {
@@ -1286,8 +1259,7 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 			Vector3 tangent;
 			if (std::abs(emitter_.planeNormal.x) < 0.9f) {
 				tangent = Normalize(Cross({ 1.0f, 0.0f, 0.0f }, emitter_.planeNormal));
-			}
-			else {
+			} else {
 				tangent = Normalize(Cross({ 0.0f, 1.0f, 0.0f }, emitter_.planeNormal));
 			}
 
@@ -1312,7 +1284,9 @@ void Particles::DrawEmitterShape(Line3d* line3d, const Vector4& color) {
 					emitterPos.z + dir.z * emitter_.ringOuterRadius
 				};
 
-				line3d->AddLine(innerPoint, outerPoint, Vector4{ color.x * 0.5f, color.y * 0.5f, color.z * 0.5f, color.w });
+				Line line = { innerPoint, outerPoint };
+
+				MyDebugLine::AddShape(line, Vector4{ color.x * 0.5f, color.y * 0.5f, color.z * 0.5f, color.w });
 			}
 		}
 		break;

@@ -54,8 +54,6 @@ private:
 
 	GameTimer textMoveTimer_;
 
-	unique_ptr<Line3d> testLine_ = make_unique<Line3d>();
-
 	// ビットマップフォント（数字表示用）
 	unique_ptr<BitmapFont> timeFont_;
 	unique_ptr<BitmapFont> playerHPFont_;

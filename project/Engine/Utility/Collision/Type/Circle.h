@@ -7,11 +7,11 @@
 #include "imgui_impl_win32.h"
 #endif
 
-// 平面を表す構造体
-struct Plane {
-	Vector3 center; // 平面の中心座標
-	Vector3 normal; // 平面の法線
-	float size; 
+// 平円を表す構造体
+struct Circle {
+	Vector3 center; // 平円の中心座標
+	float radius;   // 平円の半径
+	Vector3 normal; // 平円の法線
 
 #ifdef USE_IMGUI
 	/// <summary>
@@ -23,12 +23,12 @@ struct Plane {
 
 		ImGui::DragFloat3("center", &center.x, 0.01f);
 		ImGui::DragFloat3("normal", &normal.x, 0.01f, -1.0f, 1.0f);
-		ImGui::DragFloat("size", &size, 0.01f);
+		ImGui::DragFloat("size", &radius, 0.01f);
 
 		if (ImGui::Button("Reset")) {
 			normal = { 0.0f,1.0f,0.0f };
 			center = { 0.0f,0.0f,0.0f };
-			size = 1.0f;
+			radius = 1.0f;
 		}
 
 		ImGui::End();

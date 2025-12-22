@@ -41,7 +41,7 @@
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
-    <ClCompile Include="Engine\3d\Line\Line.cpp" />
+    <ClCompile Include="Engine\3d\Line\Data\Line.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.cpp" />
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
@@ -70,7 +70,7 @@
     <ClCompile Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
     <ClCompile Include="Engine\Input\InputDevice\GamePad.cpp" />
-    <ClCompile Include="Engine\Input\KeyConfig.cpp" />
+    <ClCompile Include="Engine\Input\InputManager..cpp" />
     <ClCompile Include="Engine\Input\InputDevice\Input.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\JsonManager.cpp" />
     <ClCompile Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.cpp" />
@@ -85,7 +85,7 @@
     <ClCompile Include="Engine\Utility\ImGui\SceneViewWindow.cpp" />
     <ClCompile Include="Engine\Utility\ImGui\StatsWindow.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
-    <ClCompile Include="Engine\3d\Particle\ParticlePlayManager.cpp" />
+    <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -129,7 +129,7 @@
     <ClInclude Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponName.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.h" />
-    <ClInclude Include="Engine\3d\Line\Line.h" />
+    <ClInclude Include="Engine\3d\Line\Data\Line.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.h" />
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
     <ClInclude Include="Engine\2d\Gauge\Gauge.h" />
@@ -184,7 +184,7 @@
     <ClInclude Include="Engine\Utility\Collision\Type\LineStruct.h" />
     <ClInclude Include="Engine\Camera\Frustum.h" />
     <ClInclude Include="Engine\Input\InputDevice\GamePad.h" />
-    <ClInclude Include="Engine\Input\KeyConfig.h" />
+    <ClInclude Include="Engine\Input\InputManager.h" />
     <ClInclude Include="Engine\Input\InputDevice\Input.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\JsonManager.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Json\Data\JsonOutput.h" />
@@ -199,7 +199,13 @@
     <ClInclude Include="Engine\Utility\ImGui\SceneViewWindow.h" />
     <ClInclude Include="Engine\Utility\ImGui\StatsWindow.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
-    <ClInclude Include="Engine\3d\Particle\ParticlePlayManager.h" />
+    <ClInclude Include="Engine\Utility\Easing\Type\EaseType.h" />
+    <ClInclude Include="Engine\3d\Line\LineManager.h" />
+    <ClInclude Include="Engine\3d\Line\MyDebugLine.h" />
+    <ClInclude Include="Engine\Utility\Collision\CollisionShape.h" />
+    <ClInclude Include="Engine\Input\MyInput.h" />
+    <ClInclude Include="Engine\Audio\MyAudio.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\Circle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -208,7 +214,6 @@
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="resources\json\ranking.json" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
-    <None Include="docs\JsonManager_Usage.md" />
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />

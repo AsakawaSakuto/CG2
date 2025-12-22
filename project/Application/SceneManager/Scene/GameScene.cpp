@@ -31,8 +31,6 @@ void GameScene::Initialize() {
 	dustParticle_->Initialize();
 	dustParticle_->LoadJson("dust");
 
-	testLine_->Initialize();
-
 	lv_ = make_unique<Sprite>();
 	lv_->Initialize("UI/game/lv.png", { 70.0f, 110.0f }, { 0.7f, 0.7f });
 
@@ -105,10 +103,10 @@ void GameScene::Update() {
 	testParticle_->Update();
 	dustParticle_->Update();
 
-	testLine_->AddGrid(100.0f, 20);
+	MyDebugLine::AddGrid(100.0f, 20);
 
 	if (textMoveTimer_.IsActive()) {
-		text_->SetPosition({ Easing::Lerp(1780.0f, -500.0f, textMoveTimer_.GetProgress(),Easing::Type::EaseOutInSine), 360.0f });
+		text_->SetPosition({ Easing::Lerp(1780.0f, -500.0f, textMoveTimer_.GetProgress(),EaseType::EaseOutInSine), 360.0f });
 		textMoveTimer_.Update();
 	}
 
@@ -143,7 +141,7 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
-	testLine_->Draw(camera_);
+	MyDebugLine::Draw(camera_);
 
 	enemyManager_->Draw(camera_);
 
@@ -160,6 +158,8 @@ void GameScene::Draw() {
 	fireBallIcon_->Draw();
 	leaserIcon_->Draw();
 	runaIcon_->Draw();
+
+	//MyParticle::DrawAll(camera_);
 
 	// ゲージの描画
 	hpGauge_->Draw();

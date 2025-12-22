@@ -13,8 +13,6 @@ void Enemy::Initialize() {
 	collicionRadius_ = 0.5f;
 
 	scaleTimer_.Start(0.5f, false);
-
-	debugLine_->Initialize();
 }
 
 void Enemy::Update() {
@@ -24,20 +22,18 @@ void Enemy::Update() {
 	model_->Update();
 
 	transform_.scale = Easing::Lerp(Vector3({0.0f,0.0f,0.0f}), Vector3({ 1.0f,1.0f,1.0f }), 
-		scaleTimer_.GetProgress(), Easing::Type::Linear);
+		scaleTimer_.GetProgress(), EaseType::Linear);
 
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = collicionRadius_;
 
 	scaleTimer_.Update();
 
-	debugLine_->AddSphere(sphereCollision_);
+	MyDebugLine::AddShape(sphereCollision_);
 }
 
 void Enemy::Draw(Camera camera) {
 	if (scaleTimer_.GetProgress() >= 0.1f) {
-		debugLine_->Draw(camera);
-
 		model_->Draw(camera, transform_);
 	}
 }

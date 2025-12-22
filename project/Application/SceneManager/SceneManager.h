@@ -1,13 +1,10 @@
 #pragma once
 #include"IScene.h"
-#include"SceneManager/Test/TestScene.h"
 
+#include"SceneManager/Test/TestScene.h"
 #include"SceneManager/Scene/TiTleScene.h"
 #include"SceneManager/Scene/GameScene.h"
 #include"SceneManager/Scene/ResultScene.h"
-
-#include"Input/InputDevice/Input.h"
-#include"Input/InputDevice/GamePad.h"
 
 #include<memory>
 

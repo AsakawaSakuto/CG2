@@ -16,6 +16,7 @@
 #include "Utility/Collision/Type/Plane.h"
 #include "Utility/Collision/Type/Segment.h"
 #include "Utility/Collision/Type/LineStruct.h"
+#include "Utility/Collision/Type/Circle.h"
 
 /// <summary>
 /// 3D空間に線を描画するクラス（デバッグ表示、UI、可視化用）
@@ -114,16 +115,7 @@ public:
     /// <param name="radius">半径</param>
     /// <param name="normal">法線方向</param>
     /// <param name="color">色（デフォルト：白）</param>
-    void AddCircle(const Vector3& center, float radius, const Vector3& normal, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
-
-    /// <summary>
-    /// XZ平面、円描画
-    /// </summary>
-    /// <param name="center">中心座標</param>
-    /// <param name="radius">半径</param>
-    /// <param name="normal">法線方向</param>
-    /// <param name="color">色（デフォルト：白）</param>
-    void AddCircleXZ(const Vector3& center, float radius, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
+    void AddCircle(const Circle& circle, const Vector4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
     /// <summary>
     /// レイ（半直線）描画
@@ -183,7 +175,7 @@ private:
 
     // 線データ
     std::vector<LineVertex> vertices_;
-    size_t maxVertices_ = 1000;
+    size_t maxVertices_ = 100000;
 
     // リソース作成関数
     void CreateVertexBuffer();

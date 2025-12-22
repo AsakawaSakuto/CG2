@@ -6,9 +6,9 @@
 
 // Include
 #include "Core/WinApp/WinApp.h"
-#include "Input/KeyConfig.h"
+#include "Input/MyInput.h"
 #include "Camera/Camera.h"
-#include "Audio/AudioManager.h"
+#include "Audio/MyAudio.h"
 #include "Camera/DebugCamera.h"
 #include "Utility/ConvertString/ConvertString.h"
 #include "Core/DirectXCommon/DirectXCommon.h"
@@ -21,7 +21,7 @@
 #include "3d/Model/Model.h"
 #include "3d/Particle/Particles.h"
 #include "3d/Particle/Struct/EmitterState.h"
-#include "3d/Line/Line.h"
+#include "3d/Line/MyDebugLine.h"
 
 // Math
 #include "Math/Type/Vector2.h"

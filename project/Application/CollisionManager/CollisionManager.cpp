@@ -96,8 +96,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				// 弾と敵の衝突判定
 				if (Collision::IsHit(bulletSphere, enemySphere)) {
 					// 衝突した敵を死亡状態にする
-					enemyDieParticle_->SetEmitterPosition(enemy->GetPosition());
-					enemyDieParticle_->Play(false);
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					switch (bullet->GetBulletType())
 					{
@@ -150,8 +149,7 @@ void CollisionManager::CheckExpItemPlayerCollision() {
 		if (Collision::IsHit(playerSphere, expItemSphere)) {
 			// 衝突したEnemyを死亡状態にする
 
-			expItemGetParticle_->SetEmitterPosition(player_->GetPosition());
-			expItemGetParticle_->Play(false);
+			expItemGetParticle_->Play(player_->GetPosition(), false);
 			player_->AddExp(5);
 
 			expItem->Dead();
