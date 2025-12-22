@@ -38,6 +38,9 @@ Line3d::~Line3d() {
 }
 
 void Line3d::AddLine(const Vector3& start, const Vector3& end, const Vector4& color) {
+    if (vertices_.size() + 2 > maxVertices_) {
+        return;
+    }
     // 頂点を追加
     vertices_.push_back({ start, color });
     vertices_.push_back({ end, color });
@@ -344,7 +347,12 @@ void Line3d::AddOvalSphere(const OvalSphere& ovalSphere, const Vector4& color) {
     }
 }
 
-void Line3d::AddCircle(const Vector3& center, float radius, const Vector3& normal, const Vector4& color) {
+void Line3d::AddCircle(const Circle& circle, const Vector4& color) {
+
+	Vector3 center = circle.center;
+	float radius = circle.radius;
+	Vector3 normal = circle.normal;
+
     const float pi = std::numbers::pi_v<float>;
 
     // 法線から適当な接線ベクトルを作成
@@ -385,10 +393,6 @@ void Line3d::AddCircle(const Vector3& center, float radius, const Vector3& norma
 
         AddLine(p1, p2, color);
     }
-}
-
-void Line3d::AddCircleXZ(const Vector3& center, float radius, const Vector4& color) {
-	AddCircle(center, radius, { 0.0f, 1.0f, 0.0f }, color);
 }
 
 void Line3d::AddPoint(const Vector3& position, const Vector4& color) {

@@ -30,7 +30,7 @@
 #include "Camera/Camera.h"
 #include "3d/Particle/Struct/ParticleDataStruct.h"
 #include "3d/Particle/Struct/EmitterState.h"
-#include "3d/Line/Line.h"
+#include "3d/Line/LineManager.h"
 
 #pragma endregion
 
@@ -104,13 +104,14 @@ public:
 	/// パーティクルの生成開始
 	/// </summary>
 	/// <param name="isLoop">trueならループ生成、falseなら一回だけ生成</param>
-	void Play(bool isLoop = true) {
+	void Play(Vector3 pos, bool isLoop = true) {
 		if (isLoop) {
+			emitter_.translate = pos;
 			emitter_.frequencyTime = emitter_.frequency;
 			emitter_.useEmitter = true;
 			isPlaying_ = true;
-		}
-		else {
+		} else {
+			emitter_.translate = pos;
 			emitter_.frequencyTime = emitter_.frequency;
 			emitter_.useEmitter = false;
 			isPlaying_ = false;
@@ -154,7 +155,7 @@ public:
 	/// エミッター形状の可視化（内部のLine3dを使用してワイヤーフレーム表示）
 	/// </summary>
 	/// <param name="color">描画色（デフォルト：黄色）</param>
-	void DrawEmitterShape(Line3d* line3d, const Vector4& color = { 1.0f,1.0f,0.0f,1.0f });
+	void DrawEmitterShape();
 
 	void SetEmitterState(EmitterState emitter) { emitter_ = emitter; }
 private:
@@ -213,9 +214,6 @@ private:
 	float emitterSpeed_ = 0.0f;
 
 	Vector3 offset_ = {};
-
-	// エミッター形状可視化用のLine3d（内部で保持）
-	std::unique_ptr<Line3d> line3d_;
 
 	/*-----------GPUパーティクルに使用してる変数-----------*/
 

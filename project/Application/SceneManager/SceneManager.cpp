@@ -4,12 +4,13 @@
 #include <filesystem>
 #include <comdef.h>
 #include <windows.h>
-#include "Core/TextureManager/TextureManager.h"
 #include "Core/Logger/Logger.h"
+#include "Core/TextureManager/TextureManager.h"
 #include "Core/ServiceLocator/ServiceLocator.h"
-#include "Utility/GameTimer/DeltaTime.h"
-#include "3d/Model/Model.h"
+
 #include "Audio/AudioManager.h"
+#include "Input/InputManager.h"
+#include "3d/Line/LineManager.h"
 
 SceneManager::SceneManager() {
     // シーン配列は初期化時には空にする
@@ -67,10 +68,12 @@ void SceneManager::Initialize() {
 	gamePad_ = std::make_unique<GamePad>();
     gamePad_->Initialize();
 
-    KeyConfig::GetInstance()->Initialize();
-    KeyConfig::GetInstance()->SetInputDevices(input_.get(), gamePad_.get());
+    InputManager::GetInstance()->Initialize();
+    InputManager::GetInstance()->SetInputDevices(input_.get(), gamePad_.get());
 
 	AudioManager::GetInstance()->Initialize();
+
+	LineManager::GetInstance()->Initialize();
 
     // 初期シーンを作成
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);

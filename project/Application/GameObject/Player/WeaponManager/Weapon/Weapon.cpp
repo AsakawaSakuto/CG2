@@ -173,14 +173,14 @@ void Weapon::BulletTypeUpdate() {
 		switch (weaponName_)
 		{
 		case WeaponName::FireBall:
-			bullet->LoadJson("fireBall", "fireBall2");
+			//bullet->LoadJson("fireBall", "fireBall2");
 			break;
 		case WeaponName::Laser:
-			bullet->LoadJson("laser", "laser2");
+			//bullet->LoadJson("laser", "laser2");
 			bullet->SetPenetrationCount(status_.penetrationCount);
 			break;
 		case WeaponName::Runa:
-			bullet->LoadJson("runa", "runa2");
+			//bullet->LoadJson("runa", "runa2");
 			bullet->SetBounceCount(status_.bounceCount);
 			break;
 		}

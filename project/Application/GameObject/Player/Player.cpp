@@ -26,8 +26,6 @@ void Player::Initialize() {
 
 	weaponManager_->Initialize();
 
-	debugLine_->Initialize();
-
 	// ステータスの初期化
 	status_.currentHP_ = status_.maxHP_;
 	status_.currentExp_ = 0;
@@ -50,10 +48,8 @@ void Player::Update() {
 	model_->Update();
 	expItemGetRange_->Update();
 
-	moveParticle_->SetEmitterPosition(transform_.translate);
 	moveParticle_->SetOffSet({ 0.0f, -0.2f, 0.0f });
 	moveParticle_->Update();
-	landingParticle_->SetEmitterPosition(transform_.translate);
 	landingParticle_->Update();
 
 	weaponManager_->SetDirectionToEnemy(directionToEnemy_);
@@ -66,15 +62,17 @@ void Player::Update() {
 	expItemStateChangeCollision_.center = transform_.translate;
 	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
 
-	debugLine_->AddSphere(sphereCollision_);
-	debugLine_->AddCircleXZ(transform_.translate, expItemStateChangeRadius_);
+	MyDebugLine::AddShape(sphereCollision_);
+	Circle expCircle = {};
+	expCircle.center = { transform_.translate.x ,transform_.translate.y + 0.1f ,transform_.translate.z };
+	expCircle.radius = expItemStateChangeRadius_;
+	expCircle.normal = { 0.0f,1.0f,0.0f };
+	MyDebugLine::AddShape(expCircle);
 }
 
 void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
-
-	debugLine_->Draw(camera);
 
 	model_->Draw(camera, transform_);
 
@@ -111,7 +109,7 @@ void Player::DrawImGui() {
 
 void Player::Move() {
 	// KeyConfigを使って移動入力を取得
-	KeyConfig::Vector2D moveInput = { 0.0f, 0.0f };
+	InputManager::Vector2D moveInput = { 0.0f, 0.0f };
 	
 	// GamePadが接続されている場合、スティック入力を取得
 	if (MyInput::UseGamePad()) {
@@ -173,7 +171,7 @@ void Player::Move() {
 		}
 		
 		if (!moveParticle_->IsPlaying()) {
-			moveParticle_->Play();
+			moveParticle_->Play(transform_.translate, false);
 		}
 	} else {
 		moveParticle_->Stop();
@@ -231,7 +229,7 @@ void Player::Jump() {
 		// 着地した瞬間の判定（前フレームで空中にいて、今フレームで地面に接触）
 		if (!wasGrounded_) {
 			// 着地した瞬間の処理
-			landingParticle_->Play(false);
+			landingParticle_->Play(transform_.translate, false);
 		}
 	} else {
 		isGrounded_ = false;

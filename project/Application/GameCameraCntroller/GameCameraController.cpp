@@ -1,5 +1,5 @@
 #include "GameCameraController.h"
-#include "Input/KeyConfig.h"
+#include "Input/MyInput.h"
 
 void GameCameraController::Initialize() {
 	// カメラの初期設定

@@ -1,6 +1,5 @@
 #include "TestScene.h"
 #include "Core/ServiceLocator/ServiceLocator.h"
-#include "Audio/AudioManager.h"
 
 #define WHITE {1.0f,1.0f,1.0f,1.0f}
 #define RED   {1.0f,0.0f,0.0f,1.0f}
@@ -53,8 +52,6 @@ void TestScene::Initialize() {
 	testOvalSphere_.rotate = { 0.0f, 0.0f, 0.0f };
 	testOvalSphere_.UpdateOrientation();
 
-	testLine_->Initialize();
-
 	bitmapFont_.Initialize();
 
     testGauge_->Initialize();
@@ -79,7 +76,8 @@ void TestScene::Update() {
 
     Vector3 start = { 0.0f, 0.0f, 0.0f };
     Vector3 end = { 1.0f, 1.0f, 1.0f };
-    testLine_->AddLine(walkTransform_.translate, sneakWalkTransform_.translate);
+    Line line = { walkTransform_.translate, sneakWalkTransform_.translate };
+    MyDebugLine::AddShape(line);
 
 	// 回転を適用（orientation行列を更新）
 	testOBB_.UpdateOrientation();
@@ -117,14 +115,14 @@ void TestScene::Update() {
 	Vector4 aabbColor = aabbHit ? Vector4 RED : Vector4 WHITE;
 	Vector4 obbColor = obbHit ? Vector4 RED : Vector4 WHITE;
 
-	testLine_->AddSphere(testSphere_, sphereColor);
-	testLine_->AddOvalSphere(testOvalSphere_, ovalSphereColor);
-	testLine_->AddBox(testAABB_, aabbColor);
-	testLine_->AddBox(testOBB_, obbColor);
+	MyDebugLine::AddShape(testSphere_, sphereColor);
+	MyDebugLine::AddShape(testOvalSphere_, ovalSphereColor);
+	MyDebugLine::AddShape(testAABB_, aabbColor);
+	MyDebugLine::AddShape(testOBB_, obbColor);
     
-    testLine_->AddPlane(testPlane_);
+    MyDebugLine::AddShape(testPlane_);
 
-	testLine_->AddGrid(20.0f, 20);
+    MyDebugLine::AddGrid(20.0f, 20);
 
 	testParticle_->Update();
 
@@ -152,7 +150,7 @@ void TestScene::Draw() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
     postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 
-	testLine_->Draw(camera_);
+    MyDebugLine::Draw(camera_);
 
     cube_->Draw(camera_, cubeTransform_);
     spinCube_->Draw(camera_, spinCubeTransform_);

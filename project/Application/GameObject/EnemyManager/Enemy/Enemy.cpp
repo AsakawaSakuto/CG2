@@ -13,8 +13,6 @@ void Enemy::Initialize() {
 	collicionRadius_ = 0.5f;
 
 	scaleTimer_.Start(0.5f, false);
-
-	debugLine_->Initialize();
 }
 
 void Enemy::Update() {
@@ -31,13 +29,11 @@ void Enemy::Update() {
 
 	scaleTimer_.Update();
 
-	debugLine_->AddSphere(sphereCollision_);
+	MyDebugLine::AddShape(sphereCollision_);
 }
 
 void Enemy::Draw(Camera camera) {
 	if (scaleTimer_.GetProgress() >= 0.1f) {
-		debugLine_->Draw(camera);
-
 		model_->Draw(camera, transform_);
 	}
 }

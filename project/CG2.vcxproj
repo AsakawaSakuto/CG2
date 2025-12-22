@@ -172,10 +172,10 @@
     <ClCompile Include="Application\SceneManager\Test\TestScene.cpp" />
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
-    <ClCompile Include="Engine\3d\Line\Line.cpp" />
+    <ClCompile Include="Engine\3d\Line\Data\Line.cpp" />
+    <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
     <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
-    <ClCompile Include="Engine\3d\Particle\ParticlePlayManager.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
     <ClCompile Include="Engine\Audio\Data\Audio.cpp" />
@@ -184,7 +184,7 @@
     <ClCompile Include="Engine\Core\ServiceLocator\ServiceLocator.cpp" />
     <ClCompile Include="Engine\Input\InputDevice\GamePad.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\HeapManager.cpp" />
-    <ClCompile Include="Engine\Input\KeyConfig.cpp" />
+    <ClCompile Include="Engine\Input\InputManager..cpp" />
     <ClCompile Include="Engine\OffScreen\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="Engine\OffScreen\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Engine\Math\MathFunction\MathFunction.cpp" />
@@ -277,13 +277,15 @@
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
     <ClInclude Include="Engine\2d\Gauge\Gauge.h" />
-    <ClInclude Include="Engine\3d\Line\Line.h" />
+    <ClInclude Include="Engine\3d\Line\MyDebugLine.h" />
+    <ClInclude Include="Engine\3d\Line\Data\Line.h" />
+    <ClInclude Include="Engine\3d\Line\LineManager.h" />
     <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
     <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
-    <ClInclude Include="Engine\3d\Particle\ParticlePlayManager.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
+    <ClInclude Include="Engine\Audio\MyAudio.h" />
     <ClInclude Include="Engine\Camera\Frustum.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
@@ -293,13 +295,16 @@
     <ClInclude Include="Engine\Core\ServiceLocator\ServiceLocator.h" />
     <ClInclude Include="Engine\Input\InputDevice\GamePad.h" />
     <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
-    <ClInclude Include="Engine\Input\KeyConfig.h" />
+    <ClInclude Include="Engine\Input\InputManager.h" />
+    <ClInclude Include="Engine\Input\MyInput.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectParams.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOType.h" />
     <ClInclude Include="Engine\OffScreen\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Engine\Math\MathFunction\MathFunction.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOManager.h" />
+    <ClInclude Include="Engine\Utility\Collision\CollisionShape.h" />
+    <ClInclude Include="Engine\Utility\Collision\Type\Circle.h" />
     <ClInclude Include="Engine\Utility\Easing\Type\EaseType.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Utility\FileFormat\Binary\Data\BinaryInput.h" />
@@ -419,7 +424,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="docs\JsonManager_Usage.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />

@@ -1,29 +1,29 @@
-#include "KeyConfig.h"
+#include "InputManager.h"
 #include <algorithm>
 
-void KeyConfig::Initialize() {
+void InputManager::Initialize() {
 	SetupDefaultBindings();
 }
 
-void KeyConfig::SetInputDevices(Input* input, GamePad* gamePad) {
+void InputManager::SetInputDevices(Input* input, GamePad* gamePad) {
 	input_ = input;
 	gamePad_ = gamePad;
 }
 
-void KeyConfig::BindAction(Action action, const InputBinding& binding) {
+void InputManager::BindAction(Action action, const InputBinding& binding) {
 	bindings_[action].clear();
 	bindings_[action].push_back(binding);
 }
 
-void KeyConfig::AddAlternativeBinding(Action action, const InputBinding& binding) {
+void InputManager::AddAlternativeBinding(Action action, const InputBinding& binding) {
 	bindings_[action].push_back(binding);
 }
 
-void KeyConfig::ClearBindings(Action action) {
+void InputManager::ClearBindings(Action action) {
 	bindings_[action].clear();
 }
 
-bool KeyConfig::TriggerAction(Action action) const {
+bool InputManager::TriggerAction(Action action) const {
 	if (!input_ && !gamePad_) return false;
 
 	auto it = bindings_.find(action);
@@ -38,7 +38,7 @@ bool KeyConfig::TriggerAction(Action action) const {
 	return false;
 }
 
-bool KeyConfig::PushAction(Action action) const {
+bool InputManager::PushAction(Action action) const {
 	if (!input_ && !gamePad_) return false;
 
 	auto it = bindings_.find(action);
@@ -53,7 +53,7 @@ bool KeyConfig::PushAction(Action action) const {
 	return false;
 }
 
-bool KeyConfig::ReleaseAction(Action action) const {
+bool InputManager::ReleaseAction(Action action) const {
 	if (!input_ && !gamePad_) return false;
 
 	auto it = bindings_.find(action);
@@ -68,7 +68,7 @@ bool KeyConfig::ReleaseAction(Action action) const {
 	return false;
 }
 
-float KeyConfig::GetActionValue(Action action) const {
+float InputManager::GetActionValue(Action action) const {
 	if (!input_ && !gamePad_) return 0.0f;
 
 	auto it = bindings_.find(action);
@@ -83,7 +83,7 @@ float KeyConfig::GetActionValue(Action action) const {
 	return maxValue;
 }
 
-KeyConfig::Vector2D KeyConfig::GetActionVector2D(Action action) const {
+InputManager::Vector2D InputManager::GetActionVector2D(Action action) const {
 	if (!input_ && !gamePad_) return { 0.0f, 0.0f };
 
 	auto it = bindings_.find(action);
@@ -99,12 +99,12 @@ KeyConfig::Vector2D KeyConfig::GetActionVector2D(Action action) const {
 	return result;
 }
 
-void KeyConfig::ResetToDefault() {
+void InputManager::ResetToDefault() {
 	bindings_.clear();
 	SetupDefaultBindings();
 }
 
-const char* KeyConfig::GetActionName(Action action) {
+const char* InputManager::GetActionName(Action action) {
 	switch (action) {
 	case Action::CONFIRM: return "決定";
 	case Action::MOVE_UP: return "上移動";
@@ -117,19 +117,19 @@ const char* KeyConfig::GetActionName(Action action) {
 	}
 }
 
-const std::vector<InputBinding>& KeyConfig::GetBindings(Action action) const {
+const std::vector<InputBinding>& InputManager::GetBindings(Action action) const {
 	static std::vector<InputBinding> empty;
 	auto it = bindings_.find(action);
 	if (it == bindings_.end()) return empty;
 	return it->second;
 }
 
-void KeyConfig::SetupDefaultBindings() {
+void InputManager::SetupDefaultBindings() {
 	// 決定
 	bindings_[Action::CONFIRM].push_back(InputBinding(InputSource::KEYBOARD, DIK_SPACE));
 	bindings_[Action::CONFIRM].push_back(InputBinding(InputSource::KEYBOARD, DIK_Z));
 	bindings_[Action::CONFIRM].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::A));
-	
+
 	// ポーズ
 	bindings_[Action::PAUSE].push_back(InputBinding(InputSource::KEYBOARD, DIK_TAB));
 	bindings_[Action::PAUSE].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::START));
@@ -183,7 +183,7 @@ void KeyConfig::SetupDefaultBindings() {
 	bindings_[Action::CAMERA_LOOK].push_back(InputBinding(InputSource::GAMEPAD_STICK_RIGHT, GamePad::ALL_STICK));
 }
 
-bool KeyConfig::CheckBindingTrigger(const InputBinding& binding) const {
+bool InputManager::CheckBindingTrigger(const InputBinding& binding) const {
 	switch (binding.source) {
 	case InputSource::KEYBOARD:
 		return input_ && input_->TriggerKey(binding.key);
@@ -207,7 +207,7 @@ bool KeyConfig::CheckBindingTrigger(const InputBinding& binding) const {
 	}
 }
 
-bool KeyConfig::CheckBindingPush(const InputBinding& binding) const {
+bool InputManager::CheckBindingPush(const InputBinding& binding) const {
 	switch (binding.source) {
 	case InputSource::KEYBOARD:
 		return input_ && input_->PushKey(binding.key);
@@ -230,7 +230,7 @@ bool KeyConfig::CheckBindingPush(const InputBinding& binding) const {
 	}
 }
 
-bool KeyConfig::CheckBindingRelease(const InputBinding& binding) const {
+bool InputManager::CheckBindingRelease(const InputBinding& binding) const {
 	switch (binding.source) {
 	case InputSource::KEYBOARD:
 		// Inputクラスにはリリース判定がないので、Push判定の反転で代用
@@ -255,7 +255,7 @@ bool KeyConfig::CheckBindingRelease(const InputBinding& binding) const {
 	}
 }
 
-float KeyConfig::GetBindingValue(const InputBinding& binding) const {
+float InputManager::GetBindingValue(const InputBinding& binding) const {
 	switch (binding.source) {
 	case InputSource::KEYBOARD:
 		return (input_ && input_->PushKey(binding.key)) ? 1.0f : 0.0f;
@@ -306,7 +306,7 @@ float KeyConfig::GetBindingValue(const InputBinding& binding) const {
 	}
 }
 
-KeyConfig::Vector2D KeyConfig::GetBindingVector2D(const InputBinding& binding) const {
+InputManager::Vector2D InputManager::GetBindingVector2D(const InputBinding& binding) const {
 	Vector2D result = { 0.0f, 0.0f };
 
 	switch (binding.source) {

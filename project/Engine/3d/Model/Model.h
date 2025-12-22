@@ -41,7 +41,7 @@ public:
 	
 	/// <summary>
 	/// 静的リソースのクリーンアップ（アプリケーション終了時に呼び出す）
-/// </summary>
+    /// </summary>
 	static void Finalize();
 
 	/// <summary>
