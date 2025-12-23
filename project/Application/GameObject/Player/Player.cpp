@@ -15,10 +15,6 @@ void Player::Initialize() {
 	model_->Initialize("animation/human/walk.gltf");
 	model_->UseLight(false);
 
-	expItemGetRange_->Initialize("player/expItemGetRange.obj");
-	expItemGetRange_->SetTexture("resources/image/white16x16.png");
-	expItemGetRange_->SetDrawMode(true);
-
 	moveParticle_->Initialize();
 	moveParticle_->LoadJson("playerMove");
 	landingParticle_->Initialize();
@@ -46,7 +42,6 @@ void Player::Update() {
 	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
 
 	model_->Update();
-	expItemGetRange_->Update();
 
 	moveParticle_->SetOffSet({ 0.0f, -0.2f, 0.0f });
 	moveParticle_->Update();

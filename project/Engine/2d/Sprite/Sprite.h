@@ -1,5 +1,5 @@
 #pragma once
-#include "3d/Model/ModelDataStruct.h"
+#include "3d/Model/Data/ModelDataStruct.h"
 
 #include "Utility/Transform/Transform.h"
 #include "Core/TextureManager/TextureManager.h"

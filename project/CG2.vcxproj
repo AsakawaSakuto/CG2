@@ -174,7 +174,7 @@
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
     <ClCompile Include="Engine\3d\Line\Data\Line.cpp" />
     <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
-    <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
+    <ClCompile Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
@@ -280,9 +280,9 @@
     <ClInclude Include="Engine\3d\Line\MyDebugLine.h" />
     <ClInclude Include="Engine\3d\Line\Data\Line.h" />
     <ClInclude Include="Engine\3d\Line\LineManager.h" />
-    <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
-    <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
-    <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
+    <ClInclude Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.h" />
+    <ClInclude Include="Engine\3d\Model\Data\Animation\AnimationStruct.h" />
+    <ClInclude Include="Engine\3d\Model\Data\ModelDataStruct.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Audio\MyAudio.h" />

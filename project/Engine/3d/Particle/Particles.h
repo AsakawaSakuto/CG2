@@ -56,7 +56,7 @@ public:
 	/// <summary>
 	/// パーティクルの更新
 	/// </summary>
-	void Update();
+	void Update(float deltaTime = 1.0f / 60.0f);
 
 	/// <summary>
 	/// パーティクルの描画
@@ -237,13 +237,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_;
 	uint32_t frameIndex = 0;
 	void CreatePerFrameResource();
-	void UpdatePerFrame();
+	void UpdatePerFrame(float deltaTime);
 
 	EmitterState emitter_ = {};
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> emitterRangeResource_;
 	void CreateEmitterResource();
-	void UpdateEmitter();
+	void UpdateEmitter(float deltaTime);
 
 	/*----------作成から描画までの様々な変数や関数----------*/
 

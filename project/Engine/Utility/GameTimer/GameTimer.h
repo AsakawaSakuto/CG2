@@ -18,7 +18,7 @@ public:
     GameTimer(float duration, bool loop = false);
 
     /// @brief タイマーの更新
-    void Update();
+    void Update(float deltaTime = 1.0f / 60.0f);
 
     /// @brief タイマーを開始
     /// @param duration タイマーの継続時間

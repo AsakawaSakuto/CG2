@@ -26,7 +26,7 @@ private:
 
 private:
 	float speed_ = 10.0f;
-	unique_ptr<Model> model_ = make_unique<Model>();
+	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
 	GameTimer scaleTimer_;
 	Vector3 targetPosition_ = {};
 };

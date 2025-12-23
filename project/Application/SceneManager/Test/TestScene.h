@@ -34,10 +34,11 @@ private:
 	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
 
 	unique_ptr<Model> cube_ = make_unique<Model>();
-	unique_ptr<Model> spinCube_ = make_unique<Model>();
-	unique_ptr<Model> simpleSkin_ = make_unique<Model>();
-	unique_ptr<Model> walk_ = make_unique<Model>();
-	unique_ptr<Model> sneakWalk_ = make_unique<Model>();
+	unique_ptr<SkiningModel> spinCube_ = make_unique<SkiningModel>();
+	unique_ptr<SkiningModel> simpleSkin_ = make_unique<SkiningModel>();
+	unique_ptr<SkiningModel> walk_ = make_unique<SkiningModel>();
+	unique_ptr<SkiningModel> sneakWalk_ = make_unique<SkiningModel>();
+	unique_ptr<SkiningModel> testPlayer_ = make_unique<SkiningModel>();
 
 	unique_ptr<Gauge> testGauge_ = make_unique<Gauge>();
 	float currentGaugeValue_ = 0.0f;
@@ -48,6 +49,7 @@ private:
 	Transform simpleSkinTransform_;
 	Transform walkTransform_;
 	Transform sneakWalkTransform_;
+	Transform testPlayerTransform_;
 
 	Animation walkAnimation_;
 	Animation sneakWalkAnimation_;

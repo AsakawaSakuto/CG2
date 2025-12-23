@@ -30,8 +30,6 @@ void Area::Update() {
 	particle2_->SetEmitterPosition(transform_.translate);
 	particle2_->Update();
 
-	model_->Update();
-
 	if (lifeTimer_.GetProgress() >= 0.9f) {
 		particle_->Stop();
 		particle2_->Stop();

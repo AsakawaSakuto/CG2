@@ -6,13 +6,13 @@ GameTimer::GameTimer(float duration, bool loop)
     : duration_(duration), loop_(loop) {
 }
 
-void GameTimer::Update() {
+void GameTimer::Update(float deltaTime) {
     if (!isActive_) return;
 
     loopedThisFrame_ = false;
     finished_ = false;
 
-    float scaledDeltaTime = GetDeltaTime() * timeScale_; // deltaTime_からGetDeltaTime()に変更
+    float scaledDeltaTime = deltaTime * timeScale_;
 
     currentTime_ += scaledDeltaTime;
     if (currentTime_ >= duration_) {

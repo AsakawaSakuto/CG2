@@ -2,15 +2,15 @@
 #include "Math/Type/Vector3.h"
 #include "Math/Type/Matrix4x4.h"
 #include "Math/Type/Quaternion.h"
-#include "3d/Model/Animation/AnimationStruct.h"
-#include "3d/Model/ModelDataStruct.h"
+#include "3d/Model/Data/ModelDataStruct.h"
+#include "3d/Model/Data/Animation/AnimationStruct.h"
 #include "Core/CreateResource/CreateResource.h"
 #include <vector>
 #include <cassert> 
 #include <d3d12.h>
 #include <wrl/client.h>
 
-Animation LoadAnimationFile(const std::string& filename);
+Animation LoadAnimationFile(const std::string& filename, int index = 0);
 
 Skeleton CreateSkeleton(const ModelNode& rootNode);
 
