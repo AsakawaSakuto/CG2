@@ -207,7 +207,7 @@ Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 		forward.z * stickY + right.z * stickX
 	};
 	
-	return moveDirection.Normalize();
+	return moveDirection.Normalized();
 }
 
 void Player::Jump() {
