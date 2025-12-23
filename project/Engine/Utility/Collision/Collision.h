@@ -8,7 +8,6 @@
 #include "Utility/Collision/Type/Segment.h"
 #include "Utility/Collision/Type/LineStruct.h"
 #include <algorithm>
-#include <cmath>
 
 /// <summary>
 /// 当たり判定ユーティリティ
@@ -87,9 +86,9 @@ namespace Collision
         /// </summary>
         inline float GetProjectionRadius(const OBB& obb, const Vector3& axis)
         {
-            return std::abs(obb.size.x * 0.5f * (obb.orientation[0] * axis)) +
-                   std::abs(obb.size.y * 0.5f * (obb.orientation[1] * axis)) +
-                   std::abs(obb.size.z * 0.5f * (obb.orientation[2] * axis));
+            return std::abs(obb.size.x * 0.5f * Dot(obb.orientation[0], axis)) +
+                   std::abs(obb.size.y * 0.5f * Dot(obb.orientation[1], axis)) +
+                   std::abs(obb.size.z * 0.5f * Dot(obb.orientation[2], axis));
         }
 
         /// <summary>
@@ -101,11 +100,11 @@ namespace Collision
             float axisLengthSq = axis.x * axis.x + axis.y * axis.y + axis.z * axis.z;
             if (axisLengthSq < 0.0001f) return false;
 
-            Vector3 normalizedAxis = axis.Normalize();
+            Vector3 normalizedAxis = axis.Normalized();
             
             // 中心間の距離を軸に投影
             Vector3 centerDiff = { b.center.x - a.center.x, b.center.y - a.center.y, b.center.z - a.center.z };
-            float centerProjection = std::abs(centerDiff * normalizedAxis);
+            float centerProjection = std::abs(Dot(centerDiff, normalizedAxis));
 
             // 各OBBの投影半径を計算
             float aProjection = GetProjectionRadius(a, normalizedAxis);
@@ -126,7 +125,7 @@ namespace Collision
             float segLengthSq = segVec.x * segVec.x + segVec.y * segVec.y + segVec.z * segVec.z;
             if (segLengthSq < 0.0001f) return 0.0f;
             
-            float t = (pointVec * segVec) / segLengthSq;
+            float t = Dot(pointVec, segVec) / segLengthSq;
             return std::clamp(t, 0.0f, 1.0f);
         }
     }
@@ -160,7 +159,7 @@ namespace Collision
         {
             for (int j = 0; j < 3; ++j)
             {
-                Vector3 axis = a.orientation[i] ^ b.orientation[j];
+                Vector3 axis = Cross(a.orientation[i], b.orientation[j]);
                 if (Detail::IsSeparatedOnAxis(a, b, axis))
                     return false;
             }
@@ -211,9 +210,9 @@ namespace Collision
 
         // OBBの各軸に投影してローカル座標を求める
         Vector3 localCenter = {
-            centerDiff * obb.orientation[0],
-            centerDiff * obb.orientation[1],
-            centerDiff * obb.orientation[2]
+            Dot(centerDiff, obb.orientation[0]),
+            Dot(centerDiff, obb.orientation[1]),
+            Dot(centerDiff, obb.orientation[2])
         };
 
         // OBBのローカル空間での半サイズ
@@ -271,9 +270,9 @@ namespace Collision
 
         // 楕円球体の各軸に投影してローカル座標を求める
         Vector3 localCenter = {
-            centerDiff * ovalSphere.orientation[0],
-            centerDiff * ovalSphere.orientation[1],
-            centerDiff * ovalSphere.orientation[2]
+            Dot(centerDiff, ovalSphere.orientation[0]),
+            Dot(centerDiff, ovalSphere.orientation[1]),
+            Dot(centerDiff, ovalSphere.orientation[2])
         };
 
         // ローカル座標系で楕円座標系に変換（各軸を半径で正規化）
@@ -370,9 +369,9 @@ namespace Collision
 
         // 差分を楕円球体のローカル座標系に変換
         Vector3 localDiff = {
-            diff * ovalSphere.orientation[0],
-            diff * ovalSphere.orientation[1],
-            diff * ovalSphere.orientation[2]
+            Dot(diff, ovalSphere.orientation[0]),
+            Dot(diff, ovalSphere.orientation[1]),
+            Dot(diff, ovalSphere.orientation[2])
         };
 
         // 楕円の方程式で判定: (x/a)² + (y/b)² + (z/c)² <= 1
@@ -413,9 +412,9 @@ namespace Collision
 
         // OBBの各軸に投影してローカル座標を求める
         Vector3 localOvalCenter = {
-            centerDiff * obb.orientation[0],
-            centerDiff * obb.orientation[1],
-            centerDiff * obb.orientation[2]
+            Dot(centerDiff, obb.orientation[0]),
+            Dot(centerDiff, obb.orientation[1]),
+            Dot(centerDiff, obb.orientation[2])
         };
 
         // ローカル空間での最近点を求める
@@ -441,9 +440,9 @@ namespace Collision
 
         // 差分を楕円球体のローカル座標系に変換
         Vector3 localDiff = {
-            diff * ovalSphere.orientation[0],
-            diff * ovalSphere.orientation[1],
-            diff * ovalSphere.orientation[2]
+            Dot(diff, ovalSphere.orientation[0]),
+            Dot(diff, ovalSphere.orientation[1]),
+            Dot(diff, ovalSphere.orientation[2])
         };
 
         // 楕円の方程式で判定: (x/a)² + (y/b)² + (z/c)² <= 1
@@ -477,9 +476,9 @@ namespace Collision
 
         // 楕円球体Aのローカル座標系での距離を計算
         Vector3 localDiffA = {
-            diff * a.orientation[0],
-            diff * a.orientation[1],
-            diff * a.orientation[2]
+            Dot(diff, a.orientation[0]),
+            Dot(diff, a.orientation[1]),
+            Dot(diff, a.orientation[2])
         };
 
         // 楕円球体Bのローカル座標系での距離を計算（逆方向）
@@ -490,9 +489,9 @@ namespace Collision
         };
 
         Vector3 localDiffB = {
-            diffInverse * b.orientation[0],
-            diffInverse * b.orientation[1],
-            diffInverse * b.orientation[2]
+            Dot(diffInverse, b.orientation[0]),
+            Dot(diffInverse, b.orientation[1]),
+            Dot(diffInverse, b.orientation[2])
         };
 
         // 各楕円体のローカル空間での正規化距離
@@ -519,7 +518,7 @@ namespace Collision
     inline bool IsHit(const Plane& plane, const Sphere& sphere)
     {
         // 正規化された法線を使用
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         
         // 球の中心から平面中心への差分ベクトル
         Vector3 centerToPlane = {
@@ -529,7 +528,7 @@ namespace Collision
         };
         
         // 平面への垂直距離
-        float normalDistance = centerToPlane * normal;
+        float normalDistance = Dot(centerToPlane, normal);
         
         // 法線方向の距離が球の半径より大きい場合は衝突しない
         if (std::abs(normalDistance) > sphere.radius) {
@@ -546,12 +545,12 @@ namespace Collision
         // 平面の接線ベクトルを計算
         Vector3 tangent;
         if (std::abs(normal.x) < 0.9f) {
-            tangent = normal ^ Vector3{ 1.0f, 0.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 1.0f, 0.0f, 0.0f });
         } else {
-            tangent = normal ^ Vector3{ 0.0f, 1.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 0.0f, 1.0f, 0.0f });
         }
-        tangent = tangent.Normalize();
-        Vector3 bitangent = (normal ^ tangent).Normalize();
+        tangent = tangent.Normalized();
+        Vector3 bitangent = Cross(normal, tangent).Normalized();
         
         // 投影点から平面中心への差分を平面の座標系で表現
         Vector3 diff = {
@@ -560,8 +559,8 @@ namespace Collision
             projectedPoint.z - plane.center.z
         };
         
-        float u = diff * tangent;
-        float v = diff * bitangent;
+        float u = Dot(diff, tangent);
+        float v = Dot(diff, bitangent);
         
         // 平面の範囲内にあるかチェック（正方形の範囲）
         float halfSize = plane.size * 0.5f;
@@ -603,7 +602,7 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Plane& plane, const AABB& aabb)
     {
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         Vector3 halfSize = { aabb.size.x * 0.5f, aabb.size.y * 0.5f, aabb.size.z * 0.5f };
         
         // AABBの8頂点を生成
@@ -621,12 +620,12 @@ namespace Collision
         // 平面の接線ベクトルを計算
         Vector3 tangent;
         if (std::abs(normal.x) < 0.9f) {
-            tangent = normal ^ Vector3{ 1.0f, 0.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 1.0f, 0.0f, 0.0f });
         } else {
-            tangent = normal ^ Vector3{ 0.0f, 1.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 0.0f, 1.0f, 0.0f });
         }
-        tangent = tangent.Normalize();
-        Vector3 bitangent = (normal ^ tangent).Normalize();
+        tangent = tangent.Normalized();
+        Vector3 bitangent = Cross(normal, tangent).Normalized();
         
         float planeHalfSize = plane.size * 0.5f;
         
@@ -642,9 +641,9 @@ namespace Collision
                 vertices[i].z - plane.center.z
             };
             
-            float normalDist = toVertex * normal;
-            float u = toVertex * tangent;
-            float v = toVertex * bitangent;
+            float normalDist = Dot(toVertex, normal);
+            float u = Dot(toVertex, tangent);
+            float v = Dot(toVertex, bitangent);
             
             // 平面の範囲内にあるかチェック
             if (std::abs(u) <= planeHalfSize && std::abs(v) <= planeHalfSize) {
@@ -672,7 +671,7 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Plane& plane, const OBB& obb)
     {
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         Vector3 halfSize = { obb.size.x * 0.5f, obb.size.y * 0.5f, obb.size.z * 0.5f };
         
         // OBBの8頂点を生成
@@ -699,12 +698,12 @@ namespace Collision
         // 平面の接線ベクトルを計算
         Vector3 tangent;
         if (std::abs(normal.x) < 0.9f) {
-            tangent = normal ^ Vector3{ 1.0f, 0.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 1.0f, 0.0f, 0.0f });
         } else {
-            tangent = normal ^ Vector3{ 0.0f, 1.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 0.0f, 1.0f, 0.0f });
         }
-        tangent = tangent.Normalize();
-        Vector3 bitangent = (normal ^ tangent).Normalize();
+        tangent = tangent.Normalized();
+        Vector3 bitangent = Cross(normal, tangent).Normalized();
         
         float planeHalfSize = plane.size * 0.5f;
         
@@ -720,9 +719,9 @@ namespace Collision
                 worldVertices[i].z - plane.center.z
             };
             
-            float normalDist = toVertex * normal;
-            float u = toVertex * tangent;
-            float v = toVertex * bitangent;
+            float normalDist = Dot(toVertex, normal);
+            float u = Dot(toVertex, tangent);
+            float v = Dot(toVertex, bitangent);
             
             // 平面の範囲内にあるかチェック
             if (std::abs(u) <= planeHalfSize && std::abs(v) <= planeHalfSize) {
@@ -857,7 +856,7 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Segment& segment, const Plane& plane)
     {
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         
         Vector3 segEnd = {
             segment.origin.x + segment.diff.x,
@@ -877,8 +876,8 @@ namespace Collision
             segEnd.z - plane.center.z
         };
         
-        float startDist = startToPlane * normal;
-        float endDist = endToPlane * normal;
+        float startDist = Dot(startToPlane, normal);
+        float endDist = Dot(endToPlane, normal);
         
         // 始点と終点が平面の反対側にあれば交差
         return (startDist * endDist) <= 0.0f;
@@ -919,7 +918,7 @@ namespace Collision
         }
         
         // 直線上の最近点（制限なし）
-        float t = (toSphere * lineVec) / lineLengthSq;
+        float t = Dot(toSphere, lineVec) / lineLengthSq;
         Vector3 closestPoint = {
             line.start.x + lineVec.x * t,
             line.start.y + lineVec.y * t,
@@ -950,7 +949,7 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Line& line, const Plane& plane)
     {
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         
         Vector3 lineVec = {
             line.end.x - line.start.x,
@@ -958,7 +957,7 @@ namespace Collision
             line.end.z - line.start.z
         };
         
-        float dotProduct = lineVec * normal;
+        float dotProduct = Dot(lineVec, normal);
         
         // 直線が平面に平行な場合
         if (std::abs(dotProduct) < 0.0001f) {
@@ -968,7 +967,7 @@ namespace Collision
                 line.start.y - plane.center.y,
                 line.start.z - plane.center.z
             };
-            return std::abs(startToPlane * normal) < 0.0001f;
+            return std::abs(Dot(startToPlane, normal)) < 0.0001f;
         }
         
         // 直線は必ず平面と交差する（平行でない限り）

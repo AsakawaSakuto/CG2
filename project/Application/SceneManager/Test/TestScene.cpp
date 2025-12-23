@@ -153,8 +153,6 @@ void TestScene::Draw() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
     postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 
-    MyDebugLine::Draw(camera_);
-
     cube_->Draw(camera_, cubeTransform_);
     spinCube_->Draw(camera_, spinCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
@@ -169,6 +167,8 @@ void TestScene::Draw() {
 	bitmapFont_.Draw();
 
 	testGauge_->Draw();
+
+    MyDebugLine::Draw(camera_);
 }
 
 void TestScene::DrawImGui() {
@@ -182,6 +182,8 @@ void TestScene::DrawImGui() {
     //testSphere_.DrawImGui("testSphere");
     //testOvalSphere_.DrawImGui("testOvalSphere");
     //testPlane_.DrawImGui("testPlane");
+    
+	cube_->DrawImGui("cubeModel");
 
 	testParticle_->DrawImGui("testParticle");
 

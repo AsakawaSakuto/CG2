@@ -490,7 +490,7 @@ void SkiningModel::DrawImGui(const char* objectName) {
 			}
 
 			ImGui::DragFloat3("d.Direction", &direction_.x, 0.01f, -1.0f, 1.0f);
-			direction_ = direction_.Normalize();
+			direction_ = direction_.Normalized();
 			ImGui::DragFloat("d.Intensity", &directionalLightData_->intensity, 0.01f, 0.0f, 5.0f);
 			ImGui::DragFloat("d.Shininess", &materialData_->shininess, 0.01f, 0.0f, 100.0f);
 			ImGui::ColorEdit4("d.Color", &directionalLightData_->color.x);
@@ -539,7 +539,7 @@ void SkiningModel::DrawImGui(const char* objectName) {
 			ImGui::DragFloat3("s.Pos", &spotLightData_->position.x, 0.01f);
 			ImGui::DragFloat("s.Intensity", &spotLightData_->intensity, 0.01f, 0.0f, 10.0f);
 			ImGui::DragFloat("s.Distance", &spotLightData_->distance, 0.01f);
-			spotLightData_->direction = spotLightData_->direction.Normalize();
+			spotLightData_->direction = spotLightData_->direction.Normalized();
 			ImGui::DragFloat3("s.Direction", &spotLightData_->direction.x, 0.01f);
 			ImGui::DragFloat("s.Decay", &spotLightData_->decay, 0.01f);
 			float angleDeg = 60.0f;            // cosAngle用の角度（UI用、一時変数）

@@ -1,70 +1,71 @@
 #pragma once
+#include <cstddef>  // std::size_t
+#include <cmath>    // std::sqrt
 
 /// <summary>
 /// 4次元ベクトル
 /// </summary>
 struct Vector4 {
-	float x;
-	float y;
-	float z;
-	float w;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float w = 0.0f;
 
-    // 自身に他のベクトルを加算する（+=）
-    Vector4& operator+=(const Vector4& num) {
-        this->x += num.x;
-        this->y += num.y;
-        this->z += num.z;
-        return *this;
+    // --- constructors ---
+    constexpr Vector4() = default;
+    constexpr Vector4(float x_, float y_, float z_, float w_) : x(x_), y(y_), z(z_), w(w_) {}
+
+    // --- index access ---
+    constexpr float& operator[](std::size_t i) noexcept {
+        return (i == 0) ? x : (i == 1 ? y : (i == 2 ? z : w));
+    }
+    constexpr const float& operator[](std::size_t i) const noexcept {
+        return (i == 0) ? x : (i == 1 ? y : (i == 2 ? z : w));
     }
 
-    // 自身から他のベクトルを減算する（-=）
-    Vector4& operator-=(const Vector4& num) {
-        this->x -= num.x;
-        this->y -= num.y;
-        this->z -= num.z;
-        return *this;
+    // --- unary ---
+    constexpr Vector4 operator+() const noexcept { return *this; }
+    constexpr Vector4 operator-() const noexcept { return { -x, -y, -z, -w }; }
+
+    // --- vector op ---
+    constexpr Vector4 operator+(const Vector4& r) const noexcept { return { x + r.x, y + r.y, z + r.z, w + r.w }; }
+    constexpr Vector4 operator-(const Vector4& r) const noexcept { return { x - r.x, y - r.y, z - r.z, w - r.w }; }
+    constexpr Vector4 operator*(const Vector4& r) const noexcept { return { x * r.x, y * r.y, z * r.z, w * r.w }; } // 要素ごと
+    constexpr Vector4 operator/(const Vector4& r) const noexcept { return { x / r.x, y / r.y, z / r.z, w / r.w }; } // 要素ごと
+
+    constexpr Vector4& operator+=(const Vector4& r) noexcept { x += r.x; y += r.y; z += r.z; w += r.w; return *this; }
+    constexpr Vector4& operator-=(const Vector4& r) noexcept { x -= r.x; y -= r.y; z -= r.z; w -= r.w; return *this; }
+    constexpr Vector4& operator*=(const Vector4& r) noexcept { x *= r.x; y *= r.y; z *= r.z; w *= r.w; return *this; }
+    constexpr Vector4& operator/=(const Vector4& r) noexcept { x /= r.x; y /= r.y; z /= r.z; w /= r.w; return *this; }
+
+    // --- scalar op ---
+    constexpr Vector4 operator*(float s) const noexcept { return { x * s, y * s, z * s, w * s }; }
+    constexpr Vector4 operator/(float s) const noexcept { return { x / s, y / s, z / s, w / s }; }
+    constexpr Vector4& operator*=(float s) noexcept { x *= s; y *= s; z *= s; w *= s; return *this; }
+    constexpr Vector4& operator/=(float s) noexcept { x /= s; y /= s; z /= s; w /= s; return *this; }
+
+    friend constexpr Vector4 operator*(float s, const Vector4& v) noexcept { return { v.x * s, v.y * s, v.z * s, v.w * s }; }
+
+    // --- compare ---
+    constexpr bool operator==(const Vector4& r) const noexcept { return x == r.x && y == r.y && z == r.z && w == r.w; }
+    constexpr bool operator!=(const Vector4& r) const noexcept { return !(*this == r); }
+
+    // --- utilities ---
+    constexpr float LengthSq() const noexcept { return x * x + y * y + z * z + w * w; }
+    float Length() const noexcept { return std::sqrt(LengthSq()); }
+
+    Vector4 Normalized() const noexcept {
+        const float len = Length();
+        if (len == 0.0f) { return { 0.0f, 0.0f, 0.0f, 0.0f }; }
+        return { x / len, y / len, z / len, w / len };
+    }
+    void Normalize() noexcept {
+        const float len = Length();
+        if (len == 0.0f) { return; }
+        x /= len; y /= len; z /= len; w /= len;
     }
 
-    // 要素ごとの積を行う（*=）
-    // ※通常の数学的ベクトル積ではない（Hadamard積）
-    Vector4& operator*=(const Vector4& num) {
-        this->x *= num.x;
-        this->y *= num.y;
-        this->z *= num.z;
-        return *this;
-    }
-
-    // ベクトル同士の加算（+）
-    Vector4 operator+(const Vector4& other) const {
-        Vector4 result = *this;
-        result += other;
-        return result;
-    }
-
-    // ベクトル同士の減算（-）
-    Vector4 operator-(const Vector4& other) const {
-        Vector4 result = *this;
-        result -= other;
-        return result;
-    }
-
-    // 各成分にスカラー値を加算する
-    Vector4 operator+(float scalar) const {
-        return Vector4{ x + scalar, y + scalar, z + scalar };
-    }
-
-    // 各成分からスカラー値を減算する
-    Vector4 operator-(float scalar) const {
-        return Vector4{ x - scalar, y - scalar, z - scalar };
-    }
-
-    // 各成分をスカラー倍する
-    Vector4 operator*(float scalar) const {
-        return Vector4{ x * scalar, y * scalar, z * scalar };
+    static constexpr float Dot(const Vector4& a, const Vector4& b) noexcept {
+        return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
     }
 };
-
-// スカラー * ベクトル
-inline Vector4 operator*(float scalar, const Vector4& vec) {
-    return { vec.x * scalar, vec.y * scalar, vec.z * scalar };
-}
