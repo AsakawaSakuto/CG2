@@ -96,7 +96,7 @@ void Particles::Initialize(const std::string& filePath, const uint32_t maxPartic
 	isInitialized_ = true;
 }
 
-void Particles::Update() {
+void Particles::Update(float deltaTime) {
 
 	// バッファリセットが必要な場合、コンピュートシェーダーで即座にリセット
 	if (needsBufferReset_) {
@@ -146,9 +146,9 @@ void Particles::Update() {
 	memcpy(mappedPtr, &tempPreView, sizeof(PerView));
 	perViewResource_->Unmap(0, nullptr);
 
-	UpdatePerFrame();
+	UpdatePerFrame(deltaTime);
 
-	UpdateEmitter();
+	UpdateEmitter(deltaTime);
 
 	UpdateParticle();
 }
@@ -788,10 +788,10 @@ void Particles::CreateEmitterResource() {
 	);
 }
 
-void Particles::UpdateEmitter() {
+void Particles::UpdateEmitter(float deltaTime) {
 	// このemitterSphereをCBufferとしてGPUへ転送
 	if (emitter_.useEmitter) {
-		emitter_.frequencyTime += GetDeltaTime();  // kDeltaTime_からGetDeltaTime()に変更
+		emitter_.frequencyTime += deltaTime;  // kDeltaTime_からGetDeltaTime()に変更
 	}
 
 	if (emitter_.frequency <= emitter_.frequencyTime) {
@@ -831,14 +831,14 @@ void Particles::CreatePerFrameResource() {
 	);
 }
 
-void Particles::UpdatePerFrame() {
+void Particles::UpdatePerFrame(float deltaTime) {
 	frameIndex++;
-	totalTime_ += GetDeltaTime();  // kDeltaTime_からGetDeltaTime()に変更
+	totalTime_ += deltaTime;  // kDeltaTime_からGetDeltaTime()に変更
 	// フレームごとに
 	PerFrame* mapped = nullptr;
 	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
 	mapped->time = totalTime_;      // 例えば経過時間など
-	mapped->deltaTime = GetDeltaTime();  // kDeltaTime_からGetDeltaTime()に変更
+	mapped->deltaTime = deltaTime;  // kDeltaTime_からGetDeltaTime()に変更
 	mapped->index = frameIndex;
 	mapped->pad1 = 0.0f;            // パディングを初期化
 }

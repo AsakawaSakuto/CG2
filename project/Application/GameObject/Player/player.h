@@ -23,8 +23,6 @@ public:
 	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
 
 	void PostFrameCleanup();
-
-	// === ステータス取得メソッド ===
 	
 	/// <summary>
 	/// 現在のHPを取得
@@ -79,8 +77,7 @@ private:
 	float GetDistanceToNearestEnemy() const;
 
 private:
-	unique_ptr<Model> model_ = make_unique<Model>();
-	unique_ptr<Model> expItemGetRange_ = make_unique<Model>();
+	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
 
 	Transform expGetRangeTransform_;
 

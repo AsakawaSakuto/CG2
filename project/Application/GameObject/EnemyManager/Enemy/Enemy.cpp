@@ -65,9 +65,9 @@ void Enemy::Move() {
 
 		// 移動速度を適用
 		Vector3 velocity = {
-			direction.x * moveSpeed_ * deltaTime_,
+			direction.x * moveSpeed_ * GetDeltaTime(),
 			0.0f, // y方向には移動しない
-			direction.z * moveSpeed_ * deltaTime_
+			direction.z * moveSpeed_ * GetDeltaTime()
 		};
 
 		// 位置を更新（yはそのまま）

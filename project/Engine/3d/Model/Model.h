@@ -18,17 +18,20 @@
 
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Core/HeapManager/DescriptorAllocator.h"
+#include "Core/TextureManager/TextureManager.h"
 
-#include "3d/Model/ModelDataStruct.h"
+#include "Data/ModelDataStruct.h"
+#include "Data/Animation/AnimationStruct.h"
+#include "Data/Animation/Function/AnimationFunction.h"
 
 #include "Utility/Transform/Transform.h"
 #include "Utility/Light/DirectionalLight.h"
 #include "Utility/Light/PointLight.h"
 #include "Utility/Light/SpotLight.h"
 
-#include "Core/TextureManager/TextureManager.h"
 #include "Camera/Camera.h"
 #include "Camera/CameraForGPU.h"
+
 #include "Math/MatrixFunction/MatrixFunction.h"
 
 class DirectXCommon;
@@ -53,11 +56,6 @@ public:
 
 	// デストラクタ
 	~Model();
-
-	/// <summary>
-	/// 行列計算やアニメーションの更新
-	/// </summary>
-	void Update();
 
 	/// <summary>
 	/// Modelの描画
@@ -171,22 +169,6 @@ public:
 	/// <returns>true カメラ外 / false カメラ内</returns>
 	bool GetIsInFrustum() const { return isInFrustum_; }
 
-	/// <summary>
-	/// アニメーションを再生しModelを動かす
-	/// </summary>
-	void PlayAnimation() { if (!useAnimationTimer_) { useAnimationTimer_ = true; } }
-
-	/// <summary>
-	/// アニメーションを停止しModelを静止させる
-	/// </summary>
-	void StopAnimation() { if (useAnimationTimer_) { useAnimationTimer_ = false; } }
-
-	/// <summary>
-	/// アニメーションデータを設定
-	/// </summary>
-	/// <param name="animation">アニメーションがコピーされ、設定したアニメーションを行うようになる</param>
-	void SetAnimationData(Animation animation) { animationData_ = animation; }
-
 	void UseLight(bool use) { materialData_->enableLighting = use; }
 private:
 
@@ -197,38 +179,22 @@ private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;             // 共有VBV
 		ModelData modelData;                                   // 共有モデルデータ
-		Animation animationData;                               // 共有アニメーションデータ
-		Skeleton skeletonData;
-		SkinCluster skinClusterData;
-		uint32_t skinClusterIndex;
 		std::string textureName;                               // 使用テクスチャ名
 		uint32_t textureIndex = 0;                             // テクスチャインデックス
 		float boundingRadius = 1.0f;                           // バウンディング半径
 		DirectXCommon* dxCommon = nullptr;                     // SRV解放用
-		
-		// デストラクタでSRVを返却
-		~GeometryCache() {
-			if (dxCommon && skinClusterIndex != 0 && skinClusterData.paletteResource) {
-				// スキニング使用時のみ返却（paletteResourceが存在する場合）
-				dxCommon->GetModelAlloc().Free(skinClusterIndex);
-			}
-		}
 	};
 	static std::unordered_map<std::string, std::shared_ptr<GeometryCache>> s_geometryCache_;
-
-	// アニメーションタイプ
-	enum class AnimationType {
-		NONE,     // アニメーション無し
-		NORMAL,   // キーフレームアニメーション
-		SKINNING, // スキニングアニメーション
-	};
 
 	// ワールド座標を取得
 	Vector3 GetWorldPosition();
 
+	/// <summary>
+	/// 行列計算の更新
+	/// </summary>
+	void UpdateMatrix();
+
 private:
-	// アニメーションタイプ
-	AnimationType animationType_ = AnimationType::NONE;
 
 	// モデルのパス
 	std::string modelPath_;
@@ -256,15 +222,7 @@ private:
 	float boundingRadius_ = 0.5f;          // オブジェクトのバウンディング半径
 	bool useDrawFrustumCulling_ = false;   // カメラ外の描画、有効/無効
 	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
-	bool isInFrustum_ = false;              // フラスタム内か否か
-
-	// アニメーション関連
-	bool useAnimationTimer_ = false; // アニメーション使用フラグ
-	float animationTime_ = 0.0f;     // アニメーション再生時間
-	Animation animationData_;        // アニメーションデータ
-	Skeleton skeleton_;              // スケルトンデータ
-	SkinCluster skinCluster_;        // スキンクラスター
-	uint32_t skinClusterSrvIndex_ = 0; // SkinCluster用のSRVインデックス（動的割り当て）
+	bool isInFrustum_ = false;             // フラスタム内か否か
 
 	//-----------------------------------------------------------//
 

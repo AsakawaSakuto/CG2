@@ -13,6 +13,7 @@ protected:
     AABB aabbCollision_;
 	Sphere sphereCollision_;
 
+	float deltaTime_ = 1.0f / 60.0f;
 public:
     virtual void Initialize() = 0;
     virtual void Update() = 0;

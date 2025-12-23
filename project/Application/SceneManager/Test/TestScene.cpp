@@ -44,6 +44,9 @@ void TestScene::Initialize() {
 	walkAnimation_ = LoadAnimationFile("Animation/human/Walk.gltf");
 	sneakWalkAnimation_ = LoadAnimationFile("Animation/human/sneakWalk.gltf");
 
+	testPlayer_->Initialize("test/player.gltf");
+	testPlayerTransform_.translate = { 2.0f,2.0f,0.0f };
+
 	testTimer_.Start(2.0f, true);
 
 	// 楕円球体の初期化
@@ -126,11 +129,11 @@ void TestScene::Update() {
 
 	testParticle_->Update();
 
-	cube_->Update();
 	spinCube_->Update();
     simpleSkin_->Update();
     sneakWalk_->Update();
-	walk_->Update();
+    walk_->Update(1.0f / 30.0f);
+	testPlayer_->Update();
 
 	testSprite_->Update();
 
@@ -157,6 +160,7 @@ void TestScene::Draw() {
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
 	walk_->Draw(camera_, walkTransform_);
     sneakWalk_->Draw(camera_, sneakWalkTransform_);
+	testPlayer_->Draw(camera_, testPlayerTransform_);
 
 	testParticle_->Draw(camera_);
 

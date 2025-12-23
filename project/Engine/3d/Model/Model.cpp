@@ -12,7 +12,6 @@ using namespace Microsoft::WRL;
 #include "Core/HeapManager/DescriptorAllocator.h"
 #include "Core/ServiceLocator/ServiceLocator.h"
 #include "Utility/GameTimer/DeltaTime.h"
-#include "3d/Model/Animation/Function/AnimationFunction.h"
 
 // 共有キャッシュの定義
 std::unordered_map<std::string, std::shared_ptr<Model::GeometryCache>> Model::s_geometryCache_;
@@ -89,63 +88,9 @@ void Model::Initialize(const std::string& modelPath) {
 
 			// .obj形式の処理
 			cache->modelData = LoadObject3dFile(modelPath_);
-			cache->animationData = {}; // アニメーションデータを初期化
 
-		} else if (extension == ".gltf" || extension == ".glb") {
-
-			// .gltf/.glb形式の処理
-			cache->modelData = LoadObject3dFile(modelPath_);
-			cache->animationData = LoadAnimationFile(modelPath);
-
-		} else {
+		}  else {
 			Logger::Log("Unsupported model format: %s\n");
-		}
-
-		// アニメーションタイプを判定
-		// スキンクラスターデータがある → BONE（ボーン付きスキニング）
-		if (!cache->modelData.skinClusterData.empty()) {
-			animationType_ = AnimationType::SKINNING;
-			useAnimationTimer_ = true;
-			
-			cache->skeletonData = CreateSkeleton(cache->modelData.rootNode);
-
-			// Model専用のSRVアロケータから空きインデックスを取得
-			cache->skinClusterIndex = dxCommon_->GetModelAlloc().Allocate();
-
-			cache->skinClusterData = CreateSkinCluster(
-				device_,
-				cache->skeletonData,
-				cache->modelData,
-				dxCommon_->GetSRV(),
-				dxCommon_->GetDescriptorSizeSRV(),
-				cache->skinClusterIndex // 動的に割り当てられたインデックスを使用
-			);
-
-			char debugBuffer[256];
-			sprintf_s(debugBuffer, "AnimationType set to BONE for model: %s\n", modelPath_.c_str());
-			OutputDebugStringA(debugBuffer);
-			sprintf_s(debugBuffer, "SkinClusterData count: %zu\n", cache->modelData.skinClusterData.size());
-			OutputDebugStringA(debugBuffer);
-		}
-		// アニメーションデータがある → NORMAL（キーフレームアニメーション）
-		else if (!cache->animationData.nodeAnimations.empty()) {
-			animationType_ = AnimationType::NORMAL;
-			useAnimationTimer_ = true;
-			
-			char debugBuffer[256];
-			sprintf_s(debugBuffer, "AnimationType set to NORMAL for model: %s\n", modelPath_.c_str());
-			OutputDebugStringA(debugBuffer);
-			sprintf_s(debugBuffer, "NodeAnimations count: %zu\n", cache->animationData.nodeAnimations.size());
-			OutputDebugStringA(debugBuffer);
-		}
-		// 両方ない → NONE（アニメーションなし）
-		else {
-			animationType_ = AnimationType::NONE;
-			useAnimationTimer_ = false;
-			
-			char debugBuffer[256];
-			sprintf_s(debugBuffer, "AnimationType set to NONE for model: %s\n", modelPath_.c_str());
-			OutputDebugStringA(debugBuffer);
 		}
 
 		// バウンディング半径を自動計算
@@ -197,37 +142,11 @@ void Model::Initialize(const std::string& modelPath) {
 		// キャッシュヒット
 		std::string message = "Model cache hit: " + modelPath_ + "\n";
 		OutputDebugStringA(message.c_str());
-		
-		// キャッシュヒット時もアニメーションタイプを判定
-		const auto& cache = it->second;
-		if (!cache->modelData.skinClusterData.empty()) {
-			animationType_ = AnimationType::SKINNING;
-			useAnimationTimer_ = true;
-			
-			char debugBuffer[256];
-			sprintf_s(debugBuffer, "AnimationType set to BONE (cache hit) for model: %s\n", modelPath_.c_str());
-			OutputDebugStringA(debugBuffer);
-		} else if (!cache->animationData.nodeAnimations.empty()) {
-			animationType_ = AnimationType::NORMAL;
-			useAnimationTimer_ = true;
-			
-			char debugBuffer[256];
-			sprintf_s(debugBuffer, "AnimationType set to NORMAL (cache hit) for model: %s\n", modelPath_.c_str());
-			OutputDebugStringA(debugBuffer);
-		} else {
-			animationType_ = AnimationType::NONE;
-			useAnimationTimer_ = false;
-			
-			char debugBuffer[256];
-			sprintf_s(debugBuffer, "AnimationType set to NONE (cache hit) for model: %s\n", modelPath_.c_str());
-			OutputDebugStringA(debugBuffer);
-		}
 	}
 
 	// キャッシュからインスタンスへ設定
 	const auto& cache = it->second;
 	modelData_ = cache->modelData;
-	animationData_ = cache->animationData;
 	textureName_ = cache->textureName;
 	textureIndex_ = cache->textureIndex;
 	indexResource_ = cache->indexResource;
@@ -235,8 +154,6 @@ void Model::Initialize(const std::string& modelPath) {
 	vertexBufferView_ = cache->vertexBufferView;
 	vertexResource_ = cache->vertexResource;
 	boundingRadius_ = cache->boundingRadius;
-	skeleton_ = cache->skeletonData;
-	skinCluster_ = cache->skinClusterData;
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
@@ -251,22 +168,7 @@ void Model::Initialize(const std::string& modelPath) {
 	CreateSpotLightResource();
 }
 
-void Model::Update() {
-
-	if (useUpdateFrustumCulling_) {
-		Vector3 worldPosition = GetWorldPosition();
-		// スケールを考慮したバウンディング半径を計算
-		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
-		float adjustedRadius = boundingRadius_ * maxScale;
-
-		// カメラのフラスタム内にない場合は描画をスキップ
-		if (!camera_.IsInFrustum(worldPosition, adjustedRadius)) {
-			isInFrustum_ = true;
-			return; // 更新をスキップ
-		} else {
-			isInFrustum_ = false;
-		}
-	}
+void Model::UpdateMatrix() {
 
 	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
 
@@ -279,48 +181,8 @@ void Model::Update() {
 
 	// 追加処理：法線変換行列を計算
 	Matrix4x4 worldInverseMatrix = InverseMatrix(worldMatrix);
-
-	if (useAnimationTimer_) {
-		animationTime_ += deltaTime_;
-		animationTime_ = fmod(animationTime_, animationData_.duration);
-	}
-
-	switch (animationType_)
-	{
-	case AnimationType::NONE: {
-
-		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
-		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
-
-		break;
-	}
-	case AnimationType::NORMAL: {
-
-		NodeAnimation& rootNodeAnimation = animationData_.nodeAnimations[modelData_.rootNode.name];
-		Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
-		Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-		Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
-		Matrix4x4 localMatrix = MakeAffineAnimationMatrix(scale, rotate, translate);
-
-		modelData_.rootNode.localMatrix = localMatrix;
-
-		transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
-		transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
-
-		break;
-	}
-	case AnimationType::SKINNING: {
-
-		ApplyAnimation(skeleton_, animationData_, animationTime_);
-		UpdateAnimation(skeleton_);
-		UpdateCluster(skinCluster_, skeleton_);
-
-		transformationData_->WVP = worldViewProjectionMatrix;
-		transformationData_->World = worldMatrix;
-
-		break;
-	}
-	}
+	transformationData_->WVP = MultiplyMatrix(modelData_.rootNode.localMatrix, worldViewProjectionMatrix);
+	transformationData_->World = MultiplyMatrix(modelData_.rootNode.localMatrix, worldMatrix);
 
 	transformationData_->WorldInverseTranspose = worldInverseMatrix;
 
@@ -347,22 +209,10 @@ void Model::Update() {
 
 void Model::Draw(Camera& useCamera, const Transform& transform) {
 
-	// フラスタムカリングのチェック
-	if (useDrawFrustumCulling_) {
-		Vector3 worldPosition = GetWorldPosition();
-		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
-		float adjustedRadius = boundingRadius_ * maxScale;
-
-		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
-			isInFrustum_ = true;
-			return;
-		} else {
-			isInFrustum_ = false;
-		}
-	}
-
 	camera_ = useCamera;
 	transform_ = transform;
+
+	UpdateMatrix();
 
 	auto& psoManager = PSOManager::GetInstance();
 
@@ -370,66 +220,22 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
 	
-	switch (animationType_)
-	{
-	case Model::AnimationType::NONE: {
+	
+	rootSignature = psoManager.GetRootSignature("Object3D");
 
-		rootSignature = psoManager.GetRootSignature("Object3D");
-
-		if (useTransparent_) {
-			pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
-		} else {
-			pso = useWireFrame ?
-				psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
-				psoManager.GetPSO(PSOType::Model_Solid_Normal);
-		}
-
-		break;
-	}
-	case Model::AnimationType::NORMAL: {
-
-		rootSignature = psoManager.GetRootSignature("Object3D");
-
-		if (useTransparent_) {
-			pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
-		} else {
-			pso = useWireFrame ?
-				psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
-				psoManager.GetPSO(PSOType::Model_Solid_Normal);
-		}
-
-		break;
-	}
-	case Model::AnimationType::SKINNING: {
-
-		rootSignature = psoManager.GetRootSignature("Skinning");
-
-		if (useTransparent_) {
-			pso = psoManager.GetPSO(PSOType::SkinningModel_Alpha_Normal);
-		} else {
-			pso = useWireFrame ?
-				psoManager.GetPSO(PSOType::SkinningModel_Wireframe_Normal) :
-				psoManager.GetPSO(PSOType::SkinningModel_Solid_Normal);
-		}
-
-		break;
-	}
+	if (useTransparent_) {
+		pso = psoManager.GetPSO(PSOType::Model_Alpha_Normal);
+	} else {
+		pso = useWireFrame ?
+			psoManager.GetPSO(PSOType::Model_Wireframe_Normal) :
+			psoManager.GetPSO(PSOType::Model_Solid_Normal);
 	}
 
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());
 	commandList_->SetPipelineState(pso.Get());
 
-	if (animationType_ == AnimationType::SKINNING) {
-		// Skinningモデルは2つのVBVを使用
-		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-			vertexBufferView_,
-			skinCluster_.influenceBufferView
-		};
-		commandList_->IASetVertexBuffers(0, 2, vbvs);
-	} else {
-		// 通常モデルは1つのVBVのみ
-		commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	}
+	// 通常モデルは1つのVBVのみ
+	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
 	commandList_->IASetIndexBuffer(&indexBufferView_);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -443,9 +249,18 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
 
-	// Skinningモデルの場合、MatrixPaletteを設定
-	if (animationType_ == AnimationType::SKINNING) {
-		commandList_->SetGraphicsRootDescriptorTable(7, skinCluster_.paletteSrvHandle.second);
+	// フラスタムカリングのチェック
+	if (useDrawFrustumCulling_) {
+		Vector3 worldPosition = GetWorldPosition();
+		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
+		float adjustedRadius = boundingRadius_ * maxScale;
+
+		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
+			isInFrustum_ = true;
+			return;
+		} else {
+			isInFrustum_ = false;
+		}
 	}
 
 	// 描画

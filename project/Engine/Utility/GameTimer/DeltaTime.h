@@ -61,4 +61,4 @@ inline float GetFPS() {
 }
 
 // 互換性のための定数
-constexpr float deltaTime_ = 1.0f / 60.0f;
+//constexpr float deltaTime_ = 1.0f / 60.0f;
