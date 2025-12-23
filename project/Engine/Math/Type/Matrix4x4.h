@@ -6,6 +6,29 @@
 struct Matrix4x4 {
     float m[4][4];
 
+    // 加算
+    Matrix4x4 operator+(const Matrix4x4& rhs) const {
+        Matrix4x4 result{};
+        for (int y = 0; y < 4; ++y) {
+            for (int x = 0; x < 4; ++x) {
+                result.m[y][x] = m[y][x] + rhs.m[y][x];
+            }
+        }
+        return result;
+    }
+
+    // 減算
+    Matrix4x4 operator-(const Matrix4x4& rhs) const {
+        Matrix4x4 result{};
+        for (int y = 0; y < 4; ++y) {
+            for (int x = 0; x < 4; ++x) {
+                result.m[y][x] = m[y][x] - rhs.m[y][x];
+            }
+        }
+        return result;
+    }
+
+    // 行列積
     Matrix4x4 operator*(const Matrix4x4& rhs) const {
         Matrix4x4 result = {};
         for (int row = 0; row < 4; ++row) {

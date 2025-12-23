@@ -297,6 +297,8 @@
     <ClInclude Include="Engine\Core\HeapManager\HeapManager.h" />
     <ClInclude Include="Engine\Input\InputManager.h" />
     <ClInclude Include="Engine\Input\MyInput.h" />
+    <ClInclude Include="Engine\Math\Type\Matrix2x2.h" />
+    <ClInclude Include="Engine\Math\Type\Matrix3x3.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectParams.h" />
     <ClInclude Include="Engine\Core\PSOManager\PSOType.h" />

@@ -344,7 +344,7 @@ void TestScene::MT4_01_04() {
     Quaternion rotation = MakeRotateAxisAngleQuaternion(axisNormalized, angle);
     Matrix4x4  rotateMatrix = MakeRotateMatrix(rotation);
     Vector3    rotateByQuat = RotateVector(pointY, rotation);
-    Vector3    rotateByMat = TransformVtoM(pointY, rotateMatrix);
+    Vector3    rotateByMat = TransformMatrix(pointY, rotateMatrix);
 
     ImGui::Begin("MT4_01_04");
 
