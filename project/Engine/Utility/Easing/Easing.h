@@ -12,7 +12,7 @@
 /// <summary>
 /// 汎用イージング関数群 float, Vector2, Vector3 対応
 /// </summary>
-namespace Easing {
+namespace MyEasing {
 
     /// @brief イージング関数を適用
     /// @param t 進行状況 0.0～1.0

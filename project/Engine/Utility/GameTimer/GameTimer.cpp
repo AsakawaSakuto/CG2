@@ -12,7 +12,7 @@ void GameTimer::Update(float deltaTime) {
     loopedThisFrame_ = false;
     finished_ = false;
 
-    float scaledDeltaTime = deltaTime * timeScale_;
+    float scaledDeltaTime = deltaTime;
 
     currentTime_ += scaledDeltaTime;
     if (currentTime_ >= duration_) {
@@ -81,11 +81,6 @@ float GameTimer::GetReverseProgress() const {
     return 1.0f - GetProgress();
 }
 
-float GameTimer::GetEasedProgress(EaseType easingType) const {
-    float progress = GetProgress();
-    return Easing::Apply(progress, easingType);
-}
-
 float GameTimer::GetRemainingTime() const {
     return (std::max)(0.0f, duration_ - currentTime_);
 }
@@ -110,30 +105,4 @@ void GameTimer::SetDuration(float duration) {
 
 void GameTimer::SetLoop(bool loop) {
     loop_ = loop;
-}
-
-
-void GameTimer::StartFrames(int frameCount, bool loop, float targetFPS) {
-    totalFrames_ = frameCount;
-    targetFPS_ = targetFPS;
-    duration_ = frameCount / targetFPS;
-    loop_ = loop;
-    currentTime_ = 0.0f;
-    isActive_ = true;
-    finished_ = false;
-    useFrameMode_ = true;
-    loopedThisFrame_ = false;
-}
-
-int GameTimer::GetCurrentFrame() const {
-    if (!useFrameMode_) return 0;
-    return static_cast<int>(currentTime_ * targetFPS_);
-}
-
-int GameTimer::GetTotalFrames() const {
-    return totalFrames_;
-}
-
-void GameTimer::SetTimeScale(float scale) {
-    timeScale_ = (std::max)(0.0f, scale);
 }

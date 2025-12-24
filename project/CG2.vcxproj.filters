@@ -37,7 +37,6 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
-    <ClCompile Include="Engine\3d\Model\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
@@ -86,6 +85,8 @@
     <ClCompile Include="Engine\Utility\ImGui\StatsWindow.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
+    <ClCompile Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.cpp" />
+    <ClCompile Include="Engine\Game\Map\Map3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -122,9 +123,6 @@
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.h" />
-    <ClInclude Include="Engine\3d\Model\Animation\AnimationStruct.h" />
-    <ClInclude Include="Engine\3d\Model\Animation\Function\AnimationFunction.h" />
-    <ClInclude Include="Engine\3d\Model\ModelDataStruct.h" />
     <ClInclude Include="Application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponName.h" />
@@ -206,6 +204,13 @@
     <ClInclude Include="Engine\Input\MyInput.h" />
     <ClInclude Include="Engine\Audio\MyAudio.h" />
     <ClInclude Include="Engine\Utility\Collision\Type\Circle.h" />
+    <ClInclude Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.h" />
+    <ClInclude Include="Engine\3d\Model\Data\Animation\AnimationStruct.h" />
+    <ClInclude Include="Engine\3d\Model\Data\ModelDataStruct.h" />
+    <ClInclude Include="Engine\Math\Type\Matrix2x2.h" />
+    <ClInclude Include="Engine\Math\Type\Matrix3x3.h" />
+    <ClInclude Include="Engine\Game\Map\Map3D.h" />
+    <ClInclude Include="Engine\Game\Map\Map3D_Usage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

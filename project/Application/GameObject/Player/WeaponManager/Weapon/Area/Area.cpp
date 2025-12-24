@@ -43,7 +43,7 @@ void Area::Update() {
 	}
 
 	if (scaleTimer_.IsActive()) {
-		transform_.scale = Easing::Lerp(Vector3{ 3.2f,3.2f,3.2f }, Vector3{ 0.0f,0.0f,0.0f }, scaleTimer_.GetProgress());
+		transform_.scale = MyEasing::Lerp(Vector3{ 3.2f,3.2f,3.2f }, Vector3{ 0.0f,0.0f,0.0f }, scaleTimer_.GetProgress());
 	}
 
 	lifeTimer_.Update();

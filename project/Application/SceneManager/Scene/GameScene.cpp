@@ -106,7 +106,7 @@ void GameScene::Update() {
 	MyDebugLine::AddGrid(100.0f, 20);
 
 	if (textMoveTimer_.IsActive()) {
-		text_->SetPosition({ Easing::Lerp(1780.0f, -500.0f, textMoveTimer_.GetProgress(),EaseType::EaseOutInSine), 360.0f });
+		text_->SetPosition({ MyEasing::Lerp(1780.0f, -500.0f, textMoveTimer_.GetProgress(),EaseType::EaseOutInSine), 360.0f });
 		textMoveTimer_.Update();
 	}
 
