@@ -95,7 +95,7 @@ private:
 	float collisionRadius_ = 0.5f;
 
 	// ジャンプ関連のメンバ変数
-	float groundLevel_ = 0.0f; // 地面のY座標
+	float groundLevel_ = 2.5f; // 地面のY座標
 	bool isGrounded_ = true;   // 地面にいるかどうか
 	bool wasGrounded_ = true;  // 前フレームで地面にいたかどうか
 

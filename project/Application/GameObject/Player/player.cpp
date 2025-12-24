@@ -11,6 +11,7 @@ void Player::PostFrameCleanup() {
 void Player::Initialize() {
 
 	transform_.scale = { 1.0f,1.0f,1.0f };
+	transform_.translate = { 10.0f,10.0f,10.0f };
 
 	model_->Initialize("animation/human/walk.gltf");
 	model_->UseLight(false);
@@ -35,8 +36,8 @@ void Player::Update() {
 
 	directionToEnemy_ = GetDirectionToEnemy();
 
-	transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
-	transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
+	//transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
+	//transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
 
 	expGetRangeTransform_.translate = transform_.translate;
 	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
