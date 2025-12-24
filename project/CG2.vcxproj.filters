@@ -86,7 +86,7 @@
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
     <ClCompile Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.cpp" />
-    <ClCompile Include="Engine\Game\Map\Map3D.cpp" />
+    <ClCompile Include="Engine\Map\Map3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -209,8 +209,8 @@
     <ClInclude Include="Engine\3d\Model\Data\ModelDataStruct.h" />
     <ClInclude Include="Engine\Math\Type\Matrix2x2.h" />
     <ClInclude Include="Engine\Math\Type\Matrix3x3.h" />
-    <ClInclude Include="Engine\Game\Map\Map3D.h" />
-    <ClInclude Include="Engine\Game\Map\Map3D_Usage.h" />
+    <ClInclude Include="Engine\Map\Map3D.h" />
+    <ClInclude Include="Engine\Map\Map3DSamples.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -222,5 +222,6 @@
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />
+    <None Include="docs\Map3D_Usage.md" />
   </ItemGroup>
 </Project>

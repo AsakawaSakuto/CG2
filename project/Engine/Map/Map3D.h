@@ -1,0 +1,165 @@
+#pragma once
+#include <vector>
+#include <memory>
+#include <cassert>
+#include <cstdint>
+#include "Math/Type/Vector3.h"
+#include "Utility/Transform/Transform.h"
+#include "3d/Model/Model.h"
+
+/// <summary>
+/// タイル種別の定義
+/// </summary>
+enum class TileType : uint8_t {
+	Empty = 0,   // 空（何もない）
+	Normal = 1,  // 通常ブロック
+	// 今後の拡張用（例）
+	// Wall = 2,
+	// Lava = 3,
+	// Ice = 4,
+};
+
+/// <summary>
+/// ブロックデータ（各セルの情報）
+/// </summary>
+struct BlockData {
+	TileType type = TileType::Empty;
+	std::unique_ptr<Model> model = nullptr;
+	Transform transform;
+};
+
+/// <summary>
+/// 固定サイズの3Dマップ管理クラス
+/// </summary>
+class Map3D {
+public:
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="width">X方向のサイズ</param>
+	/// <param name="height">Y方向のサイズ</param>
+	/// <param name="depth">Z方向のサイズ</param>
+	Map3D(uint32_t width, uint32_t height, uint32_t depth);
+
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Map3D();
+
+	/// <summary>
+	/// 初期化処理
+	/// </summary>
+	void Initialize();
+
+	/// <summary>
+	/// 描画処理
+	/// </summary>
+	/// <param name="camera">使用するカメラ</param>
+	void Draw(Camera& camera);
+
+	/// <summary>
+	/// ImGui描画
+	/// </summary>
+	void DrawImGui();
+
+	/// <summary>
+	/// 指定座標のタイルタイプを取得
+	/// </summary>
+	/// <param name="x">X座標</param>
+	/// <param name="y">Y座標</param>
+	/// <param name="z">Z座標</param>
+	/// <returns>タイルタイプ</returns>
+	TileType GetTile(uint32_t x, uint32_t y, uint32_t z) const;
+
+	/// <summary>
+	/// 指定座標のタイルタイプを設定
+	/// </summary>
+	/// <param name="x">X座標</param>
+	/// <param name="y">Y座標</param>
+	/// <param name="z">Z座標</param>
+	/// <param name="type">設定するタイルタイプ</param>
+	void SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type);
+
+	/// <summary>
+	/// ワールド座標からマップ座標に変換
+	/// </summary>
+	/// <param name="worldPos">ワールド座標</param>
+	/// <param name="outX">出力X座標</param>
+	/// <param name="outY">出力Y座標</param>
+	/// <param name="outZ">出力Z座標</param>
+	/// <returns>範囲内ならtrue</returns>
+	bool WorldToMap(const Vector3& worldPos, uint32_t& outX, uint32_t& outY, uint32_t& outZ) const;
+
+	/// <summary>
+	/// マップ座標からワールド座標（ブロック中心）に変換
+	/// </summary>
+	/// <param name="x">X座標</param>
+	/// <param name="y">Y座標</param>
+	/// <param name="z">Z座標</param>
+	/// <returns>ワールド座標</returns>
+	Vector3 MapToWorld(uint32_t x, uint32_t y, uint32_t z) const;
+
+	/// <summary>
+	/// 指定座標が範囲内かチェック
+	/// </summary>
+	bool IsInBounds(uint32_t x, uint32_t y, uint32_t z) const;
+
+	/// <summary>
+	/// マップをクリア（全てEmptyにする）
+	/// </summary>
+	void Clear();
+
+	/// <summary>
+	/// ブロックサイズを取得
+	/// </summary>
+	Vector3 GetBlockSize() const { return blockSize_; }
+
+	/// <summary>
+	/// マップサイズを取得
+	/// </summary>
+	uint32_t GetWidth() const { return width_; }
+	uint32_t GetHeight() const { return height_; }
+	uint32_t GetDepth() const { return depth_; }
+
+private:
+	/// <summary>
+	/// 3D座標から1次元インデックスに変換
+	/// </summary>
+	inline uint32_t ToIndex(uint32_t x, uint32_t y, uint32_t z) const {
+		assert(IsInBounds(x, y, z) && "Map3D: Index out of bounds!");
+		return x + width_ * (y + height_ * z);
+	}
+
+	/// <summary>
+	/// 指定座標のブロックにモデルを作成
+	/// </summary>
+	void CreateBlockModel(uint32_t x, uint32_t y, uint32_t z, TileType type);
+
+	/// <summary>
+	/// 指定座標のブロックを削除
+	/// </summary>
+	void DestroyBlock(uint32_t x, uint32_t y, uint32_t z);
+
+	/// <summary>
+	/// タイルタイプに応じたスケールを取得
+	/// </summary>
+	Vector3 GetScaleForTileType(TileType type) const;
+
+private:
+	// マップサイズ
+	uint32_t width_;
+	uint32_t height_;
+	uint32_t depth_;
+
+	// ブロックサイズ（各軸の直径）
+	Vector3 blockSize_ = { 10.0f, 5.0f, 10.0f };
+
+	// ブロックデータ（1次元配列）
+	std::vector<BlockData> blocks_;
+
+	// モデルパスのマッピング
+	static const std::unordered_map<TileType, std::string> kModelPaths_;
+	
+	// タイルタイプごとのスケール設定（半径1mのキューブからの倍率）
+	static const std::unordered_map<TileType, Vector3> kTileScales_;
+};

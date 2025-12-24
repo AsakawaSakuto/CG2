@@ -11,6 +11,8 @@ void GameScene::CleanupResources() {
 void GameScene::Initialize() {
 	ChangeScene(SCENE::GAME);
 
+	debugCamera_.SetInput(MyInput::GetInput());
+
 	gameCamera_->Initialize();
 
 	player_ = make_unique<Player>();
@@ -79,6 +81,39 @@ void GameScene::Initialize() {
 
 	gameTime_ = 0.0f;
 	score_ = 0;
+
+	// ===== Map3D のサンプル実装 =====
+	// 25x20x25 のマップを作成
+	map3D_ = make_unique<Map3D>(25, 20, 25);
+	map3D_->Initialize();
+
+	// サンプル: 床を作成（y=0の全面にNormalブロックを配置）
+	for (uint32_t z = 0; z < map3D_->GetDepth(); ++z) {
+		for (uint32_t x = 0; x < map3D_->GetWidth(); ++x) {
+			map3D_->SetTile(x, 0, z, TileType::Normal);
+		}
+	}
+
+	// サンプル: 壁を作成（外周に壁を配置）
+	for (uint32_t y = 1; y < 5; ++y) {
+		for (uint32_t z = 0; z < map3D_->GetDepth(); ++z) {
+			// X方向の壁
+			map3D_->SetTile(0, y, z, TileType::Normal);
+			map3D_->SetTile(map3D_->GetWidth() - 1, y, z, TileType::Normal);
+		}
+		for (uint32_t x = 0; x < map3D_->GetWidth(); ++x) {
+			// Z方向の壁
+			map3D_->SetTile(x, y, 0, TileType::Normal);
+			map3D_->SetTile(x, y, map3D_->GetDepth() - 1, TileType::Normal);
+		}
+	}
+
+	// サンプル: 中央に柱を配置
+	uint32_t centerX = map3D_->GetWidth() / 2;
+	uint32_t centerZ = map3D_->GetDepth() / 2;
+	for (uint32_t y = 1; y < 10; ++y) {
+		map3D_->SetTile(centerX, y, centerZ, TileType::Normal);
+	}
 }
 
 void GameScene::Update() {
@@ -98,6 +133,8 @@ void GameScene::Update() {
 	enemyManager_->Update();
 
 	camera_ = gameCamera_->GetCamera();
+	//debugCamera_.Update();
+	//camera_ = debugCamera_;
 	camera_.Update();
 
 	testParticle_->Update();
@@ -143,6 +180,11 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	MyDebugLine::Draw(camera_);
 
+	// マップの描画
+	if (map3D_) {
+		map3D_->Draw(camera_);
+	}
+
 	enemyManager_->Draw(camera_);
 
 	player_->Draw(camera_);
@@ -183,6 +225,11 @@ void GameScene::DrawImGui() {
 	//enemyManager_->DrawImGui();
 
 	testParticle_->DrawImGui("TestParticle");
+
+	// マップのImGui描画
+	if (map3D_) {
+		map3D_->DrawImGui();
+	}
 }
 
 void GameScene::PostFrameCleanup() {
