@@ -27,12 +27,21 @@ void Player::Initialize() {
 	status_.currentHP_ = status_.maxHP_;
 	status_.currentExp_ = 0;
 	status_.level_ = 1;
+
+	// AABBの初期化（ローカルオフセットを設定）
+	// 中心から見て、下方向に0.0f、上方向に2.0f伸びる
+	mapCollosion_.min = { -0.5f, 0.0f, -0.5f }; 
+	mapCollosion_.max = { 0.5f, 2.0f, 0.5f };
 }
 
 void Player::Update() {
 
 	Move();
 	Jump();
+
+	// AABBの中心をプレイヤーの位置に設定（超シンプル！）
+	mapCollosion_.center = transform_.translate;
+	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
 
 	directionToEnemy_ = GetDirectionToEnemy();
 

@@ -122,19 +122,10 @@ void Line3d::AddBox(const Vector3& center, const Vector3& size, const Vector4& c
 }
 
 void Line3d::AddBox(const AABB& aabb, const Vector4& color) {
-    // centerとsizeからワールド座標のminとmaxを計算
-    Vector3 worldMin = { 
-        aabb.center.x - aabb.size.x * 0.5f, 
-        aabb.center.y - aabb.size.y * 0.5f, 
-        aabb.center.z - aabb.size.z * 0.5f 
-    };
-    Vector3 worldMax = { 
-        aabb.center.x + aabb.size.x * 0.5f, 
-        aabb.center.y + aabb.size.y * 0.5f, 
-        aabb.center.z + aabb.size.z * 0.5f 
-    };
+    // AABBのワールド座標のmin/maxから8つの頂点を定義
+    Vector3 worldMin = aabb.GetWorldMin();
+    Vector3 worldMax = aabb.GetWorldMax();
     
-    // AABBのmin/maxから8つの頂点を定義
     Vector3 vertices[8] = {
         { worldMin.x, worldMin.y, worldMin.z }, // 0: 左下前
         { worldMax.x, worldMin.y, worldMin.z }, // 1: 右下前
@@ -167,7 +158,9 @@ void Line3d::AddBox(const AABB& aabb, const Vector4& color) {
 
 void Line3d::AddBox(const OBB& obb, const Vector4& color) {
     // OBBのローカル座標系での8つの頂点を計算
-    Vector3 halfSize = { obb.size.x * 0.5f, obb.size.y * 0.5f, obb.size.z * 0.5f };
+    Vector3 center = obb.GetCenter();
+    Vector3 size = obb.GetSize();
+    Vector3 halfSize = { size.x * 0.5f, size.y * 0.5f, size.z * 0.5f };
     
     // ローカル座標系での8つのコーナー（中心を原点とする）
     Vector3 localVertices[8] = {
@@ -186,9 +179,9 @@ void Line3d::AddBox(const OBB& obb, const Vector4& color) {
     for (int i = 0; i < 8; ++i) {
         // orientation[0], orientation[1], orientation[2]はそれぞれX, Y, Z軸の基底ベクトル
         worldVertices[i] = {
-            obb.center.x + localVertices[i].x * obb.orientation[0].x + localVertices[i].y * obb.orientation[1].x + localVertices[i].z * obb.orientation[2].x,
-            obb.center.y + localVertices[i].x * obb.orientation[0].y + localVertices[i].y * obb.orientation[1].y + localVertices[i].z * obb.orientation[2].y,
-            obb.center.z + localVertices[i].x * obb.orientation[0].z + localVertices[i].y * obb.orientation[1].z + localVertices[i].z * obb.orientation[2].z
+            center.x + localVertices[i].x * obb.orientation[0].x + localVertices[i].y * obb.orientation[1].x + localVertices[i].z * obb.orientation[2].x,
+            center.y + localVertices[i].x * obb.orientation[0].y + localVertices[i].y * obb.orientation[1].y + localVertices[i].z * obb.orientation[2].y,
+            center.z + localVertices[i].x * obb.orientation[0].z + localVertices[i].y * obb.orientation[1].z + localVertices[i].z * obb.orientation[2].z
         };
     }
     
