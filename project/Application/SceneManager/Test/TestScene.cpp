@@ -83,7 +83,7 @@ void TestScene::Update() {
     MyDebugLine::AddShape(line);
 
 	// 回転を適用（orientation行列を更新）
-	testOBB_.UpdateOrientation();
+	//testOBB_.UpdateOrientation();
 	testOvalSphere_.UpdateOrientation();
 
 	// 当たり判定チェック
@@ -117,6 +117,9 @@ void TestScene::Update() {
 	Vector4 ovalSphereColor = ovalSphereHit ? Vector4 RED : Vector4 WHITE;
 	Vector4 aabbColor = aabbHit ? Vector4 RED : Vector4 WHITE;
 	Vector4 obbColor = obbHit ? Vector4 RED : Vector4 WHITE;
+
+    //testAABB_.UpdateOrientation();
+	//testOBB_.UpdateOrientation();
 
 	MyDebugLine::AddShape(testSphere_, sphereColor);
 	MyDebugLine::AddShape(testOvalSphere_, ovalSphereColor);
@@ -177,11 +180,11 @@ void TestScene::DrawImGui() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	//testOBB_.DrawImGui("testOBB");
-    //testAABB_.DrawImGui("testAABB");
-    //testSphere_.DrawImGui("testSphere");
-    //testOvalSphere_.DrawImGui("testOvalSphere");
-    //testPlane_.DrawImGui("testPlane");
+	testOBB_.DrawImGui("testOBB");
+    testAABB_.DrawImGui("testAABB");
+    testSphere_.DrawImGui("testSphere");
+    testOvalSphere_.DrawImGui("testOvalSphere");
+    testPlane_.DrawImGui("testPlane");
     
 	cube_->DrawImGui("cubeModel");
 

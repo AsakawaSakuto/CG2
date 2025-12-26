@@ -9,35 +9,15 @@
 #endif
 
 struct OBB {
-	Vector3 min = { -0.5f, -0.5f, -0.5f }; // 最小点（ローカル空間）
-	Vector3 max = { 0.5f, 0.5f, 0.5f };    // 最大点（ローカル空間）
+	Vector3 center = { 0.0f, 0.0f, 0.0f }; // ワールド中心
+	Vector3 min = { -0.5f, -0.5f, -0.5f }; // centerからのローカルオフセット（回転前のローカル空間）
+	Vector3 max = { 0.5f, 0.5f, 0.5f };    // centerからのローカルオフセット（回転前のローカル空間）
 	Vector3 rotate = { 0.0f, 0.0f, 0.0f }; // 回転角
 	Vector3 orientation[3];                // 座標軸 正規化 直交必須
 
 	/// <summary>
-	/// 中心点を取得
-	/// </summary>
-	Vector3 GetCenter() const {
-		return {
-			(min.x + max.x) * 0.5f,
-			(min.y + max.y) * 0.5f,
-			(min.z + max.z) * 0.5f
-		};
-	}
-
-	/// <summary>
-	/// サイズを取得
-	/// </summary>
-	Vector3 GetSize() const {
-		return {
-			max.x - min.x,
-			max.y - min.y,
-			max.z - min.z
-		};
-	}
-
-	/// <summary>
 	/// 回転角から座標軸を更新
+	/// 注意: rotateが変更されたら必ずこの関数を呼ぶこと
 	/// </summary>
 	void UpdateOrientation() {
 		Matrix4x4 rotateMatrix = MakeRotateXMatrix(rotate.x) * MakeRotateYMatrix(rotate.y) * MakeRotateZMatrix(rotate.z);
@@ -67,11 +47,13 @@ struct OBB {
 
 		ImGui::Begin(name);
 
+		ImGui::DragFloat3("center", &center.x, 0.01f);
 		ImGui::DragFloat3("min", &min.x, 0.01f);
 		ImGui::DragFloat3("max", &max.x, 0.01f);
 		ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 
 		if (ImGui::Button("Reset")) {
+			center = { 0.0f, 0.0f, 0.0f };
 			min = { -0.5f, -0.5f, -0.5f };
 			max = { 0.5f, 0.5f, 0.5f };
 			rotate = { 0.0f, 0.0f, 0.0f };
