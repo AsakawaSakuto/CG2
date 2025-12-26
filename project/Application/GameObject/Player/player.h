@@ -105,5 +105,5 @@ private:
 	Sphere expItemStateChangeCollision_;
 	float expItemStateChangeRadius_ = 3.5f;
 
-	OBB mapCollosion_;
+	AABB mapCollosion_;
 };
