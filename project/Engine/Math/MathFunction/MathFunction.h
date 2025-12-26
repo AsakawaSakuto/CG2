@@ -1,30 +1,53 @@
 #pragma once
+#include <Math/Type/Vector2.h>
 #include <Math/Type/Vector3.h>
+#include <Math/Type/Vector4.h>
 #include <Utility/Collision/Type/Segment.h>
 
-// クロス積（ベクトル積）
+// クロス積
+// 2Dはスカラー（Z成分）を返す
+float   Cross(const Vector2& v1, const Vector2& v2);
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 
 // 加算
+Vector2 Add(const Vector2& v1, const Vector2& v2);
 Vector3 Add(const Vector3& v1, const Vector3& v2);
+Vector4 Add(const Vector4& v1, const Vector4& v2);
 
 // 減算
+Vector2 Subtract(const Vector2& v1, const Vector2& v2);
 Vector3 Subtract(const Vector3& v1, const Vector3& v2);
+Vector4 Subtract(const Vector4& v1, const Vector4& v2);
+
+// 乗算（要素ごと）
+Vector2 Multiply(const Vector2& v1, const Vector2& v2);
+Vector3 Multiply(const Vector3& v1, const Vector3& v2);
+Vector4 Multiply(const Vector4& v1, const Vector4& v2);
 
 // スカラー倍
-Vector3 Multiply(float scalar, const Vector3& v);
+Vector2 Multiply(const Vector2& v, float scalar);
+Vector3 Multiply(const Vector3& v, float scalar);
+Vector4 Multiply(const Vector4& v, float scalar);
 
 // 内積
+float Dot(const Vector2& v1, const Vector2& v2);
 float Dot(const Vector3& v1, const Vector3& v2);
+float Dot(const Vector4& v1, const Vector4& v2);
 
 // 長さ
+float Length(const Vector2& v);
 float Length(const Vector3& v);
+float Length(const Vector4& v);
 
 // 正規化
+Vector2 Normalize(const Vector2& v);
 Vector3 Normalize(const Vector3& v);
+Vector4 Normalize(const Vector4& v);
 
 // 正射影ベクトル
+Vector2 Project(const Vector2& v1, const Vector2& v2);
 Vector3 Project(const Vector3& v1, const Vector3& v2);
+Vector4 Project(const Vector4& v1, const Vector4& v2);
 
 // 最近接点
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);

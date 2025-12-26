@@ -1,111 +1,77 @@
 #pragma once
-#include <cmath>
-#include <limits>
-#include <iostream>
+#include <cstddef>  // std::size_t
+#include <cmath>    // std::sqrt
 
 /// <summary>
 /// 3次元ベクトル
 /// </summary>
 struct Vector3 {
-    float x;
-    float y;
-    float z;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
 
-    ///@return ベクトルの長さ（ノルム）を返す
-    float Length() const {
-        return std::sqrt(x * x + y * y + z * z);
+    // --- constructors ---
+    constexpr Vector3() = default;
+    constexpr Vector3(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {}
+
+    // --- index access ---
+    constexpr float& operator[](std::size_t i) noexcept {
+        return (i == 0) ? x : (i == 1 ? y : z);
+    }
+    constexpr const float& operator[](std::size_t i) const noexcept {
+        return (i == 0) ? x : (i == 1 ? y : z);
     }
 
-    ///@return 正規化ベクトルを返す（長さを1にしたベクトル）
-    ///@return ゼロベクトルの場合は {0,0,0} を返す
-    Vector3 Normalize() const {
-        float len = Length();
-        if (len == 0.0f) return { 0.0f, 0.0f, 0.0f }; // 0除算防止
+    // --- unary ---
+    constexpr Vector3 operator+() const noexcept { return *this; }
+    constexpr Vector3 operator-() const noexcept { return Vector3{ -x, -y, -z }; }
+
+    // --- vector op ---
+    constexpr Vector3 operator+(const Vector3& r) const noexcept { return { x + r.x, y + r.y, z + r.z }; }
+    constexpr Vector3 operator-(const Vector3& r) const noexcept { return { x - r.x, y - r.y, z - r.z }; }
+    constexpr Vector3 operator*(const Vector3& r) const noexcept { return { x * r.x, y * r.y, z * r.z }; } // 要素ごと
+    constexpr Vector3 operator/(const Vector3& r) const noexcept { return { x / r.x, y / r.y, z / r.z }; } // 要素ごと
+
+    constexpr Vector3& operator+=(const Vector3& r) noexcept { x += r.x; y += r.y; z += r.z; return *this; }
+    constexpr Vector3& operator-=(const Vector3& r) noexcept { x -= r.x; y -= r.y; z -= r.z; return *this; }
+    constexpr Vector3& operator*=(const Vector3& r) noexcept { x *= r.x; y *= r.y; z *= r.z; return *this; }
+    constexpr Vector3& operator/=(const Vector3& r) noexcept { x /= r.x; y /= r.y; z /= r.z; return *this; }
+
+    // --- scalar op ---
+    constexpr Vector3 operator*(float s) const noexcept { return { x * s, y * s, z * s }; }
+    constexpr Vector3 operator/(float s) const noexcept { return { x / s, y / s, z / s }; }
+    constexpr Vector3& operator*=(float s) noexcept { x *= s; y *= s; z *= s; return *this; }
+    constexpr Vector3& operator/=(float s) noexcept { x /= s; y /= s; z /= s; return *this; }
+
+    friend constexpr Vector3 operator*(float s, const Vector3& v) noexcept { return { v.x * s, v.y * s, v.z * s }; }
+
+    // --- compare ---
+    constexpr bool operator==(const Vector3& r) const noexcept { return x == r.x && y == r.y && z == r.z; }
+    constexpr bool operator!=(const Vector3& r) const noexcept { return !(*this == r); }
+
+    // --- utilities ---
+    constexpr float LengthSq() const noexcept { return x * x + y * y + z * z; }
+    float Length() const noexcept { return std::sqrt(LengthSq()); }
+
+    Vector3 Normalized() const noexcept {
+        const float len = Length();
+        if (len == 0.0f) { return { 0.0f, 0.0f, 0.0f }; }
         return { x / len, y / len, z / len };
     }
-
-    /// 内積（dot product）
-    ///@return 自分と other の角度・投影関係を表すスカラー値を返す
-    float operator*(const Vector3& other) const {
-        return x * other.x + y * other.y + z * other.z;
+    void Normalize() noexcept {
+        const float len = Length();
+        if (len == 0.0f) { return; }
+        x /= len; y /= len; z /= len;
     }
 
-    /// 外積（cross product）
-    ///@return 自分と other に垂直なベクトルを返す
-    Vector3 operator^(const Vector3& other) const {
+    static constexpr float Dot(const Vector3& a, const Vector3& b) noexcept {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+    static constexpr Vector3 Cross(const Vector3& a, const Vector3& b) noexcept {
         return {
-            y * other.z - z * other.y,
-            z * other.x - x * other.z,
-            x * other.y - y * other.x
+            a.y * b.z - a.z * b.y,
+            a.z * b.x - a.x * b.z,
+            a.x * b.y - a.y * b.x
         };
     }
-
-    // 代入演算子
-    Vector3& operator=(const Vector3& other) {
-        if (this != &other) {
-            x = other.x;
-            y = other.y;
-            z = other.z;
-        }
-        return *this;
-    }
-
-    // 自身に他のベクトルを加算する（+=）
-    Vector3& operator+=(const Vector3& num) {
-        this->x += num.x;
-        this->y += num.y;
-        this->z += num.z;
-        return *this;
-    }
-
-    // 自身から他のベクトルを減算する（-=）
-    Vector3& operator-=(const Vector3& num) {
-        this->x -= num.x;
-        this->y -= num.y;
-        this->z -= num.z;
-        return *this;
-    }
-
-    // 要素ごとの積を行う（*=）
-    // ※通常の数学的ベクトル積ではない（Hadamard積）
-    Vector3& operator*=(const Vector3& num) {
-        this->x *= num.x;
-        this->y *= num.y;
-        this->z *= num.z;
-        return *this;
-    }
-
-    // ベクトル同士の加算（+）
-    Vector3 operator+(const Vector3& other) const {
-        Vector3 result = *this;
-        result += other;
-        return result;
-    }
-
-    // ベクトル同士の減算（-）
-    Vector3 operator-(const Vector3& other) const {
-        Vector3 result = *this;
-        result -= other;
-        return result;
-    }
-
-    // 各成分にスカラー値を加算する
-    Vector3 operator+(float scalar) const {
-        return Vector3{ x + scalar, y + scalar, z + scalar };
-    }
-
-    // 各成分からスカラー値を減算する
-    Vector3 operator-(float scalar) const {
-        return Vector3{ x - scalar, y - scalar, z - scalar };
-    }
-
-    // 各成分をスカラー倍する
-    Vector3 operator*(float scalar) const {
-        return Vector3{ x * scalar, y * scalar, z * scalar };
-    }
 };
-
-// スカラー * ベクトル
-inline Vector3 operator*(float scalar, const Vector3& vec) {
-    return { vec.x * scalar, vec.y * scalar, vec.z * scalar };
-}

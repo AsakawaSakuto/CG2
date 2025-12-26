@@ -114,7 +114,7 @@ void Gauge::Update(float currenValue, float maxValue) {
 			
 			// セグメントの色を計算（グラデーション）
 			float colorT = (numGradientSegments_ > 1) ? static_cast<float>(i) / static_cast<float>(numGradientSegments_ - 1) : 0.0f;
-			Vector4 segmentColor = Easing::Lerp(gaugeStartColor_, gaugeEndColor_, colorT);
+			Vector4 segmentColor = MyEasing::Lerp(gaugeStartColor_, gaugeEndColor_, colorT);
 			gradientSegments_[i]->SetColor(segmentColor);
 			
 			gradientSegments_[i]->Update();

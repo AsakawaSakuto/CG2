@@ -59,7 +59,7 @@ private:
 	Camera camera_;
 	DebugCamera debugCamera_;
 
-	AABB testAABB_;
+	OBB testAABB_;
 	OBB testOBB_;
 	Sphere testSphere_;
 	OvalSphere testOvalSphere_;

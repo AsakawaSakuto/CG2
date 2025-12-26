@@ -70,5 +70,5 @@ void Bullet::SetPosition(const Vector3& position) {
 }
 
 void Bullet::SetDirectionToEnemy(const Vector3& direction) {
-    directionToEnemy_ = direction.Normalize();
+    directionToEnemy_ = direction.Normalized();
 }

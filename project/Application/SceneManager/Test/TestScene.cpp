@@ -83,7 +83,7 @@ void TestScene::Update() {
     MyDebugLine::AddShape(line);
 
 	// 回転を適用（orientation行列を更新）
-	testOBB_.UpdateOrientation();
+	//testOBB_.UpdateOrientation();
 	testOvalSphere_.UpdateOrientation();
 
 	// 当たり判定チェック
@@ -117,6 +117,9 @@ void TestScene::Update() {
 	Vector4 ovalSphereColor = ovalSphereHit ? Vector4 RED : Vector4 WHITE;
 	Vector4 aabbColor = aabbHit ? Vector4 RED : Vector4 WHITE;
 	Vector4 obbColor = obbHit ? Vector4 RED : Vector4 WHITE;
+
+    //testAABB_.UpdateOrientation();
+	//testOBB_.UpdateOrientation();
 
 	MyDebugLine::AddShape(testSphere_, sphereColor);
 	MyDebugLine::AddShape(testOvalSphere_, ovalSphereColor);
@@ -153,8 +156,6 @@ void TestScene::Draw() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
     postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 
-    MyDebugLine::Draw(camera_);
-
     cube_->Draw(camera_, cubeTransform_);
     spinCube_->Draw(camera_, spinCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
@@ -169,6 +170,8 @@ void TestScene::Draw() {
 	bitmapFont_.Draw();
 
 	testGauge_->Draw();
+
+    MyDebugLine::Draw(camera_);
 }
 
 void TestScene::DrawImGui() {
@@ -177,11 +180,13 @@ void TestScene::DrawImGui() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	//testOBB_.DrawImGui("testOBB");
-    //testAABB_.DrawImGui("testAABB");
-    //testSphere_.DrawImGui("testSphere");
-    //testOvalSphere_.DrawImGui("testOvalSphere");
-    //testPlane_.DrawImGui("testPlane");
+	testOBB_.DrawImGui("testOBB");
+    testAABB_.DrawImGui("testAABB");
+    testSphere_.DrawImGui("testSphere");
+    testOvalSphere_.DrawImGui("testOvalSphere");
+    testPlane_.DrawImGui("testPlane");
+    
+	cube_->DrawImGui("cubeModel");
 
 	testParticle_->DrawImGui("testParticle");
 
@@ -342,7 +347,7 @@ void TestScene::MT4_01_04() {
     Quaternion rotation = MakeRotateAxisAngleQuaternion(axisNormalized, angle);
     Matrix4x4  rotateMatrix = MakeRotateMatrix(rotation);
     Vector3    rotateByQuat = RotateVector(pointY, rotation);
-    Vector3    rotateByMat = TransformVtoM(pointY, rotateMatrix);
+    Vector3    rotateByMat = TransformMatrix(pointY, rotateMatrix);
 
     ImGui::Begin("MT4_01_04");
 

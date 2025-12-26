@@ -11,6 +11,7 @@ void Player::PostFrameCleanup() {
 void Player::Initialize() {
 
 	transform_.scale = { 1.0f,1.0f,1.0f };
+	transform_.translate = { 10.0f,10.0f,10.0f };
 
 	model_->Initialize("animation/human/walk.gltf");
 	model_->UseLight(false);
@@ -26,6 +27,13 @@ void Player::Initialize() {
 	status_.currentHP_ = status_.maxHP_;
 	status_.currentExp_ = 0;
 	status_.level_ = 1;
+
+	// AABBの初期化（新仕様: center + min/maxのローカルオフセット）
+	// center は transform_.translate で毎フレーム更新されるため、ここでは初期化不要
+	// min/max はローカル空間でのオフセットとして設定
+	mapCollosion_.center = { 0.0f, 0.0f, 0.0f }; // 初期値（Update()で更新される）
+	mapCollosion_.min = { -0.5f, 0.0f, -0.5f }; // centerからのローカルオフセット
+	mapCollosion_.max = { 0.5f, 2.0f, 0.5f };   // centerからのローカルオフセット
 }
 
 void Player::Update() {
@@ -33,10 +41,16 @@ void Player::Update() {
 	Move();
 	Jump();
 
+	// OBBの中心をプレイヤーの位置に設定
+	mapCollosion_.center = transform_.translate;
+	mapCollosion_.rotate = transform_.rotate;
+	mapCollosion_.UpdateOrientation();
+	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
+
 	directionToEnemy_ = GetDirectionToEnemy();
 
-	transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
-	transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
+	//transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
+	//transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
 
 	expGetRangeTransform_.translate = transform_.translate;
 	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
@@ -207,7 +221,7 @@ Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 		forward.z * stickY + right.z * stickX
 	};
 	
-	return moveDirection.Normalize();
+	return moveDirection.Normalized();
 }
 
 void Player::Jump() {

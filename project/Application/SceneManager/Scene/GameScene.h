@@ -7,6 +7,7 @@
 #include "CollisionManager/CollisionManager.h"
 #include "2d/BitmapFont/BitmapFont.h"
 #include "2d/Gauge/Gauge.h"
+#include "Map/Map3D.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -66,4 +67,7 @@ private:
 	// ゲージ（HP・経験値表示用）
 	unique_ptr<Gauge> hpGauge_;
 	unique_ptr<Gauge> expGauge_;
+
+	// 3Dマップ
+	unique_ptr<Map3D> map3D_;
 };

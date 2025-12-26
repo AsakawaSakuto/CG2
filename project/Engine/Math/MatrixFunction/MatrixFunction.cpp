@@ -1,5 +1,5 @@
 #include"MatrixFunction.h"
-#include"../MathFunction/MathFunction.h"
+#include"Math/MathFunction/MathFunction.h"
 #include <algorithm>
 
 constexpr float PI = 3.14159265358979323846f;
@@ -15,6 +15,28 @@ Matrix4x4 MakeIdentityMatrix() {
 			} else {
 				result.m[j][i] = 0.0f;
 			}
+		}
+	}
+	return result;
+}
+
+// 行列の加算
+Matrix4x4 AddMatrix(const Matrix4x4& a, const Matrix4x4& b) {
+	Matrix4x4 result{};
+	for (int y = 0; y < 4; ++y) {
+		for (int x = 0; x < 4; ++x) {
+			result.m[y][x] = a.m[y][x] + b.m[y][x];
+		}
+	}
+	return result;
+}
+
+// 行列の減算
+Matrix4x4 SubtractMatrix(const Matrix4x4& a, const Matrix4x4& b) {
+	Matrix4x4 result{};
+	for (int y = 0; y < 4; ++y) {
+		for (int x = 0; x < 4; ++x) {
+			result.m[y][x] = a.m[y][x] - b.m[y][x];
 		}
 	}
 	return result;
@@ -200,7 +222,7 @@ Matrix4x4 MakeAffineMatrix(const  Vector3& scale, const  Vector3& rotate, const 
 };
 
 // 逆行列
-Matrix4x4 InverseMatrix(Matrix4x4 cameraMatrix)
+Matrix4x4 InverseMatrix(const Matrix4x4& cameraMatrix)
 {
 	Matrix4x4 result{};
 
@@ -431,7 +453,7 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 	return MakeRotateAxisAngle(axis, angle);
 }
 
-Vector3 TransformVtoM(const Vector3& v, const Matrix4x4& m) {
+Vector3 TransformMatrix(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result;
 	result.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + m.m[3][0];
 	result.y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1] + m.m[3][1];

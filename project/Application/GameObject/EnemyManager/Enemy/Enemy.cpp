@@ -21,7 +21,7 @@ void Enemy::Update() {
 
 	model_->Update();
 
-	transform_.scale = Easing::Lerp(Vector3({0.0f,0.0f,0.0f}), Vector3({ 1.0f,1.0f,1.0f }), 
+	transform_.scale = MyEasing::Lerp(Vector3({0.0f,0.0f,0.0f}), Vector3({ 1.0f,1.0f,1.0f }), 
 		scaleTimer_.GetProgress(), EaseType::Linear);
 
 	sphereCollision_.center = transform_.translate;

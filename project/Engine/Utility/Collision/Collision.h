@@ -8,7 +8,11 @@
 #include "Utility/Collision/Type/Segment.h"
 #include "Utility/Collision/Type/LineStruct.h"
 #include <algorithm>
-#include <cmath>
+#include <iostream>
+#include <cfloat>
+
+#undef min
+#undef max
 
 /// <summary>
 /// 当たり判定ユーティリティ
@@ -31,11 +35,10 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const AABB& a, const AABB& b)
     {
-        // centerとsizeからワールド座標のminとmaxを計算
-        Vector3 aMin = { a.center.x - a.size.x * 0.5f, a.center.y - a.size.y * 0.5f, a.center.z - a.size.z * 0.5f };
-        Vector3 aMax = { a.center.x + a.size.x * 0.5f, a.center.y + a.size.y * 0.5f, a.center.z + a.size.z * 0.5f };
-        Vector3 bMin = { b.center.x - b.size.x * 0.5f, b.center.y - b.size.y * 0.5f, b.center.z - b.size.z * 0.5f };
-        Vector3 bMax = { b.center.x + b.size.x * 0.5f, b.center.y + b.size.y * 0.5f, b.center.z + b.size.z * 0.5f };
+        Vector3 aMin = a.GetWorldMin();
+        Vector3 aMax = a.GetWorldMax();
+        Vector3 bMin = b.GetWorldMin();
+        Vector3 bMax = b.GetWorldMax();
         
         // 各軸で分離していなければ衝突
         return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
@@ -48,9 +51,8 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Sphere& sphere, const AABB& box)
     {
-        // centerとsizeからワールド座標のminとmaxを計算
-        Vector3 boxMin = { box.center.x - box.size.x * 0.5f, box.center.y - box.size.y * 0.5f, box.center.z - box.size.z * 0.5f };
-        Vector3 boxMax = { box.center.x + box.size.x * 0.5f, box.center.y + box.size.y * 0.5f, box.center.z + box.size.z * 0.5f };
+        Vector3 boxMin = box.GetWorldMin();
+        Vector3 boxMax = box.GetWorldMax();
         
         // AABB内でSphere.centerに最も近い点を求める
         Vector3 closestPoint;
@@ -83,13 +85,44 @@ namespace Collision
     namespace Detail
     {
         /// <summary>
-        /// OBBを指定された軸に投影した際の半径を計算
+        /// OBBを指定された軸に投影した際の範囲を計算
+        /// OBBの8頂点をワールド空間で計算し、軸への投影範囲を求める
         /// </summary>
-        inline float GetProjectionRadius(const OBB& obb, const Vector3& axis)
+        /// <param name="obb">対象のOBB</param>
+        /// <param name="axis">投影する軸</param>
+        /// <param name="outMin">投影範囲の最小値（出力）</param>
+        /// <param name="outMax">投影範囲の最大値（出力）</param>
+        inline void GetProjectionRange(const OBB& obb, const Vector3& axis, float& outMin, float& outMax)
         {
-            return std::abs(obb.size.x * 0.5f * (obb.orientation[0] * axis)) +
-                   std::abs(obb.size.y * 0.5f * (obb.orientation[1] * axis)) +
-                   std::abs(obb.size.z * 0.5f * (obb.orientation[2] * axis));
+            // OBBの8頂点をローカル空間で生成
+            Vector3 localVertices[8] = {
+                { obb.min.x, obb.min.y, obb.min.z },
+                { obb.max.x, obb.min.y, obb.min.z },
+                { obb.max.x, obb.max.y, obb.min.z },
+                { obb.min.x, obb.max.y, obb.min.z },
+                { obb.min.x, obb.min.y, obb.max.z },
+                { obb.max.x, obb.min.y, obb.max.z },
+                { obb.max.x, obb.max.y, obb.max.z },
+                { obb.min.x, obb.max.y, obb.max.z }
+            };
+            
+            // ワールド空間に変換して軸に投影
+            outMin = FLT_MAX;
+            outMax = -FLT_MAX;
+            
+            for (int i = 0; i < 8; ++i) {
+                // ローカル座標をワールド座標に変換
+                Vector3 worldVertex = {
+                    obb.center.x + obb.orientation[0].x * localVertices[i].x + obb.orientation[1].x * localVertices[i].y + obb.orientation[2].x * localVertices[i].z,
+                    obb.center.y + obb.orientation[0].y * localVertices[i].x + obb.orientation[1].y * localVertices[i].y + obb.orientation[2].y * localVertices[i].z,
+                    obb.center.z + obb.orientation[0].z * localVertices[i].x + obb.orientation[1].z * localVertices[i].y + obb.orientation[2].z * localVertices[i].z
+                };
+                
+                // 軸に投影
+                float projection = Dot(worldVertex, axis);
+                outMin = std::min(outMin, projection);
+                outMax = std::max(outMax, projection);
+            }
         }
 
         /// <summary>
@@ -101,18 +134,15 @@ namespace Collision
             float axisLengthSq = axis.x * axis.x + axis.y * axis.y + axis.z * axis.z;
             if (axisLengthSq < 0.0001f) return false;
 
-            Vector3 normalizedAxis = axis.Normalize();
+            Vector3 normalizedAxis = axis.Normalized();
             
-            // 中心間の距離を軸に投影
-            Vector3 centerDiff = { b.center.x - a.center.x, b.center.y - a.center.y, b.center.z - a.center.z };
-            float centerProjection = std::abs(centerDiff * normalizedAxis);
+            // 各OBBの投影範囲を計算
+            float aMin, aMax, bMin, bMax;
+            GetProjectionRange(a, normalizedAxis, aMin, aMax);
+            GetProjectionRange(b, normalizedAxis, bMin, bMax);
 
-            // 各OBBの投影半径を計算
-            float aProjection = GetProjectionRadius(a, normalizedAxis);
-            float bProjection = GetProjectionRadius(b, normalizedAxis);
-
-            // 分離している場合はtrue
-            return centerProjection > (aProjection + bProjection);
+            // 分離している場合はtrue（範囲が重なっていない）
+            return (aMax < bMin) || (bMax < aMin);
         }
 
         /// <summary>
@@ -126,7 +156,7 @@ namespace Collision
             float segLengthSq = segVec.x * segVec.x + segVec.y * segVec.y + segVec.z * segVec.z;
             if (segLengthSq < 0.0001f) return 0.0f;
             
-            float t = (pointVec * segVec) / segLengthSq;
+            float t = Dot(pointVec, segVec) / segLengthSq;
             return std::clamp(t, 0.0f, 1.0f);
         }
     }
@@ -160,7 +190,7 @@ namespace Collision
         {
             for (int j = 0; j < 3; ++j)
             {
-                Vector3 axis = a.orientation[i] ^ b.orientation[j];
+                Vector3 axis = Cross(a.orientation[i], b.orientation[j]);
                 if (Detail::IsSeparatedOnAxis(a, b, axis))
                     return false;
             }
@@ -172,28 +202,112 @@ namespace Collision
 
     /// <summary>
     /// AABB × OBB 判定
-    /// AABBをOBBとして扱い、OBB×OBB判定を使用
+    /// AABBの3軸 + OBBの3軸 + 外積9軸 = 15軸でテスト
     /// </summary>
     inline bool IsHit(const AABB& aabb, const OBB& obb)
     {
-        // AABBをOBBに変換（軸が整列した状態）
-        OBB aabbAsOBB;
-        aabbAsOBB.center = aabb.center;
-        aabbAsOBB.size = aabb.size;
-        aabbAsOBB.rotate = { 0.0f, 0.0f, 0.0f };
-        aabbAsOBB.orientation[0] = { 1.0f, 0.0f, 0.0f }; // X軸
-        aabbAsOBB.orientation[1] = { 0.0f, 1.0f, 0.0f }; // Y軸
-        aabbAsOBB.orientation[2] = { 0.0f, 0.0f, 1.0f }; // Z軸
-
-        return IsHit(aabbAsOBB, obb);
-    }
-
-    /// <summary>
-    /// OBB × AABB 判定（呼び出し順反転のラッパ）
-    /// </summary>
-    inline bool IsHit(const OBB& obb, const AABB& aabb)
-    {
-        return IsHit(aabb, obb);
+        // AABBの3軸（X, Y, Z）でテスト
+        Vector3 aabbAxes[3] = {
+            { 1.0f, 0.0f, 0.0f },
+            { 0.0f, 1.0f, 0.0f },
+            { 0.0f, 0.0f, 1.0f }
+        };
+        
+        // AABBのワールド座標での範囲
+        Vector3 aabbMin = aabb.GetWorldMin();
+        Vector3 aabbMax = aabb.GetWorldMax();
+        
+        // AABBの各軸での投影テスト
+        for (int i = 0; i < 3; ++i) {
+            // AABBの投影範囲
+            float aabbProjMin = (i == 0) ? aabbMin.x : (i == 1) ? aabbMin.y : aabbMin.z;
+            float aabbProjMax = (i == 0) ? aabbMax.x : (i == 1) ? aabbMax.y : aabbMax.z;
+            
+            // OBBの投影範囲
+            float obbProjMin, obbProjMax;
+            Detail::GetProjectionRange(obb, aabbAxes[i], obbProjMin, obbProjMax);
+            
+            // 分離軸判定（範囲が重なっていない場合は衝突していない）
+            if (aabbProjMax < obbProjMin || obbProjMax < aabbProjMin) {
+                return false;
+            }
+        }
+        
+        // OBBの各軸での投影テスト
+        for (int i = 0; i < 3; ++i) {
+            // OBBの投影範囲
+            float obbProjMin, obbProjMax;
+            Detail::GetProjectionRange(obb, obb.orientation[i], obbProjMin, obbProjMax);
+            
+            // AABBの8頂点を生成してOBBの軸に投影
+            Vector3 aabbVertices[8] = {
+                { aabbMin.x, aabbMin.y, aabbMin.z },
+                { aabbMax.x, aabbMin.y, aabbMin.z },
+                { aabbMax.x, aabbMax.y, aabbMin.z },
+                { aabbMin.x, aabbMax.y, aabbMin.z },
+                { aabbMin.x, aabbMin.y, aabbMax.z },
+                { aabbMax.x, aabbMin.y, aabbMax.z },
+                { aabbMax.x, aabbMax.y, aabbMax.z },
+                { aabbMin.x, aabbMax.y, aabbMax.z }
+            };
+            
+            float aabbProjMin = FLT_MAX;
+            float aabbProjMax = -FLT_MAX;
+            for (int j = 0; j < 8; ++j) {
+                float proj = Dot(aabbVertices[j], obb.orientation[i]);
+                aabbProjMin = std::min(aabbProjMin, proj);
+                aabbProjMax = std::max(aabbProjMax, proj);
+            }
+            
+            // 分離軸判定
+            if (aabbProjMax < obbProjMin || obbProjMax < aabbProjMin) {
+                return false;
+            }
+        }
+        
+        // 外積の9軸でテスト（AABBの3軸 × OBBの3軸）
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                Vector3 axis = Cross(aabbAxes[i], obb.orientation[j]);
+                
+                float axisLengthSq = axis.x * axis.x + axis.y * axis.y + axis.z * axis.z;
+                if (axisLengthSq < 0.0001f) continue; // 平行な軸はスキップ
+                
+                Vector3 normalizedAxis = axis.Normalized();
+                
+                // AABBの投影範囲
+                Vector3 aabbVertices[8] = {
+                    { aabbMin.x, aabbMin.y, aabbMin.z },
+                    { aabbMax.x, aabbMin.y, aabbMin.z },
+                    { aabbMax.x, aabbMax.y, aabbMin.z },
+                    { aabbMin.x, aabbMax.y, aabbMin.z },
+                    { aabbMin.x, aabbMin.y, aabbMax.z },
+                    { aabbMax.x, aabbMin.y, aabbMax.z },
+                    { aabbMax.x, aabbMax.y, aabbMax.z },
+                    { aabbMin.x, aabbMax.y, aabbMax.z }
+                };
+                
+                float aabbProjMin = FLT_MAX;
+                float aabbProjMax = -FLT_MAX;
+                for (int k = 0; k < 8; ++k) {
+                    float proj = Dot(aabbVertices[k], normalizedAxis);
+                    aabbProjMin = std::min(aabbProjMin, proj);
+                    aabbProjMax = std::max(aabbProjMax, proj);
+                }
+                
+                // OBBの投影範囲
+                float obbProjMin, obbProjMax;
+                Detail::GetProjectionRange(obb, normalizedAxis, obbProjMin, obbProjMax);
+                
+                // 分離軸判定
+                if (aabbProjMax < obbProjMin || obbProjMax < aabbProjMin) {
+                    return false;
+                }
+            }
+        }
+        
+        // すべての軸で分離していない = 衝突している
+        return true;
     }
 
     /// <summary>
@@ -202,39 +316,35 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const OBB& obb, const Sphere& sphere)
     {
+        Vector3 center = obb.center;
+        
         // 球の中心をOBBのローカル座標系に変換
         Vector3 centerDiff = {
-            sphere.center.x - obb.center.x,
-            sphere.center.y - obb.center.y,
-            sphere.center.z - obb.center.z
+            sphere.center.x - center.x,
+            sphere.center.y - center.y,
+            sphere.center.z - center.z
         };
 
         // OBBの各軸に投影してローカル座標を求める
         Vector3 localCenter = {
-            centerDiff * obb.orientation[0],
-            centerDiff * obb.orientation[1],
-            centerDiff * obb.orientation[2]
+            Dot(centerDiff, obb.orientation[0]),
+            Dot(centerDiff, obb.orientation[1]),
+            Dot(centerDiff, obb.orientation[2])
         };
 
-        // OBBのローカル空間での半サイズ
-        Vector3 halfSize = {
-            obb.size.x * 0.5f,
-            obb.size.y * 0.5f,
-            obb.size.z * 0.5f
-        };
-
-        // ローカル空間での最近点を求める（AABB判定と同じロジック）
+        // ローカル空間での最近点を求める（min/maxの範囲でクランプ）
+        // min/maxはcenterからのオフセットなので、そのまま範囲として使用
         Vector3 closestLocal = {
-            std::clamp(localCenter.x, -halfSize.x, halfSize.x),
-            std::clamp(localCenter.y, -halfSize.y, halfSize.y),
-            std::clamp(localCenter.z, -halfSize.z, halfSize.z)
+            std::clamp(localCenter.x, obb.min.x, obb.max.x),
+            std::clamp(localCenter.y, obb.min.y, obb.max.y),
+            std::clamp(localCenter.z, obb.min.z, obb.max.z)
         };
 
         // 最近点をワールド座標に戻す
         Vector3 closestWorld = {
-            obb.center.x + closestLocal.x * obb.orientation[0].x + closestLocal.y * obb.orientation[1].x + closestLocal.z * obb.orientation[2].x,
-            obb.center.y + closestLocal.x * obb.orientation[0].y + closestLocal.y * obb.orientation[1].y + closestLocal.z * obb.orientation[2].y,
-            obb.center.z + closestLocal.x * obb.orientation[0].z + closestLocal.y * obb.orientation[1].z + closestLocal.z * obb.orientation[2].z
+            center.x + obb.orientation[0].x * closestLocal.x + obb.orientation[1].x * closestLocal.y + obb.orientation[2].x * closestLocal.z,
+            center.y + obb.orientation[0].y * closestLocal.x + obb.orientation[1].y * closestLocal.y + obb.orientation[2].y * closestLocal.z,
+            center.z + obb.orientation[0].z * closestLocal.x + obb.orientation[1].z * closestLocal.y + obb.orientation[2].z * closestLocal.z
         };
 
         // 球の中心と最近点の距離の2乗を計算
@@ -271,59 +381,35 @@ namespace Collision
 
         // 楕円球体の各軸に投影してローカル座標を求める
         Vector3 localCenter = {
-            centerDiff * ovalSphere.orientation[0],
-            centerDiff * ovalSphere.orientation[1],
-            centerDiff * ovalSphere.orientation[2]
+            Dot(centerDiff, ovalSphere.orientation[0]),
+            Dot(centerDiff, ovalSphere.orientation[1]),
+            Dot(centerDiff, ovalSphere.orientation[2])
         };
 
-        // ローカル座標系で楕円座標系に変換（各軸を半径で正規化）
-        Vector3 normalizedDiff = {
-            localCenter.x / ovalSphere.radius.x,
-            localCenter.y / ovalSphere.radius.y,
-            localCenter.z / ovalSphere.radius.z
+        // ローカル空間での最近点を求める（min/maxの範囲でクランプ）
+        Vector3 closestLocal = {
+            std::clamp(localCenter.x, -ovalSphere.radius.x, ovalSphere.radius.x),
+            std::clamp(localCenter.y, -ovalSphere.radius.y, ovalSphere.radius.y),
+            std::clamp(localCenter.z, -ovalSphere.radius.z, ovalSphere.radius.z)
         };
 
-        // 正規化された空間での距離
-        float normalizedDistance = std::sqrt(normalizedDiff.x * normalizedDiff.x + 
-                                           normalizedDiff.y * normalizedDiff.y + 
-                                           normalizedDiff.z * normalizedDiff.z);
-
-        // 楕円球体表面への最近点を正規化空間で計算
-        if (normalizedDistance < 0.0001f) {
-            // 球の中心が楕円の中心と同じ場合は必ず衝突
-            return true;
-        }
-
-        Vector3 normalizedSurfacePoint = {
-            normalizedDiff.x / normalizedDistance,
-            normalizedDiff.y / normalizedDistance,
-            normalizedDiff.z / normalizedDistance
-        };
-
-        // 楕円表面の点をローカル座標に戻す
-        Vector3 localSurfacePoint = {
-            normalizedSurfacePoint.x * ovalSphere.radius.x,
-            normalizedSurfacePoint.y * ovalSphere.radius.y,
-            normalizedSurfacePoint.z * ovalSphere.radius.z
-        };
-
-        // ローカル座標からワールド座標に変換
-        Vector3 surfacePoint = {
-            ovalSphere.center.x + localSurfacePoint.x * ovalSphere.orientation[0].x + localSurfacePoint.y * ovalSphere.orientation[1].x + localSurfacePoint.z * ovalSphere.orientation[2].x,
-            ovalSphere.center.y + localSurfacePoint.x * ovalSphere.orientation[0].y + localSurfacePoint.y * ovalSphere.orientation[1].y + localSurfacePoint.z * ovalSphere.orientation[2].y,
-            ovalSphere.center.z + localSurfacePoint.x * ovalSphere.orientation[0].z + localSurfacePoint.y * ovalSphere.orientation[1].z + localSurfacePoint.z * ovalSphere.orientation[2].z
+        // 最近点をワールド座標に戻す
+        Vector3 closestWorld = {
+            ovalSphere.center.x + ovalSphere.orientation[0].x * closestLocal.x + ovalSphere.orientation[1].x * closestLocal.y + ovalSphere.orientation[2].x * closestLocal.z,
+            ovalSphere.center.y + ovalSphere.orientation[0].y * closestLocal.x + ovalSphere.orientation[1].y * closestLocal.y + ovalSphere.orientation[2].y * closestLocal.z,
+            ovalSphere.center.z + ovalSphere.orientation[0].z * closestLocal.x + ovalSphere.orientation[1].z * closestLocal.y + ovalSphere.orientation[2].z * closestLocal.z
         };
 
         // 球の中心から楕円表面の最近点までの距離
         Vector3 surfaceDiff = {
-            sphere.center.x - surfacePoint.x,
-            sphere.center.y - surfacePoint.y,
-            sphere.center.z - surfacePoint.z
+            sphere.center.x - closestWorld.x,
+            sphere.center.y - closestWorld.y,
+            sphere.center.z - closestWorld.z
         };
 
-        float surfaceDistanceSq = surfaceDiff.x * surfaceDiff.x + 
-                                 surfaceDiff.y * surfaceDiff.y + 
-                                 surfaceDiff.z * surfaceDiff.z;
+        float surfaceDistanceSq = surfaceDiff.x * surfaceDiff.x +
+            surfaceDiff.y * surfaceDiff.y +
+            surfaceDiff.z * surfaceDiff.z;
 
         return surfaceDistanceSq <= (sphere.radius * sphere.radius);
     }
@@ -342,17 +428,8 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const OvalSphere& ovalSphere, const AABB& aabb)
     {
-        // AABBのmin/max計算
-        Vector3 aabbMin = {
-            aabb.center.x - aabb.size.x * 0.5f,
-            aabb.center.y - aabb.size.y * 0.5f,
-            aabb.center.z - aabb.size.z * 0.5f
-        };
-        Vector3 aabbMax = {
-            aabb.center.x + aabb.size.x * 0.5f,
-            aabb.center.y + aabb.size.y * 0.5f,
-            aabb.center.z + aabb.size.z * 0.5f
-        };
+        Vector3 aabbMin = aabb.GetWorldMin();
+        Vector3 aabbMax = aabb.GetWorldMax();
 
         // AABBに対する楕円球体の中心の最近点を求める
         Vector3 closestPoint = {
@@ -370,9 +447,9 @@ namespace Collision
 
         // 差分を楕円球体のローカル座標系に変換
         Vector3 localDiff = {
-            diff * ovalSphere.orientation[0],
-            diff * ovalSphere.orientation[1],
-            diff * ovalSphere.orientation[2]
+            Dot(diff, ovalSphere.orientation[0]),
+            Dot(diff, ovalSphere.orientation[1]),
+            Dot(diff, ovalSphere.orientation[2])
         };
 
         // 楕円の方程式で判定: (x/a)² + (y/b)² + (z/c)² <= 1
@@ -397,39 +474,35 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const OvalSphere& ovalSphere, const OBB& obb)
     {
-        // OBBのローカル空間での半サイズ
-        Vector3 halfSize = {
-            obb.size.x * 0.5f,
-            obb.size.y * 0.5f,
-            obb.size.z * 0.5f
-        };
-
+        Vector3 center = obb.center;
+        
         // 楕円球体の中心をOBBのローカル座標系に変換
         Vector3 centerDiff = {
-            ovalSphere.center.x - obb.center.x,
-            ovalSphere.center.y - obb.center.y,
-            ovalSphere.center.z - obb.center.z
+            ovalSphere.center.x - center.x,
+            ovalSphere.center.y - center.y,
+            ovalSphere.center.z - center.z
         };
 
         // OBBの各軸に投影してローカル座標を求める
         Vector3 localOvalCenter = {
-            centerDiff * obb.orientation[0],
-            centerDiff * obb.orientation[1],
-            centerDiff * obb.orientation[2]
+            Dot(centerDiff, obb.orientation[0]),
+            Dot(centerDiff, obb.orientation[1]),
+            Dot(centerDiff, obb.orientation[2])
         };
 
-        // ローカル空間での最近点を求める
+        // ローカル空間での最近点を求める（min/maxの範囲でクランプ）
+        // min/maxはcenterからのオフセットなので、そのまま範囲として使用
         Vector3 closestLocal = {
-            std::clamp(localOvalCenter.x, -halfSize.x, halfSize.x),
-            std::clamp(localOvalCenter.y, -halfSize.y, halfSize.y),
-            std::clamp(localOvalCenter.z, -halfSize.z, halfSize.z)
+            std::clamp(localOvalCenter.x, obb.min.x, obb.max.x),
+            std::clamp(localOvalCenter.y, obb.min.y, obb.max.y),
+            std::clamp(localOvalCenter.z, obb.min.z, obb.max.z)
         };
 
         // 最近点をワールド座標に戻す
         Vector3 closestWorld = {
-            obb.center.x + closestLocal.x * obb.orientation[0].x + closestLocal.y * obb.orientation[1].x + closestLocal.z * obb.orientation[2].x,
-            obb.center.y + closestLocal.x * obb.orientation[0].y + closestLocal.y * obb.orientation[1].y + closestLocal.z * obb.orientation[2].y,
-            obb.center.z + closestLocal.x * obb.orientation[0].z + closestLocal.y * obb.orientation[1].z + closestLocal.z * obb.orientation[2].z
+            center.x + obb.orientation[0].x * closestLocal.x + obb.orientation[1].x * closestLocal.y + obb.orientation[2].x * closestLocal.z,
+            center.y + obb.orientation[0].y * closestLocal.x + obb.orientation[1].y * closestLocal.y + obb.orientation[2].y * closestLocal.z,
+            center.z + obb.orientation[0].z * closestLocal.x + obb.orientation[1].z * closestLocal.y + obb.orientation[2].z * closestLocal.z
         };
 
         // 楕円球体の中心から最近点への差分
@@ -441,9 +514,9 @@ namespace Collision
 
         // 差分を楕円球体のローカル座標系に変換
         Vector3 localDiff = {
-            diff * ovalSphere.orientation[0],
-            diff * ovalSphere.orientation[1],
-            diff * ovalSphere.orientation[2]
+            Dot(diff, ovalSphere.orientation[0]),
+            Dot(diff, ovalSphere.orientation[1]),
+            Dot(diff, ovalSphere.orientation[2])
         };
 
         // 楕円の方程式で判定: (x/a)² + (y/b)² + (z/c)² <= 1
@@ -477,9 +550,9 @@ namespace Collision
 
         // 楕円球体Aのローカル座標系での距離を計算
         Vector3 localDiffA = {
-            diff * a.orientation[0],
-            diff * a.orientation[1],
-            diff * a.orientation[2]
+            Dot(diff, a.orientation[0]),
+            Dot(diff, a.orientation[1]),
+            Dot(diff, a.orientation[2])
         };
 
         // 楕円球体Bのローカル座標系での距離を計算（逆方向）
@@ -490,9 +563,9 @@ namespace Collision
         };
 
         Vector3 localDiffB = {
-            diffInverse * b.orientation[0],
-            diffInverse * b.orientation[1],
-            diffInverse * b.orientation[2]
+            Dot(diffInverse, b.orientation[0]),
+            Dot(diffInverse, b.orientation[1]),
+            Dot(diffInverse, b.orientation[2])
         };
 
         // 各楕円体のローカル空間での正規化距離
@@ -519,7 +592,7 @@ namespace Collision
     inline bool IsHit(const Plane& plane, const Sphere& sphere)
     {
         // 正規化された法線を使用
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         
         // 球の中心から平面中心への差分ベクトル
         Vector3 centerToPlane = {
@@ -529,7 +602,7 @@ namespace Collision
         };
         
         // 平面への垂直距離
-        float normalDistance = centerToPlane * normal;
+        float normalDistance = Dot(centerToPlane, normal);
         
         // 法線方向の距離が球の半径より大きい場合は衝突しない
         if (std::abs(normalDistance) > sphere.radius) {
@@ -546,12 +619,12 @@ namespace Collision
         // 平面の接線ベクトルを計算
         Vector3 tangent;
         if (std::abs(normal.x) < 0.9f) {
-            tangent = normal ^ Vector3{ 1.0f, 0.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 1.0f, 0.0f, 0.0f });
         } else {
-            tangent = normal ^ Vector3{ 0.0f, 1.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 0.0f, 1.0f, 0.0f });
         }
-        tangent = tangent.Normalize();
-        Vector3 bitangent = (normal ^ tangent).Normalize();
+        tangent = tangent.Normalized();
+        Vector3 bitangent = Cross(normal, tangent).Normalized();
         
         // 投影点から平面中心への差分を平面の座標系で表現
         Vector3 diff = {
@@ -560,8 +633,8 @@ namespace Collision
             projectedPoint.z - plane.center.z
         };
         
-        float u = diff * tangent;
-        float v = diff * bitangent;
+        float u = Dot(diff, tangent);
+        float v = Dot(diff, bitangent);
         
         // 平面の範囲内にあるかチェック（正方形の範囲）
         float halfSize = plane.size * 0.5f;
@@ -603,30 +676,31 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Plane& plane, const AABB& aabb)
     {
-        Vector3 normal = plane.normal.Normalize();
-        Vector3 halfSize = { aabb.size.x * 0.5f, aabb.size.y * 0.5f, aabb.size.z * 0.5f };
+        Vector3 normal = plane.normal.Normalized();
+        Vector3 aabbMin = aabb.GetWorldMin();
+        Vector3 aabbMax = aabb.GetWorldMax();
         
         // AABBの8頂点を生成
         Vector3 vertices[8] = {
-            { aabb.center.x - halfSize.x, aabb.center.y - halfSize.y, aabb.center.z - halfSize.z },
-            { aabb.center.x + halfSize.x, aabb.center.y - halfSize.y, aabb.center.z - halfSize.z },
-            { aabb.center.x + halfSize.x, aabb.center.y + halfSize.y, aabb.center.z - halfSize.z },
-            { aabb.center.x - halfSize.x, aabb.center.y + halfSize.y, aabb.center.z - halfSize.z },
-            { aabb.center.x - halfSize.x, aabb.center.y - halfSize.y, aabb.center.z + halfSize.z },
-            { aabb.center.x + halfSize.x, aabb.center.y - halfSize.y, aabb.center.z + halfSize.z },
-            { aabb.center.x + halfSize.x, aabb.center.y + halfSize.y, aabb.center.z + halfSize.z },
-            { aabb.center.x - halfSize.x, aabb.center.y + halfSize.y, aabb.center.z + halfSize.z }
+            { aabbMin.x, aabbMin.y, aabbMin.z },
+            { aabbMax.x, aabbMin.y, aabbMin.z },
+            { aabbMax.x, aabbMax.y, aabbMin.z },
+            { aabbMin.x, aabbMax.y, aabbMin.z },
+            { aabbMin.x, aabbMin.y, aabbMax.z },
+            { aabbMax.x, aabbMin.y, aabbMax.z },
+            { aabbMax.x, aabbMax.y, aabbMax.z },
+            { aabbMin.x, aabbMax.y, aabbMax.z }
         };
         
         // 平面の接線ベクトルを計算
         Vector3 tangent;
         if (std::abs(normal.x) < 0.9f) {
-            tangent = normal ^ Vector3{ 1.0f, 0.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 1.0f, 0.0f, 0.0f });
         } else {
-            tangent = normal ^ Vector3{ 0.0f, 1.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 0.0f, 1.0f, 0.0f });
         }
-        tangent = tangent.Normalize();
-        Vector3 bitangent = (normal ^ tangent).Normalize();
+        tangent = tangent.Normalized();
+        Vector3 bitangent = Cross(normal, tangent).Normalized();
         
         float planeHalfSize = plane.size * 0.5f;
         
@@ -642,9 +716,9 @@ namespace Collision
                 vertices[i].z - plane.center.z
             };
             
-            float normalDist = toVertex * normal;
-            float u = toVertex * tangent;
-            float v = toVertex * bitangent;
+            float normalDist = Dot(toVertex, normal);
+            float u = Dot(toVertex, tangent);
+            float v = Dot(toVertex, bitangent);
             
             // 平面の範囲内にあるかチェック
             if (std::abs(u) <= planeHalfSize && std::abs(v) <= planeHalfSize) {
@@ -672,39 +746,40 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Plane& plane, const OBB& obb)
     {
-        Vector3 normal = plane.normal.Normalize();
-        Vector3 halfSize = { obb.size.x * 0.5f, obb.size.y * 0.5f, obb.size.z * 0.5f };
+        Vector3 normal = plane.normal.Normalized();
+        Vector3 center = obb.center;
         
-        // OBBの8頂点を生成
+        // OBBの8頂点を生成（min/maxのローカルオフセットから）
+        // min/maxはcenterからのオフセットなので、そのまま使用
         Vector3 localVertices[8] = {
-            { -halfSize.x, -halfSize.y, -halfSize.z },
-            {  halfSize.x, -halfSize.y, -halfSize.z },
-            {  halfSize.x,  halfSize.y, -halfSize.z },
-            { -halfSize.x,  halfSize.y, -halfSize.z },
-            { -halfSize.x, -halfSize.y,  halfSize.z },
-            {  halfSize.x, -halfSize.y,  halfSize.z },
-            {  halfSize.x,  halfSize.y,  halfSize.z },
-            { -halfSize.x,  halfSize.y,  halfSize.z }
+            { obb.min.x, obb.min.y, obb.min.z },
+            { obb.max.x, obb.min.y, obb.min.z },
+            { obb.max.x, obb.max.y, obb.min.z },
+            { obb.min.x, obb.max.y, obb.min.z },
+            { obb.min.x, obb.min.y, obb.max.z },
+            { obb.max.x, obb.min.y, obb.max.z },
+            { obb.max.x, obb.max.y, obb.max.z },
+            { obb.min.x, obb.max.y, obb.max.z }
         };
         
         Vector3 worldVertices[8];
         for (int i = 0; i < 8; ++i) {
             worldVertices[i] = {
-                obb.center.x + localVertices[i].x * obb.orientation[0].x + localVertices[i].y * obb.orientation[1].x + localVertices[i].z * obb.orientation[2].x,
-                obb.center.y + localVertices[i].x * obb.orientation[0].y + localVertices[i].y * obb.orientation[1].y + localVertices[i].z * obb.orientation[2].y,
-                obb.center.z + localVertices[i].x * obb.orientation[0].z + localVertices[i].y * obb.orientation[1].z + localVertices[i].z * obb.orientation[2].z
+                center.x + obb.orientation[0].x * localVertices[i].x + obb.orientation[1].x * localVertices[i].y + obb.orientation[2].x * localVertices[i].z,
+                center.y + obb.orientation[0].y * localVertices[i].x + obb.orientation[1].y * localVertices[i].y + obb.orientation[2].y * localVertices[i].z,
+                center.z + obb.orientation[0].z * localVertices[i].x + obb.orientation[1].z * localVertices[i].y + obb.orientation[2].z * localVertices[i].z
             };
         }
         
         // 平面の接線ベクトルを計算
         Vector3 tangent;
         if (std::abs(normal.x) < 0.9f) {
-            tangent = normal ^ Vector3{ 1.0f, 0.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 1.0f, 0.0f, 0.0f });
         } else {
-            tangent = normal ^ Vector3{ 0.0f, 1.0f, 0.0f };
+            tangent = Cross(normal, Vector3{ 0.0f, 1.0f, 0.0f });
         }
-        tangent = tangent.Normalize();
-        Vector3 bitangent = (normal ^ tangent).Normalize();
+        tangent = tangent.Normalized();
+        Vector3 bitangent = Cross(normal, tangent).Normalized();
         
         float planeHalfSize = plane.size * 0.5f;
         
@@ -720,9 +795,9 @@ namespace Collision
                 worldVertices[i].z - plane.center.z
             };
             
-            float normalDist = toVertex * normal;
-            float u = toVertex * tangent;
-            float v = toVertex * bitangent;
+            float normalDist = Dot(toVertex, normal);
+            float u = Dot(toVertex, tangent);
+            float v = Dot(toVertex, bitangent);
             
             // 平面の範囲内にあるかチェック
             if (std::abs(u) <= planeHalfSize && std::abs(v) <= planeHalfSize) {
@@ -732,7 +807,7 @@ namespace Collision
             }
         }
         
-        // 範囲内に頂点があり、かつ平面の両側に頂点がある場合は衝突
+        // 範囲内に頂Vertexがあり、かつ平面の両側に頂Vertexがある場合は衝突
         return hasInRange && (hasPositive && hasNegative);
     }
 
@@ -789,16 +864,8 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Segment& segment, const AABB& aabb)
     {
-        Vector3 aabbMin = {
-            aabb.center.x - aabb.size.x * 0.5f,
-            aabb.center.y - aabb.size.y * 0.5f,
-            aabb.center.z - aabb.size.z * 0.5f
-        };
-        Vector3 aabbMax = {
-            aabb.center.x + aabb.size.x * 0.5f,
-            aabb.center.y + aabb.size.y * 0.5f,
-            aabb.center.z + aabb.size.z * 0.5f
-        };
+        Vector3 aabbMin = aabb.GetWorldMin();
+        Vector3 aabbMax = aabb.GetWorldMax();
         
         Vector3 segEnd = {
             segment.origin.x + segment.diff.x,
@@ -857,7 +924,7 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Segment& segment, const Plane& plane)
     {
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         
         Vector3 segEnd = {
             segment.origin.x + segment.diff.x,
@@ -877,10 +944,10 @@ namespace Collision
             segEnd.z - plane.center.z
         };
         
-        float startDist = startToPlane * normal;
-        float endDist = endToPlane * normal;
+        float startDist = Dot(startToPlane, normal);
+        float endDist = Dot(endToPlane, normal);
         
-        // 始点と終点が平面の反対側にあれば交差
+        // 始点と終点が平面の反対側にあえば交差
         return (startDist * endDist) <= 0.0f;
     }
 
@@ -919,7 +986,7 @@ namespace Collision
         }
         
         // 直線上の最近点（制限なし）
-        float t = (toSphere * lineVec) / lineLengthSq;
+        float t = Dot(toSphere, lineVec) / lineLengthSq;
         Vector3 closestPoint = {
             line.start.x + lineVec.x * t,
             line.start.y + lineVec.y * t,
@@ -950,7 +1017,7 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Line& line, const Plane& plane)
     {
-        Vector3 normal = plane.normal.Normalize();
+        Vector3 normal = plane.normal.Normalized();
         
         Vector3 lineVec = {
             line.end.x - line.start.x,
@@ -958,7 +1025,7 @@ namespace Collision
             line.end.z - line.start.z
         };
         
-        float dotProduct = lineVec * normal;
+        float dotProduct = Dot(lineVec, normal);
         
         // 直線が平面に平行な場合
         if (std::abs(dotProduct) < 0.0001f) {
@@ -968,7 +1035,7 @@ namespace Collision
                 line.start.y - plane.center.y,
                 line.start.z - plane.center.z
             };
-            return std::abs(startToPlane * normal) < 0.0001f;
+            return std::abs(Dot(startToPlane, normal)) < 0.0001f;
         }
         
         // 直線は必ず平面と交差する（平行でない限り）
@@ -981,5 +1048,13 @@ namespace Collision
     inline bool IsHit(const Plane& plane, const Line& line)
     {
         return IsHit(line, plane);
+    }
+
+    /// <summary>
+    /// OBB × AABB 判定（呼び出し順反転のラッパ）
+    /// </summary>
+    inline bool IsHit(const OBB& obb, const AABB& aabb)
+    {
+        return IsHit(aabb, obb);
     }
 }

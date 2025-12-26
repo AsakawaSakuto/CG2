@@ -122,19 +122,10 @@ void Line3d::AddBox(const Vector3& center, const Vector3& size, const Vector4& c
 }
 
 void Line3d::AddBox(const AABB& aabb, const Vector4& color) {
-    // centerとsizeからワールド座標のminとmaxを計算
-    Vector3 worldMin = { 
-        aabb.center.x - aabb.size.x * 0.5f, 
-        aabb.center.y - aabb.size.y * 0.5f, 
-        aabb.center.z - aabb.size.z * 0.5f 
-    };
-    Vector3 worldMax = { 
-        aabb.center.x + aabb.size.x * 0.5f, 
-        aabb.center.y + aabb.size.y * 0.5f, 
-        aabb.center.z + aabb.size.z * 0.5f 
-    };
+    // AABBのワールド座標のmin/maxから8つの頂点を定義
+    Vector3 worldMin = aabb.GetWorldMin();
+    Vector3 worldMax = aabb.GetWorldMax();
     
-    // AABBのmin/maxから8つの頂点を定義
     Vector3 vertices[8] = {
         { worldMin.x, worldMin.y, worldMin.z }, // 0: 左下前
         { worldMax.x, worldMin.y, worldMin.z }, // 1: 右下前
@@ -167,18 +158,18 @@ void Line3d::AddBox(const AABB& aabb, const Vector4& color) {
 
 void Line3d::AddBox(const OBB& obb, const Vector4& color) {
     // OBBのローカル座標系での8つの頂点を計算
-    Vector3 halfSize = { obb.size.x * 0.5f, obb.size.y * 0.5f, obb.size.z * 0.5f };
+    Vector3 center = obb.center;
     
-    // ローカル座標系での8つのコーナー（中心を原点とする）
+    // ローカル座標系での8つのコーナー（min/maxのローカルオフセットから直接生成）
     Vector3 localVertices[8] = {
-        { -halfSize.x, -halfSize.y, -halfSize.z }, // 0: 左下前
-        {  halfSize.x, -halfSize.y, -halfSize.z }, // 1: 右下前
-        {  halfSize.x,  halfSize.y, -halfSize.z }, // 2: 右上前
-        { -halfSize.x,  halfSize.y, -halfSize.z }, // 3: 左上前
-        { -halfSize.x, -halfSize.y,  halfSize.z }, // 4: 左下奥
-        {  halfSize.x, -halfSize.y,  halfSize.z }, // 5: 右下奥
-        {  halfSize.x,  halfSize.y,  halfSize.z }, // 6: 右上奥
-        { -halfSize.x,  halfSize.y,  halfSize.z }  // 7: 左上奥
+        { obb.min.x, obb.min.y, obb.min.z }, // 0: 左下前
+        { obb.max.x, obb.min.y, obb.min.z }, // 1: 右下前
+        { obb.max.x, obb.max.y, obb.min.z }, // 2: 右上前
+        { obb.min.x, obb.max.y, obb.min.z }, // 3: 左上前
+        { obb.min.x, obb.min.y, obb.max.z }, // 4: 左下奥
+        { obb.max.x, obb.min.y, obb.max.z }, // 5: 右下奥
+        { obb.max.x, obb.max.y, obb.max.z }, // 6: 右上奥
+        { obb.min.x, obb.max.y, obb.max.z }  // 7: 左上奥
     };
     
     // ワールド座標系へ変換（orientation行列を使用して回転し、centerで平行移動）
@@ -186,9 +177,9 @@ void Line3d::AddBox(const OBB& obb, const Vector4& color) {
     for (int i = 0; i < 8; ++i) {
         // orientation[0], orientation[1], orientation[2]はそれぞれX, Y, Z軸の基底ベクトル
         worldVertices[i] = {
-            obb.center.x + localVertices[i].x * obb.orientation[0].x + localVertices[i].y * obb.orientation[1].x + localVertices[i].z * obb.orientation[2].x,
-            obb.center.y + localVertices[i].x * obb.orientation[0].y + localVertices[i].y * obb.orientation[1].y + localVertices[i].z * obb.orientation[2].y,
-            obb.center.z + localVertices[i].x * obb.orientation[0].z + localVertices[i].y * obb.orientation[1].z + localVertices[i].z * obb.orientation[2].z
+            center.x + localVertices[i].x * obb.orientation[0].x + localVertices[i].y * obb.orientation[1].x + localVertices[i].z * obb.orientation[2].x,
+            center.y + localVertices[i].x * obb.orientation[0].y + localVertices[i].y * obb.orientation[1].y + localVertices[i].z * obb.orientation[2].y,
+            center.z + localVertices[i].x * obb.orientation[0].z + localVertices[i].y * obb.orientation[1].z + localVertices[i].z * obb.orientation[2].z
         };
     }
     

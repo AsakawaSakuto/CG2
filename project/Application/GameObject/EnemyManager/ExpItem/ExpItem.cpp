@@ -13,7 +13,7 @@ void ExpItem::Initialize() {
 
 void ExpItem::Update() {
 
-	transform_.scale = Easing::Lerp(
+	transform_.scale = MyEasing::Lerp(
 		Vector3({0.0f,0.0f,0.0f}), Vector3({ 0.5f,0.5f,0.5f }),
 		scaleTimer_.GetProgress(), EaseType::EaseOutBack);
 
