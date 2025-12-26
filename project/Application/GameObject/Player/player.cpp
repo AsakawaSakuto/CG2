@@ -28,10 +28,12 @@ void Player::Initialize() {
 	status_.currentExp_ = 0;
 	status_.level_ = 1;
 
-	// AABBの初期化（ローカルオフセットを設定）
-	// 中心から見て、下方向に0.0f、上方向に2.0f伸びる
-	mapCollosion_.min = { -0.5f, 0.0f, -0.5f }; 
-	mapCollosion_.max = { 0.5f, 2.0f, 0.5f };
+	// AABBの初期化（新仕様: center + min/maxのローカルオフセット）
+	// center は transform_.translate で毎フレーム更新されるため、ここでは初期化不要
+	// min/max はローカル空間でのオフセットとして設定
+	mapCollosion_.center = { 0.0f, 0.0f, 0.0f }; // 初期値（Update()で更新される）
+	mapCollosion_.min = { -0.5f, 0.0f, -0.5f }; // centerからのローカルオフセット
+	mapCollosion_.max = { 0.5f, 2.0f, 0.5f };   // centerからのローカルオフセット
 }
 
 void Player::Update() {
@@ -39,8 +41,10 @@ void Player::Update() {
 	Move();
 	Jump();
 
-	// AABBの中心をプレイヤーの位置に設定（超シンプル！）
+	// OBBの中心をプレイヤーの位置に設定
 	mapCollosion_.center = transform_.translate;
+	mapCollosion_.rotate = transform_.rotate;
+	mapCollosion_.UpdateOrientation();
 	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
 
 	directionToEnemy_ = GetDirectionToEnemy();
