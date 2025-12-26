@@ -35,10 +35,10 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const AABB& a, const AABB& b)
     {
-        Vector3 aMin = a.GetWorldMin();
-        Vector3 aMax = a.GetWorldMax();
-        Vector3 bMin = b.GetWorldMin();
-        Vector3 bMax = b.GetWorldMax();
+        Vector3 aMin = a.center + a.min;
+        Vector3 aMax = a.center + a.max;
+        Vector3 bMin = b.center + b.min;
+        Vector3 bMax = b.center + b.max;
         
         // 各軸で分離していなければ衝突
         return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
@@ -51,8 +51,8 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Sphere& sphere, const AABB& box)
     {
-        Vector3 boxMin = box.GetWorldMin();
-        Vector3 boxMax = box.GetWorldMax();
+        Vector3 boxMin = box.center + box.min;
+        Vector3 boxMax = box.center + box.max;
         
         // AABB内でSphere.centerに最も近い点を求める
         Vector3 closestPoint;
@@ -214,8 +214,8 @@ namespace Collision
         };
         
         // AABBのワールド座標での範囲
-        Vector3 aabbMin = aabb.GetWorldMin();
-        Vector3 aabbMax = aabb.GetWorldMax();
+        Vector3 aabbMin = aabb.center + aabb.min;
+        Vector3 aabbMax = aabb.center + aabb.max;
         
         // AABBの各軸での投影テスト
         for (int i = 0; i < 3; ++i) {
@@ -428,8 +428,8 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const OvalSphere& ovalSphere, const AABB& aabb)
     {
-        Vector3 aabbMin = aabb.GetWorldMin();
-        Vector3 aabbMax = aabb.GetWorldMax();
+        Vector3 aabbMin = aabb.center + aabb.min;
+        Vector3 aabbMax = aabb.center + aabb.max;
 
         // AABBに対する楕円球体の中心の最近点を求める
         Vector3 closestPoint = {
@@ -677,8 +677,8 @@ namespace Collision
     inline bool IsHit(const Plane& plane, const AABB& aabb)
     {
         Vector3 normal = plane.normal.Normalized();
-        Vector3 aabbMin = aabb.GetWorldMin();
-        Vector3 aabbMax = aabb.GetWorldMax();
+        Vector3 aabbMin = aabb.center + aabb.min;
+        Vector3 aabbMax = aabb.center + aabb.max;
         
         // AABBの8頂点を生成
         Vector3 vertices[8] = {
@@ -864,8 +864,8 @@ namespace Collision
     /// </summary>
     inline bool IsHit(const Segment& segment, const AABB& aabb)
     {
-        Vector3 aabbMin = aabb.GetWorldMin();
-        Vector3 aabbMax = aabb.GetWorldMax();
+        Vector3 aabbMin = aabb.center + aabb.min;
+        Vector3 aabbMax = aabb.center + aabb.max;
         
         Vector3 segEnd = {
             segment.origin.x + segment.diff.x,
