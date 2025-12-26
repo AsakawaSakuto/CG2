@@ -175,6 +175,8 @@ void GameScene::Update() {
 	// ゲージの更新
 	hpGauge_->Update(player_->GetCurrentHP(), player_->GetMaxHP());
 	expGauge_->Update(player_->GetCurrentExp(), player_->GetExpToNextLevel());
+
+	map3D_->Update();
 }
 
 void GameScene::Draw() {

@@ -43,8 +43,6 @@ void Player::Update() {
 
 	// OBBの中心をプレイヤーの位置に設定
 	mapCollosion_.center = transform_.translate;
-	mapCollosion_.rotate = transform_.rotate;
-	mapCollosion_.UpdateOrientation();
 	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
 
 	directionToEnemy_ = GetDirectionToEnemy();

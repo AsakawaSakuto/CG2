@@ -1,21 +1,20 @@
 #include "Map3D.h"
 #include <algorithm>
+#include "3d/Line/MyDebugLine.h"
 
 // タイルタイプとモデルパスのマッピング
 const std::unordered_map<TileType, std::string> Map3D::kModelPaths_ = {
 	{ TileType::Normal, "MapBlock/NormalBlock.obj" },
-	// 今後の拡張用
-	// { TileType::Wall, "MapBlock/WallBlock.obj" },
-	// { TileType::Lava, "MapBlock/LavaBlock.obj" },
 };
 
 // タイルタイプごとのスケール設定（Blenderの半径1mキューブからの倍率）
 // Normalブロックは直径(10m, 5m, 10m) → 半径(5m, 2.5m, 5m) → スケール(5.0, 2.5, 5.0)
 const std::unordered_map<TileType, Vector3> Map3D::kTileScales_ = {
 	{ TileType::Normal, { 5.0f, 2.5f, 5.0f } },
-	// 今後の拡張用
-	// { TileType::Wall, { 1.0f, 3.0f, 1.0f } },
-	// { TileType::Lava, { 5.0f, 0.5f, 5.0f } },
+};
+
+const std::unordered_map<TileType, AABB> Map3D::kNormalAABB_ = {
+	{ TileType::Normal, AABB{ {0.0f, 0.0f, 0.0f}, {-5.0f, -2.5f, -5.0f}, {5.0f, 2.5f, 5.0f} } },
 };
 
 Map3D::Map3D(uint32_t width, uint32_t height, uint32_t depth)
@@ -35,6 +34,39 @@ Map3D::~Map3D() {
 
 void Map3D::Initialize() {
 	// 初期化時点では何もしない（SetTileで動的に生成）
+}
+
+void Map3D::Update() {
+	// ブロックの形状更新
+	BlockShapeUpdate();
+}
+
+void Map3D::BlockShapeUpdate() {
+	// 全ブロックを走査して描画
+	for (uint32_t z = 0; z < depth_; ++z) {
+		for (uint32_t y = 0; y < height_; ++y) {
+			for (uint32_t x = 0; x < width_; ++x) {
+				uint32_t index = ToIndex(x, y, z);
+				BlockData& block = blocks_[index];
+
+				if (block.type == TileType::Empty || !block.model) {
+					continue;
+				}
+
+				if (block.type == TileType::Normal) {
+					// Normalタイプのブロックに定義済みのAABBを設定
+					auto it = kNormalAABB_.find(TileType::Normal);
+					if (it != kNormalAABB_.end()) {
+						block.aabb = it->second;
+						// AABBの中心位置をブロックのワールド座標に設定
+						block.aabb.center = block.transform.translate;
+					}
+					
+					MyDebugLine::AddShape(block.aabb, { 1.0f, 0.0f, 0.0f, 1.0f });
+				}
+			}
+		}
+	}
 }
 
 void Map3D::Draw(Camera& camera) {

@@ -6,6 +6,7 @@
 #include "Math/Type/Vector3.h"
 #include "Utility/Transform/Transform.h"
 #include "3d/Model/Model.h"
+#include "Utility/Collision/Type/AABB.h"
 
 /// <summary>
 /// タイル種別の定義
@@ -26,6 +27,7 @@ struct BlockData {
 	TileType type = TileType::Empty;
 	std::unique_ptr<Model> model = nullptr;
 	Transform transform;
+	AABB aabb;
 };
 
 /// <summary>
@@ -121,6 +123,7 @@ public:
 	uint32_t GetHeight() const { return height_; }
 	uint32_t GetDepth() const { return depth_; }
 
+	void Update();
 private:
 	/// <summary>
 	/// 3D座標から1次元インデックスに変換
@@ -145,6 +148,7 @@ private:
 	/// </summary>
 	Vector3 GetScaleForTileType(TileType type) const;
 
+	void BlockShapeUpdate();
 private:
 	// マップサイズ
 	uint32_t width_;
@@ -162,4 +166,6 @@ private:
 	
 	// タイルタイプごとのスケール設定（半径1mのキューブからの倍率）
 	static const std::unordered_map<TileType, Vector3> kTileScales_;
+
+	static const std::unordered_map<TileType, AABB> kNormalAABB_;
 };
