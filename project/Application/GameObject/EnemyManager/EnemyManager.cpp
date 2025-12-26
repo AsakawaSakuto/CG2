@@ -12,7 +12,7 @@ void EnemyManager::Initialize() {
 
 void EnemyManager::Update() {
 	if (enemies_.size() < 50) {
-		spawnTimer_.Update();
+		//spawnTimer_.Update();
 
 		if (spawnTimer_.IsFinished()) {
 			auto enemy = std::make_unique<Enemy>();

@@ -12,6 +12,14 @@ struct AABB {
 	Vector3 min = { -0.5f, -0.5f, -0.5f }; // 最小点（ローカルオフセット）
 	Vector3 max = { 0.5f, 0.5f, 0.5f };    // 最大点（ローカルオフセット）
 
+	Vector3 GetMinWorld() const {
+		return center + min;
+	}
+
+	Vector3 GetMaxWorld() const {
+		return center + max;
+	}
+
 #ifdef USE_IMGUI
 	/// <summary>
 	/// AABBの値をImGuiで編集する

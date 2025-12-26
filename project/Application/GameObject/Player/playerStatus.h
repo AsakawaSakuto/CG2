@@ -20,7 +20,7 @@ struct PlayerStatus {
 	// 難易度
 	// .XP回収範囲
 	float moveSpeed_ = 5.0f;   // 移動速度
-	int jumpCanCount_ = 1;     // ジャンプ可能回数
+	int jumpCanCount_ = 100;     // ジャンプ可能回数
 	int currentJumpCount_ = 0; // 現在のジャンプ回数
 	float jumpPower_ = 8.0f;   // ジャンプ力
 	float velocity_Y_ = 0.0f;  // Y軸方向の速度
