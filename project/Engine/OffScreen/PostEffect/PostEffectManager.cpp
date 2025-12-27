@@ -319,8 +319,8 @@ void PostEffectManager::DrawImGui() {
         {
             ImGui::Text("Fog Settings");
             ImGui::ColorEdit3("Fog Color", params_.fog.fogColor);
-            ImGui::SliderFloat("Fog Start", &params_.fog.fogStart, 0.0f, 100.0f);
-            ImGui::SliderFloat("Fog End", &params_.fog.fogEnd, 0.0f, 100.0f);
+            ImGui::SliderFloat("Fog Start", &params_.fog.fogStart, 0.0f, 1000.0f);
+            ImGui::SliderFloat("Fog End", &params_.fog.fogEnd, 0.0f, 1000.0f);
             ImGui::SliderFloat("Fog Density", &params_.fog.fogDensity, 0.0f, 1.0f);
             if (ImGui::Button("Reset##Fog")) {
                 params_.fog.fogColor[0] = 0.7f;

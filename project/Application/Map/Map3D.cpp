@@ -5,16 +5,20 @@
 // タイルタイプとモデルパスのマッピング
 const std::unordered_map<TileType, std::string> Map3D::kModelPaths_ = {
 	{ TileType::Normal, "MapBlock/NormalBlock.obj" },
+	{ TileType::Slope, "MapBlock/SlopeBlock.obj" },  // スロープのモデルパス
 };
 
 // タイルタイプごとのスケール設定（Blenderの半径1mキューブからの倍率）
 // Normalブロックは直径(10m, 5m, 10m) → 半径(5m, 2.5m, 5m) → スケール(5.0, 2.5, 5.0)
 const std::unordered_map<TileType, Vector3> Map3D::kTileScales_ = {
 	{ TileType::Normal, { 5.0f, 2.5f, 5.0f } },
+	{ TileType::Slope, { 5.0f, 2.5f, 5.0f } },
 };
 
 const std::unordered_map<TileType, AABB> Map3D::kNormalAABB_ = {
-	{ TileType::Normal, AABB{ {0.0f, 0.0f, 0.0f}, {-5.0f, -2.5f, -5.0f}, {5.0f, 2.5f, 5.0f} } },
+	{ TileType::Normal, AABB{ {0.0f, 0.0f, 0.0f}, 
+	{-5.0f, -2.5f, -5.0f}, 
+	{ 5.0f,  2.5f,  5.0f} } },
 };
 
 Map3D::Map3D(uint32_t width, uint32_t height, uint32_t depth)
@@ -98,11 +102,13 @@ void Map3D::DrawImGui() {
 	// タイル数のカウント
 	uint32_t emptyCount = 0;
 	uint32_t normalCount = 0;
+	uint32_t slopeCount = 0;
 	for (const auto& block : blocks_) {
 		if (block.type == TileType::Empty) emptyCount++;
 		else if (block.type == TileType::Normal) normalCount++;
+		else if (block.type == TileType::Slope) slopeCount++;
 	}
-	ImGui::Text("Empty: %u, Normal: %u", emptyCount, normalCount);
+	ImGui::Text("Empty: %u, Normal: %u, Slope: %u", emptyCount, normalCount, slopeCount);
 	
 	ImGui::End();
 #endif
@@ -131,6 +137,114 @@ void Map3D::SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type) {
 	if (type != TileType::Empty) {
 		CreateBlockModel(x, y, z, type);
 	}
+}
+
+void Map3D::SetSlope(uint32_t x, uint32_t y, uint32_t z, SlopeDirection direction) {
+	uint32_t index = ToIndex(x, y, z);
+	BlockData& block = blocks_[index];
+
+	// 古いブロックを削除
+	if (block.type != TileType::Empty) {
+		DestroyBlock(x, y, z);
+	}
+
+	// スロープブロックを作成
+	block.type = TileType::Slope;
+	block.slopeDir = direction;
+	CreateBlockModel(x, y, z, TileType::Slope);
+
+	// スロープの向きに応じてモデルを回転
+	float rotationY = 0.0f;
+	switch (direction) {
+		case SlopeDirection::PlusX:  rotationY = 0.0f; break;           // 0度
+		case SlopeDirection::MinusX: rotationY = 3.14159265f; break;    // 180度
+		case SlopeDirection::PlusZ:  rotationY = -1.57079633f; break;   // -90度
+		case SlopeDirection::MinusZ: rotationY = 1.57079633f; break;    // 90度
+	}
+	block.transform.rotate.y = rotationY;
+}
+
+SlopeDirection Map3D::GetSlopeDirection(uint32_t x, uint32_t y, uint32_t z) const {
+	return blocks_[ToIndex(x, y, z)].slopeDir;
+}
+
+bool Map3D::GetSlopeHeight(const Vector3& worldPos, float& outY) const {
+	// ワールド座標からマップ座標を取得
+	uint32_t mx, my, mz;
+	if (!WorldToMap(worldPos, mx, my, mz)) {
+		return false;
+	}
+
+	// 該当セルがスロープでない場合は失敗
+	TileType tileType = GetTile(mx, my, mz);
+	if (tileType != TileType::Slope) {
+		return false;
+	}
+
+	// ブロックの中心座標を取得
+	Vector3 blockCenter = MapToWorld(mx, my, mz);
+	SlopeDirection dir = GetSlopeDirection(mx, my, mz);
+
+	// ブロックの半サイズ
+	float halfWidth = blockSize_.x * 0.5f;
+	float halfHeight = blockSize_.y;  // スロープは高さ全体を使用
+	float halfDepth = blockSize_.z * 0.5f;
+
+	// ブロック内のローカル座標を計算 (-0.5 ~ 0.5)
+	float localX = (worldPos.x - blockCenter.x) / blockSize_.x;
+	float localZ = (worldPos.z - blockCenter.z) / blockSize_.z;
+
+	// スロープの向きに応じて高さを計算
+	float heightRatio = 0.0f;  // 0.0 (底) ~ 1.0 (頂上)
+	bool isOnSlope = false;
+
+	switch (dir) {
+		case SlopeDirection::PlusX:
+			// X+ 方向に上る（X=-0.5で底、X=+0.5で頂上）
+			if (localX >= -0.5f && localX <= 0.5f && 
+			    localZ >= -0.5f && localZ <= 0.5f) {
+				heightRatio = (localX + 0.5f);  // 0.0 ~ 1.0
+				isOnSlope = true;
+			}
+			break;
+
+		case SlopeDirection::MinusX:
+			// X- 方向に上る（X=+0.5で底、X=-0.5で頂上）
+			if (localX >= -0.5f && localX <= 0.5f && 
+			    localZ >= -0.5f && localZ <= 0.5f) {
+				heightRatio = (0.5f - localX);  // 0.0 ~ 1.0
+				isOnSlope = true;
+			}
+			break;
+
+		case SlopeDirection::PlusZ:
+			// Z+ 方向に上る（Z=-0.5で底、Z=+0.5で頂上）
+			if (localX >= -0.5f && localX <= 0.5f && 
+			    localZ >= -0.5f && localZ <= 0.5f) {
+				heightRatio = (localZ + 0.5f);  // 0.0 ~ 1.0
+				isOnSlope = true;
+			}
+			break;
+
+		case SlopeDirection::MinusZ:
+			// Z- 方向に上る（Z=+0.5で底、Z=-0.5で頂上）
+			if (localX >= -0.5f && localX <= 0.5f && 
+			    localZ >= -0.5f && localZ <= 0.5f) {
+				heightRatio = (0.5f - localZ);  // 0.0 ~ 1.0
+				isOnSlope = true;
+			}
+			break;
+	}
+
+	if (isOnSlope) {
+		// スロープの底面Y座標
+		float bottomY = blockCenter.y - (blockSize_.y * 0.5f);
+		// スロープ上のY座標を計算
+		outY = bottomY + (heightRatio * halfHeight);
+		return true;
+	}
+
+	return false;
 }
 
 bool Map3D::WorldToMap(const Vector3& worldPos, uint32_t& outX, uint32_t& outY, uint32_t& outZ) const {

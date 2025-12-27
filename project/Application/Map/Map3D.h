@@ -14,10 +14,21 @@
 enum class TileType : uint8_t {
 	Empty = 0,   // 空（何もない）
 	Normal = 1,  // 通常ブロック
+	Slope = 2,   // スロープ（坂道）
 	// 今後の拡張用（例）
-	// Wall = 2,
-	// Lava = 3,
-	// Ice = 4,
+	// Wall = 3,
+	// Lava = 4,
+	// Ice = 5,
+};
+
+/// <summary>
+/// スロープの向き（低い方から高い方への方向）
+/// </summary>
+enum class SlopeDirection : uint8_t {
+	PlusX = 0,   // X+ 方向に上る
+	MinusX = 1,  // X- 方向に上る
+	PlusZ = 2,   // Z+ 方向に上る
+	MinusZ = 3,  // Z- 方向に上る
 };
 
 /// <summary>
@@ -25,6 +36,7 @@ enum class TileType : uint8_t {
 /// </summary>
 struct BlockData {
 	TileType type = TileType::Empty;
+	SlopeDirection slopeDir = SlopeDirection::PlusX;  // スロープの向き
 	std::unique_ptr<Model> model = nullptr;
 	Transform transform;
 	AABB aabb;
@@ -81,6 +93,28 @@ public:
 	/// <param name="z">Z座標</param>
 	/// <param name="type">設定するタイルタイプ</param>
 	void SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type);
+
+	/// <summary>
+	/// スロープを設定（向き指定）
+	/// </summary>
+	/// <param name="x">X座標</param>
+	/// <param name="y">Y座標</param>
+	/// <param name="z">Z座標</param>
+	/// <param name="direction">スロープの向き</param>
+	void SetSlope(uint32_t x, uint32_t y, uint32_t z, SlopeDirection direction);
+
+	/// <summary>
+	/// 指定座標のスロープ向きを取得
+	/// </summary>
+	SlopeDirection GetSlopeDirection(uint32_t x, uint32_t y, uint32_t z) const;
+
+	/// <summary>
+	/// スロープ上のワールド座標からY座標を計算
+	/// </summary>
+	/// <param name="worldPos">ワールド座標</param>
+	/// <param name="outY">計算されたY座標</param>
+	/// <returns>スロープ上にいる場合true</returns>
+	bool GetSlopeHeight(const Vector3& worldPos, float& outY) const;
 
 	/// <summary>
 	/// ワールド座標からマップ座標に変換

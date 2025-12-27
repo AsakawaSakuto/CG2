@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 
 GameScene::~GameScene() {
 	CleanupResources();
@@ -15,6 +16,55 @@ void GameScene::Initialize() {
 
 	gameCamera_->Initialize();
 
+	// ===== Map3D のサンプル実装 =====
+	// 25x20x25 のマップを作成
+	map3D_ = make_unique<Map3D>(25, 20, 25);
+	map3D_->Initialize();
+
+	// サンプル: 床を作成（y=0の全面にNormalブロックを配置）
+	for (uint32_t z = 0; z < map3D_->GetDepth(); ++z) {
+		for (uint32_t x = 0; x < map3D_->GetWidth(); ++x) {
+			map3D_->SetTile(x, 0, z, TileType::Normal);
+		}
+	}
+
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(2, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 2, TileType::Normal);
+	map3D_->SetTile(2, 2, 2, TileType::Normal);
+
+	// X+ 方向に上るスロープを配置（座標 5,0,5 に）
+	map3D_->SetSlope(5, 1, 5, SlopeDirection::PlusX);
+	map3D_->SetTile(6, 1, 5, TileType::Normal);
+	map3D_->SetSlope(6, 2, 5, SlopeDirection::PlusX);
+	map3D_->SetTile(5, 1, 4, TileType::Normal);
+	map3D_->SetTile(6, 1, 4, TileType::Normal);
+	map3D_->SetTile(6, 2, 4, TileType::Normal);
+
+	// Z- 方向に上るスロープを配置
+	map3D_->SetSlope(5, 1, 6, SlopeDirection::MinusZ);
+
+	//// サンプル: 壁を作成（外周に壁を配置）
+	//for (uint32_t y = 1; y < 5; ++y) {
+	//	for (uint32_t z = 0; z < map3D_->GetDepth(); ++z) {
+	//		// X方向の壁
+	//		map3D_->SetTile(0, y, z, TileType::Normal);
+	//		map3D_->SetTile(map3D_->GetWidth() - 1, y, z, TileType::Normal);
+	//	}
+	//	for (uint32_t x = 0; x < map3D_->GetWidth(); ++x) {
+	//		// Z方向の壁
+	//		map3D_->SetTile(x, y, 0, TileType::Normal);
+	//		map3D_->SetTile(x, y, map3D_->GetDepth() - 1, TileType::Normal);
+	//	}
+	//}
+
+	// サンプル: 中央に柱を配置
+	uint32_t centerX = map3D_->GetWidth() / 2;
+	uint32_t centerZ = map3D_->GetDepth() / 2;
+	for (uint32_t y = 1; y < 10; ++y) {
+		map3D_->SetTile(centerX, y, centerZ, TileType::Normal);
+	}
+
 	player_ = make_unique<Player>();
 	player_->Initialize();
 
@@ -22,6 +72,9 @@ void GameScene::Initialize() {
 
 	// プレイヤーにEnemyManagerへの参照を設定
 	player_->SetEnemyManager(enemyManager_.get());
+
+	// プレイヤーにMap3Dへの参照を設定
+	player_->SetMap(map3D_.get());
 
 	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
 	collisionManager_->Initialize();
@@ -81,39 +134,6 @@ void GameScene::Initialize() {
 
 	gameTime_ = 0.0f;
 	score_ = 0;
-
-	// ===== Map3D のサンプル実装 =====
-	// 25x20x25 のマップを作成
-	map3D_ = make_unique<Map3D>(25, 20, 25);
-	map3D_->Initialize();
-
-	// サンプル: 床を作成（y=0の全面にNormalブロックを配置）
-	for (uint32_t z = 0; z < map3D_->GetDepth(); ++z) {
-		for (uint32_t x = 0; x < map3D_->GetWidth(); ++x) {
-			map3D_->SetTile(x, 0, z, TileType::Normal);
-		}
-	}
-
-	// サンプル: 壁を作成（外周に壁を配置）
-	for (uint32_t y = 1; y < 5; ++y) {
-		for (uint32_t z = 0; z < map3D_->GetDepth(); ++z) {
-			// X方向の壁
-			map3D_->SetTile(0, y, z, TileType::Normal);
-			map3D_->SetTile(map3D_->GetWidth() - 1, y, z, TileType::Normal);
-		}
-		for (uint32_t x = 0; x < map3D_->GetWidth(); ++x) {
-			// Z方向の壁
-			map3D_->SetTile(x, y, 0, TileType::Normal);
-			map3D_->SetTile(x, y, map3D_->GetDepth() - 1, TileType::Normal);
-		}
-	}
-
-	// サンプル: 中央に柱を配置
-	uint32_t centerX = map3D_->GetWidth() / 2;
-	uint32_t centerZ = map3D_->GetDepth() / 2;
-	for (uint32_t y = 1; y < 10; ++y) {
-		map3D_->SetTile(centerX, y, centerZ, TileType::Normal);
-	}
 }
 
 void GameScene::Update() {
@@ -217,16 +237,15 @@ void GameScene::Draw() {
 
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
-	//auto postEffect = ctx_->dxCommon.GetPostEffectManager();
+	//auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 	//postEffect->DrawImGui();
 #endif // USE_IMGUI
 
-	//gridModel_->DrawImGui("grid");
-	//player_->DrawImGui();
+	player_->DrawImGui();
 	//enemyManager_->DrawImGui();
 
-	testParticle_->DrawImGui("TestParticle");
+	//testParticle_->DrawImGui("TestParticle");
 
 	// マップのImGui描画
 	if (map3D_) {
