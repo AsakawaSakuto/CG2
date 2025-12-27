@@ -139,6 +139,17 @@ void Map3D::SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type) {
 	}
 }
 
+void Map3D::SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type, SlopeDirection direction) {
+	// Slope以外のタイプの場合は通常のSetTileを呼び出し
+	if (type != TileType::Slope) {
+		SetTile(x, y, z, type);
+		return;
+	}
+
+	// Slopeの場合はSetSlopeを呼び出し
+	SetSlope(x, y, z, direction);
+}
+
 void Map3D::SetSlope(uint32_t x, uint32_t y, uint32_t z, SlopeDirection direction) {
 	uint32_t index = ToIndex(x, y, z);
 	BlockData& block = blocks_[index];

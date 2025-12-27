@@ -29,20 +29,15 @@ void GameScene::Initialize() {
 	}
 
 	map3D_->SetTile(1, 1, 1, TileType::Normal);
-	map3D_->SetTile(2, 1, 1, TileType::Normal);
-	map3D_->SetTile(1, 1, 2, TileType::Normal);
-	map3D_->SetTile(2, 2, 2, TileType::Normal);
-
-	// X+ 方向に上るスロープを配置（座標 5,0,5 に）
-	map3D_->SetSlope(5, 1, 5, SlopeDirection::PlusX);
-	map3D_->SetTile(6, 1, 5, TileType::Normal);
-	map3D_->SetSlope(6, 2, 5, SlopeDirection::PlusX);
-	map3D_->SetTile(5, 1, 4, TileType::Normal);
-	map3D_->SetTile(6, 1, 4, TileType::Normal);
-	map3D_->SetTile(6, 2, 4, TileType::Normal);
-
-	// Z- 方向に上るスロープを配置
-	map3D_->SetSlope(5, 1, 6, SlopeDirection::MinusZ);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
+	map3D_->SetTile(1, 1, 1, TileType::Normal);
 
 	//// サンプル: 壁を作成（外周に壁を配置）
 	//for (uint32_t y = 1; y < 5; ++y) {

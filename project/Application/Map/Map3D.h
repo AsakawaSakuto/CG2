@@ -95,6 +95,16 @@ public:
 	void SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type);
 
 	/// <summary>
+	/// 指定座標のタイルタイプを設定（スロープの向き指定付き）
+	/// </summary>
+	/// <param name="x">X座標</param>
+	/// <param name="y">Y座標</param>
+	/// <param name="z">Z座標</param>
+	/// <param name="type">設定するタイルタイプ</param>
+	/// <param name="direction">スロープの向き（type が Slope の場合のみ使用）</param>
+	void SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type, SlopeDirection direction);
+
+	/// <summary>
 	/// スロープを設定（向き指定）
 	/// </summary>
 	/// <param name="x">X座標</param>
