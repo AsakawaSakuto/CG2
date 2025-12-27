@@ -5,7 +5,11 @@
 // タイルタイプとモデルパスのマッピング
 const std::unordered_map<TileType, std::string> Map3D::kModelPaths_ = {
 	{ TileType::Normal, "MapBlock/NormalBlock.obj" },
-	{ TileType::Slope, "MapBlock/SlopeBlock.obj" },  // スロープのモデルパス
+	{ TileType::Slope, "MapBlock/SlopeBlock.obj" },  // スロープのモデルパス（汎用）
+	{ TileType::Slope_PlusX, "MapBlock/SlopeBlock.obj" },
+	{ TileType::Slope_MinusX, "MapBlock/SlopeBlock.obj" },
+	{ TileType::Slope_PlusZ, "MapBlock/SlopeBlock.obj" },
+	{ TileType::Slope_MinusZ, "MapBlock/SlopeBlock.obj" },
 };
 
 // タイルタイプごとのスケール設定（Blenderの半径1mキューブからの倍率）
@@ -13,6 +17,10 @@ const std::unordered_map<TileType, std::string> Map3D::kModelPaths_ = {
 const std::unordered_map<TileType, Vector3> Map3D::kTileScales_ = {
 	{ TileType::Normal, { 5.0f, 2.5f, 5.0f } },
 	{ TileType::Slope, { 5.0f, 2.5f, 5.0f } },
+	{ TileType::Slope_PlusX, { 5.0f, 2.5f, 5.0f } },
+	{ TileType::Slope_MinusX, { 5.0f, 2.5f, 5.0f } },
+	{ TileType::Slope_PlusZ, { 5.0f, 2.5f, 5.0f } },
+	{ TileType::Slope_MinusZ, { 5.0f, 2.5f, 5.0f } },
 };
 
 const std::unordered_map<TileType, AABB> Map3D::kNormalAABB_ = {
@@ -57,8 +65,9 @@ void Map3D::BlockShapeUpdate() {
 					continue;
 				}
 
+				// Normalタイプのブロックに定義済みのAABBを設定
+				// スロープはAABB判定を行わないか、別のロジックで処理
 				if (block.type == TileType::Normal) {
-					// Normalタイプのブロックに定義済みのAABBを設定
 					auto it = kNormalAABB_.find(TileType::Normal);
 					if (it != kNormalAABB_.end()) {
 						block.aabb = it->second;
@@ -106,7 +115,7 @@ void Map3D::DrawImGui() {
 	for (const auto& block : blocks_) {
 		if (block.type == TileType::Empty) emptyCount++;
 		else if (block.type == TileType::Normal) normalCount++;
-		else if (block.type == TileType::Slope) slopeCount++;
+		else if (IsSlopeType(block.type)) slopeCount++;
 	}
 	ImGui::Text("Empty: %u, Normal: %u, Slope: %u", emptyCount, normalCount, slopeCount);
 	
@@ -135,18 +144,40 @@ void Map3D::SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type) {
 	// 新しいブロックを作成
 	block.type = type;
 	if (type != TileType::Empty) {
+		// スロープタイプの場合は向きを設定
+		if (IsSlopeType(type)) {
+			block.slopeDir = GetDirectionFromTileType(type);
+		}
+		
 		CreateBlockModel(x, y, z, type);
+		
+		// y より下のブロックが空なら Normal で埋める
+		for (uint32_t fillY = 0; fillY < y; ++fillY) {
+			if (GetTile(x, fillY, z) == TileType::Empty) {
+				uint32_t fillIndex = ToIndex(x, fillY, z);
+				BlockData& fillBlock = blocks_[fillIndex];
+				fillBlock.type = TileType::Normal;
+				CreateBlockModel(x, fillY, z, TileType::Normal);
+			}
+		}
 	}
 }
 
 void Map3D::SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type, SlopeDirection direction) {
+	// 新しいスロープタイプが指定されている場合は、そのまま通常のSetTileを呼び出す
+	if (type == TileType::Slope_PlusX || type == TileType::Slope_MinusX || 
+	    type == TileType::Slope_PlusZ || type == TileType::Slope_MinusZ) {
+		SetTile(x, y, z, type);
+		return;
+	}
+	
 	// Slope以外のタイプの場合は通常のSetTileを呼び出し
 	if (type != TileType::Slope) {
 		SetTile(x, y, z, type);
 		return;
 	}
 
-	// Slopeの場合はSetSlopeを呼び出し
+	// 汎用Slopeの場合はSetSlopeを呼び出し
 	SetSlope(x, y, z, direction);
 }
 
@@ -173,6 +204,16 @@ void Map3D::SetSlope(uint32_t x, uint32_t y, uint32_t z, SlopeDirection directio
 		case SlopeDirection::MinusZ: rotationY = 1.57079633f; break;    // 90度
 	}
 	block.transform.rotate.y = rotationY;
+	
+	// y より下のブロックが空なら Normal で埋める
+	for (uint32_t fillY = 0; fillY < y; ++fillY) {
+		if (GetTile(x, fillY, z) == TileType::Empty) {
+			uint32_t fillIndex = ToIndex(x, fillY, z);
+			BlockData& fillBlock = blocks_[fillIndex];
+			fillBlock.type = TileType::Normal;
+			CreateBlockModel(x, fillY, z, TileType::Normal);
+		}
+	}
 }
 
 SlopeDirection Map3D::GetSlopeDirection(uint32_t x, uint32_t y, uint32_t z) const {
@@ -188,7 +229,7 @@ bool Map3D::GetSlopeHeight(const Vector3& worldPos, float& outY) const {
 
 	// 該当セルがスロープでない場合は失敗
 	TileType tileType = GetTile(mx, my, mz);
-	if (tileType != TileType::Slope) {
+	if (!IsSlopeType(tileType)) {
 		return false;
 	}
 
@@ -338,6 +379,19 @@ void Map3D::CreateBlockModel(uint32_t x, uint32_t y, uint32_t z, TileType type) 
 	
 	// タイルタイプに応じたスケールを設定
 	block.transform.scale = GetScaleForTileType(type);
+	
+	// スロープの場合、向きに応じて回転を設定
+	if (IsSlopeType(type)) {
+		SlopeDirection direction = block.slopeDir;
+		float rotationY = 0.0f;
+		switch (direction) {
+			case SlopeDirection::PlusX:  rotationY = 0.0f; break;           // 0度
+			case SlopeDirection::MinusX: rotationY = 3.14159265f; break;    // 180度
+			case SlopeDirection::PlusZ:  rotationY = -1.57079633f; break;   // -90度
+			case SlopeDirection::MinusZ: rotationY = 1.57079633f; break;    // 90度
+		}
+		block.transform.rotate.y = rotationY;
+	}
 }
 
 void Map3D::DestroyBlock(uint32_t x, uint32_t y, uint32_t z) {

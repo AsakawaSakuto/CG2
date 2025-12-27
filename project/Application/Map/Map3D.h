@@ -14,7 +14,14 @@
 enum class TileType : uint8_t {
 	Empty = 0,   // 空（何もない）
 	Normal = 1,  // 通常ブロック
-	Slope = 2,   // スロープ（坂道）
+	Slope = 2,   // スロープ（坂道）- 汎用（後方互換性のため残す）
+
+	// スロープの向き別（より使いやすい記法）
+	Slope_PlusX = 10,   // X+ 方向に上るスロープ
+	Slope_MinusX = 11,  // X- 方向に上るスロープ
+	Slope_PlusZ = 12,   // Z+ 方向に上るスロープ
+	Slope_MinusZ = 13,  // Z- 方向に上るスロープ
+
 	// 今後の拡張用（例）
 	// Wall = 3,
 	// Lava = 4,
@@ -178,6 +185,30 @@ private:
 	}
 
 	/// <summary>
+	/// TileTypeがスロープかどうかを判定
+	/// </summary>
+	inline bool IsSlopeType(TileType type) const {
+		return type == TileType::Slope || 
+		       type == TileType::Slope_PlusX || 
+		       type == TileType::Slope_MinusX || 
+		       type == TileType::Slope_PlusZ || 
+		       type == TileType::Slope_MinusZ;
+	}
+
+	/// <summary>
+	/// TileTypeからSlopeDirectionを取得
+	/// </summary>
+	inline SlopeDirection GetDirectionFromTileType(TileType type) const {
+		switch (type) {
+			case TileType::Slope_PlusX:  return SlopeDirection::PlusX;
+			case TileType::Slope_MinusX: return SlopeDirection::MinusX;
+			case TileType::Slope_PlusZ:  return SlopeDirection::PlusZ;
+			case TileType::Slope_MinusZ: return SlopeDirection::MinusZ;
+			default: return SlopeDirection::PlusX; // デフォルト
+		}
+	}
+
+	/// <summary>
 	/// 指定座標のブロックにモデルを作成
 	/// </summary>
 	void CreateBlockModel(uint32_t x, uint32_t y, uint32_t z, TileType type);
@@ -207,7 +238,7 @@ private:
 
 	// モデルパスのマッピング
 	static const std::unordered_map<TileType, std::string> kModelPaths_;
-	
+
 	// タイルタイプごとのスケール設定（半径1mのキューブからの倍率）
 	static const std::unordered_map<TileType, Vector3> kTileScales_;
 
