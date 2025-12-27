@@ -18,7 +18,7 @@ SceneManager::SceneManager() {
         sceneArr_[i] = nullptr;
     }
 
-    currentSceneNo_ = SCENE::TITLE;
+    //currentSceneNo_ = SCENE::GAME;
     prevSceneNo_ = currentSceneNo_;
 }
 
