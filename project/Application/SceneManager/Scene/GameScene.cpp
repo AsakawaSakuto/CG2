@@ -18,7 +18,7 @@ void GameScene::Initialize() {
 
 	// ===== Map3D のサンプル実装 =====
 	// 25x20x25 のマップを作成
-	map3D_ = make_unique<Map3D>(16, 20, 16);
+	map3D_ = make_unique<Map3D>(16, 10, 16);
 	map3D_->Initialize();
 
 	// サンプル: 床を作成（y=0の全面にNormalブロックを配置）
@@ -28,8 +28,8 @@ void GameScene::Initialize() {
 		}
 	}
 
-	// map3D_->SetTile(8, 1, 0, TileType::Normal);
-	// map3D_->SetTile(9, 1, 0, TileType::Normal);
+	// map3D_->SetTile(14, 1, 0, TileType::Normal);
+	// map3D_->SetTile(15, 1, 0, TileType::Normal);
 
 #pragma region x 0 - 1
 
@@ -290,6 +290,166 @@ void GameScene::Initialize() {
 	map3D_->SetTile(9, 5, 15, TileType::Normal);
 
 #pragma endregion
+
+#pragma region x 10 - 11
+
+	map3D_->SetTile(10, 6, 0, TileType::Normal);
+	map3D_->SetTile(11, 6, 0, TileType::Normal);
+
+	map3D_->SetTile(10, 6, 1, TileType::Normal);
+	map3D_->SetTile(11, 6, 1, TileType::Normal);
+
+	map3D_->SetTile(10, 5, 2, TileType::Normal);
+	map3D_->SetTile(11, 5, 2, TileType::Normal);
+
+	map3D_->SetTile(10, 6, 3, TileType::Slope_PlusZ);
+	map3D_->SetTile(11, 5, 3, TileType::Normal);
+
+	map3D_->SetTile(10, 6, 4, TileType::Normal);
+	map3D_->SetTile(11, 6, 4, TileType::Normal);
+
+	map3D_->SetTile(10, 6, 5, TileType::Slope_PlusX);
+	map3D_->SetTile(11, 6, 5, TileType::Normal);
+
+	map3D_->SetTile(10, 5, 6, TileType::Normal);
+	map3D_->SetTile(11, 5, 6, TileType::Normal);
+
+	map3D_->SetTile(10, 5, 7, TileType::Normal);
+	map3D_->SetTile(11, 5, 7, TileType::Normal);
+
+	map3D_->SetTile(10, 5, 8, TileType::Slope_PlusX);
+	map3D_->SetTile(11, 5, 8, TileType::Normal);
+
+	map3D_->SetTile(10, 5, 9, TileType::Slope_PlusX);
+	map3D_->SetTile(11, 5, 9, TileType::Normal);
+
+	map3D_->SetTile(10, 3, 10, TileType::Normal);
+	map3D_->SetTile(11, 4, 10, TileType::Slope_PlusX);
+
+	map3D_->SetTile(10, 3, 11, TileType::Normal);
+	map3D_->SetTile(11, 5, 11, TileType::Normal);
+
+	map3D_->SetTile(10, 3, 12, TileType::Normal);
+	map3D_->SetTile(11, 5, 12, TileType::Normal);
+
+	map3D_->SetTile(10, 6, 13, TileType::Slope_MinusX);
+	map3D_->SetTile(11, 5, 13, TileType::Normal);
+
+	map3D_->SetTile(10, 5, 14, TileType::Normal);
+	map3D_->SetTile(11, 5, 14, TileType::Normal);
+
+	map3D_->SetTile(10, 5, 15, TileType::Normal);
+	map3D_->SetTile(11, 5, 15, TileType::Normal);
+
+#pragma endregion
+
+#pragma region x 12 - 13
+
+	map3D_->SetTile(12, 6, 0, TileType::Slope_MinusX);
+	map3D_->SetTile(13, 5, 0, TileType::Slope_MinusX);
+
+	map3D_->SetTile(12, 6, 1, TileType::Normal);
+	map3D_->SetTile(13, 3, 1, TileType::Normal);
+
+	map3D_->SetTile(12, 6, 2, TileType::Normal);
+	map3D_->SetTile(13, 6, 2, TileType::Slope_MinusX);
+
+	map3D_->SetTile(12, 6, 3, TileType::Normal);
+	map3D_->SetTile(13, 6, 3, TileType::Slope_MinusX);
+
+	map3D_->SetTile(12, 5, 4, TileType::Normal);
+	map3D_->SetTile(13, 5, 4, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 5, TileType::Normal);
+	map3D_->SetTile(13, 6, 5, TileType::Slope_PlusX);
+
+	map3D_->SetTile(12, 5, 6, TileType::Normal);
+	map3D_->SetTile(13, 6, 6, TileType::Slope_PlusX);
+
+	map3D_->SetTile(12, 5, 7, TileType::Normal);
+	map3D_->SetTile(13, 5, 7, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 8, TileType::Normal);
+	map3D_->SetTile(13, 5, 8, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 9, TileType::Normal);
+	map3D_->SetTile(13, 5, 9, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 10, TileType::Normal);
+	map3D_->SetTile(13, 5, 10, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 10, TileType::Slope_PlusX);
+	map3D_->SetTile(13, 6, 10, TileType::Slope_PlusX);
+
+	map3D_->SetTile(12, 6, 11, TileType::Slope_PlusX);
+	map3D_->SetTile(13, 6, 11, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 12, TileType::Normal);
+	map3D_->SetTile(13, 6, 12, TileType::Normal);
+
+	map3D_->SetTile(12, 6, 13, TileType::Slope_PlusX);
+	map3D_->SetTile(13, 6, 13, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 14, TileType::Normal);
+	map3D_->SetTile(13, 5, 14, TileType::Normal);
+
+	map3D_->SetTile(12, 5, 15, TileType::Normal);
+	map3D_->SetTile(13, 5, 15, TileType::Normal);
+
+#pragma endregion
+
+#pragma region x 14 - 15
+
+	map3D_->SetTile(14, 4, 0, TileType::Slope_MinusX);
+	map3D_->SetTile(15, 3, 0, TileType::Normal);
+
+	map3D_->SetTile(14, 3, 1, TileType::Normal);
+	map3D_->SetTile(15, 3, 1, TileType::Normal);
+
+	map3D_->SetTile(14, 5, 2, TileType::Normal);
+	map3D_->SetTile(15, 5, 2, TileType::Normal);
+
+	map3D_->SetTile(14, 5, 3, TileType::Normal);
+	map3D_->SetTile(15, 5, 3, TileType::Normal);
+
+	map3D_->SetTile(14, 6, 4, TileType::Slope_PlusZ);
+	map3D_->SetTile(15, 6, 4, TileType::Slope_PlusZ);
+
+	map3D_->SetTile(14, 6, 5, TileType::Normal);
+	map3D_->SetTile(15, 6, 5, TileType::Normal);
+
+	map3D_->SetTile(14, 6, 6, TileType::Normal);
+	map3D_->SetTile(15, 6, 6, TileType::Normal);
+
+	map3D_->SetTile(14, 6, 7, TileType::Slope_MinusZ);
+	map3D_->SetTile(15, 6, 7, TileType::Slope_MinusZ);
+
+	map3D_->SetTile(14, 5, 8, TileType::Normal);
+	map3D_->SetTile(15, 5, 8, TileType::Normal);
+
+	map3D_->SetTile(14, 6, 9, TileType::Slope_PlusZ);
+	map3D_->SetTile(15, 6, 9, TileType::Slope_PlusZ);
+
+	map3D_->SetTile(14, 6, 10, TileType::Normal);
+	map3D_->SetTile(15, 6, 10, TileType::Normal);
+
+	map3D_->SetTile(14, 6, 11, TileType::Normal);
+	map3D_->SetTile(15, 6, 11, TileType::Normal);
+
+	map3D_->SetTile(14, 6, 12, TileType::Normal);
+	map3D_->SetTile(15, 6, 12, TileType::Normal);
+
+	map3D_->SetTile(14, 6, 13, TileType::Slope_MinusZ);
+	map3D_->SetTile(15, 6, 13, TileType::Slope_MinusZ);
+
+	map3D_->SetTile(14, 5, 14, TileType::Normal);
+	map3D_->SetTile(15, 5, 14, TileType::Normal);
+
+	map3D_->SetTile(14, 5, 15, TileType::Normal);
+	map3D_->SetTile(15, 5, 15, TileType::Normal);
+
+#pragma endregion
+
 
 	player_ = make_unique<Player>();
 	player_->Initialize();
