@@ -123,8 +123,8 @@ void Line3d::AddBox(const Vector3& center, const Vector3& size, const Vector4& c
 
 void Line3d::AddBox(const AABB& aabb, const Vector4& color) {
     // AABBのワールド座標のmin/maxから8つの頂点を定義
-    Vector3 worldMin = aabb.GetWorldMin();
-    Vector3 worldMax = aabb.GetWorldMax();
+    Vector3 worldMin = aabb.center + aabb.min;
+    Vector3 worldMax = aabb.center + aabb.max;
     
     Vector3 vertices[8] = {
         { worldMin.x, worldMin.y, worldMin.z }, // 0: 左下前

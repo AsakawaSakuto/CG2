@@ -60,7 +60,7 @@ private:
 	DebugCamera debugCamera_;
 
 	OBB testAABB_;
-	OBB testOBB_;
+	AABB testOBB_;
 	Sphere testSphere_;
 	OvalSphere testOvalSphere_;
 	Plane testPlane_;

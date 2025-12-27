@@ -12,17 +12,11 @@ struct AABB {
 	Vector3 min = { -0.5f, -0.5f, -0.5f }; // 最小点（ローカルオフセット）
 	Vector3 max = { 0.5f, 0.5f, 0.5f };    // 最大点（ローカルオフセット）
 
-	/// <summary>
-	/// ワールド空間での最小点を取得
-	/// </summary>
-	Vector3 GetWorldMin() const {
+	Vector3 GetMinWorld() const {
 		return center + min;
 	}
 
-	/// <summary>
-	/// ワールド空間での最大点を取得
-	/// </summary>
-	Vector3 GetWorldMax() const {
+	Vector3 GetMaxWorld() const {
 		return center + max;
 	}
 
