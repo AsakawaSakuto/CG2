@@ -6,6 +6,7 @@
 
 // 前方宣言
 class EnemyManager;
+class Map3D;
 
 class Player : public BaseGameObject {
 public:
@@ -18,6 +19,9 @@ public:
 
 	// EnemyManagerへの参照を設定
 	void SetEnemyManager(EnemyManager* enemyManager) { enemyManager_ = enemyManager; }
+
+	// Map3Dへの参照を設定
+	void SetMap(Map3D* map) { map_ = map; }
 
 	// WeaponManagerへのアクセス
 	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
@@ -76,6 +80,17 @@ private:
 	// プレイヤーから最も近い敵までの距離を取得
 	float GetDistanceToNearestEnemy() const;
 
+	/// <summary>
+	/// マップとの衝突を解決する（めり込み防止）
+	/// </summary>
+	void ResolveMapCollision();
+
+	/// <summary>
+	/// 地面に接地しているかをマップのAABBで判定
+	/// </summary>
+	/// <returns>地面に接している場合true</returns>
+	bool IsGroundedOnMap();
+
 private:
 	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
 
@@ -95,12 +110,15 @@ private:
 	float collisionRadius_ = 0.5f;
 
 	// ジャンプ関連のメンバ変数
-	float groundLevel_ = 2.5f; // 地面のY座標
+	float groundLevel_ = 2.5f; // 地面のY座標（廃止予定）
 	bool isGrounded_ = true;   // 地面にいるかどうか
 	bool wasGrounded_ = true;  // 前フレームで地面にいたかどうか
 
 	// EnemyManagerへの参照（生ポインタ、所有権なし)
 	EnemyManager* enemyManager_ = nullptr;
+
+	// Map3Dへの参照（生ポインタ、所有権なし）
+	Map3D* map_ = nullptr;
 
 	Sphere expItemStateChangeCollision_;
 	float expItemStateChangeRadius_ = 3.5f;
