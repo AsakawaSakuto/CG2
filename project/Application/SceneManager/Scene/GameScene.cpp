@@ -433,9 +433,6 @@ void GameScene::Initialize() {
 	collisionManager_->SetPlayer(player_.get());
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
-
-	minJar_->Initialize("jar/minjar.obj");
-	maxJar_->Initialize("jar/maxjar.obj");
 }
 
 void GameScene::Update() {
@@ -483,9 +480,6 @@ void GameScene::Draw() {
 
 	// 宝箱の描画
 	chestManager_->Draw(camera_);
-
-	minJar_->Draw(camera_, minJarTransform_);
-	maxJar_->Draw(camera_, maxJarTransform_);
 
 	enemyManager_->Draw(camera_);
 

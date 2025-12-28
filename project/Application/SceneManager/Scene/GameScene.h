@@ -51,10 +51,4 @@ private:
 
 	// 宝箱管理クラス
 	unique_ptr<ChestManager> chestManager_ = make_unique<ChestManager>();
-
-	unique_ptr<Model> minJar_ = make_unique<Model>();
-	unique_ptr<Model> maxJar_ = make_unique<Model>();
-
-	Transform minJarTransform_;
-	Transform maxJarTransform_;
 };
