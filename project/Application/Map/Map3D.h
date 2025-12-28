@@ -134,6 +134,16 @@ public:
 	bool GetSlopeHeight(const Vector3& worldPos, float& outY) const;
 
 	/// <summary>
+	/// 指定座標のブロックのモデルにテクスチャを設定
+	/// </summary>
+	/// <param name="x">X座標</param>
+	/// <param name="y">Y座標</param>
+	/// <param name="z">Z座標</param>
+	/// <param name="texturePath">テクスチャファイルのパス（フルパス）</param>
+	/// <returns>成功した場合true、ブロックが存在しないかモデルが無い場合false</returns>
+	bool SetBlockTexture(uint32_t x, uint32_t y, uint32_t z, const std::string& texturePath);
+
+	/// <summary>
 	/// ワールド座標からマップ座標に変換
 	/// </summary>
 	/// <param name="worldPos">ワールド座標</param>

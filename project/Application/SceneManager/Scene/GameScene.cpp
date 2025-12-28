@@ -18,7 +18,7 @@ void GameScene::Initialize() {
 
 	// ===== Map3D のサンプル実装 =====
 	// 25x20x25 のマップを作成
-	map3D_ = make_unique<Map3D>(16, 10, 16);
+	map3D_ = make_unique<Map3D>(15, 10, 15);
 	map3D_->Initialize();
 
 	// サンプル: 床を作成（y=0の全面にNormalブロックを配置）
@@ -75,11 +75,8 @@ void GameScene::Initialize() {
 	map3D_->SetTile(0, 7, 13, TileType::Normal);
 	map3D_->SetTile(1, 7, 13, TileType::Normal);
 
-	map3D_->SetTile(0, 3, 14, TileType::Normal);
-	map3D_->SetTile(1, 3, 14, TileType::Normal);
-
-	map3D_->SetTile(0, 3, 15, TileType::Normal);
-	map3D_->SetTile(1, 4, 15, TileType::Slope_PlusX);
+	map3D_->SetTile(0, 7, 14, TileType::Normal);
+	map3D_->SetTile(1, 7, 14, TileType::Normal);
 
 #pragma endregion
 
@@ -130,9 +127,6 @@ void GameScene::Initialize() {
 	map3D_->SetTile(2, 7, 14, TileType::Normal);
 	map3D_->SetTile(3, 7, 14, TileType::Slope_MinusX);
 
-	map3D_->SetTile(2, 5, 15, TileType::Slope_PlusX);
-	map3D_->SetTile(3, 6, 15, TileType::Slope_PlusX);
-
 #pragma endregion
 
 #pragma region x 4 - 5
@@ -176,14 +170,11 @@ void GameScene::Initialize() {
 	map3D_->SetTile(4, 5, 12, TileType::Normal);
 	map3D_->SetTile(5, 5, 12, TileType::Normal);
 
-	map3D_->SetTile(4, 5, 13, TileType::Normal);
-	map3D_->SetTile(5, 5, 13, TileType::Normal);
+	map3D_->SetTile(4, 6, 13, TileType::Slope_PlusZ);
+	map3D_->SetTile(5, 6, 13, TileType::Slope_PlusZ);
 
 	map3D_->SetTile(4, 6, 14, TileType::Normal);
-	map3D_->SetTile(5, 6, 14, TileType::Slope_PlusZ);
-
-	map3D_->SetTile(4, 6, 15, TileType::Normal);
-	map3D_->SetTile(5, 6, 15, TileType::Normal);
+	map3D_->SetTile(5, 6, 14, TileType::Normal);
 
 #pragma endregion
 
@@ -234,9 +225,6 @@ void GameScene::Initialize() {
 	map3D_->SetTile(6, 6, 14, TileType::Normal);
 	map3D_->SetTile(7, 6, 14, TileType::Slope_MinusX);
 
-	map3D_->SetTile(6, 6, 15, TileType::Normal);
-	map3D_->SetTile(7, 6, 15, TileType::Slope_MinusX);
-
 #pragma endregion
 
 #pragma region  x 8 - 9
@@ -286,9 +274,6 @@ void GameScene::Initialize() {
 	map3D_->SetTile(8, 5, 14, TileType::Normal);
 	map3D_->SetTile(9, 5, 14, TileType::Normal);
 
-	map3D_->SetTile(8, 5, 15, TileType::Normal);
-	map3D_->SetTile(9, 5, 15, TileType::Normal);
-
 #pragma endregion
 
 #pragma region x 10 - 11
@@ -337,9 +322,6 @@ void GameScene::Initialize() {
 
 	map3D_->SetTile(10, 5, 14, TileType::Normal);
 	map3D_->SetTile(11, 5, 14, TileType::Normal);
-
-	map3D_->SetTile(10, 5, 15, TileType::Normal);
-	map3D_->SetTile(11, 5, 15, TileType::Normal);
 
 #pragma endregion
 
@@ -393,60 +375,39 @@ void GameScene::Initialize() {
 	map3D_->SetTile(12, 5, 14, TileType::Normal);
 	map3D_->SetTile(13, 5, 14, TileType::Normal);
 
-	map3D_->SetTile(12, 5, 15, TileType::Normal);
-	map3D_->SetTile(13, 5, 15, TileType::Normal);
-
 #pragma endregion
 
 #pragma region x 14 - 15
 
 	map3D_->SetTile(14, 4, 0, TileType::Slope_MinusX);
-	map3D_->SetTile(15, 3, 0, TileType::Normal);
 
 	map3D_->SetTile(14, 3, 1, TileType::Normal);
-	map3D_->SetTile(15, 3, 1, TileType::Normal);
 
 	map3D_->SetTile(14, 5, 2, TileType::Normal);
-	map3D_->SetTile(15, 5, 2, TileType::Normal);
 
 	map3D_->SetTile(14, 5, 3, TileType::Normal);
-	map3D_->SetTile(15, 5, 3, TileType::Normal);
 
 	map3D_->SetTile(14, 6, 4, TileType::Slope_PlusZ);
-	map3D_->SetTile(15, 6, 4, TileType::Slope_PlusZ);
 
 	map3D_->SetTile(14, 6, 5, TileType::Normal);
-	map3D_->SetTile(15, 6, 5, TileType::Normal);
 
 	map3D_->SetTile(14, 6, 6, TileType::Normal);
-	map3D_->SetTile(15, 6, 6, TileType::Normal);
 
 	map3D_->SetTile(14, 6, 7, TileType::Slope_MinusZ);
-	map3D_->SetTile(15, 6, 7, TileType::Slope_MinusZ);
 
 	map3D_->SetTile(14, 5, 8, TileType::Normal);
-	map3D_->SetTile(15, 5, 8, TileType::Normal);
 
 	map3D_->SetTile(14, 6, 9, TileType::Slope_PlusZ);
-	map3D_->SetTile(15, 6, 9, TileType::Slope_PlusZ);
 
 	map3D_->SetTile(14, 6, 10, TileType::Normal);
-	map3D_->SetTile(15, 6, 10, TileType::Normal);
 
 	map3D_->SetTile(14, 6, 11, TileType::Normal);
-	map3D_->SetTile(15, 6, 11, TileType::Normal);
 
 	map3D_->SetTile(14, 6, 12, TileType::Normal);
-	map3D_->SetTile(15, 6, 12, TileType::Normal);
 
 	map3D_->SetTile(14, 6, 13, TileType::Slope_MinusZ);
-	map3D_->SetTile(15, 6, 13, TileType::Slope_MinusZ);
 
 	map3D_->SetTile(14, 5, 14, TileType::Normal);
-	map3D_->SetTile(15, 5, 14, TileType::Normal);
-
-	map3D_->SetTile(14, 5, 15, TileType::Normal);
-	map3D_->SetTile(15, 5, 15, TileType::Normal);
 
 #pragma endregion
 
@@ -520,6 +481,8 @@ void GameScene::Initialize() {
 
 	gameTime_ = 0.0f;
 	score_ = 0;
+
+	wallModel_->Initialize("mapBlock/wall.obj");
 }
 
 void GameScene::Update() {
@@ -588,6 +551,8 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	MyDebugLine::Draw(camera_);
 
+	//wallModel_->Draw(camera_);
+
 	// マップの描画
 	if (map3D_) {
 		map3D_->Draw(camera_);
@@ -623,9 +588,9 @@ void GameScene::Draw() {
 
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
-	//auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
-	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	//postEffect->DrawImGui();
+	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	postEffect->DrawImGui();
 #endif // USE_IMGUI
 
 	player_->DrawImGui();

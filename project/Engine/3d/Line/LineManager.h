@@ -52,5 +52,6 @@ private:
 
 private:
     bool initialized_ = false;
+	bool isDrawing_ = true;
     std::unique_ptr<Line3d> line_;
 };

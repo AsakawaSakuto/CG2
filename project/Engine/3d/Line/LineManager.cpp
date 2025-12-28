@@ -1,5 +1,6 @@
 #include "LineManager.h"
 #include <variant>
+#include "Input/MyInput.h"
 
 LineManager* LineManager::GetInstance() {
 	static LineManager instance;
@@ -44,7 +45,17 @@ void LineManager::AddGrid(float size, int divisions, const Vector4& color) {
 void LineManager::Draw(Camera& camera) {
 #ifdef USE_IMGUI
 	// 描画
-	line_->Draw(camera);
+	if (isDrawing_) {
+		line_->Draw(camera);
+
+		if(MyInput::TriggerKey(DIK_RETURN)) {
+			isDrawing_ = false;
+		}
+	} else {
+		if(MyInput::TriggerKey(DIK_RETURN)) {
+			isDrawing_ = true;
+		}
+	}
 #endif // USE_IMGUI
 
 }

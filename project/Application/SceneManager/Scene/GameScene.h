@@ -30,7 +30,7 @@ private:
 	Camera camera_;
 	DebugCamera debugCamera_;
 
-	unique_ptr<Model> gridModel_ = make_unique<Model>();
+	unique_ptr<Model> wallModel_ = make_unique<Model>();
 	Transform gridTransform_;
 
 	// プレイヤー関連のクラス
