@@ -44,6 +44,10 @@ public:
 	Vector2 GetMouseDelta() const;
 
 	Vector2 GetMousePos() { return currentMousePos_; }
+	
+	// WinAppへのアクセサを追加
+	WinApp* GetWinApp() const { return winApp_; }
+	
 private:
 	WinApp* winApp_ = nullptr;
 	HRESULT result_;

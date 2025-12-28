@@ -91,6 +91,12 @@ private:
 	/// <returns>地面に接している場合true</returns>
 	bool IsGroundedOnMap();
 
+	/// <summary>
+	/// ブロック内に不正に貫通していないかチェック
+	/// </summary>
+	/// <returns>不正な貫通が検出された場合true</returns>
+	bool IsInsideBlockIllegally();
+
 private:
 	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
 
@@ -124,4 +130,8 @@ private:
 	float expItemStateChangeRadius_ = 3.5f;
 
 	AABB mapCollosion_;
+
+	// フォールバック機構：前フレームの位置を記録
+	Vector3 previousFramePosition_ = { 0.0f, 0.0f, 0.0f };
+	bool hasPreviousPosition_ = false; // 前フレーム位置が有効かどうか
 };

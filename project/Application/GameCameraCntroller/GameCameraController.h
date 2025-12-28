@@ -19,4 +19,6 @@ private:
 	Camera camera_;
 	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 offset_ = { 0.0f, 4.0f, 0.0f };
+	
+	bool isMouseCameraActive_ = false; // マウスカメラ操作がアクティブかどうか
 };

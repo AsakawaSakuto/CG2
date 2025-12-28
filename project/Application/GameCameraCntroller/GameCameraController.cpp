@@ -14,19 +14,72 @@ void GameCameraController::Update() {
 	// KeyConfigを使ってカメラ操作の入力を取得
 	auto cameraInput = MyInput::GetVector2D(Action::CAMERA_LOOK);
 
+	// マウスの移動量を取得
+	auto mouseDelta = MyInput::GetInput()->GetMouseDelta();
+
 	// 感度設定
-	const float horizontalSensitivity = 0.05f;  // 水平方向の感度
-	const float verticalSensitivity = 0.03f;    // 垂直方向の感度
+	const float horizontalSensitivity = 0.05f;  // 水平方向の感度（スティック）
+	const float verticalSensitivity = 0.03f;    // 垂直方向の感度（スティック）
+	const float mouseHorizontalSensitivity = 0.003f;  // 水平方向の感度（マウス）
+	const float mouseVerticalSensitivity = 0.003f;    // 垂直方向の感度（マウス）
+
+	float deltaHorizontal = 0.0f;
+	float deltaVertical = 0.0f;
 
 	// スティック入力からカメラの角度を更新
 	if (std::abs(cameraInput.x) > 0.1f || std::abs(cameraInput.y) > 0.1f) {
 		// 水平角度：スティックのX軸
-		float deltaHorizontal = cameraInput.x * horizontalSensitivity;
+		deltaHorizontal += cameraInput.x * horizontalSensitivity;
 		
 		// 垂直角度：スティックのY軸（反転）
-		float deltaVertical = -cameraInput.y * verticalSensitivity;
+		deltaVertical += -cameraInput.y * verticalSensitivity;
+	}
 
-		// カメラの角度を更新
+	// マウス右クリックでカメラ操作モードをトグル（ON/OFF切り替え）
+	auto* input = MyInput::GetInput();
+	if (input && input->GetWinApp()) {
+		// 右クリックのトリガー（押した瞬間）でトグル
+		if (input->TriggerMouseButtonR()) {
+			isMouseCameraActive_ = !isMouseCameraActive_;
+			
+			if (isMouseCameraActive_) {
+				// マウスカメラモードをON
+				ShowCursor(FALSE);
+			} else {
+				// マウスカメラモードをOFF
+				ShowCursor(TRUE);
+			}
+		}
+
+		// マウスカメラモードがアクティブの場合
+		if (isMouseCameraActive_) {
+			// マウス入力からカメラの角度を更新
+			if (std::abs(mouseDelta.x) > 0.01f || std::abs(mouseDelta.y) > 0.01f) {
+				// 水平角度：マウスのX軸移動
+				deltaHorizontal += mouseDelta.x * mouseHorizontalSensitivity;
+				
+				// 垂直角度：マウスのY軸移動
+				deltaVertical += mouseDelta.y * mouseVerticalSensitivity;
+			}
+
+			// マウスを画面中央にリセット
+			HWND hwnd = input->GetWinApp()->GetHWND();
+			RECT clientRect;
+			GetClientRect(hwnd, &clientRect);
+			int centerX = (clientRect.right - clientRect.left) / 2;
+			int centerY = (clientRect.bottom - clientRect.top) / 2;
+			
+			POINT centerPoint = { centerX, centerY };
+			ClientToScreen(hwnd, &centerPoint);
+			SetCursorPos(centerPoint.x, centerPoint.y);
+			
+			// Inputクラスの内部マウス座標も更新
+			input->SetMousePosition(centerX, centerY);
+		}
+	}
+
+	// カメラの角度を更新
+	if (deltaHorizontal != 0.0f || deltaVertical != 0.0f) {
 		camera_.AddTPSAngles(deltaHorizontal, deltaVertical);
 	}
 
@@ -50,6 +103,11 @@ void GameCameraController::DrawImgui() {
 #ifdef  USE_IMGUI
 
 	if (ImGui::TreeNode("GameCameraController")) {
+		// マウスカメラモードの状態表示
+		ImGui::Text("Mouse Camera Mode: %s", isMouseCameraActive_ ? "ON" : "OFF");
+		ImGui::Text("(Right Click to Toggle)");
+		ImGui::Separator();
+		
 		// ターゲット位置の調整
 		ImGui::DragFloat3("Target Position", &targetPosition_.x, 0.1f);
 		
