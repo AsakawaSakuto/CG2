@@ -14,6 +14,10 @@ struct Transform {
 	Vector3 rotate = { 0.0f,0.0f,0.0f };
 	Vector3 translate = { 0.0f,0.0f,0.0f };
 
+	void SetAllScale(float s) {
+		scale = { s,s,s };
+	}
+
 #ifdef USE_IMGUI
 	/// <summary>
 	/// Transformの値をImGuiで編集する

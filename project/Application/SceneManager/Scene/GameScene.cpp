@@ -501,8 +501,7 @@ void GameScene::DrawImGui() {
 	postEffect->DrawImGui();
 #endif // USE_IMGUI
 
-	minJarTransform_.DrawImGui("MinJarTransform");
-	maxJarTransform_.DrawImGui("MaxJarTransform");
+	//gameCamera_->DrawImgui();
 
 	player_->DrawImGui();
 	//enemyManager_->DrawImGui();
@@ -515,10 +514,10 @@ void GameScene::DrawImGui() {
 	}
 	
 	// JarManagerのImGui描画
-	jarManager_->DrawImGui();
+	//jarManager_->DrawImGui();
 
 	// ChestManagerのImGui描画
-	chestManager_->DrawImGui();
+	//chestManager_->DrawImGui();
 }
 
 void GameScene::PostFrameCleanup() {

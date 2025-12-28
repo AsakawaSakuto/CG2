@@ -6,12 +6,13 @@ void PaidChest::Initialize(Vector3 pos) {
 
 	// モデルの読み込み
 	model_ = std::make_unique<Model>();
-	model_->Initialize("chest/chest.obj");
+	model_->Initialize("MapObject/chest/chest.obj");
 	//model_->SetTexture("resources/image/white1x1.png");
 
 	// 位置設定
 	transform_.translate = pos;
 	transform_.rotate.y = MyRand::Float(0.0f, 10.0f);
+	transform_.SetAllScale(0.85f);
 
 	// 当たり判定設定
 	aabbCollision_.center = pos;

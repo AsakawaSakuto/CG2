@@ -7,7 +7,7 @@ void MaxJar::Initialize(Vector3 pos) {
 
 	// モデルの読み込み
 	model_ = std::make_unique<Model>();
-	model_->Initialize("jar/maxjar.obj");
+	model_->Initialize("MapObject/jar/maxjar.obj");
 	model_->SetTexture("resources/image/white1x1.png");
 
 	// 位置設定
