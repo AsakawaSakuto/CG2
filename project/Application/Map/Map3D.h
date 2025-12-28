@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstdint>
 #include "Math/Type/Vector3.h"
-#include "Utility/Transform/Transform.h"
+#include "Math/Type/Transform.h"
 #include "3d/Model/Model.h"
 #include "Utility/Collision/Type/AABB.h"
 
@@ -132,6 +132,16 @@ public:
 	/// <param name="outY">計算されたY座標</param>
 	/// <returns>スロープ上にいる場合true</returns>
 	bool GetSlopeHeight(const Vector3& worldPos, float& outY) const;
+
+	/// <summary>
+	/// 指定座標のブロックのモデルにテクスチャを設定
+	/// </summary>
+	/// <param name="x">X座標</param>
+	/// <param name="y">Y座標</param>
+	/// <param name="z">Z座標</param>
+	/// <param name="texturePath">テクスチャファイルのパス（フルパス）</param>
+	/// <returns>成功した場合true、ブロックが存在しないかモデルが無い場合false</returns>
+	bool SetBlockTexture(uint32_t x, uint32_t y, uint32_t z, const std::string& texturePath);
 
 	/// <summary>
 	/// ワールド座標からマップ座標に変換

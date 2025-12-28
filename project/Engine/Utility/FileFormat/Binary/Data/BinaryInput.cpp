@@ -1,5 +1,5 @@
 #include "BinaryInput.h"
-#include <Utility/Transform/Transform.h>
+#include "Math/Type/Transform.h"
 #include <d3d12.h>
 
 namespace {

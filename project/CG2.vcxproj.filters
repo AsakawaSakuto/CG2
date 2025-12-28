@@ -87,6 +87,14 @@
     <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
     <ClCompile Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Application\Map\Map3D.cpp" />
+    <ClCompile Include="Engine\3d\Shadow\ShadowMap.cpp" />
+    <ClCompile Include="Engine\3d\Shadow\ShadowMapManager.cpp" />
+    <ClCompile Include="Application\Map\JarManager\JarManager.cpp" />
+    <ClCompile Include="Application\Map\JarManager\Data\MinJar.cpp" />
+    <ClCompile Include="Application\Map\JarManager\Data\MaxJar.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\Data\PaidChest.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\Data\FreeChest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -164,7 +172,7 @@
     <ClInclude Include="Engine\Core\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixFunction\MatrixFunction.h" />
     <ClInclude Include="Engine\Core\TextureManager\TextureManager.h" />
-    <ClInclude Include="Engine\Utility\Transform\Transform.h" />
+    <ClInclude Include="Engine\Math\Type\Transform.h" />
     <ClInclude Include="Engine\Math\Type\Vector2.h" />
     <ClInclude Include="Engine\Math\Type\Vector4.h" />
     <ClInclude Include="Engine\Math\Type\Vector3.h" />
@@ -211,6 +219,16 @@
     <ClInclude Include="Engine\Math\Type\Matrix3x3.h" />
     <ClInclude Include="Application\Map\Map3D.h" />
     <ClInclude Include="Application\Map\Map3DSamples.h" />
+    <ClInclude Include="Engine\3d\Shadow\ShadowMap.h" />
+    <ClInclude Include="Engine\3d\Shadow\ShadowMapManager.h" />
+    <ClInclude Include="Application\Map\JarManager\JarManager.h" />
+    <ClInclude Include="Application\Map\JarManager\Data\BaseJar.h" />
+    <ClInclude Include="Application\Map\JarManager\Data\MinJar.h" />
+    <ClInclude Include="Application\Map\JarManager\Data\MaxJar.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\BaseChest.h" />
+    <ClInclude Include="Application\Map\ChestManager\ChestManager.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\PaidChest.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\FreeChest.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

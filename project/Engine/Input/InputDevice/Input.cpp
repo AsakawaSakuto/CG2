@@ -54,9 +54,13 @@ void Input::Update() {
     preMouseL_ = isMouseL_;
     preMouseR_ = isMouseR_;
     preMouseM_ = isMouseM_;
+    preMouseX1_ = isMouseX1_;
+    preMouseX2_ = isMouseX2_;
     isMouseL_ = (::GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
     isMouseR_ = (::GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0;
     isMouseM_ = (::GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0;
+    isMouseX1_ = (::GetAsyncKeyState(VK_XBUTTON1) & 0x8000) != 0;
+    isMouseX2_ = (::GetAsyncKeyState(VK_XBUTTON2) & 0x8000) != 0;
 
     // ===== ホイール（これはメッセージ由来のまま） =====
     wheelDelta_ = static_cast<float>(winApp_->GetWheelDelta()) / WHEEL_DELTA;
@@ -90,3 +94,5 @@ Vector2 Input::GetMouseDelta() const {
 bool Input::ReleaseMouseButtonL() const { return preMouseL_ && !isMouseL_; }
 bool Input::ReleaseMouseButtonR() const { return preMouseR_ && !isMouseR_; }
 bool Input::ReleaseMouseButtonM() const { return preMouseM_ && !isMouseM_; }
+bool Input::ReleaseMouseButtonX1() const { return preMouseX1_ && !isMouseX1_; }
+bool Input::ReleaseMouseButtonX2() const { return preMouseX2_ && !isMouseX2_; }

@@ -7,7 +7,7 @@
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Camera/Camera.h"
 #include "Math/MatrixFunction/MatrixFunction.h"
-#include "Utility/Transform/Transform.h"
+#include "Math/Type/Transform.h"
 #include "Math/Type/Vector3.h"
 #include "Utility/Collision/Type/AABB.h"
 #include "Utility/Collision/Type/OBB.h"

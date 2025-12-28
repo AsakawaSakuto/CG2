@@ -20,19 +20,25 @@ public:
 	bool TriggerKey(int keyNumber);
 	float GetWheelDelta() const { return wheelDelta_; }
 
-	// 左右押下状態（Push）
+	// 左右中押下状態（Push）
 	bool PushMouseButtonL() const { return isMouseL_; }
 	bool PushMouseButtonR() const { return isMouseR_; }
 	bool PushMouseButtonM() const { return isMouseM_; }
+	bool PushMouseButtonX1() const { return isMouseX1_; }
+	bool PushMouseButtonX2() const { return isMouseX2_; }
 
-	// 左右トリガー状態（Trigger）
+	// 左右中トリガー状態（Trigger）
 	bool TriggerMouseButtonL() const { return (isMouseL_ && !preMouseL_); }
 	bool TriggerMouseButtonR() const { return (isMouseR_ && !preMouseR_); }
 	bool TriggerMouseButtonM() const { return (isMouseM_ && !preMouseM_); }
+	bool TriggerMouseButtonX1() const { return (isMouseX1_ && !preMouseX1_); }
+	bool TriggerMouseButtonX2() const { return (isMouseX2_ && !preMouseX2_); }
 
 	bool ReleaseMouseButtonL() const;
 	bool ReleaseMouseButtonR() const;
 	bool ReleaseMouseButtonM() const;
+	bool ReleaseMouseButtonX1() const;
+	bool ReleaseMouseButtonX2() const;
 
 	void SetMousePosition(LONG x, LONG y);
 	Vector2 GetMouseDelta() const;
@@ -50,9 +56,13 @@ private:
 	bool isMouseL_ = false;
 	bool isMouseR_ = false;
 	bool isMouseM_ = false;
+	bool isMouseX1_ = false;
+	bool isMouseX2_ = false;
 	bool preMouseL_ = false;
 	bool preMouseR_ = false;
 	bool preMouseM_ = false;
+	bool preMouseX1_ = false;
+	bool preMouseX2_ = false;
 
 	Vector2 currentMousePos_ = {};
 	Vector2 previousMousePos_ = {};

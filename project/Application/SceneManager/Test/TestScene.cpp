@@ -156,7 +156,7 @@ void TestScene::Draw() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
     postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 
-    cube_->Draw(camera_, cubeTransform_);
+    cube_->Draw(camera_);
     spinCube_->Draw(camera_, spinCubeTransform_);
     simpleSkin_->Draw(camera_, simpleSkinTransform_);
 	walk_->Draw(camera_, walkTransform_);

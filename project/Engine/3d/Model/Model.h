@@ -24,7 +24,7 @@
 #include "Data/Animation/AnimationStruct.h"
 #include "Data/Animation/Function/AnimationFunction.h"
 
-#include "Utility/Transform/Transform.h"
+#include "Math/Type/Transform.h"
 #include "Utility/Light/DirectionalLight.h"
 #include "Utility/Light/PointLight.h"
 #include "Utility/Light/SpotLight.h"

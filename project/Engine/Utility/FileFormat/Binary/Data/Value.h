@@ -6,7 +6,7 @@
 #include <cassert>
 #include <istream>
 #include <ostream>
-#include <Utility/Transform/Transform.h>
+#include <Math/Type/Transform.h>
 #include <Math/Type/Vector4.h>
 
 enum class TypeID : uint8_t {

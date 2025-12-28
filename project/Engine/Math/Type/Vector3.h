@@ -2,6 +2,12 @@
 #include <cstddef>  // std::size_t
 #include <cmath>    // std::sqrt
 
+#ifdef USE_IMGUI
+#include "imgui.h"           
+#include "imgui_impl_dx12.h" 
+#include "imgui_impl_win32.h"
+#endif
+
 /// <summary>
 /// 3次元ベクトル
 /// </summary>

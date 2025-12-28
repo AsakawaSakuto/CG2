@@ -158,6 +158,7 @@ void Map3D::SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type) {
 				BlockData& fillBlock = blocks_[fillIndex];
 				fillBlock.type = TileType::Normal;
 				CreateBlockModel(x, fillY, z, TileType::Normal);
+				SetBlockTexture(x, fillY, z, "resources/model/MapBlock/NormalBlockTexture2.png");
 			}
 		}
 	}
@@ -297,6 +298,25 @@ bool Map3D::GetSlopeHeight(const Vector3& worldPos, float& outY) const {
 	}
 
 	return false;
+}
+
+bool Map3D::SetBlockTexture(uint32_t x, uint32_t y, uint32_t z, const std::string& texturePath) {
+	// 範囲外チェック
+	if (!IsInBounds(x, y, z)) {
+		return false;
+	}
+
+	uint32_t index = ToIndex(x, y, z);
+	BlockData& block = blocks_[index];
+
+	// ブロックが空、またはモデルが無い場合は失敗
+	if (block.type == TileType::Empty || !block.model) {
+		return false;
+	}
+
+	// モデルにテクスチャを設定
+	block.model->SetTexture(texturePath);
+	return true;
 }
 
 bool Map3D::WorldToMap(const Vector3& worldPos, uint32_t& outX, uint32_t& outY, uint32_t& outZ) const {
