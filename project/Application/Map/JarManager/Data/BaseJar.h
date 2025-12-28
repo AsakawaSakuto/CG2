@@ -19,6 +19,7 @@ protected:
     Transform transform_;
     AABB aabbCollision_;
     bool isAlive_ = true;
+	bool isSpawn_ = false;
 
     int dropExpMin_;
     int dropExpMax_;
@@ -33,8 +34,8 @@ public:
 
     virtual const Vector3& GetPosition() { return transform_.translate; }
     virtual const AABB& GetAABBCollision() { return aabbCollision_; }
+	virtual const JarType GetJarType() const { return jarType_; }
     virtual bool IsAlive() const { return isAlive_; }
-	virtual JarType GetJarType() const { return jarType_; }
 
     virtual ~BaseJar() {}
 };

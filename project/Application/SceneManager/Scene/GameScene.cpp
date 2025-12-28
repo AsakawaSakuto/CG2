@@ -411,6 +411,8 @@ void GameScene::Initialize() {
 
 #pragma endregion
 
+	// JarManagerを初期化（マップ構築後に呼ぶ）
+	jarManager_->Initialize(map3D_.get());
 
 	player_ = make_unique<Player>();
 	player_->Initialize();
@@ -449,6 +451,9 @@ void GameScene::Update() {
 	enemyManager_->SetTargetPosition(player_->GetPosition());
 	enemyManager_->Update();
 
+	// JarManagerの更新
+	jarManager_->Update();
+
 	//camera_ = debugCamera_;
 	camera_ = gameCamera_->GetCamera();
 
@@ -466,6 +471,9 @@ void GameScene::Draw() {
 	if (map3D_) {
 		map3D_->Draw(camera_);
 	}
+
+	// 壺の描画
+	jarManager_->Draw(camera_);
 
 	minJar_->Draw(camera_, minJarTransform_);
 	maxJar_->Draw(camera_, maxJarTransform_);
@@ -496,6 +504,9 @@ void GameScene::DrawImGui() {
 	if (map3D_) {
 		map3D_->DrawImGui();
 	}
+	
+	// JarManagerのImGui描画
+	jarManager_->DrawImGui();
 }
 
 void GameScene::PostFrameCleanup() {

@@ -8,6 +8,7 @@
 #include "2d/BitmapFont/BitmapFont.h"
 #include "2d/Gauge/Gauge.h"
 #include "Map/Map3D.h"
+#include "Map/JarManager/JarManager.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -43,6 +44,9 @@ private:
 
 	// 3Dマップ
 	unique_ptr<Map3D> map3D_;
+
+	// 壺管理クラス
+	unique_ptr<JarManager> jarManager_ = make_unique<JarManager>();
 
 	unique_ptr<Model> minJar_ = make_unique<Model>();
 	unique_ptr<Model> maxJar_ = make_unique<Model>();

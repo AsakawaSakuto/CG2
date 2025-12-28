@@ -1,6 +1,10 @@
 #include "MaxJar.h"
 
 void MaxJar::Initialize(Vector3 pos) {
+
+	if (isSpawn_) { return; }
+	isSpawn_ = true;
+
 	// モデルの読み込み
 	model_ = std::make_unique<Model>();
 	model_->Initialize("jar/maxjar.obj");
@@ -41,17 +45,19 @@ int MaxJar::Break() {
 		switch (jarType_)
 		{
 		case JarType::Exp:
-
-			int exp = MyRand::Int(dropExpMin_, dropExpMax_);
-			return exp;
-
+			{
+				int exp = MyRand::Int(dropExpMin_, dropExpMax_);
+				return exp;
+			}
 			break;
 		case JarType::Money:
-
-			int money = MyRand::Int(dropMoneyMin_, dropMoneyMax_);
-			return money;
-
+			{
+				int money = MyRand::Int(dropMoneyMin_, dropMoneyMax_);
+				return money;
+			}
 			break;
 		}
 	}
+	
+	return 0;
 }
