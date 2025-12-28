@@ -87,6 +87,8 @@
     <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
     <ClCompile Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Application\Map\Map3D.cpp" />
+    <ClCompile Include="Engine\3d\Shadow\ShadowMap.cpp" />
+    <ClCompile Include="Engine\3d\Shadow\ShadowMapManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -211,6 +213,8 @@
     <ClInclude Include="Engine\Math\Type\Matrix3x3.h" />
     <ClInclude Include="Application\Map\Map3D.h" />
     <ClInclude Include="Application\Map\Map3DSamples.h" />
+    <ClInclude Include="Engine\3d\Shadow\ShadowMap.h" />
+    <ClInclude Include="Engine\3d\Shadow\ShadowMapManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

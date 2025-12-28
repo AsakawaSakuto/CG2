@@ -176,6 +176,8 @@
     <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
     <ClCompile Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.cpp" />
     <ClCompile Include="Engine\3d\Model\SkiningModel.cpp" />
+    <ClCompile Include="Engine\3d\Shadow\ShadowMap.cpp" />
+    <ClCompile Include="Engine\3d\Shadow\ShadowMapManager.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
     <ClCompile Include="Engine\Audio\Data\Audio.cpp" />
@@ -285,6 +287,8 @@
     <ClInclude Include="Engine\3d\Model\Data\Animation\AnimationStruct.h" />
     <ClInclude Include="Engine\3d\Model\Data\ModelDataStruct.h" />
     <ClInclude Include="Engine\3d\Model\SkiningModel.h" />
+    <ClInclude Include="Engine\3d\Shadow\ShadowMap.h" />
+    <ClInclude Include="Engine\3d\Shadow\ShadowMapManager.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Audio\MyAudio.h" />
     <ClInclude Include="Engine\Camera\Frustum.h" />
