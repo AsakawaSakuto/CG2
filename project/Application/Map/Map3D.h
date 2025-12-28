@@ -241,7 +241,7 @@ private:
 	uint32_t depth_;
 
 	// ブロックサイズ（各軸の直径）
-	Vector3 blockSize_ = { 10.0f, 5.0f, 10.0f };
+	Vector3 blockSize_ = { 15.0f, 10.0f, 15.0f };
 
 	// ブロックデータ（1次元配列）
 	std::vector<BlockData> blocks_;

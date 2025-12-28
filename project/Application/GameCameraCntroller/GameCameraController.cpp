@@ -47,6 +47,8 @@ void GameCameraController::SetDistance(float distance) {
 }
 
 void GameCameraController::DrawImgui() {
+#ifdef  USE_IMGUI
+
 	if (ImGui::TreeNode("GameCameraController")) {
 		// ターゲット位置の調整
 		ImGui::DragFloat3("Target Position", &targetPosition_.x, 0.1f);
@@ -79,4 +81,6 @@ void GameCameraController::DrawImgui() {
 		
 		ImGui::TreePop();
 	}
+
+#endif //  USE_IMGUI
 }

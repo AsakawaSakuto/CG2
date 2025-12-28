@@ -13,27 +13,27 @@ const std::unordered_map<TileType, std::string> Map3D::kModelPaths_ = {
 };
 
 // タイルタイプごとのスケール設定（Blenderの半径1mキューブからの倍率）
-// Normalブロックは直径(10m, 5m, 10m) → 半径(5m, 2.5m, 5m) → スケール(5.0, 2.5, 5.0)
+// Normalブロックは直径(15m, 10m, 15m) → 半径(7.5m, 5m, 7.5m) → スケール(7.5, 5.0, 7.5)
 const std::unordered_map<TileType, Vector3> Map3D::kTileScales_ = {
-	{ TileType::Normal, { 5.0f, 2.5f, 5.0f } },
-	{ TileType::Slope, { 5.0f, 2.5f, 5.0f } },
-	{ TileType::Slope_PlusX, { 5.0f, 2.5f, 5.0f } },
-	{ TileType::Slope_MinusX, { 5.0f, 2.5f, 5.0f } },
-	{ TileType::Slope_PlusZ, { 5.0f, 2.5f, 5.0f } },
-	{ TileType::Slope_MinusZ, { 5.0f, 2.5f, 5.0f } },
+	{ TileType::Normal, { 7.5f, 5.0f, 7.5f } },
+	{ TileType::Slope, { 7.5f, 5.0f, 7.5f } },
+	{ TileType::Slope_PlusX, { 7.5f, 5.0f, 7.5f } },
+	{ TileType::Slope_MinusX, { 7.5f, 5.0f, 7.5f } },
+	{ TileType::Slope_PlusZ, { 7.5f, 5.0f, 7.5f } },
+	{ TileType::Slope_MinusZ, { 7.5f, 5.0f, 7.5f } },
 };
 
 const std::unordered_map<TileType, AABB> Map3D::kNormalAABB_ = {
 	{ TileType::Normal, AABB{ {0.0f, 0.0f, 0.0f}, 
-	{-5.0f, -2.5f, -5.0f}, 
-	{ 5.0f,  2.5f,  5.0f} } },
+	{-7.5f, -5.0f, -7.5f}, 
+	{ 7.5f,  5.0f,  7.5f} } },
 };
 
 Map3D::Map3D(uint32_t width, uint32_t height, uint32_t depth)
 	: width_(width)
 	, height_(height)
 	, depth_(depth)
-	, blockSize_{ 10.0f, 5.0f, 10.0f }
+	, blockSize_{ 15.0f, 10.0f, 15.0f }
 {
 	// ブロック配列のサイズを確保
 	uint32_t totalSize = width_ * height_ * depth_;

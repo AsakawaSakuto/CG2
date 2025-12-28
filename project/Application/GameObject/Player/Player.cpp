@@ -12,7 +12,7 @@ void Player::PostFrameCleanup() {
 void Player::Initialize() {
 
 	transform_.scale = { 2.0f, 2.0f, 2.0f };
-	transform_.translate = { 10.0f,50.0f,10.0f };
+	transform_.translate = { 10.0f,100.0f,10.0f };
 
 	model_->Initialize("animation/human/walk.gltf");
 	model_->UseLight(false);
@@ -191,8 +191,8 @@ void Player::Move() {
 		moveParticle_->Stop();
 	}
 
-	transform_.translate.x = std::clamp(transform_.translate.x, -4.5f, 144.5f);
-	transform_.translate.z = std::clamp(transform_.translate.z, -4.5f, 144.5f);
+	transform_.translate.x = std::clamp(transform_.translate.x, -7.5f, 217.5f);
+	transform_.translate.z = std::clamp(transform_.translate.z, -7.5f, 217.5f);
 }
 
 Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
@@ -376,8 +376,8 @@ void Player::ResolveMapCollision() {
 						Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 						AABB blockAABB;
 						blockAABB.center = blockWorldPos;
-						blockAABB.min = { -5.0f, -2.5f, -5.0f };
-						blockAABB.max = {  5.0f,  2.5f,  5.0f };
+						blockAABB.min = { -7.5f, -5.0f, -7.5f };
+						blockAABB.max = {  7.5f,  5.0f,  7.5f };
 
 						// 衝突判定
 						if (!Collision::IsHit(mapCollosion_, blockAABB)) continue;
@@ -497,8 +497,8 @@ void Player::ResolveMapCollision() {
 					Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 					AABB blockAABB;
 					blockAABB.center = blockWorldPos;
-					blockAABB.min = { -5.0f, -2.5f, -5.0f };
-					blockAABB.max = {  5.0f,  2.5f,  5.0f };
+					blockAABB.min = { -7.5f, -5.0f, -7.5f };
+					blockAABB.max = {  7.5f,  5.0f,  7.5f };
 
 					// 衝突判定
 					if (!Collision::IsHit(mapCollosion_, blockAABB)) continue;
@@ -695,8 +695,8 @@ bool Player::IsGroundedOnMap() {
 					Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 					AABB blockAABB;
 					blockAABB.center = blockWorldPos;
-					blockAABB.min = { -5.0f, -2.5f, -5.0f };
-					blockAABB.max = { 5.0f, 2.5f, 5.0f };
+					blockAABB.min = { -7.5f, -5.0f, -7.5f };
+					blockAABB.max = {  7.5f,  5.0f,  7.5f };
 
 					// 足元チェック用AABBとの衝突判定
 					if (Collision::IsHit(groundCheckAABB, blockAABB)) {

@@ -96,6 +96,18 @@ bool JarManager::FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t
 	for (int32_t y = static_cast<int32_t>(map->GetHeight()) - 1; y >= 0; --y) {
 		TileType type = map->GetTile(x, static_cast<uint32_t>(y), z);
 		if (type == TileType::Normal) {
+			// このNormalブロックの上にSlopeがないかチェック
+			if (y < static_cast<int32_t>(map->GetHeight()) - 1) {
+				TileType topType = map->GetTile(x, static_cast<uint32_t>(y + 1), z);
+				// 上にSlopeがある場合はスキップ（Slopeの中に配置されるのを防ぐ）
+				if (topType == TileType::Slope || 
+				    topType == TileType::Slope_PlusX || 
+				    topType == TileType::Slope_MinusX || 
+				    topType == TileType::Slope_PlusZ || 
+				    topType == TileType::Slope_MinusZ) {
+					continue;
+				}
+			}
 			outY = static_cast<uint32_t>(y);
 			return true;
 		}
@@ -137,15 +149,15 @@ void JarManager::SpawnJars(Map3D* map) {
 				// ブロックの中心座標を取得
 				Vector3 blockCenter = map->MapToWorld(x, topY, z);
 				
-				// XZ方向に±4.5の範囲でランダムな位置を生成
+				// XZ方向に±7.0の範囲でランダムな位置を生成（ブロックサイズ15.0の半分）
 				// より多くの候補を生成（8個に増やす）
 				for (int i = 0; i < 8; ++i) {
-					float offsetX = MyRand::Float(-4.5f, 4.5f);
-					float offsetZ = MyRand::Float(-4.5f, 4.5f);
+					float offsetX = MyRand::Float(-7.0f, 7.0f);
+					float offsetZ = MyRand::Float(-7.0f, 7.0f);
 					
 					Vector3 jarPos = {
 						blockCenter.x + offsetX,
-						blockCenter.y + 2.5f,  // Y座標はCenter.y + 2.5f
+						blockCenter.y + 5.0f,  // Y座標はCenter.y + 5.0f（ブロックの高さ10.0の半分）
 						blockCenter.z + offsetZ
 					};
 					
