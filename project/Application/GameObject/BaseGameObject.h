@@ -1,7 +1,7 @@
 #pragma once
 #include "Utility/Collision/Type/AABB.h"
 #include "Utility/Collision/Type/Sphere.h"
-#include "Utility/Transform/Transform.h"
+#include "Math/Type/Transform.h"
 #include "Camera/Camera.h"
 
 class BaseGameObject {

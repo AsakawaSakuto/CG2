@@ -25,49 +25,28 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
+	bool cameraDebugMode_ = false;
 private:
 	
 	Camera camera_;
 	DebugCamera debugCamera_;
 
-	unique_ptr<Model> wallModel_ = make_unique<Model>();
-	Transform gridTransform_;
-
 	// プレイヤー関連のクラス
 	unique_ptr<Player> player_;
 	unique_ptr<GameCameraController> gameCamera_ = make_unique<GameCameraController>();
 
+	// 敵管理クラス
 	unique_ptr<EnemyManager> enemyManager_ = make_unique<EnemyManager>();
 
 	// 衝突判定マネージャー
 	unique_ptr<CollisionManager> collisionManager_ = make_unique<CollisionManager>();
 
-	unique_ptr<Particles> testParticle_ = make_unique<Particles>();
-
-	unique_ptr<Particles> dustParticle_ = make_unique<Particles>();
-
-	unique_ptr<Sprite> text_;
-	unique_ptr<Sprite> lv_;
-	unique_ptr<Sprite> lvText_;
-	unique_ptr<Sprite> fireBallIcon_;
-	unique_ptr<Sprite> leaserIcon_;
-	unique_ptr<Sprite> runaIcon_;
-
-	GameTimer textMoveTimer_;
-
-	// ビットマップフォント（数字表示用）
-	unique_ptr<BitmapFont> timeFont_;
-	unique_ptr<BitmapFont> playerHPFont_;
-	unique_ptr<BitmapFont> playerLv_;
-
-	float gameTime_ = 0.0f;
-	int score_ = 0;
-	GameTimer gameTimer_;
-
-	// ゲージ（HP・経験値表示用）
-	unique_ptr<Gauge> hpGauge_;
-	unique_ptr<Gauge> expGauge_;
-
 	// 3Dマップ
 	unique_ptr<Map3D> map3D_;
+
+	unique_ptr<Model> minJar_ = make_unique<Model>();
+	unique_ptr<Model> maxJar_ = make_unique<Model>();
+
+	Transform minJarTransform_;
+	Transform maxJarTransform_;
 };

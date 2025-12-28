@@ -1,7 +1,7 @@
 #pragma once
 #include "3d/Model/Data/ModelDataStruct.h"
 
-#include "Utility/Transform/Transform.h"
+#include "Math/Type/Transform.h"
 #include "Core/TextureManager/TextureManager.h"
 #include "Math/MatrixFunction/MatrixFunction.h"
 #include "Camera/CameraForGPU.h"

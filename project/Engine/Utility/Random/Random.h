@@ -1,3 +1,4 @@
+#pragma once
 #include <random>
 
 class Random {
@@ -19,3 +20,22 @@ public:
 private:
     std::mt19937 engine;
 };
+
+// MyRand名前空間 - どこからでも使えるランダム機能
+namespace MyRand {
+    // スレッドローカルなRandomインスタンスを取得
+    inline Random& GetInstance() {
+        thread_local Random instance;
+        return instance;
+    }
+
+    // min ～ max の整数乱数を返す
+    inline int Int(int min, int max) {
+        return GetInstance().Int(min, max);
+    }
+
+    // min ～ max の浮動小数乱数を返す
+    inline float Float(float min, float max) {
+        return GetInstance().Float(min, max);
+    }
+}

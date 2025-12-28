@@ -89,6 +89,9 @@
     <ClCompile Include="Application\Map\Map3D.cpp" />
     <ClCompile Include="Engine\3d\Shadow\ShadowMap.cpp" />
     <ClCompile Include="Engine\3d\Shadow\ShadowMapManager.cpp" />
+    <ClCompile Include="Application\Map\JarManager\JarManager.cpp" />
+    <ClCompile Include="Application\Map\JarManager\Data\MinJar.cpp" />
+    <ClCompile Include="Application\Map\JarManager\Data\MaxJar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -166,7 +169,7 @@
     <ClInclude Include="Engine\Core\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MatrixFunction\MatrixFunction.h" />
     <ClInclude Include="Engine\Core\TextureManager\TextureManager.h" />
-    <ClInclude Include="Engine\Utility\Transform\Transform.h" />
+    <ClInclude Include="Engine\Math\Type\Transform.h" />
     <ClInclude Include="Engine\Math\Type\Vector2.h" />
     <ClInclude Include="Engine\Math\Type\Vector4.h" />
     <ClInclude Include="Engine\Math\Type\Vector3.h" />
@@ -215,6 +218,10 @@
     <ClInclude Include="Application\Map\Map3DSamples.h" />
     <ClInclude Include="Engine\3d\Shadow\ShadowMap.h" />
     <ClInclude Include="Engine\3d\Shadow\ShadowMapManager.h" />
+    <ClInclude Include="Application\Map\JarManager\JarManager.h" />
+    <ClInclude Include="Application\Map\JarManager\Data\BaseJar.h" />
+    <ClInclude Include="Application\Map\JarManager\Data\MinJar.h" />
+    <ClInclude Include="Application\Map\JarManager\Data\MaxJar.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
