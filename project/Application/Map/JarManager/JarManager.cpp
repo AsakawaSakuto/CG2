@@ -204,3 +204,23 @@ void JarManager::SpawnJars(Map3D* map) {
 		}
 	}
 }
+
+std::vector<Vector3> JarManager::GetAllJarPositions() const {
+	std::vector<Vector3> positions;
+	
+	// MinJarの位置を追加
+	for (const auto& jar : minJars_) {
+		if (jar->IsAlive()) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	// MaxJarの位置を追加
+	for (const auto& jar : maxJars_) {
+		if (jar->IsAlive()) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	return positions;
+}

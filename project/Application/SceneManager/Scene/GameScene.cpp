@@ -414,6 +414,9 @@ void GameScene::Initialize() {
 	// JarManagerを初期化（マップ構築後に呼ぶ）
 	jarManager_->Initialize(map3D_.get());
 
+	// ChestManagerを初期化（JarManagerの後に呼んで位置情報を取得）
+	chestManager_->Initialize(map3D_.get(), jarManager_.get());
+
 	player_ = make_unique<Player>();
 	player_->Initialize();
 
@@ -454,6 +457,9 @@ void GameScene::Update() {
 	// JarManagerの更新
 	jarManager_->Update();
 
+	// ChestManagerの更新
+	chestManager_->Update();
+
 	//camera_ = debugCamera_;
 	camera_ = gameCamera_->GetCamera();
 
@@ -474,6 +480,9 @@ void GameScene::Draw() {
 
 	// 壺の描画
 	jarManager_->Draw(camera_);
+
+	// 宝箱の描画
+	chestManager_->Draw(camera_);
 
 	minJar_->Draw(camera_, minJarTransform_);
 	maxJar_->Draw(camera_, maxJarTransform_);
@@ -507,6 +516,9 @@ void GameScene::DrawImGui() {
 	
 	// JarManagerのImGui描画
 	jarManager_->DrawImGui();
+
+	// ChestManagerのImGui描画
+	chestManager_->DrawImGui();
 }
 
 void GameScene::PostFrameCleanup() {

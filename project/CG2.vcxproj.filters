@@ -92,6 +92,9 @@
     <ClCompile Include="Application\Map\JarManager\JarManager.cpp" />
     <ClCompile Include="Application\Map\JarManager\Data\MinJar.cpp" />
     <ClCompile Include="Application\Map\JarManager\Data\MaxJar.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\Data\PaidChest.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\Data\FreeChest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -222,6 +225,10 @@
     <ClInclude Include="Application\Map\JarManager\Data\BaseJar.h" />
     <ClInclude Include="Application\Map\JarManager\Data\MinJar.h" />
     <ClInclude Include="Application\Map\JarManager\Data\MaxJar.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\BaseChest.h" />
+    <ClInclude Include="Application\Map\ChestManager\ChestManager.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\PaidChest.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\FreeChest.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

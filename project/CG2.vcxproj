@@ -164,6 +164,9 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\GameUI\BaseUI.cpp" />
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\Data\FreeChest.cpp" />
+    <ClCompile Include="Application\Map\ChestManager\Data\PaidChest.cpp" />
     <ClCompile Include="Application\Map\JarManager\Data\MaxJar.cpp" />
     <ClCompile Include="Application\Map\JarManager\Data\MinJar.cpp" />
     <ClCompile Include="Application\Map\JarManager\JarManager.cpp" />
@@ -275,6 +278,10 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />
+    <ClInclude Include="Application\Map\ChestManager\ChestManager.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\BaseChest.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\FreeChest.h" />
+    <ClInclude Include="Application\Map\ChestManager\Data\PaidChest.h" />
     <ClInclude Include="Application\Map\JarManager\Data\BaseJar.h" />
     <ClInclude Include="Application\Map\JarManager\Data\MaxJar.h" />
     <ClInclude Include="Application\Map\JarManager\Data\MinJar.h" />

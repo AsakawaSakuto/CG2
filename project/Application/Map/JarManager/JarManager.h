@@ -17,6 +17,9 @@ public:
 	// 壺を壊す（戻り値: ドロップアイテムの量）
 	int BreakJar(const AABB& attackAABB, JarType& outJarType);
 	
+	// 全ての壺の位置を取得（ChestManagerで使用）
+	std::vector<Vector3> GetAllJarPositions() const;
+	
 private:
 	// 最上面のNormalブロックを見つける
 	bool FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const;

@@ -9,6 +9,7 @@
 #include "2d/Gauge/Gauge.h"
 #include "Map/Map3D.h"
 #include "Map/JarManager/JarManager.h"
+#include "Map/ChestManager/ChestManager.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -47,6 +48,9 @@ private:
 
 	// 壺管理クラス
 	unique_ptr<JarManager> jarManager_ = make_unique<JarManager>();
+
+	// 宝箱管理クラス
+	unique_ptr<ChestManager> chestManager_ = make_unique<ChestManager>();
 
 	unique_ptr<Model> minJar_ = make_unique<Model>();
 	unique_ptr<Model> maxJar_ = make_unique<Model>();

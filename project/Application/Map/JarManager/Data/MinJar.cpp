@@ -8,6 +8,7 @@ void MinJar::Initialize(Vector3 pos) {
 	// モデルの読み込み
 	model_ = std::make_unique<Model>();
 	model_->Initialize("jar/minjar.obj");
+	model_->SetTexture("resources/image/white1x1.png");
 
 	// 位置設定
 	transform_.translate = pos;
@@ -26,8 +27,10 @@ void MinJar::Initialize(Vector3 pos) {
 
 	if (MyRand::Int(0, 1) == 0) {
 		jarType_ = JarType::Exp;
+		model_->SetColor3({ 0.0f, 0.0f, 1.0f });
 	} else {
 		jarType_ = JarType::Money;
+		model_->SetColor3({ 1.0f, 1.0f, 0.0f });
 	}
 }
 
