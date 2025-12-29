@@ -7,6 +7,7 @@
 // 前方宣言
 class EnemyManager;
 class Map3D;
+class TreeManager;
 
 class Player : public BaseGameObject {
 public:
@@ -22,6 +23,9 @@ public:
 
 	// Map3Dへの参照を設定
 	void SetMap(Map3D* map) { map_ = map; }
+	
+	// TreeManagerへの参照を設定
+	void SetTreeManager(TreeManager* treeManager) { treeManager_ = treeManager; }
 
 	// WeaponManagerへのアクセス
 	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
@@ -143,6 +147,9 @@ private:
 
 	// Map3Dへの参照（生ポインタ、所有権なし）
 	Map3D* map_ = nullptr;
+	
+	// TreeManagerへの参照（生ポインタ、所有権なし）
+	TreeManager* treeManager_ = nullptr;
 
 	Sphere expItemStateChangeCollision_;
 	float expItemStateChangeRadius_ = 3.5f;

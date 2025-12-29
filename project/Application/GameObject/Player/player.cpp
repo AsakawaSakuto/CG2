@@ -1,6 +1,7 @@
 #include "player.h"
 #include "GameObject/EnemyManager/EnemyManager.h"
 #include "Map/Map3D.h"
+#include "Map/TreeManager/TreeManager.h"
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -11,7 +12,7 @@ void Player::PostFrameCleanup() {
 
 void Player::Initialize() {
 
-	transform_.scale = { 2.0f, 2.0f, 2.0f };
+	transform_.SetAllScale(1.5);
 	transform_.translate = { 10.0f,100.0f,10.0f };
 
 	model_->Initialize("animation/human/walk.gltf");
@@ -48,6 +49,13 @@ void Player::Update() {
 	// マップとの衝突解決を実行
 	if (map_) {
 		ResolveMapCollision();
+	}
+	
+	// 木との衝突解決を実行（XZ軸のみ）
+	if (treeManager_) {
+		treeManager_->ResolvePlayerCollision(transform_.translate, mapCollosion_);
+		// 衝突解決後、AABBの中心も更新
+		mapCollosion_.center = transform_.translate;
 	}
 
 	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
