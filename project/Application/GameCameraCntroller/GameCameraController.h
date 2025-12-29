@@ -4,6 +4,9 @@
 #include "Utility/Collision/Type/LineStruct.h"
 #include <cmath>
 
+// 前方宣言
+class TreeManager;
+
 class GameCameraController
 {
 public:
@@ -14,6 +17,13 @@ public:
 	// TPS機能
 	void SetTarget(Vector3 targetPosition);
 	void SetDistance(float distance);
+	
+	/// <summary>
+	/// カメラとプレイヤー間の障害物を半透明化
+	/// </summary>
+	/// <param name="map">マップへのポインタ</param>
+	/// <param name="treeManager">ツリーマネージャーへのポインタ</param>
+	void UpdateOccluderTransparency(TreeManager* treeManager);
 	
 	Camera& GetCamera() { return camera_; }
 

@@ -185,6 +185,7 @@ public:
 	uint32_t GetDepth() const { return depth_; }
 
 	void Update();
+
 private:
 	/// <summary>
 	/// 3D座標から1次元インデックスに変換

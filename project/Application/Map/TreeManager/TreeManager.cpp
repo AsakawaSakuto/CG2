@@ -258,3 +258,47 @@ void TreeManager::ResolvePlayerCollision(Vector3& playerPosition, const AABB& pl
 		playerPosition.z += bestPushOut.z;
 	}
 }
+
+void TreeManager::SetOccludersTransparent(const Vector3& cameraPos, const Vector3& playerPos) {
+	// カメラからプレイヤーへの方向ベクトル
+	Vector3 direction = playerPos - cameraPos;
+	float distance = direction.Length();
+	
+	if (distance < 0.01f) return;
+	
+	direction = direction / distance; // 正規化
+	
+	const float checkRadius = 7.5f; // チェック半径
+	
+	// 全ての木をチェック
+	for (auto& tree : trees_) {
+		if (!tree->IsSpawned()) continue;
+		
+		Vector3 treePos = tree->GetPosition();
+		
+		// 木の位置がカメラ-プレイヤー線上付近にあるかチェック
+		Vector3 toTree = treePos - cameraPos;
+		float projectionLength = Vector3::Dot(toTree, direction);
+		
+		// プレイヤーより手前にある木のみ処理
+		if (projectionLength < 0.0f || projectionLength > distance) {
+			continue;
+		}
+		
+		Vector3 closestPoint = cameraPos + direction * projectionLength;
+		float distanceToLine = (treePos - closestPoint).Length();
+		
+		// 線に近い木を半透明化
+		if (distanceToLine < checkRadius) {
+			tree->SetTransparent(true, 0.3f);
+		}
+	}
+}
+
+void TreeManager::ResetAllTransparency() {
+	for (auto& tree : trees_) {
+		if (tree->IsSpawned()) {
+			tree->SetTransparent(false);
+		}
+	}
+}

@@ -1,5 +1,6 @@
 #include "GameCameraController.h"
 #include "Input/MyInput.h"
+#include "Map/TreeManager/TreeManager.h"
 #include <imgui.h>
 
 void GameCameraController::Initialize() {
@@ -141,4 +142,18 @@ void GameCameraController::DrawImgui() {
 	}
 
 #endif //  USE_IMGUI
+}
+
+void GameCameraController::UpdateOccluderTransparency(TreeManager* treeManager) {
+	// カメラとプレイヤー（ターゲット）の位置を取得
+	Vector3 cameraPos = camera_.GetTranslate();
+	Vector3 playerPos = targetPosition_;
+	
+	if (treeManager) {
+		treeManager->ResetAllTransparency();
+	}
+	
+	if (treeManager) {
+		treeManager->SetOccludersTransparent(cameraPos, playerPos);
+	}
 }

@@ -71,6 +71,9 @@ void GameScene::Update() {
 
 	gameCamera_->SetTarget(player_->GetPosition());
 	gameCamera_->Update();
+	
+	// カメラとプレイヤー間の障害物を半透明化
+	gameCamera_->UpdateOccluderTransparency(treeManager_.get());
 
 	// CollisionManagerで衝突判定を実行
 	collisionManager_->Update();

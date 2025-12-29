@@ -19,6 +19,18 @@ public:
 	// PlayerとTreeのXZ軸衝突解決（Y軸は無視）
 	void ResolvePlayerCollision(Vector3& playerPosition, const AABB& playerAABB);
 	
+	/// <summary>
+	/// カメラ-プレイヤー間の木を半透明化
+	/// </summary>
+	/// <param name="cameraPos">カメラ位置</param>
+	/// <param name="playerPos">プレイヤー位置</param>
+	void SetOccludersTransparent(const Vector3& cameraPos, const Vector3& playerPos);
+	
+	/// <summary>
+	/// 全ての木の透明度をリセット
+	/// </summary>
+	void ResetAllTransparency();
+	
 private:
 	// 最上面のNormalブロックを見つける
 	bool FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const;
