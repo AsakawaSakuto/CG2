@@ -31,27 +31,33 @@ public:
 	/// <summary>
 	/// 現在のHPを取得
 	/// </summary>
-	int GetCurrentHP() const { return status_.currentHP_; }
+	int GetCurrentHP() const { return status_.currentHP; }
 
 	/// <summary>
 	/// 最大HPを取得
 	/// </summary>
-	int GetMaxHP() const { return status_.maxHP_; }
+	int GetMaxHP() const { return status_.maxHP; }
 
 	/// <summary>
 	/// 現在の経験値を取得
 	/// </summary>
-	int GetCurrentExp() const { return status_.currentExp_; }
+	int GetCurrentExp() const { return status_.currentExp; }
 
 	/// <summary>
 	/// 次のレベルまでに必要な経験値を取得
 	/// </summary>
-	int GetExpToNextLevel() const { return status_.expToNextLevel_; }
+	int GetExpToNextLevel() const { return status_.expToNextLevel; }
+
+	/// <summary>
+	/// /
+	/// </summary>
+	/// <returns></returns>
+	int GetNowMoney() const { return status_.nowMoney; }
 
 	/// <summary>
 	/// 現在のレベルを取得
 	/// </summary>
-	int GetLevel() const { return status_.level_; }
+	int GetLevel() const { return status_.level; }
 
 	/// <summary>
 	/// HPを設定（ダメージ・回復用）
@@ -62,6 +68,8 @@ public:
 	/// 経験値を追加
 	/// </summary>
 	void AddExp(int exp);
+
+	void AddMoney(int money);
 
 private:
 
@@ -90,6 +98,12 @@ private:
 	/// </summary>
 	/// <returns>地面に接している場合true</returns>
 	bool IsGroundedOnMap();
+
+	/// <summary>
+	/// ブロック内に不正に貫通していないかチェック
+	/// </summary>
+	/// <returns>不正な貫通が検出された場合true</returns>
+	bool IsInsideBlockIllegally();
 
 private:
 	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
@@ -124,4 +138,8 @@ private:
 	float expItemStateChangeRadius_ = 3.5f;
 
 	AABB mapCollosion_;
+
+	// フォールバック機構：前フレームの位置を記録
+	Vector3 previousFramePosition_ = { 0.0f, 0.0f, 0.0f };
+	bool hasPreviousPosition_ = false; // 前フレーム位置が有効かどうか
 };

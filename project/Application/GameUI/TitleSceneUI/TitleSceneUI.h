@@ -8,7 +8,6 @@ public:
 	void Update() override;
 	void Draw() override;
 	void DrawImGui() override;
-	~TitleSceneUI();
 
 	bool QuitSelected() { return isQuit_; }
 	bool PlaySelected() { return isPlay_; }

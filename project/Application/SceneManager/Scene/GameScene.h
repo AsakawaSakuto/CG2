@@ -10,6 +10,7 @@
 #include "Map/Map3D.h"
 #include "Map/JarManager/JarManager.h"
 #include "Map/ChestManager/ChestManager.h"
+#include "GameUI/GameSceneUI/GameSceneUI.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -32,6 +33,8 @@ private:
 	
 	Camera camera_;
 	DebugCamera debugCamera_;
+
+	unique_ptr<GameSceneUI> gameSceneUI_;
 
 	// プレイヤー関連のクラス
 	unique_ptr<Player> player_;

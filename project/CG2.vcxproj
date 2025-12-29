@@ -152,7 +152,6 @@
   <ItemGroup>
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
-    <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
@@ -162,7 +161,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
-    <ClCompile Include="Application\GameUI\BaseUI.cpp" />
+    <ClCompile Include="Application\GameUI\GameSceneUI\GameSceneUI.cpp" />
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
     <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
     <ClCompile Include="Application\Map\ChestManager\Data\FreeChest.cpp" />
@@ -277,6 +276,7 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
+    <ClInclude Include="Application\GameUI\GameSceneUI\GameSceneUI.h" />
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />
     <ClInclude Include="Application\Map\ChestManager\ChestManager.h" />
     <ClInclude Include="Application\Map\ChestManager\Data\BaseChest.h" />

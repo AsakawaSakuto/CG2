@@ -433,6 +433,9 @@ void GameScene::Initialize() {
 	collisionManager_->SetPlayer(player_.get());
 	collisionManager_->SetEnemyManager(enemyManager_.get());
 	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
+
+	gameSceneUI_ = make_unique<GameSceneUI>();
+	gameSceneUI_->Initialize();
 }
 
 void GameScene::Update() {
@@ -464,6 +467,10 @@ void GameScene::Update() {
 
 	map3D_->Update();
 
+	gameSceneUI_->SetNowMoney(player_->GetNowMoney());
+	gameSceneUI_->SetExpGauge(player_->GetCurrentExp(), player_->GetExpToNextLevel());
+	gameSceneUI_->Update();
+
 	MyDebugLine::AddGrid(100.0f, 20);
 }
 
@@ -486,6 +493,8 @@ void GameScene::Draw() {
 	player_->Draw(camera_);
 
 	collisionManager_->Draw(camera_);
+
+	gameSceneUI_->Draw();
 }
 
 void GameScene::DrawImGui() {
@@ -507,6 +516,8 @@ void GameScene::DrawImGui() {
 		map3D_->DrawImGui();
 	}
 	
+	gameSceneUI_->DrawImGui();
+
 	// JarManagerのImGui描画
 	//jarManager_->DrawImGui();
 

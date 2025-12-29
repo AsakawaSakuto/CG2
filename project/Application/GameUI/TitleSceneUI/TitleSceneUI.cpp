@@ -1,8 +1,5 @@
 #include "TitleSceneUI.h"
 
-TitleSceneUI::~TitleSceneUI() {
-}
-
 void TitleSceneUI::Initialize() {
 
 	playUI_->Initialize("UI/title/playUI.png", { 640.0f,440.0f }, { 0.5f,0.5f });

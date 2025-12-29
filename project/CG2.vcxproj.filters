@@ -28,8 +28,6 @@
     <ClCompile Include="Application\SceneManager\Scene\GameScene.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\ResultScene.cpp" />
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
-    <ClCompile Include="Application\GameUI\BaseUI.cpp" />
-    <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
@@ -95,6 +93,7 @@
     <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
     <ClCompile Include="Application\Map\ChestManager\Data\PaidChest.cpp" />
     <ClCompile Include="Application\Map\ChestManager\Data\FreeChest.cpp" />
+    <ClCompile Include="Application\GameUI\GameSceneUI\GameSceneUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -229,6 +228,7 @@
     <ClInclude Include="Application\Map\ChestManager\ChestManager.h" />
     <ClInclude Include="Application\Map\ChestManager\Data\PaidChest.h" />
     <ClInclude Include="Application\Map\ChestManager\Data\FreeChest.h" />
+    <ClInclude Include="Application\GameUI\GameSceneUI\GameSceneUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
