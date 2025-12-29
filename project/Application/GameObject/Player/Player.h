@@ -60,6 +60,11 @@ public:
 	int GetLevel() const { return status_.level; }
 
 	/// <summary>
+	/// マップ衝突用AABBを取得
+	/// </summary>
+	const AABB& GetMapCollisionAABB() const { return mapCollosion_; }
+
+	/// <summary>
 	/// HPを設定（ダメージ・回復用）
 	/// </summary>
 	void SetCurrentHP(int hp);
@@ -71,6 +76,11 @@ public:
 
 	void AddMoney(int money);
 
+	/// <summary>
+	/// お金を減らす（戻り値: 減らせたかどうか）
+	/// </summary>
+	bool SubtractMoney(int money);
+	
 private:
 
 	// 移動処理

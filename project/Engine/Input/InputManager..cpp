@@ -134,6 +134,9 @@ void InputManager::SetupDefaultBindings() {
 	bindings_[Action::PAUSE].push_back(InputBinding(InputSource::KEYBOARD, DIK_TAB));
 	bindings_[Action::PAUSE].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::START));
 
+	bindings_[Action::INTERACT].push_back(InputBinding(InputSource::KEYBOARD, DIK_E));
+	bindings_[Action::INTERACT].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::X));
+
 	// セレクト
 	bindings_[Action::CELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_W));
 	bindings_[Action::CELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_UP));

@@ -71,13 +71,13 @@ void ChestManager::DrawImGui() {
 #endif
 }
 
-bool ChestManager::OpenChest(const AABB& interactAABB, bool& outIsPaidChest) {
+bool ChestManager::CheckChestCollision(const AABB& interactAABB, bool& outIsPaidChest, int& outOpenAmount) {
 	// PaidChestとの衝突チェック
 	for (auto& chest : paidChests_) {
 		if (chest->IsAlive()) {
 			if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
-				chest->Open();
 				outIsPaidChest = true;
+				outOpenAmount = openAmount_;
 				return true;
 			}
 		}
@@ -87,9 +87,35 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool& outIsPaidChest) {
 	for (auto& chest : freeChests_) {
 		if (chest->IsAlive()) {
 			if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
-				chest->Open();
 				outIsPaidChest = false;
+				outOpenAmount = 0;
 				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+bool ChestManager::OpenChest(const AABB& interactAABB, bool needMoney) {
+	if (needMoney) {
+		// PaidChestを開ける
+		for (auto& chest : paidChests_) {
+			if (chest->IsAlive()) {
+				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
+					chest->Open();
+					return true;
+				}
+			}
+		}
+	} else {
+		// FreeChestを開ける
+		for (auto& chest : freeChests_) {
+			if (chest->IsAlive()) {
+				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
+					chest->Open();
+					return true;
+				}
 			}
 		}
 	}

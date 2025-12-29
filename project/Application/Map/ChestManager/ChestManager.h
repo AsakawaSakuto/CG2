@@ -16,8 +16,17 @@ public:
 	void Draw(Camera& camera);
 	void DrawImGui();
 	
-	// 宝箱を開ける（戻り値: 開けることができたか）
-	bool OpenChest(const AABB& interactAABB, bool& outIsPaidChest);
+	// 宝箱との衝突をチェック（戻り値: 衝突したか）
+	// outIsPaidChest: PaidChestならtrue、FreeChestならfalse
+	// outOpenAmount: 開けるのに必要な金額（PaidChestの場合のみ）
+	bool CheckChestCollision(const AABB& interactAABB, bool& outIsPaidChest, int& outOpenAmount);
+	
+	// 宝箱を開ける（お金のチェック後に使用）
+	// needMoney: PaidChestの場合true、FreeChestの場合false
+	bool OpenChest(const AABB& interactAABB, bool needMoney);
+	
+	// 開けるのに必要な金額を取得
+	int GetOpenAmount() const { return openAmount_; }
 	
 private:
 	// 最上面のNormalブロックを見つける
@@ -33,6 +42,8 @@ private:
 	int paidChestNum_ = 45;
 	int freeChestNum_ = 5;
 	
+	int openAmount_ = 10;
+
 	std::vector<std::unique_ptr<PaidChest>> paidChests_;
 	std::vector<std::unique_ptr<FreeChest>> freeChests_;
 	

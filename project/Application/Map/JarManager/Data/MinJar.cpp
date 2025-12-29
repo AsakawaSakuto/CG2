@@ -22,8 +22,8 @@ void MinJar::Initialize(Vector3 pos) {
 	dropExpMin_   = 5;
 	dropExpMax_   = 10;
 
-	dropMoneyMin_ = 10;
-	dropMoneyMax_ = 20;
+	dropMoneyMin_ = 5;
+	dropMoneyMax_ = 10;
 
 	if (MyRand::Int(0, 1) == 0) {
 		jarType_ = JarType::Exp;

@@ -28,9 +28,18 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
+	void TempMap();
+
+	void JarUpdate();
+	
+	void ChestUpdate();
+
+	void UIUpdate();
+
 	bool cameraDebugMode_ = false;
 private:
-	
+	int dangerLv_ = 0;
+
 	Camera camera_;
 	DebugCamera debugCamera_;
 

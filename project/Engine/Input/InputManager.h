@@ -11,6 +11,7 @@ enum class Action {
 	// 決定
 	CONFIRM,
 	PAUSE,
+	INTERACT,
 
 	// セレクト
 	CELECT_UP,

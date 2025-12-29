@@ -811,3 +811,11 @@ void Player::AddMoney(int money) {
 		status_.nowMoney = 0;
 	}
 }
+
+bool Player::SubtractMoney(int money) {
+	if (status_.nowMoney >= money) {
+		status_.nowMoney -= money;
+		return true;
+	}
+	return false;
+}
