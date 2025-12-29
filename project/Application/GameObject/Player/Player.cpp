@@ -25,9 +25,9 @@ void Player::Initialize() {
 	weaponManager_->Initialize();
 
 	// ステータスの初期化
-	status_.currentHP_ = status_.maxHP_;
-	status_.currentExp_ = 0;
-	status_.level_ = 1;
+	status_.currentHP = status_.maxHP;
+	status_.currentExp = 0;
+	status_.level = 1;
 
 	// AABBの初期化（新仕様: center + min/maxのローカルオフセット）
 	// center は transform_.translate で毎フレーム更新されるため、ここでは初期化不要
@@ -53,9 +53,6 @@ void Player::Update() {
 	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
 
 	directionToEnemy_ = GetDirectionToEnemy();
-
-	//transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
-	//transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
 
 	expGetRangeTransform_.translate = transform_.translate;
 	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
@@ -102,20 +99,20 @@ void Player::DrawImGui() {
 #ifdef USE_IMGUI
 	// プレイヤー固有のImGui
 	ImGui::Begin("Player Settings");
-	ImGui::DragFloat("Move Speed", &status_.moveSpeed_, 0.1f, 0.1f, 20.0f);
+	ImGui::DragFloat("Move Speed", &status_.moveSpeed, 0.1f, 0.1f, 20.0f);
 	ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
 	
 	// ジャンプ設定
 	ImGui::Separator();
 	ImGui::Text("Jump Settings");
-	ImGui::DragInt("Jump Can Count", &status_.jumpCanCount_, 1, 1, 5);
-	ImGui::DragFloat("Jump Power", &status_.jumpPower_, 0.1f, 1.0f, 20.0f);
-	ImGui::DragFloat("Gravity", &status_.gravity_, 0.1f, 1.0f, 50.0f);
+	ImGui::DragInt("Jump Can Count", &status_.jumpCanCount, 1, 1, 5);
+	ImGui::DragFloat("Jump Power", &status_.jumpPower, 0.1f, 1.0f, 20.0f);
+	ImGui::DragFloat("Gravity", &status_.gravity, 0.1f, 1.0f, 50.0f);
 	ImGui::DragFloat("Ground Level", &groundLevel_, 0.1f, -10.0f, 10.0f);
-	ImGui::Text("Current Jump Count: %d / %d", status_.currentJumpCount_, status_.jumpCanCount_);
+	ImGui::Text("Current Jump Count: %d / %d", status_.currentJumpCount, status_.jumpCanCount);
 	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
-	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y_);
+	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y);
 	ImGui::End();
 #endif
 	//landingParticle_->DrawImGui("move Particle");
@@ -169,9 +166,9 @@ void Player::Move() {
 
 		// 移動量を計算
 		Vector3 movement = {
-			moveDirection.x * status_.moveSpeed_ * deltaTime_,
+			moveDirection.x * status_.moveSpeed * deltaTime_,
 			0.0f, // Y軸移動は制限
-			moveDirection.z * status_.moveSpeed_ * deltaTime_
+			moveDirection.z * status_.moveSpeed * deltaTime_
 		};
 
 		// プレイヤーの位置を更新
@@ -243,7 +240,7 @@ void Player::Jump() {
 		// マップが無い場合は従来の判定を使用
 		if (transform_.translate.y <= groundLevel_) {
 			transform_.translate.y = groundLevel_;
-			status_.velocity_Y_ = 0.0f;
+			status_.velocity_Y = 0.0f;
 			isGrounded_ = true;
 		} else {
 			isGrounded_ = false;
@@ -265,10 +262,10 @@ void Player::Jump() {
 			
 			// スロープの表面付近にいるか、スロープより下にいる場合
 			// かつ、プレイヤーの頭頂部がスロープ表面より上にある場合のみ吸着
-			if (distanceToSlope <= 0.2f && status_.velocity_Y_ <= 0.0f && playerTop > slopeY) {
+			if (distanceToSlope <= 0.2f && status_.velocity_Y <= 0.0f && playerTop > slopeY) {
 				// スロープに吸着
 				transform_.translate.y = slopeY - mapCollosion_.min.y;
-				status_.velocity_Y_ = 0.0f;
+				status_.velocity_Y = 0.0f;
 				isGrounded_ = true;
 				onSlope = true;
 			}
@@ -276,9 +273,9 @@ void Player::Jump() {
 	}
 
 	// 地面に着地した場合（下方向の速度がある場合のみ）
-	if (isGrounded_ && status_.velocity_Y_ <= 0.0f) {
-		status_.velocity_Y_ = 0.0f;
-		status_.currentJumpCount_ = 0; // 地面に着いたらジャンプカウントをリセット
+	if (isGrounded_ && status_.velocity_Y <= 0.0f) {
+		status_.velocity_Y = 0.0f;
+		status_.currentJumpCount = 0; // 地面に着いたらジャンプカウントをリセット
 		
 		// 着地した瞬間の判定（前フレームで空中にいて、今フレームで地面に接触）
 		if (!wasGrounded_) {
@@ -289,16 +286,16 @@ void Player::Jump() {
 
 	// Aボタンでジャンプ
 	if (MyInput::Trigger(Action::CONFIRM)) {
-		if (status_.currentJumpCount_ < status_.jumpCanCount_) {
-			status_.velocity_Y_ = status_.jumpPower_;
-			status_.currentJumpCount_++;
+		if (status_.currentJumpCount < status_.jumpCanCount) {
+			status_.velocity_Y = status_.jumpPower;
+			status_.currentJumpCount++;
 		}
 	}
 
 	// 重力を適用（スロープ上でない場合、または上昇中の場合）
-	if ((!isGrounded_ || status_.velocity_Y_ > 0.0f) && !onSlope) {
-		status_.velocity_Y_ -= status_.gravity_ * deltaTime_;
-		transform_.translate.y += status_.velocity_Y_ * deltaTime_;
+	if ((!isGrounded_ || status_.velocity_Y > 0.0f) && !onSlope) {
+		status_.velocity_Y -= status_.gravity * deltaTime_;
+		transform_.translate.y += status_.velocity_Y * deltaTime_;
 	}
 }
 
@@ -609,9 +606,9 @@ void Player::ResolveMapCollision() {
 					
 					// Y軸方向の押し出しの場合、速度と地面状態を処理
 					if (finalPushOut.y < 0.0f) {
-						status_.velocity_Y_ = 0.0f;
-					} else if (finalPushOut.y > 0.0f && status_.velocity_Y_ > 0.0f) {
-						status_.velocity_Y_ = 0.0f;
+						status_.velocity_Y = 0.0f;
+					} else if (finalPushOut.y > 0.0f && status_.velocity_Y > 0.0f) {
+						status_.velocity_Y = 0.0f;
 					}
 				}
 			}
@@ -793,17 +790,24 @@ float Player::GetDistanceToNearestEnemy() const {
 }
 
 void Player::SetCurrentHP(int hp) {
-	status_.currentHP_ = std::clamp(hp, 0, status_.maxHP_);
+	status_.currentHP = std::clamp(hp, 0, status_.maxHP);
 }
 
 void Player::AddExp(int exp) {
-	status_.currentExp_ += exp;
+	status_.currentExp += int(float(exp) * status_.expMultiply);
 	
 	// レベルアップチェック
-	while (status_.currentExp_ >= status_.expToNextLevel_) {
-		status_.currentExp_ -= status_.expToNextLevel_;
-		status_.level_++;
+	while (status_.currentExp >= status_.expToNextLevel) {
+		status_.currentExp -= status_.expToNextLevel;
+		status_.level++;
 		// 次のレベルに必要な経験値を増やす（例：1.5倍）
-		status_.expToNextLevel_ = static_cast<int>(status_.expToNextLevel_ * 1.1f);
+		status_.expToNextLevel = static_cast<int>(status_.expToNextLevel * 1.1f);
+	}
+}
+
+void Player::AddMoney(int money) {
+	status_.nowMoney += int(float(money) * status_.moneyMultiply);
+	if (status_.nowMoney < 0) {
+		status_.nowMoney = 0;
 	}
 }
