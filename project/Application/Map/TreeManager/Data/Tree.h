@@ -18,6 +18,13 @@ class Tree
 public:
 	void Initialize(Vector3 pos);
 	void Draw(Camera camera);
+	
+	// Getter
+	Vector3 GetPosition() const { return transform_.translate; }
+	const AABB& GetAABBCollision() const { return aabbCollision_; }
+	TreeType GetTreeType() const { return treeType_; }
+	bool IsSpawned() const { return isSpawn_; }
+	
 private:
 	std::unique_ptr<Model> model_;
 	Transform transform_;

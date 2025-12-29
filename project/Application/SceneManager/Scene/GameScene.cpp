@@ -27,6 +27,9 @@ void GameScene::Initialize() {
 	// ChestManagerを初期化（JarManagerの後に呼んで位置情報を取得）
 	chestManager_->Initialize(map3D_.get(), jarManager_.get());
 
+	// TreeManagerを初期化（マップ構築後に呼ぶ）
+	treeManager_->Initialize(map3D_.get());
+
 	player_ = make_unique<Player>();
 	player_->Initialize();
 
@@ -37,6 +40,9 @@ void GameScene::Initialize() {
 
 	// プレイヤーにMap3Dへの参照を設定
 	player_->SetMap(map3D_.get());
+	
+	// プレイヤーにTreeManagerへの参照を設定
+	player_->SetTreeManager(treeManager_.get());
 
 	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
 	collisionManager_->Initialize();
@@ -46,6 +52,14 @@ void GameScene::Initialize() {
 
 	gameSceneUI_ = make_unique<GameSceneUI>();
 	gameSceneUI_->Initialize();
+
+	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	postEffect->SetEnabled(true);
+	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	postEffect->SetPostEffectType(PSOType::PostEffect_Fog);
+	postEffect->GetParams().fog.fogStart = 50.0f;
+	postEffect->GetParams().fog.fogEnd = 200.0f;
+	postEffect->GetParams().fog.fogDensity = 1.0f;
 }
 
 void GameScene::Update() {
@@ -71,6 +85,9 @@ void GameScene::Update() {
 	// ChestManagerの更新
 	chestManager_->Update();
 
+	// TreeManagerの更新
+	treeManager_->Update();
+
 	//camera_ = debugCamera_;
 	camera_ = gameCamera_->GetCamera();
 
@@ -81,6 +98,20 @@ void GameScene::Update() {
 	UIUpdate();
 
 	MyDebugLine::AddGrid(100.0f, 20);
+
+	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	if (useFog_) {
+		if (MyInput::TriggerKey(DIK_RETURN)) {
+			useFog_ = false;
+			postEffect->SetEnabled(false);
+		}
+	} else {
+		if (MyInput::TriggerKey(DIK_RETURN)) {
+			useFog_ = true;
+			postEffect->SetEnabled(true);
+		}
+	}
 }
 
 void GameScene::Draw() {
@@ -96,6 +127,9 @@ void GameScene::Draw() {
 	// 宝箱の描画
 	chestManager_->Draw(camera_);
 
+	// 木の描画
+	treeManager_->Draw(camera_);
+
 	enemyManager_->Draw(camera_);
 
 	player_->Draw(camera_);
@@ -109,9 +143,9 @@ void GameScene::Draw() {
 
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
-	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
-	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	postEffect->DrawImGui();
+	//auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	//postEffect->DrawImGui();
 #endif // USE_IMGUI
 
 	//gameCamera_->DrawImgui();
@@ -133,6 +167,9 @@ void GameScene::DrawImGui() {
 
 	// ChestManagerのImGui描画
 	//chestManager_->DrawImGui();
+
+	// TreeManagerのImGui描画
+	//treeManager_->DrawImGui();
 }
 
 void GameScene::PostFrameCleanup() {

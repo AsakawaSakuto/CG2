@@ -10,6 +10,7 @@
 #include "Map/Map3D.h"
 #include "Map/JarManager/JarManager.h"
 #include "Map/ChestManager/ChestManager.h"
+#include "Map/TreeManager/TreeManager.h"
 #include "GameUI/GameSceneUI/GameSceneUI.h"
 
 using Microsoft::WRL::ComPtr;
@@ -63,4 +64,9 @@ private:
 
 	// 宝箱管理クラス
 	unique_ptr<ChestManager> chestManager_ = make_unique<ChestManager>();
+
+	// 木管理クラス
+	unique_ptr<TreeManager> treeManager_ = make_unique<TreeManager>();
+
+	bool useFog_ = false;
 };

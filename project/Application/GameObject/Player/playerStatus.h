@@ -22,7 +22,7 @@ struct PlayerStatus {
 	float moveSpeed = 5.0f;   // 移動速度
 	int jumpCanCount = 100;     // ジャンプ可能回数
 	int currentJumpCount = 0; // 現在のジャンプ回数
-	float jumpPower = 8.0f;   // ジャンプ力
+	float jumpPower = 15.0f;   // ジャンプ力
 	float velocity_Y = 0.0f;  // Y軸方向の速度
 	float gravity = 20.0f;    // 重力
 };
