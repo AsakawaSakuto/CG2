@@ -41,4 +41,9 @@ namespace MyInput {
 	inline bool TriggerKey(uint32_t key) {
 		return InputManager::GetInstance()->GetInput()->TriggerKey(key);
 	}
+
+	// Push（Key）判定
+	inline bool PushKey(uint32_t key) {
+		return InputManager::GetInstance()->GetInput()->PushKey(key);
+	}
 }

@@ -375,122 +375,203 @@ void Player::ResolveMapCollision() {
 
 					TileType tileType = map_->GetTile(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 					
-					// スロープの側面衝突をチェック
-					if (tileType == TileType::Slope) {
-						// ブロックのAABBを取得
+					// スロープの側面衝突をチェック（新しい段階的AABB方式）
+					// IsSlopeType()を使用してすべてのスロープタイプを判定
+					bool isSlopeTile = (tileType == TileType::Slope || 
+					                    tileType == TileType::Slope_PlusX || 
+					                    tileType == TileType::Slope_MinusX || 
+					                    tileType == TileType::Slope_PlusZ || 
+					                    tileType == TileType::Slope_MinusZ);
+					
+					if (isSlopeTile) {
+						// ブロックの基本情報を取得
 						Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
-						AABB blockAABB;
-						blockAABB.center = blockWorldPos;
-						blockAABB.min = { -7.5f, -5.0f, -7.5f };
-						blockAABB.max = {  7.5f,  5.0f,  7.5f };
-
-						// 衝突判定
-						if (!Collision::IsHit(mapCollosion_, blockAABB)) continue;
-
-						// スロープの向きを取得
 						SlopeDirection slopeDir = map_->GetSlopeDirection(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 						
-						// プレイヤーの足元の位置でスロープ高さをチェック（より正確）
-						// 足元の4隅をサンプリング
-						bool isSideCollision = false;
+						// デバッグ: スロープブロック検出
+						AABB slopeBlockAABB;
+						slopeBlockAABB.center = blockWorldPos;
+						slopeBlockAABB.min = { -7.5f, -5.0f, -7.5f };
+						slopeBlockAABB.max = {  7.5f,  5.0f,  7.5f };
+						MyDebugLine::AddShape(slopeBlockAABB, {0.0f, 1.0f, 1.0f, 1.0f}); // シアン色でスロープブロック全体を表示
 						
-						// 足元の4隅(XZ平面)でスロープ高さをチェック
-						Vector3 footCheckPoints[4] = {
-							{ playerMin.x, playerBottom, playerMin.z },  // 左下
-							{ playerMax.x, playerBottom, playerMin.z },  // 右下
-							{ playerMin.x, playerBottom, playerMax.z },  // 左上
-							{ playerMax.x, playerBottom, playerMax.z }   // 右上
-						};
+						// スロープを高さ方向に分割して段階的なAABBを作成
+						const int slopeSteps = 16; // スロープを10段階に分割
+						const float blockHalfHeight = 5.0f; // ブロックの半分の高さ
+						const float blockFullHeight = 10.0f; // ブロックの全高さ
+						const float blockHalfWidth = 7.5f; // ブロックの半幅
 						
-						int pointsBelowSurface = 0;
-						int totalValidPoints = 0;
+						bool hasSlopeSideCollision = false;
+						Vector3 slopePushOut = {0.0f, 0.0f, 0.0f};
+						float minSlopePenetration = (std::numeric_limits<float>::max)();
 						
-						for (int i = 0; i < 4; ++i) {
-							float pointSlopeY;
-							if (map_->GetSlopeHeight(footCheckPoints[i], pointSlopeY)) {
-								totalValidPoints++;
-								// この点での足元の高さとスロープ表面の差
-								float footToSurface = footCheckPoints[i].y - pointSlopeY;
-								
-								// 足元がスロープ表面より明確に上にあるかチェック
-								// プレイヤーが登っている時は、足元はスロープより少し上にある
-								if (footToSurface < -0.3f) {  // 足元がスロープより明確に下（めり込んでいる）
-									pointsBelowSurface++;
-								}
+						// プレイヤーがスロープ表面の上にいるかチェック
+						float playerSlopeHeight;
+						bool playerIsOnSlopeSurface = false;
+						if (map_->GetSlopeHeight(transform_.translate, playerSlopeHeight)) {
+							// プレイヤーの足元とスロープ表面の距離
+							float distToSurface = playerBottom - playerSlopeHeight;
+							// 表面から十分に上にいる場合（スロープの上に立っている）
+							if (distToSurface >= -0.15f && distToSurface <= 0.15f) {
+								playerIsOnSlopeSurface = true;
 							}
 						}
 						
-						// 4点中2点以上が明確にスロープより下にある場合のみ側面衝突
-						// （スロープを登っている時は0〜1点程度しか下にならない）
-						if (totalValidPoints > 0 && pointsBelowSurface >= 2) {
-							isSideCollision = true;
-						}
-						
-						if (isSideCollision) {
-							// 側面衝突：横方向に押し戻す処理を適用
-							hasCollision = true;
-
-							Vector3 blockMin = blockAABB.GetMinWorld();
-							Vector3 blockMax = blockAABB.GetMaxWorld();
-
-							// 各軸での重なり量を計算
-							float overlapX = (std::min)(playerMax.x - blockMin.x, blockMax.x - playerMin.x);
-							float overlapZ = (std::min)(playerMax.z - blockMin.z, blockMax.z - playerMin.z);
+						// 各段階でAABBを生成してチェック
+						for (int step = 0; step < slopeSteps; ++step) {
+							// この段階の高さ割合（0.0 = 底, 1.0 = 頂上）
+							float stepHeightStart = static_cast<float>(step) / static_cast<float>(slopeSteps);
+							float stepHeightEnd = static_cast<float>(step + 1) / static_cast<float>(slopeSteps);
 							
-							// スロープの向きに基づいて、押し出し軸を決定
-							bool preferXAxis = (slopeDir == SlopeDirection::PlusZ || slopeDir == SlopeDirection::MinusZ);
-							bool preferZAxis = (slopeDir == SlopeDirection::PlusX || slopeDir == SlopeDirection::MinusX);
-
-							// X軸の押し出しを評価
-							if (preferXAxis) {
-								// X軸が優先される場合、より積極的に評価
-								if (overlapX < bestCollisionX.penetration * 1.3f) {
-									bestCollisionX.penetration = overlapX;
-									bestCollisionX.isSlopeCollision = true;
-									if (transform_.translate.x < blockWorldPos.x) {
-										bestCollisionX.pushOut = { -overlapX, 0.0f, 0.0f };
-									} else {
-										bestCollisionX.pushOut = { overlapX, 0.0f, 0.0f };
-									}
-								}
-							} else {
-								// 通常の評価
-								if (overlapX < bestCollisionX.penetration) {
-									bestCollisionX.penetration = overlapX;
-									bestCollisionX.isSlopeCollision = true;
-									if (transform_.translate.x < blockWorldPos.x) {
-										bestCollisionX.pushOut = { -overlapX, 0.0f, 0.0f };
-									} else {
-										bestCollisionX.pushOut = { overlapX, 0.0f, 0.0f };
-									}
-								}
+							// この段階のAABBを構築
+							AABB stepAABB;
+							stepAABB.center = {0.0f, 0.0f, 0.0f}; // 後で設定
+							stepAABB.min = {0.0f, 0.0f, 0.0f};
+							stepAABB.max = {0.0f, 0.0f, 0.0f};
+							
+							// Y座標の範囲（スロープブロックの底面を基準）
+							float yMin = blockWorldPos.y - blockHalfHeight + stepHeightStart * blockFullHeight;
+							float yMax = blockWorldPos.y - blockHalfHeight + stepHeightEnd * blockFullHeight;
+							
+							// XZ座標の範囲（スロープの向きに応じて変化）
+							float xMin, xMax, zMin, zMax;
+							
+							switch (slopeDir) {
+								case SlopeDirection::PlusX: // X+方向に登る
+									// 低い方（X-側）から高い方（X+側）へ
+									xMin = blockWorldPos.x - blockHalfWidth + stepHeightStart * (blockHalfWidth * 2.0f);
+									xMax = blockWorldPos.x - blockHalfWidth + stepHeightEnd * (blockHalfWidth * 2.0f);
+									zMin = blockWorldPos.z - blockHalfWidth;
+									zMax = blockWorldPos.z + blockHalfWidth;
+									break;
+									
+								case SlopeDirection::MinusX: // X-方向に登る
+									// 低い方（X+側）から高い方（X-側）へ
+									xMin = blockWorldPos.x + blockHalfWidth - stepHeightEnd * (blockHalfWidth * 2.0f);
+									xMax = blockWorldPos.x + blockHalfWidth - stepHeightStart * (blockHalfWidth * 2.0f);
+									zMin = blockWorldPos.z - blockHalfWidth;
+									zMax = blockWorldPos.z + blockHalfWidth;
+									break;
+									
+								case SlopeDirection::PlusZ: // Z+方向に登る
+									// 低い方（Z-側）から高い方（Z+側）へ
+									xMin = blockWorldPos.x - blockHalfWidth;
+									xMax = blockWorldPos.x + blockHalfWidth;
+									zMin = blockWorldPos.z - blockHalfWidth + stepHeightStart * (blockHalfWidth * 2.0f);
+									zMax = blockWorldPos.z - blockHalfWidth + stepHeightEnd * (blockHalfWidth * 2.0f);
+									break;
+										
+								case SlopeDirection::MinusZ: // Z-方向に登る
+									// 低い方（Z+側）から高い方（Z-側）へ
+									xMin = blockWorldPos.x - blockHalfWidth;
+									xMax = blockWorldPos.x + blockHalfWidth;
+									zMin = blockWorldPos.z + blockHalfWidth - stepHeightEnd * (blockHalfWidth * 2.0f);
+									zMax = blockWorldPos.z + blockHalfWidth - stepHeightStart * (blockHalfWidth * 2.0f);
+									break;
 							}
-
-							// Z軸の押し出しを評価
-							if (preferZAxis) {
-								// Z軸が優先される場合、より積極的に評価
-								if (overlapZ < bestCollisionZ.penetration * 1.3f) {
-									bestCollisionZ.penetration = overlapZ;
-									bestCollisionZ.isSlopeCollision = true;
-									if (transform_.translate.z < blockWorldPos.z) {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, -overlapZ };
-									} else {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, overlapZ };
-									}
+							
+							// AABBを設定
+							stepAABB.center = {
+								(xMin + xMax) / 2.0f,
+								(yMin + yMax) / 2.0f,
+								(zMin + zMax) / 2.0f
+							};
+							stepAABB.min = {
+								xMin - stepAABB.center.x,
+								-10.0f,
+								zMin - stepAABB.center.z
+							};
+							stepAABB.max = {
+								xMax - stepAABB.center.x,
+								-0.5f,
+								zMax - stepAABB.center.z
+							};
+							
+							// デバッグ可視化（段階ごとに異なる色）- 常に表示
+							float colorIntensity = stepHeightStart;
+							MyDebugLine::AddShape(stepAABB, {1.0f, colorIntensity, 0.0f, 0.3f});
+							
+							// プレイヤーとの衝突判定
+							bool isHit = Collision::IsHit(mapCollosion_, stepAABB);
+							
+							// デバッグ: 衝突した段階を強調表示
+							if (isHit) {
+								MyDebugLine::AddShape(stepAABB, {1.0f, 0.0f, 1.0f, 0.8f}); // マゼンタで衝突を表示
+							}
+							
+							if (!isHit) {
+								continue;
+							}
+							
+							// スロープ表面の上にいる場合はスキップ
+							if (playerIsOnSlopeSurface) {
+								continue;
+							}
+							
+							// XZ方向のみの押し出し量を計算
+							Vector3 stepMin = stepAABB.GetMinWorld();
+							Vector3 stepMax = stepAABB.GetMaxWorld();
+							
+							float penetrationX = (std::min)(playerMax.x - stepMin.x, stepMax.x - playerMin.x);
+							float penetrationZ = (std::min)(playerMax.z - stepMin.z, stepMax.z - playerMin.z);
+							
+							// スロープの向きに基づいて優先軸を決定
+							bool shouldPushX = false;
+							bool shouldPushZ = false;
+							
+							switch (slopeDir) {
+								case SlopeDirection::PlusX:
+								case SlopeDirection::MinusX:
+									// X軸方向のスロープなので、Z軸で押し出す
+									shouldPushZ = true;
+									break;
+								case SlopeDirection::PlusZ:
+								case SlopeDirection::MinusZ:
+									// Z軸方向のスロープなので、X軸で押し出す
+									shouldPushX = true;
+									break;
+							}
+							
+							// 適切な軸で押し出し
+							if (shouldPushX && penetrationX < minSlopePenetration) {
+								minSlopePenetration = penetrationX;
+								if (transform_.translate.x < stepAABB.center.x) {
+									slopePushOut = {-penetrationX, 0.0f, 0.0f};
+								} else {
+									slopePushOut = {penetrationX, 0.0f, 0.0f};
 								}
-							} else {
-								// 通常の評価
-								if (overlapZ < bestCollisionZ.penetration) {
-									bestCollisionZ.penetration = overlapZ;
+								hasSlopeSideCollision = true;
+							} else if (shouldPushZ && penetrationZ < minSlopePenetration) {
+								minSlopePenetration = penetrationZ;
+								if (transform_.translate.z < stepAABB.center.z) {
+									slopePushOut = {0.0f, 0.0f, -penetrationZ};
+								} else {
+									slopePushOut = {0.0f, 0.0f, penetrationZ};
+								}
+								hasSlopeSideCollision = true;
+							}
+						}
+						
+						// スロープ側面衝突が検出された場合
+						if (hasSlopeSideCollision) {
+							hasCollision = true;
+							
+							// 適切な軸に押し出しを適用
+							if (slopePushOut.x != 0.0f) {
+								if (minSlopePenetration < bestCollisionX.penetration) {
+									bestCollisionX.penetration = minSlopePenetration;
+									bestCollisionX.pushOut = slopePushOut;
+									bestCollisionX.isSlopeCollision = true;
+								}
+							} else if (slopePushOut.z != 0.0f) {
+								if (minSlopePenetration < bestCollisionZ.penetration) {
+									bestCollisionZ.penetration = minSlopePenetration;
+									bestCollisionZ.pushOut = slopePushOut;
 									bestCollisionZ.isSlopeCollision = true;
-									if (transform_.translate.z < blockWorldPos.z) {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, -overlapZ };
-									} else {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, overlapZ };
-									}
 								}
 							}
 						}
+						
 						// スロープの上に立っている場合はスキップ（従来の処理）
 						continue;
 					}

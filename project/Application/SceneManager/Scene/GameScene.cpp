@@ -118,7 +118,10 @@ void GameScene::Draw() {
 	
 	// マップの描画
 	if (map3D_) {
-		map3D_->Draw(camera_);
+		if (!MyInput::PushKey(DIK_P)) {
+			map3D_->Draw(camera_);
+		}
+		//map3D_->Draw(camera_);
 	}
 
 	// 壺の描画

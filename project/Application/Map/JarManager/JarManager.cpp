@@ -92,24 +92,34 @@ int JarManager::BreakJar(const AABB& attackAABB, JarType& outJarType) {
 }
 
 bool JarManager::FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const {
-	// 上から下に向かって最初のNormalブロックを探す
+	// 上から下に向かって最初の適切なNormalブロックを探す
 	for (int32_t y = static_cast<int32_t>(map->GetHeight()) - 1; y >= 0; --y) {
 		TileType type = map->GetTile(x, static_cast<uint32_t>(y), z);
+		
+		// Normalブロックのみを対象とする（Slope系は除外）
 		if (type == TileType::Normal) {
-			// このNormalブロックの上にSlopeがないかチェック
+			// このブロックの上（y+1）を確認
 			if (y < static_cast<int32_t>(map->GetHeight()) - 1) {
-				TileType topType = map->GetTile(x, static_cast<uint32_t>(y + 1), z);
-				// 上にSlopeがある場合はスキップ（Slopeの中に配置されるのを防ぐ）
-				if (topType == TileType::Slope || 
-				    topType == TileType::Slope_PlusX || 
-				    topType == TileType::Slope_MinusX || 
-				    topType == TileType::Slope_PlusZ || 
-				    topType == TileType::Slope_MinusZ) {
+				TileType aboveType = map->GetTile(x, static_cast<uint32_t>(y + 1), z);
+				
+				// 上にブロックがある場合はスキップ（最上面ではない）
+				if (aboveType != TileType::Empty) {
 					continue;
 				}
 			}
+			
+			// この位置が最上面のNormalブロックなので採用
 			outY = static_cast<uint32_t>(y);
 			return true;
+		}
+		
+		// スロープブロックの場合はスキップ（スロープ上には配置しない）
+		if (type == TileType::Slope || 
+		    type == TileType::Slope_PlusX || 
+		    type == TileType::Slope_MinusX || 
+		    type == TileType::Slope_PlusZ || 
+		    type == TileType::Slope_MinusZ) {
+			continue;
 		}
 	}
 	return false;

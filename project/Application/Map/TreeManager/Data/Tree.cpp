@@ -11,6 +11,7 @@ void Tree::Initialize(Vector3 pos) {
 
 	// 位置設定
 	transform_.translate = pos;
+	transform_.rotate.y = MyRand::Float(0.0f, 10.0f);
 	aabbCollision_.center = pos;
 	
 	switch (treeType_) {
