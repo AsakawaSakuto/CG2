@@ -196,8 +196,8 @@ void Player::Move() {
 		moveParticle_->Stop();
 	}
 
-	transform_.translate.x = std::clamp(transform_.translate.x, -7.5f, 217.5f);
-	transform_.translate.z = std::clamp(transform_.translate.z, -7.5f, 217.5f);
+	transform_.translate.x = std::clamp(transform_.translate.x, -7.0f, 217.0f);
+	transform_.translate.z = std::clamp(transform_.translate.z, -7.0f, 217.0f);
 }
 
 Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
