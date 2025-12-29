@@ -152,7 +152,6 @@
   <ItemGroup>
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
-    <ClCompile Include="Application\GameObject\BaseGameObject.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
@@ -162,7 +161,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
-    <ClCompile Include="Application\GameUI\BaseUI.cpp" />
+    <ClCompile Include="Application\GameUI\GameSceneUI\GameSceneUI.cpp" />
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
     <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
     <ClCompile Include="Application\Map\ChestManager\Data\FreeChest.cpp" />
@@ -170,6 +169,8 @@
     <ClCompile Include="Application\Map\JarManager\Data\MaxJar.cpp" />
     <ClCompile Include="Application\Map\JarManager\Data\MinJar.cpp" />
     <ClCompile Include="Application\Map\JarManager\JarManager.cpp" />
+    <ClCompile Include="Application\Map\TreeManager\Data\Tree.cpp" />
+    <ClCompile Include="Application\Map\TreeManager\TreeManager.cpp" />
     <ClCompile Include="Application\SceneManager\IScene.cpp" />
     <ClCompile Include="Application\SceneManager\SceneManager.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\GameScene.cpp" />
@@ -277,6 +278,7 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
+    <ClInclude Include="Application\GameUI\GameSceneUI\GameSceneUI.h" />
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />
     <ClInclude Include="Application\Map\ChestManager\ChestManager.h" />
     <ClInclude Include="Application\Map\ChestManager\Data\BaseChest.h" />
@@ -286,6 +288,8 @@
     <ClInclude Include="Application\Map\JarManager\Data\MaxJar.h" />
     <ClInclude Include="Application\Map\JarManager\Data\MinJar.h" />
     <ClInclude Include="Application\Map\JarManager\JarManager.h" />
+    <ClInclude Include="Application\Map\TreeManager\Data\Tree.h" />
+    <ClInclude Include="Application\Map\TreeManager\TreeManager.h" />
     <ClInclude Include="Application\SceneManager\IScene.h" />
     <ClInclude Include="Application\SceneManager\SceneManager.h" />
     <ClInclude Include="Application\SceneManager\Scene\GameScene.h" />

@@ -1,6 +1,7 @@
 #include "player.h"
 #include "GameObject/EnemyManager/EnemyManager.h"
 #include "Map/Map3D.h"
+#include "Map/TreeManager/TreeManager.h"
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -11,8 +12,8 @@ void Player::PostFrameCleanup() {
 
 void Player::Initialize() {
 
-	transform_.scale = { 2.0f, 2.0f, 2.0f };
-	transform_.translate = { 10.0f,50.0f,10.0f };
+	transform_.SetAllScale(1.5);
+	transform_.translate = { 10.0f,100.0f,10.0f };
 
 	model_->Initialize("animation/human/walk.gltf");
 	model_->UseLight(false);
@@ -25,9 +26,9 @@ void Player::Initialize() {
 	weaponManager_->Initialize();
 
 	// ステータスの初期化
-	status_.currentHP_ = status_.maxHP_;
-	status_.currentExp_ = 0;
-	status_.level_ = 1;
+	status_.currentHP = status_.maxHP;
+	status_.currentExp = 0;
+	status_.level = 1;
 
 	// AABBの初期化（新仕様: center + min/maxのローカルオフセット）
 	// center は transform_.translate で毎フレーム更新されるため、ここでは初期化不要
@@ -49,13 +50,17 @@ void Player::Update() {
 	if (map_) {
 		ResolveMapCollision();
 	}
+	
+	// 木との衝突解決を実行（XZ軸のみ）
+	if (treeManager_) {
+		treeManager_->ResolvePlayerCollision(transform_.translate, mapCollosion_);
+		// 衝突解決後、AABBの中心も更新
+		mapCollosion_.center = transform_.translate;
+	}
 
 	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
 
 	directionToEnemy_ = GetDirectionToEnemy();
-
-	//transform_.translate.x = std::clamp(transform_.translate.x, -49.5f, 49.5f);
-	//transform_.translate.z = std::clamp(transform_.translate.z, -49.5f, 49.5f);
 
 	expGetRangeTransform_.translate = transform_.translate;
 	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
@@ -102,20 +107,20 @@ void Player::DrawImGui() {
 #ifdef USE_IMGUI
 	// プレイヤー固有のImGui
 	ImGui::Begin("Player Settings");
-	ImGui::DragFloat("Move Speed", &status_.moveSpeed_, 0.1f, 0.1f, 20.0f);
+	ImGui::DragFloat("Move Speed", &status_.moveSpeed, 0.1f, 0.1f, 20.0f);
 	ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
 	
 	// ジャンプ設定
 	ImGui::Separator();
 	ImGui::Text("Jump Settings");
-	ImGui::DragInt("Jump Can Count", &status_.jumpCanCount_, 1, 1, 5);
-	ImGui::DragFloat("Jump Power", &status_.jumpPower_, 0.1f, 1.0f, 20.0f);
-	ImGui::DragFloat("Gravity", &status_.gravity_, 0.1f, 1.0f, 50.0f);
+	ImGui::DragInt("Jump Can Count", &status_.jumpCanCount, 1, 1, 5);
+	ImGui::DragFloat("Jump Power", &status_.jumpPower, 0.1f, 1.0f, 20.0f);
+	ImGui::DragFloat("Gravity", &status_.gravity, 0.1f, 1.0f, 50.0f);
 	ImGui::DragFloat("Ground Level", &groundLevel_, 0.1f, -10.0f, 10.0f);
-	ImGui::Text("Current Jump Count: %d / %d", status_.currentJumpCount_, status_.jumpCanCount_);
+	ImGui::Text("Current Jump Count: %d / %d", status_.currentJumpCount, status_.jumpCanCount);
 	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
-	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y_);
+	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y);
 	ImGui::End();
 #endif
 	//landingParticle_->DrawImGui("move Particle");
@@ -169,9 +174,9 @@ void Player::Move() {
 
 		// 移動量を計算
 		Vector3 movement = {
-			moveDirection.x * status_.moveSpeed_ * deltaTime_,
+			moveDirection.x * status_.moveSpeed * deltaTime_,
 			0.0f, // Y軸移動は制限
-			moveDirection.z * status_.moveSpeed_ * deltaTime_
+			moveDirection.z * status_.moveSpeed * deltaTime_
 		};
 
 		// プレイヤーの位置を更新
@@ -191,8 +196,8 @@ void Player::Move() {
 		moveParticle_->Stop();
 	}
 
-	transform_.translate.x = std::clamp(transform_.translate.x, -4.5f, 144.5f);
-	transform_.translate.z = std::clamp(transform_.translate.z, -4.5f, 144.5f);
+	transform_.translate.x = std::clamp(transform_.translate.x, -7.5f, 217.5f);
+	transform_.translate.z = std::clamp(transform_.translate.z, -7.5f, 217.5f);
 }
 
 Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
@@ -243,7 +248,7 @@ void Player::Jump() {
 		// マップが無い場合は従来の判定を使用
 		if (transform_.translate.y <= groundLevel_) {
 			transform_.translate.y = groundLevel_;
-			status_.velocity_Y_ = 0.0f;
+			status_.velocity_Y = 0.0f;
 			isGrounded_ = true;
 		} else {
 			isGrounded_ = false;
@@ -265,10 +270,10 @@ void Player::Jump() {
 			
 			// スロープの表面付近にいるか、スロープより下にいる場合
 			// かつ、プレイヤーの頭頂部がスロープ表面より上にある場合のみ吸着
-			if (distanceToSlope <= 0.2f && status_.velocity_Y_ <= 0.0f && playerTop > slopeY) {
+			if (distanceToSlope <= 0.2f && status_.velocity_Y <= 0.0f && playerTop > slopeY) {
 				// スロープに吸着
 				transform_.translate.y = slopeY - mapCollosion_.min.y;
-				status_.velocity_Y_ = 0.0f;
+				status_.velocity_Y = 0.0f;
 				isGrounded_ = true;
 				onSlope = true;
 			}
@@ -276,9 +281,9 @@ void Player::Jump() {
 	}
 
 	// 地面に着地した場合（下方向の速度がある場合のみ）
-	if (isGrounded_ && status_.velocity_Y_ <= 0.0f) {
-		status_.velocity_Y_ = 0.0f;
-		status_.currentJumpCount_ = 0; // 地面に着いたらジャンプカウントをリセット
+	if (isGrounded_ && status_.velocity_Y <= 0.0f) {
+		status_.velocity_Y = 0.0f;
+		status_.currentJumpCount = 0; // 地面に着いたらジャンプカウントをリセット
 		
 		// 着地した瞬間の判定（前フレームで空中にいて、今フレームで地面に接触）
 		if (!wasGrounded_) {
@@ -289,16 +294,16 @@ void Player::Jump() {
 
 	// Aボタンでジャンプ
 	if (MyInput::Trigger(Action::CONFIRM)) {
-		if (status_.currentJumpCount_ < status_.jumpCanCount_) {
-			status_.velocity_Y_ = status_.jumpPower_;
-			status_.currentJumpCount_++;
+		if (status_.currentJumpCount < status_.jumpCanCount) {
+			status_.velocity_Y = status_.jumpPower;
+			status_.currentJumpCount++;
 		}
 	}
 
 	// 重力を適用（スロープ上でない場合、または上昇中の場合）
-	if ((!isGrounded_ || status_.velocity_Y_ > 0.0f) && !onSlope) {
-		status_.velocity_Y_ -= status_.gravity_ * deltaTime_;
-		transform_.translate.y += status_.velocity_Y_ * deltaTime_;
+	if ((!isGrounded_ || status_.velocity_Y > 0.0f) && !onSlope) {
+		status_.velocity_Y -= status_.gravity * deltaTime_;
+		transform_.translate.y += status_.velocity_Y * deltaTime_;
 	}
 }
 
@@ -370,122 +375,203 @@ void Player::ResolveMapCollision() {
 
 					TileType tileType = map_->GetTile(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 					
-					// スロープの側面衝突をチェック
-					if (tileType == TileType::Slope) {
-						// ブロックのAABBを取得
+					// スロープの側面衝突をチェック（新しい段階的AABB方式）
+					// IsSlopeType()を使用してすべてのスロープタイプを判定
+					bool isSlopeTile = (tileType == TileType::Slope || 
+					                    tileType == TileType::Slope_PlusX || 
+					                    tileType == TileType::Slope_MinusX || 
+					                    tileType == TileType::Slope_PlusZ || 
+					                    tileType == TileType::Slope_MinusZ);
+					
+					if (isSlopeTile) {
+						// ブロックの基本情報を取得
 						Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
-						AABB blockAABB;
-						blockAABB.center = blockWorldPos;
-						blockAABB.min = { -5.0f, -2.5f, -5.0f };
-						blockAABB.max = {  5.0f,  2.5f,  5.0f };
-
-						// 衝突判定
-						if (!Collision::IsHit(mapCollosion_, blockAABB)) continue;
-
-						// スロープの向きを取得
 						SlopeDirection slopeDir = map_->GetSlopeDirection(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 						
-						// プレイヤーの足元の位置でスロープ高さをチェック（より正確）
-						// 足元の4隅をサンプリング
-						bool isSideCollision = false;
+						// デバッグ: スロープブロック検出
+						AABB slopeBlockAABB;
+						slopeBlockAABB.center = blockWorldPos;
+						slopeBlockAABB.min = { -7.5f, -5.0f, -7.5f };
+						slopeBlockAABB.max = {  7.5f,  5.0f,  7.5f };
+						MyDebugLine::AddShape(slopeBlockAABB, {0.0f, 1.0f, 1.0f, 1.0f}); // シアン色でスロープブロック全体を表示
 						
-						// 足元の4隅(XZ平面)でスロープ高さをチェック
-						Vector3 footCheckPoints[4] = {
-							{ playerMin.x, playerBottom, playerMin.z },  // 左下
-							{ playerMax.x, playerBottom, playerMin.z },  // 右下
-							{ playerMin.x, playerBottom, playerMax.z },  // 左上
-							{ playerMax.x, playerBottom, playerMax.z }   // 右上
-						};
+						// スロープを高さ方向に分割して段階的なAABBを作成
+						const int slopeSteps = 16; // スロープを10段階に分割
+						const float blockHalfHeight = 5.0f; // ブロックの半分の高さ
+						const float blockFullHeight = 10.0f; // ブロックの全高さ
+						const float blockHalfWidth = 7.5f; // ブロックの半幅
 						
-						int pointsBelowSurface = 0;
-						int totalValidPoints = 0;
+						bool hasSlopeSideCollision = false;
+						Vector3 slopePushOut = {0.0f, 0.0f, 0.0f};
+						float minSlopePenetration = (std::numeric_limits<float>::max)();
 						
-						for (int i = 0; i < 4; ++i) {
-							float pointSlopeY;
-							if (map_->GetSlopeHeight(footCheckPoints[i], pointSlopeY)) {
-								totalValidPoints++;
-								// この点での足元の高さとスロープ表面の差
-								float footToSurface = footCheckPoints[i].y - pointSlopeY;
-								
-								// 足元がスロープ表面より明確に上にあるかチェック
-								// プレイヤーが登っている時は、足元はスロープより少し上にある
-								if (footToSurface < -0.3f) {  // 足元がスロープより明確に下（めり込んでいる）
-									pointsBelowSurface++;
-								}
+						// プレイヤーがスロープ表面の上にいるかチェック
+						float playerSlopeHeight;
+						bool playerIsOnSlopeSurface = false;
+						if (map_->GetSlopeHeight(transform_.translate, playerSlopeHeight)) {
+							// プレイヤーの足元とスロープ表面の距離
+							float distToSurface = playerBottom - playerSlopeHeight;
+							// 表面から十分に上にいる場合（スロープの上に立っている）
+							if (distToSurface >= -0.15f && distToSurface <= 0.15f) {
+								playerIsOnSlopeSurface = true;
 							}
 						}
 						
-						// 4点中2点以上が明確にスロープより下にある場合のみ側面衝突
-						// （スロープを登っている時は0〜1点程度しか下にならない）
-						if (totalValidPoints > 0 && pointsBelowSurface >= 2) {
-							isSideCollision = true;
-						}
-						
-						if (isSideCollision) {
-							// 側面衝突：横方向に押し戻す処理を適用
-							hasCollision = true;
-
-							Vector3 blockMin = blockAABB.GetMinWorld();
-							Vector3 blockMax = blockAABB.GetMaxWorld();
-
-							// 各軸での重なり量を計算
-							float overlapX = (std::min)(playerMax.x - blockMin.x, blockMax.x - playerMin.x);
-							float overlapZ = (std::min)(playerMax.z - blockMin.z, blockMax.z - playerMin.z);
+						// 各段階でAABBを生成してチェック
+						for (int step = 0; step < slopeSteps; ++step) {
+							// この段階の高さ割合（0.0 = 底, 1.0 = 頂上）
+							float stepHeightStart = static_cast<float>(step) / static_cast<float>(slopeSteps);
+							float stepHeightEnd = static_cast<float>(step + 1) / static_cast<float>(slopeSteps);
 							
-							// スロープの向きに基づいて、押し出し軸を決定
-							bool preferXAxis = (slopeDir == SlopeDirection::PlusZ || slopeDir == SlopeDirection::MinusZ);
-							bool preferZAxis = (slopeDir == SlopeDirection::PlusX || slopeDir == SlopeDirection::MinusX);
-
-							// X軸の押し出しを評価
-							if (preferXAxis) {
-								// X軸が優先される場合、より積極的に評価
-								if (overlapX < bestCollisionX.penetration * 1.3f) {
-									bestCollisionX.penetration = overlapX;
-									bestCollisionX.isSlopeCollision = true;
-									if (transform_.translate.x < blockWorldPos.x) {
-										bestCollisionX.pushOut = { -overlapX, 0.0f, 0.0f };
-									} else {
-										bestCollisionX.pushOut = { overlapX, 0.0f, 0.0f };
-									}
-								}
-							} else {
-								// 通常の評価
-								if (overlapX < bestCollisionX.penetration) {
-									bestCollisionX.penetration = overlapX;
-									bestCollisionX.isSlopeCollision = true;
-									if (transform_.translate.x < blockWorldPos.x) {
-										bestCollisionX.pushOut = { -overlapX, 0.0f, 0.0f };
-									} else {
-										bestCollisionX.pushOut = { overlapX, 0.0f, 0.0f };
-									}
-								}
+							// この段階のAABBを構築
+							AABB stepAABB;
+							stepAABB.center = {0.0f, 0.0f, 0.0f}; // 後で設定
+							stepAABB.min = {0.0f, 0.0f, 0.0f};
+							stepAABB.max = {0.0f, 0.0f, 0.0f};
+							
+							// Y座標の範囲（スロープブロックの底面を基準）
+							float yMin = blockWorldPos.y - blockHalfHeight + stepHeightStart * blockFullHeight;
+							float yMax = blockWorldPos.y - blockHalfHeight + stepHeightEnd * blockFullHeight;
+							
+							// XZ座標の範囲（スロープの向きに応じて変化）
+							float xMin, xMax, zMin, zMax;
+							
+							switch (slopeDir) {
+								case SlopeDirection::PlusX: // X+方向に登る
+									// 低い方（X-側）から高い方（X+側）へ
+									xMin = blockWorldPos.x - blockHalfWidth + stepHeightStart * (blockHalfWidth * 2.0f);
+									xMax = blockWorldPos.x - blockHalfWidth + stepHeightEnd * (blockHalfWidth * 2.0f);
+									zMin = blockWorldPos.z - blockHalfWidth;
+									zMax = blockWorldPos.z + blockHalfWidth;
+									break;
+									
+								case SlopeDirection::MinusX: // X-方向に登る
+									// 低い方（X+側）から高い方（X-側）へ
+									xMin = blockWorldPos.x + blockHalfWidth - stepHeightEnd * (blockHalfWidth * 2.0f);
+									xMax = blockWorldPos.x + blockHalfWidth - stepHeightStart * (blockHalfWidth * 2.0f);
+									zMin = blockWorldPos.z - blockHalfWidth;
+									zMax = blockWorldPos.z + blockHalfWidth;
+									break;
+									
+								case SlopeDirection::PlusZ: // Z+方向に登る
+									// 低い方（Z-側）から高い方（Z+側）へ
+									xMin = blockWorldPos.x - blockHalfWidth;
+									xMax = blockWorldPos.x + blockHalfWidth;
+									zMin = blockWorldPos.z - blockHalfWidth + stepHeightStart * (blockHalfWidth * 2.0f);
+									zMax = blockWorldPos.z - blockHalfWidth + stepHeightEnd * (blockHalfWidth * 2.0f);
+									break;
+										
+								case SlopeDirection::MinusZ: // Z-方向に登る
+									// 低い方（Z+側）から高い方（Z-側）へ
+									xMin = blockWorldPos.x - blockHalfWidth;
+									xMax = blockWorldPos.x + blockHalfWidth;
+									zMin = blockWorldPos.z + blockHalfWidth - stepHeightEnd * (blockHalfWidth * 2.0f);
+									zMax = blockWorldPos.z + blockHalfWidth - stepHeightStart * (blockHalfWidth * 2.0f);
+									break;
 							}
-
-							// Z軸の押し出しを評価
-							if (preferZAxis) {
-								// Z軸が優先される場合、より積極的に評価
-								if (overlapZ < bestCollisionZ.penetration * 1.3f) {
-									bestCollisionZ.penetration = overlapZ;
-									bestCollisionZ.isSlopeCollision = true;
-									if (transform_.translate.z < blockWorldPos.z) {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, -overlapZ };
-									} else {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, overlapZ };
-									}
+							
+							// AABBを設定
+							stepAABB.center = {
+								(xMin + xMax) / 2.0f,
+								(yMin + yMax) / 2.0f,
+								(zMin + zMax) / 2.0f
+							};
+							stepAABB.min = {
+								xMin - stepAABB.center.x,
+								-10.0f,
+								zMin - stepAABB.center.z
+							};
+							stepAABB.max = {
+								xMax - stepAABB.center.x,
+								-0.5f,
+								zMax - stepAABB.center.z
+							};
+							
+							// デバッグ可視化（段階ごとに異なる色）- 常に表示
+							float colorIntensity = stepHeightStart;
+							MyDebugLine::AddShape(stepAABB, {1.0f, colorIntensity, 0.0f, 0.3f});
+							
+							// プレイヤーとの衝突判定
+							bool isHit = Collision::IsHit(mapCollosion_, stepAABB);
+							
+							// デバッグ: 衝突した段階を強調表示
+							if (isHit) {
+								MyDebugLine::AddShape(stepAABB, {1.0f, 0.0f, 1.0f, 0.8f}); // マゼンタで衝突を表示
+							}
+							
+							if (!isHit) {
+								continue;
+							}
+							
+							// スロープ表面の上にいる場合はスキップ
+							if (playerIsOnSlopeSurface) {
+								continue;
+							}
+							
+							// XZ方向のみの押し出し量を計算
+							Vector3 stepMin = stepAABB.GetMinWorld();
+							Vector3 stepMax = stepAABB.GetMaxWorld();
+							
+							float penetrationX = (std::min)(playerMax.x - stepMin.x, stepMax.x - playerMin.x);
+							float penetrationZ = (std::min)(playerMax.z - stepMin.z, stepMax.z - playerMin.z);
+							
+							// スロープの向きに基づいて優先軸を決定
+							bool shouldPushX = false;
+							bool shouldPushZ = false;
+							
+							switch (slopeDir) {
+								case SlopeDirection::PlusX:
+								case SlopeDirection::MinusX:
+									// X軸方向のスロープなので、Z軸で押し出す
+									shouldPushZ = true;
+									break;
+								case SlopeDirection::PlusZ:
+								case SlopeDirection::MinusZ:
+									// Z軸方向のスロープなので、X軸で押し出す
+									shouldPushX = true;
+									break;
+							}
+							
+							// 適切な軸で押し出し
+							if (shouldPushX && penetrationX < minSlopePenetration) {
+								minSlopePenetration = penetrationX;
+								if (transform_.translate.x < stepAABB.center.x) {
+									slopePushOut = {-penetrationX, 0.0f, 0.0f};
+								} else {
+									slopePushOut = {penetrationX, 0.0f, 0.0f};
 								}
-							} else {
-								// 通常の評価
-								if (overlapZ < bestCollisionZ.penetration) {
-									bestCollisionZ.penetration = overlapZ;
+								hasSlopeSideCollision = true;
+							} else if (shouldPushZ && penetrationZ < minSlopePenetration) {
+								minSlopePenetration = penetrationZ;
+								if (transform_.translate.z < stepAABB.center.z) {
+									slopePushOut = {0.0f, 0.0f, -penetrationZ};
+								} else {
+									slopePushOut = {0.0f, 0.0f, penetrationZ};
+								}
+								hasSlopeSideCollision = true;
+							}
+						}
+						
+						// スロープ側面衝突が検出された場合
+						if (hasSlopeSideCollision) {
+							hasCollision = true;
+							
+							// 適切な軸に押し出しを適用
+							if (slopePushOut.x != 0.0f) {
+								if (minSlopePenetration < bestCollisionX.penetration) {
+									bestCollisionX.penetration = minSlopePenetration;
+									bestCollisionX.pushOut = slopePushOut;
+									bestCollisionX.isSlopeCollision = true;
+								}
+							} else if (slopePushOut.z != 0.0f) {
+								if (minSlopePenetration < bestCollisionZ.penetration) {
+									bestCollisionZ.penetration = minSlopePenetration;
+									bestCollisionZ.pushOut = slopePushOut;
 									bestCollisionZ.isSlopeCollision = true;
-									if (transform_.translate.z < blockWorldPos.z) {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, -overlapZ };
-									} else {
-										bestCollisionZ.pushOut = { 0.0f, 0.0f, overlapZ };
-									}
 								}
 							}
 						}
+						
 						// スロープの上に立っている場合はスキップ（従来の処理）
 						continue;
 					}
@@ -497,8 +583,8 @@ void Player::ResolveMapCollision() {
 					Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 					AABB blockAABB;
 					blockAABB.center = blockWorldPos;
-					blockAABB.min = { -5.0f, -2.5f, -5.0f };
-					blockAABB.max = {  5.0f,  2.5f,  5.0f };
+					blockAABB.min = { -7.5f, -5.0f, -7.5f };
+					blockAABB.max = {  7.5f,  5.0f,  7.5f };
 
 					// 衝突判定
 					if (!Collision::IsHit(mapCollosion_, blockAABB)) continue;
@@ -609,9 +695,9 @@ void Player::ResolveMapCollision() {
 					
 					// Y軸方向の押し出しの場合、速度と地面状態を処理
 					if (finalPushOut.y < 0.0f) {
-						status_.velocity_Y_ = 0.0f;
-					} else if (finalPushOut.y > 0.0f && status_.velocity_Y_ > 0.0f) {
-						status_.velocity_Y_ = 0.0f;
+						status_.velocity_Y = 0.0f;
+					} else if (finalPushOut.y > 0.0f && status_.velocity_Y > 0.0f) {
+						status_.velocity_Y = 0.0f;
 					}
 				}
 			}
@@ -695,8 +781,8 @@ bool Player::IsGroundedOnMap() {
 					Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
 					AABB blockAABB;
 					blockAABB.center = blockWorldPos;
-					blockAABB.min = { -5.0f, -2.5f, -5.0f };
-					blockAABB.max = { 5.0f, 2.5f, 5.0f };
+					blockAABB.min = { -7.5f, -5.0f, -7.5f };
+					blockAABB.max = {  7.5f,  5.0f,  7.5f };
 
 					// 足元チェック用AABBとの衝突判定
 					if (Collision::IsHit(groundCheckAABB, blockAABB)) {
@@ -793,17 +879,32 @@ float Player::GetDistanceToNearestEnemy() const {
 }
 
 void Player::SetCurrentHP(int hp) {
-	status_.currentHP_ = std::clamp(hp, 0, status_.maxHP_);
+	status_.currentHP = std::clamp(hp, 0, status_.maxHP);
 }
 
 void Player::AddExp(int exp) {
-	status_.currentExp_ += exp;
+	status_.currentExp += int(float(exp) * status_.expMultiply);
 	
 	// レベルアップチェック
-	while (status_.currentExp_ >= status_.expToNextLevel_) {
-		status_.currentExp_ -= status_.expToNextLevel_;
-		status_.level_++;
+	while (status_.currentExp >= status_.expToNextLevel) {
+		status_.currentExp -= status_.expToNextLevel;
+		status_.level++;
 		// 次のレベルに必要な経験値を増やす（例：1.5倍）
-		status_.expToNextLevel_ = static_cast<int>(status_.expToNextLevel_ * 1.1f);
+		status_.expToNextLevel = static_cast<int>(status_.expToNextLevel * 1.1f);
 	}
+}
+
+void Player::AddMoney(int money) {
+	status_.nowMoney += int(float(money) * status_.moneyMultiply);
+	if (status_.nowMoney < 0) {
+		status_.nowMoney = 0;
+	}
+}
+
+bool Player::SubtractMoney(int money) {
+	if (status_.nowMoney >= money) {
+		status_.nowMoney -= money;
+		return true;
+	}
+	return false;
 }

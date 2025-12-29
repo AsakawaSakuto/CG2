@@ -99,7 +99,7 @@ void BitmapFont::SetNumber(int value) {
 	}
 
 	// 数字を桁ごとに分解
-std::vector<int> digitList = SplitDigits(value);
+    std::vector<int> digitList = SplitDigits(value);
 
 	// 桁数が最大桁数を超える場合は切り詰める
 	if (digitList.size() > kMaxDigits) {

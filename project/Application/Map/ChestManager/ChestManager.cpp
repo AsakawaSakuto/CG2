@@ -71,13 +71,13 @@ void ChestManager::DrawImGui() {
 #endif
 }
 
-bool ChestManager::OpenChest(const AABB& interactAABB, bool& outIsPaidChest) {
+bool ChestManager::CheckChestCollision(const AABB& interactAABB, bool& outIsPaidChest, int& outOpenAmount) {
 	// PaidChestとの衝突チェック
 	for (auto& chest : paidChests_) {
 		if (chest->IsAlive()) {
 			if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
-				chest->Open();
 				outIsPaidChest = true;
+				outOpenAmount = openAmount_;
 				return true;
 			}
 		}
@@ -87,8 +87,8 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool& outIsPaidChest) {
 	for (auto& chest : freeChests_) {
 		if (chest->IsAlive()) {
 			if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
-				chest->Open();
 				outIsPaidChest = false;
+				outOpenAmount = 0;
 				return true;
 			}
 		}
@@ -97,13 +97,61 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool& outIsPaidChest) {
 	return false;
 }
 
+bool ChestManager::OpenChest(const AABB& interactAABB, bool needMoney) {
+	if (needMoney) {
+		// PaidChestを開ける
+		for (auto& chest : paidChests_) {
+			if (chest->IsAlive()) {
+				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
+					chest->Open();
+					return true;
+				}
+			}
+		}
+	} else {
+		// FreeChestを開ける
+		for (auto& chest : freeChests_) {
+			if (chest->IsAlive()) {
+				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
+					chest->Open();
+					return true;
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
 bool ChestManager::FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const {
-	// 上から下に向かって最初のNormalブロックを探す
+	// 上から下に向かって最初の適切なNormalブロックを探す
 	for (int32_t y = static_cast<int32_t>(map->GetHeight()) - 1; y >= 0; --y) {
 		TileType type = map->GetTile(x, static_cast<uint32_t>(y), z);
+		
+		// Normalブロックのみを対象とする（Slope系は除外）
 		if (type == TileType::Normal) {
+			// このブロックの上（y+1）を確認
+			if (y < static_cast<int32_t>(map->GetHeight()) - 1) {
+				TileType aboveType = map->GetTile(x, static_cast<uint32_t>(y + 1), z);
+				
+				// 上にブロックがある場合はスキップ（最上面ではない）
+				if (aboveType != TileType::Empty) {
+					continue;
+				}
+			}
+			
+			// この位置が最上面のNormalブロックなので採用
 			outY = static_cast<uint32_t>(y);
 			return true;
+		}
+		
+		// スロープブロックの場合はスキップ（スロープ上には配置しない）
+		if (type == TileType::Slope || 
+		    type == TileType::Slope_PlusX || 
+		    type == TileType::Slope_MinusX || 
+		    type == TileType::Slope_PlusZ || 
+		    type == TileType::Slope_MinusZ) {
+			continue;
 		}
 	}
 	return false;
@@ -152,15 +200,15 @@ void ChestManager::SpawnChests(Map3D* map, const std::vector<Vector3>& jarPositi
 				// ブロックの中心座標を取得
 				Vector3 blockCenter = map->MapToWorld(x, topY, z);
 				
-				// XZ方向に±4.5の範囲でランダムな位置を生成
+				// XZ方向に±7.0の範囲でランダムな位置を生成（ブロックサイズ15.0の半分）
 				// 各ブロックから複数の候補を生成
 				for (int i = 0; i < 6; ++i) {
-					float offsetX = MyRand::Float(-4.5f, 4.5f);
-					float offsetZ = MyRand::Float(-4.5f, 4.5f);
+					float offsetX = MyRand::Float(-7.0f, 7.0f);
+					float offsetZ = MyRand::Float(-7.0f, 7.0f);
 					
 					Vector3 chestPos = {
 						blockCenter.x + offsetX,
-						blockCenter.y + 2.5f,  // Y座標はCenter.y + 2.5f
+						blockCenter.y + 5.0f,  // Y座標はCenter.y + 5.0f（ブロックの高さ10.0の半分）
 						blockCenter.z + offsetZ
 					};
 					

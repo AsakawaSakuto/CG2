@@ -1,5 +1,7 @@
 #pragma once
 #include "Camera/Camera.h"
+#include "3d/Line/MyDebugLine.h"
+#include "Utility/Collision/Type/LineStruct.h"
 #include <cmath>
 
 class GameCameraController
@@ -19,4 +21,8 @@ private:
 	Camera camera_;
 	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 offset_ = { 0.0f, 4.0f, 0.0f };
+	
+	bool isMouseCameraActive_ = false; // マウスカメラ操作がアクティブかどうか
+
+	Line cameraRay_ = { {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 };

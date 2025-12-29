@@ -10,6 +10,8 @@
 #include "Map/Map3D.h"
 #include "Map/JarManager/JarManager.h"
 #include "Map/ChestManager/ChestManager.h"
+#include "Map/TreeManager/TreeManager.h"
+#include "GameUI/GameSceneUI/GameSceneUI.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -27,11 +29,22 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
+	void TempMap();
+
+	void JarUpdate();
+	
+	void ChestUpdate();
+
+	void UIUpdate();
+
 	bool cameraDebugMode_ = false;
 private:
-	
+	int dangerLv_ = 0;
+
 	Camera camera_;
 	DebugCamera debugCamera_;
+
+	unique_ptr<GameSceneUI> gameSceneUI_;
 
 	// プレイヤー関連のクラス
 	unique_ptr<Player> player_;
@@ -51,4 +64,9 @@ private:
 
 	// 宝箱管理クラス
 	unique_ptr<ChestManager> chestManager_ = make_unique<ChestManager>();
+
+	// 木管理クラス
+	unique_ptr<TreeManager> treeManager_ = make_unique<TreeManager>();
+
+	bool useFog_ = false;
 };

@@ -16,21 +16,226 @@ void GameScene::Initialize() {
 
 	gameCamera_->Initialize();
 
-	// ===== Map3D のサンプル実装 =====
 	// 25x20x25 のマップを作成
 	map3D_ = make_unique<Map3D>(15, 10, 15);
 	map3D_->Initialize();
+	TempMap();
 
-	// サンプル: 床を作成（y=0の全面にNormalブロックを配置）
-	for (uint32_t z = 0; z < map3D_->GetDepth(); ++z) {
-		for (uint32_t x = 0; x < map3D_->GetWidth(); ++x) {
-			map3D_->SetTile(x, 0, z, TileType::Normal);
+	// JarManagerを初期化（マップ構築後に呼ぶ）
+	jarManager_->Initialize(map3D_.get());
+
+	// ChestManagerを初期化（JarManagerの後に呼んで位置情報を取得）
+	chestManager_->Initialize(map3D_.get(), jarManager_.get());
+
+	// TreeManagerを初期化（マップ構築後に呼ぶ）
+	treeManager_->Initialize(map3D_.get());
+
+	player_ = make_unique<Player>();
+	player_->Initialize();
+
+	enemyManager_->Initialize();
+
+	// プレイヤーにEnemyManagerへの参照を設定
+	player_->SetEnemyManager(enemyManager_.get());
+
+	// プレイヤーにMap3Dへの参照を設定
+	player_->SetMap(map3D_.get());
+	
+	// プレイヤーにTreeManagerへの参照を設定
+	player_->SetTreeManager(treeManager_.get());
+
+	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
+	collisionManager_->Initialize();
+	collisionManager_->SetPlayer(player_.get());
+	collisionManager_->SetEnemyManager(enemyManager_.get());
+	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
+
+	gameSceneUI_ = make_unique<GameSceneUI>();
+	gameSceneUI_->Initialize();
+
+	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	postEffect->SetEnabled(true);
+	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	postEffect->SetPostEffectType(PSOType::PostEffect_Fog);
+	postEffect->GetParams().fog.fogStart = 50.0f;
+	postEffect->GetParams().fog.fogEnd = 200.0f;
+	postEffect->GetParams().fog.fogDensity = 1.0f;
+}
+
+void GameScene::Update() {
+	if (MyInput::Trigger(Action::PAUSE)) {
+		ChangeScene(SCENE::TITLE);
+	}
+
+	player_->Update();
+
+	gameCamera_->SetTarget(player_->GetPosition());
+	gameCamera_->Update();
+
+	// CollisionManagerで衝突判定を実行
+	collisionManager_->Update();
+
+	enemyManager_->SetTargetPosition(player_->GetPosition());
+	enemyManager_->Update();
+
+	JarUpdate();
+
+	ChestUpdate();
+
+	// ChestManagerの更新
+	chestManager_->Update();
+
+	// TreeManagerの更新
+	treeManager_->Update();
+
+	//camera_ = debugCamera_;
+	camera_ = gameCamera_->GetCamera();
+
+	camera_.Update();
+
+	map3D_->Update();
+
+	UIUpdate();
+
+	MyDebugLine::AddGrid(100.0f, 20);
+
+	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	if (useFog_) {
+		if (MyInput::TriggerKey(DIK_RETURN)) {
+			useFog_ = false;
+			postEffect->SetEnabled(false);
+		}
+	} else {
+		if (MyInput::TriggerKey(DIK_RETURN)) {
+			useFog_ = true;
+			postEffect->SetEnabled(true);
+		}
+	}
+}
+
+void GameScene::Draw() {
+	
+	// マップの描画
+	if (map3D_) {
+		if (!MyInput::PushKey(DIK_P)) {
+			map3D_->Draw(camera_);
+		}
+		//map3D_->Draw(camera_);
+	}
+
+	// 壺の描画
+	jarManager_->Draw(camera_);
+
+	// 宝箱の描画
+	chestManager_->Draw(camera_);
+
+	// 木の描画
+	treeManager_->Draw(camera_);
+
+	enemyManager_->Draw(camera_);
+
+	player_->Draw(camera_);
+
+	collisionManager_->Draw(camera_);
+
+	MyDebugLine::Draw(camera_);
+
+	gameSceneUI_->Draw();
+}
+
+void GameScene::DrawImGui() {
+#ifdef USE_IMGUI
+	//auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+	//postEffect->DrawImGui();
+#endif // USE_IMGUI
+
+	//gameCamera_->DrawImgui();
+
+	player_->DrawImGui();
+	//enemyManager_->DrawImGui();
+
+	//testParticle_->DrawImGui("TestParticle");
+
+	// マップのImGui描画
+	if (map3D_) {
+		map3D_->DrawImGui();
+	}
+	
+	gameSceneUI_->DrawImGui();
+
+	// JarManagerのImGui描画
+	//jarManager_->DrawImGui();
+
+	// ChestManagerのImGui描画
+	//chestManager_->DrawImGui();
+
+	// TreeManagerのImGui描画
+	//treeManager_->DrawImGui();
+}
+
+void GameScene::PostFrameCleanup() {
+	player_->PostFrameCleanup();
+}
+
+void GameScene::JarUpdate() {
+
+	// プレイヤーと壺の衝突判定（ExpとMoneyを取得）
+	const AABB& playerAABB = player_->GetMapCollisionAABB();
+	JarType jarType;
+	int reward = 0;
+
+	if (MyInput::Trigger(Action::INTERACT)) {
+		reward = jarManager_->BreakJar(playerAABB, jarType);
+	}
+
+	if (reward > 0) {
+		// 壺のタイプに応じてExpまたはMoneyを追加
+		if (jarType == JarType::Exp) {
+			player_->AddExp(reward);
+		} else if (jarType == JarType::Money) {
+			player_->AddMoney(reward);
 		}
 	}
 
-	// map3D_->SetTile(14, 1, 0, TileType::Normal);
-	// map3D_->SetTile(15, 1, 0, TileType::Normal);
+	// JarManagerの更新
+	jarManager_->Update();
+}
 
+void GameScene::ChestUpdate() {
+	// プレイヤーと宝箱の衝突判定
+	const AABB& playerAABB = player_->GetMapCollisionAABB();
+	bool isPaidChest = false;
+	int openAmount = 0;
+
+	if (MyInput::Trigger(Action::INTERACT)) {
+		// まず宝箱との衝突をチェック
+		if (chestManager_->CheckChestCollision(playerAABB, isPaidChest, openAmount)) {
+			if (isPaidChest) {
+				// PaidChestの場合、お金をチェックしてから開ける
+				if (player_->SubtractMoney(openAmount)) {
+					// お金が足りる場合は宝箱を開ける
+					chestManager_->OpenChest(playerAABB, true);
+				} else {
+					// お金が足りない場合は開けない
+					// TODO: お金が足りないメッセージを表示する
+				}
+			} else {
+				// FreeChestの場合は無条件で開ける
+				chestManager_->OpenChest(playerAABB, false);
+			}
+		}
+	}
+}
+
+void GameScene::UIUpdate() {
+	gameSceneUI_->SetNowMoney(player_->GetNowMoney());
+	gameSceneUI_->SetExpGauge(float(player_->GetCurrentExp()), float(player_->GetExpToNextLevel()));
+	gameSceneUI_->Update();
+}
+
+void GameScene::TempMap() {
 #pragma region x 0 - 1
 
 	map3D_->SetTile(0, 6, 0, TileType::Normal);
@@ -410,110 +615,4 @@ void GameScene::Initialize() {
 	map3D_->SetTile(14, 5, 14, TileType::Normal);
 
 #pragma endregion
-
-	// JarManagerを初期化（マップ構築後に呼ぶ）
-	jarManager_->Initialize(map3D_.get());
-
-	// ChestManagerを初期化（JarManagerの後に呼んで位置情報を取得）
-	chestManager_->Initialize(map3D_.get(), jarManager_.get());
-
-	player_ = make_unique<Player>();
-	player_->Initialize();
-
-	enemyManager_->Initialize();
-
-	// プレイヤーにEnemyManagerへの参照を設定
-	player_->SetEnemyManager(enemyManager_.get());
-
-	// プレイヤーにMap3Dへの参照を設定
-	player_->SetMap(map3D_.get());
-
-	// CollisionManagerを初期化し、PlayerとEnemyManagerとWeaponManagerへの参照を設定
-	collisionManager_->Initialize();
-	collisionManager_->SetPlayer(player_.get());
-	collisionManager_->SetEnemyManager(enemyManager_.get());
-	collisionManager_->SetWeaponManager(player_->GetWeaponManager());
-}
-
-void GameScene::Update() {
-	if (MyInput::Trigger(Action::PAUSE)) {
-		ChangeScene(SCENE::TITLE);
-	}
-
-	player_->Update();
-
-	gameCamera_->SetTarget(player_->GetPosition());
-	gameCamera_->Update();
-
-	// CollisionManagerで衝突判定を実行
-	collisionManager_->Update();
-
-	enemyManager_->SetTargetPosition(player_->GetPosition());
-	enemyManager_->Update();
-
-	// JarManagerの更新
-	jarManager_->Update();
-
-	// ChestManagerの更新
-	chestManager_->Update();
-
-	//camera_ = debugCamera_;
-	camera_ = gameCamera_->GetCamera();
-
-	camera_.Update();
-
-	map3D_->Update();
-
-	MyDebugLine::AddGrid(100.0f, 20);
-}
-
-void GameScene::Draw() {
-	MyDebugLine::Draw(camera_);
-
-	// マップの描画
-	if (map3D_) {
-		map3D_->Draw(camera_);
-	}
-
-	// 壺の描画
-	jarManager_->Draw(camera_);
-
-	// 宝箱の描画
-	chestManager_->Draw(camera_);
-
-	enemyManager_->Draw(camera_);
-
-	player_->Draw(camera_);
-
-	collisionManager_->Draw(camera_);
-}
-
-void GameScene::DrawImGui() {
-#ifdef USE_IMGUI
-	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
-	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	postEffect->DrawImGui();
-#endif // USE_IMGUI
-
-	//gameCamera_->DrawImgui();
-
-	player_->DrawImGui();
-	//enemyManager_->DrawImGui();
-
-	//testParticle_->DrawImGui("TestParticle");
-
-	// マップのImGui描画
-	if (map3D_) {
-		map3D_->DrawImGui();
-	}
-	
-	// JarManagerのImGui描画
-	//jarManager_->DrawImGui();
-
-	// ChestManagerのImGui描画
-	//chestManager_->DrawImGui();
-}
-
-void GameScene::PostFrameCleanup() {
-	player_->PostFrameCleanup();
 }

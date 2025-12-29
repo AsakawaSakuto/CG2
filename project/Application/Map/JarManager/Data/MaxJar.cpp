@@ -12,11 +12,12 @@ void MaxJar::Initialize(Vector3 pos) {
 
 	// 位置設定
 	transform_.translate = pos;
+	transform_.scale = { 1.1f, 1.1f, 1.1f };
 
 	// 当たり判定設定
 	aabbCollision_.center = pos;
-	aabbCollision_.min = { -0.5f, 0.0f, -0.5f };
-	aabbCollision_.max = { 0.5f, 1.0f, 0.5f };
+	aabbCollision_.min = { -1.0f, 0.0f, -1.0f };
+	aabbCollision_.max = {  1.0f, 1.0f,  1.0f };
 
 	// ドロップアイテム設定
 	dropExpMin_ = 5;

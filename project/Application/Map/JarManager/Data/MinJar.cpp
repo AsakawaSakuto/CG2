@@ -15,15 +15,15 @@ void MinJar::Initialize(Vector3 pos) {
 	
 	// 当たり判定設定
 	aabbCollision_.center = pos;
-	aabbCollision_.min = { -0.25f, 0.0f, -0.25f };
-	aabbCollision_.max = { 0.25f, 0.5f, 0.25f };
+	aabbCollision_.min = { -0.5f, 0.0f, -0.5f };
+	aabbCollision_.max = { 0.5f, 0.5f, 0.5f };
 
 	// ドロップアイテム設定
 	dropExpMin_   = 5;
 	dropExpMax_   = 10;
 
-	dropMoneyMin_ = 10;
-	dropMoneyMax_ = 20;
+	dropMoneyMin_ = 5;
+	dropMoneyMax_ = 10;
 
 	if (MyRand::Int(0, 1) == 0) {
 		jarType_ = JarType::Exp;

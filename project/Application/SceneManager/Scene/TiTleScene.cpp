@@ -1,4 +1,5 @@
 #include "TiTleScene.h"
+#include "Core/ServiceLocator/ServiceLocator.h"
 
 TitleScene::~TitleScene() {
 	CleanupResources();
@@ -12,6 +13,9 @@ void TitleScene::Initialize() {
 	ChangeScene(SCENE::TITLE);
 
 	titleUI_->Initialize();
+
+	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	postEffect->SetEnabled(false);
 }
 
 void TitleScene::Update() {
