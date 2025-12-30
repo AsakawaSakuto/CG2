@@ -51,11 +51,3 @@ void FireBall::Draw(Camera camera) {
 void FireBall::DrawImGui() {
 
 }
-
-void FireBall::SetPosition(const Vector3& position) {
-	transform_.translate = position;
-}
-
-void FireBall::SetDirectionToEnemy(const Vector3& direction) {
-	directionToEnemy_ = direction.Normalized();
-}

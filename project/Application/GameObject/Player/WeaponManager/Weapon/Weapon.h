@@ -20,20 +20,27 @@ public:
 	void Draw(Camera camera);
 
 	void SetPlayerPosition(const Vector3& position) { playerPosition_ = position; }
-	void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction; }
+	void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction.Normalized(); }
 
 	// 弾のリストへのアクセス（const参照）
 	const std::vector<std::unique_ptr<FireBall>>& GetFireBalls() const { return fireBall_; }
+	const std::vector<std::unique_ptr<Laser>>& GetLaser() const { return laser_; }
+	const std::vector<std::unique_ptr<Runa>>& GetRuna() const { return runa_; }
 
 	void PostFrameCleanup();
 	
 private:
 
 	void FireBallUpdate();
+	void LaserUpdate();
+	void RunaUpdate();
 
 private:
 
 	std::vector<std::unique_ptr<FireBall>> fireBall_;
+	std::vector<std::unique_ptr<Laser>> laser_;
+	std::vector<std::unique_ptr<Runa>> runa_;
+
 	Vector3 spawnOffSet_ = { 0.0f, 1.0f, 0.0f };
 
 	WeaponName weaponName_;
@@ -44,4 +51,26 @@ private:
 
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
+
+	template <class T>
+	void EraseDead(std::vector<std::unique_ptr<T>>& v) {
+		v.erase(
+			std::remove_if(v.begin(), v.end(),
+				[](const std::unique_ptr<T>& p)
+				{
+					return !p || !p->IsAlive();
+				}),
+			v.end()
+		);
+	}
+
+	template<class T, class... Args>
+	void DrawVec(const std::vector<std::unique_ptr<T>>& v, Args&&... args) {
+		for (const auto& p : v) {
+			if (p) {
+				p->Draw(std::forward<Args>(args)...);
+			}
+		}
+	}
+
 };

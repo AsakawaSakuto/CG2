@@ -71,17 +71,19 @@ void GameScene::Initialize() {
 
 	wall_ = make_unique<Model>();
 	wall_->Initialize("MapBlock/wall.obj");
+	wall_->SetColor3({ 0.0f,0.0f,0.0f });
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetEnabled(true);
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 	postEffect->SetPostEffectType(PSOType::PostEffect_Fog);
 	postEffect->GetParams().fog.fogStart = 50.0f;
-	postEffect->GetParams().fog.fogEnd = 200.0f;
+	postEffect->GetParams().fog.fogEnd = 175.0f;
 	postEffect->GetParams().fog.fogDensity = 1.0f;
-	postEffect->GetParams().fog.fogColor[0] = 0.5f;
-	postEffect->GetParams().fog.fogColor[1] = 0.5f;
-	postEffect->GetParams().fog.fogColor[2] = 0.5f;
+	postEffect->GetParams().fog.fogColor[0] = 0.0f;
+	postEffect->GetParams().fog.fogColor[1] = 0.0f;
+	postEffect->GetParams().fog.fogColor[2] = 0.0f;
+
 }
 
 void GameScene::Update() {
@@ -126,7 +128,7 @@ void GameScene::Update() {
 
 	UIUpdate();
 
-	MyDebugLine::AddGrid(100.0f, 20);
+	//MyDebugLine::AddGrid(100.0f, 20);
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());

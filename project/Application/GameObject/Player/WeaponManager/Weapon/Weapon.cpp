@@ -11,7 +11,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 2.0f;
 		status_.intervalTime = 0.2f;
-		status_.shotMaxCount = 5;
+		status_.shotMaxCount = 3;
 		status_.shotNowCount = 0;
 		status_.size = 1.0f;
 		status_.damage = 10.0f;
@@ -70,29 +70,26 @@ void Weapon::Update() {
 		FireBallUpdate();
 		break;
 	case WeaponName::Laser:
+		LaserUpdate();
 		break;
 	case WeaponName::Runa:
+		RunaUpdate();
 		break;
 	}
 
 }
 
 void Weapon::Draw(Camera camera) {
-	for (auto& fireball : fireBall_) {
-		fireball->Draw(camera);
-	}
+	DrawVec(fireBall_, camera);
+	DrawVec(laser_, camera);
+	DrawVec(runa_, camera);
 }
 
 void Weapon::PostFrameCleanup() {
 	// 死亡した弾を削除し、パーティクルをプールに返却
-	auto it = fireBall_.begin();
-	while (it != fireBall_.end()) {
-		if (!(*it)->IsAlive()) {
-			it = fireBall_.erase(it);
-		} else {
-			++it;
-		}
-	}
+	EraseDead(fireBall_);
+	EraseDead(laser_);
+	EraseDead(runa_);
 }
 
 void Weapon::FireBallUpdate() {
@@ -106,11 +103,11 @@ void Weapon::FireBallUpdate() {
 
 	if (intervalTimer_.IsFinished()) {
 
-		auto fireBall = std::make_unique<FireBall>();
-		fireBall->Initialize();
-		fireBall->SetPosition(playerPosition_ + spawnOffSet_);
-		fireBall->SetDirectionToEnemy(directionToEnemy_);
-		fireBall_.push_back(std::move(fireBall));
+		auto bullet = std::make_unique<FireBall>();
+		bullet->Initialize();
+		bullet->SetPosition(playerPosition_ + spawnOffSet_);
+		bullet->SetDirectionToEnemy(directionToEnemy_);
+		fireBall_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= status_.shotMaxCount) {
@@ -123,7 +120,68 @@ void Weapon::FireBallUpdate() {
 	coolDownTimer_.Update();
 	intervalTimer_.Update();
 
-	for (auto& fireBall : fireBall_) {
-		fireBall->Update();
+	for (auto& bullet : fireBall_) {
+		bullet->Update();
+	}
+}
+
+void Weapon::LaserUpdate() {
+	// クールタイムが終了している場合
+	if (coolDownTimer_.IsFinished()) {
+		if (!intervalTimer_.IsActive()) {
+			intervalTimer_.Start(status_.intervalTime, true);
+			coolDownTimer_.Reset();
+		}
+	}
+
+	if (intervalTimer_.IsFinished()) {
+
+		auto bullet = std::make_unique<Laser>();
+		bullet->Initialize();
+		bullet->SetPosition(playerPosition_ + spawnOffSet_);
+		bullet->SetDirectionToEnemy(directionToEnemy_);
+		laser_.push_back(std::move(bullet));
+
+		status_.shotNowCount++;
+		if (status_.shotNowCount >= status_.shotMaxCount) {
+			status_.shotNowCount = 0;
+			intervalTimer_.Reset();
+			coolDownTimer_.Start(status_.cooldownTime, false);
+		}
+	}
+
+	coolDownTimer_.Update();
+	intervalTimer_.Update();
+
+	for (auto& bullet : laser_) {
+		bullet->Update();
+	}
+}
+
+void Weapon::RunaUpdate() {
+	// クールタイムが終了している場合
+	if (coolDownTimer_.IsFinished()) {
+		if (!intervalTimer_.IsActive()) {
+			intervalTimer_.Start(status_.intervalTime, true);
+			coolDownTimer_.Reset();
+		}
+	}
+	if (intervalTimer_.IsFinished()) {
+		auto bullet = std::make_unique<Runa>();
+		bullet->Initialize();
+		bullet->SetPosition(playerPosition_ + spawnOffSet_);
+		bullet->SetDirectionToEnemy(directionToEnemy_);
+		runa_.push_back(std::move(bullet));
+		status_.shotNowCount++;
+		if (status_.shotNowCount >= status_.shotMaxCount) {
+			status_.shotNowCount = 0;
+			intervalTimer_.Reset();
+			coolDownTimer_.Start(status_.cooldownTime, false);
+		}
+	}
+	coolDownTimer_.Update();
+	intervalTimer_.Update();
+	for (auto& bullet : runa_) {
+		bullet->Update();
 	}
 }
