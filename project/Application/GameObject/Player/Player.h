@@ -2,6 +2,7 @@
 #include "GameObject/BaseGameObject.h"
 #include "EngineSystem.h"
 #include "playerStatus.h"
+#include "AnimationController/AnimationController.h"
 #include "GameObject/Player/WeaponManager/WeaponManager.h"
 
 // 前方宣言
@@ -117,7 +118,8 @@ private:
 	bool IsGroundedOnMap();
 
 private:
-	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
+	unique_ptr<AnimationController> model_;
+	PlayerMotion currentMotion_ = PlayerMotion::Idle;
 
 	Transform expGetRangeTransform_;
 
