@@ -12,11 +12,30 @@ void Player::PostFrameCleanup() {
 
 void Player::Initialize() {
 
-	transform_.SetAllScale(1.5);
+	transform_.SetAllScale(1.0);
 	transform_.translate = { 10.0f,100.0f,10.0f };
 
-	model_->Initialize("animation/human/walk.gltf");
-	model_->UseLight(false);
+	// PlayerModelControllerの初期化
+	// アニメーションをロード（gltfファイル内のアニメーションインデックスを指定）
+	Animation idle =      LoadAnimationFile("Player/Animation/idle.gltf");
+	Animation crouIdle =  LoadAnimationFile("Player/Animation/crouIdle.gltf");
+	Animation walk =      LoadAnimationFile("Player/Animation/walk.gltf");
+	Animation crouching = LoadAnimationFile("Player/Animation/Crouching.gltf");
+	Animation jump =      LoadAnimationFile("Player/Animation/jump.gltf");
+	Animation landing =   LoadAnimationFile("Player/Animation/landing.gltf");
+
+	std::map<PlayerMotion, Animation> animationMap;
+	animationMap[PlayerMotion::Idle] =      idle;
+	animationMap[PlayerMotion::CrouIdle] =  crouIdle;
+	animationMap[PlayerMotion::Walk] =      walk;
+	animationMap[PlayerMotion::Crouching] = crouching;
+	animationMap[PlayerMotion::Jump] =      jump;
+	animationMap[PlayerMotion::Landing] =   landing;
+
+	// AnimationControllerを作成してから初期化
+	model_ = std::make_unique<AnimationController>();
+	model_->Initialize(animationMap);
+	model_->SetMotion(PlayerMotion::Idle, 0.0f, true);
 
 	moveParticle_->Initialize();
 	moveParticle_->LoadJson("playerMove");
@@ -44,12 +63,6 @@ void Player::Update() {
 	Jump();
 	SlideOnSlope();  // しゃがみ中のスロープ滑り処理
 
-	if (MyInput::Push(Action::CROUCHING)) {
-		model_->SetColor3({ 1.0f, 0.0f, 0.0f });
-	} else {
-		model_->SetColor3({ 1.0f, 1.0f, 1.0f });
-	}
-
 	// AABBの中心をプレイヤーの位置に設定
 	mapCollosion_.center = transform_.translate;
 
@@ -72,7 +85,7 @@ void Player::Update() {
 	expGetRangeTransform_.translate = transform_.translate;
 	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
 
-	model_->Update();
+	model_->Update(1.0f/60.0f, transform_);
 
 	moveParticle_->SetOffSet({ 0.0f, -0.2f, 0.0f });
 	moveParticle_->Update();
@@ -100,7 +113,7 @@ void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
 
-	model_->Draw(camera, transform_);
+	model_->Draw(camera);
 
 	//expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
@@ -117,7 +130,7 @@ void Player::DrawImGui() {
 	ImGui::DragFloat("Move Speed", &status_.moveSpeed, 0.1f, 0.1f, 20.0f);
 	ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
-	
+
 	// ジャンプ設定
 	ImGui::Separator();
 	ImGui::Text("Jump Settings");
@@ -199,8 +212,37 @@ void Player::Move() {
 		if (!moveParticle_->IsPlaying()) {
 			moveParticle_->Play(transform_.translate, false);
 		}
+
+		// 移動中のアニメーション判定
+		if (MyInput::Push(Action::CROUCHING)) {
+			// しゃがみ歩き
+			if (currentMotion_ != PlayerMotion::Crouching) {
+				model_->SetMotion(PlayerMotion::Crouching, 0.1f, true);
+				currentMotion_ = PlayerMotion::Crouching;
+			}
+		} else {
+			// 通常歩き
+			if (currentMotion_ != PlayerMotion::Walk) {
+				model_->SetMotion(PlayerMotion::Walk, 0.1f, true);
+				currentMotion_ = PlayerMotion::Walk;
+			}
+		}
 	} else {
+		// 移動入力がない場合
 		moveParticle_->Stop();
+		
+		// 待機状態に遷移
+		if (MyInput::Push(Action::CROUCHING)) {
+			if (currentMotion_ != PlayerMotion::CrouIdle) {
+				model_->SetMotion(PlayerMotion::CrouIdle, 0.1f, true);
+				currentMotion_ = PlayerMotion::CrouIdle;
+			}
+		} else {
+			if (currentMotion_ != PlayerMotion::Idle) {
+				model_->SetMotion(PlayerMotion::Idle, 0.1f, true);
+				currentMotion_ = PlayerMotion::Idle;
+			}
+		}
 	}
 
 	transform_.translate.x = std::clamp(transform_.translate.x, -7.0f, 217.0f);
