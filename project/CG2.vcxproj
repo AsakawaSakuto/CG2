@@ -451,9 +451,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="docs\AABB_OBB_MinMax_Migration.md" />
-    <None Include="docs\Map3D_Usage.md" />
-    <None Include="docs\MapCollisionVisualGuide.md" />
+    <None Include="docs\CameraBlockOcclusion.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />

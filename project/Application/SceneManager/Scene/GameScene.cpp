@@ -72,6 +72,9 @@ void GameScene::Update() {
 	gameCamera_->SetTarget(player_->GetPosition());
 	gameCamera_->Update();
 	
+	// カメラとプレイヤー間のブロック遮蔽をチェックしてカメラ距離を調整
+	gameCamera_->CheckBlockOcclusion(map3D_.get());
+	
 	// カメラとプレイヤー間の障害物を半透明化
 	gameCamera_->UpdateOccluderTransparency(treeManager_.get());
 
