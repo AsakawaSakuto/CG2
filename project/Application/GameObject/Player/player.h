@@ -85,6 +85,11 @@ public:
 	/// お金を減らす（戻り値: 減らせたかどうか）
 	/// </summary>
 	bool SubtractMoney(int money);
+
+	/// <summary>
+	/// Playerの位置を設定する
+	/// </summary>
+	void SetPosition(const Vector3& position) { transform_.translate = position; }
 	
 private:
 
