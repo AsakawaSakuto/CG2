@@ -98,6 +98,7 @@ void GameScene::Update() {
 	collisionManager_->Update();
 
 	enemyManager_->SetTargetPosition(player_->GetPosition());
+	enemyManager_->SetMap(map3D_.get());
 	enemyManager_->Update();
 
 	JarUpdate();

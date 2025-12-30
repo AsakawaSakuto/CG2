@@ -56,7 +56,7 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 		if (Collision::IsHit(playerSphere, enemySphere)) {
 			// 衝突したEnemyを死亡状態にする
 			enemy->Dead();
-			goResult_ = true;
+			//goResult_ = true;
 		}
 	}
 }

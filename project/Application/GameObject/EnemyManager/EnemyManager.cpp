@@ -1,9 +1,10 @@
 #include <algorithm>
 #include "EnemyManager.h"
 #include "Utility/Collision/Collision.h"
+#include "Map/Map3D.h"
 
 void EnemyManager::Initialize() {
-	spawnTimer_.Start(0.25f, true);
+	spawnTimer_.Start(1.0f, true);
 
 	dieParticle_ = std::make_unique<Particles>();
 	dieParticle_->Initialize();
@@ -12,11 +13,16 @@ void EnemyManager::Initialize() {
 
 void EnemyManager::Update() {
 	if (enemies_.size() < 50) {
-		//spawnTimer_.Update();
+		spawnTimer_.Update();
 
 		if (spawnTimer_.IsFinished()) {
 			auto enemy = std::make_unique<Enemy>();
 			enemy->Initialize();
+			
+			// Map3Dを設定
+			if (map_) {
+				enemy->SetMap(map_);
+			}
 
 			int i = random_.Int(0, 1);
 			int j = random_.Int(0, 1);
@@ -34,7 +40,7 @@ void EnemyManager::Update() {
 			}
 			enemy->SetPosition(
 				{targetPosition_.x + random_.Float(-5.0f,5.0f) + x,
-				 0.0f,
+				 targetPosition_.y,
 				 targetPosition_.z + random_.Float(-5.0f,5.0f) + z });
 			enemies_.push_back(std::move(enemy));
 		}
@@ -58,12 +64,6 @@ void EnemyManager::Update() {
 	for (auto& enemy : enemies_) {
 		enemy->Update();
 	}
-
-	/*if (ctx_->input.TriggerKey(DIK_P)) {
-		for (auto& expItem : expItems_) {
-			expItem->StateChange();
-		}
-	}*/
 
 	for (auto& expItem : expItems_) {
 		expItem->Update();
