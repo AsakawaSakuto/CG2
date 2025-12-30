@@ -93,6 +93,9 @@ private:
 	// ジャンプ処理
 	void Jump();
 
+	// しゃがみ中のスロープ滑り処理
+	void SlideOnSlope();
+
 	// カメラの向きに基づいた移動方向を計算
 	Vector3 CalculateCameraMoveDirection(float stickX, float stickY);
 
@@ -112,12 +115,6 @@ private:
 	/// </summary>
 	/// <returns>地面に接している場合true</returns>
 	bool IsGroundedOnMap();
-
-	/// <summary>
-	/// ブロック内に不正に貫通していないかチェック
-	/// </summary>
-	/// <returns>不正な貫通が検出された場合true</returns>
-	bool IsInsideBlockIllegally();
 
 private:
 	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
@@ -141,6 +138,9 @@ private:
 	float groundLevel_ = 2.5f; // 地面のY座標（廃止予定）
 	bool isGrounded_ = true;   // 地面にいるかどうか
 	bool wasGrounded_ = true;  // 前フレームで地面にいたかどうか
+
+	// スロープ滑り関連
+	float slideSpeed_ = 20.0f;  // スロープでの滑り速度
 
 	// EnemyManagerへの参照（生ポインタ、所有権なし)
 	EnemyManager* enemyManager_ = nullptr;
