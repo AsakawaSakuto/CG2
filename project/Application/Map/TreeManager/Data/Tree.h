@@ -19,6 +19,12 @@ public:
 	void Initialize(Vector3 pos);
 	void Draw(Camera camera);
 	
+	/// <summary>
+	/// 木を半透明化
+	/// </summary>
+	/// <param name="alpha">透明度（0.0-1.0）</param>
+	void SetTransparent(bool enable, float alpha = 0.3f);
+	
 	// Getter
 	Vector3 GetPosition() const { return transform_.translate; }
 	const AABB& GetAABBCollision() const { return aabbCollision_; }

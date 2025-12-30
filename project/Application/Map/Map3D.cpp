@@ -1,5 +1,6 @@
 #include "Map3D.h"
 #include <algorithm>
+#include <vector>
 #include "3d/Line/MyDebugLine.h"
 
 // タイルタイプとモデルパスのマッピング
@@ -300,6 +301,54 @@ bool Map3D::GetSlopeHeight(const Vector3& worldPos, float& outY) const {
 	return false;
 }
 
+bool Map3D::GetSlopeGradient(const Vector3& worldPos, Vector3& outGradient) const {
+	// ワールド座標からマップ座標を取得
+	uint32_t mx, my, mz;
+	if (!WorldToMap(worldPos, mx, my, mz)) {
+		return false;
+	}
+
+	// 該当セルがスロープでない場合は失敗
+	TileType tileType = GetTile(mx, my, mz);
+	if (!IsSlopeType(tileType)) {
+		return false;
+	}
+
+	SlopeDirection dir = GetSlopeDirection(mx, my, mz);
+
+	// スロープの傾斜角度を計算（blockSize_.y / blockSize_.x または blockSize_.z）
+	// スロープは1ブロックで高さ分上がるので、傾斜角度 = atan(height / width)
+	float slopeAngle = std::atan2(blockSize_.y, blockSize_.x);
+	float sinAngle = std::sin(slopeAngle);
+	float cosAngle = std::cos(slopeAngle);
+
+	// スロープの向きに応じて下り方向のベクトルを計算
+	// 下り方向なので、上り方向の逆を返す
+	switch (dir) {
+		case SlopeDirection::PlusX:
+			// X+ 方向に上る → 下りはX-方向
+			outGradient = Vector3(-cosAngle, -sinAngle, 0.0f);
+			break;
+
+		case SlopeDirection::MinusX:
+			// X- 方向に上る → 下りはX+方向
+			outGradient = Vector3(cosAngle, -sinAngle, 0.0f);
+			break;
+
+		case SlopeDirection::PlusZ:
+			// Z+ 方向に上る → 下りはZ-方向
+			outGradient = Vector3(0.0f, -sinAngle, -cosAngle);
+			break;
+
+		case SlopeDirection::MinusZ:
+			// Z- 方向に上る → 下りはZ+方向
+			outGradient = Vector3(0.0f, -sinAngle, cosAngle);
+			break;
+	}
+
+	return true;
+}
+
 bool Map3D::SetBlockTexture(uint32_t x, uint32_t y, uint32_t z, const std::string& texturePath) {
 	// 範囲外チェック
 	if (!IsInBounds(x, y, z)) {
@@ -358,6 +407,35 @@ Vector3 Map3D::MapToWorld(uint32_t x, uint32_t y, uint32_t z) const {
 
 bool Map3D::IsInBounds(uint32_t x, uint32_t y, uint32_t z) const {
 	return x < width_ && y < height_ && z < depth_;
+}
+
+std::vector<Vector3> Map3D::GetTopNormalBlockPositions() const {
+	std::vector<Vector3> topPositions;
+
+	// 各XZ座標について、最も上にあるブロックがNormalの場合のみ記録
+	for (uint32_t z = 0; z < depth_; ++z) {
+		for (uint32_t x = 0; x < width_; ++x) {
+			// 上から順に走査して、最初に見つかったブロック（Empty以外）を確認
+			for (int32_t y = static_cast<int32_t>(height_) - 1; y >= 0; --y) {
+				TileType tileType = GetTile(x, static_cast<uint32_t>(y), z);
+				
+				// 最初に見つかったブロックがEmptyでない場合
+				if (tileType != TileType::Empty) {
+					// そのブロックがNormalの場合のみリストに追加
+					if (tileType == TileType::Normal) {
+						Vector3 worldPos = MapToWorld(x, static_cast<uint32_t>(y), z);
+						// ブロックの上面の高さに調整（ブロックの中心Y + 半分の高さ）
+						worldPos.y += blockSize_.y * 0.5f;
+						topPositions.push_back(worldPos);
+					}
+					// 最初に見つかったブロックがNormalでない（スロープなど）場合は何も追加しない
+					break; // このXZ座標の走査を終了
+				}
+			}
+		}
+	}
+
+	return topPositions;
 }
 
 void Map3D::Clear() {

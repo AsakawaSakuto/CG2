@@ -187,6 +187,12 @@ public:
 	/// <param name="animation">アニメーションがコピーされ、設定したアニメーションを行うようになる</param>
 	void SetAnimationData(Animation animation) { animationData_ = animation; }
 
+	/// <summary>
+	/// アニメーションの現在時間を設定
+	/// </summary>
+	/// <param name="time">現在時間</param>
+	void SetAnimationTime(float time) { animationTime_ = time; }
+
 	void UseLight(bool use) { materialData_->enableLighting = use; }
 private:
 
@@ -198,9 +204,9 @@ private:
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;             // 共有VBV
 		ModelData modelData;                                   // 共有モデルデータ
 		Animation animationData;                               // 共有アニメーションデータ
-		Skeleton skeletonData;
-		SkinCluster skinClusterData;
-		uint32_t skinClusterIndex;
+		Skeleton skeletonData;                                 // 共有スケルトンデータ
+		SkinCluster skinClusterData;                           // 共有スキンクラスター
+		uint32_t skinClusterIndex;                             // スキンクラスター用SRVインデックス
 		std::string textureName;                               // 使用テクスチャ名
 		uint32_t textureIndex = 0;                             // テクスチャインデックス
 		float boundingRadius = 1.0f;                           // バウンディング半径

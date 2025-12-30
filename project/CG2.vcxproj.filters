@@ -96,6 +96,7 @@
     <ClCompile Include="Application\GameUI\GameSceneUI\GameSceneUI.cpp" />
     <ClCompile Include="Application\Map\TreeManager\Data\Tree.cpp" />
     <ClCompile Include="Application\Map\TreeManager\TreeManager.cpp" />
+    <ClCompile Include="Application\GameObject\Player\AnimationController\AnimationController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -233,6 +234,8 @@
     <ClInclude Include="Application\GameUI\GameSceneUI\GameSceneUI.h" />
     <ClInclude Include="Application\Map\TreeManager\Data\Tree.h" />
     <ClInclude Include="Application\Map\TreeManager\TreeManager.h" />
+    <ClInclude Include="Application\GameObject\Player\AnimationController\AnimationController.h" />
+    <ClInclude Include="Engine\2d\Sprite\SpriteDataStruct.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -244,8 +247,5 @@
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />
-    <None Include="docs\Map3D_Usage.md" />
-    <None Include="docs\AABB_OBB_MinMax_Migration.md" />
-    <None Include="docs\MapCollisionVisualGuide.md" />
   </ItemGroup>
 </Project>

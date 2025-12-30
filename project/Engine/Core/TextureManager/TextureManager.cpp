@@ -144,10 +144,10 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         return;
     }
 
-    // sRGB変換を無効化（リニア色空間で読み込む）
+    // sRGBとして読み込む（ガンマ補正が正しく適用されるように）
     HRESULT hr = DirectX::LoadFromWICFile(
         filePathW.c_str(),
-        DirectX::WIC_FLAGS_NONE,  // WIC_FLAGS_FORCE_SRGBを削除
+        DirectX::WIC_FLAGS_FORCE_SRGB,  // sRGBフォーマットとして強制読み込み
         nullptr,
         image);
     
@@ -163,12 +163,12 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     // テクスチャが1x1ピクセルより大きい場合のみミップマップを生成
     const DirectX::TexMetadata& metadata = image.GetMetadata();
     if (metadata.width > 1 || metadata.height > 1) {
-        // ミップマップ生成（リニアフィルタに変更）
+        // ミップマップ生成（sRGBフィルタを使用）
         hr = DirectX::GenerateMipMaps(
             image.GetImages(),
             image.GetImageCount(),
             image.GetMetadata(),
-            DirectX::TEX_FILTER_DEFAULT,  // TEX_FILTER_SRGBをDEFAULTに変更
+            DirectX::TEX_FILTER_SRGB,  // sRGBガンマを考慮したフィルタリング
             0,
             mipImages);
         

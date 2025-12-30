@@ -16,7 +16,7 @@ enum class SCENE {
 
 class IScene {
 protected:
-    SCENE nowSceneName_ = SCENE::GAME;
+    SCENE nowSceneName_ = SCENE::TEST;
 
 	void ChangeScene(SCENE nextSceneName) { nowSceneName_ = nextSceneName; }
 

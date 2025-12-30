@@ -1,24 +1,84 @@
 #include "GameSceneUI.h"
 
 void GameSceneUI::Initialize() {
-	nowMoneyFont_ = std::make_unique<BitmapFont>();
-	nowMoneyFont_->Initialize("nowMoney");
+	moneyFont_ = std::make_unique<BitmapFont>();
+	moneyFont_->Initialize("nowMoney");
+
+	money_ = std::make_unique<Sprite>();
+	money_->Initialize("UI/Game/money.png");
+	money_->LoadFromJson("money");
 
 	expGauge_ = std::make_unique<Gauge>();
 	expGauge_->Initialize("expGauge");
+
+	hpGauge_ = std::make_unique<Gauge>();
+	hpGauge_->Initialize("hpGauge");
+
+	currentHpFont_ = std::make_unique<BitmapFont>();
+	currentHpFont_->Initialize("nowHp");
+
+	maxHpFont_ = std::make_unique<BitmapFont>();
+	maxHpFont_->Initialize("maxHp");
+
+	hpSrash_ = std::make_unique<Sprite>();
+	hpSrash_->Initialize("bitMapFont/srash.png", { 137.0f, 65.0f }, { 0.2f, 0.2f });
+
+	lv_ = std::make_unique<Sprite>();
+	lv_->Initialize("UI/Game/lv.png");
+	lv_->LoadFromJson("lv");
+
+	lvFont_ = std::make_unique<BitmapFont>();
+	lvFont_->Initialize("lvFont");
+
+	enemy_ = std::make_unique<Sprite>();
+	enemy_->Initialize("UI/Game/enemy.png");
+	enemy_->LoadFromJson("enemy");
+	enemyFont_ = std::make_unique<BitmapFont>();
+	enemyFont_->Initialize("enemy");
 }
 
 void GameSceneUI::Update() {
-	nowMoneyFont_->SetNumber(nowMoneyValue_);
+	moneyFont_->SetNumber(moneyValue_);
+	money_->Update();
 	expGauge_->Update(currentExpValue_, maxExpValue_);
+	hpGauge_->Update(currentHpValue_, maxHpValue_);
+	currentHpFont_->SetNumber(static_cast<int>(currentHpValue_));
+	maxHpFont_->SetNumber(static_cast<int>(maxHpValue_));
+	hpSrash_->Update();
+	lvFont_->SetNumber(nowLv_);
+	lv_->Update();
+	enemyFont_->SetNumber(killEnemyValue_);
+	enemy_->Update();
 }
 
 void GameSceneUI::Draw() {
-	nowMoneyFont_->Draw();
 	expGauge_->Draw();
+
+	hpGauge_->Draw();
+	currentHpFont_->Draw();
+	maxHpFont_->Draw();
+	hpSrash_->Draw();
+
+	moneyFont_->Draw();
+	money_->Draw();
+
+	lvFont_->Draw();
+	lv_->Draw();
+
+	enemyFont_->Draw();
+	enemy_->Draw();
 }
 
 void GameSceneUI::DrawImGui() {
-	//nowMoneyFont_->DrawImGui("NowMoneyFont");
+	//lvFont_->DrawImGui("LvFont");
+	//lv_->DrawImGui("LvSprite");
+	//moneyFont_->DrawImGui("NowMoneyFont");
+	//money_->DrawImGui("MoneySprite");
+	//enemyFont_->DrawImGui("EnemyFont");
+	//enemy_->DrawImGui("EnemySprite");
 	//expGauge_->DrawImGui("ExpGauge");
+	//hpGauge_->DrawImGui("HpGauge");
+	//currentHpFont_->DrawImGui("NowHpFont");
+	//maxHpFont_->DrawImGui("MaxHpFont");
+	//hpSrash_->DrawImGui("HpSrash");
 }

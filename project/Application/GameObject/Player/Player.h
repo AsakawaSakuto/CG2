@@ -2,6 +2,7 @@
 #include "GameObject/BaseGameObject.h"
 #include "EngineSystem.h"
 #include "playerStatus.h"
+#include "AnimationController/AnimationController.h"
 #include "GameObject/Player/WeaponManager/WeaponManager.h"
 
 // 前方宣言
@@ -84,6 +85,18 @@ public:
 	/// お金を減らす（戻り値: 減らせたかどうか）
 	/// </summary>
 	bool SubtractMoney(int money);
+
+	/// <summary>
+	/// 敵を倒したカウントをインクリメント
+	/// </summary>
+	void IncrementKillEnemyCount() { status_.killEnemyCount++; }
+
+	int GetKillEnemyCount() const { return status_.killEnemyCount; }
+
+	/// <summary>
+	/// Playerの位置を設定する
+	/// </summary>
+	void SetPosition(const Vector3& position) { transform_.translate = position; }
 	
 private:
 
@@ -92,6 +105,9 @@ private:
 
 	// ジャンプ処理
 	void Jump();
+
+	// しゃがみ中のスロープ滑り処理
+	void SlideOnSlope();
 
 	// カメラの向きに基づいた移動方向を計算
 	Vector3 CalculateCameraMoveDirection(float stickX, float stickY);
@@ -113,14 +129,9 @@ private:
 	/// <returns>地面に接している場合true</returns>
 	bool IsGroundedOnMap();
 
-	/// <summary>
-	/// ブロック内に不正に貫通していないかチェック
-	/// </summary>
-	/// <returns>不正な貫通が検出された場合true</returns>
-	bool IsInsideBlockIllegally();
-
 private:
-	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
+	unique_ptr<AnimationController> model_;
+	PlayerMotion currentMotion_ = PlayerMotion::Idle;
 
 	Transform expGetRangeTransform_;
 
@@ -141,6 +152,9 @@ private:
 	float groundLevel_ = 2.5f; // 地面のY座標（廃止予定）
 	bool isGrounded_ = true;   // 地面にいるかどうか
 	bool wasGrounded_ = true;  // 前フレームで地面にいたかどうか
+
+	// スロープ滑り関連
+	float slideSpeed_ = 20.0f;  // スロープでの滑り速度
 
 	// EnemyManagerへの参照（生ポインタ、所有権なし)
 	EnemyManager* enemyManager_ = nullptr;

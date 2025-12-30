@@ -134,6 +134,14 @@ public:
 	bool GetSlopeHeight(const Vector3& worldPos, float& outY) const;
 
 	/// <summary>
+	/// スロープの傾斜方向（下り方向）のベクトルを取得
+	/// </summary>
+	/// <param name="worldPos">ワールド座標</param>
+	/// <param name="outGradient">傾斜方向ベクトル（正規化済み、下り方向）</param>
+	/// <returns>スロープ上にいる場合true</returns>
+	bool GetSlopeGradient(const Vector3& worldPos, Vector3& outGradient) const;
+
+	/// <summary>
 	/// 指定座標のブロックのモデルにテクスチャを設定
 	/// </summary>
 	/// <param name="x">X座標</param>
@@ -184,7 +192,14 @@ public:
 	uint32_t GetHeight() const { return height_; }
 	uint32_t GetDepth() const { return depth_; }
 
+	/// <summary>
+	/// 最上面のNormalブロックの位置リストを取得
+	/// </summary>
+	/// <returns>最上面のNormalブロックのワールド座標リスト</returns>
+	std::vector<Vector3> GetTopNormalBlockPositions() const;
+
 	void Update();
+
 private:
 	/// <summary>
 	/// 3D座標から1次元インデックスに変換

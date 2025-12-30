@@ -1,0 +1,54 @@
+{
+  "values": [
+  {
+    "name": "position",
+    "type": 16,
+    "value": [20, 50]
+  },
+  {
+    "name": "size",
+    "type": 16,
+    "value": [120, 15]
+  },
+  {
+    "name": "backgroundColor",
+    "type": 18,
+    "value": [0, 0, 0, 1]
+  },
+  {
+    "name": "gaugeColor",
+    "type": 18,
+    "value": [0.911628, 0.0551217, 0.0551217, 1]
+  },
+  {
+    "name": "useGradient",
+    "type": 3,
+    "value": false
+  },
+  {
+    "name": "gaugeStartColor",
+    "type": 18,
+    "value": [0.0468794, 0.916279, 0.0468794, 1]
+  },
+  {
+    "name": "gaugeEndColor",
+    "type": 18,
+    "value": [1, 0, 0, 1]
+  },
+  {
+    "name": "numGradientSegments",
+    "type": 1,
+    "value": 50
+  },
+  {
+    "name": "drawBackground",
+    "type": 3,
+    "value": true
+  },
+  {
+    "name": "direction",
+    "type": 7,
+    "value": 0
+  }
+  ]
+}

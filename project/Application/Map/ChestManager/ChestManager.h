@@ -39,7 +39,7 @@ private:
 	void SpawnChests(Map3D* map, const std::vector<Vector3>& jarPositions);
 	
 private:
-	int paidChestNum_ = 45;
+	int paidChestNum_ = 25;
 	int freeChestNum_ = 5;
 	
 	int openAmount_ = 10;

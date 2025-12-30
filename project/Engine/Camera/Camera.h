@@ -106,7 +106,7 @@ protected:
 	Transform transform_;
 
 	float nearClip_ = 0.1f;
-	float farClip_ = 1000.0f;
+	float farClip_ = 500.0f;
 	float fovY_ = 0.45f;
 
 	// フラスタム

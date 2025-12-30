@@ -22,11 +22,6 @@ private:
 	// リソースクリーンアップメソッド
 	void CleanupResources();
 
-	void MT4_01_01();
-	void MT4_01_02();
-	void MT4_01_03();
-	void MT4_01_04();
-	void MT4_01_05();
 private:
 
 	unique_ptr<Sprite> testSprite_ = make_unique<Sprite>();

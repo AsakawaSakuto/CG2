@@ -3,7 +3,7 @@
 struct PlayerStatus {
 	// HP関連
 	int maxHP = 100;          // 最大体力
-	int currentHP = 100;      // 現在の体力
+	int currentHP = 75;      // 現在の体力
 
 	// 経験値関連
 	int currentExp = 0;       // 現在の経験値
@@ -19,6 +19,7 @@ struct PlayerStatus {
 	// 運
 	// 難易度
 	// .XP回収範囲
+	int killEnemyCount = 0; // 敵を倒した回数
 	float moveSpeed = 5.0f;   // 移動速度
 	int jumpCanCount = 100;     // ジャンプ可能回数
 	int currentJumpCount = 0; // 現在のジャンプ回数

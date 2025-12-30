@@ -220,7 +220,7 @@ private:
 	// フラスタムカリング関連(カメラ外か否かの判定)
 	Camera camera_; 				       // カメラ情報
 	float boundingRadius_ = 0.5f;          // オブジェクトのバウンディング半径
-	bool useDrawFrustumCulling_ = false;   // カメラ外の描画、有効/無効
+	bool useDrawFrustumCulling_ = true;   // カメラ外の描画、有効/無効
 	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
 	bool isInFrustum_ = false;             // フラスタム内か否か
 

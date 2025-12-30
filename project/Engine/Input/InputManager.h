@@ -12,6 +12,7 @@ enum class Action {
 	CONFIRM,
 	PAUSE,
 	INTERACT,
+	CROUCHING,
 
 	// セレクト
 	CELECT_UP,
