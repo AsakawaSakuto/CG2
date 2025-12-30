@@ -42,7 +42,7 @@ private:
 	void SpawnTrees(Map3D* map);
 	
 private:
-	int treeNum_ = 150;
+	int treeNum_ = 100;
 	
 	std::vector<std::unique_ptr<Tree>> trees_;
 	

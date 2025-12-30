@@ -255,6 +255,7 @@ void GameScene::ChestUpdate() {
 void GameScene::UIUpdate() {
 	gameSceneUI_->SetNowMoney(player_->GetNowMoney());
 	gameSceneUI_->SetExpGauge(float(player_->GetCurrentExp()), float(player_->GetExpToNextLevel()));
+	gameSceneUI_->SetHpGauge(float(player_->GetCurrentHP()), float(player_->GetMaxHP()));
 	gameSceneUI_->Update();
 }
 

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <unordered_map>
 #include "EnemyManager.h"
 #include "Utility/Collision/Collision.h"
 #include "Map/Map3D.h"
@@ -12,7 +13,7 @@ void EnemyManager::Initialize() {
 }
 
 void EnemyManager::Update() {
-	if (enemies_.size() < 50) {
+	if (enemies_.size() < 150) {
 		spawnTimer_.Update();
 
 		if (spawnTimer_.IsFinished()) {
@@ -26,18 +27,9 @@ void EnemyManager::Update() {
 
 			int i = random_.Int(0, 1);
 			int j = random_.Int(0, 1);
-			float x = 0.0f;
-			float z = 0.0f;
-			if (i == 0) {
-				x = 10.0f;
-			} else {
-				x = -10.0f;
-			}
-			if (j == 0) {
-				z = 10.0f;
-			} else {
-				z = -10.0f;
-			}
+			float x = (i == 0) ? 10.0f : -10.0f;
+			float z = (j == 0) ? 10.0f : -10.0f;
+			
 			enemy->SetPosition(
 				{targetPosition_.x + random_.Float(-5.0f,5.0f) + x,
 				 targetPosition_.y,
@@ -46,17 +38,44 @@ void EnemyManager::Update() {
 		}
 	}
 
-	// Enemy同士の衝突判定と押し出し処理
-	for (size_t i = 0; i < enemies_.size(); ++i) {
-		for (size_t j = i + 1; j < enemies_.size(); ++j) {
-			const Sphere& sphere1 = enemies_[i]->GetSphereCollision();
-			const Sphere& sphere2 = enemies_[j]->GetSphereCollision();
+	// 空間ハッシュマップを使用した衝突判定の最適化
+	const float cellSize = 5.0f; // グリッドセルのサイズ
+	std::unordered_map<int64_t, std::vector<size_t>> spatialGrid;
 
-			// 衝突判定
-			if (Collision::IsHit(sphere1, sphere2)) {
-				// お互いを押し出す
-				enemies_[i]->PushAway(sphere2.center, sphere2.radius);
-				enemies_[j]->PushAway(sphere1.center, sphere1.radius);
+	// 敵を空間グリッドに登録
+	for (size_t i = 0; i < enemies_.size(); ++i) {
+		const Vector3& pos = enemies_[i]->GetPosition();
+		int32_t cellX = static_cast<int32_t>(std::floor(pos.x / cellSize));
+		int32_t cellZ = static_cast<int32_t>(std::floor(pos.z / cellSize));
+		int64_t cellKey = (static_cast<int64_t>(cellX) << 32) | static_cast<int64_t>(cellZ);
+		spatialGrid[cellKey].push_back(i);
+	}
+
+	// 同じセルと隣接セル内でのみ衝突判定
+	for (const auto& [cellKey, indices] : spatialGrid) {
+		int32_t cellX = static_cast<int32_t>(cellKey >> 32);
+		int32_t cellZ = static_cast<int32_t>(cellKey & 0xFFFFFFFF);
+
+		// 現在のセルと隣接8セルをチェック
+		for (int32_t dx = -1; dx <= 1; ++dx) {
+			for (int32_t dz = -1; dz <= 1; ++dz) {
+				int64_t neighborKey = (static_cast<int64_t>(cellX + dx) << 32) | static_cast<int64_t>(cellZ + dz);
+				auto it = spatialGrid.find(neighborKey);
+				if (it == spatialGrid.end()) continue;
+
+				for (size_t i : indices) {
+					for (size_t j : it->second) {
+						if (i >= j) continue; // 重複チェック回避
+
+						const Sphere& sphere1 = enemies_[i]->GetSphereCollision();
+						const Sphere& sphere2 = enemies_[j]->GetSphereCollision();
+
+						if (Collision::IsHit(sphere1, sphere2)) {
+							enemies_[i]->PushAway(sphere2.center, sphere2.radius);
+							enemies_[j]->PushAway(sphere1.center, sphere1.radius);
+						}
+					}
+				}
 			}
 		}
 	}

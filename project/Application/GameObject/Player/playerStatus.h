@@ -3,7 +3,7 @@
 struct PlayerStatus {
 	// HP関連
 	int maxHP = 100;          // 最大体力
-	int currentHP = 100;      // 現在の体力
+	int currentHP = 75;      // 現在の体力
 
 	// 経験値関連
 	int currentExp = 0;       // 現在の経験値

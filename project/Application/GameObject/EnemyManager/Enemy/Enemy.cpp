@@ -8,8 +8,10 @@ void Enemy::Initialize() {
 	transform_.scale = { 0.0f,0.0f,0.0f };
 	transform_.translate = { 0.0f,0.0f,0.0f };
 
-	model_->Initialize("Animation/human/lowWalk.gltf");
-	model_->SetUpdateFrustumCulling(false);
+	//model_->Initialize("Animation/human/lowWalk.gltf");
+	model_->Initialize("enemy/enemy.obj");
+	// フラスタムカリングを有効化（画面外の敵の更新・描画をスキップ）
+	//model_->SetUpdateFrustumCulling(true);
 	model_->SetDrawFrustumCulling(true);
 
 	moveSpeed_ = 2.0f;
@@ -41,7 +43,7 @@ void Enemy::Update() {
 		ResolveMapCollision();
 	}
 
-	model_->Update();
+	//model_->Update();
 
 	transform_.scale = MyEasing::Lerp(Vector3({0.0f,0.0f,0.0f}), Vector3({ 1.0f,1.0f,1.0f }), 
 		scaleTimer_.GetProgress(), EaseType::Linear);
@@ -51,8 +53,13 @@ void Enemy::Update() {
 
 	scaleTimer_.Update();
 
-	MyDebugLine::AddShape(sphereCollision_);
-	MyDebugLine::AddShape(mapCollosion_, {0.0f, 1.0f, 0.0f, 1.0f}); // 緑色でAABBを表示
+#ifdef USE_IMGUI
+	// デバッグ描画はF1キーで切り替え（パフォーマンス向上のため）
+	if (MyInput::PushKey(DIK_F1)) {
+		MyDebugLine::AddShape(sphereCollision_);
+		MyDebugLine::AddShape(mapCollosion_, {0.0f, 1.0f, 0.0f, 1.0f});
+	}
+#endif
 }
 
 void Enemy::Draw(Camera camera) {
@@ -183,7 +190,8 @@ void Enemy::ResolveMapCollision() {
 		return;
 	}
 
-	const int32_t checkRange = 2;
+	// チェック範囲を1に縮小（パフォーマンス向上）
+	const int32_t checkRange = 1;
 	
 	// エネミーのAABBをワールド座標で取得
 	Vector3 playerMin = mapCollosion_.GetMinWorld();
