@@ -2,8 +2,10 @@
 #include "Core/WinApp/WinApp.h"
 #include "Core/DirectXCommon/DirectXCommon.h"
 #include "Core/ServiceLocator/ServiceLocator.h"
+#include "Core/CreateResource/CreateResource.h"
 
 #include <cassert>
+#include <filesystem>
 #pragma comment(lib,"d3d12.lib")
 using namespace Microsoft::WRL;
 
@@ -23,8 +25,6 @@ Sprite::~Sprite() {
 	}
 	
 	if (materialResource_ && materialData_) {
-		// 注意: CreateMaterialResourceでUnmapしているが、描画時に再度Mapされている可能性がある
-		// 安全のためチェック
 		materialResource_->Unmap(0, nullptr);
 		materialData_ = nullptr;
 	}
@@ -32,26 +32,6 @@ Sprite::~Sprite() {
 	if (transformationResource_ && transformationData_) {
 		transformationResource_->Unmap(0, nullptr);
 		transformationData_ = nullptr;
-	}
-	
-	if (directionalLightResource_ && directionalLightData_) {
-		directionalLightResource_->Unmap(0, nullptr);
-		directionalLightData_ = nullptr;
-	}
-	
-	if (cameraResource_ && cameraData_) {
-		cameraResource_->Unmap(0, nullptr);
-		cameraData_ = nullptr;
-	}
-	
-	if (pointLightResource_ && pointLightData_) {
-		pointLightResource_->Unmap(0, nullptr);
-		pointLightData_ = nullptr;
-	}
-	
-	if (spotLightResource_ && spotLightData_) {
-		spotLightResource_->Unmap(0, nullptr);
-		spotLightData_ = nullptr;
 	}
 }
 
@@ -79,37 +59,16 @@ void Sprite::Initialize(const std::string& fileName, Vector2 position, Vector2 s
 	transform2D_.rotate = 0.0f;
 	transform2D_.translate = position;
 
+	// JsonManagerの初期化（初回のみ）
+	if (!jsonManager_) {
+		jsonManager_ = std::make_unique<JsonManager>();
+		jsonManager_->SetBasePath("resources/Data/Json/Sprite/");
+	}
+
 	CreateVertexResource();
 	CreateIndexResource();
 	CreateMaterialResource();
 	CreateTransformationResource();
-	CreateDirectionalLightResource();
-
-	cameraResource_ = CreateBufferResource(device_.Get(), sizeof(CameraForGPU));
-	assert(cameraResource_ != nullptr);
-	HRESULT hr = cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
-	assert(SUCCEEDED(hr));
-
-	pointLightResource_ = CreateBufferResource(device_.Get(), sizeof(PointLight));
-	pointLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData_));
-	pointLightData_->useLight = 0;
-	pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	pointLightData_->position = { 0.0f,5.0f,0.0f };
-	pointLightData_->intensity = 1.0f;
-	pointLightData_->radius = 20.0f;
-	pointLightData_->decay = 2.0f;
-
-	spotLightResource_ = CreateBufferResource(device_.Get(), sizeof(SpotLight));
-	spotLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData_));
-	spotLightData_->useLight = 0;
-	spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	spotLightData_->position = { 2.0f,1.25f,0.0f };
-	spotLightData_->distance = 7.0f;
-	spotLightData_->direction = { -1.0f,-1.0f,0.0f };
-	spotLightData_->intensity = 4.0f;
-	spotLightData_->decay = 2.0f;
-	spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 6.0f);
-	spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
 }
 
 void Sprite::Update() {
@@ -143,8 +102,8 @@ void Sprite::Draw() {
 
 	// PSOManagerからRootSignatureとPSOを取得
 	auto& psoManager = PSOManager::GetInstance();
-	auto rootSignature = psoManager.GetRootSignature("Object3D");
-	auto pso = psoManager.GetPSO(PSOType::Model_Solid_Normal); // Sprite専用PSOを使用
+	auto rootSignature = psoManager.GetRootSignature("Sprite"); // Sprite専用RootSignature（CLAMPサンプラー）
+	auto pso = psoManager.GetPSO(PSOType::Sprite_Normal); // Sprite専用PSOを使用
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	commandList_->SetGraphicsRootSignature(rootSignature.Get());
@@ -156,14 +115,13 @@ void Sprite::Draw() {
 	// Spriteの描画。変更が必要なものだけ変更する
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);  // VBVを設定
 	commandList_->IASetIndexBuffer(&indexBufferView_);
-	//
+	
+	// 2D Sprite用のシンプルなルートパラメータ設定
+	// b0: Material, b1: Transform, t0: Texture
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
-	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
+	
 	// 描画！ (DrawCall/ドローコール)
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
@@ -173,6 +131,31 @@ void Sprite::DrawImGui(const char* objectName) {
 #ifdef USE_IMGUI
 
 	ImGui::Begin(objectName);
+
+	// ファイル名入力
+	static char fileNameBuffer[256] = "filePath";
+	strncpy_s(fileNameBuffer, loadToSaveName_.c_str(), sizeof(fileNameBuffer));
+	if (ImGui::InputText("ファイル名", fileNameBuffer, sizeof(fileNameBuffer))) {
+		loadToSaveName_ = fileNameBuffer;
+	}
+
+	if (ImGui::Button("読み込み")) {
+		LoadFromJson(loadToSaveName_);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("保存")) {
+		SaveToJson(loadToSaveName_);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("新規作成")) {
+		CreateNewJsonFile(loadToSaveName_);
+	}
+
+	ImGui::Separator();
 
 	ImGui::Text("Transform");
 	ImGui::DragFloat2("translate", &transform2D_.translate.x, 1.f);
@@ -237,15 +220,89 @@ void Sprite::SetAnchorPoint(const Vector2& anchor) {
 	}
 }
 
+void Sprite::SaveToJson(const std::string& filePath) {
+	// ディレクトリが存在しない場合は作成
+	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
+	std::filesystem::path directory = fullPath.parent_path();
+	
+	if (!directory.empty() && !std::filesystem::exists(directory)) {
+		try {
+			std::filesystem::create_directories(directory);
+			printf("[INFO] Created directory: %s\n", directory.string().c_str());
+		} catch (const std::filesystem::filesystem_error& e) {
+			printf("[ERROR] Failed to create directory: %s\n", e.what());
+			return;
+		}
+	}
+
+	// Spriteの各フィールドをJsonManagerに登録
+	jsonManager_->RegistOutput(transform2D_.translate, "position");
+	jsonManager_->RegistOutput(transform2D_.scale, "scale");
+	jsonManager_->RegistOutput(transform2D_.rotate, "rotate");
+	jsonManager_->RegistOutput(uvTransform_.translate, "uvTranslate");
+	jsonManager_->RegistOutput(uvTransform_.scale, "uvScale");
+	jsonManager_->RegistOutput(uvTransform_.rotate, "uvRotate");
+	jsonManager_->RegistOutput(materialData_->color, "color");
+	jsonManager_->RegistOutput(anchorPoint_, "anchorPoint");
+
+	// JSONファイルに書き込み
+	jsonManager_->Write(filePath);
+}
+
+void Sprite::LoadFromJson(const std::string& filePath) {
+	// JSONファイルから読み込み
+	auto values = jsonManager_->Read(filePath);
+	
+	if (values.empty()) {
+		printf("[WARNING] Failed to load JSON file: %s.json\n", filePath.c_str());
+		return;
+	}
+
+	// 読み込んだ値を順番に取得して適用
+	size_t index = 0;
+	if (index < values.size()) {
+		transform2D_.translate = JsonManager::Reverse<Vector2>(values[index++]);
+		transform2D_.scale = JsonManager::Reverse<Vector2>(values[index++]);
+		transform2D_.rotate = JsonManager::Reverse<float>(values[index++]);
+		uvTransform_.translate = JsonManager::Reverse<Vector2>(values[index++]);
+		uvTransform_.scale = JsonManager::Reverse<Vector2>(values[index++]);
+		uvTransform_.rotate = JsonManager::Reverse<float>(values[index++]);
+		materialData_->color = JsonManager::Reverse<Vector4>(values[index++]);
+		anchorPoint_ = JsonManager::Reverse<Vector2>(values[index++]);
+	}
+
+	// アンカーポイントが変更された場合は頂点データを更新
+	SetAnchorPoint(anchorPoint_);
+}
+
+void Sprite::CreateNewJsonFile(const std::string& filePath) {
+	// ディレクトリが存在しない場合は作成
+	std::filesystem::path fullPath = jsonManager_->GetBasePath() + filePath + ".json";
+	std::filesystem::path directory = fullPath.parent_path();
+	
+	if (!directory.empty() && !std::filesystem::exists(directory)) {
+		try {
+			std::filesystem::create_directories(directory);
+			printf("[INFO] Created directory: %s\n", directory.string().c_str());
+		} catch (const std::filesystem::filesystem_error& e) {
+			printf("[ERROR] Failed to create directory: %s\n", e.what());
+			return;
+		}
+	}
+
+	// デフォルト値でJSONファイルを作成
+	SaveToJson(filePath);
+}
+
 void Sprite::CreateVertexResource() {
-	// 頂点リソース
-	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(ModelVertexData) * 4);
+	// 2D Sprite専用の頂点データ（Normalなし）
+	vertexResource_ = CreateBufferResource(device_.Get(), sizeof(SpriteVertexData) * 4);
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズ
-	vertexBufferView_.SizeInBytes = sizeof(ModelVertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(SpriteVertexData) * 4;
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(ModelVertexData);
+	vertexBufferView_.StrideInBytes = sizeof(SpriteVertexData);
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
 	float width = size_.x;
@@ -265,10 +322,6 @@ void Sprite::CreateVertexResource() {
 	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[2].texcoord = { 1.0f,1.0f };
 	vertexData_[3].texcoord = { 1.0f,0.0f };
-
-	for (uint32_t i = 0; i < 4; i++) {
-		vertexData_[i].normal = { 0.0f,0.0f,-1.0f };
-	}
 }
 
 void Sprite::CreateIndexResource() {
@@ -284,40 +337,23 @@ void Sprite::CreateIndexResource() {
 	// 表面（三角形2枚）
 	indexData_[0] = 0; indexData_[1] = 1; indexData_[2] = 2;
     indexData_[3] = 1; indexData_[4] = 3; indexData_[5] = 2;
-
-	// 裏面（三角形2枚、巻き方向を逆に）
-	/*indexData_[6] = 2; indexData_[7] = 1; indexData_[8] = 0;
-	indexData_[9] = 2; indexData_[10] = 3; indexData_[11] = 1;*/
 }
 
 void Sprite::CreateMaterialResource() {
-	// MaterialResource
-	materialResource_ = CreateBufferResource(device_.Get(), sizeof(ModelMaterial));
+	// 2D Sprite専用のマテリアルデータ（ライティングなし）
+	materialResource_ = CreateBufferResource(device_.Get(), sizeof(SpriteMaterial));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	materialData_->enableLighting = false;
 	materialData_->uvTransformMatrix = MakeIdentityMatrix();
 	// マップしたままにする（Update()で書き込みを行うため）
 }
 
 void Sprite::CreateTransformationResource() {
-	//
-	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(ModelTransformationMatrix));
+	// 2D Sprite専用の変換行列（WVPのみ）
+	transformationResource_ = CreateBufferResource(device_.Get(), sizeof(SpriteTransformationMatrix));
 	//
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_));
 	//
 	transformationData_->WVP = MakeIdentityMatrix();
-	transformationData_->World = MakeIdentityMatrix();
-}
-
-void Sprite::CreateDirectionalLightResource() {
-	directionalLightResource_ = CreateBufferResource(device_.Get(), sizeof(DirectionalLight));
-	//
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	// 初期化（資料に基づく）
-	directionalLightData_->useLight = 0;
-	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
-	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
-	directionalLightData_->intensity = 1.0f;                        // 光の強さ
 }

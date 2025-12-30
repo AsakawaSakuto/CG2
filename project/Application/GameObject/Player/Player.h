@@ -87,6 +87,13 @@ public:
 	bool SubtractMoney(int money);
 
 	/// <summary>
+	/// 敵を倒したカウントをインクリメント
+	/// </summary>
+	void IncrementKillEnemyCount() { status_.killEnemyCount++; }
+
+	int GetKillEnemyCount() const { return status_.killEnemyCount; }
+
+	/// <summary>
 	/// Playerの位置を設定する
 	/// </summary>
 	void SetPosition(const Vector3& position) { transform_.translate = position; }

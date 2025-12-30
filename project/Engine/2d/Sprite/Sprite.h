@@ -1,16 +1,14 @@
 #pragma once
-#include "3d/Model/Data/ModelDataStruct.h"
+#include "2d/Sprite/SpriteDataStruct.h"
 
 #include "Math/Type/Transform.h"
 #include "Core/TextureManager/TextureManager.h"
 #include "Math/MatrixFunction/MatrixFunction.h"
-#include "Camera/CameraForGPU.h"
-#include "Utility/Light/DirectionalLight.h"
-#include "Utility/Light/SpotLight.h"
-#include "Utility/Light/PointLight.h"
+#include "Utility/FileFormat/Json/JsonManager.h"
 
 #include <cmath>
 #include <numbers>
+#include <memory>
 
 // 前方宣言
 class DirectXCommon;
@@ -105,6 +103,24 @@ public:
 	/// <param name="anchor">アンカーポイント（0.0～1.0）</param>
 	void SetAnchorPoint(const Vector2& anchor);
 
+	/// <summary>
+	/// JsonFileに設定を保存
+	/// </summary>
+	/// <param name="filePath">保存先のファイルパス（拡張子不要）</param>
+	void SaveToJson(const std::string& filePath);
+
+	/// <summary>
+	/// JsonFileから設定を読み込み
+	/// </summary>
+	/// <param name="filePath">読み込み元のファイルパス（拡張子不要）</param>
+	void LoadFromJson(const std::string& filePath);
+
+	/// <summary>
+	/// 新規JsonFileを作成
+	/// </summary>
+	/// <param name="filePath">作成するファイルパス（拡張子不要）</param>
+	void CreateNewJsonFile(const std::string& filePath);
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	HRESULT hr_;
@@ -119,6 +135,10 @@ private:
 
 	std::string textureName_;
 
+	// JSON管理
+	std::unique_ptr<JsonManager> jsonManager_;
+	std::string loadToSaveName_ = "filePath";
+
 	//----------------------------------------------//
 
 	// デバイス
@@ -130,20 +150,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource_;
-	// リソースデータ
-	ModelVertexData* vertexData_ = nullptr;
+	// リソースデータ（2D Sprite専用構造体を使用）
+	SpriteVertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
-	ModelMaterial* materialData_ = nullptr;
-	ModelTransformationMatrix* transformationData_ = nullptr;
-	DirectionalLight* directionalLightData_ = nullptr;
-	CameraForGPU* cameraData_ = nullptr;
-	PointLight* pointLightData_ = nullptr;
-	SpotLight* spotLightData_ = nullptr;
+	SpriteMaterial* materialData_ = nullptr;
+	SpriteTransformationMatrix* transformationData_ = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_ = {};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_ = {};
@@ -154,5 +166,4 @@ private:
 	void CreateIndexResource();
 	void CreateMaterialResource();
 	void CreateTransformationResource();
-	void CreateDirectionalLightResource();
 };

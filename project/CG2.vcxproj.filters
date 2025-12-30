@@ -235,6 +235,7 @@
     <ClInclude Include="Application\Map\TreeManager\Data\Tree.h" />
     <ClInclude Include="Application\Map\TreeManager\TreeManager.h" />
     <ClInclude Include="Application\GameObject\Player\AnimationController\AnimationController.h" />
+    <ClInclude Include="Engine\2d\Sprite\SpriteDataStruct.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

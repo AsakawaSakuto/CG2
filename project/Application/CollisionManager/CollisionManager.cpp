@@ -56,6 +56,8 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 		if (Collision::IsHit(playerSphere, enemySphere)) {
 			// 衝突したEnemyを死亡状態にする
 			enemy->Dead();
+			// プレイヤーの敵を倒したカウントをインクリメント
+			player_->IncrementKillEnemyCount();
 			//goResult_ = true;
 		}
 	}
@@ -104,16 +106,28 @@ void CollisionManager::CheckBulletEnemyCollision() {
 						// 通常弾なので弾も消滅
 						enemy->Dead();
 						bullet->Dead();
+						// プレイヤーの敵を倒したカウントをインクリメント
+						if (player_) {
+							player_->IncrementKillEnemyCount();
+						}
 						break;
 					case BulletType::Penetration:
 						// 貫通するので次の敵のチェックを続ける
 						enemy->Dead();
 						bullet->DecrementPenetrationCount();
+						// プレイヤーの敵を倒したカウントをインクリメント
+						if (player_) {
+							player_->IncrementKillEnemyCount();
+						}
 						break;
 					case BulletType::Bounce:
 						// 反射するので次の敵のチェックを続ける
 						enemy->Dead();
 						bullet->DecrementBounceCount();
+						// プレイヤーの敵を倒したカウントをインクリメント
+						if (player_) {
+							player_->IncrementKillEnemyCount();
+						}
 						break;
 					}
 				}

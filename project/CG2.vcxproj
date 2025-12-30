@@ -300,6 +300,7 @@
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
     <ClInclude Include="Engine\2d\Gauge\Gauge.h" />
+    <ClInclude Include="Engine\2d\Sprite\SpriteDataStruct.h" />
     <ClInclude Include="Engine\3d\Line\MyDebugLine.h" />
     <ClInclude Include="Engine\3d\Line\Data\Line.h" />
     <ClInclude Include="Engine\3d\Line\LineManager.h" />
