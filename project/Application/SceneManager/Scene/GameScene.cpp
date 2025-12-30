@@ -254,8 +254,8 @@ void GameScene::ChestUpdate() {
 
 void GameScene::UIUpdate() {
 	gameSceneUI_->SetNowMoney(player_->GetNowMoney());
-	gameSceneUI_->SetExpGauge(float(player_->GetCurrentExp()), float(player_->GetExpToNextLevel()));
-	gameSceneUI_->SetHpGauge(float(player_->GetCurrentHP()), float(player_->GetMaxHP()));
+	gameSceneUI_->SetExpGauge(static_cast<float>(player_->GetCurrentExp()), static_cast<float>(player_->GetExpToNextLevel()));
+	gameSceneUI_->SetHpGauge (static_cast<float>(player_->GetCurrentHP()),  static_cast<float>(player_->GetMaxHP()));
 	gameSceneUI_->SetNowLv(player_->GetLevel());
 	gameSceneUI_->SetKillEnemyCount(player_->GetKillEnemyCount());
 	gameSceneUI_->Update();
