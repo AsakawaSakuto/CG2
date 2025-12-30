@@ -42,8 +42,15 @@ void Player::Update() {
 
 	Move();
 	Jump();
+	SlideOnSlope();  // しゃがみ中のスロープ滑り処理
 
-	// OBBの中心をプレイヤーの位置に設定
+	if (MyInput::Push(Action::CROUCHING)) {
+		model_->SetColor3({ 1.0f, 0.0f, 0.0f });
+	} else {
+		model_->SetColor3({ 1.0f, 1.0f, 1.0f });
+	}
+
+	// AABBの中心をプレイヤーの位置に設定
 	mapCollosion_.center = transform_.translate;
 
 	// マップとの衝突解決を実行
@@ -307,6 +314,62 @@ void Player::Jump() {
 	}
 }
 
+void Player::SlideOnSlope() {
+	// しゃがみ中でなければ何もしない
+	if (!MyInput::Push(Action::CROUCHING)) {
+		return;
+	}
+
+	// マップが設定されていなければ何もしない
+	if (!map_) {
+		return;
+	}
+
+	// スロープの傾斜ベクトルを取得
+	Vector3 gradient;
+	if (!map_->GetSlopeGradient(transform_.translate, gradient)) {
+		// スロープ上にいない場合は何もしない
+		return;
+	}
+
+	// スロープ上にいるか確認（より厳密な判定）
+	float slopeY;
+	if (!map_->GetSlopeHeight(transform_.translate, slopeY)) {
+		return;
+	}
+
+	// プレイヤーの足元がスロープ表面付近にあるか確認
+	float playerBottom = transform_.translate.y + mapCollosion_.min.y;
+	float distanceToSlope = playerBottom - slopeY;
+
+	// スロープ表面から離れすぎている場合は滑らない
+	const float maxDistanceToSlide = 0.3f;
+	if (distanceToSlope < -0.1f || distanceToSlope > maxDistanceToSlide) {
+		return;
+	}
+
+	// 傾斜方向に沿って滑る
+	// Y成分は無視してXZ平面での移動のみを計算（Y座標はスロープに吸着させる）
+	Vector3 slideVelocity = {
+		gradient.x * slideSpeed_ * deltaTime_,
+		0.0f,  // Y座標はスロープ吸着処理で調整される
+		gradient.z * slideSpeed_ * deltaTime_
+	};
+
+	// プレイヤーの位置を更新
+	transform_.translate.x += slideVelocity.x;
+	transform_.translate.z += slideVelocity.z;
+
+	// スロープに吸着させる（Y座標を更新）
+	float newSlopeY;
+	if (map_->GetSlopeHeight(transform_.translate, newSlopeY)) {
+		transform_.translate.y = newSlopeY - mapCollosion_.min.y;
+	}
+
+	// AABBの中心も更新
+	mapCollosion_.center = transform_.translate;
+}
+
 void Player::ResolveMapCollision() {
 	if (!map_) return;
 
@@ -355,9 +418,9 @@ void Player::ResolveMapCollision() {
 		
 		// スロープの上に立っている判定：
 		// 1. スロープが存在する
-		// 2. プレイヤーの足元がスロープ表面付近にある
+		// 2. プレイヤーの足元がスロープ表面付近にある（下り方向への移動を考慮して許容範囲を広げる）
 		// 3. プレイヤーの頭頂部がスロープ表面より上にある（側面衝突を除外）
-		if (isOnSlope && distanceToSlope >= -0.1f && distanceToSlope <= 0.1f && playerTop > slopeY) {
+		if (isOnSlope && distanceToSlope >= -1.0f && distanceToSlope <= 1.0f && playerTop > slopeY) {
 			standingOnSlope = true;
 		}
 
@@ -589,19 +652,31 @@ void Player::ResolveMapCollision() {
 					// 衝突判定
 					if (!Collision::IsHit(mapCollosion_, blockAABB)) continue;
 
-					// スロープ上にいる場合は、横方向と下方向の衝突を無視
+					// スロープ上にいる場合は、スロープの下にあるブロックを無視
 					if (standingOnSlope) {
 						// ブロックの上面とプレイヤーの足元の高さを比較
 						float blockTop = blockAABB.GetMaxWorld().y;
 						
 						// スロープの高さより下のブロックは全て無視
+						// slopeYはスロープ表面の高さなので、それより下のブロックは無視
 						if (blockTop <= slopeY + 1.0f) {
 							continue;
 						}
 						
 						// プレイヤーの足元より下にあるブロックも無視（横方向の衝突）
-						if (blockTop <= playerBottom) {
+						if (blockTop <= playerBottom + 1.0f) {
 							continue;
+						}
+						
+						// 追加チェック: ブロックがスロープの真下にある場合は無視
+						// スロープの高さとブロックの上面を比較
+						// ブロックの上面がスロープ表面-許容値より下にある場合は無視
+						float slopeHeightAtBlockPos;
+						if (map_->GetSlopeHeight(blockWorldPos, slopeHeightAtBlockPos)) {
+							// このブロック位置でのスロープ高さより下にあるブロックは無視
+							if (blockTop <= slopeHeightAtBlockPos) {
+								continue;
+							}
 						}
 					}
 

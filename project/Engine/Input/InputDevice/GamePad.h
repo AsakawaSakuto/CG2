@@ -71,8 +71,6 @@ public:
         BUTTON_COUNT
     };
 
-
-
 private:
     // 内部状態
     DWORD padIndex_ = 0;

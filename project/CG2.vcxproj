@@ -451,7 +451,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="docs\CameraBlockOcclusion.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />

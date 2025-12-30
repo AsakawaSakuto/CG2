@@ -300,6 +300,54 @@ bool Map3D::GetSlopeHeight(const Vector3& worldPos, float& outY) const {
 	return false;
 }
 
+bool Map3D::GetSlopeGradient(const Vector3& worldPos, Vector3& outGradient) const {
+	// ワールド座標からマップ座標を取得
+	uint32_t mx, my, mz;
+	if (!WorldToMap(worldPos, mx, my, mz)) {
+		return false;
+	}
+
+	// 該当セルがスロープでない場合は失敗
+	TileType tileType = GetTile(mx, my, mz);
+	if (!IsSlopeType(tileType)) {
+		return false;
+	}
+
+	SlopeDirection dir = GetSlopeDirection(mx, my, mz);
+
+	// スロープの傾斜角度を計算（blockSize_.y / blockSize_.x または blockSize_.z）
+	// スロープは1ブロックで高さ分上がるので、傾斜角度 = atan(height / width)
+	float slopeAngle = std::atan2(blockSize_.y, blockSize_.x);
+	float sinAngle = std::sin(slopeAngle);
+	float cosAngle = std::cos(slopeAngle);
+
+	// スロープの向きに応じて下り方向のベクトルを計算
+	// 下り方向なので、上り方向の逆を返す
+	switch (dir) {
+		case SlopeDirection::PlusX:
+			// X+ 方向に上る → 下りはX-方向
+			outGradient = Vector3(-cosAngle, -sinAngle, 0.0f);
+			break;
+
+		case SlopeDirection::MinusX:
+			// X- 方向に上る → 下りはX+方向
+			outGradient = Vector3(cosAngle, -sinAngle, 0.0f);
+			break;
+
+		case SlopeDirection::PlusZ:
+			// Z+ 方向に上る → 下りはZ-方向
+			outGradient = Vector3(0.0f, -sinAngle, -cosAngle);
+			break;
+
+		case SlopeDirection::MinusZ:
+			// Z- 方向に上る → 下りはZ+方向
+			outGradient = Vector3(0.0f, -sinAngle, cosAngle);
+			break;
+	}
+
+	return true;
+}
+
 bool Map3D::SetBlockTexture(uint32_t x, uint32_t y, uint32_t z, const std::string& texturePath) {
 	// 範囲外チェック
 	if (!IsInBounds(x, y, z)) {
