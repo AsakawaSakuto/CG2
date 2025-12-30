@@ -76,7 +76,7 @@ void SceneManager::Initialize() {
 	LineManager::GetInstance()->Initialize();
 
     // 初期シーンを作成
-	currentSceneNo_ = SCENE::TEST;
+	currentSceneNo_ = SCENE::GAME;
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
     if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
         sceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();
@@ -118,9 +118,15 @@ void SceneManager::Update() {
 
         if (nextSceneNo != currentSceneNo_) {
 
+            // GPU処理の完了を待機（重要！）
+            dxCommon_->WaitForGPU();
+
             // 古いシーン破棄
             prevSceneNo_ = currentSceneNo_;
             sceneArr_[curIndex].reset();
+
+            // リソース解放後、再度GPU待機
+            dxCommon_->WaitForGPU();
 
             // 新しいシーン作成
             currentSceneNo_ = nextSceneNo;
@@ -172,7 +178,10 @@ void SceneManager::Update() {
         // 描画後
         dxCommon_->PostDraw();
 
-        if (curIndex == 2) { sceneArr_[curIndex]->PostFrameCleanup(); }
+        // PostFrameCleanupの呼び出し（GAMEシーンの場合のみ）
+        if (currentSceneNo_ == SCENE::GAME) {
+            sceneArr_[curIndex]->PostFrameCleanup();
+        }
     }
 }
 

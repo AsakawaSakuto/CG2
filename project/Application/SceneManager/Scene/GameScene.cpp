@@ -1,12 +1,17 @@
 #include "GameScene.h"
 #include "Core/ServiceLocator/ServiceLocator.h"
+#include "Utility/Random/Random.h"
 
 GameScene::~GameScene() {
 	CleanupResources();
 }
 
 void GameScene::CleanupResources() {
-
+	// PostEffectを無効化
+	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
+	if (postEffect) {
+		postEffect->SetEnabled(false);
+	}
 }
 
 void GameScene::Initialize() {
@@ -32,6 +37,17 @@ void GameScene::Initialize() {
 
 	player_ = make_unique<Player>();
 	player_->Initialize();
+
+	// プレイヤーの開始位置を最上面のNormalブロックからランダムに選択
+	auto topPositions = map3D_->GetTopNormalBlockPositions();
+	if (!topPositions.empty()) {
+		// ランダムに位置を選択
+		int randomIndex = MyRand::Int(0, static_cast<int>(topPositions.size()) - 1);
+		Vector3 startPosition = topPositions[randomIndex];
+		// プレイヤーの高さを少し上に調整（ブロック上面から少し浮かせる）
+		startPosition.y += 0.5f;
+		player_->SetPosition(startPosition);
+	}
 
 	enemyManager_->Initialize();
 

@@ -192,6 +192,12 @@ public:
 	uint32_t GetHeight() const { return height_; }
 	uint32_t GetDepth() const { return depth_; }
 
+	/// <summary>
+	/// 最上面のNormalブロックの位置リストを取得
+	/// </summary>
+	/// <returns>最上面のNormalブロックのワールド座標リスト</returns>
+	std::vector<Vector3> GetTopNormalBlockPositions() const;
+
 	void Update();
 
 private:

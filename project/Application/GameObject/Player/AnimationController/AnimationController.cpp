@@ -3,8 +3,8 @@
 void AnimationController::Initialize(std::map<PlayerMotion, Animation> animationMap) {
 	model_ = std::make_unique<SkiningModel>();
 	model_->Initialize("Player/Animation/idle.gltf");
-	//model_->SetTexture("resouces/image/white16x16.png");
-	model_->UseLight(true);
+	model_->SetTexture("resources/image/white16x16.png");
+	model_->UseLight(false);
 
 	currentMotionType_ = PlayerMotion::Idle;
 	animations_ = animationMap;

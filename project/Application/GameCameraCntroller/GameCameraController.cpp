@@ -10,7 +10,7 @@
 void GameCameraController::Initialize() {
 	// カメラの初期設定
 	camera_.SetTarget({0.0f, 0.0f, 0.0f});   // デフォルトターゲット
-	originalDistance_ = 27.5f;
+	originalDistance_ = 35.0f;
 	targetDistance_ = originalDistance_;
 	currentDistance_ = originalDistance_;
 	camera_.SetDistance(originalDistance_);              // デフォルト距離
