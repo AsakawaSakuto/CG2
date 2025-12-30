@@ -1,0 +1,264 @@
+{
+  "values": [
+  {
+    "name": "translate",
+    "type": 17,
+    "value": [0, 3.08, 0]
+  },
+  {
+    "name": "radius",
+    "type": 2,
+    "value": 1.000000
+  },
+  {
+    "name": "useEmitter",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "emit",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "count",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "frequency",
+    "type": 2,
+    "value": 0.050000
+  },
+  {
+    "name": "frequencyTime",
+    "type": 2,
+    "value": 0.033333
+  },
+  {
+    "name": "startScale",
+    "type": 16,
+    "value": [1.000000, 1.000000]
+  },
+  {
+    "name": "endScale",
+    "type": 16,
+    "value": [0.100000, 0.100000]
+  },
+  {
+    "name": "scaleFade",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "scaleRandom",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "minScale",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "maxScale",
+    "type": 17,
+    "value": [1.000000, 1.000000, 1.000000]
+  },
+  {
+    "name": "rotateMove",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "startRotateVelocity",
+    "type": 2,
+    "value": 3.000000
+  },
+  {
+    "name": "endRotateVelocity",
+    "type": 2,
+    "value": 3.000000
+  },
+  {
+    "name": "rotateVelocityRandom",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "minRotateVelocity",
+    "type": 2,
+    "value": -1.000000
+  },
+  {
+    "name": "maxRotateVelocity",
+    "type": 2,
+    "value": 1.000000
+  },
+  {
+    "name": "alphaFade",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "colorFade",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "startColor",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "endColor",
+    "type": 17,
+    "value": [1.000000, 1.000000, 1.000000]
+  },
+  {
+    "name": "colorRandom",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "minColor",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "maxColor",
+    "type": 17,
+    "value": [1.000000, 1.000000, 1.000000]
+  },
+  {
+    "name": "isMove",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "startVelocity",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "endVelocity",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "velocityRandom",
+    "type": 7,
+    "value": 1
+  },
+  {
+    "name": "minVelocity",
+    "type": 17,
+    "value": [-0.500000, -0.500000, -0.500000]
+  },
+  {
+    "name": "maxVelocity",
+    "type": 17,
+    "value": [0.500000, 0.500000, 0.500000]
+  },
+  {
+    "name": "normalVelocity",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "lifeTime",
+    "type": 2,
+    "value": 1.000000
+  },
+  {
+    "name": "lifeTimeRandom",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "minLifeTime",
+    "type": 2,
+    "value": 1.000000
+  },
+  {
+    "name": "maxLifeTime",
+    "type": 2,
+    "value": 5.000000
+  },
+  {
+    "name": "shapeType",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "size",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "lineStart",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "lineLength",
+    "type": 2,
+    "value": 0.000000
+  },
+  {
+    "name": "ringInnerRadius",
+    "type": 2,
+    "value": 0.000000
+  },
+  {
+    "name": "ringOuterRadius",
+    "type": 2,
+    "value": 0.000000
+  },
+  {
+    "name": "planeNormal",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  },
+  {
+    "name": "spawnOnEdge",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "enableVisualization",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "useGravity",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "gravityY",
+    "type": 2,
+    "value": 0.000000
+  },
+  {
+    "name": "accelerationY",
+    "type": 2,
+    "value": 0.000000
+  },
+  {
+    "name": "blendMode",
+    "type": 7,
+    "value": 2
+  },
+  {
+    "name": "texturePath",
+    "type": 4,
+    "value": "resources/image/particle/smork.png"
+  },
+  {
+    "name": "offset",
+    "type": 17,
+    "value": [0.000000, 0.000000, 0.000000]
+  }
+  ]
+}

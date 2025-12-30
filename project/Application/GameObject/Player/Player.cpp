@@ -92,7 +92,7 @@ void Player::Update() {
 
 	weaponManager_->SetDirectionToEnemy(directionToEnemy_);
 	weaponManager_->SetPlayerPosition(transform_.translate);
-	//weaponManager_->Update();
+	weaponManager_->Update();
 
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = collisionRadius_;
@@ -116,10 +116,10 @@ void Player::Draw(Camera camera) {
 
 	//expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
-	weaponManager_->Draw(camera);
-
 	moveParticle_->Draw(camera);
 	landingParticle_->Draw(camera);
+
+	weaponManager_->Draw(camera);
 }
 
 void Player::DrawImGui() {

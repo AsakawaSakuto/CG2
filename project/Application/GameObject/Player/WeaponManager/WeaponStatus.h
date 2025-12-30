@@ -1,10 +1,10 @@
 #pragma once
 #include "Utility/GameTimer/GameTimer.h"
 
-enum class WeaponType {
-	BulletType = 0,
-	AreaType = 1,
-	DirectType = 2,
+enum class WeaponName {
+	FireBall,   // ファイヤーボール
+	Laser,      // レーザー
+	Runa,       // ルナ
 };
 
 /// <summary>
@@ -24,5 +24,4 @@ struct WeaponStatus {
 	int penetrationCount;    // 貫通する回数
 	float nockBackPower;     // ノックバックさせる力
 	float durationTime;      // 持続時間
-	WeaponType weaponType;   // 武器のタイプ
 };

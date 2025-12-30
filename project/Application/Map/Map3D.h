@@ -268,4 +268,5 @@ private:
 	static const std::unordered_map<TileType, Vector3> kTileScales_;
 
 	static const std::unordered_map<TileType, AABB> kNormalAABB_;
+
 };

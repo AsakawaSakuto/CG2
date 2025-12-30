@@ -69,6 +69,9 @@ void GameScene::Initialize() {
 	gameSceneUI_ = make_unique<GameSceneUI>();
 	gameSceneUI_->Initialize();
 
+	wall_ = make_unique<Model>();
+	wall_->Initialize("MapBlock/wall.obj");
+
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetEnabled(true);
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
@@ -76,6 +79,9 @@ void GameScene::Initialize() {
 	postEffect->GetParams().fog.fogStart = 50.0f;
 	postEffect->GetParams().fog.fogEnd = 200.0f;
 	postEffect->GetParams().fog.fogDensity = 1.0f;
+	postEffect->GetParams().fog.fogColor[0] = 0.5f;
+	postEffect->GetParams().fog.fogColor[1] = 0.5f;
+	postEffect->GetParams().fog.fogColor[2] = 0.5f;
 }
 
 void GameScene::Update() {
@@ -139,6 +145,8 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 	
+	wall_->Draw(camera_, { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{105.0f,0.0f,105.0f} });
+
 	// マップの描画
 	if (map3D_) {
 		if (!MyInput::PushKey(DIK_P)) {
