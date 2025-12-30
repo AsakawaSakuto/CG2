@@ -137,6 +137,7 @@ private:
 
 	unique_ptr<Particles> moveParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> landingParticle_ = make_unique<Particles>();
+	GameTimer moveParticleTimer_;
 
 	unique_ptr<WeaponManager> weaponManager_ = make_unique<WeaponManager>();
 
