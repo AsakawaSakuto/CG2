@@ -38,7 +38,6 @@ void GameSceneUI::Initialize() {
 	enemy_->LoadFromJson("enemy");
 	enemy_->SetAnchorPoint(AnchorPoint::Center);
 
-
 	enemyFont_ = std::make_unique<BitmapFont>();
 	enemyFont_->Initialize("enemy");
 }
