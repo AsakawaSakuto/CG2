@@ -122,6 +122,6 @@ struct EmitterStateGPU {
 /// Emitterの値を保持する構造体（CPU側で使用）
 /// </summary>
 struct EmitterState : public EmitterStateGPU {
-	std::string texturePath;  // CPU専用
+	std::string texturePath;  // CPU専用 - テクスチャのフルパス（例: "resources/image/particle/circle.png"）
 	BlendMode blendMode = kBlendModeAdd; // CPU専用
 };

@@ -105,16 +105,13 @@ public:
 	/// </summary>
 	/// <param name="isLoop">trueならループ生成、falseなら一回だけ生成</param>
 	void Play(Vector3 pos, bool isLoop = true) {
-		if (isLoop) {
-			emitter_.translate = pos;
-			emitter_.frequencyTime = emitter_.frequency;
-			emitter_.useEmitter = true;
-			isPlaying_ = true;
-		} else {
-			emitter_.translate = pos;
-			emitter_.frequencyTime = emitter_.frequency;
-			emitter_.useEmitter = false;
-			isPlaying_ = false;
+		emitter_.translate = pos;
+		emitter_.frequencyTime = emitter_.frequency;
+		emitter_.useEmitter = isLoop; // ループの場合のみエミッターを有効化
+		isPlaying_ = true; // 再生状態は常にtrueに設定
+		// 一回だけ生成の場合はemitフラグを立てる
+		if (!isLoop) {
+			emitter_.emit = true;
 		}
 	}
 

@@ -34,12 +34,9 @@
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
-    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
-    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
     <ClCompile Include="Engine\3d\Line\Data\Line.cpp" />
-    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.cpp" />
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
     <ClCompile Include="Engine\Core\HeapManager\DescriptorAllocator.cpp" />
@@ -97,6 +94,9 @@
     <ClCompile Include="Application\Map\TreeManager\Data\Tree.cpp" />
     <ClCompile Include="Application\Map\TreeManager\TreeManager.cpp" />
     <ClCompile Include="Application\GameObject\Player\AnimationController\AnimationController.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -132,13 +132,9 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponStatus.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
-    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Bullet\Bullet.h" />
     <ClInclude Include="Application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.h" />
-    <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponName.h" />
-    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.h" />
     <ClInclude Include="Engine\3d\Line\Data\Line.h" />
-    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Direct\Direct.h" />
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
     <ClInclude Include="Engine\2d\Gauge\Gauge.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
@@ -236,6 +232,9 @@
     <ClInclude Include="Application\Map\TreeManager\TreeManager.h" />
     <ClInclude Include="Application\GameObject\Player\AnimationController\AnimationController.h" />
     <ClInclude Include="Engine\2d\Sprite\SpriteDataStruct.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

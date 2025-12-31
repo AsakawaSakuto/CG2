@@ -11,7 +11,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 2.0f;
 		status_.intervalTime = 0.2f;
-		status_.shotMaxCount = 5;
+		status_.shotMaxCount = 3;
 		status_.shotNowCount = 0;
 		status_.size = 1.0f;
 		status_.damage = 10.0f;
@@ -21,7 +21,6 @@ void Weapon::Initialize(WeaponName weaponName) {
 		status_.penetrationCount = 0;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
-		status_.weaponType = WeaponType::BulletType;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
@@ -40,7 +39,6 @@ void Weapon::Initialize(WeaponName weaponName) {
 		status_.penetrationCount = 99;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
-		status_.weaponType = WeaponType::BulletType;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
@@ -59,102 +57,42 @@ void Weapon::Initialize(WeaponName weaponName) {
 		status_.penetrationCount = 0;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
-		status_.weaponType = WeaponType::BulletType;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
-		break;
-
-	case WeaponName::BubbleArea:
-
-		status_.cooldownTime = 10.0f;
-		status_.intervalTime = 1.0f;
-		status_.shotMaxCount = 1;
-		status_.shotNowCount = 0;
-		status_.size = 1.0f;
-		status_.damage = 10.0f;
-		status_.criticalRand = 10;
-		status_.moveSpeed = 0.0f;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
-		status_.weaponType = WeaponType::AreaType;
-		coolDownTimer_.Start(status_.cooldownTime, false);
-
-		break;
-
-	case WeaponName::Sword:
-		break;
-	case WeaponName::Thunder:
-		break;
-	default:
 		break;
 	}
 }
 
 void Weapon::Update() {
 
-	switch (status_.weaponType) {
-	case WeaponType::BulletType:
-
-		BulletTypeUpdate();
-
+	switch (weaponName_) {
+	case WeaponName::FireBall:
+		FireBallUpdate();
 		break;
-	case WeaponType::AreaType:
-
-		AreaTypeUpdate();
-
+	case WeaponName::Laser:
+		LaserUpdate();
 		break;
-	case WeaponType::DirectType:
-
-		DirectTypeUpdate();
-
+	case WeaponName::Runa:
+		RunaUpdate();
 		break;
 	}
 
 }
 
 void Weapon::Draw(Camera camera) {
-	for (auto& bullet : bullets_) {
-		bullet->Draw(camera);
-	}
-
-	for (auto& area : areas_) {
-		area->Draw(camera);
-	}
-}
-
-void Weapon::SetPlayerPosition(const Vector3& position) {
-	playerPosition_ = position;
-}
-
-void Weapon::SetDirectionToEnemy(const Vector3& direction) {
-	directionToEnemy_ = direction;
+	DrawVec(fireBall_, camera);
+	DrawVec(laser_, camera);
+	DrawVec(runa_, camera);
 }
 
 void Weapon::PostFrameCleanup() {
 	// 死亡した弾を削除し、パーティクルをプールに返却
-	auto it = bullets_.begin();
-	while (it != bullets_.end()) {
-		if (!(*it)->IsAlive()) {
-			it = bullets_.erase(it);
-		} else {
-			++it;
-		}
-	}
-	
-	// 死亡したエリアを削除
-	auto areaIt = areas_.begin();
-	while (areaIt != areas_.end()) {
-		if (!(*areaIt)->IsAlive()) {
-			areaIt = areas_.erase(areaIt);
-		} else {
-			++areaIt;
-		}
-	}
+	EraseDead(fireBall_);
+	EraseDead(laser_);
+	EraseDead(runa_);
 }
 
-void Weapon::BulletTypeUpdate() {
+void Weapon::FireBallUpdate() {
 	// クールタイムが終了している場合
 	if (coolDownTimer_.IsFinished()) {
 		if (!intervalTimer_.IsActive()) {
@@ -165,26 +103,11 @@ void Weapon::BulletTypeUpdate() {
 
 	if (intervalTimer_.IsFinished()) {
 
-		auto bullet = std::make_unique<Bullet>();
+		auto bullet = std::make_unique<FireBall>();
 		bullet->Initialize();
-		bullet->SetPosition(playerPosition_);
+		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetSpeed(status_.moveSpeed);
-		switch (weaponName_)
-		{
-		case WeaponName::FireBall:
-			//bullet->LoadJson("fireBall", "fireBall2");
-			break;
-		case WeaponName::Laser:
-			//bullet->LoadJson("laser", "laser2");
-			bullet->SetPenetrationCount(status_.penetrationCount);
-			break;
-		case WeaponName::Runa:
-			//bullet->LoadJson("runa", "runa2");
-			bullet->SetBounceCount(status_.bounceCount);
-			break;
-		}
-		bullets_.push_back(std::move(bullet));
+		fireBall_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= status_.shotMaxCount) {
@@ -197,13 +120,12 @@ void Weapon::BulletTypeUpdate() {
 	coolDownTimer_.Update();
 	intervalTimer_.Update();
 
-	for (auto& bullet : bullets_) {
+	for (auto& bullet : fireBall_) {
 		bullet->Update();
 	}
 }
 
-void Weapon::AreaTypeUpdate() {
-
+void Weapon::LaserUpdate() {
 	// クールタイムが終了している場合
 	if (coolDownTimer_.IsFinished()) {
 		if (!intervalTimer_.IsActive()) {
@@ -214,15 +136,11 @@ void Weapon::AreaTypeUpdate() {
 
 	if (intervalTimer_.IsFinished()) {
 
-		auto area = std::make_unique<Area>();
-		area->Initialize();
-		switch (weaponName_)
-		{
-		case WeaponName::BubbleArea:
-			area->LoadJson("bubbleArea");
-			break;
-		}
-		areas_.push_back(std::move(area));
+		auto bullet = std::make_unique<Laser>();
+		bullet->Initialize();
+		bullet->SetPosition(playerPosition_ + spawnOffSet_);
+		bullet->SetDirectionToEnemy(directionToEnemy_);
+		laser_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= status_.shotMaxCount) {
@@ -235,12 +153,35 @@ void Weapon::AreaTypeUpdate() {
 	coolDownTimer_.Update();
 	intervalTimer_.Update();
 
-	for (auto& area : areas_) {
-		area->SetPosition(playerPosition_);
-		area->Update();
+	for (auto& bullet : laser_) {
+		bullet->Update();
 	}
-
 }
 
-void Weapon::DirectTypeUpdate() {
+void Weapon::RunaUpdate() {
+	// クールタイムが終了している場合
+	if (coolDownTimer_.IsFinished()) {
+		if (!intervalTimer_.IsActive()) {
+			intervalTimer_.Start(status_.intervalTime, true);
+			coolDownTimer_.Reset();
+		}
+	}
+	if (intervalTimer_.IsFinished()) {
+		auto bullet = std::make_unique<Runa>();
+		bullet->Initialize();
+		bullet->SetPosition(playerPosition_ + spawnOffSet_);
+		bullet->SetDirectionToEnemy(directionToEnemy_);
+		runa_.push_back(std::move(bullet));
+		status_.shotNowCount++;
+		if (status_.shotNowCount >= status_.shotMaxCount) {
+			status_.shotNowCount = 0;
+			intervalTimer_.Reset();
+			coolDownTimer_.Start(status_.cooldownTime, false);
+		}
+	}
+	coolDownTimer_.Update();
+	intervalTimer_.Update();
+	for (auto& bullet : runa_) {
+		bullet->Update();
+	}
 }

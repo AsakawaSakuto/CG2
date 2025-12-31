@@ -121,6 +121,16 @@ Vector2 TextureManager::GetTextureSizeByIndex(uint32_t textureIndex) {
     };
 }
 
+const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureIndex) const {
+    // 範囲外アクセスチェック
+    assert(textureIndex >= kSRVIndexTop_);
+    uint32_t index = textureIndex - kSRVIndexTop_;
+    assert(index < textureDatas_.size());
+
+    // テクスチャデータの参照を取得
+    return textureDatas_[index].matadata;
+}
+
 void TextureManager::LoadTexture(const std::string& filePath) {
     // 先に filePath の完全コピーを作成
     std::string safeFilePath = filePath;

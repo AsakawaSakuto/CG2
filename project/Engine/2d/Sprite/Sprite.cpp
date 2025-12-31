@@ -55,6 +55,10 @@ void Sprite::Initialize(const std::string& fileName, Vector2 position, Vector2 s
 	// テクスチャからサイズを自動取得
 	size_ = TextureManager::GetInstance()->GetTextureSize(textureName_);
 
+	// デフォルトでテクスチャ全体を使用
+	textureLeftTop_ = { 0.0f, 0.0f };
+	textureSize_ = size_; // テクスチャ全体のサイズ
+
 	transform2D_.scale = scale;
 	transform2D_.rotate = 0.0f;
 	transform2D_.translate = position;
@@ -200,9 +204,31 @@ void Sprite::SetTexture(const std::string& textureName) {
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 }
 
-void Sprite::SetAnchorPoint(const Vector2& anchor) {
-	anchorPoint_ = anchor;
+void Sprite::SetAnchorPoint(const AnchorPoint anchor) {
+	anchor_ = anchor;
 	
+	switch (anchor_)
+	{
+	case AnchorPoint::TopLeft:
+		anchorPoint_ = { 0.0f,0.0f };
+		break;
+	case AnchorPoint::TopRight:
+		anchorPoint_ = { 0.0f,1.0f };
+		break;
+	case AnchorPoint::Center:
+		anchorPoint_ = { 0.5f,0.5f };
+		break;
+	case AnchorPoint::BottomLeft:
+		anchorPoint_ = { 1.0f,0.0f };
+		break;
+	case AnchorPoint::BottomRight:
+		anchorPoint_ = { 1.0f,1.0f };
+		break;
+	default:
+		anchorPoint_ = { 0.0f,0.0f };
+		break;
+	}
+
 	// 頂点データが既に作成されている場合、再計算
 	if (vertexData_) {
 		float width = size_.x;
@@ -272,7 +298,7 @@ void Sprite::LoadFromJson(const std::string& filePath) {
 	}
 
 	// アンカーポイントが変更された場合は頂点データを更新
-	SetAnchorPoint(anchorPoint_);
+	//SetAnchorPoint(anchorPoint_);
 }
 
 void Sprite::CreateNewJsonFile(const std::string& filePath) {
@@ -356,4 +382,53 @@ void Sprite::CreateTransformationResource() {
 	transformationResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationData_));
 	//
 	transformationData_->WVP = MakeIdentityMatrix();
+}
+
+void Sprite::SetTextureRect(const Vector2& leftTop, const Vector2& size) {
+	textureLeftTop_ = leftTop;
+	textureSize_ = size;
+	
+	// 頂点データが存在する場合、テクスチャ座標を更新
+	if (vertexData_) {
+		UpdateTextureCoords();
+	}
+}
+
+void Sprite::SetTextureLeftTop(const Vector2& leftTop) {
+	textureLeftTop_ = leftTop;
+	
+	// 頂点データが存在する場合、テクスチャ座標を更新
+	if (vertexData_) {
+		UpdateTextureCoords();
+	}
+}
+
+void Sprite::SetTextureSize(const Vector2& size) {
+	textureSize_ = size;
+	
+	// 頂点データが存在する場合、テクスチャ座標を更新
+	if (vertexData_) {
+		UpdateTextureCoords();
+	}
+}
+
+void Sprite::UpdateTextureCoords() {
+	// テクスチャの実際のサイズを取得（メタデータから）
+	const DirectX::TexMetadata& metadata = 
+		TextureManager::GetInstance()->GetMetaData(textureIndex_);
+	
+	float textureWidth = static_cast<float>(metadata.width);
+	float textureHeight = static_cast<float>(metadata.height);
+	
+	// ピクセル座標からUV座標に変換
+	float tex_left = textureLeftTop_.x / textureWidth;
+	float tex_right = (textureLeftTop_.x + textureSize_.x) / textureWidth;
+	float tex_top = textureLeftTop_.y / textureHeight;
+	float tex_bottom = (textureLeftTop_.y + textureSize_.y) / textureHeight;
+	
+	// 頂点のテクスチャ座標を更新
+	vertexData_[0].texcoord = { tex_left, tex_bottom };   // 左下
+	vertexData_[1].texcoord = { tex_left, tex_top };      // 左上
+	vertexData_[2].texcoord = { tex_right, tex_bottom };  // 右下
+	vertexData_[3].texcoord = { tex_right, tex_top };     // 右上
 }

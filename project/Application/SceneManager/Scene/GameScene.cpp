@@ -69,13 +69,21 @@ void GameScene::Initialize() {
 	gameSceneUI_ = make_unique<GameSceneUI>();
 	gameSceneUI_->Initialize();
 
+	wall_ = make_unique<Model>();
+	wall_->Initialize("MapBlock/wall.obj");
+	wall_->SetColor3({ 0.0f,0.0f,0.0f });
+
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetEnabled(true);
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 	postEffect->SetPostEffectType(PSOType::PostEffect_Fog);
 	postEffect->GetParams().fog.fogStart = 50.0f;
-	postEffect->GetParams().fog.fogEnd = 200.0f;
+	postEffect->GetParams().fog.fogEnd = 175.0f;
 	postEffect->GetParams().fog.fogDensity = 1.0f;
+	postEffect->GetParams().fog.fogColor[0] = 0.0f;
+	postEffect->GetParams().fog.fogColor[1] = 0.0f;
+	postEffect->GetParams().fog.fogColor[2] = 0.0f;
+
 }
 
 void GameScene::Update() {
@@ -120,7 +128,7 @@ void GameScene::Update() {
 
 	UIUpdate();
 
-	MyDebugLine::AddGrid(100.0f, 20);
+	//MyDebugLine::AddGrid(100.0f, 20);
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
@@ -139,6 +147,8 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 	
+	wall_->Draw(camera_, { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{105.0f,0.0f,105.0f} });
+
 	// マップの描画
 	if (map3D_) {
 		if (!MyInput::PushKey(DIK_P)) {
@@ -254,8 +264,8 @@ void GameScene::ChestUpdate() {
 
 void GameScene::UIUpdate() {
 	gameSceneUI_->SetNowMoney(player_->GetNowMoney());
-	gameSceneUI_->SetExpGauge(float(player_->GetCurrentExp()), float(player_->GetExpToNextLevel()));
-	gameSceneUI_->SetHpGauge(float(player_->GetCurrentHP()), float(player_->GetMaxHP()));
+	gameSceneUI_->SetExpGauge(static_cast<float>(player_->GetCurrentExp()), static_cast<float>(player_->GetExpToNextLevel()));
+	gameSceneUI_->SetHpGauge (static_cast<float>(player_->GetCurrentHP()),  static_cast<float>(player_->GetMaxHP()));
 	gameSceneUI_->SetNowLv(player_->GetLevel());
 	gameSceneUI_->SetKillEnemyCount(player_->GetKillEnemyCount());
 	gameSceneUI_->Update();

@@ -19,6 +19,10 @@ Camera::Camera() {
 }
 
 void Camera::Update() {
+
+	//transform_.translate.x = std::clamp(transform_.translate.x, -7.5f, 217.5f);
+	//transform_.translate.z = std::clamp(transform_.translate.z, -7.5f, 217.5f);
+
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = InverseMatrix(worldMatrix_);
 	viewProjectionMatrix_ = MultiplyMatrix(viewMatrix_, projectionMatrix_);

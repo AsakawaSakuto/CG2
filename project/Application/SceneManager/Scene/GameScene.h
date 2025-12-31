@@ -69,4 +69,6 @@ private:
 	unique_ptr<TreeManager> treeManager_ = make_unique<TreeManager>();
 
 	bool useFog_ = false;
+
+	std::unique_ptr<Model> wall_;
 };

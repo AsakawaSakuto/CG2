@@ -37,10 +37,8 @@ void Player::Initialize() {
 	model_->Initialize(animationMap);
 	model_->SetMotion(PlayerMotion::Idle, 0.0f, true);
 
-	moveParticle_->Initialize();
-	moveParticle_->LoadJson("playerMove");
-	landingParticle_->Initialize();
-	landingParticle_->LoadJson("playerLanding");
+	moveParticle_->Initialize("playerMove");
+	landingParticle_->Initialize("playerLanding");
 
 	weaponManager_->Initialize();
 
@@ -87,13 +85,14 @@ void Player::Update() {
 
 	model_->Update(1.0f/60.0f, transform_);
 
-	moveParticle_->SetOffSet({ 0.0f, -0.2f, 0.0f });
+	moveParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
 	moveParticle_->Update();
+	landingParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
 	landingParticle_->Update();
 
 	weaponManager_->SetDirectionToEnemy(directionToEnemy_);
 	weaponManager_->SetPlayerPosition(transform_.translate);
-	//weaponManager_->Update();
+	weaponManager_->Update();
 
 	sphereCollision_.center = transform_.translate;
 	sphereCollision_.radius = collisionRadius_;
@@ -117,10 +116,10 @@ void Player::Draw(Camera camera) {
 
 	//expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
-	weaponManager_->Draw(camera);
-
 	moveParticle_->Draw(camera);
 	landingParticle_->Draw(camera);
+
+	weaponManager_->Draw(camera);
 }
 
 void Player::DrawImGui() {
@@ -209,7 +208,12 @@ void Player::Move() {
 			transform_.rotate.y = targetYaw;
 		}
 		
-		if (!moveParticle_->IsPlaying()) {
+		if (!moveParticleTimer_.IsActive()) {
+			moveParticleTimer_.Start(0.2f, true);
+		} else {
+			moveParticleTimer_.Update();
+		}
+		if (moveParticleTimer_.IsFinished()) {
 			moveParticle_->Play(transform_.translate, false);
 		}
 
@@ -230,7 +234,8 @@ void Player::Move() {
 	} else {
 		// 移動入力がない場合
 		moveParticle_->Stop();
-		
+		moveParticleTimer_.Stop();
+
 		// 待機状態に遷移
 		if (MyInput::Push(Action::CROUCHING)) {
 			if (currentMotion_ != PlayerMotion::CrouIdle) {

@@ -35,7 +35,7 @@ void Particles::Initialize(const std::string& filePath, const uint32_t maxPartic
 	emitter_.radius = 1.0f;
 	emitter_.shapeType = static_cast<uint32_t>(EmitterShapeType::POINT);
 	emitter_.blendMode = kBlendModeAdd;
-	emitter_.texturePath = "circle"; // デフォルトテクスチャ
+	emitter_.texturePath = "resources/image/particle/circle.png"; // デフォルトテクスチャ（フルパス）
 	emitter_.startScale = { 1.0f, 1.0f };
 	emitter_.endScale = { 1.0f, 1.0f };
 	emitter_.lifeTime = 3.0f;
@@ -45,6 +45,9 @@ void Particles::Initialize(const std::string& filePath, const uint32_t maxPartic
 	emitter_.size = { 1.0f, 1.0f, 1.0f };
 	emitter_.startColor = { 1.0f, 1.0f, 1.0f };
 	emitter_.endColor = { 1.0f, 1.0f, 1.0f };
+	
+	// Offsetのデフォルト値を設定
+	offset_ = { 0.0f, 0.0f, 0.0f };
 
 	// JSONファイルの読み込みを試行（失敗してもデフォルト値で続行）
 	try {
@@ -72,8 +75,8 @@ void Particles::Initialize(const std::string& filePath, const uint32_t maxPartic
 	// ブレンドモードを加算合成に初期化
 	blendMode_ = kBlendModeAdd;
 
-	// テクスチャ名を保持しておく
-	textureName_ = "resources/image/particle/circle.png";
+	// テクスチャ名を保持しておく（EmitterStateから取得）
+	textureName_ = emitter_.texturePath;
 
 	// テクスチャマネージャー初期化とテクスチャの読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
@@ -286,28 +289,67 @@ void Particles::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
-	// テクスチャ名入力
-	static char textureNameBuffer[256] = "";
-	strncpy_s(textureNameBuffer, emitter_.texturePath.c_str(), sizeof(textureNameBuffer));
-	if (ImGui::InputText("テクスチャ名", textureNameBuffer, sizeof(textureNameBuffer))) {
-		emitter_.texturePath = textureNameBuffer;
+	// テクスチャパス入力（フルパス対応）
+	static char texturePathBuffer[512] = "";
+	strncpy_s(texturePathBuffer, textureName_.c_str(), sizeof(texturePathBuffer));
+	if (ImGui::InputText("テクスチャパス", texturePathBuffer, sizeof(texturePathBuffer))) {
+		// 入力されたパスを保持
+		std::string inputPath = texturePathBuffer;
+		
+		// パスが変更された場合のみ更新
+		if (textureName_ != inputPath) {
+			textureName_ = inputPath;
+			emitter_.texturePath = inputPath; // EmitterStateにも保存
+		}
 	}
 
 	if (ImGui::Button("テクスチャ読み込み")) {
-		// すでに同じテクスチャなら処理をスキップ
-		std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
-		if (textureName_ == newTextureName) {
-			return;
+		// テクスチャファイル読み込み
+		if (!textureName_.empty()) {
+			try {
+				TextureManager::GetInstance()->LoadTexture(textureName_);
+				textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+				emitter_.texturePath = textureName_; // 成功したらパスを保存
+			} catch (const std::exception& e) {
+				printf("[ERROR] Failed to load texture '%s': %s\n", textureName_.c_str(), e.what());
+			}
 		}
-		textureName_ = newTextureName;
-		// .objの参照しているテクスチャファイル読み込み
-		TextureManager::GetInstance()->LoadTexture(textureName_);
-		// 読み込んだテクスチャの番号を取得
-		textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 	}
+
+	ImGui::SameLine();
+
+	// 簡易テクスチャ名入力（従来の互換性維持）
+	static char textureNameBuffer[256] = "";
+	if (ImGui::InputText("テクスチャ名(拡張子なし)", textureNameBuffer, sizeof(textureNameBuffer))) {
+		// 何もしない（Enter押下まで待つ）
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("簡易読み込み")) {
+		// 拡張子なしの名前からフルパスを構築
+		std::string simpleTextureName = textureNameBuffer;
+		if (!simpleTextureName.empty()) {
+			std::string newTextureName = "resources/image/particle/" + simpleTextureName + ".png";
+			if (textureName_ != newTextureName) {
+				textureName_ = newTextureName;
+				emitter_.texturePath = newTextureName;
+				try {
+					TextureManager::GetInstance()->LoadTexture(textureName_);
+					textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+				} catch (const std::exception& e) {
+					printf("[ERROR] Failed to load texture '%s': %s\n", textureName_.c_str(), e.what());
+				}
+			}
+		}
+	}
+
+	// 現在のテクスチャパス表示
+	ImGui::Text("現在のテクスチャ: %s", textureName_.c_str());
 
 	ImGui::Separator();
 
+	// 位置、オフセット、各種フラグ
 	ImGui::DragFloat3("位置", &emitter_.translate.x, 0.01f);
 
 	ImGui::DragFloat3("オフセット", &offset_.x, 0.01f);
@@ -526,6 +568,7 @@ void Particles::SetTexture(const std::string& textureName) {
 		return;
 	}
 	textureName_ = textureName;
+	emitter_.texturePath = textureName; // EmitterStateにも保存
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	// 読み込んだテクスチャの番号を取得
@@ -629,7 +672,7 @@ void Particles::CreateParticleResource() {
 
 	csRootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u1: ListIndex
 	csRootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	csRootParams[1].Descriptor.ShaderRegister = 1;
+	csRootParams[1]. Descriptor.ShaderRegister = 1;
 
 	csRootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV; // u2: List
 	csRootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
@@ -799,6 +842,11 @@ void Particles::UpdateEmitter(float deltaTime) {
 		emitter_.emit = true;
 	} else {
 		emitter_.emit = false;
+	}
+	
+	// 一回だけの再生の場合、emitが完了したらisPlaying_をfalseに
+	if (!emitter_.useEmitter && !emitter_.emit && isPlaying_) {
+		isPlaying_ = false;
 	}
 
 	emitter_.kMaxParticle = kMaxParticles_;
@@ -986,7 +1034,12 @@ void Particles::SaveToJson(const std::string& filePath) {
 	jsonManager_->RegistOutput(emitter_.gravityY, "gravityY");
 	jsonManager_->RegistOutput(emitter_.accelerationY, "accelerationY");
 	jsonManager_->RegistOutput(static_cast<uint32_t>(emitter_.blendMode), "blendMode");
+	
+	// テクスチャパスをフルパスとして保存
 	jsonManager_->RegistOutput(emitter_.texturePath, "texturePath");
+	
+	// Offset値を保存
+	jsonManager_->RegistOutput(offset_, "offset");
 
 	// JSONファイルに書き込み
 	jsonManager_->Write(filePath);
@@ -1097,6 +1150,11 @@ void Particles::LoadFromJson(const std::string& filePath) {
 					emitter_.texturePath = "circle";
 				}
 			}
+			
+			// offset値を読み込み
+			if (index < values.size()) {
+				offset_ = JsonManager::Reverse<Vector3>(values[index++]);
+			}
 		} catch (const std::length_error& e) {
 			printf("[ERROR] Length error while parsing JSON: %s\n", e.what());
 			printf("[INFO] Partially loaded settings. Some fields may use default values.\n");
@@ -1112,15 +1170,24 @@ void Particles::LoadFromJson(const std::string& filePath) {
 		// テクスチャパスが存在する場合、テクスチャを読み込む
 		if (!emitter_.texturePath.empty()) {
 			try {
-				std::string newTextureName = "resources/image/particle/" + emitter_.texturePath + ".png";
-				if (textureName_ != newTextureName) {
-					textureName_ = newTextureName;
+				// フルパスをそのまま使用
+				if (textureName_ != emitter_.texturePath) {
+					textureName_ = emitter_.texturePath;
 					TextureManager::GetInstance()->LoadTexture(textureName_);
 					textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
 				}
 			} catch (const std::exception& e) {
 				printf("[ERROR] Failed to load texture '%s': %s\n", emitter_.texturePath.c_str(), e.what());
 				printf("[INFO] Using default texture.\n");
+				// デフォルトテクスチャにフォールバック
+				textureName_ = "resources/image/particle/circle.png";
+				emitter_.texturePath = textureName_;
+				try {
+					TextureManager::GetInstance()->LoadTexture(textureName_);
+					textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+				} catch (...) {
+					printf("[ERROR] Failed to load default texture as well.\n");
+				}
 			}
 		}
 

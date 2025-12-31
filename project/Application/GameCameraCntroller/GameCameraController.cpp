@@ -36,10 +36,10 @@ void GameCameraController::Update() {
 
 	// スティック入力からカメラの角度を更新
 	if (std::abs(cameraInput.x) > 0.1f || std::abs(cameraInput.y) > 0.1f) {
-		// 水平角度：スティックのX軸
+		// 水平方向：スティックのX軸
 		deltaHorizontal += cameraInput.x * horizontalSensitivity;
 		
-		// 垂直角度：スティックのY軸（反転）
+		// 垂直方向：スティックのY軸（反転）
 		deltaVertical += -cameraInput.y * verticalSensitivity;
 	}
 
@@ -63,10 +63,10 @@ void GameCameraController::Update() {
 		if (isMouseCameraActive_) {
 			// マウス入力からカメラの角度を更新
 			if (std::abs(mouseDelta.x) > 0.01f || std::abs(mouseDelta.y) > 0.01f) {
-				// 水平角度：マウスのX軸移動
+				// 水平方向：マウスのX軸移動
 				deltaHorizontal += mouseDelta.x * mouseHorizontalSensitivity;
 				
-				// 垂直角度：マウスのY軸移動
+				// 垂直方向：マウスのY軸移動
 				deltaVertical += mouseDelta.y * mouseVerticalSensitivity;
 			}
 
@@ -221,11 +221,66 @@ void GameCameraController::CheckBlockOcclusion(Map3D* map) {
 		}
 	}
 	
+	// マップの境界チェック
+	// カメラの理想的な位置を計算
+	Vector3 idealCameraPos = {
+		playerPos.x + direction.x * maxDistance,
+		playerPos.y + direction.y * maxDistance,
+		playerPos.z + direction.z * maxDistance
+	};
+	
+	// マップの境界
+	const float mapMinX = -7.5f;
+	const float mapMaxX = 217.5f;
+	const float mapMinZ = -7.5f;
+	const float mapMaxZ = 217.5f;
+	const float boundaryMargin = 2.0f; // 境界からのマージン
+	
+	// 境界を超える場合、適切な距離を計算
+	float boundaryDistance = maxDistance;
+	bool hitBoundary = false;
+	
+	// X軸の境界チェック
+	if (direction.x != 0.0f) {
+		float tMinX = (mapMinX + boundaryMargin - playerPos.x) / direction.x;
+		float tMaxX = (mapMaxX - boundaryMargin - playerPos.x) / direction.x;
+		
+		if (tMinX > 0.0f && tMinX < boundaryDistance) {
+			boundaryDistance = tMinX;
+			hitBoundary = true;
+		}
+		if (tMaxX > 0.0f && tMaxX < boundaryDistance) {
+			boundaryDistance = tMaxX;
+			hitBoundary = true;
+		}
+	}
+	
+	// Z軸の境界チェック
+	if (direction.z != 0.0f) {
+		float tMinZ = (mapMinZ + boundaryMargin - playerPos.z) / direction.z;
+		float tMaxZ = (mapMaxZ - boundaryMargin - playerPos.z) / direction.z;
+		
+		if (tMinZ > 0.0f && tMinZ < boundaryDistance) {
+			boundaryDistance = tMinZ;
+			hitBoundary = true;
+		}
+		if (tMaxZ > 0.0f && tMaxZ < boundaryDistance) {
+			boundaryDistance = tMaxZ;
+			hitBoundary = true;
+		}
+	}
+	
+	// ブロック遮蔽と境界の両方を考慮して、より近い距離を採用
+	if (hitBoundary && boundaryDistance < nearestBlockDistance) {
+		nearestBlockDistance = boundaryDistance;
+		foundOcclusion = true;
+	}
+	
 	// 最小距離を設定（プレイヤーに近づきすぎないように）
 	const float minDistance = 3.0f;
 	
 	if (foundOcclusion) {
-		// ブロックが遮っている場合、目標距離を設定
+		// ブロックまたは境界が遮っている場合、目標距離を設定
 		targetDistance_ = std::max(minDistance, nearestBlockDistance);
 	} else {
 		// 遮るものがない場合は元の距離を目標にする
@@ -247,6 +302,20 @@ void GameCameraController::CheckBlockOcclusion(Map3D* map) {
 			MyDebugLine::AddShape(debugLine, { 1.0f, 1.0f, 0.0f, 1.0f });
 		} else {
 			MyDebugLine::AddShape(debugLine, { 0.0f, 1.0f, 0.0f, 1.0f });
+		}
+		
+		// 境界を視覚化
+		if (hitBoundary && boundaryDistance == nearestBlockDistance) {
+			Vector3 boundaryHitPos = {
+				playerPos.x + direction.x * boundaryDistance,
+				playerPos.y + direction.y * boundaryDistance,
+				playerPos.z + direction.z * boundaryDistance
+			};
+			AABB boundaryMarker;
+			boundaryMarker.center = boundaryHitPos;
+			boundaryMarker.min = { -1.0f, -1.0f, -1.0f };
+			boundaryMarker.max = { 1.0f, 1.0f, 1.0f };
+			MyDebugLine::AddShape(boundaryMarker, { 0.0f, 0.0f, 1.0f, 1.0f });
 		}
 	}
 }

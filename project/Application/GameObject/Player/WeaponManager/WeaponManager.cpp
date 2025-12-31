@@ -1,5 +1,4 @@
 #include "WeaponManager.h"
-#include "GameObject/Player/WeaponManager/WeaponName.h"
 
 void WeaponManager::Initialize() {
 
@@ -15,9 +14,9 @@ void WeaponManager::Initialize() {
 	weapon3->Initialize(WeaponName::Runa);
 	weapons_.push_back(std::move(weapon3));
 
-	auto weapon4 = std::make_unique<Weapon>();
-	weapon4->Initialize(WeaponName::BubbleArea);
-	weapons_.push_back(std::move(weapon4));
+	//auto weapon4 = std::make_unique<Weapon>();
+	//weapon4->Initialize(WeaponName::BubbleArea);
+	//weapons_.push_back(std::move(weapon4));
 }
 
 void WeaponManager::Update() {
