@@ -7,6 +7,7 @@ void GameSceneUI::Initialize() {
 	money_ = std::make_unique<Sprite>();
 	money_->Initialize("UI/Game/money.png");
 	money_->LoadFromJson("money");
+	money_->SetAnchorPoint(AnchorPoint::Center);
 
 	expGauge_ = std::make_unique<Gauge>();
 	expGauge_->Initialize("expGauge");
@@ -22,10 +23,12 @@ void GameSceneUI::Initialize() {
 
 	hpSrash_ = std::make_unique<Sprite>();
 	hpSrash_->Initialize("bitMapFont/srash.png", { 137.0f, 65.0f }, { 0.2f, 0.2f });
+	hpSrash_->SetAnchorPoint(AnchorPoint::Center);
 
 	lv_ = std::make_unique<Sprite>();
 	lv_->Initialize("UI/Game/lv.png");
 	lv_->LoadFromJson("lv");
+	lv_->SetAnchorPoint(AnchorPoint::Center);
 
 	lvFont_ = std::make_unique<BitmapFont>();
 	lvFont_->Initialize("lvFont");
@@ -33,6 +36,9 @@ void GameSceneUI::Initialize() {
 	enemy_ = std::make_unique<Sprite>();
 	enemy_->Initialize("UI/Game/enemy.png");
 	enemy_->LoadFromJson("enemy");
+	enemy_->SetAnchorPoint(AnchorPoint::Center);
+
+
 	enemyFont_ = std::make_unique<BitmapFont>();
 	enemyFont_->Initialize("enemy");
 }

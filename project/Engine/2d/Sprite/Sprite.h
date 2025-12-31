@@ -98,12 +98,6 @@ public:
 	void SetTexture(const std::string& textureName);
 
 	/// <summary>
-	/// アンカーポイントを設定
-	/// </summary>
-	/// <param name="anchor">アンカーポイント（0.0～1.0）</param>
-	void SetAnchorPoint(const Vector2& anchor);
-
-	/// <summary>
 	/// JsonFileに設定を保存
 	/// </summary>
 	/// <param name="filePath">保存先のファイルパス（拡張子不要）</param>
@@ -121,6 +115,43 @@ public:
 	/// <param name="filePath">作成するファイルパス（拡張子不要）</param>
 	void CreateNewJsonFile(const std::string& filePath);
 
+	/// <summary>
+	/// アンカーポイントを設定
+	/// </summary>
+	/// <param name="anchor">アンカーポイント（0.0～1.0）</param>
+	void SetAnchorPoint(const AnchorPoint anchor);
+
+	/// <summary>
+	/// テクスチャの切り取り範囲を設定（ピクセル座標）
+	/// </summary>
+	/// <param name="leftTop">切り取り開始座標（左上、ピクセル座標）</param>
+	/// <param name="size">切り取りサイズ（ピクセル単位）</param>
+	void SetTextureRect(const Vector2& leftTop, const Vector2& size);
+
+	/// <summary>
+	/// 切り取り開始座標のみを設定（ピクセル座標）
+	/// </summary>
+	/// <param name="leftTop">切り取り開始座標（左上、ピクセル座標）</param>
+	void SetTextureLeftTop(const Vector2& leftTop);
+
+	/// <summary>
+	/// 切り取りサイズのみを設定（ピクセル単位）
+	/// </summary>
+	/// <param name="size">切り取りサイズ（ピクセル単位）</param>
+	void SetTextureSize(const Vector2& size);
+
+	/// <summary>
+	/// 切り取り開始座標を取得
+	/// </summary>
+	/// <returns>切り取り開始座標（ピクセル座標）</returns>
+	const Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
+
+	/// <summary>
+	/// 切り取りサイズを取得
+	/// </summary>
+	/// <returns>切り取りサイズ（ピクセル単位）</returns>
+	const Vector2& GetTextureSize() const { return textureSize_; }
+
 private:
 	DirectXCommon* dxCommon_ = nullptr;
 	HRESULT hr_;
@@ -131,7 +162,12 @@ private:
 	Transform2D uvTransform_ = {};
 
 	Vector2 size_ = {};
-	Vector2 anchorPoint_ = { 0.5f,0.5f };
+	Vector2 anchorPoint_ = { 0.0f,0.0f };
+	AnchorPoint anchor_ = AnchorPoint::TopLeft;
+
+	// テクスチャ切り取り範囲（ピクセル座標）
+	Vector2 textureLeftTop_ = { 0.0f, 0.0f };  // 切り取り開始座標（左上）
+	Vector2 textureSize_ = { 0.0f, 0.0f };      // 切り取りサイズ（0の場合はテクスチャ全体を使用）
 
 	std::string textureName_;
 
@@ -166,4 +202,9 @@ private:
 	void CreateIndexResource();
 	void CreateMaterialResource();
 	void CreateTransformationResource();
+
+	/// <summary>
+	/// テクスチャ座標（UV）を更新
+	/// </summary>
+	void UpdateTextureCoords();
 };

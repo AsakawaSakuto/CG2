@@ -43,6 +43,13 @@ public:
 	Vector2 GetTextureSize(const std::string& filePath);
 	Vector2 GetTextureSizeByIndex(uint32_t textureIndex);
 
+	/// <summary>
+	/// テクスチャのメタデータを取得
+	/// </summary>
+	/// <param name="textureIndex">テクスチャインデックス</param>
+	/// <returns>テクスチャのメタデータ</returns>
+	const DirectX::TexMetadata& GetMetaData(uint32_t textureIndex) const;
+
 	//
 	size_t GetTextureCount() const {return textureDatas_.size();}
 

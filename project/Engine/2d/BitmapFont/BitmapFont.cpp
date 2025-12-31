@@ -33,20 +33,24 @@ void BitmapFont::Initialize(const std::string& jsonPath, const std::string& numb
 			digitSprites_[digitIndex].sprites[i] = std::make_unique<Sprite>();
 			std::string imagePath = numberImageFolder_ + std::to_string(i) + ".png";
 			digitSprites_[digitIndex].sprites[i]->Initialize(imagePath);
+			digitSprites_[digitIndex].sprites[i]->SetAnchorPoint(AnchorPoint::Center);
 		}
 	}
 
 	// コロンスプライトを初期化
 	colonSprite_ = std::make_unique<Sprite>();
 	colonSprite_->Initialize(numberImageFolder_ + "colon.png");
+	colonSprite_->SetAnchorPoint(AnchorPoint::Center);
 
 	// ドットスプライトを初期化（オプション、画像がある場合）
 	dotSprite_ = std::make_unique<Sprite>();
 	dotSprite_->Initialize(numberImageFolder_ + "dot.png");
+	dotSprite_->SetAnchorPoint(AnchorPoint::Center);
 
 	// パーセントスプライトを初期化
 	percentSprite_ = std::make_unique<Sprite>();
 	percentSprite_->Initialize(numberImageFolder_ + "parcent.png");
+	percentSprite_->SetAnchorPoint(AnchorPoint::Center);
 
 	LoadFromJson(jsonPath);
 }

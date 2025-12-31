@@ -25,3 +25,11 @@ struct SpriteMaterial {
 struct SpriteTransformationMatrix {
 	Matrix4x4 WVP;
 };
+
+enum class AnchorPoint {
+	TopLeft = 0, // 左上 デフォルト
+	TopRight,    // 右上
+	Center,      // 中央
+	BottomLeft,  // 左下
+	BottomRight, // 右下
+};
