@@ -2,10 +2,14 @@
 #include "Utility/GameTimer/GameTimer.h"
 
 enum class WeaponName {
-	FireBall,   // ファイヤーボール
-	Laser,      // レーザー
-	Runa,       // ルナ
-	Axe,        // アックス
+	None,      // 武器なし
+	FireBall,  // ファイヤーボール
+	Laser,     // レーザー
+	Runa,      // ルナ
+	Axe,       // アックス
+	Boomerang, // ブーメラン
+	Dice,      // ダイス
+	Toxic,     // トキシック
 
 	Count
 };
@@ -27,4 +31,5 @@ struct WeaponStatus {
 	float nockBackPower;     // ノックバックさせる力
 	float durationTime;      // 持続時間
 	float lifeTime;          // 弾の寿命
+	float sizeRate = 1.0f;   // 弾の大きさ
 };

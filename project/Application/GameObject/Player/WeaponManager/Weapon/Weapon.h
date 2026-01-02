@@ -7,6 +7,9 @@
 #include "Laser/Laser.h"
 #include "Runa/Runa.h"
 #include "Axe/Axe.h"
+#include "Boomerang/Boomerang.h"
+#include "Dice/Dice.h"
+#include "Toxic/Toxic.h"
 
 /// <summary>
 /// Update関数をラムダ式にして、Enumでそれに応じたUpdate関数を持ってくるやり方を冬休みにやる
@@ -27,8 +30,22 @@ public:
 	const std::vector<std::unique_ptr<Laser>>& GetLaser() const { return laser_; }
 	const std::vector<std::unique_ptr<Runa>>& GetRuna() const { return runa_; }
 	const std::vector<std::unique_ptr<Axe>>& GetAxe() const { return axe_; }
+	const std::vector<std::unique_ptr<Boomerang>>& GetBoomerang() const { return boomerang_; }
+	const std::vector<std::unique_ptr<Dice>>& GetDice() const { return dice_; }
+	const std::vector<std::unique_ptr<Toxic>>& GetToxic() const { return toxic_; }
 
 	void PostFrameCleanup();
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="weapon"></param>
+	void SetWeaponName(WeaponName weapon);
+	
+	/// <summary>
+	/// 武器の名前を取得
+	/// </summary>
+	WeaponName GetWeaponName() const { return weaponName_; }
 	
 private:
 
@@ -36,6 +53,9 @@ private:
 	void LaserUpdate();
 	void RunaUpdate();
 	void AxeUpdate();
+	void BoomerangUpdate();
+	void DiceUpdate();
+	void ToxicUpdate();
 
 private:
 
@@ -43,6 +63,10 @@ private:
 	std::vector<std::unique_ptr<Laser>> laser_;
 	std::vector<std::unique_ptr<Runa>> runa_;
 	std::vector<std::unique_ptr<Axe>> axe_;
+	std::vector<std::unique_ptr<Boomerang>> boomerang_;
+	std::vector<std::unique_ptr<Dice>> dice_;
+	std::vector<std::unique_ptr<Toxic>> toxic_;
+
 
 	Vector3 spawnOffSet_ = { 0.0f, 1.0f, 0.0f };
 

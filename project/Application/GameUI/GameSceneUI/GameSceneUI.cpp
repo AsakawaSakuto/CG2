@@ -42,13 +42,13 @@ void GameSceneUI::Initialize() {
 	enemyFont_->Initialize("enemy");
 
 	weaponIcon1_ = std::make_unique<Sprite>();
-	weaponIcon1_->Initialize("icon/Axe.png");
+	weaponIcon1_->Initialize("icon/none.png");
 	weaponIcon2_ = std::make_unique<Sprite>();
-	weaponIcon2_->Initialize("icon/fireBall.png");
+	weaponIcon2_->Initialize("icon/none.png");
 	weaponIcon3_ = std::make_unique<Sprite>();
-	weaponIcon3_->Initialize("icon/laser.png");
+	weaponIcon3_->Initialize("icon/none.png");
 	weaponIcon4_ = std::make_unique<Sprite>();
-	weaponIcon4_->Initialize("icon/runa.png");
+	weaponIcon4_->Initialize("icon/none.png");
 
 	weaponIcon1_->LoadFromJson("wep1");
 	weaponIcon2_->LoadFromJson("wep2");
@@ -114,4 +114,52 @@ void GameSceneUI::DrawImGui() {
 	//weaponIcon2_->DrawImGui("WeaponIcon2");
 	//weaponIcon3_->DrawImGui("WeaponIcon3");
 	//weaponIcon4_->DrawImGui("WeaponIcon4");
+}
+
+void GameSceneUI::UpdateWeaponIcon(int slotIndex, WeaponName weaponName) {
+	// スロット番号の検証
+	if (slotIndex < 0 || slotIndex > 3) {
+		return;
+	}
+
+	// 武器名からアイコンパスを取得
+	std::string iconPath = GetWeaponIconPath(weaponName);
+
+	// 対応するスロットのアイコンを更新
+	switch (slotIndex) {
+	case 0:
+		weaponIcon1_->SetTexture(iconPath);
+		break;
+	case 1:
+		weaponIcon2_->SetTexture(iconPath);
+		break;
+	case 2:
+		weaponIcon3_->SetTexture(iconPath);
+		break;
+	case 3:
+		weaponIcon4_->SetTexture(iconPath);
+		break;
+	}
+}
+
+std::string GameSceneUI::GetWeaponIconPath(WeaponName weaponName) const {
+	switch (weaponName) {
+	case WeaponName::FireBall:
+		return "icon/fireball.png";
+	case WeaponName::Laser:
+		return "icon/laser.png";
+	case WeaponName::Runa:
+		return "icon/runa.png";
+	case WeaponName::Axe:
+		return "icon/axe.png";
+	case WeaponName::Boomerang:
+		return "icon/Boomerang.png";
+	case WeaponName::Dice:
+		return "icon/dice.png";
+	case WeaponName::Toxic:
+		return "icon/toxic.png";
+	case WeaponName::None:
+	default:
+		return "icon/none.png";
+	}
 }

@@ -1,5 +1,11 @@
 #pragma once
 
+enum class PlayerName {
+	DashMan,
+	JumpMan,
+	TankMan,
+};
+
 struct PlayerStatus {
 	// HP関連
 	int maxHP = 100;          // 最大体力

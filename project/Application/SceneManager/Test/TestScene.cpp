@@ -24,7 +24,7 @@ void TestScene::Initialize() {
 
 	testSprite_->Initialize("icon/fireBall.png", { 64.0f,64.0f });
 
-	cube_->Initialize("weapon/axe/Axe.obj");
+	cube_->Initialize("weapon/boomerang/boomerang.obj");
     cubeTransform_.translate = { -1.5f,2.5f,0.0f };
 
 	spinCube_->Initialize("Animation/cube/AnimatedCube.gltf");
