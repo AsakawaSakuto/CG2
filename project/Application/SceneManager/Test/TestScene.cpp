@@ -88,6 +88,11 @@ void TestScene::Update() {
 	//testOBB_.UpdateOrientation();
 	testOvalSphere_.UpdateOrientation();
 
+	Sphere axeSphere = {};
+	axeSphere.center = cube_->GetVertexWorldPosition(axeIndex_);
+	axeSphere.radius = 0.1f;
+	MyDebugLine::AddShape(axeSphere, { 0.0f,1.0f,0.0f,1.0f });
+
 	// 当たり判定チェック
 	bool sphereHit = false;
 	bool ovalSphereHit = false;
@@ -184,6 +189,14 @@ void TestScene::DrawImGui() {
 
 	cube_->DrawImGui("test");
 
+	ImGui::Begin("axeIndex");
+
+	ImGui::DragInt("Index", &axeIndex_);
+
+	ImGui::End();
+
+	testParticle_->DrawImGui("testParticle");
+
 	/*testOBB_.DrawImGui("testOBB");
     testAABB_.DrawImGui("testAABB");
     testSphere_.DrawImGui("testSphere");
@@ -191,8 +204,6 @@ void TestScene::DrawImGui() {
     testPlane_.DrawImGui("testPlane");
     
 	cube_->DrawImGui("cubeModel");
-
-	testParticle_->DrawImGui("testParticle");
 
     debugCamera_.DrawImgui();
 

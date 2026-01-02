@@ -8,6 +8,9 @@ void Axe::Initialize() {
 
 	model_->Initialize("weapon/axe/Axe.obj");
 	moveTimer_.Start(1.0f, false);
+
+	trailParticle_->Initialize("axe");
+	trail2Particle_->Initialize("axe");
 }
 
 void Axe::Update() {
@@ -21,8 +24,13 @@ void Axe::Update() {
 		lifeTimer_.Start(lifeTime_, false);
 	}
 
+	trailParticle_->SetEmitterPosition(model_->GetVertexWorldPosition(1143));
+	trail2Particle_->SetEmitterPosition(model_->GetVertexWorldPosition(1527));
+	trailParticle_->Update();
+	trail2Particle_->Update();
+
 	sphereCollision_.center = transform_.translate;
-	transform_.rotate.y += 6.28f * deltaTime_;
+	transform_.rotate.y += 4.00f * deltaTime_;
 	sphereCollision_.radius = 1.0f;
 
 	MyDebugLine::AddShape(sphereCollision_);
@@ -48,6 +56,8 @@ void Axe::Update() {
 void Axe::Draw(Camera camera) {
 	if (isAlive_) {
 		model_->Draw(camera, transform_);
+		trailParticle_->Draw(camera);
+		trail2Particle_->Draw(camera);
 	}
 }
 

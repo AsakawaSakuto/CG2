@@ -38,6 +38,7 @@ private:
 	unique_ptr<Gauge> testGauge_ = make_unique<Gauge>();
 	float currentGaugeValue_ = 0.0f;
 	float maxGaugeValue_ = 100.0f;
+	int axeIndex_ = 0;
 
 	Transform cubeTransform_;
 	Transform spinCubeTransform_;

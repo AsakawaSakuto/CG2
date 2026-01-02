@@ -67,7 +67,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 		status_.penetrationCount = 0;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
-		status_.lifeTime = 3.0f;
+		status_.lifeTime = 5.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;

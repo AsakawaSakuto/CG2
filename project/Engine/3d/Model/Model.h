@@ -181,6 +181,13 @@ public:
 	/// <param name="enable">true/false</param>
 	void SetBillboardY(bool enable) { useBillboardY_ = enable; }
 
+	/// <summary>
+	/// ワールド座標変換された特定の頂点位置を取得
+	/// </summary>
+	/// <param name="index">頂点インデックス</param>
+	/// <returns>ワールド座標での頂点位置</returns>
+	Vector3 GetVertexWorldPosition(size_t index) const;
+
 	void UseLight(bool use) { materialData_->enableLighting = use; }
 private:
 

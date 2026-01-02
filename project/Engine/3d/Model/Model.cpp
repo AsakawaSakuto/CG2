@@ -586,3 +586,22 @@ void Model::CreateSpotLightResource() {
 	spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLightData_->useLight = false;
 }
+
+Vector3 Model::GetVertexWorldPosition(size_t index) const {
+	// インデックスが範囲内かチェック
+	if (index >= modelData_.vertices.size()) {
+		return { 0.0f, 0.0f, 0.0f };
+	}
+
+	// ローカル座標の頂点位置を取得
+	Vector4 localPos = modelData_.vertices[index].position;
+
+	// ワールド変換行列を適用
+	Vector3 worldPos = {
+		worldMatrix.m[0][0] * localPos.x + worldMatrix.m[1][0] * localPos.y + worldMatrix.m[2][0] * localPos.z + worldMatrix.m[3][0],
+		worldMatrix.m[0][1] * localPos.x + worldMatrix.m[1][1] * localPos.y + worldMatrix.m[2][1] * localPos.z + worldMatrix.m[3][1],
+		worldMatrix.m[0][2] * localPos.x + worldMatrix.m[1][2] * localPos.y + worldMatrix.m[2][2] * localPos.z + worldMatrix.m[3][2]
+	};
+
+	return worldPos;
+}

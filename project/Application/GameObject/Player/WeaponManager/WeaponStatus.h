@@ -6,6 +6,8 @@ enum class WeaponName {
 	Laser,      // レーザー
 	Runa,       // ルナ
 	Axe,        // アックス
+
+	Count
 };
 
 /// <summary>

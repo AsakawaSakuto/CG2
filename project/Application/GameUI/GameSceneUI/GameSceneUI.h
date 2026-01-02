@@ -38,4 +38,9 @@ private:
 	std::unique_ptr<Sprite> hpSrash_;
 	float currentHpValue_ = 0.0f;
 	float maxHpValue_ = 100.0f;
+
+	std::unique_ptr<Sprite> weaponIcon1_;
+	std::unique_ptr<Sprite> weaponIcon2_;
+	std::unique_ptr<Sprite> weaponIcon3_;
+	std::unique_ptr<Sprite> weaponIcon4_;
 };

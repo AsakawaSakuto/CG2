@@ -16,6 +16,8 @@ public:
 
 private:
 	unique_ptr<Model> model_ = make_unique<Model>();
+	unique_ptr<Particles> trailParticle_ = make_unique<Particles>();
+    unique_ptr<Particles> trail2Particle_ = make_unique<Particles>();
     GameTimer lifeTimer_;
 	GameTimer moveTimer_;
 	GameTimer stopTimer_;
