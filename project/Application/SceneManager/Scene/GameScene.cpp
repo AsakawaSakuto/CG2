@@ -53,6 +53,9 @@ void GameScene::Initialize() {
 
 	// プレイヤーにEnemyManagerへの参照を設定
 	player_->SetEnemyManager(enemyManager_.get());
+	
+	// EnemyManagerにPlayerへの参照を設定
+	enemyManager_->SetPlayer(player_.get());
 
 	// プレイヤーにMap3Dへの参照を設定
 	player_->SetMap(map3D_.get());
@@ -268,6 +271,18 @@ void GameScene::UIUpdate() {
 	gameSceneUI_->SetHpGauge (static_cast<float>(player_->GetCurrentHP()),  static_cast<float>(player_->GetMaxHP()));
 	gameSceneUI_->SetNowLv(player_->GetLevel());
 	gameSceneUI_->SetKillEnemyCount(player_->GetKillEnemyCount());
+	
+	// 武器アイコンの更新
+	if (player_->GetWeaponManager()) {
+		const auto& weapons = player_->GetWeaponManager()->GetWeapons();
+		for (size_t i = 0; i < weapons.size() && i < 4; ++i) {
+			if (weapons[i]) {
+				WeaponName weaponName = weapons[i]->GetWeaponName();
+				gameSceneUI_->UpdateWeaponIcon(static_cast<int>(i), weaponName);
+			}
+		}
+	}
+	
 	gameSceneUI_->Update();
 }
 

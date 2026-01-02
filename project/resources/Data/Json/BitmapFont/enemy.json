@@ -3,7 +3,7 @@
   {
     "name": "position",
     "type": 16,
-    "value": [100, 125]
+    "value": [360, 122]
   },
   {
     "name": "scale",

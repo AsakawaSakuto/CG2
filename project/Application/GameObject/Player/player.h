@@ -98,6 +98,39 @@ public:
 	/// </summary>
 	void SetPosition(const Vector3& position) { transform_.translate = position; }
 	
+	/// <summary>
+	/// 新しい武器を装備する
+	/// </summary>
+	/// <param name="weaponName">装備する武器の種類</param>
+	/// <returns>装備に成功した場合true</returns>
+	bool EquipWeapon(WeaponName weaponName) {
+		return weaponManager_->EquipWeapon(weaponName);
+	}
+
+	/// <summary>
+	/// 指定スロットの武器を変更する
+	/// </summary>
+	/// <param name="slotIndex">変更するスロット番号（0-3）</param>
+	/// <param name="weaponName">新しい武器の種類</param>
+	/// <returns>変更に成功した場合true</returns>
+	bool ChangeWeapon(int slotIndex, WeaponName weaponName) {
+		return weaponManager_->ChangeWeapon(slotIndex, weaponName);
+	}
+
+	/// <summary>
+	/// 指定の武器を持っているか確認
+	/// </summary>
+	bool HasWeapon(WeaponName weaponName) const {
+		return weaponManager_->HasWeapon(weaponName);
+	}
+
+	/// <summary>
+	/// 武器が装備可能か確認
+	/// </summary>
+	bool CanEquipWeapon() const {
+		return weaponManager_->CanEquipWeapon();
+	}
+	
 private:
 
 	// 移動処理
@@ -129,9 +162,17 @@ private:
 	/// <returns>地面に接している場合true</returns>
 	bool IsGroundedOnMap();
 
+	/// <summary>
+	/// プレイヤーの真下の地面の高さを取得
+	/// </summary>
+	/// <returns>地面のY座標</returns>
+	float GetGroundHeight() const;
+
 private:
 	unique_ptr<AnimationController> model_;
 	PlayerMotion currentMotion_ = PlayerMotion::Idle;
+
+	Transform shadowTransform_;
 
 	Transform expGetRangeTransform_;
 

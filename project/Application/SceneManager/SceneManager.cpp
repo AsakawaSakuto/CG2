@@ -76,7 +76,7 @@ void SceneManager::Initialize() {
 	LineManager::GetInstance()->Initialize();
 
     // 初期シーンを作成
-	currentSceneNo_ = SCENE::GAME;
+	currentSceneNo_ = SCENE::TITLE;
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
     if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
         sceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();

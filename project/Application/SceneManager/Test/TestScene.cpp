@@ -24,7 +24,7 @@ void TestScene::Initialize() {
 
 	testSprite_->Initialize("icon/fireBall.png", { 64.0f,64.0f });
 
-	cube_->Initialize("cube.obj");
+	cube_->Initialize("weapon/boomerang/boomerang.obj");
     cubeTransform_.translate = { -1.5f,2.5f,0.0f };
 
 	spinCube_->Initialize("Animation/cube/AnimatedCube.gltf");
@@ -87,6 +87,11 @@ void TestScene::Update() {
 	// 回転を適用（orientation行列を更新）
 	//testOBB_.UpdateOrientation();
 	testOvalSphere_.UpdateOrientation();
+
+	Sphere axeSphere = {};
+	axeSphere.center = cube_->GetVertexWorldPosition(axeIndex_);
+	axeSphere.radius = 0.1f;
+	MyDebugLine::AddShape(axeSphere, { 0.0f,1.0f,0.0f,1.0f });
 
 	// 当たり判定チェック
 	bool sphereHit = false;
@@ -171,7 +176,7 @@ void TestScene::Draw() {
 
 	bitmapFont_.Draw();
 
-	testGauge_->Draw();
+	//testGauge_->Draw();
 
     MyDebugLine::Draw(camera_);
 }
@@ -182,15 +187,23 @@ void TestScene::DrawImGui() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	testOBB_.DrawImGui("testOBB");
+	cube_->DrawImGui("test");
+
+	ImGui::Begin("axeIndex");
+
+	ImGui::DragInt("Index", &axeIndex_);
+
+	ImGui::End();
+
+	testParticle_->DrawImGui("testParticle");
+
+	/*testOBB_.DrawImGui("testOBB");
     testAABB_.DrawImGui("testAABB");
     testSphere_.DrawImGui("testSphere");
     testOvalSphere_.DrawImGui("testOvalSphere");
     testPlane_.DrawImGui("testPlane");
     
 	cube_->DrawImGui("cubeModel");
-
-	testParticle_->DrawImGui("testParticle");
 
     debugCamera_.DrawImgui();
 
@@ -206,7 +219,7 @@ void TestScene::DrawImGui() {
 
 	bitmapFont_.DrawImGui("bitmapFont");
 
-	testGauge_->DrawImGui("testGauge");
+	testGauge_->DrawImGui("testGauge");*/
 
     //testSprite_->DrawImGui("testSprite");
 

@@ -84,6 +84,12 @@ void Player::Update() {
 	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
 
 	model_->Update(1.0f/60.0f, transform_);
+	
+	// 影のY座標を地面の高さに設定
+	if (map_) {
+		float groundY = GetGroundHeight();
+		model_->SetShadowGroundY(groundY);
+	}
 
 	moveParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
 	moveParticle_->Update();
@@ -1029,4 +1035,74 @@ bool Player::SubtractMoney(int money) {
 		return true;
 	}
 	return false;
+}
+
+float Player::GetGroundHeight() const {
+	if (!map_) {
+		return groundLevel_; // フォールバック値を返す
+	}
+
+	// スロープ上にいる場合はスロープの高さを返す
+	float slopeY;
+	if (map_->GetSlopeHeight(transform_.translate, slopeY)) {
+		return slopeY;
+	}
+
+	// プレイヤーの現在位置からマップ座標を取得
+	uint32_t centerX, centerY, centerZ;
+	if (!map_->WorldToMap(transform_.translate, centerX, centerY, centerZ)) {
+		return groundLevel_; // マップ範囲外の場合はフォールバック値
+	}
+
+	// 周囲と下方向のブロックをチェック
+	const int32_t checkRange = 2;
+	float highestGroundY = -(std::numeric_limits<float>::max)(); // 最も高い地面を見つける
+	bool foundGround = false;
+
+	for (int32_t dz = -checkRange; dz <= checkRange; ++dz) {
+		for (int32_t dy = -checkRange; dy <= checkRange; ++dy) {
+			for (int32_t dx = -checkRange; dx <= checkRange; ++dx) {
+				int32_t x = static_cast<int32_t>(centerX) + dx;
+				int32_t y = static_cast<int32_t>(centerY) + dy;
+				int32_t z = static_cast<int32_t>(centerZ) + dz;
+
+				// 範囲外チェック
+				if (x < 0 || y < 0 || z < 0) continue;
+				if (!map_->IsInBounds(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z))) continue;
+
+				TileType tileType = map_->GetTile(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
+
+				// Normalブロックのチェック
+				if (tileType == TileType::Normal) {
+					Vector3 blockWorldPos = map_->MapToWorld(static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z));
+					
+					// ブロックの上面の高さを計算
+					// blockWorldPosはブロックの中心なので、+5.0fで上面の高さになる
+					float blockTopY = blockWorldPos.y + 5.0f;
+					
+					// プレイヤーの真下または真下付近にあるブロックのみを考慮
+					float xzDistance = std::sqrt(
+						(transform_.translate.x - blockWorldPos.x) * (transform_.translate.x - blockWorldPos.x) +
+						(transform_.translate.z - blockWorldPos.z) * (transform_.translate.z - blockWorldPos.z)
+					);
+					
+					// プレイヤーの足元より下にあり、XZ平面で近い位置にあるブロックのみを考慮
+					if (blockTopY <= transform_.translate.y && xzDistance <= 10.0f) {
+						if (blockTopY > highestGroundY) {
+							highestGroundY = blockTopY;
+							foundGround = true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 地面が見つかった場合はその高さを返す
+	if (foundGround) {
+		return highestGroundY;
+	}
+
+	// 地面が見つからない場合はフォールバック値
+	return groundLevel_;
 }

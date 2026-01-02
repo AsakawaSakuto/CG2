@@ -2,6 +2,13 @@
 #include "GameUI/BaseUI.h"
 #include "EngineSystem.h"
 
+enum class TitleSelectState {
+	PLAY,
+	EDIT,
+	QUIT,
+	SELECT,
+};
+
 class TitleSceneUI : public BaseUI {
 public:
 	void Initialize() override;
@@ -9,23 +16,19 @@ public:
 	void Draw() override;
 	void DrawImGui() override;
 
-	bool QuitSelected() { return isQuit_; }
-	bool PlaySelected() { return isPlay_; }
+	void SetSelectState(TitleSelectState state) { selectState_ = state; }
 private:
-
-	enum class TitleSelectState {
-		PLAY,
-		QUIT,
-	};
 
 	TitleSelectState selectState_ = TitleSelectState::PLAY;
 
 private:
 
-	unique_ptr<Sprite> playUI_ = make_unique<Sprite>();
-	unique_ptr<Sprite> quitUI_ = make_unique<Sprite>();
-	unique_ptr<Sprite> titleLogoUI_ = make_unique<Sprite>();
+	unique_ptr<Sprite> play_;
+	unique_ptr<Sprite> edit_;
+	unique_ptr<Sprite> quit_;
+	unique_ptr<Sprite> logo_;
+	unique_ptr<Sprite> ranking_;
 
-	bool isQuit_ = false;
-	bool isPlay_ = false;
+	Vector2 maxScale_ = { 0.8f,0.8f };
+	Vector2 minScale_ = { 0.5f,0.5f };
 };

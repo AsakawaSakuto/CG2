@@ -1,0 +1,194 @@
+# Weapon Collision Fix - Runa and Laser
+
+## 問題の概要
+RunaとLaserが敵に衝突した瞬間、Bounceや貫通をせずに消滅してしまう問題が発生していました。
+
+## 原因の分析
+
+### 根本原因
+衝突判定システムにおいて、**同じ弾が同じ敵と1フレーム内で複数回衝突判定される**ことが原因でした。
+
+### 具体的な問題点
+
+1. **Runa（バウンス武器）の場合**:
+   - `CollisionManager::CheckBulletEnemyCollision()`で全ての敵との衝突をチェック
+   - 衝突が検出されるたびに`bullet->Bounce()`が呼ばれる
+   - `Bounce()`内で`bounceCount_`をデクリメント
+   - 同じフレーム内で複数回衝突判定が行われると、bounceCountが即座に0になり`Dead()`が呼ばれる
+
+2. **Laser（貫通武器）の場合**:
+   - 同様に、同じ敵との複数回の衝突判定で`penetrationCount_`が即座に0になる
+   - または、意図せず複数の敵に同時に当たった場合でも即座にカウントが消費される
+
+## 実装した解決策
+
+### 衝突履歴トラッキングシステム
+
+各武器（RunaとLaser）に**衝突済みの敵を追跡する機能**を追加しました。
+
+#### 1. Runa.h / Laser.h の変更
+
+```cpp
+#include <unordered_set>
+
+class Runa : public BaseGameObject, public BaseWeapon {
+public:
+    // 既存のメンバー...
+    
+    // 衝突済みの敵かチェック
+    bool HasHitEnemy(const void* enemyPtr) const {
+        return hitEnemies_.find(enemyPtr) != hitEnemies_.end();
+    }
+
+    // 衝突した敵を記録
+    void MarkEnemyAsHit(const void* enemyPtr) {
+        hitEnemies_.insert(enemyPtr);
+    }
+
+private:
+    // 既に衝突した敵を追跡（ポインタをキーとして使用）
+    std::unordered_set<const void*> hitEnemies_;
+};
+```
+
+**主な追加機能**:
+- `hitEnemies_`: 衝突済みの敵のポインタを保存するセット
+- `HasHitEnemy()`: 特定の敵と既に衝突しているかチェック
+- `MarkEnemyAsHit()`: 衝突した敵を記録
+
+#### 2. Runa.h の Bounce() メソッド更新
+
+```cpp
+void Bounce() {
+    bounceCount_--;
+    if (bounceCount_ > 0) {
+        // バウンス時の方向変更処理...
+        
+        // バウンス後は衝突履歴をクリア（新しい敵と衝突できるように）
+        hitEnemies_.clear();
+    } else {
+        Dead();
+    }
+}
+```
+
+**重要なポイント**:
+- バウンス成功時に`hitEnemies_.clear()`を呼び出し
+- これにより、バウンス後は再び全ての敵と衝突判定できるようになる
+- バウンスカウントが0になった場合のみ`Dead()`を呼ぶ
+
+#### 3. CollisionManager.cpp の更新
+
+```cpp
+// Laserの衝突判定
+for (const auto& bullet : lasers) {
+    if (!bullet->IsAlive()) continue;
+
+    const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+    for (const auto& enemy : enemies) {
+        if (!enemy->IsAlive()) continue;
+
+        // ★この弾が既にこの敵に当たっている場合はスキップ
+        if (bullet->HasHitEnemy(enemy.get())) {
+            continue;
+        }
+
+        const Sphere& enemySphere = enemy->GetSphereCollision();
+
+        if (Collision::IsHit(bulletSphere, enemySphere) && 
+            !enemy->IsActiveInvincibleTimer()) {
+            
+            enemyDieParticle_->Play(enemy->GetPosition(), false);
+            enemy->Damage(static_cast<int>(bullet->GetDamage()));
+            
+            // ★この敵に当たったことを記録
+            bullet->MarkEnemyAsHit(enemy.get());
+            
+            // 貫通カウントを減らす
+            if (bullet->GetPenetrationCount() > 0) {
+                bullet->DecrementPenetrationCount();
+            }
+        }
+    }
+}
+
+// Runaの衝突判定（同様の変更）
+for (const auto& bullet : runas) {
+    // ... 同様の処理 ...
+    if (bullet->HasHitEnemy(enemy.get())) {
+        continue;
+    }
+    // 衝突時
+    bullet->MarkEnemyAsHit(enemy.get());
+    bullet->Bounce();
+}
+```
+
+## 動作の流れ
+
+### Laserの場合（貫通: penetrationCount = 2）
+
+1. **1体目の敵に衝突**:
+   - 衝突判定成功
+   - `MarkEnemyAsHit(enemy1)` で敵1を記録
+   - `penetrationCount` を 2 → 1 にデクリメント
+   - Laserは継続
+
+2. **同じフレームで敵1を再びチェック**:
+   - `HasHitEnemy(enemy1)` が true を返す
+   - 衝突判定をスキップ（重複ヒット防止）
+
+3. **2体目の敵に衝突**:
+   - `HasHitEnemy(enemy2)` が false を返す
+   - 衝突判定成功
+   - `MarkEnemyAsHit(enemy2)` で敵2を記録
+   - `penetrationCount` を 1 → 0 にデクリメント
+   - Laserは継続（まだ `Update()` で削除されない）
+
+4. **次のフレーム以降**:
+   - `Update()` 内で `penetrationCount == 0` をチェック
+   - `Dead()` が呼ばれる
+
+### Runaの場合（バウンス: bounceCount = 1）
+
+1. **1体目の敵に衝突**:
+   - 衝突判定成功
+   - `MarkEnemyAsHit(enemy1)` で敵1を記録
+   - `Bounce()` が呼ばれる
+   - `bounceCount` を 1 → 0 にデクリメント
+   - `hitEnemies_.clear()` で衝突履歴をクリア（重要！）
+   - 方向を変更
+
+2. **バウンス後、別の敵に衝突**:
+   - 衝突履歴がクリアされているため、再度判定可能
+   - 衝突判定成功
+   - `Bounce()` が呼ばれる
+   - `bounceCount` が 0 なので `Dead()` が呼ばれる
+
+## メリット
+
+1. **正確な貫通・バウンス動作**: 武器が意図した回数だけ貫通/バウンスできる
+2. **パフォーマンス向上**: 同じ敵との重複判定を早期にスキップ
+3. **拡張性**: 他の武器タイプにも同じパターンを適用可能
+4. **メモリ効率**: `unordered_set`による高速な検索（O(1)）
+
+## 注意点
+
+- **ポインタの有効性**: 敵が削除された場合でも、ポインタは`unordered_set`に残る
+  - ただし、弾のライフタイムは敵より短いため、問題にはならない
+  - 弾が削除されれば`hitEnemies_`も一緒に削除される
+
+- **メモリ使用量**: 各弾が衝突した敵のポインタを保持
+  - 通常、数体程度なので問題ない
+
+## テスト推奨項目
+
+1. Runaが敵にバウンスして再び別の敵に当たるか
+2. Laserが複数の敵を貫通するか
+3. 同じ敵に複数回当たらないか（デバッグ表示で確認）
+4. バウンスカウント/貫通カウントが正しく消費されるか
+
+## 結論
+
+この修正により、RunaとLaserが正常にバウンス/貫通するようになり、衝突判定の重複による即座の消滅問題が解決されました。

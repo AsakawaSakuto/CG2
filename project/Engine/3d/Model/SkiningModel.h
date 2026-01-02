@@ -79,7 +79,7 @@ public:
 	/// Transformを設定
 	/// </summary>
 	/// <param name="transform">更新したいTransformを渡す</param>
-	void SetTransform(const Transform& transform) { transform_ = transform; }
+	void SetTransform(const Transform& transform) { transform_ = transform; guiTransform_ = transform; }
 
 	/// <summary>
 	/// Translateを設定
@@ -121,7 +121,7 @@ public:
 	/// 使用してるTextureを変更
 	/// </summary>
 	/// <param name="textureName">Pathカット無し、全部入力してね</param>
-	void SetTexture(const std::string& textureName);
+	void SetTexture(const std::string& textureName = "resources/image/white16x16.png");
 
 	/// <summary>
 	/// 描画モードを変更 trueで通常 falseでワイヤーフレーム
@@ -207,8 +207,10 @@ private:
 		Skeleton skeletonData;                                 // 共有スケルトンデータ
 		SkinCluster skinClusterData;                           // 共有スキンクラスター
 		uint32_t skinClusterIndex;                             // スキンクラスター用SRVインデックス
-		std::string textureName;                               // 使用テクスチャ名
-		uint32_t textureIndex = 0;                             // テクスチャインデックス
+		std::string textureName;                               // 使用テクスチャ名（デフォルト）
+		uint32_t textureIndex = 0;                             // テクスチャインデックス（デフォルト）
+		std::vector<std::string> textureNames;                 // マルチマテリアル用テクスチャ名配列
+		std::vector<uint32_t> textureIndices;                  // マルチマテリアル用テクスチャインデックス配列
 		float boundingRadius = 1.0f;                           // バウンディング半径
 		DirectXCommon* dxCommon = nullptr;                     // SRV解放用
 
@@ -253,6 +255,10 @@ private:
 	// テクスチャ関連
 	std::string textureName_;   // 使用テクスチャファイルパス
 	uint32_t textureIndex_ = 0; // 使用テクスチャインデックス
+	
+	// マルチマテリアル対応
+	std::vector<std::string> textureNames_;   // 複数のテクスチャファイルパス
+	std::vector<uint32_t> textureIndices_;    // 複数のテクスチャインデックス
 
 	// 描画切り替えフラグ
 	bool useWireFrame = false;    // ワイヤーフレーム描画、有効/無効
@@ -273,6 +279,8 @@ private:
 	SkinCluster skinCluster_;        // スキンクラスター
 	uint32_t skinClusterSrvIndex_ = 0; // SkinCluster用のSRVインデックス（動的割り当て）
 
+	bool useGui_ = false;
+	Transform guiTransform_ = {};
 	//-----------------------------------------------------------//
 
 	// DirectX共通機能へのポインタ

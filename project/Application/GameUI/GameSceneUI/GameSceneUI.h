@@ -1,6 +1,7 @@
 #pragma once
 #include "GameUI/BaseUI.h"
 #include "EngineSystem.h"
+#include "GameObject/Player/WeaponManager/WeaponStatus.h"
 
 class GameSceneUI : public BaseUI {
 public:
@@ -14,6 +15,14 @@ public:
 	void SetHpGauge(float currentHp, float maxHp) { currentHpValue_ = currentHp; maxHpValue_ = maxHp; }
 	void SetNowLv(int lv) { nowLv_ = lv; }
 	void SetKillEnemyCount(int count) { killEnemyValue_ = count; }
+
+	/// <summary>
+	/// 武器アイコンを更新する
+	/// </summary>
+	/// <param name="slotIndex">武器スロット番号（0-3）</param>
+	/// <param name="weaponName">武器の種類</param>
+	void UpdateWeaponIcon(int slotIndex, WeaponName weaponName);
+
 private:
 	std::unique_ptr<BitmapFont> enemyFont_;
 	std::unique_ptr<Sprite> enemy_;
@@ -38,4 +47,14 @@ private:
 	std::unique_ptr<Sprite> hpSrash_;
 	float currentHpValue_ = 0.0f;
 	float maxHpValue_ = 100.0f;
+
+	std::unique_ptr<Sprite> weaponIcon1_;
+	std::unique_ptr<Sprite> weaponIcon2_;
+	std::unique_ptr<Sprite> weaponIcon3_;
+	std::unique_ptr<Sprite> weaponIcon4_;
+
+	/// <summary>
+	/// 武器名からアイコンのテクスチャパスを取得
+	/// </summary>
+	std::string GetWeaponIconPath(WeaponName weaponName) const;
 };

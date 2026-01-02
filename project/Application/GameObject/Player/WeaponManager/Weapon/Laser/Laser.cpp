@@ -19,7 +19,7 @@ void Laser::Update() {
 	transform_.translate += directionToEnemy_ * speed_ * deltaTime_;
 
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = 0.5f;
+	sphereCollision_.radius = 1.0f;
 
 	MyDebugLine::AddShape(sphereCollision_);
 
@@ -36,7 +36,7 @@ void Laser::Update() {
 		particle2_->Stop();
 	}
 
-	if (lifeTimer_.IsFinished()) {
+	if (lifeTimer_.IsFinished() || penetrationCount_ == 0) {
 		Dead();
 	}
 }

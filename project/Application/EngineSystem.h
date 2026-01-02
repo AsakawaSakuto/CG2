@@ -4,6 +4,8 @@
 
 #include "SceneManager/IScene.h"
 
+#include "GameObject/Player/WeaponManager/Weapon/BaseWeapon.h"
+
 // Include
 #include "Core/WinApp/WinApp.h"
 #include "Input/MyInput.h"
@@ -19,6 +21,7 @@
 #include "2d/Sprite/Sprite.h"
 #include "2d/BitmapFont/BitmapFont.h"
 #include "2d/Gauge/Gauge.h"
+#include "2d/TextRenderer/TextRenderer.h"
 
 #include "3d/Model/Model.h"
 #include "3d/Model/SkiningModel.h"

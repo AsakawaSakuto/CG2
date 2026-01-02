@@ -207,4 +207,9 @@ private:
 	/// テクスチャ座標（UV）を更新
 	/// </summary>
 	void UpdateTextureCoords();
+
+	/// <summary>
+	/// 頂点位置を更新
+	/// </summary>
+	void UpdateVertexPositions();
 };

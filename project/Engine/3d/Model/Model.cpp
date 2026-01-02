@@ -113,6 +113,15 @@ void Model::Initialize(const std::string& modelPath) {
 		// 読み込んだテクスチャの番号を取得
 		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
 
+		// マルチマテリアル対応：すべてのマテリアルのテクスチャを読み込む
+		cache->textureNames.resize(cache->modelData.materials.size());
+		cache->textureIndices.resize(cache->modelData.materials.size());
+		for (size_t i = 0; i < cache->modelData.materials.size(); ++i) {
+			cache->textureNames[i] = cache->modelData.materials[i].textureFilePath;
+			TextureManager::GetInstance()->LoadTexture(cache->textureNames[i]);
+			cache->textureIndices[i] = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureNames[i]);
+		}
+
 		// 頂点リソースをつくる（共有）
   		cache->indexResource = CreateBufferResource(device_.Get(), sizeof(uint32_t) * cache->modelData.indeces.size());
 		cache->indexBufferView.BufferLocation = cache->indexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
@@ -149,6 +158,8 @@ void Model::Initialize(const std::string& modelPath) {
 	modelData_ = cache->modelData;
 	textureName_ = cache->textureName;
 	textureIndex_ = cache->textureIndex;
+	textureNames_ = cache->textureNames;
+	textureIndices_ = cache->textureIndices;
 	indexResource_ = cache->indexResource;
 	indexBufferView_ = cache->indexBufferView;
 	vertexBufferView_ = cache->vertexBufferView;
@@ -157,7 +168,7 @@ void Model::Initialize(const std::string& modelPath) {
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
-	direction_ = { 1.0f,-1.0f,1.0f };
+	direction_ = { 0.0f,-1.0f,0.0f };
 
 	// 以降はインスタンス専用のリソースのみ作成
 	CreateMaterialResource();
@@ -170,10 +181,52 @@ void Model::Initialize(const std::string& modelPath) {
 
 void Model::UpdateMatrix() {
 
-	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
+	pointLightData_->position.y = transform_.translate.y + 5.0f;
+
+	cameraData_->worldPosition = camera_.GetTranslate();
+
+	// ビルボード行列の計算
+	Matrix4x4 billboardMatrix = MakeIdentityMatrix();
+	
+	if (useBillboard_) {
+		// カメラのワールド行列から回転成分のみを取得してビルボード行列を作成
+		Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_.GetScale(), camera_.GetRotate(), camera_.GetTranslate());
+		Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+		billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
+		// 移動成分を除去（回転のみ）
+		billboardMatrix.m[3][0] = 0.0f;
+		billboardMatrix.m[3][1] = 0.0f;
+		billboardMatrix.m[3][2] = 0.0f;
+	} else if (useBillboardY_) {
+		// Y軸ビルボード：カメラへの方向からY軸回転のみを計算
+		Vector3 cameraPos = camera_.GetTranslate();
+		Vector3 objPos = transform_.translate;
+		Vector3 toCamera = { cameraPos.x - objPos.x, 0.0f, cameraPos.z - objPos.z }; // Y成分を0にしてY軸のみ
+		
+		// カメラへの方向を正規化
+		float length = std::sqrt(toCamera.x * toCamera.x + toCamera.z * toCamera.z);
+		if (length > 0.0001f) {
+			toCamera.x /= length;
+			toCamera.z /= length;
+			
+			// Y軸回転角度を計算
+			float angle = std::atan2(toCamera.x, toCamera.z);
+			billboardMatrix = MakeRotateYMatrix(angle);
+		}
+	}
 
 	// 行列の内容を更新
-	worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(transform_.scale);
+	Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(transform_.rotate);
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(transform_.translate);
+	
+	// ビルボードを適用する場合は、回転行列の代わりにビルボード行列を使用
+	if (useBillboard_ || useBillboardY_) {
+		worldMatrix = MultiplyMatrix(scaleMatrix, MultiplyMatrix(billboardMatrix, translateMatrix));
+	} else {
+		worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	}
+	
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_.GetScale(), camera_.GetRotate(), camera_.GetTranslate());
 	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(camera_.GetFovY(), static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), camera_.GetNearClip(), camera_.GetFarClip());
@@ -210,7 +263,12 @@ void Model::UpdateMatrix() {
 void Model::Draw(Camera& useCamera, const Transform& transform) {
 
 	camera_ = useCamera;
-	transform_ = transform;
+
+	if (useGui_) {
+		transform_ = guiTransform_;
+	} else {
+		transform_ = transform;
+	}
 
 	UpdateMatrix();
 
@@ -259,13 +317,31 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 			isInFrustum_ = true;
 			return;
 		} else {
-			isInFrustum_ = false;
+		    isInFrustum_ = false;
 		}
 	}
 
-	// 描画
-	commandList_->DrawIndexedInstanced(
-		static_cast<UINT>(modelData_.indeces.size()), 1, 0, 0, 0);
+	// サブメッシュがある場合はマルチマテリアル描画
+	if (!modelData_.subMeshes.empty()) {
+		for (const auto& subMesh : modelData_.subMeshes) {
+			// サブメッシュのマテリアルインデックスに対応するテクスチャを設定
+			uint32_t texIndex = textureIndex_; // デフォルト
+			if (subMesh.materialIndex < textureIndices_.size()) {
+				texIndex = textureIndices_[subMesh.materialIndex];
+			}
+			
+			// テクスチャを設定
+			commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(texIndex));
+			
+			// サブメッシュを描画
+			commandList_->DrawIndexedInstanced(
+				subMesh.indexCount, 1, subMesh.indexStart, 0, 0);
+		}
+	} else {
+		// 従来の単一マテリアル描画（後方互換性）
+		commandList_->DrawIndexedInstanced(
+			static_cast<UINT>(modelData_.indeces.size()), 1, 0, 0, 0);
+	}
 }
 
 void Model::SetTexture(const std::string& textureName) {
@@ -289,10 +365,20 @@ Vector3 Model::GetWorldPosition() {
 }
 
 void Model::DrawImGui(const char* objectName) {
-
+	useGui_ = true;
 #ifdef USE_IMGUI
 
 	ImGui::Begin(objectName);
+
+	ImGui::Text("ModelEdit");
+	ImGui::DragFloat3("Translate", &guiTransform_.translate.x, 0.1f);
+	ImGui::DragFloat3("Rotate", &guiTransform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("Scale", &guiTransform_.scale.x, 0.01f);
+	if (ImGui::Button("Reset")) {
+		guiTransform_.translate = { 0.0f,0.0f,0.0f };
+		guiTransform_.rotate = { 0.0f,0.0f,0.0f };
+		guiTransform_.scale = { 1.0f,1.0f,1.0f };
+	}
 
 	ImGui::Text("MaterialEdit");
 	ImGui::DragFloat2("uvTranslate", &uvTransform_.translate.x, 0.01f);
@@ -314,6 +400,13 @@ void Model::DrawImGui(const char* objectName) {
 	ImGui::Text("Culling");
 	ImGui::Checkbox("Enable Frustum Culling", &useDrawFrustumCulling_);
 	ImGui::DragFloat("Bounding Radius", &boundingRadius_, 0.1f, 0.1f, 100.0f);
+	
+	ImGui::Separator();
+
+	ImGui::Text("Billboard");
+	ImGui::Checkbox("Enable Billboard", &useBillboard_);
+	ImGui::SameLine();
+	ImGui::Checkbox("Billboard Y Only", &useBillboardY_);
 	
 	ImGui::Separator();
 
@@ -435,7 +528,7 @@ void Model::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
  	materialData_->enableLighting = true;
  	materialData_->uvTransformMatrix = MakeIdentityMatrix();
- 	materialData_->shininess = 100.0f;
+ 	materialData_->shininess = 10000.0f;
 }
 
 void Model::CreateTransformationResource() {
@@ -457,7 +550,7 @@ void Model::CreateDirectionalLightResource() {
 	// 初期化（資料に基づく）
 	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
 	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
-	directionalLightData_->intensity = 1.0f;                        // 光の強さ
+	directionalLightData_->intensity = 1.0f;                    // 光の強さ
 	directionalLightData_->useLight = true;
 	directionalLightData_->useHalfLambert = true;
 }
@@ -492,4 +585,23 @@ void Model::CreateSpotLightResource() {
 	spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 6.0f);
 	spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLightData_->useLight = false;
+}
+
+Vector3 Model::GetVertexWorldPosition(size_t index) const {
+	// インデックスが範囲内かチェック
+	if (index >= modelData_.vertices.size()) {
+		return { 0.0f, 0.0f, 0.0f };
+	}
+
+	// ローカル座標の頂点位置を取得
+	Vector4 localPos = modelData_.vertices[index].position;
+
+	// ワールド変換行列を適用
+	Vector3 worldPos = {
+		worldMatrix.m[0][0] * localPos.x + worldMatrix.m[1][0] * localPos.y + worldMatrix.m[2][0] * localPos.z + worldMatrix.m[3][0],
+		worldMatrix.m[0][1] * localPos.x + worldMatrix.m[1][1] * localPos.y + worldMatrix.m[2][1] * localPos.z + worldMatrix.m[3][1],
+		worldMatrix.m[0][2] * localPos.x + worldMatrix.m[1][2] * localPos.y + worldMatrix.m[2][2] * localPos.z + worldMatrix.m[3][2]
+	};
+
+	return worldPos;
 }

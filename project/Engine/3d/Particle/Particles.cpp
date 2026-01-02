@@ -73,7 +73,7 @@ void Particles::Initialize(const std::string& filePath, const uint32_t maxPartic
 	idxUavFreeList_ = alloc.Allocate();
 
 	// ブレンドモードを加算合成に初期化
-	blendMode_ = kBlendModeAdd;
+	//blendMode_ = kBlendModeAdd;
 
 	// テクスチャ名を保持しておく（EmitterStateから取得）
 	textureName_ = emitter_.texturePath;

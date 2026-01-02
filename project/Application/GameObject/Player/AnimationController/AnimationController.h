@@ -77,12 +77,25 @@ public:
 		animationTime_ = currentAnimation_.duration;
 	}
 
+	void SetShadowY(float y) {
+		shadowTransform_.translate.y = y + 0.1f;
+	}
+
+	/// <summary>
+	/// 影のY座標を地面の高さに設定
+	/// </summary>
+	/// <param name="groundY">地面のY座標</param>
+	void SetShadowGroundY(float groundY) {
+		shadowTransform_.translate.y = groundY;
+	}
 private:
 
 	void SetAnimation(const Animation& animation, float beginTime = 0.0f);
 
 	std::unique_ptr<SkiningModel> model_;
+	unique_ptr<SkiningModel> shadowModel_;
 	Transform transform_;
+	Transform shadowTransform_;
 
 	Animation currentAnimation_;
 	std::vector<Animation> animationQueue_;

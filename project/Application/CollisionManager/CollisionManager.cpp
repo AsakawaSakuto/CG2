@@ -3,7 +3,6 @@
 #include "GameObject/EnemyManager/EnemyManager.h"
 #include "GameObject/Player/WeaponManager/WeaponManager.h"
 #include "GameObject/Player/WeaponManager/Weapon/Weapon.h"
-#include "GameObject/Player/WeaponManager/Weapon/Bullet/Bullet.h"
 #include "Utility/Collision/Collision.h"
 
 void CollisionManager::Initialize() {
@@ -55,10 +54,9 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 		// プレイヤーとEnemyの衝突判定
 		if (Collision::IsHit(playerSphere, enemySphere)) {
 			// 衝突したEnemyを死亡状態にする
-			enemy->Dead();
-			// プレイヤーの敵を倒したカウントをインクリメント
-			player_->IncrementKillEnemyCount();
-			//goResult_ = true;
+			// 注: BaseEnemyのDamage()経由で死亡コールバックが呼ばれるため、
+			// ここでは直接Dead()ではなくDamage()で大ダメージを与える
+			enemy->Damage(9999); // 即死ダメージ
 		}
 	}
 }
@@ -78,6 +76,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 		// 各武器の弾をチェック
 		const auto& fireBalls = weapon->GetFireBalls();
 		const auto& lasers = weapon->GetLaser();
+		const auto& runas = weapon->GetRuna();
+		const auto& axes = weapon->GetAxe();
+		const auto& boomerangs = weapon->GetBoomerang();
+		const auto& dices = weapon->GetDice();
+		const auto& toxics = weapon->GetToxic();
 
 		for (const auto& bullet : fireBalls) {
 			// 弾が既に死亡している場合はスキップ
@@ -97,20 +100,95 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				const Sphere& enemySphere = enemy->GetSphereCollision();
 
 				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere)) {
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
 					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					enemy->Dead();
+					enemy->Damage(static_cast<int>(bullet->GetDamage()));
 					bullet->Dead();
-					// プレイヤーの敵を倒したカウントをインクリメント
-					if (player_) {
-						player_->IncrementKillEnemyCount();
+				}
+			}
+		}
+
+		for (const auto& bullet : lasers) {
+			// 弾が既に死亡している場合はスキップ
+			if (!bullet->IsAlive()) {
+				continue;
+			}
+
+			const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				// この弾が既にこの敵に当たっている場合はスキップ
+				if (bullet->HasHitEnemy(enemy.get())) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// 弾と敵の衝突判定
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
+					// 衝突した敵を死亡状態にする
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					
+					// この敵に当たったことを記録
+					bullet->MarkEnemyAsHit(enemy.get());
+					
+					// 貫通カウントを減らす
+					if (bullet->GetPenetrationCount() > 0) {
+						bullet->DecrementPenetrationCount();
 					}
 				}
 			}
 		}
-		for (const auto& bullet : lasers) {
+
+		for (const auto& bullet : runas) {
+			// 弾が既に死亡している場合はスキップ
+			if (!bullet->IsAlive()) {
+				continue;
+			}
+
+			const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				// この弾が既にこの敵に当たっている場合はスキップ
+				if (bullet->HasHitEnemy(enemy.get())) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// 弾と敵の衝突判定
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
+					// 衝突した敵を死亡状態にする
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					
+					// この敵に当たったことを記録
+					bullet->MarkEnemyAsHit(enemy.get());
+					
+					// バウンス処理
+					bullet->Bounce();
+				}
+			}
+		}
+
+		for (const auto& bullet : axes) {
 			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
@@ -128,22 +206,94 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				const Sphere& enemySphere = enemy->GetSphereCollision();
 
 				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere)) {
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
 					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					enemy->Dead();
-					
-					if (bullet->GetPenetrationCount() > 0) {
-						bullet->DecrementPenetrationCount();
-					} else {
-						bullet->Dead();
-					}
+					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+				}
+			}
+		}
 
-					// プレイヤーの敵を倒したカウントをインクリメント
-					if (player_) {
-						player_->IncrementKillEnemyCount();
-					}
+		for (const auto& bullet : boomerangs) {
+			// 弾が既に死亡している場合はスキップ
+			if (!bullet->IsAlive()) {
+				continue;
+			}
+
+			const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// 弾と敵の衝突判定
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
+					// 衝突した敵を死亡状態にする
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+				}
+			}
+		}
+
+		for (const auto& bullet : dices) {
+			// 弾が既に死亡している場合はスキップ
+			if (!bullet->IsAlive()) {
+				continue;
+			}
+
+			const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// 弾と敵の衝突判定
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
+					// 衝突した敵を死亡状態にする
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+					// Diceはランダムダメージ(1-6)を与える
+					enemy->Damage(static_cast<int>(bullet->GetRandDamage()));
+				}
+			}
+		}
+
+		for (const auto& bullet : toxics) {
+			// 弾が既に死亡している場合はスキップ
+			if (!bullet->IsAlive()) {
+				continue;
+			}
+
+			const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// 弾と敵の衝突判定
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
+					// 衝突した敵を死亡状態にする
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+					// Toxicは通常ダメージを与える（継続ダメージは将来の実装で追加可能）
+					enemy->Damage(static_cast<int>(bullet->GetDamage()));
 				}
 			}
 		}

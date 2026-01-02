@@ -174,6 +174,16 @@ void Sprite::DrawImGui(const char* objectName) {
 
 	ImGui::Separator();
 
+	// アンカーポイントの選択
+	ImGui::Text("Anchor Point");
+	const char* anchorItems[] = { "TopLeft", "TopRight", "Center", "BottomLeft", "BottomRight" };
+	int currentAnchor = static_cast<int>(anchor_);
+	if (ImGui::Combo("AnchorPoint", &currentAnchor, anchorItems, IM_ARRAYSIZE(anchorItems))) {
+		SetAnchorPoint(static_cast<AnchorPoint>(currentAnchor));
+	}
+
+	ImGui::Separator();
+
 	ImGui::Text("MaterialEdit");
 	ImGui::DragFloat2("uvTranslate", &uvTransform_.translate.x, 0.01f);
 	ImGui::DragFloat2("uvScale", &uvTransform_.scale.x, 0.01f);
@@ -270,6 +280,7 @@ void Sprite::SaveToJson(const std::string& filePath) {
 	jsonManager_->RegistOutput(uvTransform_.rotate, "uvRotate");
 	jsonManager_->RegistOutput(materialData_->color, "color");
 	jsonManager_->RegistOutput(anchorPoint_, "anchorPoint");
+	jsonManager_->RegistOutput(static_cast<uint32_t>(anchor_), "anchor");
 
 	// JSONファイルに書き込み
 	jsonManager_->Write(filePath);
@@ -295,6 +306,12 @@ void Sprite::LoadFromJson(const std::string& filePath) {
 		uvTransform_.rotate = JsonManager::Reverse<float>(values[index++]);
 		materialData_->color = JsonManager::Reverse<Vector4>(values[index++]);
 		anchorPoint_ = JsonManager::Reverse<Vector2>(values[index++]);
+		
+		// anchorをロードして適用
+		if (index < values.size()) {
+			uint32_t anchorValue = JsonManager::Reverse<uint32_t>(values[index++]);
+			SetAnchorPoint(static_cast<AnchorPoint>(anchorValue));
+		}
 	}
 
 	// アンカーポイントが変更された場合は頂点データを更新
@@ -388,9 +405,13 @@ void Sprite::SetTextureRect(const Vector2& leftTop, const Vector2& size) {
 	textureLeftTop_ = leftTop;
 	textureSize_ = size;
 	
-	// 頂点データが存在する場合、テクスチャ座標を更新
+	// スプライトのサイズを切り取りサイズに合わせる
+	size_ = size;
+	
+	// 頂点データが存在する場合、テクスチャ座標と頂点位置を更新
 	if (vertexData_) {
 		UpdateTextureCoords();
+		UpdateVertexPositions();
 	}
 }
 
@@ -406,9 +427,13 @@ void Sprite::SetTextureLeftTop(const Vector2& leftTop) {
 void Sprite::SetTextureSize(const Vector2& size) {
 	textureSize_ = size;
 	
-	// 頂点データが存在する場合、テクスチャ座標を更新
+	// スプライトのサイズを切り取りサイズに合わせる
+	size_ = size;
+	
+	// 頂点データが存在する場合、テクスチャ座標と頂点位置を更新
 	if (vertexData_) {
 		UpdateTextureCoords();
+		UpdateVertexPositions();
 	}
 }
 
@@ -431,4 +456,21 @@ void Sprite::UpdateTextureCoords() {
 	vertexData_[1].texcoord = { tex_left, tex_top };      // 左上
 	vertexData_[2].texcoord = { tex_right, tex_bottom };  // 右下
 	vertexData_[3].texcoord = { tex_right, tex_top };     // 右上
+}
+
+void Sprite::UpdateVertexPositions() {
+	if (!vertexData_) return;
+
+	float width = size_.x;
+	float height = size_.y;
+
+	float left = 0.0f - anchorPoint_.x * size_.x;
+	float right = 1.0f - anchorPoint_.x * size_.x;
+	float top = 0.0f - anchorPoint_.y * size_.y;
+	float bottom = 1.0f - anchorPoint_.y * size_.y;
+
+	vertexData_[0].position = { left, bottom + height, 0.0f, 1.0f };  // 左下
+	vertexData_[1].position = { left, top, 0.0f, 1.0f };              // 左上
+	vertexData_[2].position = { right + width, bottom + height, 0.0f, 1.0f }; // 右下
+	vertexData_[3].position = { right + width, top, 0.0f, 1.0f };     // 右上
 }

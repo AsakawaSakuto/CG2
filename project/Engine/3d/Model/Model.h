@@ -169,6 +169,25 @@ public:
 	/// <returns>true カメラ外 / false カメラ内</returns>
 	bool GetIsInFrustum() const { return isInFrustum_; }
 
+	/// <summary>
+	/// ビルボード機能を有効/無効にする
+	/// </summary>
+	/// <param name="enable">true/false</param>
+	void SetBillboard(bool enable) { useBillboard_ = enable; }
+
+	/// <summary>
+	/// Y軸ビルボード機能を有効/無効にする（Y軸回転のみ）
+	/// </summary>
+	/// <param name="enable">true/false</param>
+	void SetBillboardY(bool enable) { useBillboardY_ = enable; }
+
+	/// <summary>
+	/// ワールド座標変換された特定の頂点位置を取得
+	/// </summary>
+	/// <param name="index">頂点インデックス</param>
+	/// <returns>ワールド座標での頂点位置</returns>
+	Vector3 GetVertexWorldPosition(size_t index) const;
+
 	void UseLight(bool use) { materialData_->enableLighting = use; }
 private:
 
@@ -179,8 +198,10 @@ private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;             // 共有VBV
 		ModelData modelData;                                   // 共有モデルデータ
-		std::string textureName;                               // 使用テクスチャ名
-		uint32_t textureIndex = 0;                             // テクスチャインデックス
+		std::string textureName;                               // 使用テクスチャ名（デフォルト）
+		uint32_t textureIndex = 0;                             // テクスチャインデックス（デフォルト）
+		std::vector<std::string> textureNames;                 // マルチマテリアル用テクスチャ名配列
+		std::vector<uint32_t> textureIndices;                  // マルチマテリアル用テクスチャインデックス配列
 		float boundingRadius = 1.0f;                           // バウンディング半径
 		DirectXCommon* dxCommon = nullptr;                     // SRV解放用
 	};
@@ -212,6 +233,10 @@ private:
 	// テクスチャ関連
 	std::string textureName_;   // 使用テクスチャファイルパス
 	uint32_t textureIndex_ = 0; // 使用テクスチャインデックス
+	
+	// マルチマテリアル対応
+	std::vector<std::string> textureNames_;   // 複数のテクスチャファイルパス
+	std::vector<uint32_t> textureIndices_;    // 複数のテクスチャインデックス
 
 	// 描画切り替えフラグ
 	bool useWireFrame = false;    // ワイヤーフレーム描画、有効/無効
@@ -224,6 +249,12 @@ private:
 	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
 	bool isInFrustum_ = false;             // フラスタム内か否か
 
+	// ビルボード関連
+	bool useBillboard_ = false;    // ビルボード機能、有効/無効
+	bool useBillboardY_ = false;   // Y軸ビルボード機能、有効/無効
+
+	bool useGui_ = false;
+	Transform guiTransform_ = {};
 	//-----------------------------------------------------------//
 
 	// DirectX共通機能へのポインタ

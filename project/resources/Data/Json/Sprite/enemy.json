@@ -3,7 +3,7 @@
   {
     "name": "position",
     "type": 16,
-    "value": [50, 125]
+    "value": [310, 120]
   },
   {
     "name": "scale",
@@ -39,6 +39,11 @@
     "name": "anchorPoint",
     "type": 16,
     "value": [0.500000, 0.500000]
+  },
+  {
+    "name": "anchor",
+    "type": 7,
+    "value": 2
   }
   ]
 }

@@ -19,7 +19,7 @@ void Runa::Update() {
 	transform_.translate += directionToEnemy_ * speed_ * deltaTime_;
 
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = 0.5f;
+	sphereCollision_.radius = 1.0f;
 
 	MyDebugLine::AddShape(sphereCollision_);
 
