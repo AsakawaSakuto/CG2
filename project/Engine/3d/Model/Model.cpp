@@ -113,6 +113,15 @@ void Model::Initialize(const std::string& modelPath) {
 		// 読み込んだテクスチャの番号を取得
 		cache->textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureName);
 
+		// マルチマテリアル対応：すべてのマテリアルのテクスチャを読み込む
+		cache->textureNames.resize(cache->modelData.materials.size());
+		cache->textureIndices.resize(cache->modelData.materials.size());
+		for (size_t i = 0; i < cache->modelData.materials.size(); ++i) {
+			cache->textureNames[i] = cache->modelData.materials[i].textureFilePath;
+			TextureManager::GetInstance()->LoadTexture(cache->textureNames[i]);
+			cache->textureIndices[i] = TextureManager::GetInstance()->GetTextureIndexByFilePath(cache->textureNames[i]);
+		}
+
 		// 頂点リソースをつくる（共有）
   		cache->indexResource = CreateBufferResource(device_.Get(), sizeof(uint32_t) * cache->modelData.indeces.size());
 		cache->indexBufferView.BufferLocation = cache->indexResource->GetGPUVirtualAddress(); // ここのエラーは.mltファイルのTexturePathが間違えてる可能性が高い
@@ -149,6 +158,8 @@ void Model::Initialize(const std::string& modelPath) {
 	modelData_ = cache->modelData;
 	textureName_ = cache->textureName;
 	textureIndex_ = cache->textureIndex;
+	textureNames_ = cache->textureNames;
+	textureIndices_ = cache->textureIndices;
 	indexResource_ = cache->indexResource;
 	indexBufferView_ = cache->indexBufferView;
 	vertexBufferView_ = cache->vertexBufferView;
@@ -157,7 +168,7 @@ void Model::Initialize(const std::string& modelPath) {
 
 	transform_ = { {1.0f,1.0f,1.0f}, {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.0f} };
 	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
-	direction_ = { 1.0f,-1.0f,1.0f };
+	direction_ = { 0.0f,-1.0f,0.0f };
 
 	// 以降はインスタンス専用のリソースのみ作成
 	CreateMaterialResource();
@@ -170,7 +181,9 @@ void Model::Initialize(const std::string& modelPath) {
 
 void Model::UpdateMatrix() {
 
-	cameraData_->worldPosition = camera_.GetTranslate(); // カメラの位置を渡す
+	pointLightData_->position.y = transform_.translate.y + 5.0f;
+
+	cameraData_->worldPosition = camera_.GetTranslate();
 
 	// 行列の内容を更新
 	worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
@@ -210,7 +223,12 @@ void Model::UpdateMatrix() {
 void Model::Draw(Camera& useCamera, const Transform& transform) {
 
 	camera_ = useCamera;
-	transform_ = transform;
+
+	if (useGui_) {
+		transform_ = guiTransform_;
+	} else {
+		transform_ = transform;
+	}
 
 	UpdateMatrix();
 
@@ -263,9 +281,27 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 		}
 	}
 
-	// 描画
-	commandList_->DrawIndexedInstanced(
-		static_cast<UINT>(modelData_.indeces.size()), 1, 0, 0, 0);
+	// サブメッシュがある場合はマルチマテリアル描画
+	if (!modelData_.subMeshes.empty()) {
+		for (const auto& subMesh : modelData_.subMeshes) {
+			// サブメッシュのマテリアルインデックスに対応するテクスチャを設定
+			uint32_t texIndex = textureIndex_; // デフォルト
+			if (subMesh.materialIndex < textureIndices_.size()) {
+				texIndex = textureIndices_[subMesh.materialIndex];
+			}
+			
+			// テクスチャを設定
+			commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(texIndex));
+			
+			// サブメッシュを描画
+			commandList_->DrawIndexedInstanced(
+				subMesh.indexCount, 1, subMesh.indexStart, 0, 0);
+		}
+	} else {
+		// 従来の単一マテリアル描画（後方互換性）
+		commandList_->DrawIndexedInstanced(
+			static_cast<UINT>(modelData_.indeces.size()), 1, 0, 0, 0);
+	}
 }
 
 void Model::SetTexture(const std::string& textureName) {
@@ -289,10 +325,20 @@ Vector3 Model::GetWorldPosition() {
 }
 
 void Model::DrawImGui(const char* objectName) {
-
+	useGui_ = true;
 #ifdef USE_IMGUI
 
 	ImGui::Begin(objectName);
+
+	ImGui::Text("ModelEdit");
+	ImGui::DragFloat3("Translate", &guiTransform_.translate.x, 0.1f);
+	ImGui::DragFloat3("Rotate", &guiTransform_.rotate.x, 0.01f);
+	ImGui::DragFloat3("Scale", &guiTransform_.scale.x, 0.01f);
+	if (ImGui::Button("Reset")) {
+		guiTransform_.translate = { 0.0f,0.0f,0.0f };
+		guiTransform_.rotate = { 0.0f,0.0f,0.0f };
+		guiTransform_.scale = { 1.0f,1.0f,1.0f };
+	}
 
 	ImGui::Text("MaterialEdit");
 	ImGui::DragFloat2("uvTranslate", &uvTransform_.translate.x, 0.01f);
@@ -435,7 +481,7 @@ void Model::CreateMaterialResource() {
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白 (RGBA)
  	materialData_->enableLighting = true;
  	materialData_->uvTransformMatrix = MakeIdentityMatrix();
- 	materialData_->shininess = 100.0f;
+ 	materialData_->shininess = 10000.0f;
 }
 
 void Model::CreateTransformationResource() {
@@ -457,7 +503,7 @@ void Model::CreateDirectionalLightResource() {
 	// 初期化（資料に基づく）
 	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };      // 白い光
 	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };       // 真上から真下
-	directionalLightData_->intensity = 1.0f;                        // 光の強さ
+	directionalLightData_->intensity = 1.0f;                    // 光の強さ
 	directionalLightData_->useLight = true;
 	directionalLightData_->useHalfLambert = true;
 }

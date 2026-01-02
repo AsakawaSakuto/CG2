@@ -28,4 +28,5 @@ public:
 	void PostFrameCleanup();
 private:
 	std::vector<std::unique_ptr<Weapon>> weapons_;
+	int maxWeaponNum_ = 4;
 };

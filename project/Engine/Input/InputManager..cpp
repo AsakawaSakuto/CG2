@@ -130,6 +130,9 @@ void InputManager::SetupDefaultBindings() {
 	bindings_[Action::CONFIRM].push_back(InputBinding(InputSource::KEYBOARD, DIK_Z));
 	bindings_[Action::CONFIRM].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::A));
 
+	// キャンセル
+	bindings_[Action::CANCEL].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::B));
+
 	// ポーズ
 	bindings_[Action::PAUSE].push_back(InputBinding(InputSource::KEYBOARD, DIK_TAB));
 	bindings_[Action::PAUSE].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::START));

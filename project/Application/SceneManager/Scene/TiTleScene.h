@@ -25,5 +25,20 @@ private:
 	Camera camera_;
 	DebugCamera debugCamera_;
 
-	unique_ptr<TitleSceneUI> titleUI_ = make_unique<TitleSceneUI>();
+	TitleSelectState selectState_ = TitleSelectState::PLAY;
+
+	unique_ptr<TitleSceneUI> titleUI_;
+	unique_ptr<SkiningModel> player_;
+	Transform playerTransform_;
+
+	unique_ptr<Model> block_;
+	Transform blockTransform_;
+	unique_ptr<Model> block2_;
+	Transform block2Transform_;
+	unique_ptr<Model> block3_;
+	Transform block3Transform_;
+	unique_ptr<Model> slope_;
+	Transform slopeTransform_;
+	unique_ptr<Model> tree_;
+	Transform treeTransform_;
 };

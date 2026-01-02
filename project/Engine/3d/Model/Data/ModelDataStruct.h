@@ -82,6 +82,8 @@ struct ModelData {
     std::map<std::string, JointWeightData> skinClusterData;
     std::vector<ModelVertexData> vertices;
     std::vector<uint32_t> indeces;
-    ModeldMaterialData material;
+    ModeldMaterialData material; // 後方互換性のため残す（非推奨）
+    std::vector<ModeldMaterialData> materials; // マルチマテリアル対応
+    std::vector<ModelSubMesh> subMeshes; // サブメッシュ情報
     ModelNode rootNode;
 };

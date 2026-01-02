@@ -179,8 +179,10 @@ private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource; // 共有頂点リソース
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;             // 共有VBV
 		ModelData modelData;                                   // 共有モデルデータ
-		std::string textureName;                               // 使用テクスチャ名
-		uint32_t textureIndex = 0;                             // テクスチャインデックス
+		std::string textureName;                               // 使用テクスチャ名（デフォルト）
+		uint32_t textureIndex = 0;                             // テクスチャインデックス（デフォルト）
+		std::vector<std::string> textureNames;                 // マルチマテリアル用テクスチャ名配列
+		std::vector<uint32_t> textureIndices;                  // マルチマテリアル用テクスチャインデックス配列
 		float boundingRadius = 1.0f;                           // バウンディング半径
 		DirectXCommon* dxCommon = nullptr;                     // SRV解放用
 	};
@@ -212,6 +214,10 @@ private:
 	// テクスチャ関連
 	std::string textureName_;   // 使用テクスチャファイルパス
 	uint32_t textureIndex_ = 0; // 使用テクスチャインデックス
+	
+	// マルチマテリアル対応
+	std::vector<std::string> textureNames_;   // 複数のテクスチャファイルパス
+	std::vector<uint32_t> textureIndices_;    // 複数のテクスチャインデックス
 
 	// 描画切り替えフラグ
 	bool useWireFrame = false;    // ワイヤーフレーム描画、有効/無効
@@ -224,6 +230,8 @@ private:
 	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
 	bool isInFrustum_ = false;             // フラスタム内か否か
 
+	bool useGui_ = false;
+	Transform guiTransform_ = {};
 	//-----------------------------------------------------------//
 
 	// DirectX共通機能へのポインタ

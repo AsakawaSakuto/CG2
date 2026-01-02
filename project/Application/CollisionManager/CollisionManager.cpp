@@ -3,7 +3,6 @@
 #include "GameObject/EnemyManager/EnemyManager.h"
 #include "GameObject/Player/WeaponManager/WeaponManager.h"
 #include "GameObject/Player/WeaponManager/Weapon/Weapon.h"
-#include "GameObject/Player/WeaponManager/Weapon/Bullet/Bullet.h"
 #include "Utility/Collision/Collision.h"
 
 void CollisionManager::Initialize() {
@@ -78,6 +77,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 		// 各武器の弾をチェック
 		const auto& fireBalls = weapon->GetFireBalls();
 		const auto& lasers = weapon->GetLaser();
+		const auto& runas = weapon->GetRuna();
 
 		for (const auto& bullet : fireBalls) {
 			// 弾が既に死亡している場合はスキップ
@@ -110,6 +110,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				}
 			}
 		}
+
 		for (const auto& bullet : lasers) {
 			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
@@ -136,9 +137,40 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					
 					if (bullet->GetPenetrationCount() > 0) {
 						bullet->DecrementPenetrationCount();
-					} else {
-						bullet->Dead();
 					}
+
+					// プレイヤーの敵を倒したカウントをインクリメント
+					if (player_) {
+						player_->IncrementKillEnemyCount();
+					}
+				}
+			}
+		}
+
+		for (const auto& bullet : runas) {
+			// 弾が既に死亡している場合はスキップ
+			if (!bullet->IsAlive()) {
+				continue;
+			}
+
+			const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// 弾と敵の衝突判定
+				if (Collision::IsHit(bulletSphere, enemySphere)) {
+					// 衝突した敵を死亡状態にする
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+					enemy->Dead();
+					bullet->Bounce();
 
 					// プレイヤーの敵を倒したカウントをインクリメント
 					if (player_) {

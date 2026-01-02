@@ -1,5 +1,4 @@
 #pragma once
-#include "GameObject/Player/WeaponManager/Weapon/Bullet/bullet.h"
 #include "GameObject/Player/WeaponManager/WeaponStatus.h"
 #include "Camera/Camera.h"
 #include <queue>
@@ -7,6 +6,7 @@
 #include "FireBall/FireBall.h"
 #include "Laser/Laser.h"
 #include "Runa/Runa.h"
+#include "Axe/Axe.h"
 
 /// <summary>
 /// Update関数をラムダ式にして、Enumでそれに応じたUpdate関数を持ってくるやり方を冬休みにやる
@@ -34,12 +34,14 @@ private:
 	void FireBallUpdate();
 	void LaserUpdate();
 	void RunaUpdate();
+	void AxeUpdate();
 
 private:
 
 	std::vector<std::unique_ptr<FireBall>> fireBall_;
 	std::vector<std::unique_ptr<Laser>> laser_;
 	std::vector<std::unique_ptr<Runa>> runa_;
+	std::vector<std::unique_ptr<Axe>> axe_;
 
 	Vector3 spawnOffSet_ = { 0.0f, 1.0f, 0.0f };
 

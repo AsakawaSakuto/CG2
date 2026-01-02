@@ -10,6 +10,7 @@
 enum class Action {
 	// 決定
 	CONFIRM,
+	CANCEL,
 	PAUSE,
 	INTERACT,
 	CROUCHING,

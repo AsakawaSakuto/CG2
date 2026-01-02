@@ -24,7 +24,7 @@ void TestScene::Initialize() {
 
 	testSprite_->Initialize("icon/fireBall.png", { 64.0f,64.0f });
 
-	cube_->Initialize("cube.obj");
+	cube_->Initialize("weapon/axe/Axe.obj");
     cubeTransform_.translate = { -1.5f,2.5f,0.0f };
 
 	spinCube_->Initialize("Animation/cube/AnimatedCube.gltf");
@@ -171,7 +171,7 @@ void TestScene::Draw() {
 
 	bitmapFont_.Draw();
 
-	testGauge_->Draw();
+	//testGauge_->Draw();
 
     MyDebugLine::Draw(camera_);
 }
@@ -182,7 +182,9 @@ void TestScene::DrawImGui() {
     auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->DrawImGui();
 
-	testOBB_.DrawImGui("testOBB");
+	cube_->DrawImGui("test");
+
+	/*testOBB_.DrawImGui("testOBB");
     testAABB_.DrawImGui("testAABB");
     testSphere_.DrawImGui("testSphere");
     testOvalSphere_.DrawImGui("testOvalSphere");
@@ -206,7 +208,7 @@ void TestScene::DrawImGui() {
 
 	bitmapFont_.DrawImGui("bitmapFont");
 
-	testGauge_->DrawImGui("testGauge");
+	testGauge_->DrawImGui("testGauge");*/
 
     //testSprite_->DrawImGui("testSprite");
 

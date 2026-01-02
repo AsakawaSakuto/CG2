@@ -12,6 +12,7 @@ void FireBall::Initialize() {
 	// Particlesクラス内部で isInitialized_ フラグを使用して判定
 	particle_->Initialize("fireBall");
 	particle2_->Initialize("fireBall2");
+
 }
 
 void FireBall::Update() {
@@ -19,7 +20,7 @@ void FireBall::Update() {
 	transform_.translate += directionToEnemy_ * speed_ * deltaTime_;
 
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = 0.5f;
+	sphereCollision_.radius = 1.0f;
 
 	MyDebugLine::AddShape(sphereCollision_);
 

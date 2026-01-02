@@ -97,6 +97,8 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.cpp" />
+    <ClCompile Include="Engine\2d\TextRenderer\TextRenderer.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Axe\Axe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -235,6 +237,9 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.h" />
+    <ClInclude Include="Engine\2d\TextRenderer\TextRenderer.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Axe\Axe.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\BaseWeapon.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -246,5 +251,6 @@
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />
+    <None Include="Engine\Audio\AudioDocs.md" />
   </ItemGroup>
 </Project>

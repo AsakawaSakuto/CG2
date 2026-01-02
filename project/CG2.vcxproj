@@ -158,6 +158,7 @@
     <ClCompile Include="Application\GameObject\Player\AnimationController\AnimationController.cpp" />
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Axe\Axe.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.cpp" />
@@ -180,6 +181,7 @@
     <ClCompile Include="Application\SceneManager\Test\TestScene.cpp" />
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
     <ClCompile Include="Engine\2d\Gauge\Gauge.cpp" />
+    <ClCompile Include="Engine\2d\TextRenderer\TextRenderer.cpp" />
     <ClCompile Include="Engine\3d\Line\Data\Line.cpp" />
     <ClCompile Include="Engine\3d\Line\LineManager.cpp" />
     <ClCompile Include="Engine\3d\Model\Data\Animation\Function\AnimationFunction.cpp" />
@@ -274,7 +276,9 @@
     <ClInclude Include="Application\GameObject\Player\PlayerStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponManager.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponStatus.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Axe\Axe.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\BaseWeapon.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
@@ -300,6 +304,7 @@
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
     <ClInclude Include="Engine\2d\Gauge\Gauge.h" />
     <ClInclude Include="Engine\2d\Sprite\SpriteDataStruct.h" />
+    <ClInclude Include="Engine\2d\TextRenderer\TextRenderer.h" />
     <ClInclude Include="Engine\3d\Line\MyDebugLine.h" />
     <ClInclude Include="Engine\3d\Line\Data\Line.h" />
     <ClInclude Include="Engine\3d\Line\LineManager.h" />
@@ -455,6 +460,10 @@
   <ItemGroup>
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
+    <None Include="Engine\Audio\AudioDocs.md">
+      <SubType>
+      </SubType>
+    </None>
     <None Include="Engine\Utility\ImGui\IMPLEMENTATION_COMPLETE.md" />
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />

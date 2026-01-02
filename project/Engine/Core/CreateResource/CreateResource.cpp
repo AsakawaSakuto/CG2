@@ -260,33 +260,81 @@ ModelData LoadObject3dFile(const std::string& filepath) {
 
     modelData.rootNode = modelData.rootNode.ReadNode(scene->mRootNode);
 
+    // マテリアルを先に読み込む
+    modelData.materials.resize(scene->mNumMaterials);
+    for (uint32_t matIndex = 0; matIndex < scene->mNumMaterials; ++matIndex) {
+        aiMaterial* material = scene->mMaterials[matIndex];
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+            aiString texPath;
+            if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+                std::string textureFilePath = directoryPath + "/" + texPath.C_Str();
+                
+                // uvChecker.pngが設定されている場合、white1x1.pngに置き換え
+                if (textureFilePath.find("uvChecker.png") != std::string::npos) {
+                    modelData.materials[matIndex].textureFilePath = "resources/image/white1x1.png";
+                } else {
+                    modelData.materials[matIndex].textureFilePath = textureFilePath;
+                }
+            } else {
+                modelData.materials[matIndex].textureFilePath = "resources/image/white1x1.png";
+            }
+        } else {
+            modelData.materials[matIndex].textureFilePath = "resources/image/white1x1.png";
+        }
+    }
+
+    // マテリアルがない場合のデフォルト
+    if (modelData.materials.empty()) {
+        modelData.materials.push_back({ "resources/image/white1x1.png" });
+    }
+
+    // 各メッシュを処理
+    uint32_t indexOffset = 0;
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());
         assert(mesh->HasTextureCoords(0));
-        modelData.vertices.resize(mesh->mNumVertices);
 
+        uint32_t vertexStart = static_cast<uint32_t>(modelData.vertices.size());
+
+        // 頂点データを追加
         for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+            ModelVertexData vertex;
             aiVector3D& position = mesh->mVertices[vertexIndex];
             aiVector3D& normal = mesh->mNormals[vertexIndex];
             aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-            // 右手系→左手系への変換を忘れずに
-            modelData.vertices[vertexIndex].position = { -position.x, position.y, position.z, 1.0f };
-            modelData.vertices[vertexIndex].normal = { -normal.x, normal.y, normal.z };
-            modelData.vertices[vertexIndex].texcoord = { texcoord.x, texcoord.y };
+            // 右手系→左手系への変換
+            vertex.position = { -position.x, position.y, position.z, 1.0f };
+            vertex.normal = { -normal.x, normal.y, normal.z };
+            vertex.texcoord = { texcoord.x, texcoord.y };
+            modelData.vertices.push_back(vertex);
         }
 
-        // ★インデックスの読み込み（二重ループを削除）
+        // インデックスデータを追加
+        uint32_t indexStart = static_cast<uint32_t>(modelData.indeces.size());
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
             aiFace& face = mesh->mFaces[faceIndex];
             assert(face.mNumIndices == 3); // 三角形のみ対応
 
             for (uint32_t element = 0; element < face.mNumIndices; ++element) {
                 uint32_t vertexIndex = face.mIndices[element];
-                modelData.indeces.push_back(vertexIndex);
+                modelData.indeces.push_back(vertexStart + vertexIndex);
             }
         }
+        uint32_t indexCount = static_cast<uint32_t>(modelData.indeces.size()) - indexStart;
 
+        // サブメッシュ情報を追加
+        ModelSubMesh subMesh;
+        subMesh.indexStart = indexStart;
+        subMesh.indexCount = indexCount;
+        subMesh.materialIndex = mesh->mMaterialIndex;
+        // マテリアルインデックスが範囲外の場合はクランプ
+        if (subMesh.materialIndex >= modelData.materials.size()) {
+            subMesh.materialIndex = 0;
+        }
+        modelData.subMeshes.push_back(subMesh);
+
+        // スキニング情報の処理
         for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
             aiBone* bone = mesh->mBones[boneIndex];
             std::string jointName = bone->mName.C_Str();
@@ -301,26 +349,15 @@ ModelData LoadObject3dFile(const std::string& filepath) {
             jointWeightData.inverseBindPoseMatrix = InverseMatrix(bindPoseMatrix);
 
             for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
-                jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
+                jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, vertexStart + bone->mWeights[weightIndex].mVertexId });
             }
         }
     }
 
-    bool hasTexture = false;
-    for (uint32_t matIndex = 0; matIndex < scene->mNumMaterials; ++matIndex) {
-        aiMaterial* material = scene->mMaterials[matIndex];
-        if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-            aiString texPath;
-            if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
-                modelData.material.textureFilePath = directoryPath + "/" + texPath.C_Str();
-                hasTexture = true;
-                break; // 今は1枚だけ読み込む
-            }
-        }
-    }
-
-    // テクスチャが見つからなかった場合
-    if (!hasTexture) {
+    // 後方互換性のため、最初のマテリアルを material に設定
+    if (!modelData.materials.empty()) {
+        modelData.material = modelData.materials[0];
+    } else {
         modelData.material.textureFilePath = "resources/image/uvChecker.png";
     }
     
