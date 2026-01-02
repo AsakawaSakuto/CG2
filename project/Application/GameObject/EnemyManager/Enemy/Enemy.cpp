@@ -33,6 +33,11 @@ void Enemy::Initialize() {
 
 void Enemy::Update() {
 	
+	if (status_.hp < 0) {
+		Dead(); 
+		return;
+	}
+
 	Move();
 	
 	// AABBの中心をエネミーの位置に設定
@@ -43,8 +48,6 @@ void Enemy::Update() {
 		ResolveMapCollision();
 	}
 
-	//model_->Update();
-
 	transform_.scale = MyEasing::Lerp(Vector3({0.0f,0.0f,0.0f}), Vector3({ 1.0f,1.0f,1.0f }), 
 		scaleTimer_.GetProgress(), EaseType::Linear);
 
@@ -52,6 +55,17 @@ void Enemy::Update() {
 	sphereCollision_.radius = collicionRadius_;
 
 	scaleTimer_.Update();
+
+	if (invicibilityTimer_.IsActive() && invicibilityTimer_.GetProgress() < 0.9f) {
+		model_->SetColor3({ 0.1f,0.1f,0.1f });
+	} else {
+		model_->SetColor3({ 1.0f,1.0f,1.0f });
+	}
+
+	invicibilityTimer_.Update();
+	if (invicibilityTimer_.IsFinished()) {
+		invicibilityTimer_.Reset();
+	}
 
 #ifdef USE_IMGUI
 	// デバッグ描画はF1キーで切り替え（パフォーマンス向上のため）

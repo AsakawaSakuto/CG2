@@ -3,6 +3,7 @@
 #include "EnemyManager.h"
 #include "Utility/Collision/Collision.h"
 #include "Map/Map3D.h"
+#include "GameObject/Player/Player.h"
 
 void EnemyManager::Initialize() {
 	spawnTimer_.Start(1.0f, true);
@@ -23,6 +24,13 @@ void EnemyManager::Update() {
 			// Map3Dを設定
 			if (map_) {
 				enemy->SetMap(map_);
+			}
+			
+			// 死亡時のコールバックを設定（Playerのキルカウントをインクリメント）
+			if (player_) {
+				enemy->SetOnDeathCallback([this]() {
+					player_->IncrementKillEnemyCount();
+				});
 			}
 
 			int i = random_.Int(0, 1);

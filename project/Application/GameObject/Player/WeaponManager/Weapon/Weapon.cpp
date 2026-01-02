@@ -29,7 +29,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 		status_.intervalTime = 0.5f;
 		status_.shotMaxCount = 1;
 		status_.shotNowCount = 0;
-		status_.damage = 10.0f;
+		status_.damage = 5.0f;
 		status_.criticalRand = 10;
 		status_.bounceCount = 0;
 		status_.penetrationCount = 2;
@@ -43,11 +43,11 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 3.0f;
 		status_.intervalTime = 1.0f;
-		status_.shotMaxCount = 1;
+		status_.shotMaxCount = 2;
 		status_.shotNowCount = 0;
-		status_.damage = 10.0f;
+		status_.damage = 5.0f;
 		status_.criticalRand = 10;
-		status_.bounceCount = 1;
+		status_.bounceCount = 2;
 		status_.penetrationCount = 0;
 		status_.nockBackPower = 0.0f;
 		status_.durationTime = 0.0f;
@@ -61,7 +61,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 		status_.intervalTime = 1.0f;
 		status_.shotMaxCount = 1;
 		status_.shotNowCount = 0;
-		status_.damage = 10.0f;
+		status_.damage = 5.0f;
 		status_.criticalRand = 10;
 		status_.bounceCount = 0;
 		status_.penetrationCount = 0;
@@ -123,6 +123,7 @@ void Weapon::FireBallUpdate() {
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
+		bullet->SetDamage(status_.damage);
 		fireBall_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
@@ -156,6 +157,8 @@ void Weapon::LaserUpdate() {
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
+		bullet->SetDamage(status_.damage);
+		bullet->SetPenetrationCount(status_.penetrationCount);
 		laser_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
@@ -187,6 +190,7 @@ void Weapon::RunaUpdate() {
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
+		bullet->SetDamage(status_.damage);
 		bullet->SetBounceCount(status_.bounceCount);
 		runa_.push_back(std::move(bullet));
 		status_.shotNowCount++;
@@ -216,6 +220,7 @@ void Weapon::AxeUpdate() {
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
+		bullet->SetDamage(status_.damage);
 		bullet->SetLifeTime(status_.lifeTime);
 		axe_.push_back(std::move(bullet));
 		status_.shotNowCount++;

@@ -169,6 +169,18 @@ public:
 	/// <returns>true カメラ外 / false カメラ内</returns>
 	bool GetIsInFrustum() const { return isInFrustum_; }
 
+	/// <summary>
+	/// ビルボード機能を有効/無効にする
+	/// </summary>
+	/// <param name="enable">true/false</param>
+	void SetBillboard(bool enable) { useBillboard_ = enable; }
+
+	/// <summary>
+	/// Y軸ビルボード機能を有効/無効にする（Y軸回転のみ）
+	/// </summary>
+	/// <param name="enable">true/false</param>
+	void SetBillboardY(bool enable) { useBillboardY_ = enable; }
+
 	void UseLight(bool use) { materialData_->enableLighting = use; }
 private:
 
@@ -229,6 +241,10 @@ private:
 	bool useDrawFrustumCulling_ = true;   // カメラ外の描画、有効/無効
 	bool useUpdateFrustumCulling_ = false; // カメラ外の更新、有効/無効
 	bool isInFrustum_ = false;             // フラスタム内か否か
+
+	// ビルボード関連
+	bool useBillboard_ = false;    // ビルボード機能、有効/無効
+	bool useBillboardY_ = false;   // Y軸ビルボード機能、有効/無効
 
 	bool useGui_ = false;
 	Transform guiTransform_ = {};

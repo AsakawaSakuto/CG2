@@ -185,8 +185,48 @@ void Model::UpdateMatrix() {
 
 	cameraData_->worldPosition = camera_.GetTranslate();
 
+	// ビルボード行列の計算
+	Matrix4x4 billboardMatrix = MakeIdentityMatrix();
+	
+	if (useBillboard_) {
+		// カメラのワールド行列から回転成分のみを取得してビルボード行列を作成
+		Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_.GetScale(), camera_.GetRotate(), camera_.GetTranslate());
+		Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+		billboardMatrix = MultiplyMatrix(backToFrontMatrix, cameraMatrix);
+		// 移動成分を除去（回転のみ）
+		billboardMatrix.m[3][0] = 0.0f;
+		billboardMatrix.m[3][1] = 0.0f;
+		billboardMatrix.m[3][2] = 0.0f;
+	} else if (useBillboardY_) {
+		// Y軸ビルボード：カメラへの方向からY軸回転のみを計算
+		Vector3 cameraPos = camera_.GetTranslate();
+		Vector3 objPos = transform_.translate;
+		Vector3 toCamera = { cameraPos.x - objPos.x, 0.0f, cameraPos.z - objPos.z }; // Y成分を0にしてY軸のみ
+		
+		// カメラへの方向を正規化
+		float length = std::sqrt(toCamera.x * toCamera.x + toCamera.z * toCamera.z);
+		if (length > 0.0001f) {
+			toCamera.x /= length;
+			toCamera.z /= length;
+			
+			// Y軸回転角度を計算
+			float angle = std::atan2(toCamera.x, toCamera.z);
+			billboardMatrix = MakeRotateYMatrix(angle);
+		}
+	}
+
 	// 行列の内容を更新
-	worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(transform_.scale);
+	Matrix4x4 rotateMatrix = MakeRotateXYZMatrix(transform_.rotate);
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(transform_.translate);
+	
+	// ビルボードを適用する場合は、回転行列の代わりにビルボード行列を使用
+	if (useBillboard_ || useBillboardY_) {
+		worldMatrix = MultiplyMatrix(scaleMatrix, MultiplyMatrix(billboardMatrix, translateMatrix));
+	} else {
+		worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	}
+	
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_.GetScale(), camera_.GetRotate(), camera_.GetTranslate());
 	Matrix4x4 viewMatrix = InverseMatrix(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(camera_.GetFovY(), static_cast<float>(WinApp::kClientWidth_) / static_cast<float>(WinApp::kClientHeight_), camera_.GetNearClip(), camera_.GetFarClip());
@@ -277,7 +317,7 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 			isInFrustum_ = true;
 			return;
 		} else {
-			isInFrustum_ = false;
+		    isInFrustum_ = false;
 		}
 	}
 
@@ -360,6 +400,13 @@ void Model::DrawImGui(const char* objectName) {
 	ImGui::Text("Culling");
 	ImGui::Checkbox("Enable Frustum Culling", &useDrawFrustumCulling_);
 	ImGui::DragFloat("Bounding Radius", &boundingRadius_, 0.1f, 0.1f, 100.0f);
+	
+	ImGui::Separator();
+
+	ImGui::Text("Billboard");
+	ImGui::Checkbox("Enable Billboard", &useBillboard_);
+	ImGui::SameLine();
+	ImGui::Checkbox("Billboard Y Only", &useBillboardY_);
 	
 	ImGui::Separator();
 

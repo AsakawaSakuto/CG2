@@ -268,6 +268,7 @@
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\EnemyManager.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\Enemy\BaseEnemy.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\Enemy.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.h" />
@@ -328,7 +329,6 @@
     <ClInclude Include="Engine\Input\InputManager.h" />
     <ClInclude Include="Engine\Input\MyInput.h" />
     <ClInclude Include="Application\Map\Map3D.h" />
-    <ClInclude Include="Application\Map\Map3DSamples.h" />
     <ClInclude Include="Engine\Math\Type\Matrix2x2.h" />
     <ClInclude Include="Engine\Math\Type\Matrix3x3.h" />
     <ClInclude Include="Engine\OffScreen\PostEffect\PostEffectManager.h" />
@@ -458,7 +458,9 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="docs\EnemyKillCountSystem.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
+    <None Include="docs\WeaponCollisionFix.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="Engine\Audio\AudioDocs.md">
       <SubType>

@@ -2,10 +2,11 @@
 #include "GameObject/BaseGameObject.h"
 #include "EngineSystem.h"
 #include "Utility/Collision/Type/AABB.h"
+#include "BaseEnemy.h"
 
 class Map3D; // 前方宣言
 
-class Enemy : public BaseGameObject {
+class Enemy : public BaseGameObject, public BaseEnemy {
 public:
     void Initialize() override;
     void Update() override;
@@ -21,6 +22,7 @@ public:
 	// Map3Dを設定
 	void SetMap(Map3D* map) { map_ = map; }
 
+	bool IsActiveInvincibleTimer() const { return invicibilityTimer_.IsActive(); }
 private:
 
     void Move();
@@ -33,6 +35,7 @@ private:
 
 private:
     unique_ptr<Model> model_ = make_unique<Model>();
+
 	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
 	float moveSpeed_ = 2.0f; // デフォルトの移動速度
 	float collicionRadius_ = 0.5f;

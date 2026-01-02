@@ -20,12 +20,13 @@ public:
 	void Draw(Camera camera);
 
 	void SetPlayerPosition(const Vector3& position) { playerPosition_ = position; }
-	void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction.Normalized(); }
+	void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction; }
 
 	// 弾のリストへのアクセス（const参照）
 	const std::vector<std::unique_ptr<FireBall>>& GetFireBalls() const { return fireBall_; }
 	const std::vector<std::unique_ptr<Laser>>& GetLaser() const { return laser_; }
 	const std::vector<std::unique_ptr<Runa>>& GetRuna() const { return runa_; }
+	const std::vector<std::unique_ptr<Axe>>& GetAxe() const { return axe_; }
 
 	void PostFrameCleanup();
 	
@@ -53,7 +54,7 @@ private:
 
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
-
+	
 	template <class T>
 	void EraseDead(std::vector<std::unique_ptr<T>>& v) {
 		v.erase(

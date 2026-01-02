@@ -4,16 +4,26 @@ void AnimationController::Initialize(std::map<PlayerMotion, Animation> animation
 	model_ = std::make_unique<SkiningModel>();
 	model_->Initialize("Player/Animation/idle.gltf");
 	model_->SetTexture("resources/image/white16x16.png");
-	model_->UseLight(false);
+	//model_->UseLight(false);
+
+	shadowModel_ = std::make_unique<SkiningModel>();
+	shadowModel_->Initialize("Player/Animation/idle.gltf");
+	shadowModel_->SetTexture("resources/image/white16x16.png");
+	shadowModel_->UseLight(false);
+	shadowModel_->SetColor3({ 0.1f,0.1f,0.1f });
 
 	currentMotionType_ = PlayerMotion::Idle;
 	animations_ = animationMap;
 
 	transform_.translate = { 10.0f,100.0f,10.0f };
+	shadowTransform_.scale.y = 0.01f;
 }
 
 void AnimationController::Update(float deltaTime, const Transform& transform) {
 	transform_ = transform;
+	shadowTransform_.translate.x = transform.translate.x;
+	shadowTransform_.translate.z = transform.translate.z;
+	shadowTransform_.rotate = transform.rotate;
 	animationTime_ += deltaTime;
 
 	// 補間中の処理
@@ -56,6 +66,7 @@ void AnimationController::Update(float deltaTime, const Transform& transform) {
 
 void AnimationController::Draw(Camera& camera) {
 	model_->Draw(camera, transform_);
+	shadowModel_->Draw(camera, shadowTransform_);
 }
 
 void AnimationController::SetMotion(PlayerMotion motion, float calculationTime, bool isLoop) {
@@ -152,4 +163,6 @@ void AnimationController::SetAnimation(const Animation& animation, float beginTi
 	// モデルに反映
 	model_->SetAnimationData(currentAnimation_);
 	model_->SetAnimationTime(animationTime_);
+	shadowModel_->SetAnimationData(currentAnimation_);
+	shadowModel_->SetAnimationTime(animationTime_);
 }

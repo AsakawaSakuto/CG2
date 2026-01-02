@@ -53,6 +53,9 @@ void GameScene::Initialize() {
 
 	// プレイヤーにEnemyManagerへの参照を設定
 	player_->SetEnemyManager(enemyManager_.get());
+	
+	// EnemyManagerにPlayerへの参照を設定
+	enemyManager_->SetPlayer(player_.get());
 
 	// プレイヤーにMap3Dへの参照を設定
 	player_->SetMap(map3D_.get());

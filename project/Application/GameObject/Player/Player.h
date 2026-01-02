@@ -129,9 +129,17 @@ private:
 	/// <returns>地面に接している場合true</returns>
 	bool IsGroundedOnMap();
 
+	/// <summary>
+	/// プレイヤーの真下の地面の高さを取得
+	/// </summary>
+	/// <returns>地面のY座標</returns>
+	float GetGroundHeight() const;
+
 private:
 	unique_ptr<AnimationController> model_;
 	PlayerMotion currentMotion_ = PlayerMotion::Idle;
+
+	Transform shadowTransform_;
 
 	Transform expGetRangeTransform_;
 

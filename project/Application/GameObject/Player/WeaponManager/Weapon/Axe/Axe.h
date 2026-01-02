@@ -12,12 +12,10 @@ public:
     ~Axe() override = default;
 
     void SetPosition(const Vector3& position) { transform_.translate = position; }
-    void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction; }
 	void SetLifeTime(float lifeTime) { lifeTime_ = lifeTime; }
 
 private:
 	unique_ptr<Model> model_ = make_unique<Model>();
-    Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
     GameTimer lifeTimer_;
 	GameTimer moveTimer_;
 	GameTimer stopTimer_;

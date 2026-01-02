@@ -218,7 +218,6 @@
     <ClInclude Include="Engine\Math\Type\Matrix2x2.h" />
     <ClInclude Include="Engine\Math\Type\Matrix3x3.h" />
     <ClInclude Include="Application\Map\Map3D.h" />
-    <ClInclude Include="Application\Map\Map3DSamples.h" />
     <ClInclude Include="Engine\3d\Shadow\ShadowMap.h" />
     <ClInclude Include="Engine\3d\Shadow\ShadowMapManager.h" />
     <ClInclude Include="Application\Map\JarManager\JarManager.h" />
@@ -240,6 +239,7 @@
     <ClInclude Include="Engine\2d\TextRenderer\TextRenderer.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Axe\Axe.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\BaseWeapon.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\Enemy\BaseEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -252,5 +252,7 @@
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />
     <None Include="Engine\Audio\AudioDocs.md" />
+    <None Include="docs\WeaponCollisionFix.md" />
+    <None Include="docs\EnemyKillCountSystem.md" />
   </ItemGroup>
 </Project>

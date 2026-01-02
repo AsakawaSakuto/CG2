@@ -3,6 +3,7 @@
 #include "GameObject/EnemyManager/ExpItem/ExpItem.h"
 
 class Map3D; // 前方宣言
+class Player; // 前方宣言
 
 class EnemyManager {
 public:
@@ -22,6 +23,9 @@ public:
 	
 	// Map3Dを設定
 	void SetMap(Map3D* map) { map_ = map; }
+	
+	// Playerへの参照を設定
+	void SetPlayer(Player* player) { player_ = player; }
 
 private:
 
@@ -35,4 +39,7 @@ private:
 	
 	// Map3Dへの参照
 	Map3D* map_ = nullptr;
+	
+	// Playerへの参照
+	Player* player_ = nullptr;
 };
