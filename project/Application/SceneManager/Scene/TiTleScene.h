@@ -2,6 +2,8 @@
 #include"EngineSystem.h"
 #include"SceneManager/IScene.h"
 #include"GameUI/TitleSceneUI/TitleSceneUI.h"
+#include"GameObject/Player/playerStatus.h"
+#include"GameObject/Player/WeaponManager/WeaponStatus.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -25,7 +27,10 @@ private:
 	Camera camera_;
 	DebugCamera debugCamera_;
 
-	TitleSelectState selectState_ = TitleSelectState::PLAY;
+	TitleSelectState selectState_ = TitleSelectState::Play;
+
+	PlayerName playerName_ = PlayerName::PowerMan;
+	WeaponName weaponName_ = WeaponName::FireBall;
 
 	unique_ptr<TitleSceneUI> titleUI_;
 	unique_ptr<SkiningModel> player_;

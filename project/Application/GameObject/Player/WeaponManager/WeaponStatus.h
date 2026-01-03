@@ -10,6 +10,8 @@ enum class WeaponName {
 	Boomerang, // ブーメラン
 	Dice,      // ダイス
 	Toxic,     // トキシック
+	Area,      // エリア
+	Gun,       // ガン
 
 	Count
 };
@@ -32,4 +34,5 @@ struct WeaponStatus {
 	float durationTime;      // 持続時間
 	float lifeTime;          // 弾の寿命
 	float sizeRate = 1.0f;   // 弾の大きさ
+	bool useRandomTarget = false; // ランダムターゲット選択を使用するか
 };

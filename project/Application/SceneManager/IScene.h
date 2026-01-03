@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include "Core/WinApp/WinApp.h"
+#include "GameObject/Player/playerStatus.h"
+#include "GameObject/Player/WeaponManager/WeaponStatus.h"
 
 using std::unique_ptr;
 using std::make_unique;
@@ -21,6 +23,11 @@ protected:
 	void ChangeScene(SCENE nextSceneName) { nowSceneName_ = nextSceneName; }
 
     void Quit();
+
+    // シーン間でデータを受け渡すための静的メンバ
+    static PlayerName selectedPlayerName_;
+    static WeaponName selectedWeaponName_;
+
 public:
 
     virtual void Initialize() = 0;
@@ -31,4 +38,10 @@ public:
     virtual ~IScene() {}
     SCENE GetSceneNo();
     void DrawSceneName();
+
+    // シーン間データ受け渡し用の静的メソッド
+    static void SetSelectedPlayerName(PlayerName name) { selectedPlayerName_ = name; }
+    static void SetSelectedWeaponName(WeaponName name) { selectedWeaponName_ = name; }
+    static PlayerName GetSelectedPlayerName() { return selectedPlayerName_; }
+    static WeaponName GetSelectedWeaponName() { return selectedWeaponName_; }
 };

@@ -20,6 +20,7 @@ public:
 	// 全ての壺の位置を取得（ChestManagerで使用）
 	std::vector<Vector3> GetAllJarPositions() const;
 	
+	void SetAABBCollision(const AABB& aabb) { aabbCollision_ = aabb; }
 private:
 	// 最上面のNormalブロックを見つける
 	bool FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const;
@@ -36,7 +37,9 @@ private:
 	
 	std::vector<std::unique_ptr<MinJar>> minJars_;
 	std::vector<std::unique_ptr<MaxJar>> maxJars_;
-	
+
+	AABB aabbCollision_;
+
 	// 壺同士の最小距離
 	float minJarDistance_ = 2.0f;
 };

@@ -1,9 +1,12 @@
 #pragma once
 
 enum class PlayerName {
-	DashMan,
-	JumpMan,
+	PowerMan,
 	TankMan,
+	JumpMan,
+	SpeedMan,
+
+	Count
 };
 
 struct PlayerStatus {

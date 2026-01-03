@@ -20,7 +20,7 @@ void TitleScene::Initialize() {
 	player_->SetTexture();
 	playerTransform_.SetAllScale(1.5f);
 	playerTransform_.rotate.y = 3.8f;
-	playerTransform_.translate = { 0.0f,1.0f,-10.0f };
+	playerTransform_.translate = { -0.7f,1.0f,-10.0f };
 	player_->SetTransform(playerTransform_);
 
 	block_ = make_unique<Model>();
@@ -55,25 +55,25 @@ void TitleScene::Initialize() {
 void TitleScene::Update() {
 	
 	switch (selectState_) {
-	case TitleSelectState::PLAY:
+	case TitleSelectState::Play:
 
 		if (MyInput::Trigger(Action::CELECT_DOWN)) {
-			selectState_ = TitleSelectState::EDIT;
+			selectState_ = TitleSelectState::Edit;
 		}
-
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			selectState_ = TitleSelectState::SELECT;
+			selectState_ = TitleSelectState::PlayerSelect;
+			playerName_ = PlayerName::PowerMan;
+			weaponName_ = WeaponName::FireBall;
 		}
 
 		break;
-	case TitleSelectState::EDIT:
+	case TitleSelectState::Edit:
 
 		if (MyInput::Trigger(Action::CELECT_UP)) {
-			selectState_ = TitleSelectState::PLAY;
+			selectState_ = TitleSelectState::Play;
 		}
-
 		if (MyInput::Trigger(Action::CELECT_DOWN)) {
-			selectState_ = TitleSelectState::QUIT;
+			selectState_ = TitleSelectState::Quit;
 		}
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
@@ -81,26 +81,180 @@ void TitleScene::Update() {
 		}
 
 		break;
-	case TitleSelectState::QUIT:
+	case TitleSelectState::Quit:
 
 		if (MyInput::Trigger(Action::CELECT_UP)) {
-			selectState_ = TitleSelectState::EDIT;
+			selectState_ = TitleSelectState::Edit;
 		}
-
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			Quit();
 		}
 
 		break;
 
-	case TitleSelectState::SELECT:
+	case TitleSelectState::PlayerSelect:
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
+			selectState_ = TitleSelectState::WeaponSelect;
+		}
+
+		if (MyInput::Trigger(Action::CANCEL)) {
+			selectState_ = TitleSelectState::Play;
+		}
+
+		switch (playerName_) {
+		case PlayerName::PowerMan:
+
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				playerName_ = PlayerName::TankMan;
+			}
+
+			break;
+		case PlayerName::TankMan:
+
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				playerName_ = PlayerName::JumpMan;
+			}
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				playerName_ = PlayerName::PowerMan;
+			}
+
+			break;
+		case PlayerName::JumpMan:
+
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				playerName_ = PlayerName::SpeedMan;
+			}
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				playerName_ = PlayerName::TankMan;
+			}
+
+			break;
+		case PlayerName::SpeedMan:
+
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				playerName_ = PlayerName::JumpMan;
+			}
+
+			break;
+		default:
+			break;
+		}
+
+		break;
+
+	case TitleSelectState::WeaponSelect:
+
+		if (MyInput::Trigger(Action::CONFIRM)) {
+			selectState_ = TitleSelectState::Confirmed;
+		}
+
+		if (MyInput::Trigger(Action::CANCEL)) {
+			selectState_ = TitleSelectState::PlayerSelect;
+		}
+
+		switch (weaponName_) {
+		case WeaponName::FireBall:
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				weaponName_ = WeaponName::Laser;
+			}
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				weaponName_ = WeaponName::Boomerang;
+			}
+			break;
+		case WeaponName::Laser:
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				weaponName_ = WeaponName::Runa;
+			}
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				weaponName_ = WeaponName::FireBall;
+			}
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				weaponName_ = WeaponName::Dice;
+			}
+			break;
+		case WeaponName::Runa:
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				weaponName_ = WeaponName::Axe;
+			}
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				weaponName_ = WeaponName::Laser;
+			}
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				weaponName_ = WeaponName::Toxic;
+			}
+			break;
+		case WeaponName::Axe:
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				weaponName_ = WeaponName::Runa;
+			}
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				weaponName_ = WeaponName::Area;
+			}
+			break;
+		case WeaponName::Boomerang:
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				weaponName_ = WeaponName::Dice;
+			}
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				weaponName_ = WeaponName::FireBall;
+			}
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				weaponName_ = WeaponName::Gun;
+			}
+			break;
+		case WeaponName::Dice:
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				weaponName_ = WeaponName::Toxic;
+			}
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				weaponName_ = WeaponName::Boomerang;
+			}
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				weaponName_ = WeaponName::Laser;
+			}
+			break;
+		case WeaponName::Toxic:
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				weaponName_ = WeaponName::Area;
+			}
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				weaponName_ = WeaponName::Dice;
+			}
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				weaponName_ = WeaponName::Runa;
+			}
+			break;
+		case WeaponName::Area:
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				weaponName_ = WeaponName::Toxic;
+			}
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				weaponName_ = WeaponName::Axe;
+			}
+			break;
+		case WeaponName::Gun:
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				weaponName_ = WeaponName::Boomerang;
+			}
+			break;
+		default:
+			break;
+		}
+
+		break;
+
+	case TitleSelectState::Confirmed:
+
+		if (MyInput::Trigger(Action::CONFIRM)) {
+			// GameSceneに選択したプレイヤーと武器を渡す
+			SetSelectedPlayerName(playerName_);
+			SetSelectedWeaponName(weaponName_);
 			ChangeScene(SCENE::GAME);
 		}
 
 		if (MyInput::Trigger(Action::CANCEL)) {
-			selectState_ = TitleSelectState::PLAY;
+			selectState_ = TitleSelectState::WeaponSelect;
 		}
 
 		break;
@@ -108,10 +262,11 @@ void TitleScene::Update() {
 			break;
 	}
 
-
 	player_->Update();
 
 	titleUI_->SetSelectState(selectState_);
+	titleUI_->SetPlayerName(playerName_);
+	titleUI_->SetWeaponName(weaponName_);
 	titleUI_->Update();
 }
 

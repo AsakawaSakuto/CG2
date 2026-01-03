@@ -401,6 +401,17 @@ void SkiningModel::Draw(Camera& useCamera, const Transform& transform) {
 	// 共通パラメータの設定
 	commandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, transformationResource_->GetGPUVirtualAddress());
+	
+	// デバッグ：使用するテクスチャインデックスをログ出力（最初の数フレームのみ）
+	static int debugFrameCount = 0;
+	if (debugFrameCount < 5) {
+		char debugBuffer[256];
+		sprintf_s(debugBuffer, "[SkiningModel::Draw] Using textureIndex: %u (textureName: %s)\n", 
+		          textureIndex_, textureName_.c_str());
+		OutputDebugStringA(debugBuffer);
+		debugFrameCount++;
+	}
+	
 	commandList_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
 	commandList_->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
@@ -457,13 +468,35 @@ void SkiningModel::Draw(Camera& useCamera, const Transform& transform) {
 void SkiningModel::SetTexture(const std::string& textureName) {
 	// すでに同じテクスチャなら処理をスキップ
 	if (textureName_ == textureName) {
+		char debugBuffer[512];
+		sprintf_s(debugBuffer, "[SkiningModel] SetTexture skipped (same texture): %s\n", textureName.c_str());
+		OutputDebugStringA(debugBuffer);
 		return;
 	}
+	
+	char debugBuffer[512];
+	sprintf_s(debugBuffer, "[SkiningModel] SetTexture: %s -> %s\n", textureName_.c_str(), textureName.c_str());
+	OutputDebugStringA(debugBuffer);
+	
 	textureName_ = textureName;
 	// .objの参照しているテクスチャファイル読み込み
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	// 読み込んだテクスチャの番号を取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+	
+	// マルチマテリアル対応：すべてのマテリアルのテクスチャも更新
+	// サブメッシュがある場合、textureIndices_配列も更新する必要がある
+	if (!textureIndices_.empty()) {
+		// すべてのマテリアルを同じテクスチャに変更
+		for (size_t i = 0; i < textureIndices_.size(); ++i) {
+			textureIndices_[i] = textureIndex_;
+		}
+		sprintf_s(debugBuffer, "[SkiningModel] Updated %zu material textures\n", textureIndices_.size());
+		OutputDebugStringA(debugBuffer);
+	}
+	
+	sprintf_s(debugBuffer, "[SkiningModel] New textureIndex: %u\n", textureIndex_);
+	OutputDebugStringA(debugBuffer);
 }
 
 Vector3 SkiningModel::GetWorldPosition() {
@@ -591,15 +624,12 @@ void SkiningModel::DrawImGui(const char* objectName) {
 			spotLightData_->direction = spotLightData_->direction.Normalized();
 			ImGui::DragFloat3("s.Direction", &spotLightData_->direction.x, 0.01f);
 			ImGui::DragFloat("s.Decay", &spotLightData_->decay, 0.01f);
-			float angleDeg = 60.0f;            // cosAngle用の角度（UI用、一時変数）
-			float falloffStartDeg = 30.0f;     // cosFalloffStart用の角度
-			// 現在のcos値から度に変換してUIに表示（必要なら）
+			float angleDeg = 60.0f;
+			float falloffStartDeg = 30.0f;
 			angleDeg = std::acos(spotLightData_->cosAngle) * 180.0f / std::numbers::pi_v<float>;
 			falloffStartDeg = std::acos(spotLightData_->cosFalloffStart) * 180.0f / std::numbers::pi_v<float>;
-			// ImGuiスライダー（例：0〜90度まで）
 			ImGui::SliderFloat("Spot Angle (deg)", &angleDeg, 1.0f, 90.0f);
-			ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f); // 必ず angle より小さく
-			// 入力された角度からcos値に変換して反映
+			ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f);
 			spotLightData_->cosAngle = std::cos(angleDeg * std::numbers::pi_v<float> / 180.0f);
 			spotLightData_->cosFalloffStart = std::cos(falloffStartDeg * std::numbers::pi_v<float> / 180.0f);
 			ImGui::ColorEdit4("s.Color", &spotLightData_->color.x);

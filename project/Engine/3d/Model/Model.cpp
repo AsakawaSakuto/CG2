@@ -354,6 +354,28 @@ void Model::SetTexture(const std::string& textureName) {
 	TextureManager::GetInstance()->LoadTexture(textureName_);
 	// 読み込んだテクスチャの番号を取得
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureName_);
+	
+	// マルチマテリアル対応：すべてのマテリアルのテクスチャも更新
+	if (!textureIndices_.empty()) {
+		for (size_t i = 0; i < textureIndices_.size(); ++i) {
+			textureIndices_[i] = textureIndex_;
+		}
+	}
+	
+	// UV変換をリセット（全体表示）
+	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
+}
+
+void Model::SetTextureWithRect(const std::string& textureName, const Vector2& topLeft, const Vector2& size) {
+	// テクスチャを設定
+	SetTexture(textureName);
+	
+	// UV座標の切り取り領域を設定
+	// topLeftは左上の座標、sizeは幅と高さ
+	// UV座標系は左上が(0,0)、右下が(1,1)
+	uvTransform_.scale = size;
+	uvTransform_.translate = topLeft;
+	uvTransform_.rotate = 0.0f;
 }
 
 Vector3 Model::GetWorldPosition() {
@@ -495,7 +517,7 @@ void Model::DrawImGui(const char* objectName) {
 			falloffStartDeg = std::acos(spotLightData_->cosFalloffStart) * 180.0f / std::numbers::pi_v<float>;
 			// ImGuiスライダー（例：0〜90度まで）
 			ImGui::SliderFloat("Spot Angle (deg)", &angleDeg, 1.0f, 90.0f);
-			ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f); // 必ず angle より小さく
+			ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f); // 必ず angle より小なく
 			// 入力された角度からcos値に変換して反映
 			spotLightData_->cosAngle = std::cos(angleDeg * std::numbers::pi_v<float> / 180.0f);
 			spotLightData_->cosFalloffStart = std::cos(falloffStartDeg * std::numbers::pi_v<float> / 180.0f);

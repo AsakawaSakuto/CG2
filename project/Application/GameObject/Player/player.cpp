@@ -2,6 +2,7 @@
 #include "GameObject/EnemyManager/EnemyManager.h"
 #include "Map/Map3D.h"
 #include "Map/TreeManager/TreeManager.h"
+#include "Utility/Random/Random.h"
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -11,6 +12,12 @@ void Player::PostFrameCleanup() {
 }
 
 void Player::Initialize() {
+	// デフォルト値で初期化
+	Initialize(PlayerName::PowerMan, WeaponName::FireBall);
+}
+
+void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
+	playerName_ = playerName;
 
 	transform_.SetAllScale(1.0);
 	transform_.translate = { 10.0f,100.0f,10.0f };
@@ -41,8 +48,11 @@ void Player::Initialize() {
 	landingParticle_->Initialize("playerLanding");
 
 	weaponManager_->Initialize();
+	
+	// 選択した武器を最初に装備
+	weaponManager_->EquipWeapon(weaponName);
 
-	// ステータスの初期化
+	// ステータスの初期化（PlayerNameに応じて変更することも可能）
 	status_.currentHP = status_.maxHP;
 	status_.currentExp = 0;
 	status_.level = 1;
@@ -96,7 +106,10 @@ void Player::Update() {
 	landingParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
 	landingParticle_->Update();
 
-	weaponManager_->SetDirectionToEnemy(directionToEnemy_);
+	// 通常の最も近い敵への方向とランダムターゲット方向の両方を設定
+	Vector3 closestEnemyDirection = GetDirectionToClosestEnemy();
+	weaponManager_->SetDirectionToEnemy(closestEnemyDirection);
+	weaponManager_->SetRandomDirectionToEnemy(directionToEnemy_);
 	weaponManager_->SetPlayerPosition(transform_.translate);
 	weaponManager_->Update();
 
@@ -576,7 +589,7 @@ void Player::ResolveMapCollision() {
 									zMin = blockWorldPos.z - blockHalfWidth + stepHeightStart * (blockHalfWidth * 2.0f);
 									zMax = blockWorldPos.z - blockHalfWidth + stepHeightEnd * (blockHalfWidth * 2.0f);
 									break;
-										
+									
 								case SlopeDirection::MinusZ: // Z-方向に登る
 									// 低い方（Z+側）から高い方（Z-側）へ
 									xMin = blockWorldPos.x - blockHalfWidth;
@@ -959,6 +972,79 @@ Vector3 Player::GetDirectionToEnemy() const {
 		return Vector3{ 0.0f, 0.0f, 0.0f };
 	}
 
+	const Vector3& playerPos = transform_.translate;
+
+	// 距離と敵のペアを格納するベクトル
+	std::vector<std::pair<float, const std::unique_ptr<Enemy>*>> enemyDistances;
+	enemyDistances.reserve(enemies.size());
+
+	// 全ての敵をチェックして距離を計算
+	for (const auto& enemy : enemies) {
+		// 死んでいる敵はスキップ
+		if (!enemy->IsAlive()) {
+			continue;
+		}
+
+		const Vector3& enemyPos = enemy->GetPosition();
+		
+		// 敵へのベクトルを計算
+		Vector3 vectorToEnemy = {
+			enemyPos.x - playerPos.x,
+			enemyPos.y - playerPos.y,
+			enemyPos.z - playerPos.z
+		};
+
+		// 距離の二乗を計算（sqrtを避けるため）
+		float distanceSquared = 
+			vectorToEnemy.x * vectorToEnemy.x +
+			vectorToEnemy.y * vectorToEnemy.y +
+			vectorToEnemy.z * vectorToEnemy.z;
+
+		enemyDistances.push_back({distanceSquared, &enemy});
+	}
+
+	// 敵がいない場合（全て死んでいる場合）
+	if (enemyDistances.empty()) {
+		return Vector3{ 0.0f, 0.0f, 0.0f };
+	}
+
+	// 距離でソート（近い順）
+	std::sort(enemyDistances.begin(), enemyDistances.end(),
+		[](const auto& a, const auto& b) {
+			return a.first < b.first;
+		});
+
+	// 近い敵10体（またはそれ以下）から選択
+	const size_t candidateCount = std::min(size_t(10), enemyDistances.size());
+	
+	// ランダムに1体選択
+	int randomIndex = MyRand::Int(0, static_cast<int>(candidateCount) - 1);
+	const std::unique_ptr<Enemy>* selectedEnemy = enemyDistances[randomIndex].second;
+
+	// 選択された敵へのベクトルを計算
+	const Vector3& enemyPos = (*selectedEnemy)->GetPosition();
+	Vector3 vectorToEnemy = {
+		enemyPos.x - playerPos.x,
+		enemyPos.y - playerPos.y,
+		enemyPos.z - playerPos.z
+	};
+
+	return vectorToEnemy;
+}
+
+Vector3 Player::GetDirectionToClosestEnemy() const {
+	// EnemyManagerが設定されていない場合はゼロベクトルを返す
+	if (!enemyManager_) {
+		return Vector3{ 0.0f, 0.0f, 0.0f };
+	}
+
+	const auto& enemies = enemyManager_->GetEnemies();
+	
+	// 敵がいない場合はゼロベクトルを返す
+	if (enemies.empty()) {
+		return Vector3{ 0.0f, 0.0f, 0.0f };
+	}
+
 	float minDistanceSquared = (std::numeric_limits<float>::max)();
 	Vector3 vectorToNearest = { 0.0f, 0.0f, 0.0f };
 	const Vector3& playerPos = transform_.translate;
@@ -1051,7 +1137,7 @@ float Player::GetGroundHeight() const {
 	// プレイヤーの現在位置からマップ座標を取得
 	uint32_t centerX, centerY, centerZ;
 	if (!map_->WorldToMap(transform_.translate, centerX, centerY, centerZ)) {
-		return groundLevel_; // マップ範囲外の場合はフォールバック値
+		return groundLevel_; // マップ範囲外の場合はフォールバッグ値
 	}
 
 	// 周囲と下方向のブロックをチェック

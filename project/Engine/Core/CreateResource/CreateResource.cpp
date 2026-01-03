@@ -293,7 +293,8 @@ ModelData LoadObject3dFile(const std::string& filepath) {
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());
-        assert(mesh->HasTextureCoords(0));
+        // テクスチャ座標のチェックを削除
+        // assert(mesh->HasTextureCoords(0));
 
         uint32_t vertexStart = static_cast<uint32_t>(modelData.vertices.size());
 
@@ -302,11 +303,19 @@ ModelData LoadObject3dFile(const std::string& filepath) {
             ModelVertexData vertex;
             aiVector3D& position = mesh->mVertices[vertexIndex];
             aiVector3D& normal = mesh->mNormals[vertexIndex];
-            aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+            
             // 右手系→左手系への変換
             vertex.position = { -position.x, position.y, position.z, 1.0f };
             vertex.normal = { -normal.x, normal.y, normal.z };
-            vertex.texcoord = { texcoord.x, texcoord.y };
+            
+            // テクスチャ座標が存在する場合のみ取得、なければデフォルト値(0,0)
+            if (mesh->HasTextureCoords(0)) {
+                aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+                vertex.texcoord = { texcoord.x, texcoord.y };
+            } else {
+                vertex.texcoord = { 0.0f, 0.0f };
+            }
+            
             modelData.vertices.push_back(vertex);
         }
 

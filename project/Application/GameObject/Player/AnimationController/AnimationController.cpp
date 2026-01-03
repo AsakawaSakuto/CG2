@@ -20,6 +20,12 @@ void AnimationController::Initialize(std::map<PlayerMotion, Animation> animation
 }
 
 void AnimationController::Update(float deltaTime, const Transform& transform) {
+
+	if (MyInput::TriggerKey(DIK_O)) {
+		model_->SetTexture("resources/image/uvChecker.png");
+		OutputDebugStringA("[DEBUG] SetTexture called: uvChecker.png\n");
+	}
+
 	transform_ = transform;
 	shadowTransform_.translate.x = transform.translate.x;
 	shadowTransform_.translate.z = transform.translate.z;

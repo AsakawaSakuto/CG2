@@ -36,7 +36,8 @@ void GameScene::Initialize() {
 	treeManager_->Initialize(map3D_.get());
 
 	player_ = make_unique<Player>();
-	player_->Initialize();
+	// TitleSceneで選択されたPlayerNameとWeaponNameで初期化
+	player_->Initialize(GetSelectedPlayerName(), GetSelectedWeaponName());
 
 	// プレイヤーの開始位置を最上面のNormalブロックからランダムに選択
 	auto topPositions = map3D_->GetTopNormalBlockPositions();
@@ -80,12 +81,12 @@ void GameScene::Initialize() {
 	postEffect->SetEnabled(true);
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 	postEffect->SetPostEffectType(PSOType::PostEffect_Fog);
-	postEffect->GetParams().fog.fogStart = 50.0f;
-	postEffect->GetParams().fog.fogEnd = 175.0f;
+	postEffect->GetParams().fog.fogStart = 75.0f;
+	postEffect->GetParams().fog.fogEnd = 150.0f;
 	postEffect->GetParams().fog.fogDensity = 1.0f;
-	postEffect->GetParams().fog.fogColor[0] = 0.0f;
-	postEffect->GetParams().fog.fogColor[1] = 0.0f;
-	postEffect->GetParams().fog.fogColor[2] = 0.0f;
+	postEffect->GetParams().fog.fogColor[0] = 1.0f;
+	postEffect->GetParams().fog.fogColor[1] = 1.0f;
+	postEffect->GetParams().fog.fogColor[2] = 1.0f;
 
 }
 
@@ -183,7 +184,7 @@ void GameScene::Draw() {
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
 	//auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
-	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+    //postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 	//postEffect->DrawImGui();
 #endif // USE_IMGUI
 
@@ -236,6 +237,7 @@ void GameScene::JarUpdate() {
 	}
 
 	// JarManagerの更新
+	jarManager_->SetAABBCollision(playerAABB);
 	jarManager_->Update();
 }
 

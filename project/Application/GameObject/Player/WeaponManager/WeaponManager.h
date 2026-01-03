@@ -22,6 +22,12 @@ public:
 		}
 	}
 
+	void SetRandomDirectionToEnemy(const Vector3& direction) {
+		for (auto& weapon : weapons_) {
+			weapon->SetRandomDirectionToEnemy(direction);
+		}
+	}
+
 	// 武器のリストへのアクセス（const参照）
 	const std::vector<std::unique_ptr<Weapon>>& GetWeapons() const { return weapons_; }
 

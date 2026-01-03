@@ -10,6 +10,8 @@
 #include "Boomerang/Boomerang.h"
 #include "Dice/Dice.h"
 #include "Toxic/Toxic.h"
+#include "Area/Area.h"
+#include "Gun/Gun.h"
 
 /// <summary>
 /// Update関数をラムダ式にして、Enumでそれに応じたUpdate関数を持ってくるやり方を冬休みにやる
@@ -24,6 +26,7 @@ public:
 
 	void SetPlayerPosition(const Vector3& position) { playerPosition_ = position; }
 	void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction; }
+	void SetRandomDirectionToEnemy(const Vector3& direction) { randomDirectionToEnemy_ = direction; }
 
 	// 弾のリストへのアクセス（const参照）
 	const std::vector<std::unique_ptr<FireBall>>& GetFireBalls() const { return fireBall_; }
@@ -33,6 +36,8 @@ public:
 	const std::vector<std::unique_ptr<Boomerang>>& GetBoomerang() const { return boomerang_; }
 	const std::vector<std::unique_ptr<Dice>>& GetDice() const { return dice_; }
 	const std::vector<std::unique_ptr<Toxic>>& GetToxic() const { return toxic_; }
+	const std::unique_ptr<Area>& GetArea() const { return area_; }
+	const std::vector<std::unique_ptr<Gun>>& GetGun() const { return gun_; }
 
 	void PostFrameCleanup();
 	
@@ -56,6 +61,8 @@ private:
 	void BoomerangUpdate();
 	void DiceUpdate();
 	void ToxicUpdate();
+	void AreaUpdate();
+	void GunUpdate();
 
 private:
 
@@ -66,6 +73,8 @@ private:
 	std::vector<std::unique_ptr<Boomerang>> boomerang_;
 	std::vector<std::unique_ptr<Dice>> dice_;
 	std::vector<std::unique_ptr<Toxic>> toxic_;
+	std::unique_ptr<Area> area_;  // Areaは単一インスタンス
+	std::vector<std::unique_ptr<Gun>> gun_;
 
 
 	Vector3 spawnOffSet_ = { 0.0f, 1.0f, 0.0f };
@@ -78,6 +87,7 @@ private:
 
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	Vector3 directionToEnemy_ = { 0.0f, 0.0f, 0.0f };
+	Vector3 randomDirectionToEnemy_ = { 0.0f, 0.0f, 0.0f };
 	
 	template <class T>
 	void EraseDead(std::vector<std::unique_ptr<T>>& v) {

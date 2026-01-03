@@ -4,7 +4,7 @@ void Toxic::Initialize() {
 
 	// パーティクルは後からSetSharedParticle()で設定される
 	transform_.translate = { 0.0f,0.0f,0.0f };
-	transform_.SetAllScale(0.5f);
+	transform_.SetAllScale(1.0f);
 
 	model_->Initialize("weapon/toxic/toxic.obj");
 	model_->SetColor3({ 1.0f, 0.0f, 1.0f });

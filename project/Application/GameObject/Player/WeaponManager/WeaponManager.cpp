@@ -3,7 +3,7 @@
 void WeaponManager::Initialize() {
 
 	auto weapon = std::make_unique<Weapon>();
-	weapon->Initialize(WeaponName::Toxic);
+	weapon->Initialize(WeaponName::None);
 	weapons_.push_back(std::move(weapon));
 
 	auto weapon2 = std::make_unique<Weapon>();
