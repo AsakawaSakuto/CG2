@@ -122,6 +122,22 @@ void Weapon::Initialize(WeaponName weaponName) {
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
+
+	case WeaponName::Area:
+
+		status_.damage = 2.0f;
+		status_.criticalRand = 10;
+		status_.bounceCount = 0;
+		status_.penetrationCount = 0;
+		status_.nockBackPower = 0.0f;
+		status_.durationTime = 0.0f;
+		
+		// Areaは初期化時に生成
+		area_ = std::make_unique<Area>();
+		area_->Initialize();
+		area_->SetDamage(status_.damage);
+
+		break;
 	}
 }
 
@@ -149,6 +165,9 @@ void Weapon::Update() {
 	case WeaponName::Toxic:
 		ToxicUpdate();
 		break;
+	case WeaponName::Area:
+		AreaUpdate();
+		break;
 	}
 
 }
@@ -161,6 +180,11 @@ void Weapon::Draw(Camera camera) {
 	DrawVec(boomerang_, camera);
 	DrawVec(dice_, camera);
 	DrawVec(toxic_, camera);
+	
+	// Areaは単一インスタンスなので個別に描画
+	if (area_ && area_->IsAlive()) {
+		area_->Draw(camera);
+	}
 }
 
 void Weapon::PostFrameCleanup() {
@@ -172,6 +196,7 @@ void Weapon::PostFrameCleanup() {
 	EraseDead(boomerang_);
 	EraseDead(dice_);
 	EraseDead(toxic_);
+	// Areaは常時存在するのでクリーンアップ不要
 }
 
 void Weapon::FireBallUpdate() {
@@ -390,6 +415,14 @@ void Weapon::ToxicUpdate() {
 	}
 }
 
+void Weapon::AreaUpdate() {
+	// Areaは常にプレイヤーの位置に追従
+	if (area_) {
+		area_->SetPosition(playerPosition_);
+		area_->Update();
+	}
+}
+
 void Weapon::SetWeaponName(WeaponName weapon) {
 	if (weaponName_ == WeaponName::None) {
 		weaponName_ = weapon;
@@ -486,6 +519,21 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 			status_.durationTime = 0.0f;
 			status_.lifeTime = 5.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
+
+			break;
+		case WeaponName::Area:
+
+			status_.damage = 2.0f;
+			status_.criticalRand = 10;
+			status_.bounceCount = 0;
+			status_.penetrationCount = 0;
+			status_.nockBackPower = 0.0f;
+			status_.durationTime = 0.0f;
+			
+			// Areaは初期化時に生成
+			area_ = std::make_unique<Area>();
+			area_->Initialize();
+			area_->SetDamage(status_.damage);
 
 			break;
 		default:

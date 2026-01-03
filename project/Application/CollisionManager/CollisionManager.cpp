@@ -81,6 +81,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 		const auto& boomerangs = weapon->GetBoomerang();
 		const auto& dices = weapon->GetDice();
 		const auto& toxics = weapon->GetToxic();
+		const auto& area = weapon->GetArea();
 
 		for (const auto& bullet : fireBalls) {
 			// 弾が既に死亡している場合はスキップ
@@ -294,6 +295,27 @@ void CollisionManager::CheckBulletEnemyCollision() {
 
 					// Toxicは通常ダメージを与える（継続ダメージは将来の実装で追加可能）
 					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+				}
+			}
+		}
+
+		// Areaの衝突判定（常時存在する範囲攻撃）
+		if (area && area->IsAlive()) {
+			const Sphere& areaSphere = area->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// Areaと敵の衝突判定
+				if (Collision::IsHit(areaSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
+					// Areaは継続ダメージなので、パーティクルは出さずにダメージのみ
+					enemy->Damage(static_cast<int>(area->GetDamage()));
 				}
 			}
 		}

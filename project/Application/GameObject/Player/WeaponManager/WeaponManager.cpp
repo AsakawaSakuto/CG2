@@ -7,7 +7,7 @@ void WeaponManager::Initialize() {
 	weapons_.push_back(std::move(weapon));
 
 	auto weapon2 = std::make_unique<Weapon>();
-	weapon2->Initialize(WeaponName::None);
+	weapon2->Initialize(WeaponName::Area);
 	weapons_.push_back(std::move(weapon2));
 
 	auto weapon3 = std::make_unique<Weapon>();

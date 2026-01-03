@@ -10,6 +10,7 @@
 #include "Boomerang/Boomerang.h"
 #include "Dice/Dice.h"
 #include "Toxic/Toxic.h"
+#include "Area/Area.h"
 
 /// <summary>
 /// Update関数をラムダ式にして、Enumでそれに応じたUpdate関数を持ってくるやり方を冬休みにやる
@@ -33,6 +34,7 @@ public:
 	const std::vector<std::unique_ptr<Boomerang>>& GetBoomerang() const { return boomerang_; }
 	const std::vector<std::unique_ptr<Dice>>& GetDice() const { return dice_; }
 	const std::vector<std::unique_ptr<Toxic>>& GetToxic() const { return toxic_; }
+	const std::unique_ptr<Area>& GetArea() const { return area_; }
 
 	void PostFrameCleanup();
 	
@@ -56,6 +58,7 @@ private:
 	void BoomerangUpdate();
 	void DiceUpdate();
 	void ToxicUpdate();
+	void AreaUpdate();
 
 private:
 
@@ -66,6 +69,7 @@ private:
 	std::vector<std::unique_ptr<Boomerang>> boomerang_;
 	std::vector<std::unique_ptr<Dice>> dice_;
 	std::vector<std::unique_ptr<Toxic>> toxic_;
+	std::unique_ptr<Area> area_;  // Areaは単一インスタンス
 
 
 	Vector3 spawnOffSet_ = { 0.0f, 1.0f, 0.0f };

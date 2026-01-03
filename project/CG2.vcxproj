@@ -158,6 +158,7 @@
     <ClCompile Include="Application\GameObject\Player\AnimationController\AnimationController.cpp" />
     <ClCompile Include="Application\GameObject\Player\Player.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\WeaponManager.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Axe\Axe.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Boomerang\Boomerang.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Dice\Dice.cpp" />
@@ -280,6 +281,7 @@
     <ClInclude Include="Application\GameObject\Player\PlayerStatus.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponManager.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\WeaponStatus.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Axe\Axe.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Boomerang\Boomerang.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Dice\Dice.h" />
@@ -464,6 +466,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="docs\AreaWeaponIntegration.md" />
     <None Include="docs\DiceWeaponIntegration.md" />
     <None Include="docs\EnemyKillCountSystem.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />

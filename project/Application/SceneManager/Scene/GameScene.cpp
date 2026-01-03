@@ -80,8 +80,8 @@ void GameScene::Initialize() {
 	postEffect->SetEnabled(true);
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 	postEffect->SetPostEffectType(PSOType::PostEffect_Fog);
-	postEffect->GetParams().fog.fogStart = 50.0f;
-	postEffect->GetParams().fog.fogEnd = 175.0f;
+	postEffect->GetParams().fog.fogStart = 75.0f;
+	postEffect->GetParams().fog.fogEnd = 150.0f;
 	postEffect->GetParams().fog.fogDensity = 1.0f;
 	postEffect->GetParams().fog.fogColor[0] = 1.0f;
 	postEffect->GetParams().fog.fogColor[1] = 1.0f;
@@ -183,7 +183,7 @@ void GameScene::Draw() {
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
 	//auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
-	//postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
+    //postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
 	//postEffect->DrawImGui();
 #endif // USE_IMGUI
 

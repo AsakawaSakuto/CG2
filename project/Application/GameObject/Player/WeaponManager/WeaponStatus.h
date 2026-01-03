@@ -10,6 +10,7 @@ enum class WeaponName {
 	Boomerang, // ブーメラン
 	Dice,      // ダイス
 	Toxic,     // トキシック
+	Area,      // エリア
 
 	Count
 };
