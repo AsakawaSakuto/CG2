@@ -237,6 +237,7 @@ void GameScene::JarUpdate() {
 	}
 
 	// JarManagerの更新
+	jarManager_->SetAABBCollision(playerAABB);
 	jarManager_->Update();
 }
 

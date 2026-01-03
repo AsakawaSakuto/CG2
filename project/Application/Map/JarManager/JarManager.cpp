@@ -18,6 +18,34 @@ void JarManager::Initialize(Map3D* map) {
 }
 
 void JarManager::Update() {
+
+	for (auto& jar : minJars_) {
+		if (jar->IsAlive()) {
+
+			jar->Update();
+
+			if (Collision::IsHit(aabbCollision_, jar->GetAABBCollision())) {
+				jar->SetJarActive(true);
+			} else {
+				jar->SetJarActive(false);
+			}
+		}
+	}
+
+	// MaxJarとの衝突チェック
+	for (auto& jar : maxJars_) {
+		if (jar->IsAlive()) {
+
+			jar->Update();
+
+			if (Collision::IsHit(aabbCollision_, jar->GetAABBCollision())) {
+				jar->SetJarActive(true);
+			} else {
+				jar->SetJarActive(false);
+			}
+		}
+	}
+
 	// 死んでいる壺を削除
 	minJars_.erase(
 		std::remove_if(minJars_.begin(), minJars_.end(),
@@ -68,6 +96,7 @@ void JarManager::DrawImGui() {
 }
 
 int JarManager::BreakJar(const AABB& attackAABB, JarType& outJarType) {
+
 	// MinJarとの衝突チェック
 	for (auto& jar : minJars_) {
 		if (jar->IsAlive()) {

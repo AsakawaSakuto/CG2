@@ -6,6 +6,8 @@
 #include "3d/Model/Model.h"
 #include "3d/Line/MyDebugLine.h"
 #include "Utility/Random/Random.h"
+#include "Utility/GameTimer/GameTimer.h"
+#include "Utility/Easing/Easing.h"
 
 enum class JarType {
     Exp,
@@ -16,6 +18,12 @@ class BaseJar {
 protected:
 
     std::unique_ptr<Model> model_;
+    std::unique_ptr<Model> bottom_;
+
+	bool jarIsActive_ = false;
+	Transform bottomTransform_;
+    GameTimer timer_;
+
     Transform transform_;
     AABB aabbCollision_;
     bool isAlive_ = true;
@@ -29,6 +37,7 @@ protected:
 	JarType jarType_;
 public:
     virtual void Initialize(Vector3 pos) = 0;
+    virtual void Update() = 0;
     virtual void Draw(Camera camera) = 0;
     virtual int Break() = 0;
 
@@ -36,6 +45,8 @@ public:
     virtual const AABB& GetAABBCollision() { return aabbCollision_; }
 	virtual const JarType GetJarType() const { return jarType_; }
     virtual bool IsAlive() const { return isAlive_; }
+
+	virtual void SetJarActive(bool flag) { jarIsActive_ = flag; }
 
     virtual ~BaseJar() {}
 };
