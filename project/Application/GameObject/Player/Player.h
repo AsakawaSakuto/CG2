@@ -13,6 +13,7 @@ class TreeManager;
 class Player : public BaseGameObject {
 public:
     void Initialize() override;
+    void Initialize(PlayerName playerName, WeaponName weaponName);
     void Update() override;
     void Draw(Camera camera) override;
     void DrawImGui() override;
@@ -172,6 +173,8 @@ private:
 	float GetGroundHeight() const;
 
 private:
+	PlayerName playerName_;
+
 	unique_ptr<AnimationController> model_;
 	PlayerMotion currentMotion_ = PlayerMotion::Idle;
 

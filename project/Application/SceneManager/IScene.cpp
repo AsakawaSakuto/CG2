@@ -6,6 +6,9 @@
 #include "imgui_impl_win32.h"
 #endif
 
+// 静的メンバの定義
+PlayerName IScene::selectedPlayerName_ = PlayerName::PowerMan;
+WeaponName IScene::selectedWeaponName_ = WeaponName::FireBall;
 
 SCENE IScene::GetSceneNo() { return nowSceneName_; }
 

@@ -20,7 +20,7 @@ void TitleScene::Initialize() {
 	player_->SetTexture();
 	playerTransform_.SetAllScale(1.5f);
 	playerTransform_.rotate.y = 3.8f;
-	playerTransform_.translate = { 0.0f,1.0f,-10.0f };
+	playerTransform_.translate = { -0.7f,1.0f,-10.0f };
 	player_->SetTransform(playerTransform_);
 
 	block_ = make_unique<Model>();
@@ -247,6 +247,9 @@ void TitleScene::Update() {
 	case TitleSelectState::Confirmed:
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
+			// GameSceneに選択したプレイヤーと武器を渡す
+			SetSelectedPlayerName(playerName_);
+			SetSelectedWeaponName(weaponName_);
 			ChangeScene(SCENE::GAME);
 		}
 

@@ -36,7 +36,8 @@ void GameScene::Initialize() {
 	treeManager_->Initialize(map3D_.get());
 
 	player_ = make_unique<Player>();
-	player_->Initialize();
+	// TitleSceneで選択されたPlayerNameとWeaponNameで初期化
+	player_->Initialize(GetSelectedPlayerName(), GetSelectedWeaponName());
 
 	// プレイヤーの開始位置を最上面のNormalブロックからランダムに選択
 	auto topPositions = map3D_->GetTopNormalBlockPositions();
