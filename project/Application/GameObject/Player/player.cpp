@@ -12,6 +12,12 @@ void Player::PostFrameCleanup() {
 }
 
 void Player::Initialize() {
+	// デフォルト値で初期化
+	Initialize(PlayerName::PowerMan, WeaponName::FireBall);
+}
+
+void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
+	playerName_ = playerName;
 
 	transform_.SetAllScale(1.0);
 	transform_.translate = { 10.0f,100.0f,10.0f };
@@ -42,8 +48,11 @@ void Player::Initialize() {
 	landingParticle_->Initialize("playerLanding");
 
 	weaponManager_->Initialize();
+	
+	// 選択した武器を最初に装備
+	weaponManager_->EquipWeapon(weaponName);
 
-	// ステータスの初期化
+	// ステータスの初期化（PlayerNameに応じて変更することも可能）
 	status_.currentHP = status_.maxHP;
 	status_.currentExp = 0;
 	status_.level = 1;
