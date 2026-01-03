@@ -83,9 +83,9 @@ void GameScene::Initialize() {
 	postEffect->GetParams().fog.fogStart = 50.0f;
 	postEffect->GetParams().fog.fogEnd = 175.0f;
 	postEffect->GetParams().fog.fogDensity = 1.0f;
-	postEffect->GetParams().fog.fogColor[0] = 0.0f;
-	postEffect->GetParams().fog.fogColor[1] = 0.0f;
-	postEffect->GetParams().fog.fogColor[2] = 0.0f;
+	postEffect->GetParams().fog.fogColor[0] = 1.0f;
+	postEffect->GetParams().fog.fogColor[1] = 1.0f;
+	postEffect->GetParams().fog.fogColor[2] = 1.0f;
 
 }
 
