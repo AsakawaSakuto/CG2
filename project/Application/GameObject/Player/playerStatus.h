@@ -1,10 +1,10 @@
 #pragma once
 
 enum class PlayerName {
-	SpeedMan,
-	JumpMan,
-	TankMan,
 	PowerMan,
+	TankMan,
+	JumpMan,
+	SpeedMan,
 
 	Count
 };
