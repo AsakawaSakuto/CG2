@@ -361,6 +361,21 @@ void Model::SetTexture(const std::string& textureName) {
 			textureIndices_[i] = textureIndex_;
 		}
 	}
+	
+	// UV変換をリセット（全体表示）
+	uvTransform_ = { {1.0f,1.0f}, 0.0f, {0.0f,0.0f} };
+}
+
+void Model::SetTextureWithRect(const std::string& textureName, const Vector2& topLeft, const Vector2& size) {
+	// テクスチャを設定
+	SetTexture(textureName);
+	
+	// UV座標の切り取り領域を設定
+	// topLeftは左上の座標、sizeは幅と高さ
+	// UV座標系は左上が(0,0)、右下が(1,1)
+	uvTransform_.scale = size;
+	uvTransform_.translate = topLeft;
+	uvTransform_.rotate = 0.0f;
 }
 
 Vector3 Model::GetWorldPosition() {

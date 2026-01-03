@@ -62,10 +62,10 @@ public:
 
     // テクスチャ専用レンジ
     static const uint32_t kTextureSRVBegin = 1;
-    static const uint32_t kTextureSRVEnd = 256; // 両端含む
+    static const uint32_t kTextureSRVEnd = 512; // 両端含む
 
     // パーティクル専用レンジ
-    static const uint32_t kParticleSRVBegin = 257;
+    static const uint32_t kParticleSRVBegin = 513;
     static const uint32_t kParticleSRVEnd = 1792;
 
     // Model(Skinning)専用レンジ

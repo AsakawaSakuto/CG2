@@ -119,6 +119,14 @@ public:
 	void SetTexture(const std::string& textureName);
 
 	/// <summary>
+	/// テクスチャの一部を切り取って設定
+	/// </summary>
+	/// <param name="textureName">Pathカット無し、全部入力してね</param>
+	/// <param name="topLeft">切り取り開始位置（左上、0.0～1.0のUV座標）</param>
+	/// <param name="size">切り取りサイズ（0.0～1.0のUV座標）</param>
+	void SetTextureWithRect(const std::string& textureName, const Vector2& topLeft, const Vector2& size);
+
+	/// <summary>
 	/// 描画モードを変更 trueで通常 falseでワイヤーフレーム
 	/// </summary>
 	/// <param name="drawMode">true/false</param>
