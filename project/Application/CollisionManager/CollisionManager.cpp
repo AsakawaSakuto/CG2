@@ -82,6 +82,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 		const auto& dices = weapon->GetDice();
 		const auto& toxics = weapon->GetToxic();
 		const auto& area = weapon->GetArea();
+		const auto& guns = weapon->GetGun();
 
 		for (const auto& bullet : fireBalls) {
 			// 弾が既に死亡している場合はスキップ
@@ -316,6 +317,35 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (Collision::IsHit(areaSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
 					// Areaは継続ダメージなので、パーティクルは出さずにダメージのみ
 					enemy->Damage(static_cast<int>(area->GetDamage()));
+				}
+			}
+		}
+
+		for (const auto& bullet : guns) {
+			// 弾が既に死亡している場合はスキップ
+			if (!bullet->IsAlive()) {
+				continue;
+			}
+
+			const Sphere& bulletSphere = bullet->GetSphereCollision();
+
+			// 全ての敵をチェック
+			for (const auto& enemy : enemies) {
+				// 敵が既に死亡している場合はスキップ
+				if (!enemy->IsAlive()) {
+					continue;
+				}
+
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+
+				// 弾と敵の衝突判定
+				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
+					// 衝突した敵を死亡状態にする
+					enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+					// Gunは通常ダメージを与える
+					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					bullet->Dead();
 				}
 			}
 		}

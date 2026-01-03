@@ -11,7 +11,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 2.0f;
 		status_.intervalTime = 0.2f;
-		status_.shotMaxCount = 1;
+		status_.shotMaxCount = 5;
 		status_.shotNowCount = 0;
 		status_.damage = 10.0f;
 		status_.criticalRand = 10;
@@ -138,6 +138,24 @@ void Weapon::Initialize(WeaponName weaponName) {
 		area_->SetDamage(status_.damage);
 
 		break;
+
+	case WeaponName::Gun:
+
+		status_.cooldownTime = 1.5f;
+		status_.intervalTime = 0.3f;
+		status_.shotMaxCount = 5;
+		status_.shotNowCount = 0;
+		status_.damage = 3.0f;
+		status_.criticalRand = 10;
+		status_.bounceCount = 0;
+		status_.penetrationCount = 0;
+		status_.nockBackPower = 0.0f;
+		status_.durationTime = 0.0f;
+		status_.lifeTime = 10.0f;
+		status_.useRandomTarget = true; // Gunはランダムターゲット選択を使用
+		coolDownTimer_.Start(status_.cooldownTime, false);
+
+		break;
 	}
 }
 
@@ -168,6 +186,9 @@ void Weapon::Update() {
 	case WeaponName::Area:
 		AreaUpdate();
 		break;
+	case WeaponName::Gun:
+		GunUpdate();
+		break;
 	}
 
 }
@@ -180,6 +201,7 @@ void Weapon::Draw(Camera camera) {
 	DrawVec(boomerang_, camera);
 	DrawVec(dice_, camera);
 	DrawVec(toxic_, camera);
+	DrawVec(gun_, camera);
 	
 	// Areaは単一インスタンスなので個別に描画
 	if (area_ && area_->IsAlive()) {
@@ -196,6 +218,7 @@ void Weapon::PostFrameCleanup() {
 	EraseDead(boomerang_);
 	EraseDead(dice_);
 	EraseDead(toxic_);
+	EraseDead(gun_);
 	// Areaは常時存在するのでクリーンアップ不要
 }
 
@@ -423,6 +446,40 @@ void Weapon::AreaUpdate() {
 	}
 }
 
+void Weapon::GunUpdate() {
+	// クールタイムが終了している場合
+	if (coolDownTimer_.IsFinished()) {
+		if (!intervalTimer_.IsActive()) {
+			intervalTimer_.Start(status_.intervalTime, true);
+			coolDownTimer_.Reset();
+		}
+	}
+	if (intervalTimer_.IsFinished()) {
+		auto bullet = std::make_unique<Gun>();
+		bullet->Initialize();
+		bullet->SetPosition(playerPosition_ + spawnOffSet_);
+		// ランダムターゲット選択が有効な場合はrandomDirectionToEnemy_を使用
+		if (status_.useRandomTarget) {
+			bullet->SetDirectionToEnemy(randomDirectionToEnemy_);
+		} else {
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+		}
+		bullet->SetDamage(status_.damage);
+		gun_.push_back(std::move(bullet));
+		status_.shotNowCount++;
+		if (status_.shotNowCount >= status_.shotMaxCount) {
+			status_.shotNowCount = 0;
+			intervalTimer_.Reset();
+			coolDownTimer_.Start(status_.cooldownTime, false);
+		}
+	}
+	coolDownTimer_.Update();
+	intervalTimer_.Update();
+	for (auto& bullet : gun_) {
+		bullet->Update();
+	}
+}
+
 void Weapon::SetWeaponName(WeaponName weapon) {
 	if (weaponName_ == WeaponName::None) {
 		weaponName_ = weapon;
@@ -534,6 +591,23 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 			area_ = std::make_unique<Area>();
 			area_->Initialize();
 			area_->SetDamage(status_.damage);
+
+			break;
+		case WeaponName::Gun:
+
+			status_.cooldownTime = 1.5f;
+			status_.intervalTime = 0.3f;
+			status_.shotMaxCount = 5;
+			status_.shotNowCount = 0;
+			status_.damage = 3.0f;
+			status_.criticalRand = 10;
+			status_.bounceCount = 0;
+			status_.penetrationCount = 0;
+			status_.nockBackPower = 0.0f;
+			status_.durationTime = 0.0f;
+			status_.lifeTime = 10.0f;
+			status_.useRandomTarget = true; // Gunはランダムターゲット選択を使用
+			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 		default:

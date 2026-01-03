@@ -163,6 +163,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Boomerang\Boomerang.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Dice\Dice.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Gun\Gun.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Dice\Dice.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\FireBall\FireBall.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\BaseWeapon.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Gun\Gun.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Laser\Laser.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.h" />
@@ -466,13 +468,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="docs\AreaWeaponIntegration.md" />
-    <None Include="docs\DiceWeaponIntegration.md" />
-    <None Include="docs\EnemyKillCountSystem.md" />
     <None Include="docs\OffscreenRendering_Implementation.md" />
-    <None Include="docs\ToxicWeaponIntegration.md" />
-    <None Include="docs\WeaponCollisionFix.md" />
-    <None Include="docs\WeaponEquipmentSystem.md" />
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="Engine\Audio\AudioDocs.md">
       <SubType>

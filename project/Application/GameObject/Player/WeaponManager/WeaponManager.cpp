@@ -3,11 +3,11 @@
 void WeaponManager::Initialize() {
 
 	auto weapon = std::make_unique<Weapon>();
-	weapon->Initialize(WeaponName::Toxic);
+	weapon->Initialize(WeaponName::FireBall);
 	weapons_.push_back(std::move(weapon));
 
 	auto weapon2 = std::make_unique<Weapon>();
-	weapon2->Initialize(WeaponName::Area);
+	weapon2->Initialize(WeaponName::Gun);
 	weapons_.push_back(std::move(weapon2));
 
 	auto weapon3 = std::make_unique<Weapon>();

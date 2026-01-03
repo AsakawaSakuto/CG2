@@ -160,6 +160,8 @@ std::string GameSceneUI::GetWeaponIconPath(WeaponName weaponName) const {
 		return "icon/toxic.png";
 	case WeaponName::Area:
 		return "icon/area.png";
+	case WeaponName::Gun:
+		return "icon/gun.png";
 	case WeaponName::None:
 	default:
 		return "icon/none.png";

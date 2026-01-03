@@ -148,6 +148,9 @@ private:
 	// プレイヤーから最も近い敵へのベクトルを取得（正規化されていない）
 	Vector3 GetDirectionToEnemy() const;
 
+	// プレイヤーから最も近い敵へのベクトルを取得（ランダム化なし）
+	Vector3 GetDirectionToClosestEnemy() const;
+
 	// プレイヤーから最も近い敵までの距離を取得
 	float GetDistanceToNearestEnemy() const;
 
