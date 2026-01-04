@@ -14,9 +14,30 @@ void CollisionManager::Initialize() {
 	expItemGetParticle_->Initialize();
 	expItemGetParticle_->LoadJson("expItemGet");
 	expItemGetParticle_->Stop();
+	
+	// キャッシュの予約
+	aliveEnemiesCache_.reserve(256);
+}
+
+void CollisionManager::CacheAliveEnemies() {
+	aliveEnemiesCache_.clear();
+	
+	if (!enemyManager_) {
+		return;
+	}
+	
+	const auto& enemies = enemyManager_->GetEnemies();
+	for (const auto& enemy : enemies) {
+		if (enemy->IsAlive()) {
+			aliveEnemiesCache_.push_back(enemy.get());
+		}
+	}
 }
 
 void CollisionManager::Update() {
+	// 生存している敵をキャッシュ（フレームの最初に1回だけ）
+	CacheAliveEnemies();
+	
 	// PlayerとEnemyの衝突判定を実行
 	CheckPlayerEnemyCollision();
 
@@ -44,16 +65,8 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 	// プレイヤーの球体コライダーを取得
 	const Sphere& playerSphere = player_->GetSphereCollision();
 
-	// 敵のリストを取得
-	const auto& enemies = enemyManager_->GetEnemies();
-
-	// 全ての敵をチェック
-	for (const auto& enemy : enemies) {
-		// 死んでいる敵はスキップ
-		if (!enemy->IsAlive()) {
-			continue;
-		}
-		
+	// キャッシュされた生存敵をチェック
+	for (Enemy* enemy : aliveEnemiesCache_) {
 		const Sphere& enemySphere = enemy->GetSphereCollision();
 
 		// プレイヤーとEnemyの衝突判定
@@ -65,14 +78,24 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 	}
 }
 
+// 距離の二乗を計算するヘルパー関数
+inline float DistanceSquared(const Vector3& a, const Vector3& b) {
+	float dx = a.x - b.x;
+	float dy = a.y - b.y;
+	float dz = a.z - b.z;
+	return dx * dx + dy * dy + dz * dz;
+}
+
 void CollisionManager::CheckBulletEnemyCollision() {
 	// WeaponManagerまたはEnemyManagerが設定されていない場合は何もしない
 	if (!weaponManager_ || !enemyManager_) {
 		return;
 	}
 
-	// 敵のリストを取得
-	const auto& enemies = enemyManager_->GetEnemies();
+	// 生存敵がいなければスキップ
+	if (aliveEnemiesCache_.empty()) {
+		return;
+	}
 
 	// 全ての武器をチェック
 	const auto& weapons = weaponManager_->GetWeapons();
@@ -88,76 +111,77 @@ void CollisionManager::CheckBulletEnemyCollision() {
 		const auto& area = weapon->GetArea();
 		const auto& guns = weapon->GetGun();
 
+		// FireBalls
 		for (const auto& bullet : fireBalls) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
+			float bulletRadiusSq = bulletSphere.radius * bulletSphere.radius;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue; // 他の弾で死んだ可能性
+				
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
 					continue;
 				}
 
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
 					bullet->Dead();
+					break; // FireBallは1体にしか当たらない
 				}
 			}
 		}
 
+		// Lasers
 		for (const auto& bullet : lasers) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
-					continue;
-				}
-
-				// この弾が既にこの敵に当たっている場合はスキップ
-				if (bullet->HasHitEnemy(enemy.get())) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				if (bullet->HasHitEnemy(enemy)) {
 					continue;
 				}
 
 				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
+					continue;
+				}
 
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
-					// この敵に当たったことを記録
-					bullet->MarkEnemyAsHit(enemy.get());
+					bullet->MarkEnemyAsHit(enemy);
 					
-					// 貫通カウントを減らす
 					if (bullet->GetPenetrationCount() > 0) {
 						bullet->DecrementPenetrationCount();
 					}
@@ -165,229 +189,231 @@ void CollisionManager::CheckBulletEnemyCollision() {
 			}
 		}
 
+		// Runas
 		for (const auto& bullet : runas) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
-					continue;
-				}
-
-				// この弾が既にこの敵に当たっている場合はスキップ
-				if (bullet->HasHitEnemy(enemy.get())) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				if (bullet->HasHitEnemy(enemy)) {
 					continue;
 				}
 
 				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
+					continue;
+				}
 
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
-					// この敵に当たったことを記録
-					bullet->MarkEnemyAsHit(enemy.get());
+					bullet->MarkEnemyAsHit(enemy);
 					
-					// バウンス処理
 					bullet->Bounce();
 				}
 			}
 		}
 
+		// Axes
 		for (const auto& bullet : axes) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
 					continue;
 				}
 
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
 
+		// Boomerangs
 		for (const auto& bullet : boomerangs) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
 					continue;
 				}
 
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
 
+		// Dices
 		for (const auto& bullet : dices) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
 					continue;
 				}
 
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					// Diceはランダムダメージ(1-6)を与える
 					int damage = static_cast<int>(bullet->GetRandDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
 
+		// Toxics
 		for (const auto& bullet : toxics) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
 					continue;
 				}
 
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					// Toxicは通常ダメージを与える（継続ダメージは将来の実装で追加可能）
 					int damage = static_cast<int>(bullet->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
 
-		// Areaの衝突判定（常時存在する範囲攻撃）
+		// Area（常時存在する範囲攻撃）
 		if (area && area->IsAlive()) {
 			const Sphere& areaSphere = area->GetSphereCollision();
+			const Vector3& areaPos = areaSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = areaSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(areaPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
 					continue;
 				}
 
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-
-				// Areaと敵の衝突判定
-				if (Collision::IsHit(areaSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// Areaは継続ダメージなので、パーティクルは出さずにダメージのみ
+				if (!enemy->IsActiveInvincibleTimer()) {
 					int damage = static_cast<int>(area->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
 
+		// Guns
 		for (const auto& bullet : guns) {
-			// 弾が既に死亡している場合はスキップ
 			if (!bullet->IsAlive()) {
 				continue;
 			}
 
 			const Sphere& bulletSphere = bullet->GetSphereCollision();
+			const Vector3& bulletPos = bulletSphere.center;
 
-			// 全ての敵をチェック
-			for (const auto& enemy : enemies) {
-				// 敵が既に死亡している場合はスキップ
-				if (!enemy->IsAlive()) {
+			for (Enemy* enemy : aliveEnemiesCache_) {
+				if (!enemy->IsAlive()) continue;
+				
+				const Sphere& enemySphere = enemy->GetSphereCollision();
+				
+				// 距離の二乗で早期棄却
+				float maxDist = bulletSphere.radius + enemySphere.radius;
+				float distSq = DistanceSquared(bulletPos, enemySphere.center);
+				if (distSq > maxDist * maxDist) {
 					continue;
 				}
 
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-
-				// 弾と敵の衝突判定
-				if (Collision::IsHit(bulletSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
-					// 衝突した敵を死亡状態にする
+				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					// Gunは通常ダメージを与える
 					int damage = static_cast<int>(bullet->GetDamage());
 					enemy->Damage(damage);
 					
-					// ダメージ表示を生成
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
 					bullet->Dead();
+					break; // Gunは1体にしか当たらない
 				}
 			}
 		}
@@ -403,27 +429,33 @@ void CollisionManager::CheckExpItemPlayerCollision() {
 	// プレイヤーの球体コライダーを取得
 	const Sphere& playerSphere = player_->GetSphereCollision();
 	const Sphere& stateChangeSphere = player_->GetExpItemStateChangeCollision();
+	const Vector3& playerPos = playerSphere.center;
 
 	// 敵のリストを取得
 	const auto& expItems = enemyManager_->GetExpItems();
 
-	// 全ての敵をチェック
+	// 全てのExpItemをチェック
 	for (const auto& expItem : expItems) {
+		if (!expItem->IsAlive()) {
+			continue;
+		}
+		
 		const Sphere& expItemSphere = expItem->GetSphereCollision();
-
-		// プレイヤーとEnemyの衝突判定
-		if (Collision::IsHit(stateChangeSphere, expItemSphere)) {
-			// 衝突したEnemyを死亡状態にする
+		const Vector3& itemPos = expItemSphere.center;
+		
+		// StateChange用の距離チェック
+		float stateChangeMaxDist = stateChangeSphere.radius + expItemSphere.radius;
+		float distSq = DistanceSquared(playerPos, itemPos);
+		
+		if (distSq <= stateChangeMaxDist * stateChangeMaxDist) {
 			expItem->StateChange();
 		}
 
-		// プレイヤーとEnemyの衝突判定
-		if (Collision::IsHit(playerSphere, expItemSphere)) {
-			// 衝突したEnemyを死亡状態にする
-
+		// アイテム取得用の距離チェック
+		float getMaxDist = playerSphere.radius + expItemSphere.radius;
+		if (distSq <= getMaxDist * getMaxDist) {
 			expItemGetParticle_->Play(player_->GetPosition(), false);
 			player_->AddExp(5);
-
 			expItem->Dead();
 		}
 	}

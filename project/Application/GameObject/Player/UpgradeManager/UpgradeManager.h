@@ -77,6 +77,11 @@ private:
 	std::string GetWeaponNamePath(WeaponName weaponName) const;
 
 	/// <summary>
+	/// アップグレードタイプとレアリティから説明文テクスチャのパスを取得
+	/// </summary>
+	std::string GetUpgradeTextPath(UpgradeType type, Rarity rarity) const;
+
+	/// <summary>
 	/// UIを選択肢に応じて更新
 	/// </summary>
 	void UpdateUpgradeUI();

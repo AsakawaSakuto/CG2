@@ -15,11 +15,14 @@ void Area::Initialize() {
 void Area::Update() {
 
 	transform_.rotate.y += 6.0f * deltaTime_;
+	transform_.scale.x = 1.0f * scaleRate_;
+	transform_.scale.z = 1.0f * scaleRate_;
 
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = 3.0f;
+	sphereCollision_.radius = 3.0f * scaleRate_;
 
 	areaParticle_->SetEmitterPosition(transform_.translate);
+	areaParticle_->SetRadius(sphereCollision_.radius);
 	areaParticle_->Update();
 	MyDebugLine::AddShape(sphereCollision_);
 }

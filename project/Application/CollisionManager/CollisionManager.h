@@ -1,10 +1,12 @@
 #pragma once
 #include "EngineSystem.h"
+#include <vector>
 
 // 前方宣言
 class Player;
 class EnemyManager;
 class WeaponManager;
+class Enemy;
 
 class CollisionManager
 {
@@ -31,6 +33,9 @@ private:
 
 	// BulletとEnemyの衝突判定
 	void CheckBulletEnemyCollision();
+	
+	// 生存している敵のリストをキャッシュ
+	void CacheAliveEnemies();
 
 private:
 
@@ -42,4 +47,7 @@ private:
 
 	unique_ptr<Particles> enemyDieParticle_ = make_unique<Particles>();
 	unique_ptr<Particles> expItemGetParticle_ = make_unique<Particles>();
+	
+	// 生存している敵のキャッシュ（毎フレーム更新)
+	std::vector<Enemy*> aliveEnemiesCache_;
 };

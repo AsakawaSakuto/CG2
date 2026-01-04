@@ -106,7 +106,7 @@ void UpgradeManager::Update() {
 		// この選択肢の強化をしてゲームを再開
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			ApplySelectedUpgrade();
-			isUpgrade_ = false;
+		 isUpgrade_ = false;
 		}
 
 		break;
@@ -174,14 +174,14 @@ void UpgradeManager::DrawImGui() {
 	//upgradeIcon3_->DrawImGui("UpgradeIcon3UI");
 	//bg_->DrawImGui("UpgradeBGUI");
 	//upgradeName1_->DrawImGui("UpgradeName1UI");
-	//upgradeName2_->DrawImGui("UpgradeName2UI");
+	//upgradeName2_->DrawImGui("UpgradeName2UI";
 	//upgradeName3_->DrawImGui("UpgradeName3UI");
 	//newText1_->DrawImGui("NewText1UI");
-	//newText2_->DrawImGui("NewText2UI");
-	//newText3_->DrawImGui("NewText3UI");
-	//upgradeText1_->DrawImGui("UpgradeText1UI");
-	//upgradeText2_->DrawImGui("UpgradeText2UI");
-	//upgradeText3_->DrawImGui("UpgradeText3UI");
+	//newText2_->DrawImGui("NewText2UI";
+	//newText3_->DrawImGui("NewText3UI";
+	//upgradeText1_->DrawImGui("UpgradeText1UI";
+	//upgradeText2_->DrawImGui("UpgradeText2UI";
+	//upgradeText3_->DrawImGui("UpgradeText3UI";
 }
 
 void UpgradeManager::Upgrade() {
@@ -208,6 +208,11 @@ void UpgradeManager::Upgrade() {
 	upgradeName1_->SetTexture(GetWeaponNamePath(upgradeOptions_[0].weaponName));
 	upgradeName2_->SetTexture(GetWeaponNamePath(upgradeOptions_[1].weaponName));
 	upgradeName3_->SetTexture(GetWeaponNamePath(upgradeOptions_[2].weaponName));
+	
+	// アップグレード説明テクスチャを設定
+	upgradeText1_->SetTexture(GetUpgradeTextPath(upgradeOptions_[0].type, upgradeOptions_[0].rarity));
+	upgradeText2_->SetTexture(GetUpgradeTextPath(upgradeOptions_[1].type, upgradeOptions_[1].rarity));
+	upgradeText3_->SetTexture(GetUpgradeTextPath(upgradeOptions_[2].type, upgradeOptions_[2].rarity));
 }
 
 const UpgradeOption& UpgradeManager::GetSelectedOption() const {
@@ -312,14 +317,24 @@ void UpgradeManager::GenerateUpgradeOptions() {
 				option.weaponName = availableUnequipped[index];
 				// 新規武器の場合はRarityを設定しない（使用しない）
 			} else {
-				// ダメージ強化か発射数強化かをランダムに選択
-				if (MyRand::Int(0, 1) == 0) {
-					option.type = UpgradeType::UpgradeDamage;
-				} else {
-					option.type = UpgradeType::UpgradeShotMaxCount;
-				}
 				int index = MyRand::Int(0, static_cast<int>(availableEquipped.size()) - 1);
 				option.weaponName = availableEquipped[index];
+				
+				// 武器に応じて利用可能な強化タイプを決定
+				std::vector<UpgradeType> availableUpgradeTypes;
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
+				
+				// AreaとToxicの場合はUpgradeSizeも追加
+				if (option.weaponName == WeaponName::Area || option.weaponName == WeaponName::Toxic) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
+				} else {
+					// それ以外の武器はUpgradeShotMaxCountを追加
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+				}
+				
+				// ランダムに強化タイプを選択
+				int typeIndex = MyRand::Int(0, static_cast<int>(availableUpgradeTypes.size()) - 1);
+				option.type = availableUpgradeTypes[typeIndex];
 				option.rarity = RandomRarity();
 			}
 		} else if (canEquipNew) {
@@ -328,14 +343,24 @@ void UpgradeManager::GenerateUpgradeOptions() {
 			option.weaponName = availableUnequipped[index];
 			// 新規武器の場合はRarityを設定しない（使用しない）
 		} else if (canUpgrade) {
-			// ダメージ強化か発射数強化かをランダムに選択
-			if (MyRand::Int(0, 1) == 0) {
-				option.type = UpgradeType::UpgradeDamage;
-			} else {
-				option.type = UpgradeType::UpgradeShotMaxCount;
-			}
 			int index = MyRand::Int(0, static_cast<int>(availableEquipped.size()) - 1);
 			option.weaponName = availableEquipped[index];
+			
+			// 武器に応じて利用可能な強化タイプを決定
+			std::vector<UpgradeType> availableUpgradeTypes;
+			availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
+			
+			// AreaとToxicの場合はUpgradeSizeも追加
+			if (option.weaponName == WeaponName::Area || option.weaponName == WeaponName::Toxic) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
+			} else if (option.weaponName != WeaponName::Area) {
+				// それ以外の武器はUpgradeShotMaxCountを追加
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+			}
+			
+			// ランダムに強化タイプを選択
+			int typeIndex = MyRand::Int(0, static_cast<int>(availableUpgradeTypes.size()) - 1);
+			option.type = availableUpgradeTypes[typeIndex];
 			option.rarity = RandomRarity();
 		} else {
 			// どちらもできない場合は何も設定しない（稀なケース）
@@ -415,6 +440,45 @@ std::string UpgradeManager::GetWeaponNamePath(WeaponName weaponName) const {
 	}
 }
 
+std::string UpgradeManager::GetUpgradeTextPath(UpgradeType type, Rarity rarity) const {
+	// 新規武器の場合は説明不要（空のパス、または共通テキスト）
+	if (type == UpgradeType::NewWeapon) {
+		return "UI/game/upgradeText/testText.png";
+	}
+	
+	// レアリティ名を取得
+	std::string rarityName;
+	switch (rarity) {
+	case Rarity::UnCommon:
+		rarityName = "UnCommon";
+		break;
+	case Rarity::Rare:
+		rarityName = "Rare";
+		break;
+	case Rarity::Epic:
+		rarityName = "Epic";
+		break;
+	case Rarity::Legendary:
+		rarityName = "Legendary";
+		break;
+	default:
+		rarityName = "UnCommon";
+		break;
+	}
+	
+	// アップグレードタイプに応じてパスを生成
+	if (type == UpgradeType::UpgradeDamage) {
+		return "UI/game/upgradeText/Damage/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradeShotMaxCount) {
+		return "UI/game/upgradeText/ShotMaxCount/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradeSize) {
+		return "UI/game/upgradeText/Size/" + rarityName + ".png";
+	}
+	
+	// デフォルト
+	return "UI/game/upgradeText/testText.png";
+}
+
 void UpgradeManager::UpdateUpgradeUI() {
 	// 選択中の背景を少し明るくする（強調表示）
 	// 新規武器は白、強化はレアリティ色
@@ -476,6 +540,15 @@ void UpgradeManager::ApplySelectedUpgrade() {
 		for (auto& weapon : weapons) {
 			if (weapon->GetWeaponName() == selected.weaponName) {
 				weapon->UpgradeShotMaxCount(selected.rarity);
+				break;
+			}
+		}
+	} else if (selected.type == UpgradeType::UpgradeSize) {
+		// 既存の武器のサイズを強化（AreaとToxic専用）
+		const auto& weapons = weaponManager_->GetWeapons();
+		for (auto& weapon : weapons) {
+			if (weapon->GetWeaponName() == selected.weaponName) {
+				weapon->UpgradeSize(selected.rarity);
 				break;
 			}
 		}

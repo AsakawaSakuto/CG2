@@ -30,8 +30,15 @@ public:
 	// TreeManagerへの参照を設定
 	void SetTreeManager(TreeManager* treeManager) { treeManager_ = treeManager; }
 
-	// WeaponManagerへのアクセス
+	/// <summary>
+	/// WeaponManagerへのアクセス
+	/// </summary>
 	WeaponManager* GetWeaponManager() { return weaponManager_.get(); }
+	
+	/// <summary>
+	/// UpgradeManagerへのアクセス
+	/// </summary>
+	UpgradeManager* GetUpgradeManager() { return upgradeManager_.get(); }
 
 	void PostFrameCleanup();
 	

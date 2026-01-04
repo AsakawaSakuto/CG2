@@ -97,6 +97,28 @@ public:
 			break;
 		}
 	}
+
+	/// <summary>
+	/// サイズを強化（AreaとToxic専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeSize(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.sizeRate += 0.05f;
+			break;
+		case Rarity::Rare:
+			status_.sizeRate += 0.1f;
+			break;
+		case Rarity::Epic:
+			status_.sizeRate += 0.15f;
+			break;
+		case Rarity::Legendary:
+			status_.sizeRate += 0.25f;
+			break;
+		}
+	}
 private:
 
 	void FireBallUpdate();

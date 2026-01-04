@@ -256,18 +256,24 @@ void GameScene::ChestUpdate() {
 	if (MyInput::Trigger(Action::INTERACT)) {
 		// まず宝箱との衝突をチェック
 		if (chestManager_->CheckChestCollision(playerAABB, isPaidChest, openAmount)) {
+			bool chestOpened = false;
 			if (isPaidChest) {
 				// PaidChestの場合、お金をチェックしてから開ける
 				if (player_->SubtractMoney(openAmount)) {
 					// お金が足りる場合は宝箱を開ける
-					chestManager_->OpenChest(playerAABB, true);
+					chestOpened = chestManager_->OpenChest(playerAABB, true);
 				} else {
 					// お金が足りない場合は開けない
 					// TODO: お金が足りないメッセージを表示する
 				}
 			} else {
 				// FreeChestの場合は無条件で開ける
-				chestManager_->OpenChest(playerAABB, false);
+				chestOpened = chestManager_->OpenChest(playerAABB, false);
+			}
+			
+			// 宝箱が開けられた場合、Upgradeを実行
+			if (chestOpened && player_->GetUpgradeManager()) {
+				player_->GetUpgradeManager()->Upgrade();
 			}
 		}
 	}

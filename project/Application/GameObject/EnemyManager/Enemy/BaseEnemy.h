@@ -8,7 +8,7 @@ class BaseEnemy
 public:
 	void Damage(int damage) { 
 		if (!invicibilityTimer_.IsActive()) {
-			invicibilityTimer_.Start(0.1f, false);
+			invicibilityTimer_.Start(0.5f, false);
 			status_.hp -= damage;
 			
 			// HPが0以下になったら死亡コールバックを呼ぶ
