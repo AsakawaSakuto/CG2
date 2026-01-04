@@ -49,14 +49,18 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 
 	// 全ての敵をチェック
 	for (const auto& enemy : enemies) {
+		// 死んでいる敵はスキップ
+		if (!enemy->IsAlive()) {
+			continue;
+		}
+		
 		const Sphere& enemySphere = enemy->GetSphereCollision();
 
 		// プレイヤーとEnemyの衝突判定
 		if (Collision::IsHit(playerSphere, enemySphere)) {
-			// 衝突したEnemyを死亡状態にする
-			// 注: BaseEnemyのDamage()経由で死亡コールバックが呼ばれるため、
-			// ここでは直接Dead()ではなくDamage()で大ダメージを与える
-			enemy->Damage(9999); // 即死ダメージ
+			// 敵の攻撃力分だけプレイヤーにダメージを与える
+			int enemyPower = enemy->GetPower();
+			player_->TakeDamage(enemyPower);
 		}
 	}
 }

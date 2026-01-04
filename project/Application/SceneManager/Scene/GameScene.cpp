@@ -88,6 +88,7 @@ void GameScene::Initialize() {
 	postEffect->GetParams().fog.fogColor[1] = 1.0f;
 	postEffect->GetParams().fog.fogColor[2] = 1.0f;
 
+	playTimer_.Start(300.0f, false);
 }
 
 void GameScene::Update() {
@@ -133,6 +134,8 @@ void GameScene::Update() {
 	UIUpdate();
 
 	//MyDebugLine::AddGrid(100.0f, 20);
+
+	playTimer_.Update();
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
@@ -285,6 +288,8 @@ void GameScene::UIUpdate() {
 		}
 	}
 	
+	gameSceneUI_->SetPlayTime(playTimer_.GetRemainingTime());
+
 	gameSceneUI_->Update();
 }
 
