@@ -98,42 +98,47 @@ void GameScene::Update() {
 
 	player_->Update();
 
-	gameCamera_->SetTarget(player_->GetPosition());
-	gameCamera_->Update();
-	
-	// カメラとプレイヤー間のブロック遮蔽をチェックしてカメラ距離を調整
-	gameCamera_->CheckBlockOcclusion(map3D_.get());
-	
-	// カメラとプレイヤー間の障害物を半透明化
-	gameCamera_->UpdateOccluderTransparency(treeManager_.get());
+	// ゲーム中のみ更新処理を行う、アップグレード選択中は停止
+	if (!player_->IsUpgradeSelect()) {
 
-	// CollisionManagerで衝突判定を実行
-	collisionManager_->Update();
+		gameCamera_->SetTarget(player_->GetPosition());
+		gameCamera_->Update();
 
-	enemyManager_->SetTargetPosition(player_->GetPosition());
-	enemyManager_->SetMap(map3D_.get());
-	enemyManager_->Update();
+		// カメラとプレイヤー間のブロック遮蔽をチェックしてカメラ距離を調整
+		gameCamera_->CheckBlockOcclusion(map3D_.get());
 
-	JarUpdate();
+		// カメラとプレイヤー間の障害物を半透明化
+		gameCamera_->UpdateOccluderTransparency(treeManager_.get());
 
-	ChestUpdate();
+		// CollisionManagerで衝突判定を実行
+		collisionManager_->Update();
 
-	// ChestManagerの更新
-	chestManager_->Update();
+		enemyManager_->SetTargetPosition(player_->GetPosition());
+		enemyManager_->SetMap(map3D_.get());
+		enemyManager_->Update();
 
-	// TreeManagerの更新
-	treeManager_->Update();
+		JarUpdate();
 
-	//camera_ = debugCamera_;
-	camera_ = gameCamera_->GetCamera();
+		ChestUpdate();
 
-	camera_.Update();
+		// ChestManagerの更新
+		chestManager_->Update();
 
-	map3D_->Update();
+		// TreeManagerの更新
+		treeManager_->Update();
 
-	UIUpdate();
+		//camera_ = debugCamera_;
+		camera_ = gameCamera_->GetCamera();
 
-	playTimer_.Update();
+		camera_.Update();
+
+		map3D_->Update();
+
+		UIUpdate();
+
+		playTimer_.Update();
+
+	}
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());

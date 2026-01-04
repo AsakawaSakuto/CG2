@@ -16,9 +16,11 @@ void Toxic::Initialize() {
 void Toxic::Update() {
 
 	transform_.rotate.y += 6.0f * deltaTime_;
+	transform_.scale.x = scaleMultipler_;
+	transform_.scale.z = scaleMultipler_;
 
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = 1.0f;
+	sphereCollision_.radius = scaleMultipler_;
 
 	MyDebugLine::AddShape(sphereCollision_);
 

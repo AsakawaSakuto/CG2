@@ -1,9 +1,9 @@
 #include "UpgradeManager.h"
 
 void UpgradeManager::Initialize() {
-	upgradeSelect_ = std::make_unique<Sprite>();
-	upgradeSelect_->Initialize("UI/game/upgradeSelect.png");
-	upgradeSelect_->LoadFromJson("upgradeSelectText");
+	upgradeSelectText_ = std::make_unique<Sprite>();
+	upgradeSelectText_->Initialize("UI/game/upgradeSelect.png");
+	upgradeSelectText_->LoadFromJson("upgradeSelectText");
 
 	upgradeBG1_ = std::make_unique<Sprite>();
 	upgradeBG1_->Initialize("UI/game/upgradeBG.png");
@@ -28,10 +28,56 @@ void UpgradeManager::Initialize() {
 	bg_ = std::make_unique<Sprite>();
 	bg_->Initialize("UI/game/selectBG.png");
 	bg_->LoadFromJson("selectBG");
+
+	isUpgrade_ = false;
 }
 
 void UpgradeManager::Update() {
-	upgradeSelect_->Update();
+
+	switch (upgradeSelect_) {
+	case UpgradeSelect::Select1:
+
+		if (MyInput::Trigger(Action::CELECT_DOWN)) {
+			upgradeSelect_ = UpgradeSelect::Select2;
+		}
+
+		// この選択肢の強化をしてゲームを再開
+		if (MyInput::Trigger(Action::CONFIRM)) {
+			isUpgrade_ = false;
+		}
+
+		break;
+	case UpgradeSelect::Select2:
+
+		if (MyInput::Trigger(Action::CELECT_DOWN)) {
+			upgradeSelect_ = UpgradeSelect::Select3;
+		}
+
+		if (MyInput::Trigger(Action::CELECT_UP)) {
+			upgradeSelect_ = UpgradeSelect::Select1;
+		}
+
+		// この選択肢の強化をしてゲームを再開
+		if (MyInput::Trigger(Action::CONFIRM)) {
+			isUpgrade_ = false;
+		}
+
+		break;
+	case UpgradeSelect::Select3:
+
+		if (MyInput::Trigger(Action::CELECT_UP)) {
+			upgradeSelect_ = UpgradeSelect::Select2;
+		}
+
+		// この選択肢の強化をしてゲームを再開
+		if (MyInput::Trigger(Action::CONFIRM)) {
+			isUpgrade_ = false;
+		}
+
+		break;
+	}
+
+	upgradeSelectText_->Update();
 	upgradeBG1_->Update();
 	upgradeBG2_->Update();
 	upgradeBG3_->Update();
@@ -42,18 +88,20 @@ void UpgradeManager::Update() {
 }
 
 void UpgradeManager::Draw() {
-	bg_->Draw();
-	upgradeSelect_->Draw();
-	upgradeBG1_->Draw();
-	upgradeBG2_->Draw();
-	upgradeBG3_->Draw();
-	upgradeIcon1_->Draw();
-	upgradeIcon2_->Draw();
-	upgradeIcon3_->Draw();
+	if (isUpgrade_) {
+		bg_->Draw();
+		upgradeSelectText_->Draw();
+		upgradeBG1_->Draw();
+		upgradeBG2_->Draw();
+		upgradeBG3_->Draw();
+		upgradeIcon1_->Draw();
+		upgradeIcon2_->Draw();
+		upgradeIcon3_->Draw();
+	}
 }
 
 void UpgradeManager::DrawImGui() {
-	//upgradeSelect_->DrawImGui("UpgradeSelectUI");
+	//upgradeSelectText_->DrawImGui("UpgradeSelectUI");
 	//upgradeBG1_->DrawImGui("UpgradeBG1UI");
 	//upgradeBG2_->DrawImGui("UpgradeBG2UI");
 	//upgradeBG3_->DrawImGui("UpgradeBG3UI");
@@ -61,8 +109,4 @@ void UpgradeManager::DrawImGui() {
 	//upgradeIcon2_->DrawImGui("UpgradeIcon2UI");
 	//upgradeIcon3_->DrawImGui("UpgradeIcon3UI");
 	bg_->DrawImGui("UpgradeBGUI");
-}
-
-void UpgradeManager::Upgrade() {
-	// アップグレード処理
 }

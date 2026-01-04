@@ -417,12 +417,14 @@ void Weapon::ToxicUpdate() {
 			coolDownTimer_.Reset();
 		}
 	}
+
 	if (intervalTimer_.IsFinished()) {
 		auto bullet = std::make_unique<Toxic>();
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
+		bullet->SetScaleMultipler(status_.sizeRate);
 		toxic_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= status_.shotMaxCount) {
@@ -431,6 +433,11 @@ void Weapon::ToxicUpdate() {
 			coolDownTimer_.Start(status_.cooldownTime, false);
 		}
 	}
+
+	if (MyInput::TriggerKey(DIK_T)) {
+		status_.sizeRate = status_.sizeRate + 0.1f;
+	}
+
 	coolDownTimer_.Update();
 	intervalTimer_.Update();
 	for (auto& bullet : toxic_) {
