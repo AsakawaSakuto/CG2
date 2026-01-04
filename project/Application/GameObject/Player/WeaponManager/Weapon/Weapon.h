@@ -3,6 +3,8 @@
 #include "Camera/Camera.h"
 #include <queue>
 
+#include"GameObject/Rarity.h"
+
 #include "FireBall/FireBall.h"
 #include "Laser/Laser.h"
 #include "Runa/Runa.h"
@@ -52,6 +54,49 @@ public:
 	/// </summary>
 	WeaponName GetWeaponName() const { return weaponName_; }
 	
+	/// <summary>
+	/// 敵に与えるダメージを強化
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeDamage(Rarity rarity) { 
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.damage += 2.0f;
+			break;
+		case Rarity::Rare:
+			status_.damage += 3.0f;
+			break;
+		case Rarity::Epic:
+			status_.damage += 4.0f;
+			break;
+		case Rarity::Legendary:
+			status_.damage += 5.0f;
+			break;
+		}
+	}
+
+	/// <summary>
+	/// 最大発射数を強化
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeShotMaxCount(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.shotMaxCount += 1.25f;
+			break;
+		case Rarity::Rare:
+			status_.shotMaxCount += 1.5f;
+			break;
+		case Rarity::Epic:
+			status_.shotMaxCount += 1.75f;
+			break;
+		case Rarity::Legendary:
+			status_.shotMaxCount += 2.0f;
+			break;
+		}
+	}
 private:
 
 	void FireBallUpdate();
