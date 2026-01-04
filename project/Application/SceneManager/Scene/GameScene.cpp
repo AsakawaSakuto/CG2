@@ -133,8 +133,6 @@ void GameScene::Update() {
 
 	UIUpdate();
 
-	//MyDebugLine::AddGrid(100.0f, 20);
-
 	playTimer_.Update();
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();

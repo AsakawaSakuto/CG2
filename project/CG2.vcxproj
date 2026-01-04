@@ -169,6 +169,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
+    <ClCompile Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.cpp" />
     <ClCompile Include="Application\GameUI\GameSceneUI\GameSceneUI.cpp" />
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
     <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
@@ -295,6 +296,9 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
+    <ClInclude Include="Application\GameObject\Rarity.h" />
+    <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.h" />
+    <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeType.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
     <ClInclude Include="Application\GameUI\GameSceneUI\GameSceneUI.h" />
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />

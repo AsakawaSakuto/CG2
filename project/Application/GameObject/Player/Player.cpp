@@ -64,6 +64,9 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	mapCollosion_.center = { 0.0f, 0.0f, 0.0f }; // 初期値（Update()で更新される）
 	mapCollosion_.min = { -0.5f, 0.0f, -0.5f };  // centerからのローカルオフセット
 	mapCollosion_.max = {  0.5f, 0.25f,  0.5f };  // centerからのローカルオフセット
+
+	upgradeManager_ = std::make_unique<UpgradeManager>();
+	upgradeManager_->Initialize();
 }
 
 void Player::Update() {
@@ -143,6 +146,8 @@ void Player::Update() {
 		isVisible_ = true;
 	}
 
+	upgradeManager_->Update();
+
 	MyDebugLine::AddShape(sphereCollision_);
 	Circle expCircle = {};
 	expCircle.center = { transform_.translate.x ,transform_.translate.y + 0.1f ,transform_.translate.z };
@@ -166,6 +171,8 @@ void Player::Draw(Camera camera) {
 	landingParticle_->Draw(camera);
 
 	weaponManager_->Draw(camera);
+
+	upgradeManager_->Draw();
 }
 
 void Player::DrawImGui() {
@@ -189,6 +196,8 @@ void Player::DrawImGui() {
 	ImGui::End();
 #endif
 	//landingParticle_->DrawImGui("move Particle");
+
+	upgradeManager_->DrawImGui();
 }
 
 void Player::Move() {

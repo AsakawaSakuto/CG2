@@ -4,6 +4,7 @@
 #include "playerStatus.h"
 #include "AnimationController/AnimationController.h"
 #include "GameObject/Player/WeaponManager/WeaponManager.h"
+#include "UpgradeManager/UpgradeManager.h"
 
 // 前方宣言
 class EnemyManager;
@@ -179,6 +180,8 @@ private:
 	float GetGroundHeight() const;
 
 private:
+	unique_ptr<UpgradeManager> upgradeManager_;
+
 	PlayerName playerName_;
 
 	unique_ptr<AnimationController> model_;
