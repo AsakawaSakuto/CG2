@@ -43,6 +43,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	model_ = std::make_unique<AnimationController>();
 	model_->Initialize(animationMap);
 	model_->SetMotion(PlayerMotion::Idle, 0.0f, true);
+	model_->SetColor(playerColors[static_cast<int>(playerName_)]);
 
 	moveParticle_->Initialize("playerMove");
 	landingParticle_->Initialize("playerLanding");
