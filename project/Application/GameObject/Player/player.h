@@ -138,6 +138,10 @@ public:
 	bool CanEquipWeapon() const {
 		return weaponManager_->CanEquipWeapon();
 	}
+
+	bool IsUpgradeSelect() const {
+		return upgradeManager_->IsUpgradeSelect();
+	}
 	
 private:
 
