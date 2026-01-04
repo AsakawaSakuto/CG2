@@ -67,6 +67,8 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 
 	upgradeManager_ = std::make_unique<UpgradeManager>();
 	upgradeManager_->Initialize();
+	// UpgradeManagerにWeaponManagerを設定
+	upgradeManager_->SetWeaponManager(weaponManager_.get());
 }
 
 void Player::Update() {
@@ -1156,6 +1158,11 @@ void Player::AddExp(int exp) {
 		status_.level++;
 		// 次のレベルに必要な経験値を増やす（例：1.5倍）
 		status_.expToNextLevel = static_cast<int>(status_.expToNextLevel * 1.1f);
+		
+		// レベルアップしたらアップグレード選択画面を表示
+		if (upgradeManager_) {
+			upgradeManager_->Upgrade();
+		}
 	}
 }
 
