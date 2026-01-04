@@ -88,6 +88,10 @@ public:
 	void SetShadowGroundY(float groundY) {
 		shadowTransform_.translate.y = groundY;
 	}
+
+	void SetColor(Vector3 color) {
+		model_->SetColor3(color);
+	}
 private:
 
 	void SetAnimation(const Animation& animation, float beginTime = 0.0f);

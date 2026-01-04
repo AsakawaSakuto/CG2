@@ -20,19 +20,19 @@ enum class WeaponName {
 /// プレイヤーが装備する武器のステータス構造体
 /// </summary>
 struct WeaponStatus {
-	float cooldownTime;      // 複数打つ際のクールタイム
-	float intervalTime;      // 攻撃間隔
-	int shotMaxCount;        // 撃つ個数
-	int shotNowCount;        // 現在撃った個数
-	float damage;            // ダメージ
-	int criticalRand;        // クリティカル発生確率
-	float curiticalDamage;   // 武器のクリティカルダメージ率
-	float moveSpeed;         // 武器の速度
-	int bounceCount;         // 跳弾する回数
-	int penetrationCount;    // 貫通する回数
-	float nockBackPower;     // ノックバックさせる力
-	float durationTime;      // 持続時間
-	float lifeTime;          // 弾の寿命
-	float sizeRate = 1.0f;   // 弾の大きさ
+	float cooldownTime = 0.2f;    // 複数打つ際のクールタイム
+	float intervalTime = 1.0f;    // 攻撃間隔
+	float shotMaxCount = 1.0f;    // 撃つ個数
+	int shotNowCount = 0;         // 現在撃った個数
+	float damage = 10.0f;         // ダメージ
+	float criticalRand = 0.0f;    // クリティカル発生確率
+	float curiticalDamage = 2.0f; // 武器のクリティカルダメージ率
+	float speedRate = 1.0f;       // 武器の速度
+	int bounceCount = 0;          // 跳弾する回数
+	int penetrationCount = 0;     // 貫通する回数
+	float nockBackPower = 0.0f;   // ノックバックさせる力
+	float durationTime = 2.0f;    // 持続時間
+	float lifeTime;               // 弾の寿命
+	float sizeRate = 1.0f;        // 弾の大きさ
 	bool useRandomTarget = false; // ランダムターゲット選択を使用するか
 };

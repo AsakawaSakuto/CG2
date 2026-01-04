@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject/EnemyManager/Enemy/Enemy.h"
 #include "GameObject/EnemyManager/ExpItem/ExpItem.h"
+#include "GameObject/EnemyManager/DamagePlane.h"
 
 class Map3D; // 前方宣言
 class Player; // 前方宣言
@@ -27,10 +28,16 @@ public:
 	// Playerへの参照を設定
 	void SetPlayer(Player* player) { player_ = player; }
 
+	/// <summary>
+	/// ダメージ表示を生成
+	/// </summary>
+	void CreateDamagePlane(const Vector3& position, int damage);
+
 private:
 
 	std::vector<std::unique_ptr<Enemy>> enemies_;
 	std::vector<std::unique_ptr<ExpItem>> expItems_;
+	std::vector<std::unique_ptr<DamagePlane>> damagePlanes_;
 	GameTimer spawnTimer_;
 	Random random_;
 	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };

@@ -44,6 +44,8 @@ private:
 	Camera camera_;
 	DebugCamera debugCamera_;
 
+	GameTimer playTimer_;
+
 	unique_ptr<GameSceneUI> gameSceneUI_;
 
 	// プレイヤー関連のクラス

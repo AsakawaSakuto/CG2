@@ -262,6 +262,7 @@ void TitleScene::Update() {
 			break;
 	}
 
+	player_->SetColor3(playerColors[static_cast<int>(playerName_)]);
 	player_->Update();
 
 	titleUI_->SetSelectState(selectState_);

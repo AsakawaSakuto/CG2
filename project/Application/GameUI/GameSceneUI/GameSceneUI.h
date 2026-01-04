@@ -23,6 +23,7 @@ public:
 	/// <param name="weaponName">武器の種類</param>
 	void UpdateWeaponIcon(int slotIndex, WeaponName weaponName);
 
+	void SetPlayTime(float time) { playTime_ = time; }
 private:
 	std::unique_ptr<BitmapFont> enemyFont_;
 	std::unique_ptr<Sprite> enemy_;
@@ -52,6 +53,9 @@ private:
 	std::unique_ptr<Sprite> weaponIcon2_;
 	std::unique_ptr<Sprite> weaponIcon3_;
 	std::unique_ptr<Sprite> weaponIcon4_;
+
+	std::unique_ptr<BitmapFont> playTimeFont_;
+	float playTime_ = 0.0f;
 
 	/// <summary>
 	/// 武器名からアイコンのテクスチャパスを取得

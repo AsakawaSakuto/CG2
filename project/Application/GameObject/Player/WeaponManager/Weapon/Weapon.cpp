@@ -241,7 +241,7 @@ void Weapon::FireBallUpdate() {
 		fireBall_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
@@ -276,7 +276,7 @@ void Weapon::LaserUpdate() {
 		laser_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
@@ -308,7 +308,7 @@ void Weapon::RunaUpdate() {
 		bullet->SetBounceCount(status_.bounceCount);
 		runa_.push_back(std::move(bullet));
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
@@ -338,7 +338,7 @@ void Weapon::AxeUpdate() {
 		bullet->SetLifeTime(status_.lifeTime);
 		axe_.push_back(std::move(bullet));
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
@@ -367,7 +367,7 @@ void Weapon::BoomerangUpdate() {
 		bullet->SetDamage(status_.damage);
 		boomerang_.push_back(std::move(bullet));
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
@@ -396,7 +396,7 @@ void Weapon::DiceUpdate() {
 		bullet->SetDamage(status_.damage);
 		dice_.push_back(std::move(bullet));
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
@@ -417,20 +417,27 @@ void Weapon::ToxicUpdate() {
 			coolDownTimer_.Reset();
 		}
 	}
+
 	if (intervalTimer_.IsFinished()) {
 		auto bullet = std::make_unique<Toxic>();
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
+		bullet->SetScaleMultipler(status_.sizeRate);
 		toxic_.push_back(std::move(bullet));
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);
 		}
 	}
+
+	if (MyInput::TriggerKey(DIK_T)) {
+		status_.sizeRate = status_.sizeRate + 0.1f;
+	}
+
 	coolDownTimer_.Update();
 	intervalTimer_.Update();
 	for (auto& bullet : toxic_) {
@@ -442,6 +449,7 @@ void Weapon::AreaUpdate() {
 	// Areaは常にプレイヤーの位置に追従
 	if (area_) {
 		area_->SetPosition(playerPosition_);
+		area_->SetDamage(status_.damage);
 		area_->Update();
 	}
 }
@@ -467,7 +475,7 @@ void Weapon::GunUpdate() {
 		bullet->SetDamage(status_.damage);
 		gun_.push_back(std::move(bullet));
 		status_.shotNowCount++;
-		if (status_.shotNowCount >= status_.shotMaxCount) {
+		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
 			coolDownTimer_.Start(status_.cooldownTime, false);

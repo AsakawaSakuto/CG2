@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
     <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
+    <ClCompile Include="Application\GameObject\EnemyManager\DamagePlane.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\ExpItem\ExpItem.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.cpp" />
+    <ClCompile Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.cpp" />
     <ClCompile Include="Application\GameUI\GameSceneUI\GameSceneUI.cpp" />
     <ClCompile Include="Application\GameUI\TitleSceneUI\TitleSceneUI.cpp" />
     <ClCompile Include="Application\Map\ChestManager\ChestManager.cpp" />
@@ -272,6 +274,7 @@
     <ClInclude Include="Application\EngineSystem.h" />
     <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\DamagePlane.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\BaseEnemy.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\Enemy.h" />
@@ -293,6 +296,9 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Runa\Runa.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Weapon.h" />
+    <ClInclude Include="Application\GameObject\Rarity.h" />
+    <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.h" />
+    <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeType.h" />
     <ClInclude Include="Application\GameUI\BaseUI.h" />
     <ClInclude Include="Application\GameUI\GameSceneUI\GameSceneUI.h" />
     <ClInclude Include="Application\GameUI\TitleSceneUI\TitleSceneUI.h" />

@@ -96,6 +96,11 @@ void EnemyManager::Update() {
 		expItem->Update();
 	}
 
+	// ダメージ表示の更新
+	for (auto& damagePlane : damagePlanes_) {
+		damagePlane->Update();
+	}
+
 	// 死亡した敵を削除し、その位置でパーティクルを再生
 	for (auto it = enemies_.begin(); it != enemies_.end();) {
 		if (!(*it)->IsAlive()) {
@@ -120,6 +125,15 @@ void EnemyManager::Update() {
 		}
 	}
 
+	// ライフタイムが終了したダメージ表示を削除
+	for (auto it = damagePlanes_.begin(); it != damagePlanes_.end();) {
+		if (!(*it)->IsAlive()) {
+			it = damagePlanes_.erase(it);
+		} else {
+			++it;
+		}
+	}
+
 	dieParticle_->Update();
 }
 
@@ -131,6 +145,11 @@ void EnemyManager::Draw(Camera camera) {
 	for (auto& expItem : expItems_) {
 		expItem->Draw(camera);
 	}
+
+	// ダメージ表示の描画
+	for (auto& damagePlane : damagePlanes_) {
+		damagePlane->Draw(camera);
+	}
 }
 
 void EnemyManager::DrawImGui() {
@@ -138,6 +157,7 @@ void EnemyManager::DrawImGui() {
 	ImGui::Begin("EnemyManager");
 	
 	ImGui::Text("Enemy Count: %zu", enemies_.size());
+	ImGui::Text("Damage Plane Count: %zu", damagePlanes_.size());
 	ImGui::Text("Timer Active: %s", spawnTimer_.IsActive() ? "Yes" : "No");
 	ImGui::Text("Timer Finished: %s", spawnTimer_.IsFinished() ? "Yes" : "No");
 	ImGui::Text("Timer Progress: %.2f", spawnTimer_.GetProgress());
@@ -168,4 +188,10 @@ void EnemyManager::SetTargetPosition(const Vector3& target) {
 	for (auto& expItem : expItems_) {
 		expItem->SetTargetPosition(targetPosition_);
 	}
+}
+
+void EnemyManager::CreateDamagePlane(const Vector3& position, int damage) {
+	auto damagePlane = std::make_unique<DamagePlane>();
+	damagePlane->Initialize(position, damage);
+	damagePlanes_.push_back(std::move(damagePlane));
 }

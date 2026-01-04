@@ -54,6 +54,9 @@ void GameSceneUI::Initialize() {
 	weaponIcon2_->LoadFromJson("wep2");
 	weaponIcon3_->LoadFromJson("wep3");
 	weaponIcon4_->LoadFromJson("wep4");
+
+	playTimeFont_ = std::make_unique<BitmapFont>();
+	playTimeFont_->Initialize("playTime");
 }
 
 void GameSceneUI::Update() {
@@ -68,6 +71,8 @@ void GameSceneUI::Update() {
 	lv_->Update();
 	enemyFont_->SetNumber(killEnemyValue_);
 	enemy_->Update();
+
+	playTimeFont_->SetTime(playTime_);
 
 	weaponIcon1_->Update();
 	weaponIcon2_->Update();
@@ -96,6 +101,8 @@ void GameSceneUI::Draw() {
 	weaponIcon2_->Draw();
 	weaponIcon3_->Draw();
 	weaponIcon4_->Draw();
+
+	playTimeFont_->Draw();
 }
 
 void GameSceneUI::DrawImGui() {
@@ -114,6 +121,7 @@ void GameSceneUI::DrawImGui() {
 	//weaponIcon2_->DrawImGui("WeaponIcon2");
 	//weaponIcon3_->DrawImGui("WeaponIcon3");
 	//weaponIcon4_->DrawImGui("WeaponIcon4");
+	playTimeFont_->DrawImGui("PlayTimeFont");
 }
 
 void GameSceneUI::UpdateWeaponIcon(int slotIndex, WeaponName weaponName) {

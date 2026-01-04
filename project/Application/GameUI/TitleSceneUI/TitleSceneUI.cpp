@@ -19,9 +19,18 @@ void TitleSceneUI::Initialize() {
 	ranking_ = std::make_unique<Sprite>();
 	ranking_->Initialize("UI/Title/ranking.png");
 
+	confirmed_ = std::make_unique<Sprite>();
+	confirmed_->Initialize("UI/Title/confirmed.png");
+	confirmed_->LoadFromJson("ConfirmedText");
+	confirmedBG_ = std::make_unique<Sprite>();
+	confirmedBG_->Initialize("UI/Title/confirmedBG.png");
+	confirmedBG_->LoadFromJson("ConfBG");
+
 	InitPlayerUI();
 
 	InitWeaponUI();
+
+	scaleTimer_.Start(1.0f, true);
 }
 
 void TitleSceneUI::Update() {
@@ -49,21 +58,31 @@ void TitleSceneUI::Update() {
 
 		break;
 
-	case  TitleSelectState::PlayerSelect:
+	case TitleSelectState::PlayerSelect:
 
 		PlayerSelectUpdate();
 
 		break;
 
-	case  TitleSelectState::WeaponSelect:
+	case TitleSelectState::WeaponSelect:
 
 		WeaponSelectUpdate();
+
+		break;
+
+	case TitleSelectState::Confirmed:
+
+		playerTypeText_->SetScale(textMin_);
+		weaponSelectText_->SetScale(textMin_);
+		confirmed_->SetScale(MyEasing::Lerp_GAB(confMin_, confMax_, scaleTimer_.GetProgress()));
 
 		break;
 
 	default:
 		break;
 	}
+
+	scaleTimer_.Update();
 
 	play_->   Update();
 	edit_->   Update();
@@ -89,6 +108,9 @@ void TitleSceneUI::Update() {
 	toxicIcon_->Update();
 	areaIcon_->Update();
 	gunIcon_->Update();
+
+	confirmed_->Update();
+	confirmedBG_->Update();
 }
 
 void TitleSceneUI::Draw() {
@@ -120,6 +142,11 @@ void TitleSceneUI::Draw() {
 		areaIcon_->Draw();
 		gunIcon_->Draw();
 	}
+
+	if (selectState_ == TitleSelectState::Confirmed) {
+		confirmedBG_->Draw();
+		confirmed_->Draw();
+	}
 }
 
 void TitleSceneUI::DrawImGui() {
@@ -145,6 +172,8 @@ void TitleSceneUI::DrawImGui() {
 	//toxicIcon_->DrawImGui("ToxicIconUI");
 	//areaIcon_->DrawImGui("AreaIconUI");
 	//gunIcon_->DrawImGui("GunIconUI");
+	//Confirmed_->DrawImGui("ConfirmedUI");]
+	confirmedBG_->DrawImGui("ConfirmedBGUI");
 }
 
 void TitleSceneUI::InitPlayerUI() {
@@ -165,7 +194,7 @@ void TitleSceneUI::InitPlayerUI() {
 	tankManIcon_->LoadFromJson("tankManIconT");
 
 	jumpManIcon_ = std::make_unique<Sprite>();
-	jumpManIcon_->Initialize("Icon/JumpMan.png");
+	jumpManIcon_->Initialize("Icon/jumpMan.png");
 	jumpManIcon_->LoadFromJson("jumpManIconT");
 
 	speedManIcon_ = std::make_unique<Sprite>();
@@ -177,35 +206,39 @@ void TitleSceneUI::PlayerSelectUpdate() {
 	switch (playerName_) {
 	case PlayerName::PowerMan:
 		playerNameText_->SetTexture("UI/Title/playerName/PowerMan.png");
-		powerManIcon_->SetScale(iconMax);
-		tankManIcon_->SetScale(iconMin);
-		jumpManIcon_->SetScale(iconMin);
-		speedManIcon_->SetScale(iconMin);
+		powerManIcon_->SetScale(iconMax_);
+		tankManIcon_->SetScale(iconMin_);
+		jumpManIcon_->SetScale(iconMin_);
+		speedManIcon_->SetScale(iconMin_);
 		break;
 	case PlayerName::TankMan:
 		playerNameText_->SetTexture("UI/Title/playerName/TankMan.png");
-		powerManIcon_->SetScale(iconMin);
-		tankManIcon_->SetScale(iconMax);
-		jumpManIcon_->SetScale(iconMin);
-		speedManIcon_->SetScale(iconMin);
+		powerManIcon_->SetScale(iconMin_);
+		tankManIcon_->SetScale(iconMax_);
+		jumpManIcon_->SetScale(iconMin_);
+		speedManIcon_->SetScale(iconMin_);
 		break;
 	case PlayerName::JumpMan:
-		playerNameText_->SetTexture("UI/Title/playerName/JumpMan.png");
-		powerManIcon_->SetScale(iconMin);
-		tankManIcon_->SetScale(iconMin);
-		jumpManIcon_->SetScale(iconMax);
-		speedManIcon_->SetScale(iconMin);
+		playerNameText_->SetTexture("UI/Title/playerName/jumpMan.png");
+		powerManIcon_->SetScale(iconMin_);
+		tankManIcon_->SetScale(iconMin_);
+		jumpManIcon_->SetScale(iconMax_);
+		speedManIcon_->SetScale(iconMin_);
 		break;
 	case PlayerName::SpeedMan:
 		playerNameText_->SetTexture("UI/Title/playerName/SpeedMan.png");
-		powerManIcon_->SetScale(iconMin);
-		tankManIcon_->SetScale(iconMin);
-		jumpManIcon_->SetScale(iconMin);
-		speedManIcon_->SetScale(iconMax);
+		powerManIcon_->SetScale(iconMin_);
+		tankManIcon_->SetScale(iconMin_);
+		jumpManIcon_->SetScale(iconMin_);
+		speedManIcon_->SetScale(iconMax_);
 		break;
 	default:
 		break;
 	}
+
+	playerTypeText_->SetScale(MyEasing::Lerp_GAB(textMin_, textMax_, scaleTimer_.GetProgress()));
+	weaponSelectText_->SetScale(textMin_);
+	confirmed_->SetScale(confMin_);
 }
 
 void TitleSceneUI::InitWeaponUI() {
@@ -254,130 +287,134 @@ void TitleSceneUI::InitWeaponUI() {
 	gunIcon_->LoadFromJson("gunIconT");
 
 	weaponNameText_->SetTexture("UI/Title/weaponName/fireBall.png");
-	fireBallIcon_->SetScale(iconMax);
-	laserIcon_->SetScale(iconMin);
-	runaIcon_->SetScale(iconMin);
-	axeIcon_->SetScale(iconMin);
-	boomerangIcon_->SetScale(iconMin);
-	diceIcon_->SetScale(iconMin);
-	toxicIcon_->SetScale(iconMin);
-	areaIcon_->SetScale(iconMin);
-	gunIcon_->SetScale(iconMin);
+	fireBallIcon_->SetScale(iconMax_);
+	laserIcon_->SetScale(iconMin_);
+	runaIcon_->SetScale(iconMin_);
+	axeIcon_->SetScale(iconMin_);
+	boomerangIcon_->SetScale(iconMin_);
+	diceIcon_->SetScale(iconMin_);
+	toxicIcon_->SetScale(iconMin_);
+	areaIcon_->SetScale(iconMin_);
+	gunIcon_->SetScale(iconMin_);
 }
 
 void TitleSceneUI::WeaponSelectUpdate() {
 	switch (weaponName_) {
 	case WeaponName::FireBall:
 		weaponNameText_->SetTexture("UI/Title/weaponName/fireBall.png");
-		fireBallIcon_->SetScale(iconMax);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMax_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Laser:
 		weaponNameText_->SetTexture("UI/Title/weaponName/laser.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMax);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMax_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Runa:
 		weaponNameText_->SetTexture("UI/Title/weaponName/runa.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMax);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMax_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Axe:
 		weaponNameText_->SetTexture("UI/Title/weaponName/axe.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMax);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMax_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Boomerang:
 		weaponNameText_->SetTexture("UI/Title/weaponName/Boomerang.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMax);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMax_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Dice:
 		weaponNameText_->SetTexture("UI/Title/weaponName/dice.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMax);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMax_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Toxic:
 		weaponNameText_->SetTexture("UI/Title/weaponName/toxic.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMax);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMax_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Area:
 		weaponNameText_->SetTexture("UI/Title/weaponName/area.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMax);
-		gunIcon_->SetScale(iconMin);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMax_);
+		gunIcon_->SetScale(iconMin_);
 		break;
 	case WeaponName::Gun:
 		weaponNameText_->SetTexture("UI/Title/weaponName/gun.png");
-		fireBallIcon_->SetScale(iconMin);
-		laserIcon_->SetScale(iconMin);
-		runaIcon_->SetScale(iconMin);
-		axeIcon_->SetScale(iconMin);
-		boomerangIcon_->SetScale(iconMin);
-		diceIcon_->SetScale(iconMin);
-		toxicIcon_->SetScale(iconMin);
-		areaIcon_->SetScale(iconMin);
-		gunIcon_->SetScale(iconMax);
+		fireBallIcon_->SetScale(iconMin_);
+		laserIcon_->SetScale(iconMin_);
+		runaIcon_->SetScale(iconMin_);
+		axeIcon_->SetScale(iconMin_);
+		boomerangIcon_->SetScale(iconMin_);
+		diceIcon_->SetScale(iconMin_);
+		toxicIcon_->SetScale(iconMin_);
+		areaIcon_->SetScale(iconMin_);
+		gunIcon_->SetScale(iconMax_);
 		break;
 	case WeaponName::Count:
 		break;
 	default:
 		break;
 	}
+
+	weaponSelectText_->SetScale(MyEasing::Lerp_GAB(textMin_, textMax_, scaleTimer_.GetProgress()));
+	playerTypeText_->SetScale(textMin_);
+	confirmed_->SetScale(confMin_);
 }

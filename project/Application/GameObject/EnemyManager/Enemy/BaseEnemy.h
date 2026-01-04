@@ -18,6 +18,8 @@ public:
 		}
 	}
 
+	int GetPower() { return status_.power; }
+
 	void SetHP(int hp) { status_.hp = hp; }
 	
 	// 死亡時のコールバックを設定

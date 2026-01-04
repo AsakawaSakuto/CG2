@@ -4,6 +4,7 @@
 #include "playerStatus.h"
 #include "AnimationController/AnimationController.h"
 #include "GameObject/Player/WeaponManager/WeaponManager.h"
+#include "UpgradeManager/UpgradeManager.h"
 
 // 前方宣言
 class EnemyManager;
@@ -74,6 +75,12 @@ public:
 	/// HPを設定（ダメージ・回復用）
 	/// </summary>
 	void SetCurrentHP(int hp);
+	
+	/// <summary>
+	/// ダメージを受ける
+	/// </summary>
+	/// <param name="damage">受けるダメージ量</param>
+	void TakeDamage(int damage);
 
 	/// <summary>
 	/// 経験値を追加
@@ -131,6 +138,10 @@ public:
 	bool CanEquipWeapon() const {
 		return weaponManager_->CanEquipWeapon();
 	}
+
+	bool IsUpgradeSelect() const {
+		return upgradeManager_->IsUpgradeSelect();
+	}
 	
 private:
 
@@ -173,6 +184,8 @@ private:
 	float GetGroundHeight() const;
 
 private:
+	unique_ptr<UpgradeManager> upgradeManager_;
+
 	PlayerName playerName_;
 
 	unique_ptr<AnimationController> model_;
@@ -221,4 +234,16 @@ private:
 	// フォールバック機構：前フレームの位置を記録
 	Vector3 previousFramePosition_ = { 0.0f, 0.0f, 0.0f };
 	bool hasPreviousPosition_ = false; // 前フレーム位置が有効かどうか
+	
+	// ダメージ関連
+	GameTimer invincibilityTimer_; // 無敵時間タイマー
+	GameTimer blinkTimer_; // 点滅用タイマー
+	bool isVisible_ = true; // 描画するかどうか
+
+	Vector3 playerColors[4] = {
+	 { 1.000f, 0.447f, 0.133f },
+	 { 0.161f, 0.318f, 0.827f },
+	 { 0.102f, 0.784f, 0.000f },
+	 { 0.239f, 0.855f, 0.922f }
+	};
 };

@@ -43,6 +43,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	model_ = std::make_unique<AnimationController>();
 	model_->Initialize(animationMap);
 	model_->SetMotion(PlayerMotion::Idle, 0.0f, true);
+	model_->SetColor(playerColors[static_cast<int>(playerName_)]);
 
 	moveParticle_->Initialize("playerMove");
 	landingParticle_->Initialize("playerLanding");
@@ -63,61 +64,98 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	mapCollosion_.center = { 0.0f, 0.0f, 0.0f }; // 初期値（Update()で更新される）
 	mapCollosion_.min = { -0.5f, 0.0f, -0.5f };  // centerからのローカルオフセット
 	mapCollosion_.max = {  0.5f, 0.25f,  0.5f };  // centerからのローカルオフセット
+
+	upgradeManager_ = std::make_unique<UpgradeManager>();
+	upgradeManager_->Initialize();
+	// UpgradeManagerにWeaponManagerを設定
+	upgradeManager_->SetWeaponManager(weaponManager_.get());
 }
 
 void Player::Update() {
 
-	Move();
-	Jump();
-	SlideOnSlope();  // しゃがみ中のスロープ滑り処理
+	if (!upgradeManager_->IsUpgradeSelect()) {
 
-	// AABBの中心をプレイヤーの位置に設定
-	mapCollosion_.center = transform_.translate;
+		Move();
+		Jump();
+		SlideOnSlope();  // しゃがみ中のスロープ滑り処理
 
-	// マップとの衝突解決を実行
-	if (map_) {
-		ResolveMapCollision();
-	}
-	
-	// 木との衝突解決を実行（XZ軸のみ）
-	if (treeManager_) {
-		treeManager_->ResolvePlayerCollision(transform_.translate, mapCollosion_);
-		// 衝突解決後、AABBの中心も更新
+		// AABBの中心をプレイヤーの位置に設定
 		mapCollosion_.center = transform_.translate;
+
+		// マップとの衝突解決を実行
+		if (map_) {
+			ResolveMapCollision();
+		}
+
+		// 木との衝突解決を実行（XZ軸のみ）
+		if (treeManager_) {
+			treeManager_->ResolvePlayerCollision(transform_.translate, mapCollosion_);
+			// 衝突解決後、AABBの中心も更新
+			mapCollosion_.center = transform_.translate;
+		}
+
+		MyDebugLine::AddShape(mapCollosion_, { 1.0f,0.0f,0.0f,1.0f });
+
+		directionToEnemy_ = GetDirectionToEnemy();
+
+		expGetRangeTransform_.translate = transform_.translate;
+		expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
+
+		model_->Update(1.0f / 60.0f, transform_);
+
+		// 影のY座標を地面の高さに設定
+		if (map_) {
+			float groundY = GetGroundHeight();
+			model_->SetShadowGroundY(groundY);
+		}
+
+		moveParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
+		moveParticle_->Update();
+		landingParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
+		landingParticle_->Update();
+
+		// 通常の最も近い敵への方向とランダムターゲット方向の両方を設定
+		Vector3 closestEnemyDirection = GetDirectionToClosestEnemy();
+		weaponManager_->SetDirectionToEnemy(closestEnemyDirection);
+		weaponManager_->SetRandomDirectionToEnemy(directionToEnemy_);
+		weaponManager_->SetPlayerPosition(transform_.translate);
+		weaponManager_->Update();
+
+		sphereCollision_.center = transform_.translate;
+		sphereCollision_.radius = collisionRadius_;
+
+		expItemStateChangeCollision_.center = transform_.translate;
+		expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
+
+		// 無敵時間タイマーの更新
+		invincibilityTimer_.Update();
+
+		// 無敵時間中の点滅処理
+		if (invincibilityTimer_.IsActive()) {
+			// 点滅タイマーが動作していない場合は開始
+			if (!blinkTimer_.IsActive()) {
+				blinkTimer_.Start(0.1f, true); // 0.1秒ごとに点滅
+				isVisible_ = true;
+			}
+
+			blinkTimer_.Update();
+
+			// タイマーが完了したら表示/非表示を切り替え
+			if (blinkTimer_.IsFinished()) {
+				isVisible_ = !isVisible_;
+			}
+		} else {
+			// 無敵時間が終了したら常に表示
+			blinkTimer_.Stop();
+			isVisible_ = true;
+		}
 	}
 
-	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
-
-	directionToEnemy_ = GetDirectionToEnemy();
-
-	expGetRangeTransform_.translate = transform_.translate;
-	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
-
-	model_->Update(1.0f/60.0f, transform_);
-	
-	// 影のY座標を地面の高さに設定
-	if (map_) {
-		float groundY = GetGroundHeight();
-		model_->SetShadowGroundY(groundY);
+	if (MyInput::TriggerKey(DIK_0)) {
+		upgradeManager_->Upgrade();
 	}
 
-	moveParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
-	moveParticle_->Update();
-	landingParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
-	landingParticle_->Update();
-
-	// 通常の最も近い敵への方向とランダムターゲット方向の両方を設定
-	Vector3 closestEnemyDirection = GetDirectionToClosestEnemy();
-	weaponManager_->SetDirectionToEnemy(closestEnemyDirection);
-	weaponManager_->SetRandomDirectionToEnemy(directionToEnemy_);
-	weaponManager_->SetPlayerPosition(transform_.translate);
-	weaponManager_->Update();
-
-	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = collisionRadius_;
-
-	expItemStateChangeCollision_.center = transform_.translate;
-	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
+	upgradeManager_->Update();
 
 	MyDebugLine::AddShape(sphereCollision_);
 	Circle expCircle = {};
@@ -131,7 +169,10 @@ void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
 
-	model_->Draw(camera);
+	// 無敵時間中で非表示の場合はモデルを描画しない
+	if (isVisible_) {
+		model_->Draw(camera);
+	}
 
 	//expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
@@ -139,6 +180,8 @@ void Player::Draw(Camera camera) {
 	landingParticle_->Draw(camera);
 
 	weaponManager_->Draw(camera);
+
+	upgradeManager_->Draw();
 }
 
 void Player::DrawImGui() {
@@ -162,6 +205,8 @@ void Player::DrawImGui() {
 	ImGui::End();
 #endif
 	//landingParticle_->DrawImGui("move Particle");
+
+	upgradeManager_->DrawImGui();
 }
 
 void Player::Move() {
@@ -640,7 +685,7 @@ void Player::ResolveMapCollision() {
 							// XZ方向のみの押し出し量を計算
 							Vector3 stepMin = stepAABB.GetMinWorld();
 							Vector3 stepMax = stepAABB.GetMaxWorld();
-							
+
 							float penetrationX = (std::min)(playerMax.x - stepMin.x, stepMax.x - playerMin.x);
 							float penetrationZ = (std::min)(playerMax.z - stepMin.z, stepMax.z - playerMin.z);
 							
@@ -1096,6 +1141,21 @@ void Player::SetCurrentHP(int hp) {
 	status_.currentHP = std::clamp(hp, 0, status_.maxHP);
 }
 
+void Player::TakeDamage(int damage) {
+	// 無敵時間中はダメージを受けない
+	if (!invincibilityTimer_.IsActive()) {
+		invincibilityTimer_.Start(2.0f, false); // 0.5秒の無敵時間
+		status_.currentHP -= damage;
+		
+		// HPが0以下になったら0にクランプ
+		if (status_.currentHP < 0) {
+			status_.currentHP = 0;
+		}
+		
+		// TODO: ここで死亡処理やダメージエフェクトを追加可能
+	}
+}
+
 void Player::AddExp(int exp) {
 	status_.currentExp += int(float(exp) * status_.expMultiply);
 	
@@ -1105,6 +1165,11 @@ void Player::AddExp(int exp) {
 		status_.level++;
 		// 次のレベルに必要な経験値を増やす（例：1.5倍）
 		status_.expToNextLevel = static_cast<int>(status_.expToNextLevel * 1.1f);
+		
+		// レベルアップしたらアップグレード選択画面を表示
+		if (upgradeManager_) {
+			upgradeManager_->Upgrade();
+		}
 	}
 }
 

@@ -49,14 +49,18 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 
 	// 全ての敵をチェック
 	for (const auto& enemy : enemies) {
+		// 死んでいる敵はスキップ
+		if (!enemy->IsAlive()) {
+			continue;
+		}
+		
 		const Sphere& enemySphere = enemy->GetSphereCollision();
 
 		// プレイヤーとEnemyの衝突判定
 		if (Collision::IsHit(playerSphere, enemySphere)) {
-			// 衝突したEnemyを死亡状態にする
-			// 注: BaseEnemyのDamage()経由で死亡コールバックが呼ばれるため、
-			// ここでは直接Dead()ではなくDamage()で大ダメージを与える
-			enemy->Damage(9999); // 即死ダメージ
+			// 敵の攻撃力分だけプレイヤーにダメージを与える
+			int enemyPower = enemy->GetPower();
+			player_->TakeDamage(enemyPower);
 		}
 	}
 }
@@ -106,7 +110,12 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					int damage = static_cast<int>(bullet->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
+					
 					bullet->Dead();
 				}
 			}
@@ -139,7 +148,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					int damage = static_cast<int>(bullet->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
 					// この敵に当たったことを記録
 					bullet->MarkEnemyAsHit(enemy.get());
@@ -179,7 +192,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					int damage = static_cast<int>(bullet->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
 					// この敵に当たったことを記録
 					bullet->MarkEnemyAsHit(enemy.get());
@@ -212,7 +229,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					int damage = static_cast<int>(bullet->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
@@ -239,7 +260,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					// 衝突した敵を死亡状態にする
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					int damage = static_cast<int>(bullet->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
@@ -267,7 +292,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					// Diceはランダムダメージ(1-6)を与える
-					enemy->Damage(static_cast<int>(bullet->GetRandDamage()));
+					int damage = static_cast<int>(bullet->GetRandDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
@@ -295,7 +324,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					// Toxicは通常ダメージを与える（継続ダメージは将来の実装で追加可能）
-					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					int damage = static_cast<int>(bullet->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
@@ -316,7 +349,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				// Areaと敵の衝突判定
 				if (Collision::IsHit(areaSphere, enemySphere) && !enemy->IsActiveInvincibleTimer()) {
 					// Areaは継続ダメージなので、パーティクルは出さずにダメージのみ
-					enemy->Damage(static_cast<int>(area->GetDamage()));
+					int damage = static_cast<int>(area->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
 			}
 		}
@@ -344,7 +381,12 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					// Gunは通常ダメージを与える
-					enemy->Damage(static_cast<int>(bullet->GetDamage()));
+					int damage = static_cast<int>(bullet->GetDamage());
+					enemy->Damage(damage);
+					
+					// ダメージ表示を生成
+					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
+					
 					bullet->Dead();
 				}
 			}

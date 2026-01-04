@@ -28,7 +28,7 @@ void Enemy::Initialize() {
 	velocity_Y = 0.0f;
 	gravity_ = 20.0f;
 	isGrounded_ = false;
-	wallClimbSpeed_ = 15.0f; // 上昇速度を速くする
+	wallClimbSpeed_ = 25.0f; // 上昇速度を速くする
 }
 
 void Enemy::Update() {
