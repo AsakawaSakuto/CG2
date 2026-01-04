@@ -3,11 +3,13 @@
 /// <summary>
 /// Upgradeの種類
 /// 1・新しい武器を装備
-/// 2・既存の武器を強化
+/// 2・既存の武器のダメージを強化
+/// 3・既存の武器の発射数を強化
 /// </summary>
 enum class UpgradeType {
 	NewWeapon,
-	UpgradeWeapon,
+	UpgradeDamage,
+	UpgradeShotMaxCount,
 };
 
 /// <summary>

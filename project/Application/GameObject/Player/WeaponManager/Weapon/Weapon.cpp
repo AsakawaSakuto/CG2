@@ -449,6 +449,7 @@ void Weapon::AreaUpdate() {
 	// Areaは常にプレイヤーの位置に追従
 	if (area_) {
 		area_->SetPosition(playerPosition_);
+		area_->SetDamage(status_.damage);
 		area_->Update();
 	}
 }
