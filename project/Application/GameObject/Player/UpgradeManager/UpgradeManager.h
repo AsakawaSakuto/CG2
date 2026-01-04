@@ -72,6 +72,11 @@ private:
 	std::string GetWeaponIconPath(WeaponName weaponName) const;
 
 	/// <summary>
+	/// 武器名から名前テクスチャのパスを取得
+	/// </summary>
+	std::string GetWeaponNamePath(WeaponName weaponName) const;
+
+	/// <summary>
 	/// UIを選択肢に応じて更新
 	/// </summary>
 	void UpdateUpgradeUI();
@@ -100,5 +105,11 @@ private:
 	std::unique_ptr<Sprite> upgradeIcon1_;
 	std::unique_ptr<Sprite> upgradeIcon2_;
 	std::unique_ptr<Sprite> upgradeIcon3_;
+	std::unique_ptr<Sprite> upgradeName1_;
+	std::unique_ptr<Sprite> upgradeName2_;
+	std::unique_ptr<Sprite> upgradeName3_;
+	std::unique_ptr<Sprite> newText1_;
+	std::unique_ptr<Sprite> newText2_;
+	std::unique_ptr<Sprite> newText3_;
 	std::unique_ptr<Sprite> bg_;
 };

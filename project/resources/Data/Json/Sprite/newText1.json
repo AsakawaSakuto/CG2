@@ -1,0 +1,49 @@
+{
+  "values": [
+  {
+    "name": "position",
+    "type": 16,
+    "value": [810, 275]
+  },
+  {
+    "name": "scale",
+    "type": 16,
+    "value": [0.3, 0.3]
+  },
+  {
+    "name": "rotate",
+    "type": 2,
+    "value": 0.000000
+  },
+  {
+    "name": "uvTranslate",
+    "type": 16,
+    "value": [0.000000, 0.000000]
+  },
+  {
+    "name": "uvScale",
+    "type": 16,
+    "value": [1.000000, 1.000000]
+  },
+  {
+    "name": "uvRotate",
+    "type": 2,
+    "value": 0.000000
+  },
+  {
+    "name": "color",
+    "type": 18,
+    "value": [0.855814, 1.000000, 0.000000, 1.000000]
+  },
+  {
+    "name": "anchorPoint",
+    "type": 16,
+    "value": [0.500000, 0.500000]
+  },
+  {
+    "name": "anchor",
+    "type": 7,
+    "value": 2
+  }
+  ]
+}

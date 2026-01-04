@@ -31,6 +31,26 @@ void UpgradeManager::Initialize() {
 	bg_->Initialize("UI/game/selectBG.png");
 	bg_->LoadFromJson("selectBG");
 
+	upgradeName1_ = std::make_unique<Sprite>();
+	upgradeName1_->Initialize("UI/Title/WeaponName/None.png");
+	upgradeName1_->LoadFromJson("upgradeName1");
+	upgradeName2_ = std::make_unique<Sprite>();
+	upgradeName2_->Initialize("UI/Title/WeaponName/None.png");
+	upgradeName2_->LoadFromJson("upgradeName2");
+	upgradeName3_ = std::make_unique<Sprite>();
+	upgradeName3_->Initialize("UI/Title/WeaponName/None.png");
+	upgradeName3_->LoadFromJson("upgradeName3");
+
+	newText1_ = std::make_unique<Sprite>();
+	newText1_->Initialize("UI/game/newText.png");
+	newText1_->LoadFromJson("newText1");
+	newText2_ = std::make_unique<Sprite>();
+	newText2_->Initialize("UI/game/newText.png");
+	newText2_->LoadFromJson("newText2");
+	newText3_ = std::make_unique<Sprite>();
+	newText3_->Initialize("UI/game/newText.png");
+	newText3_->LoadFromJson("newText3");
+
 	isUpgrade_ = false;
 }
 
@@ -93,6 +113,12 @@ void UpgradeManager::Update() {
 	upgradeIcon2_->Update();
 	upgradeIcon3_->Update();
 	bg_->Update();
+	upgradeName1_->Update();
+	upgradeName2_->Update();
+	upgradeName3_->Update();
+	newText1_->Update();
+	newText2_->Update();
+	newText3_->Update();
 }
 
 void UpgradeManager::Draw() {
@@ -105,6 +131,20 @@ void UpgradeManager::Draw() {
 		upgradeIcon1_->Draw();
 		upgradeIcon2_->Draw();
 		upgradeIcon3_->Draw();
+		upgradeName1_->Draw();
+		upgradeName2_->Draw();
+		upgradeName3_->Draw();
+		
+		// NEW textは新規武器装備のときのみ描画
+		if (upgradeOptions_[0].type == UpgradeType::NewWeapon) {
+			newText1_->Draw();
+		}
+		if (upgradeOptions_[1].type == UpgradeType::NewWeapon) {
+			newText2_->Draw();
+		}
+		if (upgradeOptions_[2].type == UpgradeType::NewWeapon) {
+			newText3_->Draw();
+		}
 	}
 }
 
@@ -116,7 +156,13 @@ void UpgradeManager::DrawImGui() {
 	//upgradeIcon1_->DrawImGui("UpgradeIcon1UI");
 	//upgradeIcon2_->DrawImGui("UpgradeIcon2UI");
 	//upgradeIcon3_->DrawImGui("UpgradeIcon3UI");
-	bg_->DrawImGui("UpgradeBGUI");
+	//bg_->DrawImGui("UpgradeBGUI");
+	upgradeName1_->DrawImGui("UpgradeName1UI");
+	upgradeName2_->DrawImGui("UpgradeName2UI");
+	upgradeName3_->DrawImGui("UpgradeName3UI");
+	newText1_->DrawImGui("NewText1UI");
+	newText2_->DrawImGui("NewText2UI");
+	newText3_->DrawImGui("NewText3UI");
 }
 
 void UpgradeManager::Upgrade() {
@@ -129,15 +175,20 @@ void UpgradeManager::Upgrade() {
 	// UIを更新（背景色とアイコン）
 	// 新規武器の場合は白、強化の場合はレアリティ色
 	upgradeBG1_->SetColor(upgradeOptions_[0].type == UpgradeType::NewWeapon ? 
-		Vector4(1.0f, 1.0f, 1.0f, 1.0f) : GetRarityColor(upgradeOptions_[0].rarity));
+		Vector4(0.75f, 0.75f, 0.75f, 1.0f) : GetRarityColor(upgradeOptions_[0].rarity));
 	upgradeBG2_->SetColor(upgradeOptions_[1].type == UpgradeType::NewWeapon ? 
-		Vector4(1.0f, 1.0f, 1.0f, 1.0f) : GetRarityColor(upgradeOptions_[1].rarity));
+		Vector4(0.75f, 0.75f, 0.75f, 1.0f) : GetRarityColor(upgradeOptions_[1].rarity));
 	upgradeBG3_->SetColor(upgradeOptions_[2].type == UpgradeType::NewWeapon ? 
-		Vector4(1.0f, 1.0f, 1.0f, 1.0f) : GetRarityColor(upgradeOptions_[2].rarity));
+		Vector4(0.75f, 0.75f, 0.75f, 1.0f) : GetRarityColor(upgradeOptions_[2].rarity));
 	
 	upgradeIcon1_->SetTexture(GetWeaponIconPath(upgradeOptions_[0].weaponName));
 	upgradeIcon2_->SetTexture(GetWeaponIconPath(upgradeOptions_[1].weaponName));
 	upgradeIcon3_->SetTexture(GetWeaponIconPath(upgradeOptions_[2].weaponName));
+	
+	// 武器名テクスチャを設定
+	upgradeName1_->SetTexture(GetWeaponNamePath(upgradeOptions_[0].weaponName));
+	upgradeName2_->SetTexture(GetWeaponNamePath(upgradeOptions_[1].weaponName));
+	upgradeName3_->SetTexture(GetWeaponNamePath(upgradeOptions_[2].weaponName));
 }
 
 const UpgradeOption& UpgradeManager::GetSelectedOption() const {
@@ -289,7 +340,7 @@ Vector4 UpgradeManager::GetRarityColor(Rarity rarity) {
 	case Rarity::Legendary:
 		return Vector4(1.0f, 0.6f, 0.0f, 1.0f);  // オレンジ
 	default:
-		return Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+		return Vector4(0.75f, 0.75f, 0.75f, 1.0f);
 	}
 }
 
@@ -319,15 +370,41 @@ std::string UpgradeManager::GetWeaponIconPath(WeaponName weaponName) const {
 	}
 }
 
+std::string UpgradeManager::GetWeaponNamePath(WeaponName weaponName) const {
+	switch (weaponName) {
+	case WeaponName::FireBall:
+		return "UI/Title/WeaponName/fireBall.png";
+	case WeaponName::Laser:
+		return "UI/Title/WeaponName/laser.png";
+	case WeaponName::Runa:
+		return "UI/Title/WeaponName/runa.png";
+	case WeaponName::Axe:
+		return "UI/Title/WeaponName/axe.png";
+	case WeaponName::Boomerang:
+		return "UI/Title/WeaponName/Boomerang.png";
+	case WeaponName::Dice:
+		return "UI/Title/WeaponName/dice.png";
+	case WeaponName::Toxic:
+		return "UI/Title/WeaponName/toxic.png";
+	case WeaponName::Area:
+		return "UI/Title/WeaponName/area.png";
+	case WeaponName::Gun:
+		return "UI/Title/WeaponName/gun.png";
+	case WeaponName::None:
+	default:
+		return "UI/Title/WeaponName/None.png";
+	}
+}
+
 void UpgradeManager::UpdateUpgradeUI() {
 	// 選択中の背景を少し明るくする（強調表示）
 	// 新規武器は白、強化はレアリティ色
 	Vector4 color1 = upgradeOptions_[0].type == UpgradeType::NewWeapon ? 
-		Vector4(1.0f, 1.0f, 1.0f, 1.0f) : GetRarityColor(upgradeOptions_[0].rarity);
+		Vector4(0.75f, 0.75f, 0.75f, 1.0f) : GetRarityColor(upgradeOptions_[0].rarity);
 	Vector4 color2 = upgradeOptions_[1].type == UpgradeType::NewWeapon ? 
-		Vector4(1.0f, 1.0f, 1.0f, 1.0f) : GetRarityColor(upgradeOptions_[1].rarity);
+		Vector4(0.75f, 0.75f, 0.75f, 1.0f) : GetRarityColor(upgradeOptions_[1].rarity);
 	Vector4 color3 = upgradeOptions_[2].type == UpgradeType::NewWeapon ? 
-		Vector4(1.0f, 1.0f, 1.0f, 1.0f) : GetRarityColor(upgradeOptions_[2].rarity);
+		Vector4(0.75f, 0.75f, 0.75f, 1.0f) : GetRarityColor(upgradeOptions_[2].rarity);
 	
 	// 選択中でないものは少し暗くする
 	float dimFactor = 0.6f;

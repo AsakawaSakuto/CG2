@@ -73,79 +73,86 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 
 void Player::Update() {
 
-	Move();
-	Jump();
-	SlideOnSlope();  // しゃがみ中のスロープ滑り処理
+	if (!upgradeManager_->IsUpgradeSelect()) {
 
-	// AABBの中心をプレイヤーの位置に設定
-	mapCollosion_.center = transform_.translate;
+		Move();
+		Jump();
+		SlideOnSlope();  // しゃがみ中のスロープ滑り処理
 
-	// マップとの衝突解決を実行
-	if (map_) {
-		ResolveMapCollision();
-	}
-	
-	// 木との衝突解決を実行（XZ軸のみ）
-	if (treeManager_) {
-		treeManager_->ResolvePlayerCollision(transform_.translate, mapCollosion_);
-		// 衝突解決後、AABBの中心も更新
+		// AABBの中心をプレイヤーの位置に設定
 		mapCollosion_.center = transform_.translate;
-	}
 
-	MyDebugLine::AddShape(mapCollosion_, {1.0f,0.0f,0.0f,1.0f});
+		// マップとの衝突解決を実行
+		if (map_) {
+			ResolveMapCollision();
+		}
 
-	directionToEnemy_ = GetDirectionToEnemy();
+		// 木との衝突解決を実行（XZ軸のみ）
+		if (treeManager_) {
+			treeManager_->ResolvePlayerCollision(transform_.translate, mapCollosion_);
+			// 衝突解決後、AABBの中心も更新
+			mapCollosion_.center = transform_.translate;
+		}
 
-	expGetRangeTransform_.translate = transform_.translate;
-	expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
+		MyDebugLine::AddShape(mapCollosion_, { 1.0f,0.0f,0.0f,1.0f });
 
-	model_->Update(1.0f/60.0f, transform_);
-	
-	// 影のY座標を地面の高さに設定
-	if (map_) {
-		float groundY = GetGroundHeight();
-		model_->SetShadowGroundY(groundY);
-	}
+		directionToEnemy_ = GetDirectionToEnemy();
 
-	moveParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
-	moveParticle_->Update();
-	landingParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
-	landingParticle_->Update();
+		expGetRangeTransform_.translate = transform_.translate;
+		expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
 
-	// 通常の最も近い敵への方向とランダムターゲット方向の両方を設定
-	Vector3 closestEnemyDirection = GetDirectionToClosestEnemy();
-	weaponManager_->SetDirectionToEnemy(closestEnemyDirection);
-	weaponManager_->SetRandomDirectionToEnemy(directionToEnemy_);
-	weaponManager_->SetPlayerPosition(transform_.translate);
-	weaponManager_->Update();
+		model_->Update(1.0f / 60.0f, transform_);
 
-	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = collisionRadius_;
+		// 影のY座標を地面の高さに設定
+		if (map_) {
+			float groundY = GetGroundHeight();
+			model_->SetShadowGroundY(groundY);
+		}
 
-	expItemStateChangeCollision_.center = transform_.translate;
-	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
-	
-	// 無敵時間タイマーの更新
-	invincibilityTimer_.Update();
-	
-	// 無敵時間中の点滅処理
-	if (invincibilityTimer_.IsActive()) {
-		// 点滅タイマーが動作していない場合は開始
-		if (!blinkTimer_.IsActive()) {
-			blinkTimer_.Start(0.1f, true); // 0.1秒ごとに点滅
+		moveParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
+		moveParticle_->Update();
+		landingParticle_->SetOffSet({ 0.0f, 0.1f, 0.0f });
+		landingParticle_->Update();
+
+		// 通常の最も近い敵への方向とランダムターゲット方向の両方を設定
+		Vector3 closestEnemyDirection = GetDirectionToClosestEnemy();
+		weaponManager_->SetDirectionToEnemy(closestEnemyDirection);
+		weaponManager_->SetRandomDirectionToEnemy(directionToEnemy_);
+		weaponManager_->SetPlayerPosition(transform_.translate);
+		weaponManager_->Update();
+
+		sphereCollision_.center = transform_.translate;
+		sphereCollision_.radius = collisionRadius_;
+
+		expItemStateChangeCollision_.center = transform_.translate;
+		expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
+
+		// 無敵時間タイマーの更新
+		invincibilityTimer_.Update();
+
+		// 無敵時間中の点滅処理
+		if (invincibilityTimer_.IsActive()) {
+			// 点滅タイマーが動作していない場合は開始
+			if (!blinkTimer_.IsActive()) {
+				blinkTimer_.Start(0.1f, true); // 0.1秒ごとに点滅
+				isVisible_ = true;
+			}
+
+			blinkTimer_.Update();
+
+			// タイマーが完了したら表示/非表示を切り替え
+			if (blinkTimer_.IsFinished()) {
+				isVisible_ = !isVisible_;
+			}
+		} else {
+			// 無敵時間が終了したら常に表示
+			blinkTimer_.Stop();
 			isVisible_ = true;
 		}
-		
-		blinkTimer_.Update();
-		
-		// タイマーが完了したら表示/非表示を切り替え
-		if (blinkTimer_.IsFinished()) {
-			isVisible_ = !isVisible_;
-		}
-	} else {
-		// 無敵時間が終了したら常に表示
-		blinkTimer_.Stop();
-		isVisible_ = true;
+	}
+
+	if (MyInput::TriggerKey(DIK_0)) {
+		upgradeManager_->Upgrade();
 	}
 
 	upgradeManager_->Update();
