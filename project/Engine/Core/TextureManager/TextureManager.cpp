@@ -5,6 +5,21 @@ TextureManager* TextureManager::instance = nullptr;
 
 uint32_t TextureManager::kSRVIndexTop_ = 1;
 
+// UNORMフォーマットをsRGBフォーマットに変換するヘルパー関数
+static DXGI_FORMAT ConvertToSRGBFormat(DXGI_FORMAT format) {
+    switch (format) {
+        case DXGI_FORMAT_R8G8B8A8_UNORM:
+            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        case DXGI_FORMAT_B8G8R8A8_UNORM:
+            return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+        case DXGI_FORMAT_B8G8R8X8_UNORM:
+            return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+        default:
+            // 既にsRGBの場合やその他のフォーマットはそのまま返す
+            return format;
+    }
+}
+
 TextureManager* TextureManager::GetInstance() {
 	if (instance == nullptr) {
 		instance = new TextureManager;
@@ -228,8 +243,10 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         srvIndex);
 
     // SRV作成
+    // UNORMフォーマットの場合はsRGBフォーマットに変換して、
+    // GPUがサンプリング時に正しくsRGB→線形変換を行うようにする
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = textureData.matadata.format;
+    srvDesc.Format = ConvertToSRGBFormat(textureData.matadata.format);
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = UINT(textureData.matadata.mipLevels);
