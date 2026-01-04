@@ -2,5 +2,6 @@
 
 struct EnemyStatus {
 	int hp = 10;
-	float moveSpeed;
+	int power = 10;
+	float moveSpeed = 3.0f;
 };

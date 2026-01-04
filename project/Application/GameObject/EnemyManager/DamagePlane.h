@@ -13,8 +13,12 @@ public:
 	void Update();
 	void Draw(Camera camera);
 
+	bool IsAlive() const { return lifeTimer_.IsActive(); }
+
 private:
 	std::unique_ptr<Model> model_;
 	Transform transform_;
 	int damage_ = 0;
+	GameTimer lifeTimer_;
+	float lifeTime_ = 1.0f;  // 1秒間表示
 };

@@ -39,6 +39,8 @@ private:
 	void WeaponSelectUpdate();
 private:
 
+	GameTimer scaleTimer_;
+
 	unique_ptr<Sprite> play_;
 	unique_ptr<Sprite> edit_;
 	unique_ptr<Sprite> quit_;
@@ -68,9 +70,17 @@ private:
 	unique_ptr<Sprite> areaIcon_;
 	unique_ptr<Sprite> gunIcon_;
 
+	//
+	unique_ptr<Sprite> confirmed_;
+	unique_ptr<Sprite> confirmedBG_;
+
 	// Scale
 	Vector2 maxScale_ = { 0.8f,0.8f };
 	Vector2 minScale_ = { 0.5f,0.5f };
-	Vector2 iconMin = { 0.9f,0.9f };
-	Vector2 iconMax = { 1.1f,1.1f };
+	Vector2 iconMin_ = { 0.9f,0.9f };
+	Vector2 iconMax_ = { 1.1f,1.1f };
+	Vector2 textMin_ = { 0.2f,0.2f };
+	Vector2 textMax_ = { 0.22f,0.22f };
+	Vector2 confMin_ = { 0.45f,0.45f };
+	Vector2 confMax_ = { 0.5f,0.5f };
 };
