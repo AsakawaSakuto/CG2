@@ -3,20 +3,31 @@
 void UpgradeManager::Initialize() {
 	upgradeSelect_ = std::make_unique<Sprite>();
 	upgradeSelect_->Initialize("UI/game/upgradeSelect.png");
+	upgradeSelect_->LoadFromJson("upgradeSelectText");
 
 	upgradeBG1_ = std::make_unique<Sprite>();
 	upgradeBG1_->Initialize("UI/game/upgradeBG.png");
+	upgradeBG1_->LoadFromJson("upgradeBG1");
 	upgradeBG2_ = std::make_unique<Sprite>();
 	upgradeBG2_->Initialize("UI/game/upgradeBG.png");
+	upgradeBG2_->LoadFromJson("upgradeBG2");
 	upgradeBG3_ = std::make_unique<Sprite>();
 	upgradeBG3_->Initialize("UI/game/upgradeBG.png");
+	upgradeBG3_->LoadFromJson("upgradeBG3");
 
 	upgradeIcon1_ = std::make_unique<Sprite>();
 	upgradeIcon1_->Initialize("icon/none.png");
+	upgradeIcon1_->LoadFromJson("upgradeIcon1");
 	upgradeIcon2_ = std::make_unique<Sprite>();
 	upgradeIcon2_->Initialize("icon/none.png");
+	upgradeIcon2_->LoadFromJson("upgradeIcon2");
 	upgradeIcon3_ = std::make_unique<Sprite>();
 	upgradeIcon3_->Initialize("icon/none.png");
+	upgradeIcon3_->LoadFromJson("upgradeIcon3");
+
+	bg_ = std::make_unique<Sprite>();
+	bg_->Initialize("UI/game/selectBG.png");
+	bg_->LoadFromJson("selectBG");
 }
 
 void UpgradeManager::Update() {
@@ -27,9 +38,11 @@ void UpgradeManager::Update() {
 	upgradeIcon1_->Update();
 	upgradeIcon2_->Update();
 	upgradeIcon3_->Update();
+	bg_->Update();
 }
 
 void UpgradeManager::Draw() {
+	bg_->Draw();
 	upgradeSelect_->Draw();
 	upgradeBG1_->Draw();
 	upgradeBG2_->Draw();
@@ -40,13 +53,14 @@ void UpgradeManager::Draw() {
 }
 
 void UpgradeManager::DrawImGui() {
-	upgradeSelect_->DrawImGui("UpgradeSelectUI");
-	upgradeBG1_->DrawImGui("UpgradeBG1UI");
-	upgradeBG2_->DrawImGui("UpgradeBG2UI");
-	upgradeBG3_->DrawImGui("UpgradeBG3UI");
-	upgradeIcon1_->DrawImGui("UpgradeIcon1UI");
-	upgradeIcon2_->DrawImGui("UpgradeIcon2UI");
-	upgradeIcon3_->DrawImGui("UpgradeIcon3UI");
+	//upgradeSelect_->DrawImGui("UpgradeSelectUI");
+	//upgradeBG1_->DrawImGui("UpgradeBG1UI");
+	//upgradeBG2_->DrawImGui("UpgradeBG2UI");
+	//upgradeBG3_->DrawImGui("UpgradeBG3UI");
+	//upgradeIcon1_->DrawImGui("UpgradeIcon1UI");
+	//upgradeIcon2_->DrawImGui("UpgradeIcon2UI");
+	//upgradeIcon3_->DrawImGui("UpgradeIcon3UI");
+	bg_->DrawImGui("UpgradeBGUI");
 }
 
 void UpgradeManager::Upgrade() {

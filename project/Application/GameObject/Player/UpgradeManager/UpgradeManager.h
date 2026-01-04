@@ -22,4 +22,5 @@ private:
 	std::unique_ptr<Sprite> upgradeIcon1_;
 	std::unique_ptr<Sprite> upgradeIcon2_;
 	std::unique_ptr<Sprite> upgradeIcon3_;
+	std::unique_ptr<Sprite> bg_;
 };
