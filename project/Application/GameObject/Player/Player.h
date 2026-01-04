@@ -232,4 +232,11 @@ private:
 	GameTimer invincibilityTimer_; // 無敵時間タイマー
 	GameTimer blinkTimer_; // 点滅用タイマー
 	bool isVisible_ = true; // 描画するかどうか
+
+	Vector3 playerColors[4] = {
+	 { 1.000f, 0.447f, 0.133f },
+	 { 0.161f, 0.318f, 0.827f },
+	 { 0.102f, 0.784f, 0.000f },
+	 { 0.239f, 0.855f, 0.922f }
+	};
 };

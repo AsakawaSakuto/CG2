@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Type/Vector3.h"
 
 enum class PlayerName {
 	PowerMan,

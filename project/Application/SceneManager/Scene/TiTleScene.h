@@ -46,4 +46,11 @@ private:
 	Transform slopeTransform_;
 	unique_ptr<Model> tree_;
 	Transform treeTransform_;
+
+	Vector3 playerColors[4] = {
+	 { 1.000f, 0.447f, 0.133f },
+	 { 0.161f, 0.318f, 0.827f },
+	 { 0.102f, 0.784f, 0.000f },
+	 { 0.239f, 0.855f, 0.922f }
+	};
 };
