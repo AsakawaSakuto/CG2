@@ -157,12 +157,12 @@ void UpgradeManager::DrawImGui() {
 	//upgradeIcon2_->DrawImGui("UpgradeIcon2UI");
 	//upgradeIcon3_->DrawImGui("UpgradeIcon3UI");
 	//bg_->DrawImGui("UpgradeBGUI");
-	upgradeName1_->DrawImGui("UpgradeName1UI");
-	upgradeName2_->DrawImGui("UpgradeName2UI");
-	upgradeName3_->DrawImGui("UpgradeName3UI");
-	newText1_->DrawImGui("NewText1UI");
-	newText2_->DrawImGui("NewText2UI");
-	newText3_->DrawImGui("NewText3UI");
+	//upgradeName1_->DrawImGui("UpgradeName1UI");
+	//upgradeName2_->DrawImGui("UpgradeName2UI");
+	//upgradeName3_->DrawImGui("UpgradeName3UI");
+	//newText1_->DrawImGui("NewText1UI");
+	//newText2_->DrawImGui("NewText2UI");
+	//newText3_->DrawImGui("NewText3UI");
 }
 
 void UpgradeManager::Upgrade() {
