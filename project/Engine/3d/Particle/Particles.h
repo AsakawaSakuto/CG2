@@ -155,6 +155,11 @@ public:
 	void DrawEmitterShape();
 
 	void SetEmitterState(EmitterState emitter) { emitter_ = emitter; }
+
+	void SetRadius(float radius) { 
+		emitter_.ringInnerRadius = radius;
+		emitter_.ringOuterRadius = radius;
+	}
 private:
 
 	void ExecuteInitialization();

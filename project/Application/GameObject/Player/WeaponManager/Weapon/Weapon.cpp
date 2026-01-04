@@ -434,10 +434,6 @@ void Weapon::ToxicUpdate() {
 		}
 	}
 
-	if (MyInput::TriggerKey(DIK_T)) {
-		status_.sizeRate = status_.sizeRate + 0.1f;
-	}
-
 	coolDownTimer_.Update();
 	intervalTimer_.Update();
 	for (auto& bullet : toxic_) {
@@ -450,6 +446,7 @@ void Weapon::AreaUpdate() {
 	if (area_) {
 		area_->SetPosition(playerPosition_);
 		area_->SetDamage(status_.damage);
+		area_->SetScaleMultipler(status_.sizeRate);
 		area_->Update();
 	}
 }
@@ -554,6 +551,24 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
+
+		case WeaponName::Boomerang:
+
+			status_.cooldownTime = 2.0f;
+			status_.intervalTime = 1.0f;
+			status_.shotMaxCount = 1;
+			status_.shotNowCount = 0;
+			status_.damage = 3.0f;
+			status_.criticalRand = 10;
+			status_.bounceCount = 0;
+			status_.penetrationCount = 0;
+			status_.nockBackPower = 0.0f;
+			status_.durationTime = 0.0f;
+			status_.lifeTime = 5.0f;
+			coolDownTimer_.Start(status_.cooldownTime, false);
+
+			break;
+
 		case WeaponName::Dice:
 
 			status_.cooldownTime = 4.0f;

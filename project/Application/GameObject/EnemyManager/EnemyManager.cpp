@@ -11,6 +11,11 @@ void EnemyManager::Initialize() {
 	dieParticle_ = std::make_unique<Particles>();
 	dieParticle_->Initialize();
 	dieParticle_->LoadJson("EnemyDie");
+	
+	// ベクターの予約でメモリ再割り当てを減らす
+	enemies_.reserve(200);
+	expItems_.reserve(200);
+	damagePlanes_.reserve(100);
 }
 
 void EnemyManager::Update() {
@@ -101,38 +106,34 @@ void EnemyManager::Update() {
 		damagePlane->Update();
 	}
 
-	// 死亡した敵を削除し、その位置でパーティクルを再生
-	for (auto it = enemies_.begin(); it != enemies_.end();) {
-		if (!(*it)->IsAlive()) {
-			dieParticle_->Play((*it)->GetPosition(), false);
+	// 死亡した敵を削除し、その位置でパーティクルを再生・経験値アイテム生成
+	// まず死亡した敵の処理を行う
+	for (auto& enemy : enemies_) {
+		if (!enemy->IsAlive()) {
+			dieParticle_->Play(enemy->GetPosition(), false);
 
 			auto expItem = std::make_unique<ExpItem>();
 			expItem->Initialize();
-			expItem->SetPosition((*it)->GetPosition());
+			expItem->SetPosition(enemy->GetPosition());
 			expItems_.push_back(std::move(expItem));
-
-			it = enemies_.erase(it);
-		} else {
-			++it;
 		}
 	}
+	
+	// Erase-Remove idiomで効率的に削除
+	enemies_.erase(
+		std::remove_if(enemies_.begin(), enemies_.end(),
+			[](const std::unique_ptr<Enemy>& enemy) { return !enemy->IsAlive(); }),
+		enemies_.end());
 
-	for (auto it = expItems_.begin(); it != expItems_.end();) {
-		if (!(*it)->IsAlive()) {
-			it = expItems_.erase(it);
-		} else {
-			++it;
-		}
-	}
+	expItems_.erase(
+		std::remove_if(expItems_.begin(), expItems_.end(),
+			[](const std::unique_ptr<ExpItem>& expItem) { return !expItem->IsAlive(); }),
+		expItems_.end());
 
-	// ライフタイムが終了したダメージ表示を削除
-	for (auto it = damagePlanes_.begin(); it != damagePlanes_.end();) {
-		if (!(*it)->IsAlive()) {
-			it = damagePlanes_.erase(it);
-		} else {
-			++it;
-		}
-	}
+	damagePlanes_.erase(
+		std::remove_if(damagePlanes_.begin(), damagePlanes_.end(),
+			[](const std::unique_ptr<DamagePlane>& damagePlane) { return !damagePlane->IsAlive(); }),
+		damagePlanes_.end());
 
 	dieParticle_->Update();
 }

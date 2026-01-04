@@ -62,16 +62,16 @@ public:
 		switch (rarity)
 		{
 		case Rarity::UnCommon:
-			status_.damage += 2.0f;
+			status_.damage += 1.0f;
 			break;
 		case Rarity::Rare:
-			status_.damage += 3.0f;
+			status_.damage += 1.5f;
 			break;
 		case Rarity::Epic:
-			status_.damage += 4.0f;
+			status_.damage += 2.0f;
 			break;
 		case Rarity::Legendary:
-			status_.damage += 5.0f;
+			status_.damage += 3.0f;
 			break;
 		}
 	}
@@ -84,16 +84,38 @@ public:
 		switch (rarity)
 		{
 		case Rarity::UnCommon:
-			status_.shotMaxCount += 1.25f;
+			status_.shotMaxCount += 1.0f;
 			break;
 		case Rarity::Rare:
-			status_.shotMaxCount += 1.5f;
+			status_.shotMaxCount += 1.25f;
 			break;
 		case Rarity::Epic:
-			status_.shotMaxCount += 1.75f;
+			status_.shotMaxCount += 1.5f;
 			break;
 		case Rarity::Legendary:
 			status_.shotMaxCount += 2.0f;
+			break;
+		}
+	}
+
+	/// <summary>
+	/// サイズを強化（AreaとToxic専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeSize(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.sizeRate += 0.05f;
+			break;
+		case Rarity::Rare:
+			status_.sizeRate += 0.1f;
+			break;
+		case Rarity::Epic:
+			status_.sizeRate += 0.15f;
+			break;
+		case Rarity::Legendary:
+			status_.sizeRate += 0.25f;
 			break;
 		}
 	}

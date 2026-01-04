@@ -77,6 +77,11 @@ private:
 	std::string GetWeaponNamePath(WeaponName weaponName) const;
 
 	/// <summary>
+	/// アップグレードタイプとレアリティから説明文テクスチャのパスを取得
+	/// </summary>
+	std::string GetUpgradeTextPath(UpgradeType type, Rarity rarity) const;
+
+	/// <summary>
 	/// UIを選択肢に応じて更新
 	/// </summary>
 	void UpdateUpgradeUI();
@@ -111,5 +116,8 @@ private:
 	std::unique_ptr<Sprite> newText1_;
 	std::unique_ptr<Sprite> newText2_;
 	std::unique_ptr<Sprite> newText3_;
+	std::unique_ptr<Sprite> upgradeText1_;
+	std::unique_ptr<Sprite> upgradeText2_;
+	std::unique_ptr<Sprite> upgradeText3_;
 	std::unique_ptr<Sprite> bg_;
 };

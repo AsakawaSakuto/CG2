@@ -272,6 +272,20 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 
 	UpdateMatrix();
 
+	// フラスタムカリングのチェック（最初に実行）
+	if (useDrawFrustumCulling_) {
+		Vector3 worldPosition = GetWorldPosition();
+		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
+		float adjustedRadius = boundingRadius_ * maxScale;
+
+		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
+			isInFrustum_ = true;
+			return; // カメラ外なので描画処理全体をスキップ
+		} else {
+		    isInFrustum_ = false;
+		}
+	}
+
 	auto& psoManager = PSOManager::GetInstance();
 
 	// アニメーション使用の有無でRootSignatureとPSOを切り替え
@@ -306,20 +320,6 @@ void Model::Draw(Camera& useCamera, const Transform& transform) {
 	commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(5, pointLightResource_->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(6, spotLightResource_->GetGPUVirtualAddress());
-
-	// フラスタムカリングのチェック
-	if (useDrawFrustumCulling_) {
-		Vector3 worldPosition = GetWorldPosition();
-		float maxScale = std::max(transform_.scale.x, std::max(transform_.scale.y, transform_.scale.z));
-		float adjustedRadius = boundingRadius_ * maxScale;
-
-		if (!useCamera.IsInFrustum(worldPosition, adjustedRadius)) {
-			isInFrustum_ = true;
-			return;
-		} else {
-		    isInFrustum_ = false;
-		}
-	}
 
 	// サブメッシュがある場合はマルチマテリアル描画
 	if (!modelData_.subMeshes.empty()) {

@@ -13,6 +13,7 @@ public:
 
     void SetPosition(const Vector3& position) { transform_.translate = position; }
 
+    void SetScaleMultipler(float scale) { scaleRate_ = scale; }
 private:
     unique_ptr<Model> model_ = make_unique<Model>();
 	unique_ptr<Particles> areaParticle_ = make_unique<Particles>();
