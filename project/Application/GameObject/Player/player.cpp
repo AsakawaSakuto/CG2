@@ -118,6 +118,29 @@ void Player::Update() {
 
 	expItemStateChangeCollision_.center = transform_.translate;
 	expItemStateChangeCollision_.radius = expItemStateChangeRadius_;
+	
+	// 無敵時間タイマーの更新
+	invincibilityTimer_.Update();
+	
+	// 無敵時間中の点滅処理
+	if (invincibilityTimer_.IsActive()) {
+		// 点滅タイマーが動作していない場合は開始
+		if (!blinkTimer_.IsActive()) {
+			blinkTimer_.Start(0.1f, true); // 0.1秒ごとに点滅
+			isVisible_ = true;
+		}
+		
+		blinkTimer_.Update();
+		
+		// タイマーが完了したら表示/非表示を切り替え
+		if (blinkTimer_.IsFinished()) {
+			isVisible_ = !isVisible_;
+		}
+	} else {
+		// 無敵時間が終了したら常に表示
+		blinkTimer_.Stop();
+		isVisible_ = true;
+	}
 
 	MyDebugLine::AddShape(sphereCollision_);
 	Circle expCircle = {};
@@ -131,7 +154,10 @@ void Player::Draw(Camera camera) {
 	// カメラを保存（移動計算で使用）
 	camera_ = camera;
 
-	model_->Draw(camera);
+	// 無敵時間中で非表示の場合はモデルを描画しない
+	if (isVisible_) {
+		model_->Draw(camera);
+	}
 
 	//expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
@@ -640,7 +666,7 @@ void Player::ResolveMapCollision() {
 							// XZ方向のみの押し出し量を計算
 							Vector3 stepMin = stepAABB.GetMinWorld();
 							Vector3 stepMax = stepAABB.GetMaxWorld();
-							
+
 							float penetrationX = (std::min)(playerMax.x - stepMin.x, stepMax.x - playerMin.x);
 							float penetrationZ = (std::min)(playerMax.z - stepMin.z, stepMax.z - playerMin.z);
 							
@@ -1094,6 +1120,21 @@ float Player::GetDistanceToNearestEnemy() const {
 
 void Player::SetCurrentHP(int hp) {
 	status_.currentHP = std::clamp(hp, 0, status_.maxHP);
+}
+
+void Player::TakeDamage(int damage) {
+	// 無敵時間中はダメージを受けない
+	if (!invincibilityTimer_.IsActive()) {
+		invincibilityTimer_.Start(2.0f, false); // 0.5秒の無敵時間
+		status_.currentHP -= damage;
+		
+		// HPが0以下になったら0にクランプ
+		if (status_.currentHP < 0) {
+			status_.currentHP = 0;
+		}
+		
+		// TODO: ここで死亡処理やダメージエフェクトを追加可能
+	}
 }
 
 void Player::AddExp(int exp) {

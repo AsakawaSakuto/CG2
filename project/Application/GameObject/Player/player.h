@@ -74,6 +74,12 @@ public:
 	/// HPを設定（ダメージ・回復用）
 	/// </summary>
 	void SetCurrentHP(int hp);
+	
+	/// <summary>
+	/// ダメージを受ける
+	/// </summary>
+	/// <param name="damage">受けるダメージ量</param>
+	void TakeDamage(int damage);
 
 	/// <summary>
 	/// 経験値を追加
@@ -221,4 +227,9 @@ private:
 	// フォールバック機構：前フレームの位置を記録
 	Vector3 previousFramePosition_ = { 0.0f, 0.0f, 0.0f };
 	bool hasPreviousPosition_ = false; // 前フレーム位置が有効かどうか
+	
+	// ダメージ関連
+	GameTimer invincibilityTimer_; // 無敵時間タイマー
+	GameTimer blinkTimer_; // 点滅用タイマー
+	bool isVisible_ = true; // 描画するかどうか
 };
