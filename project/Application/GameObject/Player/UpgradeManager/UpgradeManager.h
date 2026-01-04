@@ -111,5 +111,8 @@ private:
 	std::unique_ptr<Sprite> newText1_;
 	std::unique_ptr<Sprite> newText2_;
 	std::unique_ptr<Sprite> newText3_;
+	std::unique_ptr<Sprite> upgradeText1_;
+	std::unique_ptr<Sprite> upgradeText2_;
+	std::unique_ptr<Sprite> upgradeText3_;
 	std::unique_ptr<Sprite> bg_;
 };

@@ -51,6 +51,16 @@ void UpgradeManager::Initialize() {
 	newText3_->Initialize("UI/game/newText.png");
 	newText3_->LoadFromJson("newText3");
 
+	upgradeText1_ = std::make_unique<Sprite>();
+	upgradeText1_->Initialize("UI/game/upgradeText/testText.png");
+	upgradeText1_->LoadFromJson("upgradeText1");
+	upgradeText2_ = std::make_unique<Sprite>();
+	upgradeText2_->Initialize("UI/game/upgradeText/testText.png");
+	upgradeText2_->LoadFromJson("upgradeText2");
+	upgradeText3_ = std::make_unique<Sprite>();
+	upgradeText3_->Initialize("UI/game/upgradeText/testText.png");
+	upgradeText3_->LoadFromJson("upgradeText3");
+
 	isUpgrade_ = false;
 }
 
@@ -105,6 +115,7 @@ void UpgradeManager::Update() {
 	// 選択中のUIを強調表示
 	UpdateUpgradeUI();
 
+	bg_->Update();
 	upgradeSelectText_->Update();
 	upgradeBG1_->Update();
 	upgradeBG2_->Update();
@@ -112,13 +123,15 @@ void UpgradeManager::Update() {
 	upgradeIcon1_->Update();
 	upgradeIcon2_->Update();
 	upgradeIcon3_->Update();
-	bg_->Update();
 	upgradeName1_->Update();
 	upgradeName2_->Update();
 	upgradeName3_->Update();
 	newText1_->Update();
 	newText2_->Update();
 	newText3_->Update();
+	upgradeText1_->Update();
+	upgradeText2_->Update();
+	upgradeText3_->Update();
 }
 
 void UpgradeManager::Draw() {
@@ -134,7 +147,10 @@ void UpgradeManager::Draw() {
 		upgradeName1_->Draw();
 		upgradeName2_->Draw();
 		upgradeName3_->Draw();
-		
+		upgradeText1_->Draw();
+		upgradeText2_->Draw();
+		upgradeText3_->Draw();
+
 		// NEW textは新規武器装備のときのみ描画
 		if (upgradeOptions_[0].type == UpgradeType::NewWeapon) {
 			newText1_->Draw();
@@ -163,6 +179,9 @@ void UpgradeManager::DrawImGui() {
 	//newText1_->DrawImGui("NewText1UI");
 	//newText2_->DrawImGui("NewText2UI");
 	//newText3_->DrawImGui("NewText3UI");
+	//upgradeText1_->DrawImGui("UpgradeText1UI");
+	//upgradeText2_->DrawImGui("UpgradeText2UI");
+	//upgradeText3_->DrawImGui("UpgradeText3UI");
 }
 
 void UpgradeManager::Upgrade() {
