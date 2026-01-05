@@ -40,6 +40,11 @@ public:
 		seValueFont_->SetNumber(se);
 	}
 	void SetIsFullScreen(bool isFull) { if (isFull) { onOff_->SetTexture("UI/title/on.png"); } else { onOff_->SetTexture("UI/title/off.png"); } }
+	void SetRanking(int rank1st, int rank2nd, int rank3rd) {
+		ranking1st_->SetNumber(rank1st);
+		ranking2nd_->SetNumber(rank2nd);
+		ranking3rd_->SetNumber(rank3rd);
+	}
 private:
 
 	TitleSelectState selectState_ = TitleSelectState::Play;
@@ -80,7 +85,10 @@ private:
 	unique_ptr<Sprite> edit_;
 	unique_ptr<Sprite> quit_;
 	unique_ptr<Sprite> logo_;
-	unique_ptr<Sprite> ranking_;
+	unique_ptr<Sprite> rankingBG_;
+	unique_ptr<BitmapFont> ranking1st_;
+	unique_ptr<BitmapFont> ranking2nd_;
+	unique_ptr<BitmapFont> ranking3rd_;
 
 	// PlayerSelectUI
 	unique_ptr<Sprite> playerTypeText_;

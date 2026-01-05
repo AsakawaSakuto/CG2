@@ -417,6 +417,7 @@ void TitleScene::Update() {
     titleUI_->SetEditType(editType_);
 	titleUI_->SetVolume(bgmVolume_, seVolume_);
 	titleUI_->SetIsFullScreen(isFullScreen_);
+	titleUI_->SetRanking(12345, 1024, 199);
 	titleUI_->Update();
 
 	// フェードイン（GameSceneへ遷移時、徐々に不透明に）

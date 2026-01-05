@@ -1,0 +1,44 @@
+{
+  "values": [
+  {
+    "name": "position",
+    "type": 16,
+    "value": [970, 398]
+  },
+  {
+    "name": "scale",
+    "type": 16,
+    "value": [0.7, 0.7]
+  },
+  {
+    "name": "spaceWidth",
+    "type": 2,
+    "value": 65.000000
+  },
+  {
+    "name": "color",
+    "type": 18,
+    "value": [1.000000, 1.000000, 1.000000, 1.000000]
+  },
+  {
+    "name": "showPercent",
+    "type": 3,
+    "value": false
+  },
+  {
+    "name": "alignment",
+    "type": 7,
+    "value": 0
+  },
+  {
+    "name": "percentOffset",
+    "type": 16,
+    "value": [5.000000, 20.000000]
+  },
+  {
+    "name": "percentScale",
+    "type": 16,
+    "value": [0.900000, 0.750000]
+  }
+  ]
+}
