@@ -30,7 +30,7 @@ struct PlayerStatus {
 	// 難易度
 	// .XP回収範囲
 	int killEnemyCount = 0;   // 敵を倒した回数
-	float moveSpeed = 5.0f;   // 移動速度
+	float moveSpeed = 7.5f;   // 移動速度
 	int jumpCanCount = 1;     // ジャンプ可能回数
 	int currentJumpCount = 0; // 現在のジャンプ回数
 	float jumpPower = 15.0f;  // ジャンプ力
