@@ -92,6 +92,7 @@ void TitleSceneUI::Update() {
 
 	playerNameText_->Update();
 	playerTypeText_->Update();
+	playerAbilityText_->Update();
 	powerManIcon_->Update();
 	tankManIcon_->Update();
 	jumpManIcon_->Update();
@@ -125,6 +126,7 @@ void TitleSceneUI::Draw() {
 	} else {
 		playerTypeText_->Draw();
 		playerNameText_->Draw();
+		playerAbilityText_->Draw();
 		powerManIcon_->Draw();
 		tankManIcon_->Draw();
 		jumpManIcon_->Draw();
@@ -173,7 +175,8 @@ void TitleSceneUI::DrawImGui() {
 	//areaIcon_->DrawImGui("AreaIconUI");
 	//gunIcon_->DrawImGui("GunIconUI");
 	//Confirmed_->DrawImGui("ConfirmedUI");]
-	confirmedBG_->DrawImGui("ConfirmedBGUI");
+	//confirmedBG_->DrawImGui("ConfirmedBGUI");
+	playerAbilityText_->DrawImGui("PlayerAbilityUI");
 }
 
 void TitleSceneUI::InitPlayerUI() {
@@ -200,12 +203,17 @@ void TitleSceneUI::InitPlayerUI() {
 	speedManIcon_ = std::make_unique<Sprite>();
 	speedManIcon_->Initialize("Icon/SpeedMan.png");
 	speedManIcon_->LoadFromJson("speedManIconT");
+
+	playerAbilityText_ = std::make_unique<Sprite>();
+	playerAbilityText_->Initialize("UI/Title/playerAbilityText/test.png");
+	playerAbilityText_->LoadFromJson("PlayerAbilityText");
 }
 
 void TitleSceneUI::PlayerSelectUpdate() {
 	switch (playerName_) {
 	case PlayerName::PowerMan:
 		playerNameText_->SetTexture("UI/Title/playerName/PowerMan.png");
+		playerAbilityText_->SetTexture("UI/Title/playerAbilityText/PowerMan.png");
 		powerManIcon_->SetScale(iconMax_);
 		tankManIcon_->SetScale(iconMin_);
 		jumpManIcon_->SetScale(iconMin_);
@@ -213,6 +221,7 @@ void TitleSceneUI::PlayerSelectUpdate() {
 		break;
 	case PlayerName::TankMan:
 		playerNameText_->SetTexture("UI/Title/playerName/TankMan.png");
+		playerAbilityText_->SetTexture("UI/Title/playerAbilityText/TankMan.png");
 		powerManIcon_->SetScale(iconMin_);
 		tankManIcon_->SetScale(iconMax_);
 		jumpManIcon_->SetScale(iconMin_);
@@ -220,6 +229,7 @@ void TitleSceneUI::PlayerSelectUpdate() {
 		break;
 	case PlayerName::JumpMan:
 		playerNameText_->SetTexture("UI/Title/playerName/jumpMan.png");
+		playerAbilityText_->SetTexture("UI/Title/playerAbilityText/JumpMan.png");
 		powerManIcon_->SetScale(iconMin_);
 		tankManIcon_->SetScale(iconMin_);
 		jumpManIcon_->SetScale(iconMax_);
@@ -227,6 +237,7 @@ void TitleSceneUI::PlayerSelectUpdate() {
 		break;
 	case PlayerName::SpeedMan:
 		playerNameText_->SetTexture("UI/Title/playerName/SpeedMan.png");
+		playerAbilityText_->SetTexture("UI/Title/playerAbilityText/SpeedMan.png");
 		powerManIcon_->SetScale(iconMin_);
 		tankManIcon_->SetScale(iconMin_);
 		jumpManIcon_->SetScale(iconMin_);

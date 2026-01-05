@@ -50,6 +50,7 @@ private:
 	// PlayerSelectUI
 	unique_ptr<Sprite> playerTypeText_;
 	unique_ptr<Sprite> playerNameText_;
+	unique_ptr<Sprite> playerAbilityText_;
 
 	unique_ptr<Sprite> powerManIcon_;
 	unique_ptr<Sprite> tankManIcon_;

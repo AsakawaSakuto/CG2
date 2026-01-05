@@ -12,8 +12,8 @@ enum class PlayerName {
 
 struct PlayerStatus {
 	// HP関連
-	int maxHP = 100;          // 最大体力
-	int currentHP = 75;      // 現在の体力
+	int maxHP = 100;         // 最大体力
+	int currentHP = 100;     // 現在の体力
 
 	// 経験値関連
 	int currentExp = 0;       // 現在の経験値
@@ -29,11 +29,12 @@ struct PlayerStatus {
 	// 運
 	// 難易度
 	// .XP回収範囲
-	int killEnemyCount = 0; // 敵を倒した回数
+	int killEnemyCount = 0;   // 敵を倒した回数
 	float moveSpeed = 5.0f;   // 移動速度
-	int jumpCanCount = 100;     // ジャンプ可能回数
+	int jumpCanCount = 1;     // ジャンプ可能回数
 	int currentJumpCount = 0; // 現在のジャンプ回数
-	float jumpPower = 15.0f;   // ジャンプ力
+	float jumpPower = 15.0f;  // ジャンプ力
 	float velocity_Y = 0.0f;  // Y軸方向の速度
 	float gravity = 20.0f;    // 重力
+	float damageRate = 1.0f;  // ダメージ倍率
 };
