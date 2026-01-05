@@ -151,6 +151,23 @@ public:
 	}
 	
 	float GetDamageRate() const { return status_.damageRate; }
+	
+	/// <summary>
+	/// 指定した武器のキルカウントを取得
+	/// </summary>
+	/// <param name="weaponName">キルカウントを取得する武器の種類</param>
+	/// <returns>指定した武器のキルカウント（武器を持っていない場合は0）</returns>
+	int GetWeaponKillCount(WeaponName weaponName) const {
+		return weaponManager_->GetWeaponKillCount(weaponName);
+	}
+	
+	/// <summary>
+	/// 全ての武器のキルカウントの合計を取得
+	/// </summary>
+	int GetTotalWeaponKillCount() const {
+		return weaponManager_->GetTotalWeaponKillCount();
+	}
+
 private:
 
 	// 移動処理
