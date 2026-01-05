@@ -47,6 +47,10 @@ private:
 	unique_ptr<Model> tree_;
 	Transform treeTransform_;
 
+	unique_ptr<Sprite> fadeBG_;
+	GameTimer fadeInTimer_;
+	GameTimer fadeOutTimer_;
+
 	Vector3 playerColors[4] = {
 	 { 1.000f, 0.447f, 0.133f },
 	 { 0.161f, 0.318f, 0.827f },

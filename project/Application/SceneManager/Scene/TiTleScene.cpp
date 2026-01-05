@@ -50,6 +50,13 @@ void TitleScene::Initialize() {
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetEnabled(false);
 
+	fadeBG_ = make_unique<Sprite>();
+	fadeBG_->Initialize("loading.png", { 0.0f,0.0f }, { 1.0f,1.0f });
+
+	// タイトルシーン開始時はフェードアウト（透明にする）
+	fadeInTimer_ = GameTimer(0.0f, false);
+	fadeOutTimer_ = GameTimer(1.0f, false);
+	fadeOutTimer_.Start(1.0f, false);
 }
 
 void TitleScene::Update() {
@@ -246,15 +253,21 @@ void TitleScene::Update() {
 
 	case TitleSelectState::Confirmed:
 
-		if (MyInput::Trigger(Action::CONFIRM)) {
+		if (!fadeInTimer_.IsActive()) {
+			if (MyInput::Trigger(Action::CONFIRM)) {
+				fadeInTimer_.Start(1.0f, false);
+			}
+
+			if (MyInput::Trigger(Action::CANCEL)) {
+				selectState_ = TitleSelectState::WeaponSelect;
+			}
+		}
+
+		if (fadeInTimer_.IsFinished()) {
 			// GameSceneに選択したプレイヤーと武器を渡す
 			SetSelectedPlayerName(playerName_);
 			SetSelectedWeaponName(weaponName_);
 			ChangeScene(SCENE::GAME);
-		}
-
-		if (MyInput::Trigger(Action::CANCEL)) {
-			selectState_ = TitleSelectState::WeaponSelect;
 		}
 
 		break;
@@ -269,6 +282,20 @@ void TitleScene::Update() {
 	titleUI_->SetPlayerName(playerName_);
 	titleUI_->SetWeaponName(weaponName_);
 	titleUI_->Update();
+
+	// フェードイン（GameSceneへ遷移時、徐々に不透明に）
+	if (fadeInTimer_.IsActive()) {
+		fadeInTimer_.Update();
+		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, fadeInTimer_.GetProgress() });
+	}
+
+	// フェードアウト（TitleScene開始時、徐々に透明に）
+	if (fadeOutTimer_.IsActive() && !fadeInTimer_.IsActive()) {
+		fadeOutTimer_.Update();
+		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f - fadeOutTimer_.GetProgress() });
+	}
+
+	fadeBG_->Update();
 }
 
 void TitleScene::Draw() {
@@ -280,6 +307,7 @@ void TitleScene::Draw() {
 	tree_->Draw(camera_, treeTransform_);
 	player_->Draw(camera_, playerTransform_);
 	titleUI_->Draw();
+	fadeBG_->Draw();
 }
 
 void TitleScene::DrawImGui() {
@@ -291,7 +319,7 @@ void TitleScene::DrawImGui() {
 	//playerTransform_.DrawImGui("TitleScenePlayerTransform");
 	//slope_->DrawImGui("TitleSceneSlopeModel");
 	//tree_->DrawImGui("TitleSceneTreeModel");
-
+	fadeBG_->DrawImGui("TitleSceneFadeBG");
 	titleUI_->DrawImGui();
 }
 
