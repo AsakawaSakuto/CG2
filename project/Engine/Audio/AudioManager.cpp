@@ -27,10 +27,7 @@ void AudioManager::Initialize() {
 
     // SE.Load temp
 	// LoadSE(SE_Variation::, "resources/sound/SE/");
-	LoadSE(SE_List::KAWAII, "resources/sound/SE/kawaii.mp3");
-	LoadSE(SE_List::OU, "resources/sound/SE/ou.mp3");
-	LoadSE(SE_List::DON, "resources/sound/SE/don.mp3");
-	LoadSE(SE_List::KIRAKIRA, "resources/sound/SE/kirakira.mp3");
+	LoadSE(SE_List::StartUp, "resources/sound/SE/StartUp.mp3");
 
 	// BGM.Load temp
 	LoadBGM(BGM_List::Title, "resources/sound/BGM/titleBGM.mp3");
@@ -133,6 +130,26 @@ void AudioManager::Update() {
         if (se) {
             se->Update();
         }
+    }
+}
+
+// 個別音量設定（BGM）
+void AudioManager::SetBGMVolume(BGM_List bgm, float volume) {
+    size_t index = static_cast<size_t>(bgm);
+    assert(index < bgmVolumeArray_.size() && "Invalid BGM variation");
+    bgmVolumeArray_[index] = volume;
+    if (bgmArray_[index]) {
+        bgmArray_[index]->SetVolume(bgmVolumeArray_[index] * BGM_MasterVolume);
+    }
+}
+
+// 個別音量設定（SE）
+void AudioManager::SetSEVolume(SE_List se, float volume) {
+    size_t index = static_cast<size_t>(se);
+    assert(index < seVolumeArray_.size() && "Invalid SE variation");
+    seVolumeArray_[index] = volume;
+    if (seArray_[index]) {
+        seArray_[index]->SetVolume(seVolumeArray_[index] * SE_MasterVolume);
     }
 }
 

@@ -6,10 +6,7 @@
 #include "Data/Audio.h"
 
 enum class SE_List {
-    KAWAII,
-    OU,
-    DON,
-    KIRAKIRA,
+    StartUp,
 
     Count
 };
@@ -61,6 +58,11 @@ public:
 
     void SetBgmMasterVolume(float volume) { BGM_MasterVolume = volume; };
 	void SetSeMasterVolume(float volume) { SE_MasterVolume = volume; };
+
+    // 個別の音量を設定（BGM / SE 列挙値と個別音量）
+    void SetBGMVolume(BGM_List bgm, float volume);
+    void SetSEVolume(SE_List se, float volume);
+
 private:
     AudioManager() = default;
     AudioManager(const AudioManager&) = delete;

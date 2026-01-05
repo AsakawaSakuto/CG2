@@ -9,6 +9,7 @@ using std::make_unique;
 
 enum class SCENE {
     TEST = 0,
+    START,
     TITLE,
     GAME,
     RESULT,

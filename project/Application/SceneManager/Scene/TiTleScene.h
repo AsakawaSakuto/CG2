@@ -36,6 +36,7 @@ private:
 	int bgmVolume_ = 5;
 	int seVolume_ = 5;
 	bool isFullScreen_ = false;
+	float titleBgmVolume_ = 0.5f;
 
 	unique_ptr<TitleSceneUI> titleUI_;
 	unique_ptr<SkiningModel> player_;

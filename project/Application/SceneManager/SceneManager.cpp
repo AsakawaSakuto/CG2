@@ -76,7 +76,7 @@ void SceneManager::Initialize() {
 	LineManager::GetInstance()->Initialize();
 
     // 初期シーンを作成
-	currentSceneNo_ = SCENE::TITLE;
+	currentSceneNo_ = SCENE::START;
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
     if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
         sceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();
@@ -279,6 +279,8 @@ std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
     switch (sceneNo) {
     case SCENE::TEST:
         return std::make_unique<TestScene>();
+	case SCENE::START:
+		return std::make_unique<StartScene>();
     case SCENE::TITLE:
         return std::make_unique<TitleScene>();
     case SCENE::GAME:

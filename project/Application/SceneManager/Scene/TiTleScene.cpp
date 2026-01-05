@@ -60,7 +60,7 @@ void TitleScene::Initialize() {
 
 	MyAudio::SetBgmMasterVolume(0.5f);
 	MyAudio::SetSeMasterVolume(0.5f);
-	MyAudio::PlayBGM(BGM_List::Title, 0.5f);
+	MyAudio::PlayBGM(BGM_List::Title, titleBgmVolume_);
 }
 
 void TitleScene::Update() {
@@ -346,6 +346,7 @@ void TitleScene::Update() {
 			// GameSceneに選択したプレイヤーと武器を渡す
 			SetSelectedPlayerName(playerName_);
 			SetSelectedWeaponName(weaponName_);
+			MyAudio::StopBGM(BGM_List::Title);
 			ChangeScene(SCENE::GAME);
 		}
 
@@ -369,12 +370,14 @@ void TitleScene::Update() {
 	if (fadeInTimer_.IsActive()) {
 		fadeInTimer_.Update();
 		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, fadeInTimer_.GetProgress() });
+		MyAudio::SetBGMVolume(BGM_List::Title, titleBgmVolume_* fadeInTimer_.GetReverseProgress());
 	}
 
 	// フェードアウト（TitleScene開始時、徐々に透明に）
 	if (fadeOutTimer_.IsActive() && !fadeInTimer_.IsActive()) {
 		fadeOutTimer_.Update();
 		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f - fadeOutTimer_.GetProgress() });
+		MyAudio::SetBGMVolume(BGM_List::Title, titleBgmVolume_ * fadeInTimer_.GetProgress());
 	}
 
 	fadeBG_->Update();

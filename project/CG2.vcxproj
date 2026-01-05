@@ -184,6 +184,7 @@
     <ClCompile Include="Application\SceneManager\SceneManager.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\GameScene.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\ResultScene.cpp" />
+    <ClCompile Include="Application\SceneManager\Scene\StartScene.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\TiTleScene.cpp" />
     <ClCompile Include="Application\SceneManager\Test\TestScene.cpp" />
     <ClCompile Include="Engine\2d\BitmapFont\BitmapFont.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="Application\SceneManager\SceneManager.h" />
     <ClInclude Include="Application\SceneManager\Scene\GameScene.h" />
     <ClInclude Include="Application\SceneManager\Scene\ResultScene.h" />
+    <ClInclude Include="Application\SceneManager\Scene\StartScene.h" />
     <ClInclude Include="Application\SceneManager\Scene\TiTleScene.h" />
     <ClInclude Include="Application\SceneManager\Test\TestScene.h" />
     <ClInclude Include="Engine\2d\BitmapFont\BitmapFont.h" />
