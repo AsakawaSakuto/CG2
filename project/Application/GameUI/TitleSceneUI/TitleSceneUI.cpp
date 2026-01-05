@@ -30,6 +30,8 @@ void TitleSceneUI::Initialize() {
 
 	InitWeaponUI();
 
+	InitEditUI();
+
 	scaleTimer_.Start(1.0f, true);
 }
 
@@ -50,6 +52,30 @@ void TitleSceneUI::Update() {
 		quit_->SetScale(minScale_);
 
 		break;
+
+	case TitleSelectState::EditSelect:
+
+		switch (editType_)
+		{
+		case EditType::Screen:
+			fullScreen_->SetScale(editMax_);
+			bgmVolume_->SetScale(editMin_);
+			seVolume_->SetScale(editMin_);
+			break;
+		case EditType::BgmVolume:
+			fullScreen_->SetScale(editMin_);
+			bgmVolume_->SetScale(editMax_);
+			seVolume_->SetScale(editMin_);
+			break;
+		case EditType::SeVolume:
+			fullScreen_->SetScale(editMin_);
+			bgmVolume_->SetScale(editMin_);
+			seVolume_->SetScale(editMax_);
+			break;
+		}
+
+		break;
+
 	case TitleSelectState::Quit:
 
 		play_->SetScale(minScale_);
@@ -112,6 +138,19 @@ void TitleSceneUI::Update() {
 
 	confirmed_->Update();
 	confirmedBG_->Update();
+
+	editBG_->Update();
+	fullScreen_->Update();
+	onOff_->Update();
+	bgmVolume_->Update();
+	seVolume_->Update();
+
+	select1_->Update();
+	select2_->Update();
+	select3_->Update();
+	select4_->Update();
+	select5_->Update();
+	select6_->Update();
 }
 
 void TitleSceneUI::Draw() {
@@ -149,6 +188,23 @@ void TitleSceneUI::Draw() {
 		confirmedBG_->Draw();
 		confirmed_->Draw();
 	}
+
+	if (selectState_ == TitleSelectState::EditSelect) {
+		editBG_->Draw();
+		fullScreen_->Draw();
+		onOff_->Draw();
+		bgmVolume_->Draw();
+		seVolume_->Draw();
+		bgmValueFont_->Draw();
+		seValueFont_->Draw();
+
+		select1_->Draw();
+		select2_->Draw();
+		select3_->Draw();
+		select4_->Draw();
+		select5_->Draw();
+		select6_->Draw();
+	}
 }
 
 void TitleSceneUI::DrawImGui() {
@@ -176,7 +232,20 @@ void TitleSceneUI::DrawImGui() {
 	//gunIcon_->DrawImGui("GunIconUI");
 	//Confirmed_->DrawImGui("ConfirmedUI");]
 	//confirmedBG_->DrawImGui("ConfirmedBGUI");
-	playerAbilityText_->DrawImGui("PlayerAbilityUI");
+	//playerAbilityText_->DrawImGui("PlayerAbilityUI");
+	//editBG_->DrawImGui("EditBGUI");
+    //fullScreen_->DrawImGui("FullScreenUI");
+	//bgmVolume_->DrawImGui("BGMVolumeUI");
+	//seVolume_->DrawImGui("SEVolumeUI");
+	//onOff_->DrawImGui("OnOffUI");
+	//bgmValueFont_->DrawImGui("BGMValueFontUI");
+	//seValueFont_->DrawImGui("SEValueFontUI");
+	//select1_->DrawImGui("Select1UI");
+	//select2_->DrawImGui("Select2UI");
+	//select3_->DrawImGui("Select3UI");
+	//select4_->DrawImGui("Select4UI");
+	//select5_->DrawImGui("Select5UI");
+	//select6_->DrawImGui("Select6UI");
 }
 
 void TitleSceneUI::InitPlayerUI() {
@@ -428,4 +497,45 @@ void TitleSceneUI::WeaponSelectUpdate() {
 	weaponSelectText_->SetScale(MyEasing::Lerp_GAB(textMin_, textMax_, scaleTimer_.GetProgress()));
 	playerTypeText_->SetScale(textMin_);
 	confirmed_->SetScale(confMin_);
+}
+
+void TitleSceneUI::InitEditUI() {
+	fullScreen_ = std::make_unique<Sprite>();
+	fullScreen_->Initialize("UI/Title/fullScreen.png");
+	fullScreen_->LoadFromJson("fullScreen");
+	onOff_ = std::make_unique<Sprite>();
+	onOff_->Initialize("UI/Title/off.png");
+	onOff_->LoadFromJson("onoff");
+	bgmVolume_ = std::make_unique<Sprite>();
+	bgmVolume_->Initialize("UI/Title/bgmVolume.png");
+	bgmVolume_->LoadFromJson("bgmVolume");
+	seVolume_ = std::make_unique<Sprite>();
+	seVolume_->Initialize("UI/Title/seVolume.png");
+	seVolume_->LoadFromJson("seVolume");
+	bgmValueFont_ = std::make_unique<BitmapFont>();
+	bgmValueFont_->Initialize("bgmValueFont");
+	seValueFont_ = std::make_unique<BitmapFont>();
+	seValueFont_->Initialize("seValueFont");
+	editBG_ = std::make_unique<Sprite>();
+	editBG_->Initialize("UI/Title/editBG.png");
+	editBG_->LoadFromJson("EditBG");
+
+	select1_ = std::make_unique<Sprite>();
+	select1_->Initialize("UI/Title/select.png");
+	select1_->LoadFromJson("select1");
+	select2_ = std::make_unique<Sprite>();
+	select2_->Initialize("UI/Title/select.png");
+	select2_->LoadFromJson("select2");
+	select3_ = std::make_unique<Sprite>();
+	select3_->Initialize("UI/Title/select.png");
+	select3_->LoadFromJson("select3");
+	select4_ = std::make_unique<Sprite>();
+	select4_->Initialize("UI/Title/select.png");
+	select4_->LoadFromJson("select4");
+	select5_ = std::make_unique<Sprite>();
+	select5_->Initialize("UI/Title/select.png");
+	select5_->LoadFromJson("select5");
+	select6_ = std::make_unique<Sprite>();
+	select6_->Initialize("UI/Title/select.png");
+	select6_->LoadFromJson("select6");
 }

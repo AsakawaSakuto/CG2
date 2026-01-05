@@ -31,6 +31,11 @@ private:
 
 	PlayerName playerName_ = PlayerName::PowerMan;
 	WeaponName weaponName_ = WeaponName::FireBall;
+	EditType editType_ = EditType::Screen;
+
+	int bgmVolume_ = 5;
+	int seVolume_ = 5;
+	bool isFullScreen_ = false;
 
 	unique_ptr<TitleSceneUI> titleUI_;
 	unique_ptr<SkiningModel> player_;

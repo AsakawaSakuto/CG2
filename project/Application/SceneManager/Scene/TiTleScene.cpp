@@ -57,6 +57,10 @@ void TitleScene::Initialize() {
 	fadeInTimer_ = GameTimer(0.0f, false);
 	fadeOutTimer_ = GameTimer(1.0f, false);
 	fadeOutTimer_.Start(1.0f, false);
+
+	MyAudio::SetBgmMasterVolume(0.5f);
+	MyAudio::SetSeMasterVolume(0.5f);
+	MyAudio::PlayBGM(BGM_List::Title, 0.5f);
 }
 
 void TitleScene::Update() {
@@ -84,10 +88,85 @@ void TitleScene::Update() {
 		}
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			// 編集モードは未実装
+			selectState_ = TitleSelectState::EditSelect;
+			editType_ = EditType::Screen;
 		}
 
 		break;
+
+	case TitleSelectState::EditSelect:
+
+		if (MyInput::Trigger(Action::CANCEL)) {
+			selectState_ = TitleSelectState::Edit;
+		}
+
+		switch (editType_)
+		{
+		case EditType::Screen:
+
+			if (MyInput::Trigger(Action::CONFIRM) || MyInput::Trigger(Action::CELECT_RIGHT) || MyInput::Trigger(Action::CELECT_LEFT)) {
+				auto dxCommon = ServiceLocator::GetDXCommon();
+				auto winApp = dxCommon->GetWinApp();
+				if (winApp->IsFullscreen()) {
+					winApp->ExitBorderlessFullscreen();
+					isFullScreen_ = false;
+				} else {
+					winApp->EnterBorderlessFullscreen();
+					isFullScreen_ = true;
+				}
+			}
+
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				editType_ = EditType::BgmVolume;
+			}
+			
+			break;
+
+		case EditType::BgmVolume:
+
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				bgmVolume_--;
+			}
+
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				bgmVolume_++;
+			}
+
+			bgmVolume_ = std::clamp(bgmVolume_, 0, 9);
+			MyAudio::SetBgmMasterVolume(static_cast<float>(bgmVolume_) / 10.0f);
+
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				editType_ = EditType::Screen;
+			}
+
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				editType_ = EditType::SeVolume;
+			}
+
+			break;
+
+		case EditType::SeVolume:
+
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				seVolume_--;
+			}
+
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				seVolume_++;
+			}
+
+			seVolume_ = std::clamp(seVolume_, 0, 9);
+			MyAudio::SetSeMasterVolume(static_cast<float>(seVolume_) / 10.0f);
+
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				editType_ = EditType::BgmVolume;
+			}
+
+			break;
+		}
+
+		break;
+
 	case TitleSelectState::Quit:
 
 		if (MyInput::Trigger(Action::CELECT_UP)) {
@@ -281,6 +360,9 @@ void TitleScene::Update() {
 	titleUI_->SetSelectState(selectState_);
 	titleUI_->SetPlayerName(playerName_);
 	titleUI_->SetWeaponName(weaponName_);
+	titleUI_->SetEditType(editType_);
+	titleUI_->SetVolume(bgmVolume_, seVolume_);
+	titleUI_->SetIsFullScreen(isFullScreen_);
 	titleUI_->Update();
 
 	// フェードイン（GameSceneへ遷移時、徐々に不透明に）

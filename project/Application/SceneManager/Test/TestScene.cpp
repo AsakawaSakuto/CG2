@@ -61,7 +61,7 @@ void TestScene::Initialize() {
 
     testGauge_->Initialize();
 
-    MyAudio::PlayBGM(BGM_List::TEST, 0.0f);
+    //MyAudio::PlayBGM(BGM_List::TEST, 0.0f);
 }
 
 void TestScene::Update() {

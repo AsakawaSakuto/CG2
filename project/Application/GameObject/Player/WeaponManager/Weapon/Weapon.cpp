@@ -184,7 +184,7 @@ void Weapon::LaserUpdate() {
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
-		bullet->SetPenetrationCount(status_.penetrationCount);
+		bullet->SetPenetrationCount(static_cast<int>(status_.penetrationCount));
 		laser_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
@@ -217,7 +217,7 @@ void Weapon::RunaUpdate() {
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
-		bullet->SetBounceCount(status_.bounceCount);
+		bullet->SetBounceCount(static_cast<int>(status_.bounceCount));
 		runa_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {

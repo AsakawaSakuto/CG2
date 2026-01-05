@@ -7,10 +7,19 @@
 enum class TitleSelectState {
 	Play,
 	Edit,
+	EditSelect,
 	Quit,
 	PlayerSelect,
 	WeaponSelect,
 	Confirmed,
+
+	Count
+};
+
+enum class EditType {
+	Screen,
+	BgmVolume,
+	SeVolume,
 
 	Count
 };
@@ -25,19 +34,45 @@ public:
 	void SetSelectState(TitleSelectState state) { selectState_ = state; }
 	void SetPlayerName(PlayerName name) { playerName_ = name; }
 	void SetWeaponName(WeaponName name) { weaponName_ = name; }
+	void SetEditType(EditType type) { editType_ = type; }
+	void SetVolume(int bgm, int se) { 
+		bgmValueFont_->SetNumber(bgm);
+		seValueFont_->SetNumber(se);
+	}
+	void SetIsFullScreen(bool isFull) { if (isFull) { onOff_->SetTexture("UI/title/on.png"); } else { onOff_->SetTexture("UI/title/off.png"); } }
 private:
 
 	TitleSelectState selectState_ = TitleSelectState::Play;
 
 	PlayerName playerName_ = PlayerName::PowerMan;
 	WeaponName weaponName_ = WeaponName::FireBall;
+	EditType editType_ = EditType::Screen;
 
 	void InitPlayerUI();
 	void InitWeaponUI();
+	void InitEditUI();
 
 	void PlayerSelectUpdate();
 	void WeaponSelectUpdate();
 private:
+
+	// editUI
+	unique_ptr<Sprite> fullScreen_;
+	unique_ptr<Sprite> onOff_;
+	unique_ptr<Sprite> bgmVolume_;
+	unique_ptr<Sprite> seVolume_;
+	unique_ptr<BitmapFont> bgmValueFont_;
+	unique_ptr<BitmapFont> seValueFont_;
+	unique_ptr<Sprite> editBG_;
+	Vector2 editMin_ = { 0.4f,0.4f };
+	Vector2 editMax_ = { 0.5f,0.5f };
+
+	unique_ptr<Sprite> select1_;
+	unique_ptr<Sprite> select2_;
+	unique_ptr<Sprite> select3_;
+	unique_ptr<Sprite> select4_;
+	unique_ptr<Sprite> select5_;
+	unique_ptr<Sprite> select6_;
 
 	GameTimer scaleTimer_;
 

@@ -115,6 +115,9 @@ public:
     // ポストエフェクトマネージャーを取得
     PostEffectManager* GetPostEffectManager() { return postEffectManager_.get(); }
 
+    // WinAppを取得
+    WinApp* GetWinApp() { return winApp_; }
+
 private:
 
     D3DResourceLeakChecker d3dResourceLeakChecker_;
