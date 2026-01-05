@@ -9,6 +9,11 @@ void FreeChest::Initialize(Vector3 pos) {
 	model_->Initialize("MapObject/chest/chest.obj");
 	//model_->SetTexture("resources/image/white1x1.png");
 
+	bottom_ = std::make_unique<Model>();
+	bottom_->Initialize("MapObject/Chest/ChestIsActive.obj");
+	bottom_->SetBillboard(true);
+	bottom_->UseLight(false);
+
 	// 位置設定
 	transform_.translate = pos;
 	transform_.rotate.y = MyRand::Float(0.0f, 10.0f);
@@ -19,12 +24,26 @@ void FreeChest::Initialize(Vector3 pos) {
 	aabbCollision_.min = { -1.5f, 0.0f, -1.5f };
 	aabbCollision_.max = {  1.5f, 1.0f,  1.5f };
 	model_->SetColor3({ 1.0f, 0.84f, 0.0f }); // 金色
+
+	timer_.Start(1.0f, true);
+}
+
+void FreeChest::Update() {
+	bottomTransform_.translate = transform_.translate + Vector3{ 0.0f, 2.0f, 0.0f };
+	bottomTransform_.scale = MyEasing::Lerp_GAB(textMax, textMin, timer_.GetProgress());
+
+	// タイマー更新
+	timer_.Update();
 }
 
 void FreeChest::Draw(Camera camera) {
 	if (isAlive_) {
 		MyDebugLine::AddShape(aabbCollision_);
 		model_->Draw(camera, transform_);
+
+		if (chestIsActive_) {
+			bottom_->Draw(camera, bottomTransform_);
+		}
 	}
 }
 

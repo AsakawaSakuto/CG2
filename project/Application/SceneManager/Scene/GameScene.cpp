@@ -253,6 +253,8 @@ void GameScene::ChestUpdate() {
 	bool isPaidChest = false;
 	int openAmount = 0;
 
+	chestManager_->SetChestActive(playerAABB, player_->GetNowMoney() >= chestManager_->GetOpenAmount());
+
 	if (MyInput::Trigger(Action::INTERACT)) {
 		// まず宝箱との衝突をチェック
 		if (chestManager_->CheckChestCollision(playerAABB, isPaidChest, openAmount)) {

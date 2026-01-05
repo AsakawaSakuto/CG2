@@ -13,6 +13,7 @@ void MinJar::Initialize(Vector3 pos) {
 	bottom_ = std::make_unique<Model>();
 	bottom_->Initialize("MapObject/jar/JarIsActive.obj");
 	bottom_->SetBillboard(true);
+	bottom_->UseLight(false);
 
 	// 位置設定
 	transform_.translate = pos;

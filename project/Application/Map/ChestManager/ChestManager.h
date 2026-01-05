@@ -28,6 +28,9 @@ public:
 	// 開けるのに必要な金額を取得
 	int GetOpenAmount() const { return openAmount_; }
 	
+	// チェストをアクティブ状態に設定（プレイヤーが近づいたときなど）
+	void SetChestActive(const AABB& interactAABB, bool hasEnoughMoney);
+	
 private:
 	// 最上面のNormalブロックを見つける
 	bool FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const;

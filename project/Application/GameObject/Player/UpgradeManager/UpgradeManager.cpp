@@ -531,7 +531,7 @@ void UpgradeManager::UpdateUpgradeUI() {
 	switch (upgradeSelect_) {
 	case UpgradeSelect::Select1:
 		upgradeBG1_->SetColor(color1);
-		upgradeBG2_->SetColor(Vector4(color2.x * dimFactor, color2.y * dimFactor, color3.z * dimFactor, color2.w));
+		upgradeBG2_->SetColor(Vector4(color2.x * dimFactor, color2.y * dimFactor, color2.z * dimFactor, color2.w));
 		upgradeBG3_->SetColor(Vector4(color3.x * dimFactor, color3.y * dimFactor, color3.z * dimFactor, color3.w));
 		break;
 	case UpgradeSelect::Select2:
