@@ -2,8 +2,8 @@
 #include "AudioManager.h"
 
 namespace MyAudio {
-    inline void PlayBGM(BGM_List bgm, float volume = 1.0f) {
-        AudioManager::GetInstance()->PlayBGM(bgm, volume);
+    inline void PlayBGM(BGM_List bgm, bool f = true) {
+        AudioManager::GetInstance()->PlayBGM(bgm, f);
     }
 
     inline void StopBGM(BGM_List bgm) {
@@ -37,7 +37,11 @@ namespace MyAudio {
     }
 
     // SE制御
-    inline void PlaySE(SE_List se, float volume = 1.0f) {
-        AudioManager::GetInstance()->PlaySE(se, volume);
+    inline void PlaySE(SE_List se, bool f = false) {
+        AudioManager::GetInstance()->PlaySE(se, f);
+    }
+
+    inline void StopSE(SE_List se) {
+        AudioManager::GetInstance()->StopSE(se);
     }
 }

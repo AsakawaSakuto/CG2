@@ -27,10 +27,13 @@ void AudioManager::Initialize() {
 
     // SE.Load temp
 	// LoadSE(SE_Variation::, "resources/sound/SE/");
-	LoadSE(SE_List::StartUp, "resources/sound/SE/StartUp.mp3");
+    LoadSE(SE_List::StartUp, "resources/sound/SE/StartUp.mp3", 1.0f);
+    LoadSE(SE_List::Confirm, "resources/sound/SE/Confirm.mp3", 1.0f);
+    LoadSE(SE_List::Select, "resources/sound/SE/Select.mp3", 1.0f);
+	LoadSE(SE_List::LockIn, "resources/sound/SE/LockIn.mp3", 1.0f);
 
 	// BGM.Load temp
-	LoadBGM(BGM_List::Title, "resources/sound/BGM/titleBGM.mp3");
+    LoadBGM(BGM_List::Title, "resources/sound/BGM/titleBGM.mp3");
     LoadBGM(BGM_List::Game1, "resources/sound/BGM/Game/Bgm1.mp3");
     LoadBGM(BGM_List::Game2, "resources/sound/BGM/Game/Bgm2.mp3");
     LoadBGM(BGM_List::Game3, "resources/sound/BGM/Game/Bgm3.mp3");
@@ -50,7 +53,7 @@ void AudioManager::Finalize() {
     }
 }
 
-void AudioManager::LoadBGM(BGM_List bgm, const std::string& filePath) {
+void AudioManager::LoadBGM(BGM_List bgm, const std::string& filePath, float volume) {
     size_t index = static_cast<size_t>(bgm);
     assert(index < bgmArray_.size() && "Invalid BGM variation");
 
@@ -62,9 +65,10 @@ void AudioManager::LoadBGM(BGM_List bgm, const std::string& filePath) {
     auto audio = std::make_unique<AudioX>();
     audio->Initialize(filePath);
     bgmArray_[index] = std::move(audio);
+	bgmVolumeArray_[index] = volume;
 }
 
-void AudioManager::LoadSE(SE_List se, const std::string& filePath) {
+void AudioManager::LoadSE(SE_List se, const std::string& filePath, float volume) {
     size_t index = static_cast<size_t>(se);
     assert(index < seArray_.size() && "Invalid SE variation");
 
@@ -76,28 +80,31 @@ void AudioManager::LoadSE(SE_List se, const std::string& filePath) {
     auto audio = std::make_unique<AudioX>();
     audio->Initialize(filePath);
     seArray_[index] = std::move(audio);
+	seVolumeArray_[index] = volume;
 }
 
-void AudioManager::PlayBGM(BGM_List bgm, float volume, bool loop) {
+void AudioManager::PlayBGM(BGM_List bgm, bool loop) {
     size_t index = static_cast<size_t>(bgm);
     assert(index < bgmArray_.size() && "Invalid BGM variation");
     assert(bgmArray_[index] && "BGM not loaded");
 
-	bgmVolumeArray_[index] = volume;
     bgmArray_[index]->PlayAudio(bgmVolumeArray_[index] * BGM_MasterVolume, loop);
 }
 
-void AudioManager::PlaySE(SE_List se, float volume, bool loop) {
+void AudioManager::PlaySE(SE_List se, bool loop) {
     size_t index = static_cast<size_t>(se);
     assert(index < seArray_.size() && "Invalid SE variation");
     assert(seArray_[index] && "SE not loaded");
 
-	seVolumeArray_[index] = volume;
     seArray_[index]->PlayAudio(seVolumeArray_[index] * SE_MasterVolume, loop);
 }
 
 void AudioManager::StopBGM(BGM_List bgm) {
 	bgmArray_[static_cast<size_t>(bgm)]->StopAll();
+}
+
+void AudioManager::StopSE(SE_List se) {
+    seArray_[static_cast<size_t>(se)]->StopAll();
 }
 
 void AudioManager::StopAllSE() {

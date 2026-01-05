@@ -20,7 +20,7 @@ void StartScene::Initialize() {
 	text_->SetAnchorPoint(AnchorPoint::Center);
 
 	startTimer_.Start(1.0f, false);
-	MyAudio::PlaySE(SE_List::StartUp, 1.0f);
+	MyAudio::PlaySE(SE_List::StartUp);
 }
 
 void StartScene::Update() {
@@ -49,6 +49,7 @@ void StartScene::Update() {
 	}
 
 	if (fadeTimer_.IsFinished()) {
+		MyAudio::StopSE(SE_List::StartUp);
 		ChangeScene(SCENE::TITLE);
 	}
 

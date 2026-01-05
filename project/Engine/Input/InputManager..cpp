@@ -1,4 +1,5 @@
 #include "InputManager.h"
+#include "Audio/MyAudio.h"
 #include <algorithm>
 
 void InputManager::Initialize() {
@@ -24,6 +25,7 @@ void InputManager::ClearBindings(Action action) {
 }
 
 bool InputManager::TriggerAction(Action action) const {
+
 	if (!input_ && !gamePad_) return false;
 
 	auto it = bindings_.find(action);

@@ -7,6 +7,9 @@
 
 enum class SE_List {
     StartUp,
+	Confirm,
+    Select,
+    LockIn,
 
     Count
 };
@@ -33,15 +36,16 @@ public:
     void Finalize();
 
     // 音源の事前読み込み
-    void LoadBGM(BGM_List bgm, const std::string& filePath);
-    void LoadSE(SE_List se, const std::string& filePath);
+    void LoadBGM(BGM_List bgm, const std::string& filePath, float volume = 1.0f);
+    void LoadSE(SE_List se, const std::string& filePath, float volume = 1.0f);
 
 	// BGM制御
-    void PlayBGM(BGM_List bgm, float volume = 1.0f, bool loop = true);
+    void PlayBGM(BGM_List bgm, bool loop = true);
     void StopBGM(BGM_List bgm);
 
 	// SE制御
-    void PlaySE(SE_List se, float volume = 1.0f, bool loop = false);
+    void PlaySE(SE_List se, bool loop = false);
+	void StopSE(SE_List se);
 
 	void StopAllBGM();
     void StopAllSE();
