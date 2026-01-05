@@ -3,6 +3,12 @@
 #include "EngineSystem.h"
 #include "GameObject/Player/WeaponManager/WeaponStatus.h"
 
+enum class PauseType {
+	Back,
+	ReStart,
+	GoTitle,
+};
+
 class GameSceneUI : public BaseUI {
 public:
 	void Initialize() override;
@@ -16,6 +22,8 @@ public:
 	void SetNowLv(int lv) { nowLv_ = lv; }
 	void SetKillEnemyCount(int count) { killEnemyValue_ = count; }
 	void SetChestCost(int cost) { chestCostFont_->SetNumber(cost); }
+	void SetPauseType(PauseType type) { pauseType_ = type; }
+	void SetIsPaused(bool isPaused) { isPaused_ = isPaused; }
 
 	/// <summary>
 	/// 武器アイコンを更新する
@@ -46,7 +54,17 @@ public:
 			isWeaponEquipped_[slotIndex] = equipped;
 		}
 	}
+
 private:
+	PauseType pauseType_ = PauseType::Back;
+	bool isPaused_ = false;
+	std::unique_ptr<Sprite> pauseBg_;
+	std::unique_ptr<Sprite> back_;
+	std::unique_ptr<Sprite> restart_;
+	std::unique_ptr<Sprite> goTitle_;
+	Vector2 pauseMin_ = { 0.35f,0.35f };
+	Vector2 pauseMax_ = { 0.4f,0.4f };
+
 	std::unique_ptr<BitmapFont> enemyFont_;
 	std::unique_ptr<Sprite> enemy_;
 	int killEnemyValue_ = 0;

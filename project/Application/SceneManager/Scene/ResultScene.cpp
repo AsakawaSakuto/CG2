@@ -11,15 +11,12 @@ void ResultScene::CleanupResources() {
 void ResultScene::Initialize() {
 	ChangeScene(SCENE::RESULT);
 
-	pushA_->Initialize("ui/result/pusha.png", { 640.0f,360.0f }, { 1.0f,1.0f });
+	pushA_->Initialize("loading.png", { 0.0f,0.0f }, { 1.0f,1.0f });
 }
 
 void ResultScene::Update() {
-	if (MyInput::Trigger(Action::CONFIRM)) {
-		ChangeScene(SCENE::TITLE);
-	}
-
 	pushA_->Update();
+	ChangeScene(SCENE::GAME);
 }
 
 void ResultScene::Draw() {

@@ -38,6 +38,12 @@ private:
 	void UIUpdate();
 
 	bool cameraDebugMode_ = false;
+
+private:
+
+	PauseType pauseType_ = PauseType::Back;
+	bool isPause_ = false;
+
 private:
 	int dangerLv_ = 0;
 
@@ -76,4 +82,8 @@ private:
 	bool useFog_ = false;
 
 	std::unique_ptr<Model> wall_;
+
+	unique_ptr<Sprite> fadeBG_;
+	GameTimer fadeInTimer_;
+	GameTimer fadeOutTimer_;
 };

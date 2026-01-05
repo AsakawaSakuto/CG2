@@ -92,57 +92,128 @@ void GameScene::Initialize() {
 
 	bgmNum_ = MyRand::Int(1, 5);
 	MyAudio::PlayBGM(static_cast<BGM_List>(bgmNum_), bgmVolume_);
+
+	isPause_ = false;
+
+	fadeBG_ = make_unique<Sprite>();
+	fadeBG_->Initialize("loading.png", { 0.0f,0.0f }, { 1.0f,1.0f });
+
+	// タイトルシーン開始時はフェードアウト（透明にする）
+	fadeInTimer_ = GameTimer(0.0f, false);
+	fadeOutTimer_ = GameTimer(1.0f, false);
+	fadeOutTimer_.Start(1.0f, false);
 }
 
 void GameScene::Update() {
-	if (MyInput::Trigger(Action::PAUSE)) {
-		ChangeScene(SCENE::TITLE);
-		MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+	
+	if (!isPause_) {
+		if (MyInput::Trigger(Action::PAUSE)) {
+			pauseType_ = PauseType::Back;
+			isPause_ = true;
+		}
+
+		player_->Update();
+
+		// ゲーム中のみ更新処理を行う、アップグレード選択中は停止
+		if (!player_->IsUpgradeSelect()) {
+
+			gameCamera_->SetTarget(player_->GetPosition());
+			gameCamera_->Update();
+
+			// カメラとプレイヤー間のブロック遮蔽をチェックしてカメラ距離を調整
+			gameCamera_->CheckBlockOcclusion(map3D_.get());
+
+			// カメラとプレイヤー間の障害物を半透明化
+			gameCamera_->UpdateOccluderTransparency(treeManager_.get());
+
+			// CollisionManagerで衝突判定を実行
+			collisionManager_->Update();
+
+			enemyManager_->SetTargetPosition(player_->GetPosition());
+			enemyManager_->SetMap(map3D_.get());
+			enemyManager_->Update();
+
+			JarUpdate();
+
+			ChestUpdate();
+
+			// ChestManagerの更新
+			chestManager_->Update();
+
+			// TreeManagerの更新
+			treeManager_->Update();
+
+			//camera_ = debugCamera_;
+			camera_ = gameCamera_->GetCamera();
+
+			camera_.Update();
+
+			map3D_->Update();
+
+			//UIUpdate();
+
+			playTimer_.Update();
+
+		}
+	} else {
+
+		if (!fadeInTimer_.IsActive()) {
+
+			if (MyInput::Trigger(Action::CANCEL) || MyInput::Trigger(Action::PAUSE)) {
+				pauseType_ = PauseType::Back;
+				isPause_ = false;
+			}
+
+			switch (pauseType_) {
+			case PauseType::Back:
+				if (MyInput::Trigger(Action::CONFIRM)) {
+					pauseType_ = PauseType::Back;
+					isPause_ = false;
+				}
+
+				if (MyInput::Trigger(Action::CELECT_DOWN)) {
+					pauseType_ = PauseType::ReStart;
+				}
+
+				break;
+			case PauseType::ReStart:
+				if (MyInput::Trigger(Action::CONFIRM)) {
+					fadeInTimer_.Start(1.0f, false);
+				}
+
+				if (fadeInTimer_.IsFinished()) {
+					MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+					ChangeScene(SCENE::RESULT);
+				}
+
+				if (MyInput::Trigger(Action::CELECT_DOWN)) {
+					pauseType_ = PauseType::GoTitle;
+				}
+
+				if (MyInput::Trigger(Action::CELECT_UP)) {
+					pauseType_ = PauseType::Back;
+				}
+
+				break;
+			case PauseType::GoTitle:
+				if (MyInput::Trigger(Action::CONFIRM)) {
+					fadeInTimer_.Start(1.0f, false);
+				}
+
+				if (fadeInTimer_.IsFinished()) {
+					MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+					ChangeScene(SCENE::TITLE);
+				}
+
+				if (MyInput::Trigger(Action::CELECT_UP)) {
+					pauseType_ = PauseType::ReStart;
+				}
+				break;
+			}
+		}
 	}
 
-	player_->Update();
-
-	// ゲーム中のみ更新処理を行う、アップグレード選択中は停止
-	if (!player_->IsUpgradeSelect()) {
-
-		gameCamera_->SetTarget(player_->GetPosition());
-		gameCamera_->Update();
-
-		// カメラとプレイヤー間のブロック遮蔽をチェックしてカメラ距離を調整
-		gameCamera_->CheckBlockOcclusion(map3D_.get());
-
-		// カメラとプレイヤー間の障害物を半透明化
-		gameCamera_->UpdateOccluderTransparency(treeManager_.get());
-
-		// CollisionManagerで衝突判定を実行
-		collisionManager_->Update();
-
-		enemyManager_->SetTargetPosition(player_->GetPosition());
-		enemyManager_->SetMap(map3D_.get());
-		enemyManager_->Update();
-
-		JarUpdate();
-
-		ChestUpdate();
-
-		// ChestManagerの更新
-		chestManager_->Update();
-
-		// TreeManagerの更新
-		treeManager_->Update();
-
-		//camera_ = debugCamera_;
-		camera_ = gameCamera_->GetCamera();
-
-		camera_.Update();
-
-		map3D_->Update();
-
-		UIUpdate();
-
-		playTimer_.Update();
-
-	}
+	UIUpdate();
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
@@ -157,6 +228,22 @@ void GameScene::Update() {
 			postEffect->SetEnabled(true);
 		}
 	}
+
+	// フェードイン（GameSceneへ遷移時、徐々に不透明に）
+	if (fadeInTimer_.IsActive()) {
+		fadeInTimer_.Update();
+		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, fadeInTimer_.GetProgress() });
+		MyAudio::SetBGMVolume(static_cast<BGM_List>(bgmNum_), bgmVolume_ * fadeInTimer_.GetReverseProgress());
+	}
+
+	// フェードアウト（TitleScene開始時、徐々に透明に）
+	if (fadeOutTimer_.IsActive() && !fadeInTimer_.IsActive()) {
+		fadeOutTimer_.Update();
+		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f - fadeOutTimer_.GetProgress() });
+		MyAudio::SetBGMVolume(static_cast<BGM_List>(bgmNum_), bgmVolume_ * fadeInTimer_.GetProgress());
+	}
+
+	fadeBG_->Update();
 }
 
 void GameScene::Draw() {
@@ -189,6 +276,8 @@ void GameScene::Draw() {
 	MyDebugLine::Draw(camera_);
 
 	gameSceneUI_->Draw();
+
+	fadeBG_->Draw();
 }
 
 void GameScene::DrawImGui() {
@@ -292,6 +381,8 @@ void GameScene::UIUpdate() {
 	gameSceneUI_->SetNowLv(player_->GetLevel());
 	gameSceneUI_->SetKillEnemyCount(player_->GetKillEnemyCount());
 	gameSceneUI_->SetChestCost(chestManager_->GetOpenAmount());
+	gameSceneUI_->SetPauseType(pauseType_);
+	gameSceneUI_->SetIsPaused(isPause_);
 
 	// 武器アイコンの更新
 	if (player_->GetWeaponManager()) {

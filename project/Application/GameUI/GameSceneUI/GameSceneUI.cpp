@@ -90,6 +90,19 @@ void GameSceneUI::Initialize() {
 	weaponLvFont2_->LoadJson("wLvFont2");
 	weaponLvFont3_->LoadJson("wLvFont3");
 	weaponLvFont4_->LoadJson("wLvFont4");
+
+	pauseBg_ = std::make_unique<Sprite>();
+	pauseBg_->Initialize("UI/game/pauseBg.png");
+	pauseBg_->LoadFromJson("pauseBg");
+	back_ = std::make_unique<Sprite>();
+	back_->Initialize("UI/game/back.png");
+	back_->LoadFromJson("back");
+	restart_ = std::make_unique<Sprite>();
+	restart_->Initialize("UI/game/restart.png");
+	restart_->LoadFromJson("restart");
+	goTitle_ = std::make_unique<Sprite>();
+	goTitle_->Initialize("UI/game/quit.png");
+	goTitle_->LoadFromJson("goTitle");
 }
 
 void GameSceneUI::Update() {
@@ -118,6 +131,29 @@ void GameSceneUI::Update() {
 	weaponLv2_->Update();
 	weaponLv3_->Update();
 	weaponLv4_->Update();
+
+	switch (pauseType_) {
+	case PauseType::Back:
+		back_->SetScale(pauseMax_);
+		restart_->SetScale(pauseMin_);
+		goTitle_->SetScale(pauseMin_);
+		break;
+	case PauseType::ReStart:
+		back_->SetScale(pauseMin_);
+		restart_->SetScale(pauseMax_);
+		goTitle_->SetScale(pauseMin_);
+		break;
+	case PauseType::GoTitle:
+		back_->SetScale(pauseMin_);
+		restart_->SetScale(pauseMin_);
+		goTitle_->SetScale(pauseMax_);
+		break;
+	}
+
+	pauseBg_->Update();
+	back_->Update();
+	restart_->Update();
+	goTitle_->Update();
 }
 
 void GameSceneUI::Draw() {
@@ -164,6 +200,13 @@ void GameSceneUI::Draw() {
 		weaponLv4_->Draw();
 		weaponLvFont4_->Draw();
 	}
+
+	if (isPaused_) {
+		pauseBg_->Draw();
+		back_->Draw();
+		restart_->Draw();
+		goTitle_->Draw();
+	}
 }
 
 void GameSceneUI::DrawImGui() {
@@ -193,6 +236,10 @@ void GameSceneUI::DrawImGui() {
 	//weaponLvFont2_->DrawImGui("lv2Font");
 	//weaponLvFont3_->DrawImGui("lv3Font");
 	//weaponLvFont4_->DrawImGui("lv4Font");
+	//pauseBg_->DrawImGui("PauseBg");
+	//back_->DrawImGui("Back");
+	//restart_->DrawImGui("Restart");
+	//goTitle_->DrawImGui("GoTitle");
 }
 
 void GameSceneUI::UpdateWeaponIcon(int slotIndex, WeaponName weaponName) {
