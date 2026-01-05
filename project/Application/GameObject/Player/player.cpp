@@ -31,7 +31,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 		status_.jumpCanCount = 2; // ジャンプ回数アップ
 		break;
 	case PlayerName::SpeedMan:
-		status_.moveSpeed = 7.5f; // 移動速度アップ
+		status_.moveSpeed = 10.0f; // 移動速度アップ
 		break;
 	default:
 		break;
