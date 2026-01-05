@@ -15,10 +15,12 @@ enum class SE_List {
 };
 
 enum class BGM_List {
-    TEST,
-    TITLE,
-    GAME,
-    RESULT,
+    Title,
+	Game1,
+    Game2,
+	Game3,
+    Game4,
+    Game5,
 
     Count
 };
@@ -57,6 +59,8 @@ public:
     // デストラクタ
     ~AudioManager() = default;
 
+    void SetBgmMasterVolume(float volume) { BGM_MasterVolume = volume; };
+	void SetSeMasterVolume(float volume) { SE_MasterVolume = volume; };
 private:
     AudioManager() = default;
     AudioManager(const AudioManager&) = delete;

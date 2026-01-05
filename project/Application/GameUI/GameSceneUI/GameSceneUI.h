@@ -15,6 +15,7 @@ public:
 	void SetHpGauge(float currentHp, float maxHp) { currentHpValue_ = currentHp; maxHpValue_ = maxHp; }
 	void SetNowLv(int lv) { nowLv_ = lv; }
 	void SetKillEnemyCount(int count) { killEnemyValue_ = count; }
+	void SetChestCost(int cost) { chestCostFont_->SetNumber(cost); }
 
 	/// <summary>
 	/// 武器アイコンを更新する
@@ -56,6 +57,9 @@ private:
 
 	std::unique_ptr<BitmapFont> playTimeFont_;
 	float playTime_ = 0.0f;
+
+	std::unique_ptr<Sprite> chestIcon_;
+	unique_ptr<BitmapFont> chestCostFont_;
 
 	/// <summary>
 	/// 武器名からアイコンのテクスチャパスを取得

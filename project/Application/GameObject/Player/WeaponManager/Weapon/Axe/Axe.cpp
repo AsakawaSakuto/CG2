@@ -18,6 +18,7 @@ void Axe::Update() {
 	if (moveTimer_.IsActive()) {
 		moveTimer_.Update();
 		transform_.translate += directionToEnemy_ * speed_ * deltaTime_;
+		transform_.SetAllScale(scaleRate_);
 	}
 
 	if (moveTimer_.IsFinished() && !lifeTimer_.IsActive()) {
@@ -31,7 +32,7 @@ void Axe::Update() {
 
 	sphereCollision_.center = transform_.translate;
 	transform_.rotate.y += 4.00f * deltaTime_;
-	sphereCollision_.radius = 1.0f;
+	sphereCollision_.radius = scaleRate_;
 
 	MyDebugLine::AddShape(sphereCollision_);
 
@@ -45,7 +46,7 @@ void Axe::Update() {
 
 	if (lifeTimer_.IsActive()) {
 		lifeTimer_.Update();
-		transform_.scale = MyEasing::Lerp(Vector3{ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, lifeTimer_.GetProgress(), EaseType::Linear);
+		transform_.scale = MyEasing::Lerp(Vector3{ scaleRate_,scaleRate_,scaleRate_ }, { 0.0f,0.0f,0.0f }, lifeTimer_.GetProgress(), EaseType::Linear);
 	}
 
 	if (lifeTimer_.IsFinished()) {

@@ -13,13 +13,13 @@ void EnemyManager::Initialize() {
 	dieParticle_->LoadJson("EnemyDie");
 	
 	// ベクターの予約でメモリ再割り当てを減らす
-	enemies_.reserve(200);
-	expItems_.reserve(200);
-	damagePlanes_.reserve(100);
+	enemies_.reserve(300);
+	expItems_.reserve(300);
+	damagePlanes_.reserve(300);
 }
 
 void EnemyManager::Update() {
-	if (enemies_.size() < 150) {
+	if (enemies_.size() < 300) {
 		spawnTimer_.Update();
 
 		if (spawnTimer_.IsFinished()) {
@@ -35,6 +35,7 @@ void EnemyManager::Update() {
 			if (player_) {
 				enemy->SetOnDeathCallback([this]() {
 					player_->IncrementKillEnemyCount();
+					player_->AddMoney(1);
 				});
 			}
 

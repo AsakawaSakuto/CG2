@@ -253,6 +253,8 @@ void GameScene::ChestUpdate() {
 	bool isPaidChest = false;
 	int openAmount = 0;
 
+	chestManager_->SetChestActive(playerAABB, player_->GetNowMoney() >= chestManager_->GetOpenAmount());
+
 	if (MyInput::Trigger(Action::INTERACT)) {
 		// まず宝箱との衝突をチェック
 		if (chestManager_->CheckChestCollision(playerAABB, isPaidChest, openAmount)) {
@@ -285,7 +287,8 @@ void GameScene::UIUpdate() {
 	gameSceneUI_->SetHpGauge (static_cast<float>(player_->GetCurrentHP()),  static_cast<float>(player_->GetMaxHP()));
 	gameSceneUI_->SetNowLv(player_->GetLevel());
 	gameSceneUI_->SetKillEnemyCount(player_->GetKillEnemyCount());
-	
+	gameSceneUI_->SetChestCost(chestManager_->GetOpenAmount());
+
 	// 武器アイコンの更新
 	if (player_->GetWeaponManager()) {
 		const auto& weapons = player_->GetWeaponManager()->GetWeapons();

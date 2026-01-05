@@ -57,6 +57,14 @@ void GameSceneUI::Initialize() {
 
 	playTimeFont_ = std::make_unique<BitmapFont>();
 	playTimeFont_->Initialize("playTime");
+
+	chestIcon_ = std::make_unique<Sprite>();
+	chestIcon_->Initialize("UI/Game/chest.png");
+	chestIcon_->LoadFromJson("chestIcon");
+
+	chestCostFont_ = std::make_unique<BitmapFont>();
+	chestCostFont_->Initialize("chestCost");
+	chestCostFont_->LoadJson("chestFont");
 }
 
 void GameSceneUI::Update() {
@@ -73,6 +81,8 @@ void GameSceneUI::Update() {
 	enemy_->Update();
 
 	playTimeFont_->SetTime(playTime_);
+
+	chestIcon_->Update();
 
 	weaponIcon1_->Update();
 	weaponIcon2_->Update();
@@ -102,6 +112,9 @@ void GameSceneUI::Draw() {
 	weaponIcon3_->Draw();
 	weaponIcon4_->Draw();
 
+	chestIcon_->Draw();
+	chestCostFont_->Draw();
+
 	playTimeFont_->Draw();
 }
 
@@ -121,7 +134,9 @@ void GameSceneUI::DrawImGui() {
 	//weaponIcon2_->DrawImGui("WeaponIcon2");
 	//weaponIcon3_->DrawImGui("WeaponIcon3");
 	//weaponIcon4_->DrawImGui("WeaponIcon4");
-	playTimeFont_->DrawImGui("PlayTimeFont");
+	//playTimeFont_->DrawImGui("PlayTimeFont");
+	//chestIcon_->DrawImGui("ChestIcon");
+	//chestCostFont_->DrawImGui("ChestCostFont");
 }
 
 void GameSceneUI::UpdateWeaponIcon(int slotIndex, WeaponName weaponName) {

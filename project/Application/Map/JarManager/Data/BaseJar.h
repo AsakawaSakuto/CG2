@@ -35,6 +35,9 @@ protected:
     int dropMoneyMax_;
 
 	JarType jarType_;
+
+    Vector3 textMin = { 0.8f,0.8f,0.8f };
+	Vector3 textMax = { 1.2f,1.2f,1.2f };
 public:
     virtual void Initialize(Vector3 pos) = 0;
     virtual void Update() = 0;

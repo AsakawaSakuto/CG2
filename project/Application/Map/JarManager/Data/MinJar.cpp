@@ -13,6 +13,7 @@ void MinJar::Initialize(Vector3 pos) {
 	bottom_ = std::make_unique<Model>();
 	bottom_->Initialize("MapObject/jar/JarIsActive.obj");
 	bottom_->SetBillboard(true);
+	bottom_->UseLight(false);
 
 	// 位置設定
 	transform_.translate = pos;
@@ -42,8 +43,8 @@ void MinJar::Initialize(Vector3 pos) {
 
 void MinJar::Update() {
 	
-	bottomTransform_.translate = transform_.translate + Vector3{0.0f, 2.0f, 0.0f};
-	bottomTransform_.scale = MyEasing::Lerp_GAB(Vector3{ 0.5f,0.5f,0.5f }, { 0.3f,0.3f,0.3f }, timer_.GetProgress());
+	bottomTransform_.translate = transform_.translate + Vector3{ 0.0f, 2.0f, 0.0f };
+	bottomTransform_.scale = MyEasing::Lerp_GAB(textMax, textMin, timer_.GetProgress());
 
 	// タイマー更新
 	timer_.Update();

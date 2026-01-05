@@ -4,6 +4,7 @@ void Gun::Initialize() {
 
 	// パーティクルは後からSetSharedParticle()で設定される
 	transform_.translate = { 0.0f,0.0f,0.0f };
+	transform_.scale = { 1.0f,1.0f,1.0f };
 
 	lifeTimer_.Start(10.0f, false);
 

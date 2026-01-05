@@ -6,24 +6,38 @@
 #include "3d/Model/Model.h"
 #include "3d/Line/MyDebugLine.h"
 #include "Utility/Random/Random.h"
+#include "Utility/GameTimer/GameTimer.h"
+#include "Utility/Easing/Easing.h"
 
 class BaseChest {
 protected:
 
     std::unique_ptr<Model> model_;
+    std::unique_ptr<Model> bottom_;
+    
+    bool chestIsActive_ = false;
+    Transform bottomTransform_;
+    GameTimer timer_;
+
     Transform transform_;
     AABB aabbCollision_;
     bool isAlive_ = true;
     bool isSpawn_ = false;
 
+    Vector3 textMin = { 0.8f, 0.8f, 0.8f };
+    Vector3 textMax = { 1.2f, 1.2f, 1.2f };
+
 public:
     virtual void Initialize(Vector3 pos) = 0;
+    virtual void Update() = 0;
     virtual void Draw(Camera camera) = 0;
     virtual void Open() = 0;
 
     virtual const Vector3& GetPosition() { return transform_.translate; }
     virtual const AABB& GetAABBCollision() { return aabbCollision_; }
     virtual bool IsAlive() const { return isAlive_; }
+
+    virtual void SetChestActive(bool flag) { chestIsActive_ = flag; }
 
     virtual ~BaseChest() {}
 };

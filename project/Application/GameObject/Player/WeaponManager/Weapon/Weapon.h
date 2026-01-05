@@ -99,7 +99,7 @@ public:
 	}
 
 	/// <summary>
-	/// サイズを強化（AreaとToxic専用）
+	/// サイズを強化（Area、Toxic、Axe、Boomerang専用）
 	/// </summary>
 	/// <param name="rarity"></param>
 	void UpgradeSize(Rarity rarity) {
@@ -116,6 +116,72 @@ public:
 			break;
 		case Rarity::Legendary:
 			status_.sizeRate += 0.25f;
+			break;
+		}
+	}
+
+	/// <summary>
+	/// 持続時間を強化（AxeとToxic専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeLifeTime(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.lifeTime += 0.25f;
+			break;
+		case Rarity::Rare:
+			status_.lifeTime += 0.5f;
+			break;
+		case Rarity::Epic:
+			status_.lifeTime += 1.0f;
+			break;
+		case Rarity::Legendary:
+			status_.lifeTime += 2.0f;
+			break;
+		}
+	}
+
+	/// <summary>
+	/// 貫通回数を強化（Laser専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradePenetrationCount(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.penetrationCount += 1.0f;
+			break;
+		case Rarity::Rare:
+			status_.penetrationCount += 1.5f;
+			break;
+		case Rarity::Epic:
+			status_.penetrationCount += 2.0f;
+			break;
+		case Rarity::Legendary:
+			status_.penetrationCount += 3.0f;
+			break;
+		}
+	}
+
+	/// <summary>
+	/// 反射回数を強化（Runa専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeBounceCount(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.bounceCount += 1.0f;
+			break;
+		case Rarity::Rare:
+			status_.bounceCount += 1.5f;
+			break;
+		case Rarity::Epic:
+			status_.bounceCount += 2.0f;
+			break;
+		case Rarity::Legendary:
+			status_.bounceCount += 3.0f;
 			break;
 		}
 	}

@@ -50,6 +50,17 @@ void TitleScene::Initialize() {
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetEnabled(false);
 
+	fadeBG_ = make_unique<Sprite>();
+	fadeBG_->Initialize("loading.png", { 0.0f,0.0f }, { 1.0f,1.0f });
+
+	// タイトルシーン開始時はフェードアウト（透明にする）
+	fadeInTimer_ = GameTimer(0.0f, false);
+	fadeOutTimer_ = GameTimer(1.0f, false);
+	fadeOutTimer_.Start(1.0f, false);
+
+	MyAudio::SetBgmMasterVolume(0.5f);
+	MyAudio::SetSeMasterVolume(0.5f);
+	MyAudio::PlayBGM(BGM_List::Title, 0.5f);
 }
 
 void TitleScene::Update() {
@@ -77,10 +88,85 @@ void TitleScene::Update() {
 		}
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			// 編集モードは未実装
+			selectState_ = TitleSelectState::EditSelect;
+			editType_ = EditType::Screen;
 		}
 
 		break;
+
+	case TitleSelectState::EditSelect:
+
+		if (MyInput::Trigger(Action::CANCEL)) {
+			selectState_ = TitleSelectState::Edit;
+		}
+
+		switch (editType_)
+		{
+		case EditType::Screen:
+
+			if (MyInput::Trigger(Action::CONFIRM) || MyInput::Trigger(Action::CELECT_RIGHT) || MyInput::Trigger(Action::CELECT_LEFT)) {
+				auto dxCommon = ServiceLocator::GetDXCommon();
+				auto winApp = dxCommon->GetWinApp();
+				if (winApp->IsFullscreen()) {
+					winApp->ExitBorderlessFullscreen();
+					isFullScreen_ = false;
+				} else {
+					winApp->EnterBorderlessFullscreen();
+					isFullScreen_ = true;
+				}
+			}
+
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				editType_ = EditType::BgmVolume;
+			}
+			
+			break;
+
+		case EditType::BgmVolume:
+
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				bgmVolume_--;
+			}
+
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				bgmVolume_++;
+			}
+
+			bgmVolume_ = std::clamp(bgmVolume_, 0, 9);
+			MyAudio::SetBgmMasterVolume(static_cast<float>(bgmVolume_) / 10.0f);
+
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				editType_ = EditType::Screen;
+			}
+
+			if (MyInput::Trigger(Action::CELECT_DOWN)) {
+				editType_ = EditType::SeVolume;
+			}
+
+			break;
+
+		case EditType::SeVolume:
+
+			if (MyInput::Trigger(Action::CELECT_LEFT)) {
+				seVolume_--;
+			}
+
+			if (MyInput::Trigger(Action::CELECT_RIGHT)) {
+				seVolume_++;
+			}
+
+			seVolume_ = std::clamp(seVolume_, 0, 9);
+			MyAudio::SetSeMasterVolume(static_cast<float>(seVolume_) / 10.0f);
+
+			if (MyInput::Trigger(Action::CELECT_UP)) {
+				editType_ = EditType::BgmVolume;
+			}
+
+			break;
+		}
+
+		break;
+
 	case TitleSelectState::Quit:
 
 		if (MyInput::Trigger(Action::CELECT_UP)) {
@@ -246,15 +332,21 @@ void TitleScene::Update() {
 
 	case TitleSelectState::Confirmed:
 
-		if (MyInput::Trigger(Action::CONFIRM)) {
+		if (!fadeInTimer_.IsActive()) {
+			if (MyInput::Trigger(Action::CONFIRM)) {
+				fadeInTimer_.Start(1.0f, false);
+			}
+
+			if (MyInput::Trigger(Action::CANCEL)) {
+				selectState_ = TitleSelectState::WeaponSelect;
+			}
+		}
+
+		if (fadeInTimer_.IsFinished()) {
 			// GameSceneに選択したプレイヤーと武器を渡す
 			SetSelectedPlayerName(playerName_);
 			SetSelectedWeaponName(weaponName_);
 			ChangeScene(SCENE::GAME);
-		}
-
-		if (MyInput::Trigger(Action::CANCEL)) {
-			selectState_ = TitleSelectState::WeaponSelect;
 		}
 
 		break;
@@ -268,7 +360,24 @@ void TitleScene::Update() {
 	titleUI_->SetSelectState(selectState_);
 	titleUI_->SetPlayerName(playerName_);
 	titleUI_->SetWeaponName(weaponName_);
+	titleUI_->SetEditType(editType_);
+	titleUI_->SetVolume(bgmVolume_, seVolume_);
+	titleUI_->SetIsFullScreen(isFullScreen_);
 	titleUI_->Update();
+
+	// フェードイン（GameSceneへ遷移時、徐々に不透明に）
+	if (fadeInTimer_.IsActive()) {
+		fadeInTimer_.Update();
+		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, fadeInTimer_.GetProgress() });
+	}
+
+	// フェードアウト（TitleScene開始時、徐々に透明に）
+	if (fadeOutTimer_.IsActive() && !fadeInTimer_.IsActive()) {
+		fadeOutTimer_.Update();
+		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f - fadeOutTimer_.GetProgress() });
+	}
+
+	fadeBG_->Update();
 }
 
 void TitleScene::Draw() {
@@ -280,6 +389,7 @@ void TitleScene::Draw() {
 	tree_->Draw(camera_, treeTransform_);
 	player_->Draw(camera_, playerTransform_);
 	titleUI_->Draw();
+	fadeBG_->Draw();
 }
 
 void TitleScene::DrawImGui() {
@@ -291,7 +401,7 @@ void TitleScene::DrawImGui() {
 	//playerTransform_.DrawImGui("TitleScenePlayerTransform");
 	//slope_->DrawImGui("TitleSceneSlopeModel");
 	//tree_->DrawImGui("TitleSceneTreeModel");
-
+	fadeBG_->DrawImGui("TitleSceneFadeBG");
 	titleUI_->DrawImGui();
 }
 

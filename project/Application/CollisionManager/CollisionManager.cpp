@@ -136,7 +136,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetDamage());
+					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
@@ -175,7 +175,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetDamage());
+					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
@@ -217,7 +217,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetDamage());
+					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
@@ -253,7 +253,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetDamage());
+					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
@@ -285,7 +285,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetDamage());
+					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
@@ -317,10 +317,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetRandDamage());
+					int damage = static_cast<int>(bullet->GetRandDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
+					bullet->Dead();
 				}
 			}
 		}
@@ -349,7 +350,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetDamage());
+					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
@@ -375,7 +376,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				}
 
 				if (!enemy->IsActiveInvincibleTimer()) {
-					int damage = static_cast<int>(area->GetDamage());
+					int damage = static_cast<int>(area->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
@@ -407,7 +408,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 				if (!enemy->IsActiveInvincibleTimer()) {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
-					int damage = static_cast<int>(bullet->GetDamage());
+					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);

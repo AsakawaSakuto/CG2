@@ -8,12 +8,15 @@ void Toxic::Initialize() {
 
 	model_->Initialize("weapon/toxic/toxic.obj");
 	model_->SetColor3({ 1.0f, 0.0f, 1.0f });
-	lifeTimer_.Start(lifeTime_, false);
 
 	toxicParticle_->Initialize("toxic");
 }
 
 void Toxic::Update() {
+
+	if (!lifeTimer_.IsActive()) {
+		lifeTimer_.Start(lifeTime_, false);
+	}
 
 	transform_.rotate.y += 6.0f * deltaTime_;
 	transform_.scale.x = 1.0f * scaleRate_;

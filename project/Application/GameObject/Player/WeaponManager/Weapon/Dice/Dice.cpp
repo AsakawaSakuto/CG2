@@ -4,7 +4,7 @@ void Dice::Initialize() {
 
 	// パーティクルは後からSetSharedParticle()で設定される
 	transform_.translate = { 0.0f,0.0f,0.0f };
-	transform_.SetAllScale(0.5f);
+	transform_.SetAllScale(1.0f);
 
 	model_->Initialize("weapon/dice/dice.obj");
 	lifeTimer_.Start(lifeTime_, false);

@@ -150,6 +150,7 @@ public:
 		return upgradeManager_->IsUpgradeSelect();
 	}
 	
+	float GetDamageRate() const { return status_.damageRate; }
 private:
 
 	// 移動処理

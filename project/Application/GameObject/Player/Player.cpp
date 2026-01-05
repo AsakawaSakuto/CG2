@@ -19,6 +19,28 @@ void Player::Initialize() {
 void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	playerName_ = playerName;
 
+	switch (playerName_)
+	{
+	case PlayerName::PowerMan:
+		status_.damageRate = 1.2f; // ダメージ倍率アップ
+		break;
+	case PlayerName::TankMan:
+		status_.maxHP = 150;      // 最大体力アップ
+		break;
+	case PlayerName::JumpMan:
+		status_.jumpCanCount = 2; // ジャンプ回数アップ
+		break;
+	case PlayerName::SpeedMan:
+		status_.moveSpeed = 10.0f; // 移動速度アップ
+		break;
+	default:
+		break;
+	}
+
+	status_.currentHP = status_.maxHP;
+	status_.currentExp = 0;
+	status_.level = 1;
+
 	transform_.SetAllScale(1.0);
 	transform_.translate = { 10.0f,100.0f,10.0f };
 
@@ -52,11 +74,6 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	
 	// 選択した武器を最初に装備
 	weaponManager_->EquipWeapon(weaponName);
-
-	// ステータスの初期化（PlayerNameに応じて変更することも可能）
-	status_.currentHP = status_.maxHP;
-	status_.currentExp = 0;
-	status_.level = 1;
 
 	// AABBの初期化（新仕様: center + min/maxのローカルオフセット）
 	// center は transform_.translate で毎フレーム更新されるため、ここでは初期化不要

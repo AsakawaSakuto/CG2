@@ -31,6 +31,11 @@ private:
 
 	PlayerName playerName_ = PlayerName::PowerMan;
 	WeaponName weaponName_ = WeaponName::FireBall;
+	EditType editType_ = EditType::Screen;
+
+	int bgmVolume_ = 5;
+	int seVolume_ = 5;
+	bool isFullScreen_ = false;
 
 	unique_ptr<TitleSceneUI> titleUI_;
 	unique_ptr<SkiningModel> player_;
@@ -46,6 +51,10 @@ private:
 	Transform slopeTransform_;
 	unique_ptr<Model> tree_;
 	Transform treeTransform_;
+
+	unique_ptr<Sprite> fadeBG_;
+	GameTimer fadeInTimer_;
+	GameTimer fadeOutTimer_;
 
 	Vector3 playerColors[4] = {
 	 { 1.000f, 0.447f, 0.133f },

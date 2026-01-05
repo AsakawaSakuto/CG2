@@ -175,7 +175,7 @@ void UpgradeManager::DrawImGui() {
 	//bg_->DrawImGui("UpgradeBGUI");
 	//upgradeName1_->DrawImGui("UpgradeName1UI");
 	//upgradeName2_->DrawImGui("UpgradeName2UI";
-	//upgradeName3_->DrawImGui("UpgradeName3UI");
+	//upgradeName3_->DrawImGui("UpgradeName3UI";
 	//newText1_->DrawImGui("NewText1UI");
 	//newText2_->DrawImGui("NewText2UI";
 	//newText3_->DrawImGui("NewText3UI";
@@ -324,12 +324,34 @@ void UpgradeManager::GenerateUpgradeOptions() {
 				std::vector<UpgradeType> availableUpgradeTypes;
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
 				
-				// AreaとToxicの場合はUpgradeSizeも追加
-				if (option.weaponName == WeaponName::Area || option.weaponName == WeaponName::Toxic) {
+				// Areaはサイズのみ（発射数なし）
+				if (option.weaponName == WeaponName::Area) {
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
-				} else {
-					// それ以外の武器はUpgradeShotMaxCountを追加
+				}
+				// Axe、Boomerang、Toxicはサイズと発射数の両方
+				else if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Boomerang || 
+						 option.weaponName == WeaponName::Toxic) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+				}
+				// それ以外の武器は発射数のみ
+				else {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+				}
+				
+				// AxeとToxicの場合はUpgradeLifeTimeも追加
+				if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Toxic) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeLifeTime);
+				}
+				
+				// Laserの場合はUpgradePenetrationCountも追加
+				if (option.weaponName == WeaponName::Laser) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradePenetrationCount);
+				}
+				
+				// Runaの場合はUpgradeBounceCountも追加
+				if (option.weaponName == WeaponName::Runa) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeBounceCount);
 				}
 				
 				// ランダムに強化タイプを選択
@@ -350,12 +372,34 @@ void UpgradeManager::GenerateUpgradeOptions() {
 			std::vector<UpgradeType> availableUpgradeTypes;
 			availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
 			
-			// AreaとToxicの場合はUpgradeSizeも追加
-			if (option.weaponName == WeaponName::Area || option.weaponName == WeaponName::Toxic) {
+			// Areaはサイズのみ（発射数なし）
+			if (option.weaponName == WeaponName::Area) {
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
-			} else if (option.weaponName != WeaponName::Area) {
-				// それ以外の武器はUpgradeShotMaxCountを追加
+			}
+			// Axe、Boomerang、Toxicはサイズと発射数の両方
+			else if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Boomerang || 
+					 option.weaponName == WeaponName::Toxic) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+			}
+			// それ以外の武器は発射数のみ
+			else {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+			}
+			
+			// AxeとToxicの場合はUpgradeLifeTimeも追加
+			if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Toxic) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeLifeTime);
+			}
+			
+			// Laserの場合はUpgradePenetrationCountも追加
+			if (option.weaponName == WeaponName::Laser) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradePenetrationCount);
+			}
+			
+			// Runaの場合はUpgradeBounceCountも追加
+			if (option.weaponName == WeaponName::Runa) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeBounceCount);
 			}
 			
 			// ランダムに強化タイプを選択
@@ -473,6 +517,12 @@ std::string UpgradeManager::GetUpgradeTextPath(UpgradeType type, Rarity rarity) 
 		return "UI/game/upgradeText/ShotMaxCount/" + rarityName + ".png";
 	} else if (type == UpgradeType::UpgradeSize) {
 		return "UI/game/upgradeText/Size/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradeLifeTime) {
+		return "UI/game/upgradeText/LifeTime/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradePenetrationCount) {
+		return "UI/game/upgradeText/PenetrationCount/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradeBounceCount) {
+		return "UI/game/upgradeText/BounceCount/" + rarityName + ".png";
 	}
 	
 	// デフォルト
@@ -544,11 +594,38 @@ void UpgradeManager::ApplySelectedUpgrade() {
 			}
 		}
 	} else if (selected.type == UpgradeType::UpgradeSize) {
-		// 既存の武器のサイズを強化（AreaとToxic専用）
+		// 既存の武器のサイズを強化（Area、Toxic、Axe、Boomerang専用）
 		const auto& weapons = weaponManager_->GetWeapons();
 		for (auto& weapon : weapons) {
 			if (weapon->GetWeaponName() == selected.weaponName) {
 				weapon->UpgradeSize(selected.rarity);
+				break;
+			}
+		}
+	} else if (selected.type == UpgradeType::UpgradeLifeTime) {
+		// 既存の武器の持続時間を強化（AxeとToxic専用）
+		const auto& weapons = weaponManager_->GetWeapons();
+		for (auto& weapon : weapons) {
+			if (weapon->GetWeaponName() == selected.weaponName) {
+				weapon->UpgradeLifeTime(selected.rarity);
+				break;
+			}
+		}
+	} else if (selected.type == UpgradeType::UpgradePenetrationCount) {
+		// 既存の武器の貫通回数を強化（Laser専用）
+		const auto& weapons = weaponManager_->GetWeapons();
+		for (auto& weapon : weapons) {
+			if (weapon->GetWeaponName() == selected.weaponName) {
+				weapon->UpgradePenetrationCount(selected.rarity);
+				break;
+			}
+		}
+	} else if (selected.type == UpgradeType::UpgradeBounceCount) {
+		// 既存の武器の反射回数を強化（Runa専用）
+		const auto& weapons = weaponManager_->GetWeapons();
+		for (auto& weapon : weapons) {
+			if (weapon->GetWeaponName() == selected.weaponName) {
+				weapon->UpgradeBounceCount(selected.rarity);
 				break;
 			}
 		}

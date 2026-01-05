@@ -21,6 +21,20 @@ void ChestManager::Initialize(Map3D* map, JarManager* jarManager) {
 }
 
 void ChestManager::Update() {
+	// 全てのPaidChestを更新
+	for (auto& chest : paidChests_) {
+		if (chest->IsAlive()) {
+			chest->Update();
+		}
+	}
+	
+	// 全てのFreeChestを更新
+	for (auto& chest : freeChests_) {
+		if (chest->IsAlive()) {
+			chest->Update();
+		}
+	}
+
 	// 開かれた宝箱を削除
 	paidChests_.erase(
 		std::remove_if(paidChests_.begin(), paidChests_.end(),
@@ -104,6 +118,7 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool needMoney) {
 			if (chest->IsAlive()) {
 				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
 					chest->Open();
+					openAmount_ += addOpenAmount_; // 次回以降の開封コストを増加
 					return true;
 				}
 			}
@@ -121,6 +136,38 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool needMoney) {
 	}
 	
 	return false;
+}
+
+void ChestManager::SetChestActive(const AABB& interactAABB, bool hasEnoughMoney) {
+	// 全てのチェストをまず非アクティブにする
+	for (auto& chest : paidChests_) {
+		chest->SetChestActive(false);
+	}
+	for (auto& chest : freeChests_) {
+		chest->SetChestActive(false);
+	}
+
+	// PaidChestとの衝突チェック（お金が足りる場合のみアクティブ化）
+	if (hasEnoughMoney) {
+		for (auto& chest : paidChests_) {
+			if (chest->IsAlive()) {
+				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
+					chest->SetChestActive(true);
+					return;
+				}
+			}
+		}
+	}
+	
+	// FreeChestとの衝突チェック（常にアクティブ化可能）
+	for (auto& chest : freeChests_) {
+		if (chest->IsAlive()) {
+			if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
+				chest->SetChestActive(true);
+				return;
+			}
+		}
+	}
 }
 
 bool ChestManager::FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const {

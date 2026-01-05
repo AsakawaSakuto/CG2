@@ -33,7 +33,12 @@ void AudioManager::Initialize() {
 	LoadSE(SE_List::KIRAKIRA, "resources/sound/SE/kirakira.mp3");
 
 	// BGM.Load temp
-	LoadBGM(BGM_List::TEST, "resources/sound/BGM/testBGM.mp3");
+	LoadBGM(BGM_List::Title, "resources/sound/BGM/titleBGM.mp3");
+    LoadBGM(BGM_List::Game1, "resources/sound/BGM/Game/Bgm1.mp3");
+    LoadBGM(BGM_List::Game2, "resources/sound/BGM/Game/Bgm2.mp3");
+    LoadBGM(BGM_List::Game3, "resources/sound/BGM/Game/Bgm3.mp3");
+    LoadBGM(BGM_List::Game4, "resources/sound/BGM/Game/Bgm4.mp3");
+    LoadBGM(BGM_List::Game5, "resources/sound/BGM/Game/Bgm5.mp3");
 }
 
 void AudioManager::Finalize() {
@@ -119,6 +124,7 @@ void AudioManager::Update() {
     // 全AudioXの更新（終了したインスタンスのクリーンアップ）
     for (auto& bgm : bgmArray_) {
         if (bgm) {
+			bgm->SetVolume(bgmVolumeArray_[&bgm - &bgmArray_[0]] * BGM_MasterVolume);
             bgm->Update();
         }
     }
