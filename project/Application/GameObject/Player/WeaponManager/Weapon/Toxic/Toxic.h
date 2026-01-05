@@ -14,10 +14,11 @@ public:
     void SetPosition(const Vector3& position) { transform_.translate = position; }
 
 	void SetScaleMultipler(float scale) { scaleRate_ = scale; }
+	void SetLifeTime(float lifeTime) { lifeTime_ = lifeTime; }
 private:
     unique_ptr<Model> model_ = make_unique<Model>();
 	unique_ptr<Particles> toxicParticle_ = make_unique<Particles>();
     GameTimer lifeTimer_;
     GameTimer scaleTimer_;
-    float lifeTime_ = 5.0f;
+    float lifeTime_ = 0.0f;
 };

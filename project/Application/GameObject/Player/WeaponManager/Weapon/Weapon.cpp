@@ -9,128 +9,51 @@ void Weapon::Initialize(WeaponName weaponName) {
 	{
 	case WeaponName::FireBall:
 
-		status_.cooldownTime = 2.0f;
-		status_.intervalTime = 0.2f;
-		status_.shotMaxCount = 5;
-		status_.shotNowCount = 0;
-		status_.damage = 10.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Laser:
 
-		status_.cooldownTime = 5.0f;
-		status_.intervalTime = 0.5f;
-		status_.shotMaxCount = 1;
-		status_.shotNowCount = 0;
-		status_.damage = 5.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
 		status_.penetrationCount = 2;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Runa:
 
-		status_.cooldownTime = 3.0f;
-		status_.intervalTime = 1.0f;
-		status_.shotMaxCount = 2;
-		status_.shotNowCount = 0;
-		status_.damage = 5.0f;
-		status_.criticalRand = 10;
 		status_.bounceCount = 2;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Axe:
 
-		status_.cooldownTime = 3.0f;
-		status_.intervalTime = 1.0f;
-		status_.shotMaxCount = 1;
-		status_.shotNowCount = 0;
-		status_.damage = 5.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
-		status_.lifeTime = 5.0f;
+		status_.lifeTime = 1.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Boomerang:
 
-		status_.cooldownTime = 2.0f;
-		status_.intervalTime = 1.0f;
-		status_.shotMaxCount = 1;
-		status_.shotNowCount = 0;
-		status_.damage = 3.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
-		status_.lifeTime = 5.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Dice:
 
-		status_.cooldownTime = 4.0f;
-		status_.intervalTime = 1.0f;
-		status_.shotMaxCount = 1;
-		status_.shotNowCount = 0;
-		status_.damage = 1.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
-		status_.lifeTime = 10.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Toxic:
 
-		status_.cooldownTime = 1.0f;
-		status_.intervalTime = 1.0f;
-		status_.shotMaxCount = 1;
-		status_.shotNowCount = 0;
-		status_.damage = 1.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
-		status_.lifeTime = 5.0f;
+		status_.lifeTime = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Area:
-
-		status_.damage = 2.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
 		
 		// Areaは初期化時に生成
 		area_ = std::make_unique<Area>();
@@ -141,17 +64,6 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 	case WeaponName::Gun:
 
-		status_.cooldownTime = 1.5f;
-		status_.intervalTime = 0.3f;
-		status_.shotMaxCount = 5;
-		status_.shotNowCount = 0;
-		status_.damage = 3.0f;
-		status_.criticalRand = 10;
-		status_.bounceCount = 0;
-		status_.penetrationCount = 0;
-		status_.nockBackPower = 0.0f;
-		status_.durationTime = 0.0f;
-		status_.lifeTime = 10.0f;
 		status_.useRandomTarget = true; // Gunはランダムターゲット選択を使用
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -425,6 +337,7 @@ void Weapon::ToxicUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetScaleMultipler(status_.sizeRate);
+		bullet->SetLifeTime(status_.lifeTime);
 		toxic_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -489,146 +402,65 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 	if (weaponName_ == WeaponName::None) {
 		weaponName_ = weapon;
 
-		switch (weaponName_) {
+		switch (weaponName_)
+		{
 		case WeaponName::FireBall:
 
-			status_.cooldownTime = 2.0f;
-			status_.intervalTime = 0.2f;
-			status_.shotMaxCount = 1;
-			status_.shotNowCount = 0;
-			status_.damage = 10.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
+
 		case WeaponName::Laser:
 
-			status_.cooldownTime = 5.0f;
-			status_.intervalTime = 0.5f;
-			status_.shotMaxCount = 1;
-			status_.shotNowCount = 0;
-			status_.damage = 5.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
 			status_.penetrationCount = 2;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
+
 		case WeaponName::Runa:
 
-			status_.cooldownTime = 3.0f;
-			status_.intervalTime = 1.0f;
-			status_.shotMaxCount = 2;
-			status_.shotNowCount = 0;
-			status_.damage = 5.0f;
-			status_.criticalRand = 10;
 			status_.bounceCount = 2;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
+
 		case WeaponName::Axe:
 
-			status_.cooldownTime = 3.0f;
-			status_.intervalTime = 1.0f;
-			status_.shotMaxCount = 1;
-			status_.shotNowCount = 0;
-			status_.damage = 5.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
-			status_.lifeTime = 5.0f;
+			status_.lifeTime = 1.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Boomerang:
 
-			status_.cooldownTime = 2.0f;
-			status_.intervalTime = 1.0f;
-			status_.shotMaxCount = 1;
-			status_.shotNowCount = 0;
-			status_.damage = 3.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
-			status_.lifeTime = 5.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Dice:
 
-			status_.cooldownTime = 4.0f;
-			status_.intervalTime = 1.0f;
-			status_.shotMaxCount = 1;
-			status_.shotNowCount = 0;
-			status_.damage = 1.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
-			status_.lifeTime = 10.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
+
 		case WeaponName::Toxic:
 
-			status_.cooldownTime = 1.0f;
-			status_.intervalTime = 1.0f;
-			status_.shotMaxCount = 1;
-			status_.shotNowCount = 0;
-			status_.damage = 1.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
-			status_.lifeTime = 5.0f;
+			status_.lifeTime = 2.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
+
 		case WeaponName::Area:
 
-			status_.damage = 2.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
-			
 			// Areaは初期化時に生成
 			area_ = std::make_unique<Area>();
 			area_->Initialize();
 			area_->SetDamage(status_.damage);
 
 			break;
+
 		case WeaponName::Gun:
 
-			status_.cooldownTime = 1.5f;
-			status_.intervalTime = 0.3f;
-			status_.shotMaxCount = 5;
-			status_.shotNowCount = 0;
-			status_.damage = 3.0f;
-			status_.criticalRand = 10;
-			status_.bounceCount = 0;
-			status_.penetrationCount = 0;
-			status_.nockBackPower = 0.0f;
-			status_.durationTime = 0.0f;
-			status_.lifeTime = 10.0f;
 			status_.useRandomTarget = true; // Gunはランダムターゲット選択を使用
 			coolDownTimer_.Start(status_.cooldownTime, false);
 

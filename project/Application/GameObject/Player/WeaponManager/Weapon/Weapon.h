@@ -119,6 +119,28 @@ public:
 			break;
 		}
 	}
+
+	/// <summary>
+	/// 持続時間を強化（AxeとToxic専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeLifeTime(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.lifeTime += 0.1f;
+			break;
+		case Rarity::Rare:
+			status_.lifeTime += 0.15f;
+			break;
+		case Rarity::Epic:
+			status_.sizeRate += 0.2f;
+			break;
+		case Rarity::Legendary:
+			status_.sizeRate += 0.3f;
+			break;
+		}
+	}
 private:
 
 	void FireBallUpdate();

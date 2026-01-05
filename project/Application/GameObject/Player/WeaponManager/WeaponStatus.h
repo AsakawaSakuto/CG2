@@ -31,8 +31,7 @@ struct WeaponStatus {
 	int bounceCount = 0;          // 跳弾する回数
 	int penetrationCount = 0;     // 貫通する回数
 	float nockBackPower = 0.0f;   // ノックバックさせる力
-	float durationTime = 2.0f;    // 持続時間
-	float lifeTime;               // 弾の寿命
+	float lifeTime = 1.0f;        // 弾の持続時間
 	float sizeRate = 1.0f;        // 弾の大きさ
 	bool useRandomTarget = false; // ランダムターゲット選択を使用するか
 };
