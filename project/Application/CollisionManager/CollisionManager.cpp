@@ -321,6 +321,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemy->Damage(damage);
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
+					bullet->Dead();
 				}
 			}
 		}

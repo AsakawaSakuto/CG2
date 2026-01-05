@@ -28,8 +28,8 @@ struct WeaponStatus {
 	float criticalRand = 0.0f;    // クリティカル発生確率
 	float curiticalDamage = 2.0f; // 武器のクリティカルダメージ率
 	float speedRate = 1.0f;       // 武器の速度
-	int bounceCount = 0;          // 跳弾する回数
-	int penetrationCount = 0;     // 貫通する回数
+	float bounceCount = 0;        // 跳弾する回数
+	float penetrationCount = 0;   // 貫通する回数
 	float nockBackPower = 0.0f;   // ノックバックさせる力
 	float lifeTime = 1.0f;        // 弾の持続時間
 	float sizeRate = 1.0f;        // 弾の大きさ

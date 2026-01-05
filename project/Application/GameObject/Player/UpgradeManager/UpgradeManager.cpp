@@ -175,7 +175,7 @@ void UpgradeManager::DrawImGui() {
 	//bg_->DrawImGui("UpgradeBGUI");
 	//upgradeName1_->DrawImGui("UpgradeName1UI");
 	//upgradeName2_->DrawImGui("UpgradeName2UI";
-	//upgradeName3_->DrawImGui("UpgradeName3UI");
+	//upgradeName3_->DrawImGui("UpgradeName3UI";
 	//newText1_->DrawImGui("NewText1UI");
 	//newText2_->DrawImGui("NewText2UI";
 	//newText3_->DrawImGui("NewText3UI";
@@ -332,6 +332,21 @@ void UpgradeManager::GenerateUpgradeOptions() {
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
 				}
 				
+				// AxeとToxicの場合はUpgradeLifeTimeも追加
+				if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Toxic) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeLifeTime);
+				}
+				
+				// Laserの場合はUpgradePenetrationCountも追加
+				if (option.weaponName == WeaponName::Laser) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradePenetrationCount);
+				}
+				
+				// Runaの場合はUpgradeBounceCountも追加
+				if (option.weaponName == WeaponName::Runa) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeBounceCount);
+				}
+				
 				// ランダムに強化タイプを選択
 				int typeIndex = MyRand::Int(0, static_cast<int>(availableUpgradeTypes.size()) - 1);
 				option.type = availableUpgradeTypes[typeIndex];
@@ -353,9 +368,24 @@ void UpgradeManager::GenerateUpgradeOptions() {
 			// AreaとToxicの場合はUpgradeSizeも追加
 			if (option.weaponName == WeaponName::Area || option.weaponName == WeaponName::Toxic) {
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
-			} else if (option.weaponName != WeaponName::Area) {
+			} else {
 				// それ以外の武器はUpgradeShotMaxCountを追加
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+			}
+			
+			// AxeとToxicの場合はUpgradeLifeTimeも追加
+			if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Toxic) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeLifeTime);
+			}
+			
+			// Laserの場合はUpgradePenetrationCountも追加
+			if (option.weaponName == WeaponName::Laser) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradePenetrationCount);
+			}
+			
+			// Runaの場合はUpgradeBounceCountも追加
+			if (option.weaponName == WeaponName::Runa) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeBounceCount);
 			}
 			
 			// ランダムに強化タイプを選択
@@ -473,6 +503,12 @@ std::string UpgradeManager::GetUpgradeTextPath(UpgradeType type, Rarity rarity) 
 		return "UI/game/upgradeText/ShotMaxCount/" + rarityName + ".png";
 	} else if (type == UpgradeType::UpgradeSize) {
 		return "UI/game/upgradeText/Size/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradeLifeTime) {
+		return "UI/game/upgradeText/LifeTime/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradePenetrationCount) {
+		return "UI/game/upgradeText/PenetrationCount/" + rarityName + ".png";
+	} else if (type == UpgradeType::UpgradeBounceCount) {
+		return "UI/game/upgradeText/BounceCount/" + rarityName + ".png";
 	}
 	
 	// デフォルト
@@ -495,7 +531,7 @@ void UpgradeManager::UpdateUpgradeUI() {
 	switch (upgradeSelect_) {
 	case UpgradeSelect::Select1:
 		upgradeBG1_->SetColor(color1);
-		upgradeBG2_->SetColor(Vector4(color2.x * dimFactor, color2.y * dimFactor, color2.z * dimFactor, color2.w));
+		upgradeBG2_->SetColor(Vector4(color2.x * dimFactor, color2.y * dimFactor, color3.z * dimFactor, color2.w));
 		upgradeBG3_->SetColor(Vector4(color3.x * dimFactor, color3.y * dimFactor, color3.z * dimFactor, color3.w));
 		break;
 	case UpgradeSelect::Select2:
@@ -549,6 +585,33 @@ void UpgradeManager::ApplySelectedUpgrade() {
 		for (auto& weapon : weapons) {
 			if (weapon->GetWeaponName() == selected.weaponName) {
 				weapon->UpgradeSize(selected.rarity);
+				break;
+			}
+		}
+	} else if (selected.type == UpgradeType::UpgradeLifeTime) {
+		// 既存の武器の持続時間を強化（AxeとToxic専用）
+		const auto& weapons = weaponManager_->GetWeapons();
+		for (auto& weapon : weapons) {
+			if (weapon->GetWeaponName() == selected.weaponName) {
+				weapon->UpgradeLifeTime(selected.rarity);
+				break;
+			}
+		}
+	} else if (selected.type == UpgradeType::UpgradePenetrationCount) {
+		// 既存の武器の貫通回数を強化（Laser専用）
+		const auto& weapons = weaponManager_->GetWeapons();
+		for (auto& weapon : weapons) {
+			if (weapon->GetWeaponName() == selected.weaponName) {
+				weapon->UpgradePenetrationCount(selected.rarity);
+				break;
+			}
+		}
+	} else if (selected.type == UpgradeType::UpgradeBounceCount) {
+		// 既存の武器の反射回数を強化（Runa専用）
+		const auto& weapons = weaponManager_->GetWeapons();
+		for (auto& weapon : weapons) {
+			if (weapon->GetWeaponName() == selected.weaponName) {
+				weapon->UpgradeBounceCount(selected.rarity);
 				break;
 			}
 		}

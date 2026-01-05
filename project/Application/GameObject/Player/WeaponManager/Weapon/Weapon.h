@@ -128,16 +128,60 @@ public:
 		switch (rarity)
 		{
 		case Rarity::UnCommon:
-			status_.lifeTime += 0.1f;
+			status_.lifeTime += 0.25f;
 			break;
 		case Rarity::Rare:
-			status_.lifeTime += 0.15f;
+			status_.lifeTime += 0.5f;
 			break;
 		case Rarity::Epic:
-			status_.sizeRate += 0.2f;
+			status_.lifeTime += 1.0f;
 			break;
 		case Rarity::Legendary:
-			status_.sizeRate += 0.3f;
+			status_.lifeTime += 2.0f;
+			break;
+		}
+	}
+
+	/// <summary>
+	/// 貫通回数を強化（Laser専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradePenetrationCount(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.penetrationCount += 1.0f;
+			break;
+		case Rarity::Rare:
+			status_.penetrationCount += 1.5f;
+			break;
+		case Rarity::Epic:
+			status_.penetrationCount += 2.0f;
+			break;
+		case Rarity::Legendary:
+			status_.penetrationCount += 3.0f;
+			break;
+		}
+	}
+
+	/// <summary>
+	/// 反射回数を強化（Runa専用）
+	/// </summary>
+	/// <param name="rarity"></param>
+	void UpgradeBounceCount(Rarity rarity) {
+		switch (rarity)
+		{
+		case Rarity::UnCommon:
+			status_.bounceCount += 1.0f;
+			break;
+		case Rarity::Rare:
+			status_.bounceCount += 1.5f;
+			break;
+		case Rarity::Epic:
+			status_.bounceCount += 2.0f;
+			break;
+		case Rarity::Legendary:
+			status_.bounceCount += 3.0f;
 			break;
 		}
 	}

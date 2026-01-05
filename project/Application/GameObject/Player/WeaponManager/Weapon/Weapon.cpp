@@ -15,14 +15,14 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 	case WeaponName::Laser:
 
-		status_.penetrationCount = 2;
+		status_.penetrationCount = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Runa:
 
-		status_.bounceCount = 2;
+		status_.bounceCount = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
@@ -412,14 +412,14 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 
 		case WeaponName::Laser:
 
-			status_.penetrationCount = 2;
+			status_.penetrationCount = 2.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Runa:
 
-			status_.bounceCount = 2;
+			status_.bounceCount = 2.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;

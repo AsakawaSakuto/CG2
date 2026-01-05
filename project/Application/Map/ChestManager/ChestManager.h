@@ -51,4 +51,6 @@ private:
 	float minChestDistance_ = 3.0f;
 	// 宝箱と壺の最小距離
 	float minChestJarDistance_ = 2.5f;
+
+	int addOpenAmount_ = 10;
 };
