@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Type/Vector3.h"
+#include "GameObject/Player/WeaponManager/WeaponStatus.h"
 
 class BaseWeapon
 {
@@ -13,6 +14,11 @@ public:
 	void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction.Normalized(); }
 	void SetScaleRate(float rate) { scaleRate_ = rate; }
 	void SetSpeedRate(float rate) { speedRate_ = rate; }
+	
+	// 武器の種類を設定・取得
+	void SetWeaponName(WeaponName weaponName) { weaponName_ = weaponName; }
+	WeaponName GetWeaponName() const { return weaponName_; }
+	
 protected:
 	float damage_ = 10.0f;
 	int bounceCount_ = 0;
@@ -20,4 +26,5 @@ protected:
 	float scaleRate_ = 1.0f;
 	float speedRate_ = 1.0f;
 	Vector3 directionToEnemy_ = {};
+	WeaponName weaponName_ = WeaponName::None; // この弾が属する武器の種類
 };

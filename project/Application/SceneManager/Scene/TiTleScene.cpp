@@ -58,8 +58,9 @@ void TitleScene::Initialize() {
 	fadeOutTimer_ = GameTimer(1.0f, false);
 	fadeOutTimer_.Start(1.0f, false);
 
-	MyAudio::SetBgmMasterVolume(0.5f);
-	MyAudio::SetSeMasterVolume(0.5f);
+	bgmVolume_ = static_cast<int>(MyAudio::GetBgmMasterVolume() * 10.0f);
+	seVolume_ = static_cast<int>(MyAudio::GetSeMasterVolume() * 10.0f);
+
 	MyAudio::PlayBGM(BGM_List::Title, titleBgmVolume_);
 }
 
@@ -132,7 +133,7 @@ void TitleScene::Update() {
 				bgmVolume_++;
 			}
 
-			bgmVolume_ = std::clamp(bgmVolume_, 0, 9);
+			bgmVolume_ = std::clamp(bgmVolume_, 1, 9);
 			MyAudio::SetBgmMasterVolume(static_cast<float>(bgmVolume_) / 10.0f);
 
 			if (MyInput::Trigger(Action::CELECT_UP)) {
@@ -155,7 +156,7 @@ void TitleScene::Update() {
 				seVolume_++;
 			}
 
-			seVolume_ = std::clamp(seVolume_, 0, 9);
+			seVolume_ = std::clamp(seVolume_, 1, 9);
 			MyAudio::SetSeMasterVolume(static_cast<float>(seVolume_) / 10.0f);
 
 			if (MyInput::Trigger(Action::CELECT_UP)) {

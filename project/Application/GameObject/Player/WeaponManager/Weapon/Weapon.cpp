@@ -150,6 +150,7 @@ void Weapon::FireBallUpdate() {
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		fireBall_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
@@ -185,6 +186,7 @@ void Weapon::LaserUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetPenetrationCount(static_cast<int>(status_.penetrationCount));
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		laser_.push_back(std::move(bullet));
 
 		status_.shotNowCount++;
@@ -218,6 +220,7 @@ void Weapon::RunaUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetBounceCount(static_cast<int>(status_.bounceCount));
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		runa_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -249,6 +252,7 @@ void Weapon::AxeUpdate() {
 		bullet->SetDamage(status_.damage);
 		bullet->SetLifeTime(status_.lifeTime);
 		bullet->SetScaleRate(status_.sizeRate);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		axe_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -279,6 +283,7 @@ void Weapon::BoomerangUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetScaleRate(status_.sizeRate);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		boomerang_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -308,6 +313,7 @@ void Weapon::DiceUpdate() {
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		dice_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -340,6 +346,7 @@ void Weapon::ToxicUpdate() {
 		bullet->SetDamage(status_.damage);
 		bullet->SetScaleMultipler(status_.sizeRate);
 		bullet->SetLifeTime(status_.lifeTime);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		toxic_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -362,6 +369,7 @@ void Weapon::AreaUpdate() {
 		area_->SetPosition(playerPosition_);
 		area_->SetDamage(status_.damage);
 		area_->SetScaleMultipler(status_.sizeRate);
+		area_->SetWeaponName(weaponName_); // 武器の種類を設定
 		area_->Update();
 	}
 }
@@ -385,6 +393,7 @@ void Weapon::GunUpdate() {
 			bullet->SetDirectionToEnemy(directionToEnemy_);
 		}
 		bullet->SetDamage(status_.damage);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		gun_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -458,6 +467,7 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 			area_ = std::make_unique<Area>();
 			area_->Initialize();
 			area_->SetDamage(status_.damage);
+			area_->SetWeaponName(weaponName_); // 武器の種類を設定
 
 			break;
 

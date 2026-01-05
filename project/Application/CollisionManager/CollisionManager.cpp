@@ -137,7 +137,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
@@ -176,7 +183,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
@@ -218,7 +232,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
@@ -254,7 +275,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -286,7 +314,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -318,7 +353,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetRandDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					bullet->Dead();
@@ -351,7 +393,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -377,7 +426,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 
 				if (!enemy->IsActiveInvincibleTimer()) {
 					int damage = static_cast<int>(area->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(area->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -409,7 +465,14 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					

@@ -89,11 +89,15 @@ void GameScene::Initialize() {
 	postEffect->GetParams().fog.fogColor[2] = 1.0f;
 
 	playTimer_.Start(300.0f, false);
+
+	bgmNum_ = MyRand::Int(1, 5);
+	MyAudio::PlayBGM(static_cast<BGM_List>(bgmNum_), bgmVolume_);
 }
 
 void GameScene::Update() {
 	if (MyInput::Trigger(Action::PAUSE)) {
 		ChangeScene(SCENE::TITLE);
+		MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
 	}
 
 	player_->Update();
@@ -296,11 +300,18 @@ void GameScene::UIUpdate() {
 			if (weapons[i]) {
 				WeaponName weaponName = weapons[i]->GetWeaponName();
 				gameSceneUI_->UpdateWeaponIcon(static_cast<int>(i), weaponName);
+				// 武器が装備されているかどうかを設定
+				gameSceneUI_->SetWeaponEquipped(static_cast<int>(i), weaponName != WeaponName::None);
 			}
 		}
 	}
 	
 	gameSceneUI_->SetPlayTime(playTimer_.GetRemainingTime());
+
+	for (int i = 0; i < 4; i++) {
+		gameSceneUI_->SetWeaponLv(
+			i, player_->GetWeaponManager()->GetWeapons().at(i)->GetUpgradeCount());
+	}
 
 	gameSceneUI_->Update();
 }

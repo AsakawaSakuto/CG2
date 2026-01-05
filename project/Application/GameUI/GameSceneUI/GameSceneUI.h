@@ -25,6 +25,27 @@ public:
 	void UpdateWeaponIcon(int slotIndex, WeaponName weaponName);
 
 	void SetPlayTime(float time) { playTime_ = time; }
+
+	void SetWeaponLv(int slotIndex, int lv) {
+		if (slotIndex == 0) {
+			weaponLvFont1_->SetNumber(lv);
+		}
+		if (slotIndex == 1) {
+			weaponLvFont2_->SetNumber(lv);
+		}
+		if (slotIndex == 2) {
+			weaponLvFont3_->SetNumber(lv);
+		}
+		if (slotIndex == 3) {
+			weaponLvFont4_->SetNumber(lv);
+		}
+	}
+	
+	void SetWeaponEquipped(int slotIndex, bool equipped) {
+		if (slotIndex >= 0 && slotIndex < 4) {
+			isWeaponEquipped_[slotIndex] = equipped;
+		}
+	}
 private:
 	std::unique_ptr<BitmapFont> enemyFont_;
 	std::unique_ptr<Sprite> enemy_;
@@ -60,6 +81,18 @@ private:
 
 	std::unique_ptr<Sprite> chestIcon_;
 	unique_ptr<BitmapFont> chestCostFont_;
+
+	std::unique_ptr<Sprite> weaponLv1_;
+	std::unique_ptr<Sprite> weaponLv2_;
+	std::unique_ptr<Sprite> weaponLv3_;
+	std::unique_ptr<Sprite> weaponLv4_;
+	unique_ptr<BitmapFont> weaponLvFont1_;
+	unique_ptr<BitmapFont> weaponLvFont2_;
+	unique_ptr<BitmapFont> weaponLvFont3_;
+	unique_ptr<BitmapFont> weaponLvFont4_;
+
+	// 各スロットに武器が装備されているかどうか
+	bool isWeaponEquipped_[4] = { false, false, false, false };
 
 	/// <summary>
 	/// 武器名からアイコンのテクスチャパスを取得

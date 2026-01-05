@@ -18,6 +18,14 @@ namespace MyAudio {
         AudioManager::GetInstance()->SetSeMasterVolume(volume);
     }
 
+    inline float GetBgmMasterVolume() {
+        return AudioManager::GetInstance()->GetBgmMasterVolume();
+	}
+
+    inline float GetSeMasterVolume() {
+        return AudioManager::GetInstance()->GetSeMasterVolume();
+	}
+
     // 個別音量設定（BGM）
     inline void SetBGMVolume(BGM_List bgm, float volume) {
         AudioManager::GetInstance()->SetBGMVolume(bgm, volume);

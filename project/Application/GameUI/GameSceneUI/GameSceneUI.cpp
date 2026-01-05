@@ -65,6 +65,31 @@ void GameSceneUI::Initialize() {
 	chestCostFont_ = std::make_unique<BitmapFont>();
 	chestCostFont_->Initialize("chestCost");
 	chestCostFont_->LoadJson("chestFont");
+
+	weaponLv1_ = std::make_unique<Sprite>();
+	weaponLv2_ = std::make_unique<Sprite>();
+	weaponLv3_ = std::make_unique<Sprite>();
+	weaponLv4_ = std::make_unique<Sprite>();
+	weaponLv1_->Initialize("UI/Game/Lv.png");
+	weaponLv2_->Initialize("UI/Game/Lv.png");
+	weaponLv3_->Initialize("UI/Game/Lv.png");
+	weaponLv4_->Initialize("UI/Game/Lv.png");
+	weaponLv1_->LoadFromJson("wLv1");
+	weaponLv2_->LoadFromJson("wLv2");
+	weaponLv3_->LoadFromJson("wLv3");
+	weaponLv4_->LoadFromJson("wLv4");
+	weaponLvFont1_ = std::make_unique<BitmapFont>();
+	weaponLvFont2_ = std::make_unique<BitmapFont>();
+	weaponLvFont3_ = std::make_unique<BitmapFont>();
+	weaponLvFont4_ = std::make_unique<BitmapFont>();
+	weaponLvFont1_->Initialize();
+	weaponLvFont2_->Initialize();
+	weaponLvFont3_->Initialize();
+	weaponLvFont4_->Initialize();
+	weaponLvFont1_->LoadJson("wLvFont1");
+	weaponLvFont2_->LoadJson("wLvFont2");
+	weaponLvFont3_->LoadJson("wLvFont3");
+	weaponLvFont4_->LoadJson("wLvFont4");
 }
 
 void GameSceneUI::Update() {
@@ -88,6 +113,11 @@ void GameSceneUI::Update() {
 	weaponIcon2_->Update();
 	weaponIcon3_->Update();
 	weaponIcon4_->Update();
+
+	weaponLv1_->Update();
+	weaponLv2_->Update();
+	weaponLv3_->Update();
+	weaponLv4_->Update();
 }
 
 void GameSceneUI::Draw() {
@@ -116,6 +146,24 @@ void GameSceneUI::Draw() {
 	chestCostFont_->Draw();
 
 	playTimeFont_->Draw();
+
+	// 装備している武器のみレベルを描画
+	if (isWeaponEquipped_[0]) {
+		weaponLv1_->Draw();
+		weaponLvFont1_->Draw();
+	}
+	if (isWeaponEquipped_[1]) {
+		weaponLv2_->Draw();
+		weaponLvFont2_->Draw();
+	}
+	if (isWeaponEquipped_[2]) {
+		weaponLv3_->Draw();
+		weaponLvFont3_->Draw();
+	}
+	if (isWeaponEquipped_[3]) {
+		weaponLv4_->Draw();
+		weaponLvFont4_->Draw();
+	}
 }
 
 void GameSceneUI::DrawImGui() {
@@ -137,6 +185,14 @@ void GameSceneUI::DrawImGui() {
 	//playTimeFont_->DrawImGui("PlayTimeFont");
 	//chestIcon_->DrawImGui("ChestIcon");
 	//chestCostFont_->DrawImGui("ChestCostFont");
+	//weaponLv1_->DrawImGui("lv1");
+	//weaponLv2_->DrawImGui("lv2");
+	//weaponLv3_->DrawImGui("lv3");
+	//weaponLv4_->DrawImGui("lv4");
+	//weaponLvFont1_->DrawImGui("lv1Font");
+	//weaponLvFont2_->DrawImGui("lv2Font");
+	//weaponLvFont3_->DrawImGui("lv3Font");
+	//weaponLvFont4_->DrawImGui("lv4Font");
 }
 
 void GameSceneUI::UpdateWeaponIcon(int slotIndex, WeaponName weaponName) {

@@ -203,22 +203,45 @@ void Player::Draw(Camera camera) {
 
 void Player::DrawImGui() {
 #ifdef USE_IMGUI
-	// プレイヤー固有のImGui
-	ImGui::Begin("Player Settings");
-	ImGui::DragFloat("Move Speed", &status_.moveSpeed, 0.1f, 0.1f, 20.0f);
-	ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
-	ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
-
-	// ジャンプ設定
+	ImGui::Begin("Player Status");
+	
+	// 基本ステータス表示
+	ImGui::Text("Level: %d", status_.level);
+	ImGui::Text("HP: %d / %d", status_.currentHP, status_.maxHP);
+	ImGui::Text("Exp: %d / %d", status_.currentExp, status_.expToNextLevel);
+	ImGui::Text("Money: %d", status_.nowMoney);
+	ImGui::Text("Total Kills: %d", status_.killEnemyCount);
+	
 	ImGui::Separator();
-	ImGui::Text("Jump Settings");
-	ImGui::DragInt("Jump Can Count", &status_.jumpCanCount, 1, 1, 5);
-	ImGui::DragFloat("Jump Power", &status_.jumpPower, 0.1f, 1.0f, 20.0f);
-	ImGui::DragFloat("Gravity", &status_.gravity, 0.1f, 1.0f, 50.0f);
-	ImGui::DragFloat("Ground Level", &groundLevel_, 0.1f, -10.0f, 10.0f);
-	ImGui::Text("Current Jump Count: %d / %d", status_.currentJumpCount, status_.jumpCanCount);
-	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
-	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y);
+	
+	// 武器別キルカウント表示
+	ImGui::Text("Weapon Kill Counts:");
+	
+	// 各武器のキルカウントを表示
+	const char* weaponNames[] = {
+		"None", "FireBall", "Laser", "Runa", "Axe", 
+		"Boomerang", "Dice", "Toxic", "Area", "Gun"
+	};
+	
+	for (int i = 0; i < static_cast<int>(WeaponName::Count); ++i) {
+		WeaponName weaponName = static_cast<WeaponName>(i);
+		int killCount = GetWeaponKillCount(weaponName);
+		
+		// キルカウントが0より大きい武器のみ表示
+		if (killCount > 0) {
+			ImGui::Text("  %s: %d kills", weaponNames[i], killCount);
+		}
+		
+		// 現在装備している武器かチェック
+		if (HasWeapon(weaponName) && weaponName != WeaponName::None) {
+			ImGui::SameLine();
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, " (Equipped)");
+		}
+	}
+	
+	ImGui::Separator();
+	ImGui::Text("Total Weapon Kills: %d", GetTotalWeaponKillCount());
+	
 	ImGui::End();
 #endif
 	//landingParticle_->DrawImGui("move Particle");

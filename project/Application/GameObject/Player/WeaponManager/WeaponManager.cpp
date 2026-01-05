@@ -112,3 +112,41 @@ bool WeaponManager::HasWeapon(WeaponName weaponName) const {
 	}
 	return false;
 }
+
+int WeaponManager::GetWeaponKillCount(WeaponName weaponName) const {
+	// Noneのチェックは無意味なので早期リターン
+	if (weaponName == WeaponName::None) {
+		return 0;
+	}
+
+	for (const auto& weapon : weapons_) {
+		if (weapon->GetWeaponName() == weaponName) {
+			return weapon->GetKillCount();
+		}
+	}
+	return 0; // 武器を持っていない場合は0を返す
+}
+
+void WeaponManager::IncrementWeaponKillCount(WeaponName weaponName) {
+	// Noneのチェックは無意味なので早期リターン
+	if (weaponName == WeaponName::None) {
+		return;
+	}
+
+	for (const auto& weapon : weapons_) {
+		if (weapon->GetWeaponName() == weaponName) {
+			weapon->IncrementKillCount();
+			return; // 見つけたらインクリメントして終了
+		}
+	}
+}
+
+int WeaponManager::GetTotalWeaponKillCount() const {
+	int totalKills = 0;
+	for (const auto& weapon : weapons_) {
+		if (weapon->GetWeaponName() != WeaponName::None) {
+			totalKills += weapon->GetKillCount();
+		}
+	}
+	return totalKills;
+}

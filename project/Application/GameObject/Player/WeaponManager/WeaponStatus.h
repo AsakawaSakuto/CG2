@@ -34,4 +34,6 @@ struct WeaponStatus {
 	float lifeTime = 1.0f;        // 弾の持続時間
 	float sizeRate = 1.0f;        // 弾の大きさ
 	bool useRandomTarget = false; // ランダムターゲット選択を使用するか
+	int upgradeCount = 1;         // 武器の強化回数
+	int killCount = 0;            // この武器で倒した敵の数
 };

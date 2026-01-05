@@ -70,6 +70,24 @@ public:
 	/// </summary>
 	bool HasWeapon(WeaponName weaponName) const;
 
+	/// <summary>
+	/// 指定した武器のキルカウントを取得
+	/// </summary>
+	/// <param name="weaponName">キルカウントを取得する武器の種類</param>
+	/// <returns>指定した武器のキルカウント（武器を持っていない場合は0）</returns>
+	int GetWeaponKillCount(WeaponName weaponName) const;
+
+	/// <summary>
+	/// 指定した武器のキルカウントをインクリメント
+	/// </summary>
+	/// <param name="weaponName">キルカウントをインクリメントする武器の種類</param>
+	void IncrementWeaponKillCount(WeaponName weaponName);
+
+	/// <summary>
+	/// 全ての武器のキルカウントの合計を取得
+	/// </summary>
+	int GetTotalWeaponKillCount() const;
+
 private:
 	std::vector<std::unique_ptr<Weapon>> weapons_;
 	int maxWeaponNum_ = 4;

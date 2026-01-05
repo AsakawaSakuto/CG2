@@ -12,7 +12,7 @@ enum class SE_List {
 };
 
 enum class BGM_List {
-    Title,
+    Title = 0,
 	Game1,
     Game2,
 	Game3,
@@ -59,6 +59,9 @@ public:
     void SetBgmMasterVolume(float volume) { BGM_MasterVolume = volume; };
 	void SetSeMasterVolume(float volume) { SE_MasterVolume = volume; };
 
+	float GetBgmMasterVolume() const { return BGM_MasterVolume; };
+	float GetSeMasterVolume() const { return SE_MasterVolume; };
+
     // 個別の音量を設定（BGM / SE 列挙値と個別音量）
     void SetBGMVolume(BGM_List bgm, float volume);
     void SetSEVolume(SE_List se, float volume);
@@ -77,8 +80,8 @@ private:
     std::array<float, static_cast<size_t>(SE_List::Count)> seVolumeArray_;
 
     // 音量管理
-    float BGM_MasterVolume = 1.0f;
-    float SE_MasterVolume = 1.0f;
+    float BGM_MasterVolume = 0.5f;
+    float SE_MasterVolume =  0.5f;
 
     // フェード制御
     bool isFading_ = false;

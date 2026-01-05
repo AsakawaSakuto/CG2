@@ -19,6 +19,9 @@ public:
 	}
 
 	int GetPower() { return status_.power; }
+	
+	// HPを取得
+	int GetHP() const { return status_.hp; }
 
 	void SetHP(int hp) { status_.hp = hp; }
 	
