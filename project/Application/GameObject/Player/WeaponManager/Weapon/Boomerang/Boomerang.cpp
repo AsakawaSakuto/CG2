@@ -28,6 +28,8 @@ void Boomerang::Update() {
 		transform_.translate += -directionToEnemy_ * (speed_ * backTimer_.GetProgress()) * deltaTime_;
 	}
 
+	transform_.SetAllScale(scaleRate_);
+
 	trailParticle_->SetEmitterPosition(model_->GetVertexWorldPosition(145));
 	trail2Particle_->SetEmitterPosition(model_->GetVertexWorldPosition(202));
 	trailParticle_->Update();
@@ -35,7 +37,7 @@ void Boomerang::Update() {
 
 	sphereCollision_.center = transform_.translate;
 	transform_.rotate.y += 4.00f * deltaTime_;
-	sphereCollision_.radius = 1.0f;
+	sphereCollision_.radius = scaleRate_;
 
 	MyDebugLine::AddShape(sphereCollision_);
 
@@ -50,7 +52,6 @@ void Boomerang::Update() {
 
 	if (lifeTimer_.IsActive()) {
 		lifeTimer_.Update();
-		transform_.scale = MyEasing::Lerp(Vector3{ 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, lifeTimer_.GetProgress(), EaseType::Linear);
 	}
 
 	if (lifeTimer_.IsFinished()) {

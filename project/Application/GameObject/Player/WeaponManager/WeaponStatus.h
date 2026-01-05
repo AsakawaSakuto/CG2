@@ -20,8 +20,8 @@ enum class WeaponName {
 /// プレイヤーが装備する武器のステータス構造体
 /// </summary>
 struct WeaponStatus {
-	float cooldownTime = 0.2f;    // 複数打つ際のクールタイム
-	float intervalTime = 1.0f;    // 攻撃間隔
+	float cooldownTime = 2.0f;    // 攻撃間隔
+	float intervalTime = 0.5f;    // 複数打つ際のクールタイム
 	float shotMaxCount = 1.0f;    // 撃つ個数
 	int shotNowCount = 0;         // 現在撃った個数
 	float damage = 10.0f;         // ダメージ

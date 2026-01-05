@@ -248,6 +248,7 @@ void Weapon::AxeUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetLifeTime(status_.lifeTime);
+		bullet->SetScaleRate(status_.sizeRate);
 		axe_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -277,6 +278,7 @@ void Weapon::BoomerangUpdate() {
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
+		bullet->SetScaleRate(status_.sizeRate);
 		boomerang_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {

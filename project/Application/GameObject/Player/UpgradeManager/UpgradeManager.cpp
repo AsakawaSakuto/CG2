@@ -324,11 +324,18 @@ void UpgradeManager::GenerateUpgradeOptions() {
 				std::vector<UpgradeType> availableUpgradeTypes;
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
 				
-				// AreaとToxicの場合はUpgradeSizeも追加
-				if (option.weaponName == WeaponName::Area || option.weaponName == WeaponName::Toxic) {
+				// Areaはサイズのみ（発射数なし）
+				if (option.weaponName == WeaponName::Area) {
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
-				} else {
-					// それ以外の武器はUpgradeShotMaxCountを追加
+				}
+				// Axe、Boomerang、Toxicはサイズと発射数の両方
+				else if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Boomerang || 
+						 option.weaponName == WeaponName::Toxic) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+				}
+				// それ以外の武器は発射数のみ
+				else {
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
 				}
 				
@@ -365,11 +372,18 @@ void UpgradeManager::GenerateUpgradeOptions() {
 			std::vector<UpgradeType> availableUpgradeTypes;
 			availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
 			
-			// AreaとToxicの場合はUpgradeSizeも追加
-			if (option.weaponName == WeaponName::Area || option.weaponName == WeaponName::Toxic) {
+			// Areaはサイズのみ（発射数なし）
+			if (option.weaponName == WeaponName::Area) {
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
-			} else {
-				// それ以外の武器はUpgradeShotMaxCountを追加
+			}
+			// Axe、Boomerang、Toxicはサイズと発射数の両方
+			else if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Boomerang || 
+					 option.weaponName == WeaponName::Toxic) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
+			}
+			// それ以外の武器は発射数のみ
+			else {
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
 			}
 			
@@ -580,7 +594,7 @@ void UpgradeManager::ApplySelectedUpgrade() {
 			}
 		}
 	} else if (selected.type == UpgradeType::UpgradeSize) {
-		// 既存の武器のサイズを強化（AreaとToxic専用）
+		// 既存の武器のサイズを強化（Area、Toxic、Axe、Boomerang専用）
 		const auto& weapons = weaponManager_->GetWeapons();
 		for (auto& weapon : weapons) {
 			if (weapon->GetWeaponName() == selected.weaponName) {

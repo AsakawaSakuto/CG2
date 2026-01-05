@@ -99,7 +99,7 @@ public:
 	}
 
 	/// <summary>
-	/// サイズを強化（AreaとToxic専用）
+	/// サイズを強化（Area、Toxic、Axe、Boomerang専用）
 	/// </summary>
 	/// <param name="rarity"></param>
 	void UpgradeSize(Rarity rarity) {
