@@ -67,6 +67,69 @@ public:
 			isResultDraw_ = true;
 		}
 	}
+	
+	/// <summary>
+	/// リザルト画面の武器データを更新
+	/// </summary>
+	/// <param name="equippedWeapons">装備している武器の配列（最大4つ）</param>
+	/// <param name="weaponKillCounts">各武器のキルカウント配列</param>
+	/// <param name="totalKills">総キルカウント</param>
+	void UpdateResultData(const std::vector<WeaponName>& equippedWeapons, 
+	                      const std::vector<int>& weaponKillCounts, 
+	                      int totalKills) {
+		// 総キルカウントを設定
+		resultKillEnemyFont_->SetNumber(totalKills);
+		
+		// 各スロットの武器アイコンとキルカウントを更新
+		for (int i = 0; i < 4; ++i) {
+			if (i < static_cast<int>(equippedWeapons.size()) && 
+			    equippedWeapons[i] != WeaponName::None) {
+				// 武器が装備されている
+				resultWeaponEquipped_[i] = true;
+				
+				// 武器アイコンを設定
+				std::string iconPath = GetWeaponIconPath(equippedWeapons[i]);
+				switch (i) {
+				case 0:
+					resultWeaponIcon1_->SetTexture(iconPath);
+					resultKillEnemyWeaponFont1_->SetNumber(weaponKillCounts[i]);
+					break;
+				case 1:
+					resultWeaponIcon2_->SetTexture(iconPath);
+					resultKillEnemyWeaponFont2_->SetNumber(weaponKillCounts[i]);
+					break;
+				case 2:
+					resultWeaponIcon3_->SetTexture(iconPath);
+					resultKillEnemyWeaponFont3_->SetNumber(weaponKillCounts[i]);
+					break;
+				case 3:
+					resultWeaponIcon4_->SetTexture(iconPath);
+					resultKillEnemyWeaponFont4_->SetNumber(weaponKillCounts[i]);
+					break;
+				}
+			} else {
+				// 武器が装備されていない
+				resultWeaponEquipped_[i] = false;
+				
+				// Noneアイコンを設定
+				switch (i) {
+				case 0:
+					resultWeaponIcon1_->SetTexture("icon/none.png");
+					break;
+				case 1:
+					resultWeaponIcon2_->SetTexture("icon/none.png");
+					break;
+				case 2:
+					resultWeaponIcon3_->SetTexture("icon/none.png");
+					break;
+				case 3:
+					resultWeaponIcon4_->SetTexture("icon/none.png");
+					break;
+				}
+			}
+		}
+	}
+
 private:
 
 	GameTimer resultTimer_;
@@ -87,6 +150,9 @@ private:
 	Vector2 resultMin_ = { 0.15f,0.15f };
 	Vector2 resultMax_ = { 0.25f,0.25f };
 	ResultType resultType_ = ResultType::GoTitle;
+	
+	// 各スロットに武器が装備されているかどうか（リザルト画面用）
+	bool resultWeaponEquipped_[4] = { false, false, false, false };
 
 	PauseType pauseType_ = PauseType::Back;
 	bool isPaused_ = false;

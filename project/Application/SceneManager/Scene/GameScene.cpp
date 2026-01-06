@@ -108,6 +108,34 @@ void GameScene::Update() {
 	
 	if (player_->IsDie()) {
 		gameSceneUI_->ResultTimerStart();
+		
+		// リザルトデータを更新（最初のフレームのみ）
+		if (!fadeInTimer_.IsActive() && !resultDataUpdated_) {
+			// 装備している武器とキルカウントを取得
+			std::vector<WeaponName> equippedWeapons;
+			std::vector<int> weaponKillCounts;
+			
+			if (player_->GetWeaponManager()) {
+				const auto& weapons = player_->GetWeaponManager()->GetWeapons();
+				for (const auto& weapon : weapons) {
+					if (weapon) {
+						WeaponName weaponName = weapon->GetWeaponName();
+						equippedWeapons.push_back(weaponName);
+						
+						// 各武器のキルカウントを取得
+						int killCount = player_->GetWeaponManager()->GetWeaponKillCount(weaponName);
+						weaponKillCounts.push_back(killCount);
+					}
+				}
+			}
+			
+			// 総キルカウントを取得
+			int totalKills = player_->GetWeaponManager()->GetTotalWeaponKillCount();
+			
+			// リザルト画面のデータを更新
+			gameSceneUI_->UpdateResultData(equippedWeapons, weaponKillCounts, totalKills);
+			resultDataUpdated_ = true;
+		}
 
 		if (!fadeInTimer_.IsActive()) {
 			if (resultType_ == ResultType::GoTitle) {

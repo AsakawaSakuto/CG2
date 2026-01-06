@@ -214,12 +214,6 @@ void GameSceneUI::Update() {
 	restart_->Update();
 	goTitle_->Update();
 
-	resultKillEnemyFont_->SetNumber(10000);
-	resultKillEnemyWeaponFont1_->SetNumber(12345);
-	resultKillEnemyWeaponFont2_->SetNumber(11111);
-	resultKillEnemyWeaponFont3_->SetNumber(8326);
-	resultKillEnemyWeaponFont4_->SetNumber(467);
-
 	if (resultTimer_.IsActive()) {
 		resultBg_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
 		resultRestart_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
@@ -316,10 +310,20 @@ void GameSceneUI::Draw() {
 		resultWeaponIcon3_->Draw();
 		resultWeaponIcon4_->Draw();
 		resultKillEnemyFont_->Draw();
-		resultKillEnemyWeaponFont1_->Draw();
-		resultKillEnemyWeaponFont2_->Draw();
-		resultKillEnemyWeaponFont3_->Draw();
-		resultKillEnemyWeaponFont4_->Draw();
+		
+		// 装備している武器のみキルカウントを描画
+		if (resultWeaponEquipped_[0]) {
+			resultKillEnemyWeaponFont1_->Draw();
+		}
+		if (resultWeaponEquipped_[1]) {
+			resultKillEnemyWeaponFont2_->Draw();
+		}
+		if (resultWeaponEquipped_[2]) {
+			resultKillEnemyWeaponFont3_->Draw();
+		}
+		if (resultWeaponEquipped_[3]) {
+			resultKillEnemyWeaponFont4_->Draw();
+		}
 	}
 	
 	startText_->Draw();

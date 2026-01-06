@@ -45,6 +45,7 @@ private:
 	bool isPause_ = false;
 
 	ResultType resultType_ = ResultType::GoTitle;
+	bool resultDataUpdated_ = false; // リザルトデータが更新されたかどうか
 
 private:
 	int dangerLv_ = 0;

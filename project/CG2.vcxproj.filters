@@ -270,5 +270,6 @@
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />
     <None Include="Engine\Audio\AudioDocs.md" />
+    <None Include="docs\ResultScreenWeaponStats.md" />
   </ItemGroup>
 </Project>
