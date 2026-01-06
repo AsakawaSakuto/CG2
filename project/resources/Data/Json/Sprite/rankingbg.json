@@ -3,12 +3,12 @@
   {
     "name": "position",
     "type": 16,
-    "value": [1000, 375]
+    "value": [1065, 390]
   },
   {
     "name": "scale",
     "type": 16,
-    "value": [1.05, 1.05]
+    "value": [0.7, 0.7]
   },
   {
     "name": "rotate",

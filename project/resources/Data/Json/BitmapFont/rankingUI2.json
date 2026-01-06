@@ -3,12 +3,12 @@
   {
     "name": "position",
     "type": 16,
-    "value": [970, 398]
+    "value": [1055, 408]
   },
   {
     "name": "scale",
     "type": 16,
-    "value": [0.7, 0.7]
+    "value": [0.35, 0.35]
   },
   {
     "name": "spaceWidth",

@@ -4,6 +4,7 @@
 #include"GameUI/TitleSceneUI/TitleSceneUI.h"
 #include"GameObject/Player/playerStatus.h"
 #include"GameObject/Player/WeaponManager/WeaponStatus.h"
+#include"Ranking/RankingManager.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -63,4 +64,7 @@ private:
 	 { 0.102f, 0.784f, 0.000f },
 	 { 0.239f, 0.855f, 0.922f }
 	};
+
+	// ランキング管理
+	unique_ptr<RankingManager> rankingManager_ = make_unique<RankingManager>();
 };

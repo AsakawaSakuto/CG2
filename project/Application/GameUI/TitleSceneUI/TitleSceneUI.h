@@ -119,8 +119,8 @@ private:
 	unique_ptr<Sprite> confirmedBG_;
 
 	// Scale
-	Vector2 maxScale_ = { 0.8f,0.8f };
-	Vector2 minScale_ = { 0.5f,0.5f };
+	Vector2 maxScale_ = { 0.5f,0.5f };
+	Vector2 minScale_ = { 0.3f,0.3f };
 	Vector2 iconMin_ = { 0.9f,0.9f };
 	Vector2 iconMax_ = { 1.1f,1.1f };
 	Vector2 textMin_ = { 0.2f,0.2f };

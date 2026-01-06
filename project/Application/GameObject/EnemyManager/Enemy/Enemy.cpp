@@ -33,7 +33,7 @@ void Enemy::Initialize() {
 
 void Enemy::Update() {
 	
-	if (status_.hp < 0) {
+	if (status_.hp <= 0) {
 		Dead(); 
 		return;
 	}

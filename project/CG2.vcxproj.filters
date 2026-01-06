@@ -107,6 +107,7 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Gun\Gun.cpp" />
     <ClCompile Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\StartScene.cpp" />
+    <ClCompile Include="Application\Ranking\RankingManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -258,6 +259,7 @@
     <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.h" />
     <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeType.h" />
     <ClInclude Include="Application\SceneManager\Scene\StartScene.h" />
+    <ClInclude Include="Application\Ranking\RankingManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

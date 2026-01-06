@@ -106,7 +106,14 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	
-	if (player_->IsDie()) {
+	if (player_->IsDie() || playTimer_.IsFinished()) {
+		// ランキングを保存（1回だけ）
+		if (!rankingSaved_) {
+			int killCount = player_->GetKillEnemyCount();
+			rankingManager_->RegisterScore(killCount);
+			rankingSaved_ = true;
+		}
+
 		gameSceneUI_->ResultTimerStart();
 		
 		// リザルトデータを更新（最初のフレームのみ）
@@ -170,7 +177,7 @@ void GameScene::Update() {
 		}
 	}
 
-	if (!player_->IsDie()) {
+	if (!player_->IsDie() || !playTimer_.IsFinished()) {
 		if (!isPause_) {
 			if (MyInput::Trigger(Action::PAUSE)) {
 				pauseType_ = PauseType::Back;

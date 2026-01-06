@@ -180,6 +180,7 @@
     <ClCompile Include="Application\Map\JarManager\JarManager.cpp" />
     <ClCompile Include="Application\Map\TreeManager\Data\Tree.cpp" />
     <ClCompile Include="Application\Map\TreeManager\TreeManager.cpp" />
+    <ClCompile Include="Application\Ranking\RankingManager.cpp" />
     <ClCompile Include="Application\SceneManager\IScene.cpp" />
     <ClCompile Include="Application\SceneManager\SceneManager.cpp" />
     <ClCompile Include="Application\SceneManager\Scene\GameScene.cpp" />
@@ -313,6 +314,7 @@
     <ClInclude Include="Application\Map\JarManager\JarManager.h" />
     <ClInclude Include="Application\Map\TreeManager\Data\Tree.h" />
     <ClInclude Include="Application\Map\TreeManager\TreeManager.h" />
+    <ClInclude Include="Application\Ranking\RankingManager.h" />
     <ClInclude Include="Application\SceneManager\IScene.h" />
     <ClInclude Include="Application\SceneManager\SceneManager.h" />
     <ClInclude Include="Application\SceneManager\Scene\GameScene.h" />

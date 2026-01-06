@@ -15,6 +15,7 @@ void TitleSceneUI::Initialize() {
 
 	logo_ = std::make_unique<Sprite>();
 	logo_->Initialize("UI/Title/gigabonk.png");
+	logo_->LoadFromJson("gigabonk");
 
 	rankingBG_ = std::make_unique<Sprite>();
 	rankingBG_->Initialize("UI/Title/rankingBG.png");
@@ -173,7 +174,7 @@ void TitleSceneUI::Draw() {
 		ranking1st_->Draw();
 		ranking2nd_->Draw();
 		ranking3rd_->Draw();
-		//logo_->Draw();
+		logo_->Draw();
 	} else {
 		playerTypeText_->Draw();
 		playerNameText_->Draw();
@@ -258,6 +259,7 @@ void TitleSceneUI::DrawImGui() {
 	//select4_->DrawImGui("Select4UI");
 	//select5_->DrawImGui("Select5UI");
 	//select6_->DrawImGui("Select6UI");
+	//rankingBG_->DrawImGui("RankingBGUI");
 	//ranking1st_->DrawImGui("Ranking1stUI");
 	//ranking2nd_->DrawImGui("Ranking2ndUI");
 	//ranking3rd_->DrawImGui("Ranking3rdUI");

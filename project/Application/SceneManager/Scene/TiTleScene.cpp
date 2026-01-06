@@ -12,6 +12,9 @@ void TitleScene::CleanupResources() {
 void TitleScene::Initialize() {
 	ChangeScene(SCENE::TITLE);
 
+	// ランキングを読み込む
+	rankingManager_->Load();
+
 	titleUI_ = make_unique<TitleSceneUI>();
 	titleUI_->Initialize();
 
@@ -417,7 +420,12 @@ void TitleScene::Update() {
     titleUI_->SetEditType(editType_);
 	titleUI_->SetVolume(bgmVolume_, seVolume_);
 	titleUI_->SetIsFullScreen(isFullScreen_);
-	titleUI_->SetRanking(12345, 1024, 199);
+	// ランキングマネージャーから読み込んだデータを設定
+	titleUI_->SetRanking(
+		rankingManager_->GetFirst(),
+		rankingManager_->GetSecond(),
+		rankingManager_->GetThird()
+	);
 	titleUI_->Update();
 
 	// フェードイン（GameSceneへ遷移時、徐々に不透明に）

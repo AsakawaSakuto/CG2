@@ -499,5 +499,6 @@ void BitmapFont::LoadFromJson(const std::string& filePath) {
 		percentScale_ = JsonManager::Reverse<Vector2>(values[index++]);
 	}
 
-	//loadToSaveName_ = filePath;
+	// 読み込んだファイルパスを保存（ImGuiで表示するため）
+	loadToSaveName_ = filePath;
 }
