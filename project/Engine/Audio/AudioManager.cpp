@@ -31,6 +31,8 @@ void AudioManager::Initialize() {
     LoadSE(SE_List::Confirm, "resources/sound/SE/Confirm.mp3", 1.0f);
     LoadSE(SE_List::Select, "resources/sound/SE/Select.mp3", 1.0f);
 	LoadSE(SE_List::LockIn, "resources/sound/SE/LockIn.mp3", 1.0f);
+    LoadSE(SE_List::Jar, "resources/sound/SE/jar.mp3", 1.0f);
+    LoadSE(SE_List::Chest, "resources/sound/SE/chest.mp3", 1.0f);
 
 	// BGM.Load temp
     LoadBGM(BGM_List::Title, "resources/sound/BGM/titleBGM.mp3");

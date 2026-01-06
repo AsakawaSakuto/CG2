@@ -6,10 +6,12 @@
 #include "Data/Audio.h"
 
 enum class SE_List {
-    StartUp,
-	Confirm,
-    Select,
-    LockIn,
+    StartUp, 
+	Confirm, // 決定、キャンセル
+    Select,  // SELECT○○のとき 
+    LockIn,  // Titleのビルドを確定
+    Chest,   // free pay Chestを開けるとき
+    Jar,     // min,max Jarを壊すときの
 
     Count
 };
