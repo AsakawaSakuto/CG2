@@ -173,6 +173,11 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool IsDie() const { return isDie_; }
+
+	void SetStartPos(const Vector3& pos) {
+		startPos_ = pos;
+		transform_.translate = pos;
+	}
 private:
 
 	// 移動処理
@@ -215,6 +220,10 @@ private:
 
 private:
 	bool isDie_ = false;
+
+	float comeBackTimer_ = 0.0f;
+
+	Vector3 startPos_;
 
 	unique_ptr<UpgradeManager> upgradeManager_;
 
