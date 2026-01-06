@@ -21,6 +21,9 @@ void GameScene::Initialize() {
 
 	gameCamera_->Initialize();
 
+	// ランキングを読み込む
+	rankingManager_->Load();
+
 	// 25x20x25 のマップを作成
 	map3D_ = make_unique<Map3D>(15, 10, 15);
 	map3D_->Initialize();
