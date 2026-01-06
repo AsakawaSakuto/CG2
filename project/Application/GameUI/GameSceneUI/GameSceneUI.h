@@ -212,6 +212,10 @@ private:
 	Vector2 startTextMin_ = { -500.0f,360.0f };
 	Vector2 startTextMax_ = { 1780.0f,360.0f };
 
+	std::unique_ptr<Sprite> text_;
+	std::unique_ptr<Sprite> text2_;
+	bool isTextDraw_ = true;
+
 	// 各スロットに武器が装備されているかどうか
 	bool isWeaponEquipped_[4] = { false, false, false, false };
 

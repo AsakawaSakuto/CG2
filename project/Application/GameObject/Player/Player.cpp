@@ -107,6 +107,22 @@ void Player::Update() {
 			return;
 		}
 
+		if (transform_.translate.y <= -10.0f) {
+			transform_.translate = startPos_;
+		}
+
+		if (MyInput::Push(Action::Y)) {
+			comeBackTimer_ += deltaTime_;
+			MyInput::SetVibration(1.0f, 1.0f, 0.1f);
+
+			if (comeBackTimer_ >= 5.0f) {
+				comeBackTimer_ = 0.0f;
+				transform_.translate = startPos_;
+			}
+		} else {
+			comeBackTimer_ = 0.0f;
+		}
+
 		Move();
 		Jump();
 		SlideOnSlope();  // しゃがみ中のスロープ滑り処理

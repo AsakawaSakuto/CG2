@@ -156,6 +156,14 @@ void GameSceneUI::Initialize() {
 	resultKillEnemyWeaponFont3_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 	resultKillEnemyWeaponFont4_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 
+	text_ = std::make_unique<Sprite>();
+	text_->Initialize("UI/game/Text.png", { 640.0f,720.0f - 32.0f });
+	text_->SetAnchorPoint(AnchorPoint::Center);
+	text2_ = std::make_unique<Sprite>();
+	text2_->Initialize("UI/game/Text2.png", { 640.0f,720.0f - 96.0f });
+	text2_->SetAnchorPoint(AnchorPoint::Center);
+	isTextDraw_ = true;
+
 	startTimer_.Start(2.0f, false);
 }
 
@@ -238,6 +246,14 @@ void GameSceneUI::Update() {
 		resultRestart_->SetScale(resultMax_);
 	}
 
+	if (MyInput::Trigger(Action::R)) {
+		if (isTextDraw_) {
+			isTextDraw_ = false;
+		} else {
+			isTextDraw_ = true;
+		}
+	}
+
 	resultBg_         ->Update();
 	resultRestart_    ->Update();
 	resultQuit_       ->Update();
@@ -246,6 +262,8 @@ void GameSceneUI::Update() {
 	resultWeaponIcon2_->Update();
 	resultWeaponIcon3_->Update();
 	resultWeaponIcon4_->Update();
+	text_->Update();
+	text2_->Update();
 }
 
 void GameSceneUI::Draw() {
@@ -326,6 +344,11 @@ void GameSceneUI::Draw() {
 		}
 	}
 	
+	if (isTextDraw_) {
+		text_->Draw();
+		text2_->Draw();
+	}
+
 	startText_->Draw();
 }
 

@@ -15,6 +15,9 @@ enum class Action {
 	INTERACT,
 	CROUCHING,
 
+	R,
+	Y,
+
 	// セレクト
 	SELECT_UP,
 	SELECT_DOWN,

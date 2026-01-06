@@ -46,4 +46,8 @@ namespace MyInput {
 	inline bool PushKey(uint32_t key) {
 		return InputManager::GetInstance()->GetInput()->PushKey(key);
 	}
+
+	inline void SetVibration(float leftMotor, float rightMotor ,float time) {
+		InputManager::GetInstance()->GetGamePad()->SetVibration(leftMotor, rightMotor, time);
+	}
 }

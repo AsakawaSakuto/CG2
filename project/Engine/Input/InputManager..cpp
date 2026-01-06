@@ -148,6 +148,9 @@ void InputManager::SetupDefaultBindings() {
 	bindings_[Action::CROUCHING].push_back(InputBinding(InputSource::KEYBOARD, DIK_LSHIFT));
 	bindings_[Action::CROUCHING].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::L));
 
+	bindings_[Action::Y].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::Y));
+	bindings_[Action::R].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::R));
+
 	// セレクト
 	bindings_[Action::SELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_W));
 	bindings_[Action::SELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_UP));
