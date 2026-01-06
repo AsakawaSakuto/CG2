@@ -278,6 +278,7 @@
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\DamagePlane.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\EnemyManager.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\EnemySpawnConfig.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\BaseEnemy.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\Enemy.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\Enemy\EnemyStatus.h" />

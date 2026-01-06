@@ -260,6 +260,7 @@
     <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeType.h" />
     <ClInclude Include="Application\SceneManager\Scene\StartScene.h" />
     <ClInclude Include="Application\Ranking\RankingManager.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\EnemySpawnConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

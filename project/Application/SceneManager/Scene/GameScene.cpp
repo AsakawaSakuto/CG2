@@ -375,7 +375,7 @@ void GameScene::DrawImGui() {
 	//gameCamera_->DrawImgui();
 
 	player_->DrawImGui();
-	//enemyManager_->DrawImGui();
+	enemyManager_->DrawImGui();
 
 	//testParticle_->DrawImGui("TestParticle");
 

@@ -42,6 +42,24 @@ public:
 	void SetOnDeathCallback(std::function<void()> callback) {
 		onDeathCallback_ = callback;
 	}
+
+	/// <summary>
+	/// ステータスに倍率を適用
+	/// プレイヤーレベルに応じた難易度調整に使用
+	/// </summary>
+	/// <param name="hpMul">HP倍率</param>
+	/// <param name="powerMul">攻撃力倍率</param>
+	/// <param name="speedMul">移動速度倍率</param>
+	void ApplyStatusMultipliers(float hpMul, float powerMul, float speedMul) {
+		status_.hp = static_cast<int>(status_.hp * hpMul);
+		status_.power = static_cast<int>(status_.power * powerMul);
+		status_.moveSpeed = status_.moveSpeed * speedMul;
+	}
+
+	/// <summary>
+	/// 移動速度を取得
+	/// </summary>
+	float GetMoveSpeed() const { return status_.moveSpeed; }
 	
 protected:
 	EnemyStatus status_;

@@ -14,7 +14,7 @@ void Enemy::Initialize() {
 	//model_->SetUpdateFrustumCulling(true);
 	model_->SetDrawFrustumCulling(true);
 
-	moveSpeed_ = 2.0f;
+	// moveSpeed_は使用せず、status_.moveSpeedを使用する
 	collicionRadius_ = 0.5f;
 
 	scaleTimer_.Start(0.5f, false);
@@ -179,11 +179,11 @@ void Enemy::Move() {
 		// atan2(x,z)でY軸周りの回転角度を求める
 		transform_.rotate.y = std::atan2(direction.x, direction.z);
 
-		// 移動速度を適用
+		// 移動速度を適用（status_.moveSpeedを使用してレベルスケーリングに対応）
 		Vector3 velocity = {
-			direction.x * moveSpeed_ * GetDeltaTime(),
+			direction.x * status_.moveSpeed * GetDeltaTime(),
 			0.0f, // y方向には移動しない
-			direction.z * moveSpeed_ * GetDeltaTime()
+			direction.z * status_.moveSpeed * GetDeltaTime()
 		};
 
 		// 位置を更新（yはそのまま）

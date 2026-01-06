@@ -11,16 +11,16 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 1.0f;
 		status_.intervalTime = 0.5f;
-		status_.damage = 10.0f;
+		status_.damage = 15.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Laser:
 
-		status_.cooldownTime = 2.0f;
+		status_.cooldownTime = 1.05;
 		status_.intervalTime = 0.25f;
-		status_.damage = 7.0f;
+		status_.damage = 10.0f;
 		status_.penetrationCount = 3.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -28,9 +28,9 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 	case WeaponName::Runa:
 
-		status_.cooldownTime = 2.0f;
+		status_.cooldownTime = 1.5f;
 		status_.intervalTime = 0.25f;
-		status_.damage = 8.0f;
+		status_.damage = 10.0f;
 		status_.bounceCount = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -50,14 +50,14 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 2.0f;
 		status_.intervalTime = 0.25f;
-		status_.damage = 3.0f;
+		status_.damage = 5.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Dice:
 
-		status_.cooldownTime = 1.0f;
+		status_.cooldownTime = 10.0f;
 		status_.intervalTime = 0.2f;
 		status_.damage = 1.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
@@ -68,7 +68,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 1.0f;
 		status_.intervalTime = 0.5f;
-		status_.damage = 2.0f;
+		status_.damage = 5.0f;
 		status_.lifeTime = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -88,7 +88,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 2.5f;
 		status_.intervalTime = 0.2f;
-		status_.damage = 3.0f;
+		status_.damage = 5.0f;
 		status_.shotMaxCount = 5.0f;
 		status_.useRandomTarget = true; // Gunはランダムターゲット選択を使用
 		coolDownTimer_.Start(status_.cooldownTime, false);

@@ -2,6 +2,7 @@
 #include "GameObject/EnemyManager/Enemy/Enemy.h"
 #include "GameObject/EnemyManager/ExpItem/ExpItem.h"
 #include "GameObject/EnemyManager/DamagePlane.h"
+#include "EnemySpawnConfig.h"
 
 class Map3D; // 前方宣言
 class Player; // 前方宣言
@@ -33,7 +34,17 @@ public:
 	/// </summary>
 	void CreateDamagePlane(const Vector3& position, int damage);
 
+	/// <summary>
+	/// 現在のスポーン設定を取得
+	/// </summary>
+	const EnemySpawnConfig& GetSpawnConfig() const { return spawnConfig_; }
+
 private:
+
+	/// <summary>
+	/// プレイヤーレベルに応じてスポーン設定を更新
+	/// </summary>
+	void UpdateSpawnConfig(int playerLevel);
 
 	std::vector<std::unique_ptr<Enemy>> enemies_;
 	std::vector<std::unique_ptr<ExpItem>> expItems_;
@@ -49,4 +60,8 @@ private:
 	
 	// Playerへの参照
 	Player* player_ = nullptr;
+
+	// レベルに応じたスポーン設定
+	EnemySpawnConfig spawnConfig_;
+	int currentPlayerLevel_ = 1;
 };
