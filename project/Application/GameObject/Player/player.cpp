@@ -178,9 +178,9 @@ void Player::Update() {
 			blinkTimer_.Stop();
 			isVisible_ = true;
 		}
-
-		upgradeManager_->Update();
 	}
+
+	upgradeManager_->Update();
 
 	if (!isDie_) {
 		if (currentMotion_ == PlayerMotion::Die && model_->GetAnimationProgress() >= 0.95f) {
