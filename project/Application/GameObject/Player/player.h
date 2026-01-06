@@ -223,6 +223,8 @@ private:
 
 	float comeBackTimer_ = 0.0f;
 
+	GameTimer healingTimer_;
+
 	Vector3 startPos_;
 
 	unique_ptr<UpgradeManager> upgradeManager_;
