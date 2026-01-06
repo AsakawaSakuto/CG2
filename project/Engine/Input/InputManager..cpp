@@ -134,6 +134,7 @@ void InputManager::SetupDefaultBindings() {
 
 	// キャンセル
 	bindings_[Action::CANCEL].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::B));
+	bindings_[Action::CANCEL].push_back(InputBinding(InputSource::KEYBOARD, DIK_ESCAPE));
 
 	// ポーズ
 	bindings_[Action::PAUSE].push_back(InputBinding(InputSource::KEYBOARD, DIK_TAB));

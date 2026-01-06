@@ -177,7 +177,7 @@ void GameScene::Update() {
 		}
 	}
 
-	if (!player_->IsDie() || !playTimer_.IsFinished()) {
+	if (!player_->IsDie() && !playTimer_.IsFinished()) {
 		if (!isPause_) {
 			if (MyInput::Trigger(Action::PAUSE)) {
 				pauseType_ = PauseType::Back;

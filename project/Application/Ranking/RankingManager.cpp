@@ -28,9 +28,6 @@ void RankingManager::Load() {
 }
 
 void RankingManager::Save() {
-	// ランキングをソートしてから保存
-	SortRankings();
-	
 	// ファイルに書き込む
 	for (int i = 0; i < kMaxRankings; ++i) {
 		binaryManager_->RegistOutput(rankings_[i], "rank" + std::to_string(i + 1));
@@ -50,23 +47,30 @@ int RankingManager::RegisterScore(int killCount) {
 		return 0;
 	}
 	
-	// 新しいスコアをランキングに挿入
-	// 最下位のスコアを新しいスコアで置き換え
-	rankings_[kMaxRankings - 1] = killCount;
+	// 新しいスコアを適切な位置に挿入
+	// まず、どの位置に挿入すべきかを探す
+	int insertPosition = kMaxRankings - 1; // デフォルトは最下位
 	
-	// ソートして順位を決定
-	SortRankings();
-	
-	// 登録したスコアの順位を返す
 	for (int i = 0; i < kMaxRankings; ++i) {
-		if (rankings_[i] == killCount) {
-			// 保存
-			Save();
-			return i + 1;
+		if (killCount > rankings_[i]) {
+			insertPosition = i;
+			break;
 		}
 	}
 	
-	return 0;
+	// 挿入位置から下の要素を1つずつ下にずらす
+	for (int i = kMaxRankings - 1; i > insertPosition; --i) {
+		rankings_[i] = rankings_[i - 1];
+	}
+	
+	// 新しいスコアを挿入
+	rankings_[insertPosition] = killCount;
+	
+	// 保存
+	Save();
+	
+	// 挿入した順位を返す（1-indexed）
+	return insertPosition + 1;
 }
 
 int RankingManager::GetScore(int rank) const {

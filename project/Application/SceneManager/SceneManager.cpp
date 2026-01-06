@@ -220,9 +220,9 @@ void SceneManager::Finalize() {
 
 void SceneManager::Shortcut() {
     // ESCキー : 終了
-    if (GetAsyncKeyState(VK_ESCAPE) & 1) {
-        PostQuitMessage(0);
-    }
+    //if (GetAsyncKeyState(VK_ESCAPE) & 1) {
+    //    PostQuitMessage(0);
+    //}
 
     // F11キー : フルスクリーン切替
     if (GetAsyncKeyState(VK_F11) & 1) {
