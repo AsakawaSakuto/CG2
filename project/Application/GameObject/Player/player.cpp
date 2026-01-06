@@ -52,6 +52,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	Animation crouching = LoadAnimationFile("Player/Animation/Crouching.gltf");
 	Animation jump =      LoadAnimationFile("Player/Animation/jump.gltf");
 	Animation landing =   LoadAnimationFile("Player/Animation/landing.gltf");
+	Animation die =       LoadAnimationFile("Player/Animation/die.gltf");
 
 	std::map<PlayerMotion, Animation> animationMap;
 	animationMap[PlayerMotion::Idle] =      idle;
@@ -60,6 +61,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	animationMap[PlayerMotion::Crouching] = crouching;
 	animationMap[PlayerMotion::Jump] =      jump;
 	animationMap[PlayerMotion::Landing] =   landing;
+	animationMap[PlayerMotion::Die] =       die;
 
 	// AnimationControllerを作成してから初期化
 	model_ = std::make_unique<AnimationController>();
@@ -86,11 +88,23 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	upgradeManager_->Initialize();
 	// UpgradeManagerにWeaponManagerを設定
 	upgradeManager_->SetWeaponManager(weaponManager_.get());
+
+	isDie_ = false;
 }
 
 void Player::Update() {
 
-	if (!upgradeManager_->IsUpgradeSelect()) {
+	if (!upgradeManager_->IsUpgradeSelect() && isAlive_) {
+
+		if (status_.currentHP <= 0 && currentMotion_ != PlayerMotion::Die) {
+			model_->SetMotion(PlayerMotion::Die, 0.0f, false);
+			currentMotion_ = PlayerMotion::Die;
+			isAlive_ = false;
+		}
+
+		if (!isAlive_) {
+			return;
+		}
 
 		Move();
 		Jump();
@@ -117,8 +131,6 @@ void Player::Update() {
 
 		expGetRangeTransform_.translate = transform_.translate;
 		expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
-
-		model_->Update(1.0f / 60.0f, transform_);
 
 		// 影のY座標を地面の高さに設定
 		if (map_) {
@@ -166,13 +178,25 @@ void Player::Update() {
 			blinkTimer_.Stop();
 			isVisible_ = true;
 		}
+
+		upgradeManager_->Update();
+	}
+
+	if (!isDie_) {
+		if (currentMotion_ == PlayerMotion::Die && model_->GetAnimationProgress() >= 0.95f) {
+			isDie_ = true;
+		}
+
+		model_->Update(1.0f / 60.0f, transform_);
 	}
 
 	if (MyInput::TriggerKey(DIK_0)) {
 		upgradeManager_->Upgrade();
 	}
+	if (MyInput::TriggerKey(DIK_9)) {
+		status_.currentHP -= 10;
+	}
 
-	upgradeManager_->Update();
 
 	MyDebugLine::AddShape(sphereCollision_);
 	Circle expCircle = {};
@@ -250,6 +274,7 @@ void Player::DrawImGui() {
 }
 
 void Player::Move() {
+
 	// KeyConfigを使って移動入力を取得
 	InputManager::Vector2D moveInput = { 0.0f, 0.0f };
 	
