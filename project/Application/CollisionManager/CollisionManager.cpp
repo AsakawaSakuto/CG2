@@ -62,6 +62,11 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 		return;
 	}
 
+	// プレイヤーが死亡している場合は当たり判定をスキップ
+	if (!player_->IsAlive()) {
+		return;
+	}
+
 	// プレイヤーの球体コライダーを取得
 	const Sphere& playerSphere = player_->GetSphereCollision();
 
@@ -89,6 +94,11 @@ inline float DistanceSquared(const Vector3& a, const Vector3& b) {
 void CollisionManager::CheckBulletEnemyCollision() {
 	// WeaponManagerまたはEnemyManagerが設定されていない場合は何もしない
 	if (!weaponManager_ || !enemyManager_) {
+		return;
+	}
+
+	// プレイヤーが死亡している場合は当たり判定をスキップ
+	if (!player_ || !player_->IsAlive()) {
 		return;
 	}
 
@@ -473,7 +483,7 @@ void CollisionManager::CheckBulletEnemyCollision() {
 						// この武器でキルカウントをインクリメント
 						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
 					}
-					
+	
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
 					bullet->Dead();
@@ -487,6 +497,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 void CollisionManager::CheckExpItemPlayerCollision() {
 	// PlayerまたはEnemyManagerが設定されていない場合は何もしない
 	if (!player_ || !enemyManager_) {
+		return;
+	}
+
+	// プレイヤーが死亡している場合は経験値アイテムの当たり判定をスキップ
+	if (!player_->IsAlive()) {
 		return;
 	}
 

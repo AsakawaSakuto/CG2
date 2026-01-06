@@ -91,7 +91,7 @@ void GameScene::Initialize() {
 	postEffect->GetParams().fog.fogColor[1] = 1.0f;
 	postEffect->GetParams().fog.fogColor[2] = 1.0f;
 
-	playTimer_.Start(300.0f, false);
+	playTimer_.Start(600.0f, false);
 
 	bgmNum_ = MyRand::Int(1, 5);
 	MyAudio::PlayBGM(static_cast<BGM_List>(bgmNum_), bgmVolume_);

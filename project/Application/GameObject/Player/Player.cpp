@@ -25,7 +25,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 		status_.damageRate = 1.2f; // ダメージ倍率アップ
 		break;
 	case PlayerName::TankMan:
-		status_.maxHP = 150;      // 最大体力アップ
+		status_.maxHP = 200;      // 最大体力アップ
 		break;
 	case PlayerName::JumpMan:
 		status_.jumpCanCount = 2; // ジャンプ回数アップ
@@ -89,6 +89,8 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	// UpgradeManagerにWeaponManagerを設定
 	upgradeManager_->SetWeaponManager(weaponManager_.get());
 
+	healingTimer_.Start(6.0f, true);
+
 	isDie_ = false;
 }
 
@@ -122,6 +124,12 @@ void Player::Update() {
 		} else {
 			comeBackTimer_ = 0.0f;
 		}
+
+		if (healingTimer_.IsFinished()) {
+			status_.currentHP++;
+		}
+		status_.currentHP = std::clamp(status_.currentHP, 0, status_.maxHP);
+		healingTimer_.Update();
 
 		Move();
 		Jump();

@@ -226,7 +226,7 @@ void UpgradeManager::Upgrade() {
 	upgradeSelect_ = UpgradeSelect::Select1;
 	isUpgrade_ = true;
 	justOpened_ = true; // アップグレード画面が開かれた直後のフレームであることを記録
-	
+
 	MyAudio::PlaySE(SE_List::Upgrade);
 
 	// 3つのアップグレード選択肢を生成

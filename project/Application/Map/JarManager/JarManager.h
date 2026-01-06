@@ -32,8 +32,8 @@ private:
 	void SpawnJars(Map3D* map);
 	
 private:
-	int minJarNum_ = 50;
-	int maxJarNum_ = 25;
+	int minJarNum_ = 75;
+	int maxJarNum_ = 50;
 	
 	std::vector<std::unique_ptr<MinJar>> minJars_;
 	std::vector<std::unique_ptr<MaxJar>> maxJars_;
