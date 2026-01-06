@@ -106,109 +106,141 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	
-	if (!isPause_) {
-		if (MyInput::Trigger(Action::PAUSE)) {
-			pauseType_ = PauseType::Back;
-			isPause_ = true;
-		}
-
-		player_->Update();
-
-		// ゲーム中のみ更新処理を行う、アップグレード選択中は停止
-		if (!player_->IsUpgradeSelect()) {
-
-			gameCamera_->SetTarget(player_->GetPosition());
-			gameCamera_->Update();
-
-			// カメラとプレイヤー間のブロック遮蔽をチェックしてカメラ距離を調整
-			gameCamera_->CheckBlockOcclusion(map3D_.get());
-
-			// カメラとプレイヤー間の障害物を半透明化
-			gameCamera_->UpdateOccluderTransparency(treeManager_.get());
-
-			// CollisionManagerで衝突判定を実行
-			collisionManager_->Update();
-
-			enemyManager_->SetTargetPosition(player_->GetPosition());
-			enemyManager_->SetMap(map3D_.get());
-			enemyManager_->Update();
-
-			JarUpdate();
-
-			ChestUpdate();
-
-			// ChestManagerの更新
-			chestManager_->Update();
-
-			// TreeManagerの更新
-			treeManager_->Update();
-
-			//camera_ = debugCamera_;
-			camera_ = gameCamera_->GetCamera();
-
-			camera_.Update();
-
-			map3D_->Update();
-
-			//UIUpdate();
-
-			playTimer_.Update();
-
-		}
-	} else {
+	if (player_->IsDie()) {
+		gameSceneUI_->ResultTimerStart();
 
 		if (!fadeInTimer_.IsActive()) {
+			if (resultType_ == ResultType::GoTitle) {
+				if (MyInput::Trigger(Action::SELECT_RIGHT)) {
+					resultType_ = ResultType::Restart;
+				}
+				if (MyInput::Trigger(Action::CONFIRM)) {
+					fadeInTimer_.Start(1.0f, false);
+				}
+			} else {
+				if (MyInput::Trigger(Action::SELECT_LEFT)) {
+					resultType_ = ResultType::GoTitle;
+				}
+				if (MyInput::Trigger(Action::CONFIRM)) {
+					fadeInTimer_.Start(1.0f, false);
+				}
+			}
+		}
 
-			if (MyInput::Trigger(Action::CANCEL) || MyInput::Trigger(Action::PAUSE)) {
+		if (fadeInTimer_.IsFinished()) {
+			if (resultType_ == ResultType::GoTitle) {
+				ChangeScene(SCENE::TITLE);
+			} else {
+				ChangeScene(SCENE::RESULT);
+			}
+		}
+	}
+
+	if (!player_->IsDie()) {
+		if (!isPause_) {
+			if (MyInput::Trigger(Action::PAUSE)) {
 				pauseType_ = PauseType::Back;
-				isPause_ = false;
+				isPause_ = true;
 			}
 
-			switch (pauseType_) {
-			case PauseType::Back:
-				if (MyInput::Trigger(Action::CONFIRM)) {
+			player_->Update();
+
+			// ゲーム中のみ更新処理を行う、アップグレード選択中は停止
+			if (!player_->IsUpgradeSelect()) {
+
+				gameCamera_->SetTarget(player_->GetPosition());
+				gameCamera_->Update();
+
+				// カメラとプレイヤー間のブロック遮蔽をチェックしてカメラ距離を調整
+				gameCamera_->CheckBlockOcclusion(map3D_.get());
+
+				// カメラとプレイヤー間の障害物を半透明化
+				gameCamera_->UpdateOccluderTransparency(treeManager_.get());
+
+				// CollisionManagerで衝突判定を実行
+				collisionManager_->Update();
+
+				enemyManager_->SetTargetPosition(player_->GetPosition());
+				enemyManager_->SetMap(map3D_.get());
+				enemyManager_->Update();
+
+				JarUpdate();
+
+				ChestUpdate();
+
+				// ChestManagerの更新
+				chestManager_->Update();
+
+				// TreeManagerの更新
+				treeManager_->Update();
+
+				//camera_ = debugCamera_;
+				camera_ = gameCamera_->GetCamera();
+
+				camera_.Update();
+
+				map3D_->Update();
+
+				//UIUpdate();
+
+				playTimer_.Update();
+
+			}
+		} else {
+
+			if (!fadeInTimer_.IsActive()) {
+
+				if (MyInput::Trigger(Action::CANCEL) || MyInput::Trigger(Action::PAUSE)) {
 					pauseType_ = PauseType::Back;
 					isPause_ = false;
 				}
 
-				if (MyInput::Trigger(Action::CELECT_DOWN)) {
-					pauseType_ = PauseType::ReStart;
-				}
+				switch (pauseType_) {
+				case PauseType::Back:
+					if (MyInput::Trigger(Action::CONFIRM)) {
+						pauseType_ = PauseType::Back;
+						isPause_ = false;
+					}
 
-				break;
-			case PauseType::ReStart:
-				if (MyInput::Trigger(Action::CONFIRM)) {
-					fadeInTimer_.Start(1.0f, false);
-				}
+					if (MyInput::Trigger(Action::SELECT_DOWN)) {
+						pauseType_ = PauseType::ReStart;
+					}
 
-				if (fadeInTimer_.IsFinished()) {
-					MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
-					ChangeScene(SCENE::RESULT);
-				}
+					break;
+				case PauseType::ReStart:
+					if (MyInput::Trigger(Action::CONFIRM)) {
+						fadeInTimer_.Start(1.0f, false);
+					}
 
-				if (MyInput::Trigger(Action::CELECT_DOWN)) {
-					pauseType_ = PauseType::GoTitle;
-				}
+					if (fadeInTimer_.IsFinished()) {
+						MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+						ChangeScene(SCENE::RESULT);
+					}
 
-				if (MyInput::Trigger(Action::CELECT_UP)) {
-					pauseType_ = PauseType::Back;
-				}
+					if (MyInput::Trigger(Action::SELECT_DOWN)) {
+						pauseType_ = PauseType::GoTitle;
+					}
 
-				break;
-			case PauseType::GoTitle:
-				if (MyInput::Trigger(Action::CONFIRM)) {
-					fadeInTimer_.Start(1.0f, false);
-				}
+					if (MyInput::Trigger(Action::SELECT_UP)) {
+						pauseType_ = PauseType::Back;
+					}
 
-				if (fadeInTimer_.IsFinished()) {
-					MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
-					ChangeScene(SCENE::TITLE);
-				}
+					break;
+				case PauseType::GoTitle:
+					if (MyInput::Trigger(Action::CONFIRM)) {
+						fadeInTimer_.Start(1.0f, false);
+					}
 
-				if (MyInput::Trigger(Action::CELECT_UP)) {
-					pauseType_ = PauseType::ReStart;
+					if (fadeInTimer_.IsFinished()) {
+						MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+						ChangeScene(SCENE::TITLE);
+					}
+
+					if (MyInput::Trigger(Action::SELECT_UP)) {
+						pauseType_ = PauseType::ReStart;
+					}
+					break;
 				}
-				break;
 			}
 		}
 	}
@@ -383,6 +415,7 @@ void GameScene::UIUpdate() {
 	gameSceneUI_->SetChestCost(chestManager_->GetOpenAmount());
 	gameSceneUI_->SetPauseType(pauseType_);
 	gameSceneUI_->SetIsPaused(isPause_);
+	gameSceneUI_->SetResultType(resultType_);
 
 	// 武器アイコンの更新
 	if (player_->GetWeaponManager()) {

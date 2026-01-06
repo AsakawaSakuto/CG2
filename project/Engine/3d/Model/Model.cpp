@@ -512,13 +512,13 @@ void Model::DrawImGui(const char* objectName) {
 			ImGui::DragFloat("s.Decay", &spotLightData_->decay, 0.01f);
 			float angleDeg = 60.0f;            // cosAngle用の角度（UI用、一時変数）
 			float falloffStartDeg = 30.0f;     // cosFalloffStart用の角度
-			// 現在のcos値から度に変換してUIに表示（必要なら）
+			// 現在の cos値から度に変換してUIに表示（必要なら）
 			angleDeg = std::acos(spotLightData_->cosAngle) * 180.0f / std::numbers::pi_v<float>;
 			falloffStartDeg = std::acos(spotLightData_->cosFalloffStart) * 180.0f / std::numbers::pi_v<float>;
 			// ImGuiスライダー（例：0〜90度まで）
 			ImGui::SliderFloat("Spot Angle (deg)", &angleDeg, 1.0f, 90.0f);
 			ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f); // 必ず angle より小なく
-			// 入力された角度からcos値に変換して反映
+			// 入力された角度から cos値に変換して反映
 			spotLightData_->cosAngle = std::cos(angleDeg * std::numbers::pi_v<float> / 180.0f);
 			spotLightData_->cosFalloffStart = std::cos(falloffStartDeg * std::numbers::pi_v<float> / 180.0f);
 			ImGui::ColorEdit4("s.Color", &spotLightData_->color.x);

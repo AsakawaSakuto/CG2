@@ -100,7 +100,7 @@ void UpgradeManager::Update() {
 	switch (upgradeSelect_) {
 	case UpgradeSelect::Select1:
 
-		if (MyInput::Trigger(Action::CELECT_DOWN)) {
+		if (MyInput::Trigger(Action::SELECT_DOWN)) {
 			upgradeSelect_ = UpgradeSelect::Select2;
 		}
 
@@ -113,11 +113,11 @@ void UpgradeManager::Update() {
 		break;
 	case UpgradeSelect::Select2:
 
-		if (MyInput::Trigger(Action::CELECT_DOWN)) {
+		if (MyInput::Trigger(Action::SELECT_DOWN)) {
 			upgradeSelect_ = UpgradeSelect::Select3;
 		}
 
-		if (MyInput::Trigger(Action::CELECT_UP)) {
+		if (MyInput::Trigger(Action::SELECT_UP)) {
 			upgradeSelect_ = UpgradeSelect::Select1;
 		}
 
@@ -130,7 +130,7 @@ void UpgradeManager::Update() {
 		break;
 	case UpgradeSelect::Select3:
 
-		if (MyInput::Trigger(Action::CELECT_UP)) {
+		if (MyInput::Trigger(Action::SELECT_UP)) {
 			upgradeSelect_ = UpgradeSelect::Select2;
 		}
 

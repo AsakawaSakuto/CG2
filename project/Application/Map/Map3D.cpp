@@ -159,7 +159,7 @@ void Map3D::SetTile(uint32_t x, uint32_t y, uint32_t z, TileType type) {
 				BlockData& fillBlock = blocks_[fillIndex];
 				fillBlock.type = TileType::Normal;
 				CreateBlockModel(x, fillY, z, TileType::Normal);
-				SetBlockTexture(x, fillY, z, "resources/model/MapBlock/NormalBlockTexture2.png");
+				SetBlockTexture(x, fillY, z, "resources/model/MapBlock/BlockTexture.png");
 			}
 		}
 	}

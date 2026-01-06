@@ -148,25 +148,25 @@ void InputManager::SetupDefaultBindings() {
 	bindings_[Action::CROUCHING].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::L));
 
 	// セレクト
-	bindings_[Action::CELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_W));
-	bindings_[Action::CELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_UP));
-	bindings_[Action::CELECT_UP].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::UP_STICK));
-	bindings_[Action::CELECT_UP].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::UP_BOTTON));
+	bindings_[Action::SELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_W));
+	bindings_[Action::SELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_UP));
+	bindings_[Action::SELECT_UP].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::UP_STICK));
+	bindings_[Action::SELECT_UP].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::UP_BOTTON));
 
-	bindings_[Action::CELECT_DOWN].push_back(InputBinding(InputSource::KEYBOARD, DIK_S));
-	bindings_[Action::CELECT_DOWN].push_back(InputBinding(InputSource::KEYBOARD, DIK_DOWN));
-	bindings_[Action::CELECT_DOWN].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::DOWN_STICK));
-	bindings_[Action::CELECT_DOWN].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::DOWN_BOTTON));
+	bindings_[Action::SELECT_DOWN].push_back(InputBinding(InputSource::KEYBOARD, DIK_S));
+	bindings_[Action::SELECT_DOWN].push_back(InputBinding(InputSource::KEYBOARD, DIK_DOWN));
+	bindings_[Action::SELECT_DOWN].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::DOWN_STICK));
+	bindings_[Action::SELECT_DOWN].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::DOWN_BOTTON));
 
-	bindings_[Action::CELECT_LEFT].push_back(InputBinding(InputSource::KEYBOARD, DIK_A));
-	bindings_[Action::CELECT_LEFT].push_back(InputBinding(InputSource::KEYBOARD, DIK_LEFT));
-	bindings_[Action::CELECT_LEFT].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::LEFT_STICK));
-	bindings_[Action::CELECT_LEFT].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::LEFT_BOTTON));
+	bindings_[Action::SELECT_LEFT].push_back(InputBinding(InputSource::KEYBOARD, DIK_A));
+	bindings_[Action::SELECT_LEFT].push_back(InputBinding(InputSource::KEYBOARD, DIK_LEFT));
+	bindings_[Action::SELECT_LEFT].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::LEFT_STICK));
+	bindings_[Action::SELECT_LEFT].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::LEFT_BOTTON));
 
-	bindings_[Action::CELECT_RIGHT].push_back(InputBinding(InputSource::KEYBOARD, DIK_D));
-	bindings_[Action::CELECT_RIGHT].push_back(InputBinding(InputSource::KEYBOARD, DIK_RIGHT));
-	bindings_[Action::CELECT_RIGHT].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::RIGHT_STICK));
-	bindings_[Action::CELECT_RIGHT].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::RIGHT_BOTTON));
+	bindings_[Action::SELECT_RIGHT].push_back(InputBinding(InputSource::KEYBOARD, DIK_D));
+	bindings_[Action::SELECT_RIGHT].push_back(InputBinding(InputSource::KEYBOARD, DIK_RIGHT));
+	bindings_[Action::SELECT_RIGHT].push_back(InputBinding(InputSource::GAMEPAD_STICK_LEFT, GamePad::RIGHT_STICK));
+	bindings_[Action::SELECT_RIGHT].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::RIGHT_BOTTON));
 
 	// 移動
 	bindings_[Action::MOVE_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_W));

@@ -44,6 +44,8 @@ private:
 	PauseType pauseType_ = PauseType::Back;
 	bool isPause_ = false;
 
+	ResultType resultType_ = ResultType::GoTitle;
+
 private:
 	int dangerLv_ = 0;
 

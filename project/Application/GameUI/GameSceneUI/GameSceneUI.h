@@ -9,6 +9,11 @@ enum class PauseType {
 	GoTitle,
 };
 
+enum class ResultType {
+	GoTitle,
+	Restart,
+};
+
 class GameSceneUI : public BaseUI {
 public:
 	void Initialize() override;
@@ -24,6 +29,7 @@ public:
 	void SetChestCost(int cost) { chestCostFont_->SetNumber(cost); }
 	void SetPauseType(PauseType type) { pauseType_ = type; }
 	void SetIsPaused(bool isPaused) { isPaused_ = isPaused; }
+	void SetResultType(ResultType type) { resultType_ = type; }
 
 	/// <summary>
 	/// 武器アイコンを更新する
@@ -55,7 +61,33 @@ public:
 		}
 	}
 
+	void ResultTimerStart() {
+		if (!resultTimer_.IsActive() && !isResultDraw_) {
+			resultTimer_.Start(1.0f, false);
+			isResultDraw_ = true;
+		}
+	}
 private:
+
+	GameTimer resultTimer_;
+	std::unique_ptr<Sprite> resultBg_;
+	std::unique_ptr<Sprite> resultWeaponIcon1_;
+	std::unique_ptr<Sprite> resultWeaponIcon2_;
+	std::unique_ptr<Sprite> resultWeaponIcon3_;
+	std::unique_ptr<Sprite> resultWeaponIcon4_;
+	std::unique_ptr<Sprite> resultRestart_;
+	std::unique_ptr<Sprite> resultQuit_;
+	std::unique_ptr<Sprite> resultEnemyIcon_;
+	std::unique_ptr<BitmapFont> resultKillEnemyFont_;
+	std::unique_ptr<BitmapFont> resultKillEnemyWeaponFont1_;
+	std::unique_ptr<BitmapFont> resultKillEnemyWeaponFont2_;
+	std::unique_ptr<BitmapFont> resultKillEnemyWeaponFont3_;
+	std::unique_ptr<BitmapFont> resultKillEnemyWeaponFont4_;
+	bool isResultDraw_ = false;
+	Vector2 resultMin_ = { 0.15f,0.15f };
+	Vector2 resultMax_ = { 0.25f,0.25f };
+	ResultType resultType_ = ResultType::GoTitle;
+
 	PauseType pauseType_ = PauseType::Back;
 	bool isPaused_ = false;
 	std::unique_ptr<Sprite> pauseBg_;
@@ -85,7 +117,7 @@ private:
 	std::unique_ptr<Gauge> hpGauge_;
 	std::unique_ptr<BitmapFont> currentHpFont_;
 	std::unique_ptr<BitmapFont> maxHpFont_;
-	std::unique_ptr<Sprite> hpSrash_;
+	std::unique_ptr<Sprite> hpSlash_;
 	float currentHpValue_ = 0.0f;
 	float maxHpValue_ = 100.0f;
 
@@ -108,6 +140,11 @@ private:
 	unique_ptr<BitmapFont> weaponLvFont2_;
 	unique_ptr<BitmapFont> weaponLvFont3_;
 	unique_ptr<BitmapFont> weaponLvFont4_;
+
+	std::unique_ptr<Sprite> startText_;
+	GameTimer startTimer_;
+	Vector2 startTextMin_ = { -500.0f,360.0f };
+	Vector2 startTextMax_ = { 1780.0f,360.0f };
 
 	// 各スロットに武器が装備されているかどうか
 	bool isWeaponEquipped_[4] = { false, false, false, false };

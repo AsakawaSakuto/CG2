@@ -168,6 +168,11 @@ public:
 		return weaponManager_->GetTotalWeaponKillCount();
 	}
 
+	/// <summary>
+	/// Dieが完全に終了
+	/// </summary>
+	/// <returns></returns>
+	bool IsDie() const { return isDie_; }
 private:
 
 	// 移動処理
@@ -209,6 +214,8 @@ private:
 	float GetGroundHeight() const;
 
 private:
+	bool isDie_ = false;
+
 	unique_ptr<UpgradeManager> upgradeManager_;
 
 	PlayerName playerName_;

@@ -21,9 +21,9 @@ void GameSceneUI::Initialize() {
 	maxHpFont_ = std::make_unique<BitmapFont>();
 	maxHpFont_->Initialize("maxHp");
 
-	hpSrash_ = std::make_unique<Sprite>();
-	hpSrash_->Initialize("bitMapFont/srash.png", { 137.0f, 65.0f }, { 0.2f, 0.2f });
-	hpSrash_->SetAnchorPoint(AnchorPoint::Center);
+	hpSlash_ = std::make_unique<Sprite>();
+	hpSlash_->Initialize("bitMapFont/srash.png", { 137.0f, 65.0f }, { 0.2f, 0.2f });
+	hpSlash_->SetAnchorPoint(AnchorPoint::Center);
 
 	lv_ = std::make_unique<Sprite>();
 	lv_->Initialize("UI/Game/lv.png");
@@ -103,6 +103,60 @@ void GameSceneUI::Initialize() {
 	goTitle_ = std::make_unique<Sprite>();
 	goTitle_->Initialize("UI/game/quit.png");
 	goTitle_->LoadFromJson("goTitle");
+
+	startText_ = std::make_unique<Sprite>();
+	startText_->Initialize("UI/game/startText.png");
+	startText_->SetAnchorPoint(AnchorPoint::Center);
+
+	resultBg_ = std::make_unique<Sprite>();
+	resultBg_->Initialize("UI/Game/resultBg.png", { 640.0f,360.0f });
+	resultBg_->SetAnchorPoint(AnchorPoint::Center);
+	resultBg_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultRestart_ = make_unique<Sprite>();
+	resultRestart_->Initialize("UI/Game/Restart.png");
+	resultRestart_->LoadFromJson("resultRestart");
+	resultRestart_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultQuit_ = make_unique<Sprite>();
+	resultQuit_->Initialize("UI/Game/titleText.png");
+	resultQuit_->LoadFromJson("resultQuit");
+	resultQuit_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultEnemyIcon_ = std::make_unique<Sprite>();
+	resultEnemyIcon_->Initialize("ui/game/enemy.png");
+	resultEnemyIcon_->LoadFromJson("resultEnemy");
+	resultEnemyIcon_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultWeaponIcon1_ = std::make_unique<Sprite>();
+	resultWeaponIcon2_ = std::make_unique<Sprite>();
+	resultWeaponIcon3_ = std::make_unique<Sprite>();
+	resultWeaponIcon4_ = std::make_unique<Sprite>();
+	resultWeaponIcon1_->Initialize("icon/none.png");
+	resultWeaponIcon2_->Initialize("icon/none.png");
+	resultWeaponIcon3_->Initialize("icon/none.png");
+	resultWeaponIcon4_->Initialize("icon/none.png");
+	resultWeaponIcon1_->LoadFromJson("resultWeapon1");
+	resultWeaponIcon2_->LoadFromJson("resultWeapon2");
+	resultWeaponIcon3_->LoadFromJson("resultWeapon3");
+	resultWeaponIcon4_->LoadFromJson("resultWeapon4");
+	resultWeaponIcon1_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultWeaponIcon2_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultWeaponIcon3_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultWeaponIcon4_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultKillEnemyFont_ = std::make_unique<BitmapFont>();
+	resultKillEnemyFont_->Initialize("resultAllkill");
+	resultKillEnemyFont_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultKillEnemyWeaponFont1_ = std::make_unique<BitmapFont>();
+	resultKillEnemyWeaponFont2_ = std::make_unique<BitmapFont>();
+	resultKillEnemyWeaponFont3_ = std::make_unique<BitmapFont>();
+	resultKillEnemyWeaponFont4_ = std::make_unique<BitmapFont>();
+	resultKillEnemyWeaponFont1_->Initialize("resultWeaponFont1");
+	resultKillEnemyWeaponFont2_->Initialize("resultWeaponFont2");
+	resultKillEnemyWeaponFont3_->Initialize("resultWeaponFont3");
+	resultKillEnemyWeaponFont4_->Initialize("resultWeaponFont4");
+	resultKillEnemyWeaponFont1_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultKillEnemyWeaponFont2_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultKillEnemyWeaponFont3_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	resultKillEnemyWeaponFont4_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+
+	startTimer_.Start(2.0f, false);
 }
 
 void GameSceneUI::Update() {
@@ -112,7 +166,7 @@ void GameSceneUI::Update() {
 	hpGauge_->Update(currentHpValue_, maxHpValue_);
 	currentHpFont_->SetNumber(static_cast<int>(currentHpValue_));
 	maxHpFont_->SetNumber(static_cast<int>(maxHpValue_));
-	hpSrash_->Update();
+	hpSlash_->Update();
 	lvFont_->SetNumber(nowLv_);
 	lv_->Update();
 	enemyFont_->SetNumber(killEnemyValue_);
@@ -150,10 +204,54 @@ void GameSceneUI::Update() {
 		break;
 	}
 
+	resultTimer_.Update();
+	startTimer_.Update();
+	startText_->SetPosition(MyEasing::Lerp(startTextMin_, startTextMax_, startTimer_.GetProgress(), EaseType::EaseOutInSine));
+	startText_->Update();
+
 	pauseBg_->Update();
 	back_->Update();
 	restart_->Update();
 	goTitle_->Update();
+
+	resultKillEnemyFont_->SetNumber(10000);
+	resultKillEnemyWeaponFont1_->SetNumber(12345);
+	resultKillEnemyWeaponFont2_->SetNumber(11111);
+	resultKillEnemyWeaponFont3_->SetNumber(8326);
+	resultKillEnemyWeaponFont4_->SetNumber(467);
+
+	if (resultTimer_.IsActive()) {
+		resultBg_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultRestart_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultQuit_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultEnemyIcon_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultWeaponIcon1_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultWeaponIcon2_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultWeaponIcon3_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultWeaponIcon4_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultKillEnemyFont_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultKillEnemyWeaponFont1_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultKillEnemyWeaponFont2_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultKillEnemyWeaponFont3_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+		resultKillEnemyWeaponFont4_->SetColor({ 1.0f,1.0f,1.0f,resultTimer_.GetProgress() });
+	}
+
+	if (resultType_ == ResultType::GoTitle) {
+		resultQuit_->SetScale(resultMax_);
+		resultRestart_->SetScale(resultMin_);
+	} else {
+		resultQuit_->SetScale(resultMin_);
+		resultRestart_->SetScale(resultMax_);
+	}
+
+	resultBg_         ->Update();
+	resultRestart_    ->Update();
+	resultQuit_       ->Update();
+	resultEnemyIcon_  ->Update();
+	resultWeaponIcon1_->Update();
+	resultWeaponIcon2_->Update();
+	resultWeaponIcon3_->Update();
+	resultWeaponIcon4_->Update();
 }
 
 void GameSceneUI::Draw() {
@@ -162,7 +260,7 @@ void GameSceneUI::Draw() {
 	hpGauge_->Draw();
 	currentHpFont_->Draw();
 	maxHpFont_->Draw();
-	hpSrash_->Draw();
+	hpSlash_->Draw();
 
 	moneyFont_->Draw();
 	money_->Draw();
@@ -207,6 +305,24 @@ void GameSceneUI::Draw() {
 		restart_->Draw();
 		goTitle_->Draw();
 	}
+
+	if (isResultDraw_) {
+		resultBg_->Draw();
+		resultRestart_->Draw();
+		resultQuit_->Draw();
+		resultEnemyIcon_->Draw();
+		resultWeaponIcon1_->Draw();
+		resultWeaponIcon2_->Draw();
+		resultWeaponIcon3_->Draw();
+		resultWeaponIcon4_->Draw();
+		resultKillEnemyFont_->Draw();
+		resultKillEnemyWeaponFont1_->Draw();
+		resultKillEnemyWeaponFont2_->Draw();
+		resultKillEnemyWeaponFont3_->Draw();
+		resultKillEnemyWeaponFont4_->Draw();
+	}
+	
+	startText_->Draw();
 }
 
 void GameSceneUI::DrawImGui() {
@@ -220,7 +336,7 @@ void GameSceneUI::DrawImGui() {
 	//hpGauge_->DrawImGui("HpGauge");
 	//currentHpFont_->DrawImGui("NowHpFont");
 	//maxHpFont_->DrawImGui("MaxHpFont");
-	//hpSrash_->DrawImGui("HpSrash");
+	//hpSlash_->DrawImGui("HpSlash");
 	//weaponIcon1_->DrawImGui("WeaponIcon1");
 	//weaponIcon2_->DrawImGui("WeaponIcon2");
 	//weaponIcon3_->DrawImGui("WeaponIcon3");
@@ -240,6 +356,19 @@ void GameSceneUI::DrawImGui() {
 	//back_->DrawImGui("Back");
 	//restart_->DrawImGui("Restart");
 	//goTitle_->DrawImGui("GoTitle");
+	//resultBg_->DrawImGui("ResultBg");
+	//resultRestart_->DrawImGui("ResultRestart");
+	//resultQuit_->DrawImGui("ResultQuit");
+	//resultEnemyIcon_->DrawImGui("ResultEnemyIcon");
+	//resultWeaponIcon1_->DrawImGui("ResultWeaponIcon1");
+	//resultWeaponIcon2_->DrawImGui("ResultWeaponIcon2");
+	//resultWeaponIcon3_->DrawImGui("ResultWeaponIcon3");
+	//resultWeaponIcon4_->DrawImGui("ResultWeaponIcon4");
+	//resultKillEnemyFont_->DrawImGui("ResultKillEnemyFont");
+	//resultKillEnemyWeaponFont1_->DrawImGui("ResultKillEnemyWeaponFont1");
+	//resultKillEnemyWeaponFont2_->DrawImGui("ResultKillEnemyWeaponFont2");
+	//resultKillEnemyWeaponFont3_->DrawImGui("ResultKillEnemyWeaponFont3");
+	//resultKillEnemyWeaponFont4_->DrawImGui("ResultKillEnemyWeaponFont4");
 }
 
 void GameSceneUI::UpdateWeaponIcon(int slotIndex, WeaponName weaponName) {
