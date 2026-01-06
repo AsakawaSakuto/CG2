@@ -12,6 +12,28 @@ enum class SE_List {
     LockIn,  // Titleのビルドを確定
     Chest,   // free pay Chestを開けるとき
     Jar,     // min,max Jarを壊すときの
+	PlayerDamage,  // Playerがダメージを受けたとき
+	Jump,    // ジャンプしたとき
+	Upgrade, // アップグレード時
+	ExpGet,  // 経験値取得時
+	PlayerDie, // Playerが死亡したとき
+
+	// Weapon を生成した時のSE
+    FireBall,  // ファイヤーボール
+    Laser,     // レーザー
+    Runa,      // ルナ
+    Axe,       // アックス
+    Boomerang, // ブーメラン
+    Dice,      // ダイス
+    Toxic,     // トキシック
+    Gun,       // ガン
+
+    // 敵のダメージ音
+    EnemyDamage1,
+    EnemyDamage2,
+    EnemyDamage3,
+    EnemyDamage4,
+    EnemyDamage5,
 
     Count
 };

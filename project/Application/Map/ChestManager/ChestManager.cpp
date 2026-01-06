@@ -119,7 +119,6 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool needMoney) {
 			if (chest->IsAlive()) {
 				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
 					chest->Open();
-					openAmount_ += addOpenAmount_; // 次回以降の開封コストを増加
 					MyAudio::PlaySE(SE_List::Chest);
 					return true;
 				}

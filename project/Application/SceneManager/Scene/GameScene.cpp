@@ -140,16 +140,20 @@ void GameScene::Update() {
 		if (!fadeInTimer_.IsActive()) {
 			if (resultType_ == ResultType::GoTitle) {
 				if (MyInput::Trigger(Action::SELECT_RIGHT)) {
+					MyAudio::PlaySE(SE_List::Select);
 					resultType_ = ResultType::Restart;
 				}
 				if (MyInput::Trigger(Action::CONFIRM)) {
+					MyAudio::PlaySE(SE_List::Confirm);
 					fadeInTimer_.Start(1.0f, false);
 				}
 			} else {
 				if (MyInput::Trigger(Action::SELECT_LEFT)) {
+					MyAudio::PlaySE(SE_List::Select);
 					resultType_ = ResultType::GoTitle;
 				}
 				if (MyInput::Trigger(Action::CONFIRM)) {
+					MyAudio::PlaySE(SE_List::Confirm);
 					fadeInTimer_.Start(1.0f, false);
 				}
 			}
@@ -157,8 +161,10 @@ void GameScene::Update() {
 
 		if (fadeInTimer_.IsFinished()) {
 			if (resultType_ == ResultType::GoTitle) {
+				MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
 				ChangeScene(SCENE::TITLE);
 			} else {
+				MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
 				ChangeScene(SCENE::RESULT);
 			}
 		}
@@ -169,6 +175,7 @@ void GameScene::Update() {
 			if (MyInput::Trigger(Action::PAUSE)) {
 				pauseType_ = PauseType::Back;
 				isPause_ = true;
+				MyAudio::PlaySE(SE_List::Confirm);
 			}
 
 			player_->Update();
@@ -221,22 +228,26 @@ void GameScene::Update() {
 				if (MyInput::Trigger(Action::CANCEL) || MyInput::Trigger(Action::PAUSE)) {
 					pauseType_ = PauseType::Back;
 					isPause_ = false;
+					MyAudio::PlaySE(SE_List::Confirm);
 				}
 
 				switch (pauseType_) {
 				case PauseType::Back:
 					if (MyInput::Trigger(Action::CONFIRM)) {
+						MyAudio::PlaySE(SE_List::Confirm);
 						pauseType_ = PauseType::Back;
 						isPause_ = false;
 					}
 
 					if (MyInput::Trigger(Action::SELECT_DOWN)) {
+						MyAudio::PlaySE(SE_List::Select);
 						pauseType_ = PauseType::ReStart;
 					}
 
 					break;
 				case PauseType::ReStart:
 					if (MyInput::Trigger(Action::CONFIRM)) {
+						MyAudio::PlaySE(SE_List::Confirm);
 						fadeInTimer_.Start(1.0f, false);
 					}
 
@@ -246,16 +257,19 @@ void GameScene::Update() {
 					}
 
 					if (MyInput::Trigger(Action::SELECT_DOWN)) {
+						MyAudio::PlaySE(SE_List::Select);
 						pauseType_ = PauseType::GoTitle;
 					}
 
 					if (MyInput::Trigger(Action::SELECT_UP)) {
+						MyAudio::PlaySE(SE_List::Select);
 						pauseType_ = PauseType::Back;
 					}
 
 					break;
 				case PauseType::GoTitle:
 					if (MyInput::Trigger(Action::CONFIRM)) {
+						MyAudio::PlaySE(SE_List::Confirm);
 						fadeInTimer_.Start(1.0f, false);
 					}
 
@@ -265,6 +279,7 @@ void GameScene::Update() {
 					}
 
 					if (MyInput::Trigger(Action::SELECT_UP)) {
+						MyAudio::PlaySE(SE_List::Select);
 						pauseType_ = PauseType::ReStart;
 					}
 					break;
@@ -393,6 +408,8 @@ void GameScene::JarUpdate() {
 		} else if (jarType == JarType::Money) {
 			player_->AddMoney(reward);
 		}
+		// 壺を壊したときのSEを再生
+		MyAudio::PlaySE(SE_List::Jar);
 	}
 
 	// JarManagerの更新
@@ -417,6 +434,9 @@ void GameScene::ChestUpdate() {
 				if (player_->SubtractMoney(openAmount)) {
 					// お金が足りる場合は宝箱を開ける
 					chestOpened = chestManager_->OpenChest(playerAABB, true);
+					if (chestOpened) {
+						MyAudio::PlaySE(SE_List::Chest);
+					}
 				} else {
 					// お金が足りない場合は開けない
 					// TODO: お金が足りないメッセージを表示する
@@ -424,6 +444,9 @@ void GameScene::ChestUpdate() {
 			} else {
 				// FreeChestの場合は無条件で開ける
 				chestOpened = chestManager_->OpenChest(playerAABB, false);
+				if (chestOpened) {
+					MyAudio::PlaySE(SE_List::Chest);
+				}
 			}
 			
 			// 宝箱が開けられた場合、Upgradeを実行

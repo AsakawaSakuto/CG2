@@ -33,6 +33,28 @@ void AudioManager::Initialize() {
 	LoadSE(SE_List::LockIn, "resources/sound/SE/LockIn.mp3", 1.0f);
     LoadSE(SE_List::Jar, "resources/sound/SE/jar.mp3", 1.0f);
     LoadSE(SE_List::Chest, "resources/sound/SE/chest.mp3", 1.0f);
+	LoadSE(SE_List::PlayerDamage, "resources/sound/SE/damage.mp3", 1.0f);
+	LoadSE(SE_List::Jump, "resources/sound/SE/jump.mp3", 1.0f);
+    LoadSE(SE_List::Upgrade, "resources/sound/SE/upgrade.mp3", 1.0f);
+	LoadSE(SE_List::ExpGet, "resources/sound/SE/expGet.mp3", 1.0f);
+	LoadSE(SE_List::PlayerDie, "resources/sound/SE/playerDie.mp3", 1.0f);
+
+    // Weapon SE
+    LoadSE(SE_List::FireBall, "resources/sound/SE/Weapon/fireball.mp3", 1.0f);
+    LoadSE(SE_List::Laser, "resources/sound/SE/Weapon/laser.mp3", 1.0f);
+    LoadSE(SE_List::Runa, "resources/sound/SE/Weapon/runa.mp3", 1.0f);
+    LoadSE(SE_List::Axe, "resources/sound/SE/Weapon/axe.mp3", 1.0f);
+    LoadSE(SE_List::Boomerang, "resources/sound/SE/Weapon/boomerang.mp3", 1.0f);
+    LoadSE(SE_List::Dice, "resources/sound/SE/Weapon/dice.mp3", 1.0f);
+    LoadSE(SE_List::Toxic, "resources/sound/SE/Weapon/toxic.mp3", 1.0f);
+	LoadSE(SE_List::Gun, "resources/sound/SE/Weapon/gun.mp3", 1.0f);
+
+	// Enemy Damage SE
+    LoadSE(SE_List::EnemyDamage1, "resources/sound/SE/EnemyDamage/1.mp3", 1.0f);
+    LoadSE(SE_List::EnemyDamage2, "resources/sound/SE/EnemyDamage/2.mp3", 1.0f);
+    LoadSE(SE_List::EnemyDamage3, "resources/sound/SE/EnemyDamage/3.mp3", 1.0f);
+    LoadSE(SE_List::EnemyDamage4, "resources/sound/SE/EnemyDamage/4.mp3", 1.0f);
+    LoadSE(SE_List::EnemyDamage5, "resources/sound/SE/EnemyDamage/5.mp3", 1.0f);
 
 	// BGM.Load temp
     LoadBGM(BGM_List::Title, "resources/sound/BGM/titleBGM.mp3");

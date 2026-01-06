@@ -153,6 +153,8 @@ void Weapon::FireBallUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		fireBall_.push_back(std::move(bullet));
 
+		MyAudio::PlaySE(SE_List::FireBall);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -189,6 +191,8 @@ void Weapon::LaserUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		laser_.push_back(std::move(bullet));
 
+		MyAudio::PlaySE(SE_List::Laser);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -222,6 +226,9 @@ void Weapon::RunaUpdate() {
 		bullet->SetBounceCount(static_cast<int>(status_.bounceCount));
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		runa_.push_back(std::move(bullet));
+
+		MyAudio::PlaySE(SE_List::Runa);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -254,6 +261,9 @@ void Weapon::AxeUpdate() {
 		bullet->SetScaleRate(status_.sizeRate);
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		axe_.push_back(std::move(bullet));
+
+		MyAudio::PlaySE(SE_List::Axe);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -285,6 +295,9 @@ void Weapon::BoomerangUpdate() {
 		bullet->SetScaleRate(status_.sizeRate);
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		boomerang_.push_back(std::move(bullet));
+
+		MyAudio::PlaySE(SE_List::Boomerang);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -315,6 +328,9 @@ void Weapon::DiceUpdate() {
 		bullet->SetDamage(status_.damage);
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		dice_.push_back(std::move(bullet));
+
+		MyAudio::PlaySE(SE_List::Dice);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -348,6 +364,9 @@ void Weapon::ToxicUpdate() {
 		bullet->SetLifeTime(status_.lifeTime);
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		toxic_.push_back(std::move(bullet));
+
+		MyAudio::PlaySE(SE_List::Toxic);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -386,7 +405,7 @@ void Weapon::GunUpdate() {
 		auto bullet = std::make_unique<Gun>();
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		// ランダムターゲット選択が有効な場合はrandomDirectionToEnemy_を使用
+		// ランダムターゲット選択が有効な場合は Random DirectionToEnemy_を使用
 		if (status_.useRandomTarget) {
 			bullet->SetDirectionToEnemy(randomDirectionToEnemy_);
 		} else {
@@ -396,6 +415,9 @@ void Weapon::GunUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		gun_.push_back(std::move(bullet));
 		status_.shotNowCount++;
+
+		MyAudio::PlaySE(SE_List::Gun);
+
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();

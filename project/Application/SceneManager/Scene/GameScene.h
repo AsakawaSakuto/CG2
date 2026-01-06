@@ -51,7 +51,7 @@ private:
 	int dangerLv_ = 0;
 
 	int bgmNum_ = 1;
-	float bgmVolume_ = 0.5f;
+	float bgmVolume_ = 0.2f;
 
 	Camera camera_;
 	DebugCamera debugCamera_;

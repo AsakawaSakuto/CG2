@@ -45,7 +45,7 @@ private:
 	int paidChestNum_ = 25;
 	int freeChestNum_ = 5;
 	
-	int openAmount_ = 10;
+	int openAmount_ = 30;
 
 	std::vector<std::unique_ptr<PaidChest>> paidChests_;
 	std::vector<std::unique_ptr<FreeChest>> freeChests_;

@@ -518,8 +518,9 @@ void CollisionManager::CheckExpItemPlayerCollision() {
 		// アイテム取得用の距離チェック
 		float getMaxDist = playerSphere.radius + expItemSphere.radius;
 		if (distSq <= getMaxDist * getMaxDist) {
+			MyAudio::PlaySE(SE_List::ExpGet);
 			expItemGetParticle_->Play(player_->GetPosition(), false);
-			player_->AddExp(5);
+			player_->AddExp(MyRand::Int(3, 7));
 			expItem->Dead();
 		}
 	}
