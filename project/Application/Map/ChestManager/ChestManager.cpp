@@ -119,7 +119,7 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool needMoney) {
 			if (chest->IsAlive()) {
 				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
 					chest->Open();
-					MyAudio::PlaySE(SE_List::Chest);
+					MyAudio::Play(SE_List::Chest);
 					return true;
 				}
 			}
@@ -130,7 +130,7 @@ bool ChestManager::OpenChest(const AABB& interactAABB, bool needMoney) {
 			if (chest->IsAlive()) {
 				if (Collision::IsHit(interactAABB, chest->GetAABBCollision())) {
 					chest->Open();
-					MyAudio::PlaySE(SE_List::Chest);
+					MyAudio::Play(SE_List::Chest);
 					return true;
 				}
 			}

@@ -94,7 +94,7 @@ void GameScene::Initialize() {
 	playTimer_.Start(300.0f, false);
 
 	bgmNum_ = MyRand::Int(1, 5);
-	MyAudio::PlayBGM(static_cast<BGM_List>(bgmNum_), bgmVolume_);
+	MyAudio::Play(static_cast<BGM_List>(bgmNum_), bgmVolume_);
 
 	isPause_ = false;
 
@@ -156,20 +156,20 @@ void GameScene::Update() {
 		if (!fadeInTimer_.IsActive()) {
 			if (resultType_ == ResultType::GoTitle) {
 				if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-					MyAudio::PlaySE(SE_List::Select);
+					MyAudio::Play(SE_List::Select);
 					resultType_ = ResultType::Restart;
 				}
 				if (MyInput::Trigger(Action::CONFIRM)) {
-					MyAudio::PlaySE(SE_List::Confirm);
+					MyAudio::Play(SE_List::Confirm);
 					fadeInTimer_.Start(1.0f, false);
 				}
 			} else {
 				if (MyInput::Trigger(Action::SELECT_LEFT)) {
-					MyAudio::PlaySE(SE_List::Select);
+					MyAudio::Play(SE_List::Select);
 					resultType_ = ResultType::GoTitle;
 				}
 				if (MyInput::Trigger(Action::CONFIRM)) {
-					MyAudio::PlaySE(SE_List::Confirm);
+					MyAudio::Play(SE_List::Confirm);
 					fadeInTimer_.Start(1.0f, false);
 				}
 			}
@@ -177,10 +177,10 @@ void GameScene::Update() {
 
 		if (fadeInTimer_.IsFinished()) {
 			if (resultType_ == ResultType::GoTitle) {
-				MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+				MyAudio::Stop(static_cast<BGM_List>(bgmNum_));
 				ChangeScene(SCENE::TITLE);
 			} else {
-				MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+				MyAudio::Stop(static_cast<BGM_List>(bgmNum_));
 				ChangeScene(SCENE::RESULT);
 			}
 		}
@@ -191,7 +191,7 @@ void GameScene::Update() {
 			if (MyInput::Trigger(Action::PAUSE)) {
 				pauseType_ = PauseType::Back;
 				isPause_ = true;
-				MyAudio::PlaySE(SE_List::Confirm);
+				MyAudio::Play(SE_List::Confirm);
 			}
 
 			player_->Update();
@@ -244,58 +244,58 @@ void GameScene::Update() {
 				if (MyInput::Trigger(Action::CANCEL) || MyInput::Trigger(Action::PAUSE)) {
 					pauseType_ = PauseType::Back;
 					isPause_ = false;
-					MyAudio::PlaySE(SE_List::Confirm);
+					MyAudio::Play(SE_List::Confirm);
 				}
 
 				switch (pauseType_) {
 				case PauseType::Back:
 					if (MyInput::Trigger(Action::CONFIRM)) {
-						MyAudio::PlaySE(SE_List::Confirm);
+						MyAudio::Play(SE_List::Confirm);
 						pauseType_ = PauseType::Back;
 						isPause_ = false;
 					}
 
 					if (MyInput::Trigger(Action::SELECT_DOWN)) {
-						MyAudio::PlaySE(SE_List::Select);
+						MyAudio::Play(SE_List::Select);
 						pauseType_ = PauseType::ReStart;
 					}
 
 					break;
 				case PauseType::ReStart:
 					if (MyInput::Trigger(Action::CONFIRM)) {
-						MyAudio::PlaySE(SE_List::Confirm);
+						MyAudio::Play(SE_List::Confirm);
 						fadeInTimer_.Start(1.0f, false);
 					}
 
 					if (fadeInTimer_.IsFinished()) {
-						MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+						MyAudio::Stop(static_cast<BGM_List>(bgmNum_));
 						ChangeScene(SCENE::RESULT);
 					}
 
 					if (MyInput::Trigger(Action::SELECT_DOWN)) {
-						MyAudio::PlaySE(SE_List::Select);
+						MyAudio::Play(SE_List::Select);
 						pauseType_ = PauseType::GoTitle;
 					}
 
 					if (MyInput::Trigger(Action::SELECT_UP)) {
-						MyAudio::PlaySE(SE_List::Select);
+						MyAudio::Play(SE_List::Select);
 						pauseType_ = PauseType::Back;
 					}
 
 					break;
 				case PauseType::GoTitle:
 					if (MyInput::Trigger(Action::CONFIRM)) {
-						MyAudio::PlaySE(SE_List::Confirm);
+						MyAudio::Play(SE_List::Confirm);
 						fadeInTimer_.Start(1.0f, false);
 					}
 
 					if (fadeInTimer_.IsFinished()) {
-						MyAudio::StopBGM(static_cast<BGM_List>(bgmNum_));
+						MyAudio::Stop(static_cast<BGM_List>(bgmNum_));
 						ChangeScene(SCENE::TITLE);
 					}
 
 					if (MyInput::Trigger(Action::SELECT_UP)) {
-						MyAudio::PlaySE(SE_List::Select);
+						MyAudio::Play(SE_List::Select);
 						pauseType_ = PauseType::ReStart;
 					}
 					break;
@@ -324,14 +324,14 @@ void GameScene::Update() {
 	if (fadeInTimer_.IsActive()) {
 		fadeInTimer_.Update();
 		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, fadeInTimer_.GetProgress() });
-		MyAudio::SetBGMVolume(static_cast<BGM_List>(bgmNum_), bgmVolume_ * fadeInTimer_.GetReverseProgress());
+		MyAudio::SetVolume(static_cast<BGM_List>(bgmNum_), bgmVolume_ * fadeInTimer_.GetReverseProgress());
 	}
 
 	// フェードアウト（TitleScene開始時、徐々に透明に）
 	if (fadeOutTimer_.IsActive() && !fadeInTimer_.IsActive()) {
 		fadeOutTimer_.Update();
 		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f - fadeOutTimer_.GetProgress() });
-		MyAudio::SetBGMVolume(static_cast<BGM_List>(bgmNum_), bgmVolume_ * fadeInTimer_.GetProgress());
+		MyAudio::SetVolume(static_cast<BGM_List>(bgmNum_), bgmVolume_ * fadeInTimer_.GetProgress());
 	}
 
 	fadeBG_->Update();
@@ -425,7 +425,7 @@ void GameScene::JarUpdate() {
 			player_->AddMoney(reward);
 		}
 		// 壺を壊したときのSEを再生
-		MyAudio::PlaySE(SE_List::Jar);
+		MyAudio::Play(SE_List::Jar);
 	}
 
 	// JarManagerの更新
@@ -451,7 +451,7 @@ void GameScene::ChestUpdate() {
 					// お金が足りる場合は宝箱を開ける
 					chestOpened = chestManager_->OpenChest(playerAABB, true);
 					if (chestOpened) {
-						MyAudio::PlaySE(SE_List::Chest);
+						MyAudio::Play(SE_List::Chest);
 					}
 				} else {
 					// お金が足りない場合は開けない
@@ -461,7 +461,7 @@ void GameScene::ChestUpdate() {
 				// FreeChestの場合は無条件で開ける
 				chestOpened = chestManager_->OpenChest(playerAABB, false);
 				if (chestOpened) {
-					MyAudio::PlaySE(SE_List::Chest);
+					MyAudio::Play(SE_List::Chest);
 				}
 			}
 			
@@ -780,7 +780,7 @@ void GameScene::EnterHardMode() {
 	isHardMode_ = true;
 	
 	// ハードモード開始のSEを再生
-	MyAudio::PlaySE(SE_List::Confirm);
+	MyAudio::Play(SE_List::Confirm);
 	
 	// EnemyManagerにハードモードを通知し、既存の敵を全て倒す
 	if (enemyManager_) {

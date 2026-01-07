@@ -102,14 +102,14 @@ void UpgradeManager::Update() {
 
 		if (MyInput::Trigger(Action::SELECT_DOWN)) {
 			upgradeSelect_ = UpgradeSelect::Select2;
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 		}
 
 		// この選択肢の強化をしてゲームを再開
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			ApplySelectedUpgrade();
 			isUpgrade_ = false;
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 		}
 
 		break;
@@ -117,19 +117,19 @@ void UpgradeManager::Update() {
 
 		if (MyInput::Trigger(Action::SELECT_DOWN)) {
 			upgradeSelect_ = UpgradeSelect::Select3;
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 		}
 
 		if (MyInput::Trigger(Action::SELECT_UP)) {
 			upgradeSelect_ = UpgradeSelect::Select1;
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 		}
 
 		// この選択肢の強化をしてゲームを再開
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			ApplySelectedUpgrade();
 			isUpgrade_ = false;
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 		}
 
 		break;
@@ -137,14 +137,14 @@ void UpgradeManager::Update() {
 
 		if (MyInput::Trigger(Action::SELECT_UP)) {
 			upgradeSelect_ = UpgradeSelect::Select2;
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 		}
 
 		// この選択肢の強化をしてゲームを再開
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			ApplySelectedUpgrade();
 			isUpgrade_ = false;
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 		}
 
 		break;
@@ -227,7 +227,7 @@ void UpgradeManager::Upgrade() {
 	isUpgrade_ = true;
 	justOpened_ = true; // アップグレード画面が開かれた直後のフレームであることを記録
 
-	MyAudio::PlaySE(SE_List::Upgrade);
+	MyAudio::Play(SE_List::Upgrade);
 
 	// 3つのアップグレード選択肢を生成
 	GenerateUpgradeOptions();

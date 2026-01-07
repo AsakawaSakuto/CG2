@@ -27,42 +27,42 @@ void AudioManager::Initialize() {
 
     // SE.Load temp
 	// LoadSE(SE_Variation::, "resources/sound/SE/");
-    LoadSE(SE_List::StartUp, "resources/sound/SE/StartUp.mp3", 1.0f);
-    LoadSE(SE_List::Confirm, "resources/sound/SE/Confirm.mp3", 1.0f);
-    LoadSE(SE_List::Select, "resources/sound/SE/Select.mp3", 1.0f);
-	LoadSE(SE_List::LockIn, "resources/sound/SE/LockIn.mp3", 1.0f);
-    LoadSE(SE_List::Jar, "resources/sound/SE/jar.mp3", 1.0f);
-    LoadSE(SE_List::Chest, "resources/sound/SE/chest.mp3", 1.0f);
-	LoadSE(SE_List::PlayerDamage, "resources/sound/SE/damage.mp3", 1.0f);
-	LoadSE(SE_List::Jump, "resources/sound/SE/jump.mp3", 1.0f);
-    LoadSE(SE_List::Upgrade, "resources/sound/SE/upgrade.mp3", 1.0f);
-	LoadSE(SE_List::ExpGet, "resources/sound/SE/expGet.mp3", 1.0f);
-	LoadSE(SE_List::PlayerDie, "resources/sound/SE/playerDie.mp3", 1.0f);
+    Load(SE_List::StartUp,      "StartUp.mp3", 1.0f);
+    Load(SE_List::Confirm,      "Confirm.mp3", 1.0f);
+    Load(SE_List::Select,       "Select.mp3", 1.0f);
+	Load(SE_List::LockIn,       "LockIn.mp3", 1.0f);
+    Load(SE_List::Jar,          "jar.mp3", 1.0f);
+    Load(SE_List::Chest,        "chest.mp3", 1.0f);
+	Load(SE_List::PlayerDamage, "damage.mp3", 1.0f);
+	Load(SE_List::Jump,         "jump.mp3", 1.0f);
+    Load(SE_List::Upgrade,      "upgrade.mp3", 1.0f);
+	Load(SE_List::ExpGet,       "expGet.mp3", 1.0f);
+	Load(SE_List::PlayerDie,    "playerDie.mp3", 1.0f);
 
     // Weapon SE
-    LoadSE(SE_List::FireBall, "resources/sound/SE/Weapon/fireball.mp3", 1.0f);
-    LoadSE(SE_List::Laser, "resources/sound/SE/Weapon/laser.mp3", 1.0f);
-    LoadSE(SE_List::Runa, "resources/sound/SE/Weapon/runa.mp3", 1.0f);
-    LoadSE(SE_List::Axe, "resources/sound/SE/Weapon/axe.mp3", 1.0f);
-    LoadSE(SE_List::Boomerang, "resources/sound/SE/Weapon/boomerang.mp3", 1.0f);
-    LoadSE(SE_List::Dice, "resources/sound/SE/Weapon/dice.mp3", 1.0f);
-    LoadSE(SE_List::Toxic, "resources/sound/SE/Weapon/toxic.mp3", 1.0f);
-	LoadSE(SE_List::Gun, "resources/sound/SE/Weapon/gun.mp3", 1.0f);
+    Load(SE_List::FireBall,  "Weapon/fireball.mp3", 1.0f);
+    Load(SE_List::Laser,     "Weapon/laser.mp3", 1.0f);
+    Load(SE_List::Runa,      "Weapon/runa.mp3", 1.0f);
+    Load(SE_List::Axe,       "Weapon/axe.mp3", 1.0f);
+    Load(SE_List::Boomerang, "Weapon/boomerang.mp3", 1.0f);
+    Load(SE_List::Dice,      "Weapon/dice.mp3", 1.0f);
+    Load(SE_List::Toxic,     "Weapon/toxic.mp3", 1.0f);
+	Load(SE_List::Gun,       "Weapon/gun.mp3", 1.0f);
 
 	// Enemy Damage SE
-    LoadSE(SE_List::EnemyDamage1, "resources/sound/SE/EnemyDamage/1.mp3", 1.0f);
-    LoadSE(SE_List::EnemyDamage2, "resources/sound/SE/EnemyDamage/2.mp3", 1.0f);
-    LoadSE(SE_List::EnemyDamage3, "resources/sound/SE/EnemyDamage/3.mp3", 1.0f);
-    LoadSE(SE_List::EnemyDamage4, "resources/sound/SE/EnemyDamage/4.mp3", 1.0f);
-    LoadSE(SE_List::EnemyDamage5, "resources/sound/SE/EnemyDamage/5.mp3", 1.0f);
+    Load(SE_List::EnemyDamage1, "EnemyDamage/1.mp3", 1.0f);
+    Load(SE_List::EnemyDamage2, "EnemyDamage/2.mp3", 1.0f);
+    Load(SE_List::EnemyDamage3, "EnemyDamage/3.mp3", 1.0f);
+    Load(SE_List::EnemyDamage4, "EnemyDamage/4.mp3", 1.0f);
+    Load(SE_List::EnemyDamage5, "EnemyDamage/5.mp3", 1.0f);
 
 	// BGM.Load temp
-    LoadBGM(BGM_List::Title, "resources/sound/BGM/titleBGM.mp3");
-    LoadBGM(BGM_List::Game1, "resources/sound/BGM/Game/Bgm1.mp3");
-    LoadBGM(BGM_List::Game2, "resources/sound/BGM/Game/Bgm2.mp3");
-    LoadBGM(BGM_List::Game3, "resources/sound/BGM/Game/Bgm3.mp3");
-    LoadBGM(BGM_List::Game4, "resources/sound/BGM/Game/Bgm4.mp3");
-    LoadBGM(BGM_List::Game5, "resources/sound/BGM/Game/Bgm5.mp3");
+    Load(BGM_List::Title, "titleBGM.mp3");
+    Load(BGM_List::Game1, "Game/Bgm1.mp3");
+    Load(BGM_List::Game2, "Game/Bgm2.mp3");
+    Load(BGM_List::Game3, "Game/Bgm3.mp3");
+    Load(BGM_List::Game4, "Game/Bgm4.mp3");
+    Load(BGM_List::Game5, "Game/Bgm5.mp3");
 }
 
 void AudioManager::Finalize() {
@@ -77,7 +77,7 @@ void AudioManager::Finalize() {
     }
 }
 
-void AudioManager::LoadBGM(BGM_List bgm, const std::string& filePath, float volume) {
+void AudioManager::Load(BGM_List bgm, const std::string& filePath, float volume) {
     size_t index = static_cast<size_t>(bgm);
     assert(index < bgmArray_.size() && "Invalid BGM variation");
 
@@ -87,12 +87,12 @@ void AudioManager::LoadBGM(BGM_List bgm, const std::string& filePath, float volu
     }
 
     auto audio = std::make_unique<AudioX>();
-    audio->Initialize(filePath);
+    audio->Initialize("resources/sound/BGM/" + filePath);
     bgmArray_[index] = std::move(audio);
 	bgmVolumeArray_[index] = volume;
 }
 
-void AudioManager::LoadSE(SE_List se, const std::string& filePath, float volume) {
+void AudioManager::Load(SE_List se, const std::string& filePath, float volume) {
     size_t index = static_cast<size_t>(se);
     assert(index < seArray_.size() && "Invalid SE variation");
 
@@ -102,7 +102,7 @@ void AudioManager::LoadSE(SE_List se, const std::string& filePath, float volume)
     }
 
     auto audio = std::make_unique<AudioX>();
-    audio->Initialize(filePath);
+    audio->Initialize("resources/sound/SE/" + filePath);
     seArray_[index] = std::move(audio);
 	seVolumeArray_[index] = volume;
 }

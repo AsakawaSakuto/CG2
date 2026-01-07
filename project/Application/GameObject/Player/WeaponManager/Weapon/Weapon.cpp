@@ -180,7 +180,7 @@ void Weapon::FireBallUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		fireBall_.push_back(std::move(bullet));
 
-		MyAudio::PlaySE(SE_List::FireBall);
+		MyAudio::Play(SE_List::FireBall);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -218,7 +218,7 @@ void Weapon::LaserUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		laser_.push_back(std::move(bullet));
 
-		MyAudio::PlaySE(SE_List::Laser);
+		MyAudio::Play(SE_List::Laser);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -254,7 +254,7 @@ void Weapon::RunaUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		runa_.push_back(std::move(bullet));
 
-		MyAudio::PlaySE(SE_List::Runa);
+		MyAudio::Play(SE_List::Runa);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -289,7 +289,7 @@ void Weapon::AxeUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		axe_.push_back(std::move(bullet));
 
-		MyAudio::PlaySE(SE_List::Axe);
+		MyAudio::Play(SE_List::Axe);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -323,7 +323,7 @@ void Weapon::BoomerangUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		boomerang_.push_back(std::move(bullet));
 
-		MyAudio::PlaySE(SE_List::Boomerang);
+		MyAudio::Play(SE_List::Boomerang);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -356,7 +356,7 @@ void Weapon::DiceUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		dice_.push_back(std::move(bullet));
 
-		MyAudio::PlaySE(SE_List::Dice);
+		MyAudio::Play(SE_List::Dice);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -392,7 +392,7 @@ void Weapon::ToxicUpdate() {
 		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		toxic_.push_back(std::move(bullet));
 
-		MyAudio::PlaySE(SE_List::Toxic);
+		MyAudio::Play(SE_List::Toxic);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -443,7 +443,7 @@ void Weapon::GunUpdate() {
 		gun_.push_back(std::move(bullet));
 		status_.shotNowCount++;
 
-		MyAudio::PlaySE(SE_List::Gun);
+		MyAudio::Play(SE_List::Gun);
 
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;

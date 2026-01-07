@@ -64,7 +64,7 @@ void TitleScene::Initialize() {
 	bgmVolume_ = static_cast<int>(MyAudio::GetBgmMasterVolume() * 10.0f);
 	seVolume_ = static_cast<int>(MyAudio::GetSeMasterVolume() * 10.0f);
 
-	MyAudio::PlayBGM(BGM_List::Title, titleBgmVolume_);
+	MyAudio::Play(BGM_List::Title, titleBgmVolume_);
 }
 
 void TitleScene::Update() {
@@ -73,12 +73,12 @@ void TitleScene::Update() {
 	case TitleSelectState::Play:
 
 		if (MyInput::Trigger(Action::SELECT_DOWN)) {
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 			selectState_ = TitleSelectState::Edit;
 		}
 		
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			selectState_ = TitleSelectState::PlayerSelect;
 			playerName_ = PlayerName::PowerMan;
 			weaponName_ = WeaponName::FireBall;
@@ -88,16 +88,16 @@ void TitleScene::Update() {
 	case TitleSelectState::Edit:
 
 		if (MyInput::Trigger(Action::SELECT_UP)) {
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 			selectState_ = TitleSelectState::Play;
 		}
 		if (MyInput::Trigger(Action::SELECT_DOWN)) {
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 			selectState_ = TitleSelectState::Quit;
 		}
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			selectState_ = TitleSelectState::EditSelect;
 			editType_ = EditType::Screen;
 		}
@@ -107,7 +107,7 @@ void TitleScene::Update() {
 	case TitleSelectState::EditSelect:
 
 		if (MyInput::Trigger(Action::CANCEL)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			selectState_ = TitleSelectState::Edit;
 		}
 
@@ -116,7 +116,7 @@ void TitleScene::Update() {
 		case EditType::Screen:
 
 			if (MyInput::Trigger(Action::CONFIRM) || MyInput::Trigger(Action::SELECT_RIGHT) || MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Confirm);
+				MyAudio::Play(SE_List::Confirm);
 				auto dxCommon = ServiceLocator::GetDXCommon();
 				auto winApp = dxCommon->GetWinApp();
 				if (winApp->IsFullscreen()) {
@@ -129,7 +129,7 @@ void TitleScene::Update() {
 			}
 
 			if (MyInput::Trigger(Action::SELECT_DOWN)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				editType_ = EditType::BgmVolume;
 			}
 			
@@ -138,12 +138,12 @@ void TitleScene::Update() {
 		case EditType::BgmVolume:
 
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				bgmVolume_--;
 			}
 
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				bgmVolume_++;
 			}
 
@@ -151,12 +151,12 @@ void TitleScene::Update() {
 			MyAudio::SetBgmMasterVolume(static_cast<float>(bgmVolume_) / 10.0f);
 
 			if (MyInput::Trigger(Action::SELECT_UP)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				editType_ = EditType::Screen;
 			}
 
 			if (MyInput::Trigger(Action::SELECT_DOWN)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				editType_ = EditType::SeVolume;
 			}
 
@@ -165,12 +165,12 @@ void TitleScene::Update() {
 		case EditType::SeVolume:
 
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				seVolume_--;
 			}
 
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				seVolume_++;
 			}
 
@@ -178,7 +178,7 @@ void TitleScene::Update() {
 			MyAudio::SetSeMasterVolume(static_cast<float>(seVolume_) / 10.0f);
 
 			if (MyInput::Trigger(Action::SELECT_UP)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				editType_ = EditType::BgmVolume;
 			}
 
@@ -190,11 +190,11 @@ void TitleScene::Update() {
 	case TitleSelectState::Quit:
 
 		if (MyInput::Trigger(Action::SELECT_UP)) {
-			MyAudio::PlaySE(SE_List::Select);
+			MyAudio::Play(SE_List::Select);
 			selectState_ = TitleSelectState::Edit;
 		}
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			Quit();
 		}
 
@@ -203,12 +203,12 @@ void TitleScene::Update() {
 	case TitleSelectState::PlayerSelect:
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			selectState_ = TitleSelectState::WeaponSelect;
 		}
 
 		if (MyInput::Trigger(Action::CANCEL)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			selectState_ = TitleSelectState::Play;
 		}
 
@@ -216,7 +216,7 @@ void TitleScene::Update() {
 		case PlayerName::PowerMan:
 
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				playerName_ = PlayerName::TankMan;
 			}
 
@@ -224,11 +224,11 @@ void TitleScene::Update() {
 		case PlayerName::TankMan:
 
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				playerName_ = PlayerName::JumpMan;
 			}
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				playerName_ = PlayerName::PowerMan;
 			}
 
@@ -236,11 +236,11 @@ void TitleScene::Update() {
 		case PlayerName::JumpMan:
 
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				playerName_ = PlayerName::SpeedMan;
 			}
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				playerName_ = PlayerName::TankMan;
 			}
 
@@ -248,7 +248,7 @@ void TitleScene::Update() {
 		case PlayerName::SpeedMan:
 
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				playerName_ = PlayerName::JumpMan;
 			}
 
@@ -262,119 +262,119 @@ void TitleScene::Update() {
 	case TitleSelectState::WeaponSelect:
 
 		if (MyInput::Trigger(Action::CONFIRM)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			selectState_ = TitleSelectState::Confirmed;
 		}
 
 		if (MyInput::Trigger(Action::CANCEL)) {
-			MyAudio::PlaySE(SE_List::Confirm);
+			MyAudio::Play(SE_List::Confirm);
 			selectState_ = TitleSelectState::PlayerSelect;
 		}
 
 		switch (weaponName_) {
 		case WeaponName::FireBall:
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Laser;
 			}
 			if (MyInput::Trigger(Action::SELECT_DOWN)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Boomerang;
 			}
 			break;
 		case WeaponName::Laser:
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Runa;
 			}
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::FireBall;
 			}
 			if (MyInput::Trigger(Action::SELECT_DOWN)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Dice;
 			}
 			break;
 		case WeaponName::Runa:
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Axe;
 			}
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Laser;
 			}
 			if (MyInput::Trigger(Action::SELECT_DOWN)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Toxic;
 			}
 			break;
 		case WeaponName::Axe:
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Runa;
 			}
 			if (MyInput::Trigger(Action::SELECT_DOWN)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Area;
 			}
 			break;
 		case WeaponName::Boomerang:
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Dice;
 			}
 			if (MyInput::Trigger(Action::SELECT_UP)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::FireBall;
 			}
 			if (MyInput::Trigger(Action::SELECT_DOWN)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Gun;
 			}
 			break;
 		case WeaponName::Dice:
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Toxic;
 			}
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Boomerang;
 			}
 			if (MyInput::Trigger(Action::SELECT_UP)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Laser;
 			}
 			break;
 		case WeaponName::Toxic:
 			if (MyInput::Trigger(Action::SELECT_RIGHT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Area;
 			}
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Dice;
 			}
 			if (MyInput::Trigger(Action::SELECT_UP)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Runa;
 			}
 			break;
 		case WeaponName::Area:
 			if (MyInput::Trigger(Action::SELECT_LEFT)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Toxic;
 			}
 			if (MyInput::Trigger(Action::SELECT_UP)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Axe;
 			}
 			break;
 		case WeaponName::Gun:
 			if (MyInput::Trigger(Action::SELECT_UP)) {
-				MyAudio::PlaySE(SE_List::Select);
+				MyAudio::Play(SE_List::Select);
 				weaponName_ = WeaponName::Boomerang;
 			}
 			break;
@@ -388,12 +388,12 @@ void TitleScene::Update() {
 
 		if (!fadeInTimer_.IsActive()) {
 			if (MyInput::Trigger(Action::CONFIRM)) {
-				MyAudio::PlaySE(SE_List::LockIn);
+				MyAudio::Play(SE_List::LockIn);
 				fadeInTimer_.Start(1.0f, false);
 			}
 
 			if (MyInput::Trigger(Action::CANCEL)) {
-				MyAudio::PlaySE(SE_List::Confirm);
+				MyAudio::Play(SE_List::Confirm);
 				selectState_ = TitleSelectState::WeaponSelect;
 			}
 		}
@@ -402,7 +402,7 @@ void TitleScene::Update() {
 			// GameSceneに選択したプレイヤーと武器を渡す
 			SetSelectedPlayerName(playerName_);
 			SetSelectedWeaponName(weaponName_);
-			MyAudio::StopBGM(BGM_List::Title);
+			MyAudio::Stop(BGM_List::Title);
 			ChangeScene(SCENE::GAME);
 		}
 
@@ -432,14 +432,14 @@ void TitleScene::Update() {
 	if (fadeInTimer_.IsActive()) {
 		fadeInTimer_.Update();
 		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, fadeInTimer_.GetProgress() });
-		MyAudio::SetBGMVolume(BGM_List::Title, titleBgmVolume_* fadeInTimer_.GetReverseProgress());
+		MyAudio::SetVolume(BGM_List::Title, titleBgmVolume_* fadeInTimer_.GetReverseProgress());
 	}
 
 	// フェードアウト（TitleScene開始時、徐々に透明に）
 	if (fadeOutTimer_.IsActive() && !fadeInTimer_.IsActive()) {
 		fadeOutTimer_.Update();
 		fadeBG_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f - fadeOutTimer_.GetProgress() });
-		MyAudio::SetBGMVolume(BGM_List::Title, titleBgmVolume_ * fadeInTimer_.GetProgress());
+		MyAudio::SetVolume(BGM_List::Title, titleBgmVolume_ * fadeInTimer_.GetProgress());
 	}
 
 	fadeBG_->Update();

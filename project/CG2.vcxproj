@@ -338,6 +338,7 @@
     <ClInclude Include="Engine\3d\Shadow\ShadowMapManager.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Audio\MyAudio.h" />
+    <ClInclude Include="Engine\Audio\AudioList.h" />
     <ClInclude Include="Engine\Camera\Frustum.h" />
     <ClInclude Include="Engine\Core\HeapManager\DescriptorAllocator.h" />
     <ClInclude Include="Engine\3d\Particles\Json\EmitterDataJson.h" />
@@ -481,6 +482,14 @@
   <ItemGroup>
     <None Include="docs\OffscreenRendering_Implementation.md" />
     <None Include="docs\ResultScreenWeaponStats.md" />
+    <None Include="Engine\0_Docs\Audio.md">
+      <SubType>
+      </SubType>
+    </None>
+    <None Include="Engine\0_Docs\temp.md">
+      <SubType>
+      </SubType>
+    </None>
     <None Include="Engine\3d\Particles\ParticleEmitterShapes_Usage.md" />
     <None Include="Engine\Audio\AudioDocs.md">
       <SubType>

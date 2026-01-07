@@ -103,7 +103,7 @@ int JarManager::BreakJar(const AABB& attackAABB, JarType& outJarType) {
 		if (jar->IsAlive()) {
 			if (Collision::IsHit(attackAABB, jar->GetAABBCollision())) {
 				outJarType = jar->GetJarType();
-				MyAudio::PlaySE(SE_List::Jar);
+				MyAudio::Play(SE_List::Jar);
 				return jar->Break();
 			}
 		}
@@ -114,7 +114,7 @@ int JarManager::BreakJar(const AABB& attackAABB, JarType& outJarType) {
 		if (jar->IsAlive()) {
 			if (Collision::IsHit(attackAABB, jar->GetAABBCollision())) {
 				outJarType = jar->GetJarType();
-				MyAudio::PlaySE(SE_List::Jar);
+				MyAudio::Play(SE_List::Jar);
 				return jar->Break();
 			}
 		}

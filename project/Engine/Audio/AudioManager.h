@@ -4,50 +4,7 @@
 #include <string>
 #include <array>
 #include "Data/Audio.h"
-
-enum class SE_List {
-    StartUp, 
-	Confirm, // 決定、キャンセル
-    Select,  // SELECT○○のとき 
-    LockIn,  // Titleのビルドを確定
-    Chest,   // free pay Chestを開けるとき
-    Jar,     // min,max Jarを壊すときの
-	PlayerDamage,  // Playerがダメージを受けたとき
-	Jump,    // ジャンプしたとき
-	Upgrade, // アップグレード時
-	ExpGet,  // 経験値取得時
-	PlayerDie, // Playerが死亡したとき
-
-	// Weapon を生成した時のSE
-    FireBall,  // ファイヤーボール
-    Laser,     // レーザー
-    Runa,      // ルナ
-    Axe,       // アックス
-    Boomerang, // ブーメラン
-    Dice,      // ダイス
-    Toxic,     // トキシック
-    Gun,       // ガン
-
-    // 敵のダメージ音
-    EnemyDamage1,
-    EnemyDamage2,
-    EnemyDamage3,
-    EnemyDamage4,
-    EnemyDamage5,
-
-    Count
-};
-
-enum class BGM_List {
-    Title = 0,
-	Game1,
-    Game2,
-	Game3,
-    Game4,
-    Game5,
-
-    Count
-};
+#include "AudioList.h"
 
 class AudioManager {
 public:
@@ -60,8 +17,8 @@ public:
     void Finalize();
 
     // 音源の事前読み込み
-    void LoadBGM(BGM_List bgm, const std::string& filePath, float volume = 1.0f);
-    void LoadSE(SE_List se, const std::string& filePath, float volume = 1.0f);
+    void Load(BGM_List bgm, const std::string& filePath, float volume = 1.0f);
+    void Load(SE_List se, const std::string& filePath, float volume = 1.0f);
 
 	// BGM制御
     void PlayBGM(BGM_List bgm, bool loop = true);

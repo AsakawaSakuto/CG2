@@ -99,7 +99,7 @@ void Player::Update() {
 	if (!upgradeManager_->IsUpgradeSelect() && isAlive_) {
 
 		if (status_.currentHP <= 0 && currentMotion_ != PlayerMotion::Die) {
-			MyAudio::PlaySE(SE_List::PlayerDie);
+			MyAudio::Play(SE_List::PlayerDie);
 			model_->SetMotion(PlayerMotion::Die, 0.0f, false);
 			currentMotion_ = PlayerMotion::Die;
 			isAlive_ = false;
@@ -505,7 +505,7 @@ void Player::Jump() {
 		if (status_.currentJumpCount < status_.jumpCanCount) {
 			status_.velocity_Y = status_.jumpPower;
 			status_.currentJumpCount++;
-			MyAudio::PlaySE(SE_List::Jump);
+			MyAudio::Play(SE_List::Jump);
 		}
 	}
 
@@ -1238,7 +1238,7 @@ void Player::TakeDamage(int damage) {
 		invincibilityTimer_.Start(2.0f, false); // 0.5秒の無敵時間
 		status_.currentHP -= damage;
 		
-		MyAudio::PlaySE(SE_List::PlayerDamage);
+		MyAudio::Play(SE_List::PlayerDamage);
 
 		// HPが0以下になったら0にクランプ
 		if (status_.currentHP < 0) {

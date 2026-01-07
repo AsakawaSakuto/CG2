@@ -13,15 +13,15 @@ public:
 			
 			int r = MyRand::Int(1, 5);
 			if (r == 1) {
-				MyAudio::PlaySE(SE_List::EnemyDamage1);
+				MyAudio::Play(SE_List::EnemyDamage1);
 			} else if (r == 2) {
-				MyAudio::PlaySE(SE_List::EnemyDamage2);
+				MyAudio::Play(SE_List::EnemyDamage2);
 			} else if (r == 3) {
-				MyAudio::PlaySE(SE_List::EnemyDamage3);
+				MyAudio::Play(SE_List::EnemyDamage3);
 			} else if (r == 4) {
-				MyAudio::PlaySE(SE_List::EnemyDamage4);
+				MyAudio::Play(SE_List::EnemyDamage4);
 			} else if (r == 5) {
-				MyAudio::PlaySE(SE_List::EnemyDamage5);
+				MyAudio::Play(SE_List::EnemyDamage5);
 			}
 
 			// HPが0以下になったら死亡コールバックを呼ぶ
