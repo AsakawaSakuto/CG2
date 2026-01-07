@@ -102,7 +102,7 @@ public:
 	/// <summary>
 	/// 半透明描画を有効/無効
 	/// </summary>
-	/// <param name="enable">ture/false</param>
+	/// <param name="enable">true/false</param>
 	void SetTransparent(bool enable) { useTransparent_ = enable; }
 
 	/// <summary>

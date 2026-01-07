@@ -103,6 +103,7 @@ void Sprite::Update() {
 }
 
 void Sprite::Draw() {
+	//Update();
 
 	// PSOManagerからRootSignatureとPSOを取得
 	auto& psoManager = PSOManager::GetInstance();
@@ -162,7 +163,7 @@ void Sprite::DrawImGui(const char* objectName) {
 	ImGui::Separator();
 
 	ImGui::Text("Transform");
-	ImGui::DragFloat2("translate", &transform2D_.translate.x, 1.f);
+	ImGui::DragFloat2("translate", &transform2D_.translate.x, 1.0f);
 	ImGui::DragFloat2("scale", &transform2D_.scale.x, 0.01f);
 	ImGui::DragFloat("rotate", &transform2D_.rotate, 0.01f);
 
@@ -182,7 +183,7 @@ void Sprite::DrawImGui(const char* objectName) {
 		SetAnchorPoint(static_cast<AnchorPoint>(currentAnchor));
 	}
 
-	ImGui::Separator();
+	/*ImGui::Separator();
 
 	ImGui::Text("MaterialEdit");
 	ImGui::DragFloat2("uvTranslate", &uvTransform_.translate.x, 0.01f);
@@ -195,7 +196,7 @@ void Sprite::DrawImGui(const char* objectName) {
 		uvTransform_.scale = { 1.0f,1.0f };
 		uvTransform_.rotate = 0.0f;
 		materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	}
+	}*/
 
 	ImGui::End();
 

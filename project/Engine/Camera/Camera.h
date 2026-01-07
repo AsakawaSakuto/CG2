@@ -20,7 +20,7 @@ public:
 
 	virtual void Update();
 
-	Matrix4x4 GetVeiwProjectionMatrix() const { return viewProjectionMatrix_; }
+	Matrix4x4 GetViewProjectionMatrix() const { return viewProjectionMatrix_; }
 
 	void SetPosition(const Vector3& position) { transform_.translate = position; }
 

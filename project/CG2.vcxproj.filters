@@ -261,6 +261,7 @@
     <ClInclude Include="Application\SceneManager\Scene\StartScene.h" />
     <ClInclude Include="Application\Ranking\RankingManager.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\EnemySpawnConfig.h" />
+    <ClInclude Include="Engine\Audio\AudioList.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -274,5 +275,8 @@
     <None Include="Engine\Utility\ImGui\README.md" />
     <None Include="Engine\Audio\AudioDocs.md" />
     <None Include="docs\ResultScreenWeaponStats.md" />
+    <None Include="Engine\0_Docs\Audio.md" />
+    <None Include="Engine\0_Docs\Sprite.md" />
+    <None Include="Engine\0_Docs\temp.md" />
   </ItemGroup>
 </Project>
