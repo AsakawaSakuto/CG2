@@ -91,7 +91,7 @@ void GameScene::Initialize() {
 	postEffect->GetParams().fog.fogColor[1] = 1.0f;
 	postEffect->GetParams().fog.fogColor[2] = 1.0f;
 
-	playTimer_.Start(600.0f, false);
+	playTimer_.Start(300.0f, false);
 
 	bgmNum_ = MyRand::Int(1, 5);
 	MyAudio::PlayBGM(static_cast<BGM_List>(bgmNum_), bgmVolume_);
@@ -109,7 +109,13 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	
-	if (player_->IsDie() || playTimer_.IsFinished()) {
+	// playTimer_が終了したらハードモードに移行
+	if (!isHardMode_ && playTimer_.IsFinished()) {
+		EnterHardMode();
+		gameSceneUI_->LastTimerStart();
+	}
+	
+	if (player_->IsDie()) {
 		// ランキングを保存（1回だけ）
 		if (!rankingSaved_) {
 			int killCount = player_->GetKillEnemyCount();
@@ -180,7 +186,7 @@ void GameScene::Update() {
 		}
 	}
 
-	if (!player_->IsDie() && !playTimer_.IsFinished()) {
+	if (!player_->IsDie()) {
 		if (!isPause_) {
 			if (MyInput::Trigger(Action::PAUSE)) {
 				pauseType_ = PauseType::Back;
@@ -302,7 +308,7 @@ void GameScene::Update() {
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	if (useFog_) {
+	/*if (useFog_) {
 		if (MyInput::TriggerKey(DIK_RETURN)) {
 			useFog_ = false;
 			postEffect->SetEnabled(false);
@@ -312,7 +318,7 @@ void GameScene::Update() {
 			useFog_ = true;
 			postEffect->SetEnabled(true);
 		}
-	}
+	}*/
 
 	// フェードイン（GameSceneへ遷移時、徐々に不透明に）
 	if (fadeInTimer_.IsActive()) {
@@ -768,4 +774,22 @@ void GameScene::TempMap() {
 	map3D_->SetTile(14, 5 - 3, 14, TileType::Normal);
 
 #pragma endregion
+}
+
+void GameScene::EnterHardMode() {
+	isHardMode_ = true;
+	
+	// ハードモード開始のSEを再生
+	MyAudio::PlaySE(SE_List::Confirm);
+	
+	// EnemyManagerにハードモードを通知し、既存の敵を全て倒す
+	if (enemyManager_) {
+		enemyManager_->SetHardMode(true);
+		enemyManager_->KillAllEnemiesForHardMode();
+	}
+	
+	// UIにハードモード開始を通知
+	if (gameSceneUI_) {
+		gameSceneUI_->SetHardMode(true);
+	}
 }

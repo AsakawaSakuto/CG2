@@ -27,6 +27,16 @@ void EnemyManager::UpdateSpawnConfig(int playerLevel) {
 		currentPlayerLevel_ = playerLevel;
 		spawnConfig_ = EnemySpawnConfig::CalculateFromPlayerLevel(playerLevel);
 		
+		// ハードモードの場合は追加で倍率をかける
+		if (isHardMode_) {
+			spawnConfig_.hpMultiplier *= 1.5f;
+			spawnConfig_.powerMultiplier *= 1.25f;
+			spawnConfig_.moveSpeedMultiplier *= 1.75f;
+			spawnConfig_.spawnInterval *= 0.5f; // スポーン間隔を短く
+			spawnConfig_.enemiesPerSpawn = static_cast<int>(spawnConfig_.enemiesPerSpawn * 1.5f);
+			spawnConfig_.maxEnemyCount = static_cast<int>(spawnConfig_.maxEnemyCount * 2.0f);
+		}
+		
 		// スポーン間隔を更新
 		spawnTimer_.Start(spawnConfig_.spawnInterval, true);
 	}
@@ -35,7 +45,18 @@ void EnemyManager::UpdateSpawnConfig(int playerLevel) {
 void EnemyManager::Update() {
 	// プレイヤーレベルを取得してスポーン設定を更新
 	if (player_) {
-		UpdateSpawnConfig(player_->GetLevel());
+		int currentLevel = player_->GetLevel();
+		// レベルが変わった場合、またはハードモードが有効化された直後にスポーン設定を強制更新
+		if (currentPlayerLevel_ != currentLevel) {
+			UpdateSpawnConfig(currentLevel);
+		}
+	}
+	
+	// ハードモード時、既存の敵にも色を適用
+	if (isHardMode_) {
+		for (auto& enemy : enemies_) {
+			enemy->SetHardModeColor(true);
+		}
 	}
 
 	if (enemies_.size() < static_cast<size_t>(spawnConfig_.maxEnemyCount)) {
@@ -53,6 +74,11 @@ void EnemyManager::Update() {
 					spawnConfig_.powerMultiplier,
 					spawnConfig_.moveSpeedMultiplier
 				);
+				
+				// ハードモード時は敵を赤みがかった色に
+				if (isHardMode_) {
+					enemy->SetHardModeColor(true);
+				}
 				
 				// Map3Dを設定
 				if (map_) {
@@ -237,4 +263,35 @@ void EnemyManager::CreateDamagePlane(const Vector3& position, int damage) {
 	auto damagePlane = std::make_unique<DamagePlane>();
 	damagePlane->Initialize(position, damage);
 	damagePlanes_.push_back(std::move(damagePlane));
+}
+
+void EnemyManager::KillAllEnemiesForHardMode() {
+	// 全ての生きている敵を倒す
+	for (auto& enemy : enemies_) {
+		if (enemy->IsAlive()) {
+			// 敵の位置にExpItemを生成
+			dieParticle_->Play(enemy->GetPosition(), false);
+			
+			auto expItem = std::make_unique<ExpItem>();
+			expItem->Initialize();
+			expItem->SetPosition(enemy->GetPosition());
+			// すぐにプレイヤーに向かって移動開始
+			expItem->StateChange();
+			expItems_.push_back(std::move(expItem));
+			
+			// 敵を倒す
+			enemy->Dead();
+		}
+	}
+	
+	// 死亡した敵を削除
+	enemies_.erase(
+		std::remove_if(enemies_.begin(), enemies_.end(),
+			[](const std::unique_ptr<Enemy>& enemy) { return !enemy->IsAlive(); }),
+		enemies_.end());
+	
+	// 既存のExpItemも移動状態に変更
+	for (auto& expItem : expItems_) {
+		expItem->StateChange();
+	}
 }

@@ -37,6 +37,9 @@ private:
 	void ChestUpdate();
 
 	void UIUpdate();
+	
+	// ハードモードへの移行
+	void EnterHardMode();
 
 	bool cameraDebugMode_ = false;
 
@@ -47,6 +50,8 @@ private:
 
 	ResultType resultType_ = ResultType::GoTitle;
 	bool resultDataUpdated_ = false; // リザルトデータが更新されたかどうか
+	
+	bool isHardMode_ = false; // ハードモードフラグ
 
 private:
 	int dangerLv_ = 0;

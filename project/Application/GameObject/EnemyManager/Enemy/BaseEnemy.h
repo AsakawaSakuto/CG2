@@ -61,8 +61,51 @@ public:
 	/// </summary>
 	float GetMoveSpeed() const { return status_.moveSpeed; }
 	
+	/// <summary>
+	/// ノックバックを適用
+	/// </summary>
+	/// <param name="direction">ノックバックの方向（正規化されたベクトル）</param>
+	/// <param name="force">ノックバックの強さ（デフォルト: 5.0f）</param>
+	void ApplyKnockback(const Vector3& direction, float force = 5.0f) {
+		knockbackVelocity_ = direction.Normalized() * force;
+		isKnockback_ = true;
+	}
+	
+	/// <summary>
+	/// ノックバック中かどうか
+	/// </summary>
+	bool IsKnockback() const { return isKnockback_; }
+	
+	/// <summary>
+	/// ノックバック速度を取得
+	/// </summary>
+	Vector3 GetKnockbackVelocity() const { return knockbackVelocity_; }
+	
+	/// <summary>
+	/// ノックバック速度を減衰させる
+	/// </summary>
+	void UpdateKnockback(float deltaTime) {
+		if (isKnockback_) {
+			// 減衰係数
+			float decayRate = 8.0f;
+			knockbackVelocity_ = knockbackVelocity_ * (1.0f - decayRate * deltaTime);
+			
+			// 速度が十分小さくなったらノックバック終了
+			float speed = std::sqrt(knockbackVelocity_.x * knockbackVelocity_.x + 
+			                        knockbackVelocity_.z * knockbackVelocity_.z);
+			if (speed < 0.1f) {
+				isKnockback_ = false;
+				knockbackVelocity_ = { 0.0f, 0.0f, 0.0f };
+			}
+		}
+	}
+	
 protected:
 	EnemyStatus status_;
 	GameTimer invicibilityTimer_;
 	std::function<void()> onDeathCallback_;
+	
+	// ノックバック関連
+	Vector3 knockbackVelocity_ = { 0.0f, 0.0f, 0.0f };
+	bool isKnockback_ = false;
 };

@@ -30,6 +30,11 @@ public:
 	void SetPauseType(PauseType type) { pauseType_ = type; }
 	void SetIsPaused(bool isPaused) { isPaused_ = isPaused; }
 	void SetResultType(ResultType type) { resultType_ = type; }
+	
+	/// <summary>
+	/// ハードモードを設定
+	/// </summary>
+	void SetHardMode(bool isHardMode) { isHardMode_ = isHardMode; }
 
 	/// <summary>
 	/// 武器アイコンを更新する
@@ -68,6 +73,13 @@ public:
 		}
 	}
 	
+	void LastTimerStart() {
+		if (!lastTimer_.IsActive() && !isLastDraw_) {
+			lastTimer_.Start(1.0f, false);
+			isLastDraw_ = true;
+		}
+	}
+
 	/// <summary>
 	/// リザルト画面の武器データを更新
 	/// </summary>
@@ -153,6 +165,9 @@ private:
 	
 	// 各スロットに武器が装備されているかどうか（リザルト画面用）
 	bool resultWeaponEquipped_[4] = { false, false, false, false };
+	
+	// ハードモードフラグ
+	bool isHardMode_ = false;
 
 	PauseType pauseType_ = PauseType::Back;
 	bool isPaused_ = false;
@@ -215,6 +230,10 @@ private:
 	std::unique_ptr<Sprite> text_;
 	std::unique_ptr<Sprite> text2_;
 	bool isTextDraw_ = true;
+
+	std::unique_ptr<Sprite> last_;
+	GameTimer lastTimer_;
+	bool isLastDraw_ = false;
 
 	// 各スロットに武器が装備されているかどうか
 	bool isWeaponEquipped_[4] = { false, false, false, false };

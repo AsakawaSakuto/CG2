@@ -68,6 +68,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 		status_.cooldownTime = 1.0f;
 		status_.intervalTime = 0.5f;
+		status_.sizeRate = 2.0f;
 		status_.damage = 5.0f;
 		status_.lifeTime = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
@@ -524,6 +525,7 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 
 			status_.cooldownTime = 1.0f;
 			status_.intervalTime = 0.5f;
+			status_.sizeRate = 2.0f;
 			status_.damage = 2.0f;
 			status_.lifeTime = 2.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);

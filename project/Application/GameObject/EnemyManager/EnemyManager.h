@@ -38,6 +38,21 @@ public:
 	/// 現在のスポーン設定を取得
 	/// </summary>
 	const EnemySpawnConfig& GetSpawnConfig() const { return spawnConfig_; }
+	
+	/// <summary>
+	/// ハードモードを設定
+	/// </summary>
+	void SetHardMode(bool isHardMode) { isHardMode_ = isHardMode; }
+	
+	/// <summary>
+	/// ハードモード中かどうか
+	/// </summary>
+	bool IsHardMode() const { return isHardMode_; }
+	
+	/// <summary>
+	/// ハードモード移行時に既存の敵を全て倒してExpItemをドロップさせる
+	/// </summary>
+	void KillAllEnemiesForHardMode();
 
 private:
 
@@ -64,4 +79,7 @@ private:
 	// レベルに応じたスポーン設定
 	EnemySpawnConfig spawnConfig_;
 	int currentPlayerLevel_ = 1;
+	
+	// ハードモードフラグ
+	bool isHardMode_ = false;
 };

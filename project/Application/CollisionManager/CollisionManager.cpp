@@ -150,6 +150,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
 					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 5.0f);
+					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
 						// この武器でキルカウントをインクリメント
@@ -195,6 +199,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 3.0f);
 					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
@@ -245,6 +253,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
 					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 4.0f);
+					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
 						// この武器でキルカウントをインクリメント
@@ -288,6 +300,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
 					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 4.5f);
+					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
 						// この武器でキルカウントをインクリメント
@@ -327,6 +343,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
 					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 3.5f);
+					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
 						// この武器でキルカウントをインクリメント
@@ -365,6 +385,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int damage = static_cast<int>(bullet->GetRandDamage() * player_->GetDamageRate());
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 6.0f);
 					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
@@ -406,6 +430,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
 					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 2.5f);
+					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
 						// この武器でキルカウントをインクリメント
@@ -438,6 +466,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int damage = static_cast<int>(area->GetDamage() * player_->GetDamageRate());
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（エリア中心から外側へ）
+					Vector3 knockbackDir = (enemySphere.center - areaPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 2.0f);
 					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
@@ -477,6 +509,10 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
 					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 7.0f);
 					
 					// 敵が倒されたかチェック
 					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {

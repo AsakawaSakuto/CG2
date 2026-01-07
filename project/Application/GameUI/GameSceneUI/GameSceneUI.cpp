@@ -163,6 +163,11 @@ void GameSceneUI::Initialize() {
 	text2_->Initialize("UI/game/Text2.png", { 640.0f,720.0f - 96.0f });
 	text2_->SetAnchorPoint(AnchorPoint::Center);
 	isTextDraw_ = true;
+	
+	last_ = make_unique<Sprite>();
+	last_->Initialize("UI/game/last.png", { -500.0f,360.0f });
+	last_->SetAnchorPoint(AnchorPoint::Center);
+	isLastDraw_ = false;
 
 	startTimer_.Start(2.0f, false);
 }
@@ -264,6 +269,12 @@ void GameSceneUI::Update() {
 	resultWeaponIcon4_->Update();
 	text_->Update();
 	text2_->Update();
+
+	lastTimer_.Update();
+	if (lastTimer_.IsActive()) {
+		last_->SetPosition(MyEasing::Lerp(Vector2{ -500.0f,360.0f }, { 1780.0f,360.0f }, lastTimer_.GetProgress(), EaseType::EaseOutInSine));
+	}
+	last_->Update();
 }
 
 void GameSceneUI::Draw() {
@@ -350,6 +361,7 @@ void GameSceneUI::Draw() {
 	}
 
 	startText_->Draw();
+	last_->Draw();
 }
 
 void GameSceneUI::DrawImGui() {

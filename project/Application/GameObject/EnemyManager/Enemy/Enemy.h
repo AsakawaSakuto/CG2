@@ -23,6 +23,12 @@ public:
 	void SetMap(Map3D* map) { map_ = map; }
 
 	bool IsActiveInvincibleTimer() const { return invicibilityTimer_.IsActive(); }
+	
+	/// <summary>
+	/// ハードモード時の色を設定
+	/// </summary>
+	void SetHardModeColor(bool isHardMode);
+	
 private:
 
     void Move();
@@ -57,4 +63,7 @@ private:
 	
 	// 移動方向（壁上昇判定用）
 	Vector3 moveDirection_ = { 0.0f, 0.0f, 0.0f };
+	
+	// ハードモードの色設定
+	bool isHardModeColor_ = false;
 };
