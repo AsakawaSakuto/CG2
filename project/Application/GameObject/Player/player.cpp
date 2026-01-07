@@ -215,12 +215,12 @@ void Player::Update() {
 		model_->Update(1.0f / 60.0f, transform_);
 	}
 
-	if (MyInput::TriggerKey(DIK_0)) {
+	/*if (MyInput::TriggerKey(DIK_0)) {
 		upgradeManager_->Upgrade();
 	}
 	if (MyInput::TriggerKey(DIK_9)) {
 		status_.currentHP -= 10;
-	}
+	}*/
 
 
 	MyDebugLine::AddShape(sphereCollision_);
