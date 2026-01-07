@@ -66,47 +66,85 @@ void UpgradeManager::Initialize() {
 
 void UpgradeManager::Update() {
 
+	// アップグレード選択が有効でない場合は何もしない
+	if (!isUpgrade_) {
+		return;
+	}
+
+	// アップグレード画面が開かれた直後のフレームは入力を無視
+	if (justOpened_) {
+		justOpened_ = false;
+		
+		// UIの更新のみ行う
+		UpdateUpgradeUI();
+		bg_->Update();
+		upgradeSelectText_->Update();
+		upgradeBG1_->Update();
+		upgradeBG2_->Update();
+		upgradeBG3_->Update();
+		upgradeIcon1_->Update();
+		upgradeIcon2_->Update();
+		upgradeIcon3_->Update();
+		upgradeName1_->Update();
+		upgradeName2_->Update();
+		upgradeName3_->Update();
+		newText1_->Update();
+		newText2_->Update();
+		newText3_->Update();
+		upgradeText1_->Update();
+		upgradeText2_->Update();
+		upgradeText3_->Update();
+		return;
+	}
+
 	switch (upgradeSelect_) {
 	case UpgradeSelect::Select1:
 
-		if (MyInput::Trigger(Action::CELECT_DOWN)) {
+		if (MyInput::Trigger(Action::SELECT_DOWN)) {
 			upgradeSelect_ = UpgradeSelect::Select2;
+			MyAudio::Play(SE_List::Select);
 		}
 
 		// この選択肢の強化をしてゲームを再開
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			ApplySelectedUpgrade();
 			isUpgrade_ = false;
+			MyAudio::Play(SE_List::Confirm);
 		}
 
 		break;
 	case UpgradeSelect::Select2:
 
-		if (MyInput::Trigger(Action::CELECT_DOWN)) {
+		if (MyInput::Trigger(Action::SELECT_DOWN)) {
 			upgradeSelect_ = UpgradeSelect::Select3;
+			MyAudio::Play(SE_List::Select);
 		}
 
-		if (MyInput::Trigger(Action::CELECT_UP)) {
+		if (MyInput::Trigger(Action::SELECT_UP)) {
 			upgradeSelect_ = UpgradeSelect::Select1;
+			MyAudio::Play(SE_List::Select);
 		}
 
 		// この選択肢の強化をしてゲームを再開
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			ApplySelectedUpgrade();
-		 isUpgrade_ = false;
+			isUpgrade_ = false;
+			MyAudio::Play(SE_List::Confirm);
 		}
 
 		break;
 	case UpgradeSelect::Select3:
 
-		if (MyInput::Trigger(Action::CELECT_UP)) {
+		if (MyInput::Trigger(Action::SELECT_UP)) {
 			upgradeSelect_ = UpgradeSelect::Select2;
+			MyAudio::Play(SE_List::Select);
 		}
 
 		// この選択肢の強化をしてゲームを再開
 		if (MyInput::Trigger(Action::CONFIRM)) {
 			ApplySelectedUpgrade();
-		 isUpgrade_ = false;
+			isUpgrade_ = false;
+			MyAudio::Play(SE_List::Confirm);
 		}
 
 		break;
@@ -187,10 +225,13 @@ void UpgradeManager::DrawImGui() {
 void UpgradeManager::Upgrade() {
 	upgradeSelect_ = UpgradeSelect::Select1;
 	isUpgrade_ = true;
-	
+	justOpened_ = true; // アップグレード画面が開かれた直後のフレームであることを記録
+
+	MyAudio::Play(SE_List::Upgrade);
+
 	// 3つのアップグレード選択肢を生成
 	GenerateUpgradeOptions();
-	
+
 	// UIを更新（背景色とアイコン）
 	// 新規武器の場合は白、強化の場合はレアリティ色
 	upgradeBG1_->SetColor(upgradeOptions_[0].type == UpgradeType::NewWeapon ? 

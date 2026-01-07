@@ -74,6 +74,7 @@ public:
 			status_.damage += 3.0f;
 			break;
 		}
+		status_.upgradeCount++;
 	}
 
 	/// <summary>
@@ -96,6 +97,7 @@ public:
 			status_.shotMaxCount += 2.0f;
 			break;
 		}
+		status_.upgradeCount++;
 	}
 
 	/// <summary>
@@ -118,6 +120,7 @@ public:
 			status_.sizeRate += 0.25f;
 			break;
 		}
+		status_.upgradeCount++;
 	}
 
 	/// <summary>
@@ -140,6 +143,7 @@ public:
 			status_.lifeTime += 2.0f;
 			break;
 		}
+		status_.upgradeCount++;
 	}
 
 	/// <summary>
@@ -162,6 +166,7 @@ public:
 			status_.penetrationCount += 3.0f;
 			break;
 		}
+		status_.upgradeCount++;
 	}
 
 	/// <summary>
@@ -184,7 +189,25 @@ public:
 			status_.bounceCount += 3.0f;
 			break;
 		}
+		status_.upgradeCount++;
 	}
+	
+	int GetUpgradeCount() const { return status_.upgradeCount; }
+
+	/// <summary>
+	/// この武器のキルカウントを取得
+	/// </summary>
+	int GetKillCount() const { return status_.killCount; }
+	
+	/// <summary>
+	/// この武器のキルカウントをインクリメント
+	/// </summary>
+	void IncrementKillCount() { status_.killCount++; }
+
+	/// <summary>
+	/// 武器ステータスへの参照を取得（デバッグ用）
+	/// </summary>
+	const WeaponStatus& GetStatus() const { return status_; }
 private:
 
 	void FireBallUpdate();

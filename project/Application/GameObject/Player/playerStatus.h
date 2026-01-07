@@ -17,7 +17,7 @@ struct PlayerStatus {
 
 	// 経験値関連
 	int currentExp = 0;       // 現在の経験値
-	int expToNextLevel = 100; // 次のレベルまでに必要な経験値
+	int expToNextLevel = 25; // 次のレベルまでに必要な経験値
 	int level = 1;            // 現在のレベル
 	int nowMoney = 0;         // 所持金
 

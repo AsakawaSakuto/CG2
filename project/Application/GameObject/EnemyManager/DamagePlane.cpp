@@ -12,6 +12,77 @@
 // 80-89 "resources/image/number/80-89.png"
 // 90-99 "resources/image/number/90-99.png"
 
+/// <summary>
+/// ダメージ値に応じた色を計算（1-10のまとまりごとに薄いオレンジから赤へ）
+/// </summary>
+/// <param name="damage">ダメージ値（0-99）</param>
+/// <returns>RGB色（Vector3）</returns>
+Vector3 CalculateDamageColor(int damage) {
+	// 10の位を取得（0-9）
+	int tensDigit = damage / 10;
+	
+	// 10のまとまりごとに色を変化させる
+	// 0-9:   薄いオレンジ (1.0, 0.8, 0.6)
+	// 10-19: オレンジ     (1.0, 0.7, 0.4)
+	// 20-29: 濃いオレンジ (1.0, 0.6, 0.2)
+	// 30-39: オレンジ赤   (1.0, 0.5, 0.1)
+	// 40-49: 赤オレンジ   (1.0, 0.4, 0.0)
+	// 50-59: 赤           (1.0, 0.3, 0.0)
+	// 60-69: 濃い赤       (1.0, 0.2, 0.0)
+	// 70-79: より濃い赤   (1.0, 0.1, 0.0)
+	// 80-89: 深紅         (1.0, 0.05, 0.0)
+	// 90-99: 真紅         (1.0, 0.0, 0.0)
+	
+	float greenValue = 0.0f;
+	float blueValue = 0.0f;
+	
+	switch (tensDigit) {
+	case 0:
+		greenValue = 0.8f;
+		blueValue = 0.6f;
+		break;
+	case 1:
+		greenValue = 0.7f;
+		blueValue = 0.4f;
+		break;
+	case 2:
+		greenValue = 0.6f;
+		blueValue = 0.2f;
+		break;
+	case 3:
+		greenValue = 0.5f;
+		blueValue = 0.1f;
+		break;
+	case 4:
+		greenValue = 0.4f;
+		blueValue = 0.0f;
+		break;
+	case 5:
+		greenValue = 0.3f;
+		blueValue = 0.0f;
+		break;
+	case 6:
+		greenValue = 0.2f;
+		blueValue = 0.0f;
+		break;
+	case 7:
+		greenValue = 0.1f;
+		blueValue = 0.0f;
+		break;
+	case 8:
+		greenValue = 0.05f;
+		blueValue = 0.0f;
+		break;
+	case 9:
+	default:
+		greenValue = 0.0f;
+		blueValue = 0.0f;
+		break;
+	}
+	
+	return Vector3(1.0f, greenValue, blueValue);
+}
+
 void DamagePlane::Initialize(Vector3 pos, int damage) {
 	damage_ = std::clamp(damage, 0, 99);
 
@@ -19,6 +90,10 @@ void DamagePlane::Initialize(Vector3 pos, int damage) {
 	model_->Initialize("enemy/DamagePlane.obj");
 	model_->SetBillboard(true);
 	model_->UseLight(false);
+
+	// ダメージに応じた色を設定
+	Vector3 damageColor = CalculateDamageColor(damage_);
+	model_->SetColor3(damageColor);
 
 	// ダメージに応じたテクスチャファイルとUV座標を決定
 	std::string texturePath;

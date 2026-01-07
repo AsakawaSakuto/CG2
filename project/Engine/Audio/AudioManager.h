@@ -4,26 +4,7 @@
 #include <string>
 #include <array>
 #include "Data/Audio.h"
-
-enum class SE_List {
-    KAWAII,
-    OU,
-    DON,
-    KIRAKIRA,
-
-    Count
-};
-
-enum class BGM_List {
-    Title,
-	Game1,
-    Game2,
-	Game3,
-    Game4,
-    Game5,
-
-    Count
-};
+#include "AudioList.h"
 
 class AudioManager {
 public:
@@ -36,15 +17,16 @@ public:
     void Finalize();
 
     // 音源の事前読み込み
-    void LoadBGM(BGM_List bgm, const std::string& filePath);
-    void LoadSE(SE_List se, const std::string& filePath);
+    void Load(BGM_List bgm, const std::string& filePath, float volume = 1.0f);
+    void Load(SE_List se, const std::string& filePath, float volume = 1.0f);
 
 	// BGM制御
-    void PlayBGM(BGM_List bgm, float volume = 1.0f, bool loop = true);
+    void PlayBGM(BGM_List bgm, bool loop = true);
     void StopBGM(BGM_List bgm);
 
 	// SE制御
-    void PlaySE(SE_List se, float volume = 1.0f, bool loop = false);
+    void PlaySE(SE_List se, bool loop = false);
+	void StopSE(SE_List se);
 
 	void StopAllBGM();
     void StopAllSE();
@@ -61,6 +43,14 @@ public:
 
     void SetBgmMasterVolume(float volume) { BGM_MasterVolume = volume; };
 	void SetSeMasterVolume(float volume) { SE_MasterVolume = volume; };
+
+	float GetBgmMasterVolume() const { return BGM_MasterVolume; };
+	float GetSeMasterVolume() const { return SE_MasterVolume; };
+
+    // 個別の音量を設定（BGM / SE 列挙値と個別音量）
+    void SetBGMVolume(BGM_List bgm, float volume);
+    void SetSEVolume(SE_List se, float volume);
+
 private:
     AudioManager() = default;
     AudioManager(const AudioManager&) = delete;
@@ -75,8 +65,8 @@ private:
     std::array<float, static_cast<size_t>(SE_List::Count)> seVolumeArray_;
 
     // 音量管理
-    float BGM_MasterVolume = 1.0f;
-    float SE_MasterVolume = 1.0f;
+    float BGM_MasterVolume = 0.5f;
+    float SE_MasterVolume =  0.5f;
 
     // フェード制御
     bool isFading_ = false;

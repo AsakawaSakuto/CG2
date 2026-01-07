@@ -1,0 +1,86 @@
+#include "RankingManager.h"
+#include <algorithm>
+#include <filesystem>
+
+RankingManager::RankingManager() {
+	// ランキングを0で初期化
+	rankings_.fill(0);
+	
+	// BinaryManagerを初期化
+	binaryManager_ = std::make_unique<BinaryManager>();
+	binaryManager_->SetBasePath("resources/Data/Binary/");
+}
+
+void RankingManager::Load() {
+	// ファイルからランキングを読み込む
+	auto values = binaryManager_->Read(fileName_);
+	
+	if (values.empty()) {
+		// ファイルが存在しない場合は初期値のまま
+		rankings_.fill(0);
+		return;
+	}
+	
+	// 読み込んだ値を順番に取得
+	for (size_t i = 0; i < kMaxRankings && i < values.size(); ++i) {
+		rankings_[i] = BinaryManager::Reverse<int>(values[i]);
+	}
+}
+
+void RankingManager::Save() {
+	// ファイルに書き込む
+	for (int i = 0; i < kMaxRankings; ++i) {
+		binaryManager_->RegistOutput(rankings_[i], "rank" + std::to_string(i + 1));
+	}
+	
+	binaryManager_->Write(fileName_);
+}
+
+int RankingManager::RegisterScore(int killCount) {
+	// スコアが0以下の場合は登録しない
+	if (killCount <= 0) {
+		return 0;
+	}
+	
+	// 3位のスコアより低い場合はランク外
+	if (killCount <= rankings_[kMaxRankings - 1]) {
+		return 0;
+	}
+	
+	// 新しいスコアを適切な位置に挿入
+	// まず、どの位置に挿入すべきかを探す
+	int insertPosition = kMaxRankings - 1; // デフォルトは最下位
+	
+	for (int i = 0; i < kMaxRankings; ++i) {
+		if (killCount > rankings_[i]) {
+			insertPosition = i;
+			break;
+		}
+	}
+	
+	// 挿入位置から下の要素を1つずつ下にずらす
+	for (int i = kMaxRankings - 1; i > insertPosition; --i) {
+		rankings_[i] = rankings_[i - 1];
+	}
+	
+	// 新しいスコアを挿入
+	rankings_[insertPosition] = killCount;
+	
+	// 保存
+	Save();
+	
+	// 挿入した順位を返す（1-indexed）
+	return insertPosition + 1;
+}
+
+int RankingManager::GetScore(int rank) const {
+	if (rank < 1 || rank > kMaxRankings) {
+		return 0;
+	}
+	return rankings_[rank - 1];
+}
+
+void RankingManager::SortRankings() {
+	// 降順にソート（1位が最も大きい値）
+	std::sort(rankings_.begin(), rankings_.end(), std::greater<int>());
+}

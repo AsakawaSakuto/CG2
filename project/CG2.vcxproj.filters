@@ -102,6 +102,12 @@
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Boomerang\Boomerang.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Dice\Dice.cpp" />
     <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.cpp" />
+    <ClCompile Include="Application\GameObject\EnemyManager\DamagePlane.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.cpp" />
+    <ClCompile Include="Application\GameObject\Player\WeaponManager\Weapon\Gun\Gun.cpp" />
+    <ClCompile Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.cpp" />
+    <ClCompile Include="Application\SceneManager\Scene\StartScene.cpp" />
+    <ClCompile Include="Application\Ranking\RankingManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -246,6 +252,15 @@
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Boomerang\Boomerang.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Dice\Dice.h" />
     <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Toxic\Toxic.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\DamagePlane.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Area\Area.h" />
+    <ClInclude Include="Application\GameObject\Player\WeaponManager\Weapon\Gun\Gun.h" />
+    <ClInclude Include="Application\GameObject\Rarity.h" />
+    <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeManager.h" />
+    <ClInclude Include="Application\GameObject\Player\UpgradeManager\UpgradeType.h" />
+    <ClInclude Include="Application\SceneManager\Scene\StartScene.h" />
+    <ClInclude Include="Application\Ranking\RankingManager.h" />
+    <ClInclude Include="Application\GameObject\EnemyManager\EnemySpawnConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />
@@ -258,10 +273,6 @@
     <None Include="Engine\Utility\ImGui\INTEGRATION_GUIDE.md" />
     <None Include="Engine\Utility\ImGui\README.md" />
     <None Include="Engine\Audio\AudioDocs.md" />
-    <None Include="docs\WeaponCollisionFix.md" />
-    <None Include="docs\EnemyKillCountSystem.md" />
-    <None Include="docs\WeaponEquipmentSystem.md" />
-    <None Include="docs\DiceWeaponIntegration.md" />
-    <None Include="docs\ToxicWeaponIntegration.md" />
+    <None Include="docs\ResultScreenWeaponStats.md" />
   </ItemGroup>
 </Project>

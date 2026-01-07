@@ -25,8 +25,8 @@ void MaxJar::Initialize(Vector3 pos) {
 	aabbCollision_.max = {  1.2f, 1.0f,  1.2f };
 
 	// ドロップアイテム設定
-	dropExpMin_ = 5;
-	dropExpMax_ = 10;
+	dropExpMin_ = 10;
+	dropExpMax_ = 20;
 
 	dropMoneyMin_ = 10;
 	dropMoneyMax_ = 20;

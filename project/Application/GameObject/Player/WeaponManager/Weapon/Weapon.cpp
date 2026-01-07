@@ -9,19 +9,28 @@ void Weapon::Initialize(WeaponName weaponName) {
 	{
 	case WeaponName::FireBall:
 
+		status_.cooldownTime = 1.0f;
+		status_.intervalTime = 0.5f;
+		status_.damage = 15.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Laser:
 
-		status_.penetrationCount = 2.0f;
+		status_.cooldownTime = 1.05;
+		status_.intervalTime = 0.25f;
+		status_.damage = 10.0f;
+		status_.penetrationCount = 3.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Runa:
 
+		status_.cooldownTime = 1.5f;
+		status_.intervalTime = 0.25f;
+		status_.damage = 10.0f;
 		status_.bounceCount = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -29,25 +38,38 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 	case WeaponName::Axe:
 
-		status_.lifeTime = 1.0f;
+		status_.cooldownTime = 1.5f;
+		status_.intervalTime = 0.5f;
+		status_.damage = 5.0f;
+		status_.lifeTime = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Boomerang:
 
+		status_.cooldownTime = 2.0f;
+		status_.intervalTime = 0.25f;
+		status_.damage = 5.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Dice:
 
+		status_.cooldownTime = 10.0f;
+		status_.intervalTime = 0.2f;
+		status_.damage = 1.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
 		break;
 
 	case WeaponName::Toxic:
 
+		status_.cooldownTime = 1.0f;
+		status_.intervalTime = 0.5f;
+		status_.sizeRate = 2.0f;
+		status_.damage = 5.0f;
 		status_.lifeTime = 2.0f;
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -56,6 +78,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 	case WeaponName::Area:
 		
 		// Areaは初期化時に生成
+		status_.damage = 3.0f;
 		area_ = std::make_unique<Area>();
 		area_->Initialize();
 		area_->SetDamage(status_.damage);
@@ -64,6 +87,10 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 	case WeaponName::Gun:
 
+		status_.cooldownTime = 2.5f;
+		status_.intervalTime = 0.2f;
+		status_.damage = 5.0f;
+		status_.shotMaxCount = 5.0f;
 		status_.useRandomTarget = true; // Gunはランダムターゲット選択を使用
 		coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -150,7 +177,10 @@ void Weapon::FireBallUpdate() {
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		fireBall_.push_back(std::move(bullet));
+
+		MyAudio::Play(SE_List::FireBall);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -185,7 +215,10 @@ void Weapon::LaserUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetPenetrationCount(static_cast<int>(status_.penetrationCount));
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		laser_.push_back(std::move(bullet));
+
+		MyAudio::Play(SE_List::Laser);
 
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
@@ -218,7 +251,11 @@ void Weapon::RunaUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetBounceCount(static_cast<int>(status_.bounceCount));
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		runa_.push_back(std::move(bullet));
+
+		MyAudio::Play(SE_List::Runa);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -249,7 +286,11 @@ void Weapon::AxeUpdate() {
 		bullet->SetDamage(status_.damage);
 		bullet->SetLifeTime(status_.lifeTime);
 		bullet->SetScaleRate(status_.sizeRate);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		axe_.push_back(std::move(bullet));
+
+		MyAudio::Play(SE_List::Axe);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -279,7 +320,11 @@ void Weapon::BoomerangUpdate() {
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
 		bullet->SetScaleRate(status_.sizeRate);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		boomerang_.push_back(std::move(bullet));
+
+		MyAudio::Play(SE_List::Boomerang);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -308,7 +353,11 @@ void Weapon::DiceUpdate() {
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
 		bullet->SetDirectionToEnemy(directionToEnemy_);
 		bullet->SetDamage(status_.damage);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		dice_.push_back(std::move(bullet));
+
+		MyAudio::Play(SE_List::Dice);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -340,7 +389,11 @@ void Weapon::ToxicUpdate() {
 		bullet->SetDamage(status_.damage);
 		bullet->SetScaleMultipler(status_.sizeRate);
 		bullet->SetLifeTime(status_.lifeTime);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		toxic_.push_back(std::move(bullet));
+
+		MyAudio::Play(SE_List::Toxic);
+
 		status_.shotNowCount++;
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
@@ -362,6 +415,7 @@ void Weapon::AreaUpdate() {
 		area_->SetPosition(playerPosition_);
 		area_->SetDamage(status_.damage);
 		area_->SetScaleMultipler(status_.sizeRate);
+		area_->SetWeaponName(weaponName_); // 武器の種類を設定
 		area_->Update();
 	}
 }
@@ -378,15 +432,19 @@ void Weapon::GunUpdate() {
 		auto bullet = std::make_unique<Gun>();
 		bullet->Initialize();
 		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		// ランダムターゲット選択が有効な場合はrandomDirectionToEnemy_を使用
+		// ランダムターゲット選択が有効な場合は Random DirectionToEnemy_を使用
 		if (status_.useRandomTarget) {
 			bullet->SetDirectionToEnemy(randomDirectionToEnemy_);
 		} else {
 			bullet->SetDirectionToEnemy(directionToEnemy_);
 		}
 		bullet->SetDamage(status_.damage);
+		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
 		gun_.push_back(std::move(bullet));
 		status_.shotNowCount++;
+
+		MyAudio::Play(SE_List::Gun);
+
 		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
 			status_.shotNowCount = 0;
 			intervalTimer_.Reset();
@@ -408,19 +466,28 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 		{
 		case WeaponName::FireBall:
 
+			status_.cooldownTime = 1.0f;
+			status_.intervalTime = 0.5f;
+			status_.damage = 10.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Laser:
 
-			status_.penetrationCount = 2.0f;
+			status_.cooldownTime = 2.0f;
+			status_.intervalTime = 0.25f;
+			status_.damage = 7.0f;
+			status_.penetrationCount = 3.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Runa:
 
+			status_.cooldownTime = 2.0f;
+			status_.intervalTime = 0.25f;
+			status_.damage = 8.0f;
 			status_.bounceCount = 2.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -428,25 +495,38 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 
 		case WeaponName::Axe:
 
-			status_.lifeTime = 1.0f;
+			status_.cooldownTime = 1.5f;
+			status_.intervalTime = 0.5f;
+			status_.damage = 5.0f;
+			status_.lifeTime = 2.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Boomerang:
 
+			status_.cooldownTime = 2.0f;
+			status_.intervalTime = 0.25f;
+			status_.damage = 3.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Dice:
 
+			status_.cooldownTime = 1.0f;
+			status_.intervalTime = 0.2f;
+			status_.damage = 1.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
 			break;
 
 		case WeaponName::Toxic:
 
+			status_.cooldownTime = 1.0f;
+			status_.intervalTime = 0.5f;
+			status_.sizeRate = 2.0f;
+			status_.damage = 2.0f;
 			status_.lifeTime = 2.0f;
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
@@ -455,6 +535,7 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 		case WeaponName::Area:
 
 			// Areaは初期化時に生成
+			status_.damage = 3.0f;
 			area_ = std::make_unique<Area>();
 			area_->Initialize();
 			area_->SetDamage(status_.damage);
@@ -463,11 +544,13 @@ void Weapon::SetWeaponName(WeaponName weapon) {
 
 		case WeaponName::Gun:
 
+			status_.cooldownTime = 2.5f;
+			status_.intervalTime = 0.2f;
+			status_.damage = 3.0f;
+			status_.shotMaxCount = 5.0f;
 			status_.useRandomTarget = true; // Gunはランダムターゲット選択を使用
 			coolDownTimer_.Start(status_.cooldownTime, false);
 
-			break;
-		default:
 			break;
 		}
 	}

@@ -24,11 +24,11 @@ void MinJar::Initialize(Vector3 pos) {
 	aabbCollision_.max = { 1.2f, 1.0f,  1.2f };
 
 	// ドロップアイテム設定
-	dropExpMin_   = 5;
-	dropExpMax_   = 10;
+	dropExpMin_   = 1;
+	dropExpMax_   = 9;
 
-	dropMoneyMin_ = 5;
-	dropMoneyMax_ = 10;
+	dropMoneyMin_ = 1;
+	dropMoneyMax_ = 9;
 
 	if (MyRand::Int(0, 1) == 0) {
 		jarType_ = JarType::Exp;

@@ -15,11 +15,14 @@ enum class Action {
 	INTERACT,
 	CROUCHING,
 
+	R,
+	Y,
+
 	// セレクト
-	CELECT_UP,
-	CELECT_DOWN,
-	CELECT_LEFT,
-	CELECT_RIGHT,
+	SELECT_UP,
+	SELECT_DOWN,
+	SELECT_LEFT,
+	SELECT_RIGHT,
 
 	// 移動
 	MOVE_UP,

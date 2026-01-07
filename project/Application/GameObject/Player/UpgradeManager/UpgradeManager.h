@@ -94,6 +94,9 @@ private:
 private:
 	// アップグレード選択中かどうか
 	bool isUpgrade_ = false;
+	
+	// アップグレード画面が開かれた直後のフレームかどうか
+	bool justOpened_ = false;
 
 	UpgradeSelect upgradeSelect_ = UpgradeSelect::Select1;
 

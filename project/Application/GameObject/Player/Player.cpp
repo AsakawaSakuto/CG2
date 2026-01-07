@@ -25,7 +25,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 		status_.damageRate = 1.2f; // ダメージ倍率アップ
 		break;
 	case PlayerName::TankMan:
-		status_.maxHP = 150;      // 最大体力アップ
+		status_.maxHP = 200;      // 最大体力アップ
 		break;
 	case PlayerName::JumpMan:
 		status_.jumpCanCount = 2; // ジャンプ回数アップ
@@ -52,6 +52,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	Animation crouching = LoadAnimationFile("Player/Animation/Crouching.gltf");
 	Animation jump =      LoadAnimationFile("Player/Animation/jump.gltf");
 	Animation landing =   LoadAnimationFile("Player/Animation/landing.gltf");
+	Animation die =       LoadAnimationFile("Player/Animation/die.gltf");
 
 	std::map<PlayerMotion, Animation> animationMap;
 	animationMap[PlayerMotion::Idle] =      idle;
@@ -60,6 +61,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	animationMap[PlayerMotion::Crouching] = crouching;
 	animationMap[PlayerMotion::Jump] =      jump;
 	animationMap[PlayerMotion::Landing] =   landing;
+	animationMap[PlayerMotion::Die] =       die;
 
 	// AnimationControllerを作成してから初期化
 	model_ = std::make_unique<AnimationController>();
@@ -86,11 +88,48 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	upgradeManager_->Initialize();
 	// UpgradeManagerにWeaponManagerを設定
 	upgradeManager_->SetWeaponManager(weaponManager_.get());
+
+	healingTimer_.Start(6.0f, true);
+
+	isDie_ = false;
 }
 
 void Player::Update() {
 
-	if (!upgradeManager_->IsUpgradeSelect()) {
+	if (!upgradeManager_->IsUpgradeSelect() && isAlive_) {
+
+		if (status_.currentHP <= 0 && currentMotion_ != PlayerMotion::Die) {
+			MyAudio::Play(SE_List::PlayerDie);
+			model_->SetMotion(PlayerMotion::Die, 0.0f, false);
+			currentMotion_ = PlayerMotion::Die;
+			isAlive_ = false;
+		}
+
+		if (!isAlive_) {
+			return;
+		}
+
+		if (transform_.translate.y <= -10.0f) {
+			transform_.translate = startPos_;
+		}
+
+		if (MyInput::Push(Action::Y)) {
+			comeBackTimer_ += deltaTime_;
+			MyInput::SetVibration(1.0f, 1.0f, 0.1f);
+
+			if (comeBackTimer_ >= 5.0f) {
+				comeBackTimer_ = 0.0f;
+				transform_.translate = startPos_;
+			}
+		} else {
+			comeBackTimer_ = 0.0f;
+		}
+
+		if (healingTimer_.IsFinished()) {
+			status_.currentHP++;
+		}
+		status_.currentHP = std::clamp(status_.currentHP, 0, status_.maxHP);
+		healingTimer_.Update();
 
 		Move();
 		Jump();
@@ -117,8 +156,6 @@ void Player::Update() {
 
 		expGetRangeTransform_.translate = transform_.translate;
 		expGetRangeTransform_.scale = { 7.0f, 1.0f, 7.0f };
-
-		model_->Update(1.0f / 60.0f, transform_);
 
 		// 影のY座標を地面の高さに設定
 		if (map_) {
@@ -168,11 +205,23 @@ void Player::Update() {
 		}
 	}
 
-	if (MyInput::TriggerKey(DIK_0)) {
-		upgradeManager_->Upgrade();
+	upgradeManager_->Update();
+
+	if (!isDie_) {
+		if (currentMotion_ == PlayerMotion::Die && model_->GetAnimationProgress() >= 0.95f) {
+			isDie_ = true;
+		}
+
+		model_->Update(1.0f / 60.0f, transform_);
 	}
 
-	upgradeManager_->Update();
+	/*if (MyInput::TriggerKey(DIK_0)) {
+		upgradeManager_->Upgrade();
+	}
+	if (MyInput::TriggerKey(DIK_9)) {
+		status_.currentHP -= 10;
+	}*/
+
 
 	MyDebugLine::AddShape(sphereCollision_);
 	Circle expCircle = {};
@@ -203,22 +252,45 @@ void Player::Draw(Camera camera) {
 
 void Player::DrawImGui() {
 #ifdef USE_IMGUI
-	// プレイヤー固有のImGui
-	ImGui::Begin("Player Settings");
-	ImGui::DragFloat("Move Speed", &status_.moveSpeed, 0.1f, 0.1f, 20.0f);
-	ImGui::DragFloat3("Position", &transform_.translate.x, 0.1f);
-	ImGui::DragFloat3("Rotation", &transform_.rotate.x, 0.01f);
-
-	// ジャンプ設定
+	ImGui::Begin("Player Status");
+	
+	// 基本ステータス表示
+	ImGui::Text("Level: %d", status_.level);
+	ImGui::Text("HP: %d / %d", status_.currentHP, status_.maxHP);
+	ImGui::Text("Exp: %d / %d", status_.currentExp, status_.expToNextLevel);
+	ImGui::Text("Money: %d", status_.nowMoney);
+	ImGui::Text("Total Kills: %d", status_.killEnemyCount);
+	
 	ImGui::Separator();
-	ImGui::Text("Jump Settings");
-	ImGui::DragInt("Jump Can Count", &status_.jumpCanCount, 1, 1, 5);
-	ImGui::DragFloat("Jump Power", &status_.jumpPower, 0.1f, 1.0f, 20.0f);
-	ImGui::DragFloat("Gravity", &status_.gravity, 0.1f, 1.0f, 50.0f);
-	ImGui::DragFloat("Ground Level", &groundLevel_, 0.1f, -10.0f, 10.0f);
-	ImGui::Text("Current Jump Count: %d / %d", status_.currentJumpCount, status_.jumpCanCount);
-	ImGui::Text("Is Grounded: %s", isGrounded_ ? "Yes" : "No");
-	ImGui::Text("Velocity Y: %.2f", status_.velocity_Y);
+	
+	// 武器別キルカウント表示
+	ImGui::Text("Weapon Kill Counts:");
+	
+	// 各武器のキルカウントを表示
+	const char* weaponNames[] = {
+		"None", "FireBall", "Laser", "Runa", "Axe", 
+		"Boomerang", "Dice", "Toxic", "Area", "Gun"
+	};
+	
+	for (int i = 0; i < static_cast<int>(WeaponName::Count); ++i) {
+		WeaponName weaponName = static_cast<WeaponName>(i);
+		int killCount = GetWeaponKillCount(weaponName);
+		
+		// キルカウントが0より大きい武器のみ表示
+		if (killCount > 0) {
+			ImGui::Text("  %s: %d kills", weaponNames[i], killCount);
+		}
+		
+		// 現在装備している武器かチェック
+		if (HasWeapon(weaponName) && weaponName != WeaponName::None) {
+			ImGui::SameLine();
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, " (Equipped)");
+		}
+	}
+	
+	ImGui::Separator();
+	ImGui::Text("Total Weapon Kills: %d", GetTotalWeaponKillCount());
+	
 	ImGui::End();
 #endif
 	//landingParticle_->DrawImGui("move Particle");
@@ -227,6 +299,7 @@ void Player::DrawImGui() {
 }
 
 void Player::Move() {
+
 	// KeyConfigを使って移動入力を取得
 	InputManager::Vector2D moveInput = { 0.0f, 0.0f };
 	
@@ -432,6 +505,7 @@ void Player::Jump() {
 		if (status_.currentJumpCount < status_.jumpCanCount) {
 			status_.velocity_Y = status_.jumpPower;
 			status_.currentJumpCount++;
+			MyAudio::Play(SE_List::Jump);
 		}
 	}
 
@@ -1164,6 +1238,8 @@ void Player::TakeDamage(int damage) {
 		invincibilityTimer_.Start(2.0f, false); // 0.5秒の無敵時間
 		status_.currentHP -= damage;
 		
+		MyAudio::Play(SE_List::PlayerDamage);
+
 		// HPが0以下になったら0にクランプ
 		if (status_.currentHP < 0) {
 			status_.currentHP = 0;

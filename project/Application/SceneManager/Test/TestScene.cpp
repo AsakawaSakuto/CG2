@@ -66,19 +66,6 @@ void TestScene::Initialize() {
 
 void TestScene::Update() {
 
-    if (MyInput::TriggerKey(DIK_1)) {
-        MyAudio::PlaySE(SE_List::KAWAII, 0.1f);
-    }
-    if (MyInput::TriggerKey(DIK_2)) {
-        MyAudio::PlaySE(SE_List::OU, 0.1f);
-    }
-    if (MyInput::TriggerKey(DIK_3)) {
-        MyAudio::PlaySE(SE_List::KIRAKIRA, 0.1f);
-    }
-    if (MyInput::TriggerKey(DIK_4)) {
-        MyAudio::PlaySE(SE_List::DON, 0.1f);
-    }
-
     Vector3 start = { 0.0f, 0.0f, 0.0f };
     Vector3 end = { 1.0f, 1.0f, 1.0f };
     Line line = { walkTransform_.translate, sneakWalkTransform_.translate };

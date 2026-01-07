@@ -3,12 +3,12 @@
   {
     "name": "position",
     "type": 16,
-    "value": [185, 120]
+    "value": [26, 134]
   },
   {
     "name": "scale",
     "type": 16,
-    "value": [0.5, 0.5]
+    "value": [0.25, 0.25]
   },
   {
     "name": "rotate",
@@ -38,12 +38,12 @@
   {
     "name": "anchorPoint",
     "type": 16,
-    "value": [0.000000, 0.000000]
+    "value": [0.500000, 0.500000]
   },
   {
     "name": "anchor",
     "type": 7,
-    "value": 0
+    "value": 2
   }
   ]
 }

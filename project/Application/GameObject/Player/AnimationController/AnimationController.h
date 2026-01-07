@@ -8,6 +8,7 @@ enum class PlayerMotion {
 	Crouching,
 	Jump,
 	Landing,
+	Die,
 
 	Count,
 };
@@ -65,7 +66,10 @@ public:
 	/// </summary>
 	float GetAnimationProgress() const {
 		if (currentAnimation_.duration <= 0.0f) return 0.0f;
-		return animationTime_ / currentAnimation_.duration;
+		float progress = animationTime_ / currentAnimation_.duration;
+		if (progress < 0.0f) return 0.0f;
+		if (progress > 1.0f) return 1.0f;
+		return progress;
 	}
 
 	/// <summary>

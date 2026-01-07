@@ -13,8 +13,11 @@ void Enemy::Initialize() {
 	// フラスタムカリングを有効化（画面外の敵の更新・描画をスキップ）
 	//model_->SetUpdateFrustumCulling(true);
 	model_->SetDrawFrustumCulling(true);
+	
+	// デフォルトは通常の色
+	model_->SetColor3({ 1.0f, 1.0f, 1.0f });
 
-	moveSpeed_ = 2.0f;
+	// moveSpeed_は使用せず、status_.moveSpeedを使用する
 	collicionRadius_ = 0.5f;
 
 	scaleTimer_.Start(0.5f, false);
@@ -33,7 +36,7 @@ void Enemy::Initialize() {
 
 void Enemy::Update() {
 	
-	if (status_.hp < 0) {
+	if (status_.hp <= 0) {
 		Dead(); 
 		return;
 	}
@@ -57,9 +60,15 @@ void Enemy::Update() {
 	scaleTimer_.Update();
 
 	if (invicibilityTimer_.IsActive() && invicibilityTimer_.GetProgress() < 0.9f) {
+		// 無敵時は暗くする
 		model_->SetColor3({ 0.1f,0.1f,0.1f });
 	} else {
-		model_->SetColor3({ 1.0f,1.0f,1.0f });
+		// 通常時またはハードモード時の色
+		if (isHardModeColor_) {
+			model_->SetColor3({ 1.5f, 0.5f, 0.5f });
+		} else {
+			model_->SetColor3({ 1.0f,1.0f,1.0f });
+		}
 	}
 
 	invicibilityTimer_.Update();
@@ -156,6 +165,20 @@ void Enemy::Move() {
 		transform_.translate.y += velocity_Y * GetDeltaTime();
 	}
 	
+	// ノックバックの更新
+	UpdateKnockback(GetDeltaTime());
+	
+	// ノックバック中は通常移動とノックバック移動を合成
+	Vector3 moveVelocity = { 0.0f, 0.0f, 0.0f };
+	
+	// ノックバック速度を適用
+	if (IsKnockback()) {
+		Vector3 knockback = GetKnockbackVelocity();
+		moveVelocity.x += knockback.x * GetDeltaTime();
+		moveVelocity.z += knockback.z * GetDeltaTime();
+	}
+	
+	// 通常の移動処理（ノックバック中でも弱めに適用）
 	// .xz平面でターゲット位置への方向ベクトルを計算（yは無視）
 	Vector3 direction = {
 		targetPosition_.x - transform_.translate.x,
@@ -179,19 +202,26 @@ void Enemy::Move() {
 		// atan2(x,z)でY軸周りの回転角度を求める
 		transform_.rotate.y = std::atan2(direction.x, direction.z);
 
-		// 移動速度を適用
+		// ノックバック中は移動速度を半分に
+		float moveSpeedMultiplier = IsKnockback() ? 0.3f : 1.0f;
+		
+		// 移動速度を適用（status_.moveSpeedを使用してレベルスケーリングに対応）
 		Vector3 velocity = {
-			direction.x * moveSpeed_ * GetDeltaTime(),
+			direction.x * status_.moveSpeed * moveSpeedMultiplier * GetDeltaTime(),
 			0.0f, // y方向には移動しない
-			direction.z * moveSpeed_ * GetDeltaTime()
+			direction.z * status_.moveSpeed * moveSpeedMultiplier * GetDeltaTime()
 		};
 
-		// 位置を更新（yはそのまま）
-		transform_.translate.x += velocity.x;
-		transform_.translate.z += velocity.z;
+		// 通常移動をmoveVelocityに加算
+		moveVelocity.x += velocity.x;
+		moveVelocity.z += velocity.z;
 	} else {
 		moveDirection_ = { 0.0f, 0.0f, 0.0f };
 	}
+	
+	// 合成された移動を適用
+	transform_.translate.x += moveVelocity.x;
+	transform_.translate.z += moveVelocity.z;
 }
 
 void Enemy::ResolveMapCollision() {
@@ -503,5 +533,16 @@ void Enemy::PushAway(const Vector3& otherPosition, float otherRadius) {
 		float pushDistance = overlap * 0.5f;
 		transform_.translate.x += direction.x * pushDistance;
 		transform_.translate.z += direction.z * pushDistance;
+	}
+}
+
+void Enemy::SetHardModeColor(bool isHardMode) {
+	isHardModeColor_ = isHardMode;
+	if (isHardMode) {
+		// ハードモード時は赤みがかった色（明るい赤）
+		model_->SetColor3({ 1.5f, 0.5f, 0.5f });
+	} else {
+		// 通常時は白
+		model_->SetColor3({ 1.0f, 1.0f, 1.0f });
 	}
 }

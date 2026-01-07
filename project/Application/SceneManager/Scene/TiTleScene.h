@@ -4,6 +4,7 @@
 #include"GameUI/TitleSceneUI/TitleSceneUI.h"
 #include"GameObject/Player/playerStatus.h"
 #include"GameObject/Player/WeaponManager/WeaponStatus.h"
+#include"Ranking/RankingManager.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -36,6 +37,7 @@ private:
 	int bgmVolume_ = 5;
 	int seVolume_ = 5;
 	bool isFullScreen_ = false;
+	float titleBgmVolume_ = 0.2f;
 
 	unique_ptr<TitleSceneUI> titleUI_;
 	unique_ptr<SkiningModel> player_;
@@ -62,4 +64,7 @@ private:
 	 { 0.102f, 0.784f, 0.000f },
 	 { 0.239f, 0.855f, 0.922f }
 	};
+
+	// ランキング管理
+	unique_ptr<RankingManager> rankingManager_ = make_unique<RankingManager>();
 };

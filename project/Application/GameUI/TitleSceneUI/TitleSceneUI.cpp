@@ -15,9 +15,18 @@ void TitleSceneUI::Initialize() {
 
 	logo_ = std::make_unique<Sprite>();
 	logo_->Initialize("UI/Title/gigabonk.png");
+	logo_->LoadFromJson("gigabonk");
 
-	ranking_ = std::make_unique<Sprite>();
-	ranking_->Initialize("UI/Title/ranking.png");
+	rankingBG_ = std::make_unique<Sprite>();
+	rankingBG_->Initialize("UI/Title/rankingBG.png");
+	rankingBG_->LoadFromJson("RankingBG");
+
+	ranking1st_ = std::make_unique<BitmapFont>();
+	ranking1st_->Initialize("rankingUI1");
+	ranking2nd_ = std::make_unique<BitmapFont>();
+	ranking2nd_->Initialize("rankingUI2");
+	ranking3rd_ = std::make_unique<BitmapFont>();
+	ranking3rd_->Initialize("rankingUI3");
 
 	confirmed_ = std::make_unique<Sprite>();
 	confirmed_->Initialize("UI/Title/confirmed.png");
@@ -110,11 +119,11 @@ void TitleSceneUI::Update() {
 
 	scaleTimer_.Update();
 
-	play_->   Update();
-	edit_->   Update();
-	quit_->   Update();
-	logo_->   Update();
-	ranking_->Update();
+	play_->Update();
+	edit_->Update();
+	quit_->Update();
+	logo_->Update();
+	rankingBG_->Update();
 
 	playerNameText_->Update();
 	playerTypeText_->Update();
@@ -154,14 +163,18 @@ void TitleSceneUI::Update() {
 }
 
 void TitleSceneUI::Draw() {
+
 	if (selectState_ != TitleSelectState::PlayerSelect && 
 		selectState_ != TitleSelectState::WeaponSelect && 
 		selectState_ != TitleSelectState::Confirmed) {
 		play_->Draw();
 		edit_->Draw();
 		quit_->Draw();
-		//logo_->Draw();
-		//ranking_->Draw();
+		rankingBG_->Draw();
+		ranking1st_->Draw();
+		ranking2nd_->Draw();
+		ranking3rd_->Draw();
+		logo_->Draw();
 	} else {
 		playerTypeText_->Draw();
 		playerNameText_->Draw();
@@ -212,7 +225,7 @@ void TitleSceneUI::DrawImGui() {
 	//edit_->DrawImGui("TitleEditUI");
 	//quit_->DrawImGui("TitleQuitUI");
 	//logo_->DrawImGui("TitleLogoUI");
-	//ranking_->DrawImGui("TitleRankingUI");
+	//rankingBG_->DrawImGui("TitleRankingUI");
 	//playerTypeText_->DrawImGui("PlayerTypeUI");
 	//playerNameText_->DrawImGui("PlayerNameUI");
 	//powerManIcon_->DrawImGui("PowerManIconUI");
@@ -246,6 +259,10 @@ void TitleSceneUI::DrawImGui() {
 	//select4_->DrawImGui("Select4UI");
 	//select5_->DrawImGui("Select5UI");
 	//select6_->DrawImGui("Select6UI");
+	//rankingBG_->DrawImGui("RankingBGUI");
+	//ranking1st_->DrawImGui("Ranking1stUI");
+	//ranking2nd_->DrawImGui("Ranking2ndUI");
+	//ranking3rd_->DrawImGui("Ranking3rdUI");
 }
 
 void TitleSceneUI::InitPlayerUI() {

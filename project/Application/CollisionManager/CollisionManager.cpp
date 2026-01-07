@@ -62,6 +62,11 @@ void CollisionManager::CheckPlayerEnemyCollision() {
 		return;
 	}
 
+	// プレイヤーが死亡している場合は当たり判定をスキップ
+	if (!player_->IsAlive()) {
+		return;
+	}
+
 	// プレイヤーの球体コライダーを取得
 	const Sphere& playerSphere = player_->GetSphereCollision();
 
@@ -89,6 +94,11 @@ inline float DistanceSquared(const Vector3& a, const Vector3& b) {
 void CollisionManager::CheckBulletEnemyCollision() {
 	// WeaponManagerまたはEnemyManagerが設定されていない場合は何もしない
 	if (!weaponManager_ || !enemyManager_) {
+		return;
+	}
+
+	// プレイヤーが死亡している場合は当たり判定をスキップ
+	if (!player_ || !player_->IsAlive()) {
 		return;
 	}
 
@@ -137,7 +147,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 5.0f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
@@ -176,7 +197,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 3.0f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
@@ -218,7 +250,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 4.0f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
@@ -254,7 +297,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 4.5f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -286,7 +340,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 3.5f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -318,7 +383,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetRandDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 6.0f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					bullet->Dead();
@@ -351,7 +427,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 2.5f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -377,7 +464,18 @@ void CollisionManager::CheckBulletEnemyCollision() {
 
 				if (!enemy->IsActiveInvincibleTimer()) {
 					int damage = static_cast<int>(area->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
+					
+					// ノックバック方向を計算（エリア中心から外側へ）
+					Vector3 knockbackDir = (enemySphere.center - areaPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 2.0f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(area->GetWeaponName());
+					}
 					
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 				}
@@ -409,8 +507,19 @@ void CollisionManager::CheckBulletEnemyCollision() {
 					enemyDieParticle_->Play(enemy->GetPosition(), false);
 
 					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
 					enemy->Damage(damage);
 					
+					// ノックバック方向を計算（弾の進行方向）
+					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+					enemy->ApplyKnockback(knockbackDir, 7.0f);
+					
+					// 敵が倒されたかチェック
+					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+						// この武器でキルカウントをインクリメント
+						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
+					}
+	
 					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
 					
 					bullet->Dead();
@@ -424,6 +533,11 @@ void CollisionManager::CheckBulletEnemyCollision() {
 void CollisionManager::CheckExpItemPlayerCollision() {
 	// PlayerまたはEnemyManagerが設定されていない場合は何もしない
 	if (!player_ || !enemyManager_) {
+		return;
+	}
+
+	// プレイヤーが死亡している場合は経験値アイテムの当たり判定をスキップ
+	if (!player_->IsAlive()) {
 		return;
 	}
 
@@ -455,8 +569,9 @@ void CollisionManager::CheckExpItemPlayerCollision() {
 		// アイテム取得用の距離チェック
 		float getMaxDist = playerSphere.radius + expItemSphere.radius;
 		if (distSq <= getMaxDist * getMaxDist) {
+			MyAudio::Play(SE_List::ExpGet);
 			expItemGetParticle_->Play(player_->GetPosition(), false);
-			player_->AddExp(5);
+			player_->AddExp(MyRand::Int(3, 7));
 			expItem->Dead();
 		}
 	}

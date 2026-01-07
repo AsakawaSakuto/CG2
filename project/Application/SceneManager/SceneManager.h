@@ -2,6 +2,7 @@
 #include"IScene.h"
 
 #include"SceneManager/Test/TestScene.h"
+#include"SceneManager/Scene/StartScene.h"
 #include"SceneManager/Scene/TiTleScene.h"
 #include"SceneManager/Scene/GameScene.h"
 #include"SceneManager/Scene/ResultScene.h"
@@ -9,7 +10,7 @@
 #include<memory>
 
 // シーン数
-constexpr uint32_t sceneNum = 4;
+constexpr uint32_t sceneNum = 5;
 
 class SceneManager {
 private:

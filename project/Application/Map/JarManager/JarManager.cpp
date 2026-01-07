@@ -3,6 +3,7 @@
 #include "Utility/Collision/Collision.h"
 #include <algorithm>
 #include <random>
+#include "Audio/MyAudio.h"
 
 void JarManager::Initialize(Map3D* map) {
 	// 壺の配列を予約
@@ -102,6 +103,7 @@ int JarManager::BreakJar(const AABB& attackAABB, JarType& outJarType) {
 		if (jar->IsAlive()) {
 			if (Collision::IsHit(attackAABB, jar->GetAABBCollision())) {
 				outJarType = jar->GetJarType();
+				MyAudio::Play(SE_List::Jar);
 				return jar->Break();
 			}
 		}
@@ -112,6 +114,7 @@ int JarManager::BreakJar(const AABB& attackAABB, JarType& outJarType) {
 		if (jar->IsAlive()) {
 			if (Collision::IsHit(attackAABB, jar->GetAABBCollision())) {
 				outJarType = jar->GetJarType();
+				MyAudio::Play(SE_List::Jar);
 				return jar->Break();
 			}
 		}

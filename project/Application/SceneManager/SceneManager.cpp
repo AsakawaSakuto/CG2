@@ -45,7 +45,7 @@ void SceneManager::Initialize() {
 
 	// WinAppの初期化
     winApp_ = std::make_unique<WinApp>();
-    winApp_->Initialize(L"LE2A_01_アサカワ_サクト");
+    winApp_->Initialize(L"LE2A_01_アサカワ_サクト_GIGABONK");
 
     // exeのアイコン設定
     winApp_->SetIconFromTexture("resources/image/icon.png");
@@ -76,7 +76,7 @@ void SceneManager::Initialize() {
 	LineManager::GetInstance()->Initialize();
 
     // 初期シーンを作成
-	currentSceneNo_ = SCENE::TITLE;
+	currentSceneNo_ = SCENE::START;
     sceneArr_[static_cast<int>(currentSceneNo_)] = CreateScene(currentSceneNo_);
     if (sceneArr_[static_cast<int>(currentSceneNo_)]) {
         sceneArr_[static_cast<int>(currentSceneNo_)]->Initialize();
@@ -220,9 +220,9 @@ void SceneManager::Finalize() {
 
 void SceneManager::Shortcut() {
     // ESCキー : 終了
-    if (GetAsyncKeyState(VK_ESCAPE) & 1) {
-        PostQuitMessage(0);
-    }
+    //if (GetAsyncKeyState(VK_ESCAPE) & 1) {
+    //    PostQuitMessage(0);
+    //}
 
     // F11キー : フルスクリーン切替
     if (GetAsyncKeyState(VK_F11) & 1) {
@@ -279,6 +279,8 @@ std::unique_ptr<IScene> SceneManager::CreateScene(SCENE sceneNo) {
     switch (sceneNo) {
     case SCENE::TEST:
         return std::make_unique<TestScene>();
+	case SCENE::START:
+		return std::make_unique<StartScene>();
     case SCENE::TITLE:
         return std::make_unique<TitleScene>();
     case SCENE::GAME:

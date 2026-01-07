@@ -10,7 +10,7 @@
 #include "Utility/Collision/Type/Circle.h"
 
 /// <summary>
-/// デバッグ描画用の形状を統一的に扱うためのvariant型定義
+/// デバッグ描画用の形状を統一的に扱うための variant型定義
 /// </summary>
 using Shape = std::variant<
     AABB,

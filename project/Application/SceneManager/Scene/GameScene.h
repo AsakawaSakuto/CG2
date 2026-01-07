@@ -12,6 +12,7 @@
 #include "Map/ChestManager/ChestManager.h"
 #include "Map/TreeManager/TreeManager.h"
 #include "GameUI/GameSceneUI/GameSceneUI.h"
+#include "Ranking/RankingManager.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -36,10 +37,27 @@ private:
 	void ChestUpdate();
 
 	void UIUpdate();
+	
+	// ハードモードへの移行
+	void EnterHardMode();
 
 	bool cameraDebugMode_ = false;
+
+private:
+
+	PauseType pauseType_ = PauseType::Back;
+	bool isPause_ = false;
+
+	ResultType resultType_ = ResultType::GoTitle;
+	bool resultDataUpdated_ = false; // リザルトデータが更新されたかどうか
+	
+	bool isHardMode_ = false; // ハードモードフラグ
+
 private:
 	int dangerLv_ = 0;
+
+	int bgmNum_ = 1;
+	float bgmVolume_ = 0.2f;
 
 	Camera camera_;
 	DebugCamera debugCamera_;
@@ -73,4 +91,12 @@ private:
 	bool useFog_ = false;
 
 	std::unique_ptr<Model> wall_;
+
+	unique_ptr<Sprite> fadeBG_;
+	GameTimer fadeInTimer_;
+	GameTimer fadeOutTimer_;
+
+	// ランキング管理
+	unique_ptr<RankingManager> rankingManager_ = make_unique<RankingManager>();
+	bool rankingSaved_ = false; // ランキング保存済みフラグ
 };

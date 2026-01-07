@@ -314,6 +314,9 @@ void Sprite::LoadFromJson(const std::string& filePath) {
 		}
 	}
 
+	// 読み込んだファイルパスを保存（ImGuiで表示するため）
+	loadToSaveName_ = filePath;
+
 	// アンカーポイントが変更された場合は頂点データを更新
 	//SetAnchorPoint(anchorPoint_);
 }

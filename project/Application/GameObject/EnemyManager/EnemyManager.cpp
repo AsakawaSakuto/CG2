@@ -16,47 +16,106 @@ void EnemyManager::Initialize() {
 	enemies_.reserve(300);
 	expItems_.reserve(300);
 	damagePlanes_.reserve(300);
+
+	// 初期スポーン設定
+	spawnConfig_ = EnemySpawnConfig::CalculateFromPlayerLevel(1);
+	currentPlayerLevel_ = 1;
+}
+
+void EnemyManager::UpdateSpawnConfig(int playerLevel) {
+	if (currentPlayerLevel_ != playerLevel) {
+		currentPlayerLevel_ = playerLevel;
+		spawnConfig_ = EnemySpawnConfig::CalculateFromPlayerLevel(playerLevel);
+		
+		// ハードモードの場合は追加で倍率をかける
+		if (isHardMode_) {
+			spawnConfig_.hpMultiplier *= 1.5f;
+			spawnConfig_.powerMultiplier *= 1.25f;
+			spawnConfig_.moveSpeedMultiplier *= 1.75f;
+			spawnConfig_.spawnInterval *= 0.5f; // スポーン間隔を短く
+			spawnConfig_.enemiesPerSpawn = static_cast<int>(spawnConfig_.enemiesPerSpawn * 1.5f);
+			spawnConfig_.maxEnemyCount = static_cast<int>(spawnConfig_.maxEnemyCount * 2.0f);
+		}
+		
+		// スポーン間隔を更新
+		spawnTimer_.Start(spawnConfig_.spawnInterval, true);
+	}
 }
 
 void EnemyManager::Update() {
-	if (enemies_.size() < 300) {
+	// プレイヤーレベルを取得してスポーン設定を更新
+	if (player_) {
+		int currentLevel = player_->GetLevel();
+		// レベルが変わった場合、またはハードモードが有効化された直後にスポーン設定を強制更新
+		if (currentPlayerLevel_ != currentLevel) {
+			UpdateSpawnConfig(currentLevel);
+		}
+	}
+	
+	// ハードモード時、既存の敵にも色を適用
+	if (isHardMode_) {
+		for (auto& enemy : enemies_) {
+			enemy->SetHardModeColor(true);
+		}
+	}
+
+	if (enemies_.size() < static_cast<size_t>(spawnConfig_.maxEnemyCount)) {
 		spawnTimer_.Update();
 
 		if (spawnTimer_.IsFinished()) {
-			auto enemy = std::make_unique<Enemy>();
-			enemy->Initialize();
-			
-			// Map3Dを設定
-			if (map_) {
-				enemy->SetMap(map_);
-			}
-			
-			// 死亡時のコールバックを設定（Playerのキルカウントをインクリメント）
-			if (player_) {
-				enemy->SetOnDeathCallback([this]() {
-					player_->IncrementKillEnemyCount();
-					player_->AddMoney(1);
-				});
-			}
+			// 1回のスポーンで複数体生成（レベルに応じて増加）
+			for (int spawnIndex = 0; spawnIndex < spawnConfig_.enemiesPerSpawn; ++spawnIndex) {
+				auto enemy = std::make_unique<Enemy>();
+				enemy->Initialize();
 
-			int i = random_.Int(0, 1);
-			int j = random_.Int(0, 1);
-			float x = (i == 0) ? 10.0f : -10.0f;
-			float z = (j == 0) ? 10.0f : -10.0f;
-			
-			enemy->SetPosition(
-				{targetPosition_.x + random_.Float(-5.0f,5.0f) + x,
-				 targetPosition_.y,
-				 targetPosition_.z + random_.Float(-5.0f,5.0f) + z });
-			enemies_.push_back(std::move(enemy));
+				// 敵のステータスをプレイヤーレベルに応じてスケーリング
+				enemy->ApplyStatusMultipliers(
+					spawnConfig_.hpMultiplier,
+					spawnConfig_.powerMultiplier,
+					spawnConfig_.moveSpeedMultiplier
+				);
+				
+				// ハードモード時は敵を赤みがかった色に
+				if (isHardMode_) {
+					enemy->SetHardModeColor(true);
+				}
+				
+				// Map3Dを設定
+				if (map_) {
+					enemy->SetMap(map_);
+				}
+				
+				// 死亡時のコールバックを設定（Playerのキルカウントをインクリメント）
+				if (player_) {
+					// ラムダキャプチャでspawnConfigのコピーを取得（コールバック時点での値を使用）
+					float moneyMul = spawnConfig_.moneyMultiplier;
+					enemy->SetOnDeathCallback([this, moneyMul]() {
+						player_->IncrementKillEnemyCount();
+						// レベルに応じた報酬
+						int baseMoney = 1;
+						int scaledMoney = static_cast<int>(baseMoney * moneyMul);
+						player_->AddMoney(scaledMoney);
+					});
+				}
+
+				int i = random_.Int(0, 1);
+				int j = random_.Int(0, 1);
+				float x = (i == 0) ? 25.0f : -25.0f;
+				float z = (j == 0) ? 25.0f : -25.0f;
+				
+				enemy->SetPosition(
+					{targetPosition_.x + random_.Float(-5.0f,5.0f) + x,
+					 targetPosition_.y,
+					 targetPosition_.z + random_.Float(-5.0f,5.0f) + z });
+				enemies_.push_back(std::move(enemy));
+			}
 		}
 	}
 
 	// 空間ハッシュマップを使用した衝突判定の最適化
-	const float cellSize = 5.0f; // グリッドセルのサイズ
+	const float cellSize = 5.0f;
 	std::unordered_map<int64_t, std::vector<size_t>> spatialGrid;
 
-	// 敵を空間グリッドに登録
 	for (size_t i = 0; i < enemies_.size(); ++i) {
 		const Vector3& pos = enemies_[i]->GetPosition();
 		int32_t cellX = static_cast<int32_t>(std::floor(pos.x / cellSize));
@@ -65,12 +124,10 @@ void EnemyManager::Update() {
 		spatialGrid[cellKey].push_back(i);
 	}
 
-	// 同じセルと隣接セル内でのみ衝突判定
 	for (const auto& [cellKey, indices] : spatialGrid) {
 		int32_t cellX = static_cast<int32_t>(cellKey >> 32);
 		int32_t cellZ = static_cast<int32_t>(cellKey & 0xFFFFFFFF);
 
-		// 現在のセルと隣接8セルをチェック
 		for (int32_t dx = -1; dx <= 1; ++dx) {
 			for (int32_t dz = -1; dz <= 1; ++dz) {
 				int64_t neighborKey = (static_cast<int64_t>(cellX + dx) << 32) | static_cast<int64_t>(cellZ + dz);
@@ -79,7 +136,7 @@ void EnemyManager::Update() {
 
 				for (size_t i : indices) {
 					for (size_t j : it->second) {
-						if (i >= j) continue; // 重複チェック回避
+						if (i >= j) continue;
 
 						const Sphere& sphere1 = enemies_[i]->GetSphereCollision();
 						const Sphere& sphere2 = enemies_[j]->GetSphereCollision();
@@ -102,13 +159,10 @@ void EnemyManager::Update() {
 		expItem->Update();
 	}
 
-	// ダメージ表示の更新
 	for (auto& damagePlane : damagePlanes_) {
 		damagePlane->Update();
 	}
 
-	// 死亡した敵を削除し、その位置でパーティクルを再生・経験値アイテム生成
-	// まず死亡した敵の処理を行う
 	for (auto& enemy : enemies_) {
 		if (!enemy->IsAlive()) {
 			dieParticle_->Play(enemy->GetPosition(), false);
@@ -120,7 +174,6 @@ void EnemyManager::Update() {
 		}
 	}
 	
-	// Erase-Remove idiomで効率的に削除
 	enemies_.erase(
 		std::remove_if(enemies_.begin(), enemies_.end(),
 			[](const std::unique_ptr<Enemy>& enemy) { return !enemy->IsAlive(); }),
@@ -148,7 +201,6 @@ void EnemyManager::Draw(Camera camera) {
 		expItem->Draw(camera);
 	}
 
-	// ダメージ表示の描画
 	for (auto& damagePlane : damagePlanes_) {
 		damagePlane->Draw(camera);
 	}
@@ -166,10 +218,25 @@ void EnemyManager::DrawImGui() {
 	ImGui::Text("Timer Elapsed: %.2f / %.2f", spawnTimer_.GetElapsedTime(), spawnTimer_.GetDuration());
 	
 	ImGui::Separator();
+	ImGui::Text("--- Spawn Config (Level %d) ---", currentPlayerLevel_);
+	ImGui::Text("HP Multiplier: %.2f", spawnConfig_.hpMultiplier);
+	ImGui::Text("Power Multiplier: %.2f", spawnConfig_.powerMultiplier);
+	ImGui::Text("Speed Multiplier: %.2f", spawnConfig_.moveSpeedMultiplier);
+	ImGui::Text("Spawn Interval: %.2f sec", spawnConfig_.spawnInterval);
+	ImGui::Text("Enemies Per Spawn: %d", spawnConfig_.enemiesPerSpawn);
+	ImGui::Text("Exp Multiplier: %.2f", spawnConfig_.expMultiplier);
+	ImGui::Text("Money Multiplier: %.2f", spawnConfig_.moneyMultiplier);
+	
+	ImGui::Separator();
 	
 	if (ImGui::Button("Spawn Enemy Now")) {
 		auto enemy = std::make_unique<Enemy>();
 		enemy->Initialize();
+		enemy->ApplyStatusMultipliers(
+			spawnConfig_.hpMultiplier,
+			spawnConfig_.powerMultiplier,
+			spawnConfig_.moveSpeedMultiplier
+		);
 		enemies_.push_back(std::move(enemy));
 	}
 	
@@ -196,4 +263,35 @@ void EnemyManager::CreateDamagePlane(const Vector3& position, int damage) {
 	auto damagePlane = std::make_unique<DamagePlane>();
 	damagePlane->Initialize(position, damage);
 	damagePlanes_.push_back(std::move(damagePlane));
+}
+
+void EnemyManager::KillAllEnemiesForHardMode() {
+	// 全ての生きている敵を倒す
+	for (auto& enemy : enemies_) {
+		if (enemy->IsAlive()) {
+			// 敵の位置にExpItemを生成
+			dieParticle_->Play(enemy->GetPosition(), false);
+			
+			auto expItem = std::make_unique<ExpItem>();
+			expItem->Initialize();
+			expItem->SetPosition(enemy->GetPosition());
+			// すぐにプレイヤーに向かって移動開始
+			expItem->StateChange();
+			expItems_.push_back(std::move(expItem));
+			
+			// 敵を倒す
+			enemy->Dead();
+		}
+	}
+	
+	// 死亡した敵を削除
+	enemies_.erase(
+		std::remove_if(enemies_.begin(), enemies_.end(),
+			[](const std::unique_ptr<Enemy>& enemy) { return !enemy->IsAlive(); }),
+		enemies_.end());
+	
+	// 既存のExpItemも移動状態に変更
+	for (auto& expItem : expItems_) {
+		expItem->StateChange();
+	}
 }
