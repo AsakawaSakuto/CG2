@@ -18,7 +18,7 @@ void Weapon::Initialize(WeaponName weaponName) {
 
 	case WeaponName::Laser:
 
-		status_.cooldownTime = 1.05;
+		status_.cooldownTime = 1.05f;
 		status_.intervalTime = 0.25f;
 		status_.damage = 10.0f;
 		status_.penetrationCount = 3.0f;

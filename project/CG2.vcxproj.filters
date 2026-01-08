@@ -278,5 +278,7 @@
     <None Include="Engine\0_Docs\Audio.md" />
     <None Include="Engine\0_Docs\Sprite.md" />
     <None Include="Engine\0_Docs\temp.md" />
+    <None Include="Engine\0_Docs\Model.md" />
+    <None Include="Engine\0_Docs\SkiningModel.md" />
   </ItemGroup>
 </Project>

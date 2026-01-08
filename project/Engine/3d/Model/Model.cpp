@@ -417,124 +417,124 @@ void Model::DrawImGui(const char* objectName) {
 		materialData_->color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
-	ImGui::Separator();
+	//ImGui::Separator();
 
-	ImGui::Text("Culling");
-	ImGui::Checkbox("Enable Frustum Culling", &useDrawFrustumCulling_);
-	ImGui::DragFloat("Bounding Radius", &boundingRadius_, 0.1f, 0.1f, 100.0f);
-	
-	ImGui::Separator();
+	//ImGui::Text("Culling");
+	//ImGui::Checkbox("Enable Frustum Culling", &useDrawFrustumCulling_);
+	//ImGui::DragFloat("Bounding Radius", &boundingRadius_, 0.1f, 0.1f, 100.0f);
+	//
+	//ImGui::Separator();
 
-	ImGui::Text("Billboard");
-	ImGui::Checkbox("Enable Billboard", &useBillboard_);
-	ImGui::SameLine();
-	ImGui::Checkbox("Billboard Y Only", &useBillboardY_);
-	
-	ImGui::Separator();
+	//ImGui::Text("Billboard");
+	//ImGui::Checkbox("Enable Billboard", &useBillboard_);
+	//ImGui::SameLine();
+	//ImGui::Checkbox("Billboard Y Only", &useBillboardY_);
+	//
+	//ImGui::Separator();
 
-	ImGui::Text("LightEdit");
+	//ImGui::Text("LightEdit");
 
-	uint32_t useLight = materialData_->enableLighting;
-	bool temp = (useLight != 0);
-	if (ImGui::Checkbox("UseLight", &temp)) {
-		materialData_->enableLighting = temp ? 1 : 0;
-	}
+	//uint32_t useLight = materialData_->enableLighting;
+	//bool temp = (useLight != 0);
+	//if (ImGui::Checkbox("UseLight", &temp)) {
+	//	materialData_->enableLighting = temp ? 1 : 0;
+	//}
 
-	if (materialData_->enableLighting != 0) {
-		ImGui::Separator();
+	//if (materialData_->enableLighting != 0) {
+	//	ImGui::Separator();
 
-		uint32_t useLight1 = directionalLightData_->useLight;
-		bool temp1 = (useLight1 != 0);
-		if (ImGui::Checkbox("UseDirectionLight", &temp1)) {
-			directionalLightData_->useLight = temp1 ? 1 : 0;
-		}
+	//	uint32_t useLight1 = directionalLightData_->useLight;
+	//	bool temp1 = (useLight1 != 0);
+	//	if (ImGui::Checkbox("UseDirectionLight", &temp1)) {
+	//		directionalLightData_->useLight = temp1 ? 1 : 0;
+	//	}
 
-		if (directionalLightData_->useLight != 0) {
+	//	if (directionalLightData_->useLight != 0) {
 
-			uint32_t useHalfLambert = directionalLightData_->useHalfLambert;
-			bool temp = (useHalfLambert != 0);
-			if (ImGui::Checkbox("UseHalfLambert", &temp)) {
-				directionalLightData_->useHalfLambert = temp ? 1 : 0;
-			}
+	//		uint32_t useHalfLambert = directionalLightData_->useHalfLambert;
+	//		bool temp = (useHalfLambert != 0);
+	//		if (ImGui::Checkbox("UseHalfLambert", &temp)) {
+	//			directionalLightData_->useHalfLambert = temp ? 1 : 0;
+	//		}
 
-			ImGui::DragFloat3("d.Direction", &direction_.x, 0.01f, -1.0f, 1.0f);
-			direction_ = direction_.Normalized();
-			ImGui::DragFloat("d.Intensity", &directionalLightData_->intensity, 0.01f, 0.0f, 5.0f);
-			ImGui::DragFloat("d.Shininess", &materialData_->shininess, 0.01f, 0.0f, 100.0f);
-			ImGui::ColorEdit4("d.Color", &directionalLightData_->color.x);
+	//		ImGui::DragFloat3("d.Direction", &direction_.x, 0.01f, -1.0f, 1.0f);
+	//		direction_ = direction_.Normalized();
+	//		ImGui::DragFloat("d.Intensity", &directionalLightData_->intensity, 0.01f, 0.0f, 5.0f);
+	//		ImGui::DragFloat("d.Shininess", &materialData_->shininess, 0.01f, 0.0f, 100.0f);
+	//		ImGui::ColorEdit4("d.Color", &directionalLightData_->color.x);
 
-			if (ImGui::Button("dReset")) {
-				direction_ = { 1.0f,-1.0f,1.0f };
-				materialData_->shininess = 30.0f;
-				directionalLightData_->intensity = 1.0f;
-				directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-			}
-		}
+	//		if (ImGui::Button("dReset")) {
+	//			direction_ = { 1.0f,-1.0f,1.0f };
+	//			materialData_->shininess = 30.0f;
+	//			directionalLightData_->intensity = 1.0f;
+	//			directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//		}
+	//	}
 
-		ImGui::Separator();
+	//	ImGui::Separator();
 
-		uint32_t useLight2 = pointLightData_->useLight;
-		bool temp2 = (useLight2 != 0);
-		if (ImGui::Checkbox("UsePointLight", &temp2)) {
-			pointLightData_->useLight = temp2 ? 1 : 0;
-		}
+	//	uint32_t useLight2 = pointLightData_->useLight;
+	//	bool temp2 = (useLight2 != 0);
+	//	if (ImGui::Checkbox("UsePointLight", &temp2)) {
+	//		pointLightData_->useLight = temp2 ? 1 : 0;
+	//	}
 
-		if (pointLightData_->useLight != 0) {
-			ImGui::DragFloat3("p.Pos", &pointLightData_->position.x, 0.01f);
-			ImGui::DragFloat("p.Intensity", &pointLightData_->intensity, 0.01f, 0.0f, 5.0f);
-			ImGui::DragFloat("p.Radius", &pointLightData_->radius, 0.01f);
-			ImGui::DragFloat("p.Decay", &pointLightData_->decay, 0.01f);
-			ImGui::ColorEdit4("p.Color", &pointLightData_->color.x);
+	//	if (pointLightData_->useLight != 0) {
+	//		ImGui::DragFloat3("p.Pos", &pointLightData_->position.x, 0.01f);
+	//		ImGui::DragFloat("p.Intensity", &pointLightData_->intensity, 0.01f, 0.0f, 5.0f);
+	//		ImGui::DragFloat("p.Radius", &pointLightData_->radius, 0.01f);
+	//		ImGui::DragFloat("p.Decay", &pointLightData_->decay, 0.01f);
+	//		ImGui::ColorEdit4("p.Color", &pointLightData_->color.x);
 
-			if (ImGui::Button("pReset")) {
-				pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-				pointLightData_->position = { 0.0f,5.0f,0.0f };
-				pointLightData_->intensity = 1.0f;
-				pointLightData_->radius = 20.0f;
-				pointLightData_->decay = 2.0f;
-			}
-		}
+	//		if (ImGui::Button("pReset")) {
+	//			pointLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//			pointLightData_->position = { 0.0f,5.0f,0.0f };
+	//			pointLightData_->intensity = 1.0f;
+	//			pointLightData_->radius = 20.0f;
+	//			pointLightData_->decay = 2.0f;
+	//		}
+	//	}
 
-		ImGui::Separator();
+	//	ImGui::Separator();
 
-		uint32_t useLight3 = spotLightData_->useLight;
-		bool temp3 = (useLight3 != 0);
-		if (ImGui::Checkbox("UseSpotLight", &temp3)) {
-			spotLightData_->useLight = temp3 ? 1 : 0;
-		}
+	//	uint32_t useLight3 = spotLightData_->useLight;
+	//	bool temp3 = (useLight3 != 0);
+	//	if (ImGui::Checkbox("UseSpotLight", &temp3)) {
+	//		spotLightData_->useLight = temp3 ? 1 : 0;
+	//	}
 
-		if (spotLightData_->useLight != 0) {
-			ImGui::DragFloat3("s.Pos", &spotLightData_->position.x, 0.01f);
-			ImGui::DragFloat("s.Intensity", &spotLightData_->intensity, 0.01f, 0.0f, 10.0f);
-			ImGui::DragFloat("s.Distance", &spotLightData_->distance, 0.01f);
-			spotLightData_->direction = spotLightData_->direction.Normalized();
-			ImGui::DragFloat3("s.Direction", &spotLightData_->direction.x, 0.01f);
-			ImGui::DragFloat("s.Decay", &spotLightData_->decay, 0.01f);
-			float angleDeg = 60.0f;            // cosAngle用の角度（UI用、一時変数）
-			float falloffStartDeg = 30.0f;     // cosFalloffStart用の角度
-			// 現在の cos値から度に変換してUIに表示（必要なら）
-			angleDeg = std::acos(spotLightData_->cosAngle) * 180.0f / std::numbers::pi_v<float>;
-			falloffStartDeg = std::acos(spotLightData_->cosFalloffStart) * 180.0f / std::numbers::pi_v<float>;
-			// ImGuiスライダー（例：0〜90度まで）
-			ImGui::SliderFloat("Spot Angle (deg)", &angleDeg, 1.0f, 90.0f);
-			ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f); // 必ず angle より小なく
-			// 入力された角度から cos値に変換して反映
-			spotLightData_->cosAngle = std::cos(angleDeg * std::numbers::pi_v<float> / 180.0f);
-			spotLightData_->cosFalloffStart = std::cos(falloffStartDeg * std::numbers::pi_v<float> / 180.0f);
-			ImGui::ColorEdit4("s.Color", &spotLightData_->color.x);
+	//	if (spotLightData_->useLight != 0) {
+	//		ImGui::DragFloat3("s.Pos", &spotLightData_->position.x, 0.01f);
+	//		ImGui::DragFloat("s.Intensity", &spotLightData_->intensity, 0.01f, 0.0f, 10.0f);
+	//		ImGui::DragFloat("s.Distance", &spotLightData_->distance, 0.01f);
+	//		spotLightData_->direction = spotLightData_->direction.Normalized();
+	//		ImGui::DragFloat3("s.Direction", &spotLightData_->direction.x, 0.01f);
+	//		ImGui::DragFloat("s.Decay", &spotLightData_->decay, 0.01f);
+	//		float angleDeg = 60.0f;            // cosAngle用の角度（UI用、一時変数）
+	//		float falloffStartDeg = 30.0f;     // cosFalloffStart用の角度
+	//		// 現在の cos値から度に変換してUIに表示（必要なら）
+	//		angleDeg = std::acos(spotLightData_->cosAngle) * 180.0f / std::numbers::pi_v<float>;
+	//		falloffStartDeg = std::acos(spotLightData_->cosFalloffStart) * 180.0f / std::numbers::pi_v<float>;
+	//		// ImGuiスライダー（例：0〜90度まで）
+	//		ImGui::SliderFloat("Spot Angle (deg)", &angleDeg, 1.0f, 90.0f);
+	//		ImGui::SliderFloat("Falloff Start (deg)", &falloffStartDeg, 0.0f, angleDeg - 0.01f); // 必ず angle より小なく
+	//		// 入力された角度から cos値に変換して反映
+	//		spotLightData_->cosAngle = std::cos(angleDeg * std::numbers::pi_v<float> / 180.0f);
+	//		spotLightData_->cosFalloffStart = std::cos(falloffStartDeg * std::numbers::pi_v<float> / 180.0f);
+	//		ImGui::ColorEdit4("s.Color", &spotLightData_->color.x);
 
-			if (ImGui::Button("sReset")) {
-				spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-				spotLightData_->position = { 2.0f,1.25f,0.0f };
-				spotLightData_->distance = 7.0f;
-				spotLightData_->direction = { -1.0f,-1.0f,0.0f };
-				spotLightData_->intensity = 4.0f;
-				spotLightData_->decay = 2.0f;
-				spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 6.0f);
-				spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
-			}
-		}
-	}
+	//		if (ImGui::Button("sReset")) {
+	//			spotLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+	//			spotLightData_->position = { 2.0f,1.25f,0.0f };
+	//			spotLightData_->distance = 7.0f;
+	//			spotLightData_->direction = { -1.0f,-1.0f,0.0f };
+	//			spotLightData_->intensity = 4.0f;
+	//			spotLightData_->decay = 2.0f;
+	//			spotLightData_->cosAngle = std::cos(std::numbers::pi_v<float> / 6.0f);
+	//			spotLightData_->cosFalloffStart = std::cos(std::numbers::pi_v<float> / 3.0f);
+	//		}
+	//	}
+	//}
 
 	ImGui::End();
 
