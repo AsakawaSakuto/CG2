@@ -118,7 +118,7 @@ public:
 	/// <summary>
 	/// アンカーポイントを設定
 	/// </summary>
-	/// <param name="anchor">アンカーポイント（0.0～1.0）</param>
+	/// <param name="anchor">AnchorPoint::から選択</param>
 	void SetAnchorPoint(const AnchorPoint anchor);
 
 	/// <summary>

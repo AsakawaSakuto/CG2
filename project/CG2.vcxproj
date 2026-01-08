@@ -486,6 +486,15 @@
       <SubType>
       </SubType>
     </None>
+    <None Include="Engine\0_Docs\Model.md">
+      <SubType>
+      </SubType>
+    </None>
+    <None Include="Engine\0_Docs\SkiningModel.md" />
+    <None Include="Engine\0_Docs\Sprite.md">
+      <SubType>
+      </SubType>
+    </None>
     <None Include="Engine\0_Docs\temp.md">
       <SubType>
       </SubType>

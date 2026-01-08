@@ -184,6 +184,8 @@ void TestScene::DrawImGui() {
 
 	testParticle_->DrawImGui("testParticle");
 
+	testSprite_->DrawImGui("testSprite");
+
 	/*testOBB_.DrawImGui("testOBB");
     testAABB_.DrawImGui("testAABB");
     testSphere_.DrawImGui("testSphere");
