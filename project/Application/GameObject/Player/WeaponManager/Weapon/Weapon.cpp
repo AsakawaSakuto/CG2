@@ -162,251 +162,108 @@ void Weapon::PostFrameCleanup() {
 }
 
 void Weapon::FireBallUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<FireBall>(
+		fireBall_,
+		SE_List::FireBall,
+		[this](std::unique_ptr<FireBall>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_ + spawnOffSet_);
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+			bullet->SetDamage(status_.damage);
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-
-	if (intervalTimer_.IsFinished()) {
-
-		auto bullet = std::make_unique<FireBall>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetDamage(status_.damage);
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		fireBall_.push_back(std::move(bullet));
-
-		MyAudio::Play(SE_List::FireBall);
-
-		status_.shotNowCount++;
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-
-	for (auto& bullet : fireBall_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::LaserUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<Laser>(
+		laser_,
+		SE_List::Laser,
+		[this](std::unique_ptr<Laser>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_ + spawnOffSet_);
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+			bullet->SetDamage(status_.damage);
+			bullet->SetPenetrationCount(static_cast<int>(status_.penetrationCount));
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-
-	if (intervalTimer_.IsFinished()) {
-
-		auto bullet = std::make_unique<Laser>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetDamage(status_.damage);
-		bullet->SetPenetrationCount(static_cast<int>(status_.penetrationCount));
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		laser_.push_back(std::move(bullet));
-
-		MyAudio::Play(SE_List::Laser);
-
-		status_.shotNowCount++;
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-
-	for (auto& bullet : laser_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::RunaUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<Runa>(
+		runa_,
+		SE_List::Runa,
+		[this](std::unique_ptr<Runa>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_ + spawnOffSet_);
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+			bullet->SetDamage(status_.damage);
+			bullet->SetBounceCount(static_cast<int>(status_.bounceCount));
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-	if (intervalTimer_.IsFinished()) {
-		auto bullet = std::make_unique<Runa>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetDamage(status_.damage);
-		bullet->SetBounceCount(static_cast<int>(status_.bounceCount));
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		runa_.push_back(std::move(bullet));
-
-		MyAudio::Play(SE_List::Runa);
-
-		status_.shotNowCount++;
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-	for (auto& bullet : runa_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::AxeUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<Axe>(
+		axe_,
+		SE_List::Axe,
+		[this](std::unique_ptr<Axe>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_ + spawnOffSet_);
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+			bullet->SetDamage(status_.damage);
+			bullet->SetLifeTime(status_.lifeTime);
+			bullet->SetScaleRate(status_.sizeRate);
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-	if (intervalTimer_.IsFinished()) {
-		auto bullet = std::make_unique<Axe>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetDamage(status_.damage);
-		bullet->SetLifeTime(status_.lifeTime);
-		bullet->SetScaleRate(status_.sizeRate);
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		axe_.push_back(std::move(bullet));
-
-		MyAudio::Play(SE_List::Axe);
-
-		status_.shotNowCount++;
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-	for (auto& bullet : axe_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::BoomerangUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<Boomerang>(
+		boomerang_,
+		SE_List::Boomerang,
+		[this](std::unique_ptr<Boomerang>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_ + spawnOffSet_);
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+			bullet->SetDamage(status_.damage);
+			bullet->SetScaleRate(status_.sizeRate);
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-	if (intervalTimer_.IsFinished()) {
-		auto bullet = std::make_unique<Boomerang>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetDamage(status_.damage);
-		bullet->SetScaleRate(status_.sizeRate);
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		boomerang_.push_back(std::move(bullet));
-
-		MyAudio::Play(SE_List::Boomerang);
-
-		status_.shotNowCount++;
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-	for (auto& bullet : boomerang_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::DiceUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<Dice>(
+		dice_,
+		SE_List::Dice,
+		[this](std::unique_ptr<Dice>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_ + spawnOffSet_);
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+			bullet->SetDamage(status_.damage);
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-	if (intervalTimer_.IsFinished()) {
-		auto bullet = std::make_unique<Dice>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetDamage(status_.damage);
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		dice_.push_back(std::move(bullet));
-
-		MyAudio::Play(SE_List::Dice);
-
-		status_.shotNowCount++;
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-	for (auto& bullet : dice_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::ToxicUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<Toxic>(
+		toxic_,
+		SE_List::Toxic,
+		[this](std::unique_ptr<Toxic>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_);
+			bullet->SetDirectionToEnemy(directionToEnemy_);
+			bullet->SetDamage(status_.damage);
+			bullet->SetScaleMultipler(status_.sizeRate);
+			bullet->SetLifeTime(status_.lifeTime);
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-
-	if (intervalTimer_.IsFinished()) {
-		auto bullet = std::make_unique<Toxic>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_);
-		bullet->SetDirectionToEnemy(directionToEnemy_);
-		bullet->SetDamage(status_.damage);
-		bullet->SetScaleMultipler(status_.sizeRate);
-		bullet->SetLifeTime(status_.lifeTime);
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		toxic_.push_back(std::move(bullet));
-
-		MyAudio::Play(SE_List::Toxic);
-
-		status_.shotNowCount++;
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-	for (auto& bullet : toxic_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::AreaUpdate() {
@@ -421,41 +278,22 @@ void Weapon::AreaUpdate() {
 }
 
 void Weapon::GunUpdate() {
-	// クールタイムが終了している場合
-	if (coolDownTimer_.IsFinished()) {
-		if (!intervalTimer_.IsActive()) {
-			intervalTimer_.Start(status_.intervalTime, true);
-			coolDownTimer_.Reset();
+	UpdateWeapon<Gun>(
+		gun_,
+		SE_List::Gun,
+		[this](std::unique_ptr<Gun>& bullet) {
+			bullet->Initialize();
+			bullet->SetPosition(playerPosition_ + spawnOffSet_);
+			// ランダムターゲット選択が有効な場合は Random DirectionToEnemy_を使用
+			if (status_.useRandomTarget) {
+				bullet->SetDirectionToEnemy(randomDirectionToEnemy_);
+			} else {
+				bullet->SetDirectionToEnemy(directionToEnemy_);
+			}
+			bullet->SetDamage(status_.damage);
+			bullet->SetWeaponName(weaponName_);
 		}
-	}
-	if (intervalTimer_.IsFinished()) {
-		auto bullet = std::make_unique<Gun>();
-		bullet->Initialize();
-		bullet->SetPosition(playerPosition_ + spawnOffSet_);
-		// ランダムターゲット選択が有効な場合は Random DirectionToEnemy_を使用
-		if (status_.useRandomTarget) {
-			bullet->SetDirectionToEnemy(randomDirectionToEnemy_);
-		} else {
-			bullet->SetDirectionToEnemy(directionToEnemy_);
-		}
-		bullet->SetDamage(status_.damage);
-		bullet->SetWeaponName(weaponName_); // 武器の種類を設定
-		gun_.push_back(std::move(bullet));
-		status_.shotNowCount++;
-
-		MyAudio::Play(SE_List::Gun);
-
-		if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
-			status_.shotNowCount = 0;
-			intervalTimer_.Reset();
-			coolDownTimer_.Start(status_.cooldownTime, false);
-		}
-	}
-	coolDownTimer_.Update();
-	intervalTimer_.Update();
-	for (auto& bullet : gun_) {
-		bullet->Update();
-	}
+	);
 }
 
 void Weapon::SetWeaponName(WeaponName weapon) {

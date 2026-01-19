@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Type/Vector3.h"
 
+// プレイヤーのモードを表す列挙型
 enum class PlayerName {
 	PowerMan,
 	TankMan,
@@ -10,6 +11,7 @@ enum class PlayerName {
 	Count
 };
 
+// プレイヤーのステータス構造体
 struct PlayerStatus {
 	// HP関連
 	int maxHP = 100;         // 最大体力

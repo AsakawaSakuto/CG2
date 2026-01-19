@@ -31,12 +31,12 @@ void TextureManager::Initialize(DirectXCommon* dxCommon) {
     dxCommon_ = dxCommon;
     device_ = dxCommon_->GetDevice();
 	//
-	textureDatas_.reserve(DirectXCommon::kMaxSRVCount_);
+	textureData_.reserve(DirectXCommon::kMaxSRVCount_);
 }
 
 void TextureManager::Finalize() {
     // テクスチャリソースをクリア
-    textureDatas_.clear();
+    textureData_.clear();
     texturePathToIndex_.clear();
     
     // デバイス参照をクリア
@@ -53,14 +53,14 @@ void TextureManager::Finalize() {
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath) {
     // 読み込み済みテクスチャデータを検索
     auto it = std::find_if(
-        textureDatas_.begin(), textureDatas_.end(),
+        textureData_.begin(), textureData_.end(),
         [&](const TextureData& data) {
             return data.filePath == filePath;
         });
 
     // 見つかればそのインデックスを返す
-    if (it != textureDatas_.end()) {
-        uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas_.begin(), it));
+    if (it != textureData_.end()) {
+        uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureData_.begin(), it));
         return textureIndex + kSRVIndexTop_;
     }
 
@@ -69,12 +69,12 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath) 
 
     // ※再帰ではなく再検索（安全性とデバッグ性のため）
     auto it2 = std::find_if(
-        textureDatas_.begin(), textureDatas_.end(),
+        textureData_.begin(), textureData_.end(),
         [&](const TextureData& data) {
             return data.filePath == filePath;
         });
     assert(it2 != textureDatas_.end()); // ここで見つからないなら Load に失敗している
-    uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas_.begin(), it2));
+    uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureData_.begin(), it2));
     return textureIndex + kSRVIndexTop_;
 }
 
@@ -85,31 +85,31 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
     assert(index < textureDatas_.size());
 
     // テクスチャデータの参照を取得
-    TextureData& textureData = textureDatas_[index];
+    TextureData& textureData = textureData_[index];
     return textureData.srvHandleGPU;
 }
 
 Vector2 TextureManager::GetTextureSize(const std::string& filePath) {
     // まず該当するテクスチャがロード済みかチェック
     auto it = std::find_if(
-        textureDatas_.begin(), textureDatas_.end(),
+        textureData_.begin(), textureData_.end(),
         [&](const TextureData& data) {
             return data.filePath == filePath;
         });
 
-    if (it == textureDatas_.end()) {
+    if (it == textureData_.end()) {
         // ロードされていなければ先にロード
         LoadTexture(filePath);
         
         // 再度検索
         it = std::find_if(
-            textureDatas_.begin(), textureDatas_.end(),
+            textureData_.begin(), textureData_.end(),
             [&](const TextureData& data) {
                 return data.filePath == filePath;
             });
         
         // ロード後も見つからない場合は緊急処理
-        if (it == textureDatas_.end()) {
+        if (it == textureData_.end()) {
             Logger::Error("FATAL: Texture not found after loading: " + filePath);
             // デフォルトサイズを返す（クラッシュ防止）
             return Vector2{ 1.0f, 1.0f };
@@ -117,8 +117,8 @@ Vector2 TextureManager::GetTextureSize(const std::string& filePath) {
     }
     
     return Vector2{
-        static_cast<float>(it->matadata.width),
-        static_cast<float>(it->matadata.height)
+        static_cast<float>(it->metadata.width),
+        static_cast<float>(it->metadata.height)
     };
 }
 
@@ -129,10 +129,10 @@ Vector2 TextureManager::GetTextureSizeByIndex(uint32_t textureIndex) {
     assert(index < textureDatas_.size());
 
     // テクスチャデータの参照を取得
-    const TextureData& textureData = textureDatas_[index];
+    const TextureData& textureData = textureData_[index];
     return Vector2{
-        static_cast<float>(textureData.matadata.width),
-        static_cast<float>(textureData.matadata.height)
+        static_cast<float>(textureData.metadata.width),
+        static_cast<float>(textureData.metadata.height)
     };
 }
 
@@ -143,7 +143,7 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureIndex) c
     assert(index < textureDatas_.size());
 
     // テクスチャデータの参照を取得
-    return textureDatas_[index].matadata;
+    return textureData_[index].metadata;
 }
 
 void TextureManager::LoadTexture(const std::string& filePath) {
@@ -158,7 +158,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         return;
     }
     
-    OutputDebugStringA(("  -> New texture, index=" + std::to_string(textureDatas_.size()) + "\n").c_str());
+    OutputDebugStringA(("  -> New texture, index=" + std::to_string(textureData_.size()) + "\n").c_str());
 
     // ファイルから読み込み
     DirectX::ScratchImage image{};
@@ -208,22 +208,22 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     }
 
     // 先に index を確保
-    uint32_t index = static_cast<uint32_t>(textureDatas_.size());
+    uint32_t index = static_cast<uint32_t>(textureData_.size());
     
     // 先に map に登録（これで safeFilePath の寿命が保証される）
     texturePathToIndex_[safeFilePath] = index;
     
     // その後で textureData を追加
-    textureDatas_.emplace_back();
-    TextureData& textureData = textureDatas_.back();
+    textureData_.emplace_back();
+    TextureData& textureData = textureData_.back();
 
     // map の key から取得（安全）
     auto it = texturePathToIndex_.find(safeFilePath);
     assert(it != texturePathToIndex_.end());
     textureData.filePath = it->first;  // map の key を参照（寿命が保証される）
     
-    textureData.matadata = finalImage->GetMetadata();
-    textureData.resource = CreateTextureResource(device_.Get(), textureData.matadata);
+    textureData.metadata = finalImage->GetMetadata();
+    textureData.resource = CreateTextureResource(device_.Get(), textureData.metadata);
     UploadTextureData(textureData.resource.Get(), *finalImage);
 
     // SRV登録位置を計算
@@ -246,9 +246,9 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     // UNORMフォーマットの場合はsRGBフォーマットに変換して、
     // GPUがサンプリング時に正しくsRGB→線形変換を行うようにする
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = ConvertToSRGBFormat(textureData.matadata.format);
+    srvDesc.Format = ConvertToSRGBFormat(textureData.metadata.format);
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = UINT(textureData.matadata.mipLevels);
+    srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
     device_->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 }

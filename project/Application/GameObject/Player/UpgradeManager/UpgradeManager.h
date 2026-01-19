@@ -18,6 +18,7 @@ struct UpgradeOption {
 	Rarity rarity = Rarity::UnCommon;           // レアリティ
 };
 
+// アップグレードを管理するクラス
 class UpgradeManager {
 public:
 

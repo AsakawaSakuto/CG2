@@ -7,6 +7,7 @@ class Player;
 class EnemyManager;
 class WeaponManager;
 class Enemy;
+class Weapon;
 
 class CollisionManager
 {
@@ -34,8 +35,22 @@ private:
 	// BulletとEnemyの衝突判定
 	void CheckBulletEnemyCollision();
 	
+	// 各武器タイプ別の衝突判定メソッド
+	void CheckFireBallCollision(Weapon* weapon);
+	void CheckLaserCollision(Weapon* weapon);
+	void CheckRunaCollision(Weapon* weapon);
+	void CheckAxeCollision(Weapon* weapon);
+	void CheckBoomerangCollision(Weapon* weapon);
+	void CheckDiceCollision(Weapon* weapon);
+	void CheckToxicCollision(Weapon* weapon);
+	void CheckAreaCollision(Weapon* weapon);
+	void CheckGunCollision(Weapon* weapon);
+	
 	// 生存している敵のリストをキャッシュ
 	void CacheAliveEnemies();
+	
+	// 共通のダメージ処理ヘルパー
+	void ApplyDamageToEnemy(Enemy* enemy, int damage, const Vector3& knockbackDir, float knockbackPower, WeaponName weaponName);
 
 private:
 
@@ -50,4 +65,7 @@ private:
 	
 	// 生存している敵のキャッシュ（毎フレーム更新)
 	std::vector<Enemy*> aliveEnemiesCache_;
+	int aliveEnemiesCacheReserveIndex_ = 256;
+
+	float knockbackPower_ = 5.0f;
 };

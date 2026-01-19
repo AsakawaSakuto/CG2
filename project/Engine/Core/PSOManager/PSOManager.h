@@ -63,7 +63,7 @@ private:
     DirectXCommon* dxCommon_ = nullptr;
     
     // PSO キャッシュ
-    std::unordered_map<PSOType, Microsoft::WRL::ComPtr<ID3D12PipelineState>> predefindedPSOs_;
+    std::unordered_map<PSOType, Microsoft::WRL::ComPtr<ID3D12PipelineState>> predefinedPSOs_;
     std::unordered_map<PSOCreateParams, Microsoft::WRL::ComPtr<ID3D12PipelineState>, PSOParamsHash> customPSOCache_;
     
     // Root Signature キャッシュ

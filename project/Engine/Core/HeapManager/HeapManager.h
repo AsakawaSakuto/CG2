@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 #include <cassert>
+#include <memory>
 
 class HeapManager {
 public:
@@ -42,7 +43,13 @@ private:
     HeapManager(const HeapManager&) = delete;
     HeapManager& operator=(const HeapManager&) = delete;
 
-    static HeapManager* instance;
+    struct Deleter {
+        void operator()(HeapManager* ptr) const {
+            delete ptr;
+        }
+    };
+
+    static std::unique_ptr<HeapManager, Deleter> instance;
 
     // SRV/UAVヒープ
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;

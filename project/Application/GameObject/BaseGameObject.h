@@ -4,11 +4,11 @@
 #include "Math/Type/Transform.h"
 #include "Camera/Camera.h"
 
+// BaseGameObjectクラス
 class BaseGameObject {
 protected:
 
     bool isAlive_ = true;
-
 	Transform transform_;
     AABB aabbCollision_;
 	Sphere sphereCollision_;

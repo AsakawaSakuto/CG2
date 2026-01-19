@@ -2,7 +2,7 @@
 #include "EngineSystem.h"
 #include "SceneManager/IScene.h"
 #include "GameObject/Player/player.h"
-#include "GameCameraCntroller/GameCameraController.h"
+#include "GameCameraController/GameCameraController.h"
 #include "GameObject/EnemyManager/EnemyManager.h"
 #include "CollisionManager/CollisionManager.h"
 #include "2d/BitmapFont/BitmapFont.h"

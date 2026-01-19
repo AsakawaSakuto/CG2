@@ -14,18 +14,11 @@ public:
 
 	void SetTargetPosition(const Vector3& target) { targetPosition_ = target; }
 
-	void StateChange() { state_ = State::MOVE;  }
+	void StateChange() { isMove_ = true;  }
 private:
-
-	enum class State {
-		NONE,
-		MOVE,
-	};
-
-	State state_ = State::NONE;
-
-private:
+	
 	float speed_ = 10.0f;
+	bool isMove_ = false;
 	unique_ptr<SkiningModel> model_ = make_unique<SkiningModel>();
 	GameTimer scaleTimer_;
 	Vector3 targetPosition_ = {};

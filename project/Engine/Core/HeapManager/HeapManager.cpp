@@ -1,12 +1,13 @@
 #include "HeapManager.h"
+#include <memory>
 
-HeapManager* HeapManager::instance = nullptr;
+std::unique_ptr<HeapManager, HeapManager::Deleter> HeapManager::instance = nullptr;
 
 HeapManager* HeapManager::GetInstance() {
     if (!instance) {
-        instance = new HeapManager();
+        instance.reset(new HeapManager());
     }
-    return instance;
+    return instance.get();
 }
 
 void HeapManager::Initialize(ID3D12Device* device, uint32_t maxSRV, uint32_t maxUAV) {

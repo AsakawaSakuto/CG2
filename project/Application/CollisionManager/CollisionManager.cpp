@@ -16,7 +16,7 @@ void CollisionManager::Initialize() {
 	expItemGetParticle_->Stop();
 	
 	// キャッシュの予約
-	aliveEnemiesCache_.reserve(256);
+	aliveEnemiesCache_.reserve(aliveEnemiesCacheReserveIndex_);
 }
 
 void CollisionManager::CacheAliveEnemies() {
@@ -110,421 +110,354 @@ void CollisionManager::CheckBulletEnemyCollision() {
 	// 全ての武器をチェック
 	const auto& weapons = weaponManager_->GetWeapons();
 	for (const auto& weapon : weapons) {
-		// 各武器の弾をチェック
-		const auto& fireBalls = weapon->GetFireBalls();
-		const auto& lasers = weapon->GetLaser();
-		const auto& runas = weapon->GetRuna();
-		const auto& axes = weapon->GetAxe();
-		const auto& boomerangs = weapon->GetBoomerang();
-		const auto& dices = weapon->GetDice();
-		const auto& toxics = weapon->GetToxic();
-		const auto& area = weapon->GetArea();
-		const auto& guns = weapon->GetGun();
+		CheckFireBallCollision(weapon.get());
+		CheckLaserCollision(weapon.get());
+		CheckRunaCollision(weapon.get());
+		CheckAxeCollision(weapon.get());
+		CheckBoomerangCollision(weapon.get());
+		CheckDiceCollision(weapon.get());
+		CheckToxicCollision(weapon.get());
+		CheckAreaCollision(weapon.get());
+		CheckGunCollision(weapon.get());
+	}
+}
 
-		// FireBalls
-		for (const auto& bullet : fireBalls) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-			float bulletRadiusSq = bulletSphere.radius * bulletSphere.radius;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue; // 他の弾で死んだ可能性
-				
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 5.0f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-					
-					bullet->Dead();
-					break; // FireBallは1体にしか当たらない
-				}
-			}
-		}
-
-		// Lasers
-		for (const auto& bullet : lasers) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				if (bullet->HasHitEnemy(enemy)) {
-					continue;
-				}
-
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 3.0f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-					
-					bullet->MarkEnemyAsHit(enemy);
-					
-					if (bullet->GetPenetrationCount() > 0) {
-						bullet->DecrementPenetrationCount();
-					}
-				}
-			}
-		}
-
-		// Runas
-		for (const auto& bullet : runas) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				if (bullet->HasHitEnemy(enemy)) {
-					continue;
-				}
-
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 4.0f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-					
-					bullet->MarkEnemyAsHit(enemy);
-					
-					bullet->Bounce();
-				}
-			}
-		}
-
-		// Axes
-		for (const auto& bullet : axes) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 4.5f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-				}
-			}
-		}
-
-		// Boomerangs
-		for (const auto& bullet : boomerangs) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 3.5f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-				}
-			}
-		}
-
-		// Dices
-		for (const auto& bullet : dices) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetRandDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 6.0f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-					bullet->Dead();
-				}
-			}
-		}
-
-		// Toxics
-		for (const auto& bullet : toxics) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 2.5f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-				}
-			}
-		}
-
-		// Area（常時存在する範囲攻撃）
-		if (area && area->IsAlive()) {
-			const Sphere& areaSphere = area->GetSphereCollision();
-			const Vector3& areaPos = areaSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = areaSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(areaPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					int damage = static_cast<int>(area->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（エリア中心から外側へ）
-					Vector3 knockbackDir = (enemySphere.center - areaPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 2.0f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(area->GetWeaponName());
-					}
-					
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-				}
-			}
-		}
-
-		// Guns
-		for (const auto& bullet : guns) {
-			if (!bullet->IsAlive()) {
-				continue;
-			}
-
-			const Sphere& bulletSphere = bullet->GetSphereCollision();
-			const Vector3& bulletPos = bulletSphere.center;
-
-			for (Enemy* enemy : aliveEnemiesCache_) {
-				if (!enemy->IsAlive()) continue;
-				
-				const Sphere& enemySphere = enemy->GetSphereCollision();
-				
-				// 距離の二乗で早期棄却
-				float maxDist = bulletSphere.radius + enemySphere.radius;
-				float distSq = DistanceSquared(bulletPos, enemySphere.center);
-				if (distSq > maxDist * maxDist) {
-					continue;
-				}
-
-				if (!enemy->IsActiveInvincibleTimer()) {
-					enemyDieParticle_->Play(enemy->GetPosition(), false);
-
-					int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
-					int enemyHPBefore = enemy->GetHP(); // ダメージを与える前のHP
-					enemy->Damage(damage);
-					
-					// ノックバック方向を計算（弾の進行方向）
-					Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
-					enemy->ApplyKnockback(knockbackDir, 7.0f);
-					
-					// 敵が倒されたかチェック
-					if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
-						// この武器でキルカウントをインクリメント
-						weaponManager_->IncrementWeaponKillCount(bullet->GetWeaponName());
-					}
+void CollisionManager::ApplyDamageToEnemy(Enemy* enemy, int damage, const Vector3& knockbackDir, float knockbackPower, WeaponName weaponName) {
+	int enemyHPBefore = enemy->GetHP();
+	enemy->Damage(damage);
+	enemy->ApplyKnockback(knockbackDir, knockbackPower);
 	
-					enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
-					
-					bullet->Dead();
-					break; // Gunは1体にしか当たらない
+	// 敵が倒されたかチェック
+	if (enemyHPBefore > 0 && enemy->GetHP() <= 0) {
+		weaponManager_->IncrementWeaponKillCount(weaponName);
+	}
+	
+	enemyManager_->CreateDamagePlane(enemy->GetPosition(), damage);
+}
+
+void CollisionManager::CheckFireBallCollision(Weapon* weapon) {
+	const auto& fireBalls = weapon->GetFireBalls();
+	
+	for (const auto& bullet : fireBalls) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+		float bulletRadiusSq = bulletSphere.radius * bulletSphere.radius;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, knockbackPower_, bullet->GetWeaponName());
+				
+				bullet->Dead();
+				break; // FireBallは1体にしか当たらない
+			}
+		}
+	}
+}
+
+void CollisionManager::CheckLaserCollision(Weapon* weapon) {
+	const auto& lasers = weapon->GetLaser();
+	
+	for (const auto& bullet : lasers) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			if (bullet->HasHitEnemy(enemy)) {
+				continue;
+			}
+
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, 3.0f, bullet->GetWeaponName());
+				
+				bullet->MarkEnemyAsHit(enemy);
+				
+				if (bullet->GetPenetrationCount() > 0) {
+					bullet->DecrementPenetrationCount();
 				}
+			}
+		}
+	}
+}
+
+void CollisionManager::CheckRunaCollision(Weapon* weapon) {
+	const auto& runas = weapon->GetRuna();
+	
+	for (const auto& bullet : runas) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			if (bullet->HasHitEnemy(enemy)) {
+				continue;
+			}
+
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, 4.0f, bullet->GetWeaponName());
+				
+				bullet->MarkEnemyAsHit(enemy);
+				bullet->Bounce();
+			}
+		}
+	}
+}
+
+void CollisionManager::CheckAxeCollision(Weapon* weapon) {
+	const auto& axes = weapon->GetAxe();
+	
+	for (const auto& bullet : axes) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, 4.5f, bullet->GetWeaponName());
+			}
+		}
+	}
+}
+
+void CollisionManager::CheckBoomerangCollision(Weapon* weapon) {
+	const auto& boomerangs = weapon->GetBoomerang();
+	
+	for (const auto& bullet : boomerangs) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, 3.5f, bullet->GetWeaponName());
+			}
+		}
+	}
+}
+
+void CollisionManager::CheckDiceCollision(Weapon* weapon) {
+	const auto& dices = weapon->GetDice();
+	
+	for (const auto& bullet : dices) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetRandDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, 6.0f, bullet->GetWeaponName());
+				
+				bullet->Dead();
+			}
+		}
+	}
+}
+
+void CollisionManager::CheckToxicCollision(Weapon* weapon) {
+	const auto& toxics = weapon->GetToxic();
+	
+	for (const auto& bullet : toxics) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, 2.5f, bullet->GetWeaponName());
+			}
+		}
+	}
+}
+
+void CollisionManager::CheckAreaCollision(Weapon* weapon) {
+	const auto& area = weapon->GetArea();
+	
+	if (!area || !area->IsAlive()) {
+		return;
+	}
+
+	const Sphere& areaSphere = area->GetSphereCollision();
+	const Vector3& areaPos = areaSphere.center;
+
+	for (Enemy* enemy : aliveEnemiesCache_) {
+		if (!enemy->IsAlive()) continue;
+		
+		const Sphere& enemySphere = enemy->GetSphereCollision();
+		
+		// 距離の二乗で早期棄却
+		float maxDist = areaSphere.radius + enemySphere.radius;
+		float distSq = DistanceSquared(areaPos, enemySphere.center);
+		if (distSq > maxDist * maxDist) {
+			continue;
+		}
+
+		if (!enemy->IsActiveInvincibleTimer()) {
+			int damage = static_cast<int>(area->GetDamage() * player_->GetDamageRate());
+			Vector3 knockbackDir = (enemySphere.center - areaPos).Normalized();
+			ApplyDamageToEnemy(enemy, damage, knockbackDir, 2.0f, area->GetWeaponName());
+		}
+	}
+}
+
+void CollisionManager::CheckGunCollision(Weapon* weapon) {
+	const auto& guns = weapon->GetGun();
+	
+	for (const auto& bullet : guns) {
+		if (!bullet->IsAlive()) {
+			continue;
+		}
+
+		const Sphere& bulletSphere = bullet->GetSphereCollision();
+		const Vector3& bulletPos = bulletSphere.center;
+
+		for (Enemy* enemy : aliveEnemiesCache_) {
+			if (!enemy->IsAlive()) continue;
+			
+			const Sphere& enemySphere = enemy->GetSphereCollision();
+			
+			// 距離の二乗で早期棄却
+			float maxDist = bulletSphere.radius + enemySphere.radius;
+			float distSq = DistanceSquared(bulletPos, enemySphere.center);
+			if (distSq > maxDist * maxDist) {
+				continue;
+			}
+
+			if (!enemy->IsActiveInvincibleTimer()) {
+				enemyDieParticle_->Play(enemy->GetPosition(), false);
+
+				int damage = static_cast<int>(bullet->GetDamage() * player_->GetDamageRate());
+				Vector3 knockbackDir = (enemySphere.center - bulletPos).Normalized();
+				ApplyDamageToEnemy(enemy, damage, knockbackDir, 7.0f, bullet->GetWeaponName());
+
+				bullet->Dead();
+				break; // Gunは1体にしか当たらない
 			}
 		}
 	}

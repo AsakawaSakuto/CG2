@@ -43,7 +43,7 @@ private:
     unique_ptr<Model> model_ = make_unique<Model>();
 
 	Vector3 targetPosition_ = { 0.0f, 0.0f, 0.0f };
-	float collicionRadius_ = 0.5f;
+	float collisionRadius_ = 0.5f;
 
 	GameTimer scaleTimer_;
 	
@@ -51,7 +51,7 @@ private:
 	Map3D* map_ = nullptr;
 	
 	// マップコリジョン用AABB
-	AABB mapCollosion_;
+	AABB mapCollision_;
 	
 	// 物理関連
 	float velocity_Y = 0.0f;       // 垂直速度

@@ -151,7 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\CollisionManager\CollisionManager.cpp" />
-    <ClCompile Include="Application\GameCameraCntroller\GameCameraController.cpp" />
+    <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\DamagePlane.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\GameObject\EnemyManager\Enemy\Enemy.cpp" />
@@ -274,7 +274,7 @@
   <ItemGroup>
     <ClInclude Include="Application\CollisionManager\CollisionManager.h" />
     <ClInclude Include="Application\EngineSystem.h" />
-    <ClInclude Include="Application\GameCameraCntroller\GameCameraController.h" />
+    <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
     <ClInclude Include="Application\GameObject\BaseGameObject.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\DamagePlane.h" />
     <ClInclude Include="Application\GameObject\EnemyManager\EnemyManager.h" />
