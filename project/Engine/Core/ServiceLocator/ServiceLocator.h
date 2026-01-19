@@ -26,7 +26,7 @@ public:
 	/// <summary>
 	/// サービスがセットアップされているか確認
 	/// </summary>
-	/// <returns>セットアップされていればtrue</returns>
+	/// <returns>セットアップされていれば true</returns>
 	static bool IsInitialized() {
 		return dxCommon_ != nullptr;
 	}

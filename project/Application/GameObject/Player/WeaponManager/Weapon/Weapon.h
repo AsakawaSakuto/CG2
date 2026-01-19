@@ -2,6 +2,7 @@
 #include "GameObject/Player/WeaponManager/WeaponStatus.h"
 #include "Camera/Camera.h"
 #include <queue>
+#include <functional>
 
 #include"GameObject/Rarity.h"
 
@@ -20,14 +21,23 @@
 /// </summary>
 class Weapon {
 public:
+
+	// 武器の初期化
 	void Initialize(WeaponName weaponName);
 
+	// 武器の更新
 	void Update();
 
+	// 武器の描画
 	void Draw(Camera camera);
 
+	// プレイヤーの位置と敵への方向を設定
 	void SetPlayerPosition(const Vector3& position) { playerPosition_ = position; }
+
+	// 敵への方向を設定
 	void SetDirectionToEnemy(const Vector3& direction) { directionToEnemy_ = direction; }
+
+	// 敵へのランダム方向を設定
 	void SetRandomDirectionToEnemy(const Vector3& direction) { randomDirectionToEnemy_ = direction; }
 
 	// 弾のリストへのアクセス（const参照）
@@ -40,7 +50,6 @@ public:
 	const std::vector<std::unique_ptr<Toxic>>& GetToxic() const { return toxic_; }
 	const std::unique_ptr<Area>& GetArea() const { return area_; }
 	const std::vector<std::unique_ptr<Gun>>& GetGun() const { return gun_; }
-
 	void PostFrameCleanup();
 	
 	/// <summary>
@@ -210,6 +219,7 @@ public:
 	const WeaponStatus& GetStatus() const { return status_; }
 private:
 
+	// 各武器の更新関数
 	void FireBallUpdate();
 	void LaserUpdate();
 	void RunaUpdate();
@@ -219,6 +229,50 @@ private:
 	void ToxicUpdate();
 	void AreaUpdate();
 	void GunUpdate();
+
+	/// <summary>
+	/// 共通の武器更新ロジック（テンプレート関数）
+	/// </summary>
+	/// <typeparam name="T">弾の型</typeparam>
+	/// <param name="bulletList">弾のリスト</param>
+	/// <param name="seList">再生する効果音</param>
+	/// <param name="setupFunc">弾の初期化を行うラムダ関数</param>
+	template<typename T>
+	void UpdateWeapon(
+		std::vector<std::unique_ptr<T>>& bulletList,
+		SE_List seList,
+		std::function<void(std::unique_ptr<T>&)> setupFunc
+	) {
+		// クールタイムが終了している場合
+		if (coolDownTimer_.IsFinished()) {
+			if (!intervalTimer_.IsActive()) {
+				intervalTimer_.Start(status_.intervalTime, true);
+				coolDownTimer_.Reset();
+			}
+		}
+
+		if (intervalTimer_.IsFinished()) {
+			auto bullet = std::make_unique<T>();
+			setupFunc(bullet);
+			bulletList.push_back(std::move(bullet));
+
+			MyAudio::Play(seList);
+
+			status_.shotNowCount++;
+			if (status_.shotNowCount >= static_cast<int>(status_.shotMaxCount)) {
+				status_.shotNowCount = 0;
+				intervalTimer_.Reset();
+				coolDownTimer_.Start(status_.cooldownTime, false);
+			}
+		}
+
+		coolDownTimer_.Update();
+		intervalTimer_.Update();
+
+		for (auto& bullet : bulletList) {
+			bullet->Update();
+		}
+	}
 
 private:
 

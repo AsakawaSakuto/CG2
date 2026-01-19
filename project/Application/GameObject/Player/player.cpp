@@ -215,14 +215,6 @@ void Player::Update() {
 		model_->Update(1.0f / 60.0f, transform_);
 	}
 
-	/*if (MyInput::TriggerKey(DIK_0)) {
-		upgradeManager_->Upgrade();
-	}
-	if (MyInput::TriggerKey(DIK_9)) {
-		status_.currentHP -= 10;
-	}*/
-
-
 	MyDebugLine::AddShape(sphereCollision_);
 	Circle expCircle = {};
 	expCircle.center = { transform_.translate.x ,transform_.translate.y + 0.1f ,transform_.translate.z };
@@ -239,8 +231,6 @@ void Player::Draw(Camera camera) {
 	if (isVisible_) {
 		model_->Draw(camera);
 	}
-
-	//expItemGetRange_->Draw(camera, expGetRangeTransform_);
 
 	moveParticle_->Draw(camera);
 	landingParticle_->Draw(camera);
@@ -293,8 +283,7 @@ void Player::DrawImGui() {
 	
 	ImGui::End();
 #endif
-	//landingParticle_->DrawImGui("move Particle");
-
+	
 	upgradeManager_->DrawImGui();
 }
 
@@ -420,14 +409,14 @@ Vector3 Player::CalculateCameraMoveDirection(float stickX, float stickY) {
 	// 前方向（カメラが向いている方向）
 	Vector3 forward = {
 		std::sin(cameraHorizontalAngle),   // X成分
-		0.0f,                               // Y成分は無視（水平移動のみ）
+		0.0f,                              // Y成分は無視（水平移動のみ）
 		std::cos(cameraHorizontalAngle)    // Z成分
 	};
 	
 	// 右方向（前方向を90度時計回りに回転）
 	Vector3 right = {
 		std::cos(cameraHorizontalAngle),   // X成分
-		0.0f,                               // Y成分は無視
+		0.0f,                              // Y成分は無視
 		-std::sin(cameraHorizontalAngle)   // Z成分
 	};
 	

@@ -17,7 +17,7 @@ void ExpItem::Update() {
 		Vector3({0.0f,0.0f,0.0f}), Vector3({ 0.5f,0.5f,0.5f }),
 		scaleTimer_.GetProgress(), EaseType::EaseOutBack);
 
-	if (state_ == State::MOVE) {
+	if (isMove_) {
 		// .xz平面でターゲット位置への方向ベクトルを計算（yは無視）
 		Vector3 direction = {
 			targetPosition_.x - transform_.translate.x,

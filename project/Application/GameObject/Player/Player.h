@@ -11,11 +11,20 @@ class EnemyManager;
 class Map3D;
 class TreeManager;
 
+/// <summary>
+/// プレイヤークラス
+/// </summary>
 class Player : public BaseGameObject {
 public:
+
+	// 初期化
     void Initialize() override;
     void Initialize(PlayerName playerName, WeaponName weaponName);
+
+	// 更新
     void Update() override;
+
+	// 描画
     void Draw(Camera camera) override;
     void DrawImGui() override;
   
@@ -117,7 +126,7 @@ public:
 	/// 新しい武器を装備する
 	/// </summary>
 	/// <param name="weaponName">装備する武器の種類</param>
-	/// <returns>装備に成功した場合true</returns>
+	/// <returns>装備に成功した場合 true</returns>
 	bool EquipWeapon(WeaponName weaponName) {
 		return weaponManager_->EquipWeapon(weaponName);
 	}
@@ -127,7 +136,7 @@ public:
 	/// </summary>
 	/// <param name="slotIndex">変更するスロット番号（0-3）</param>
 	/// <param name="weaponName">新しい武器の種類</param>
-	/// <returns>変更に成功した場合true</returns>
+	/// <returns>変更に成功した場合 true</returns>
 	bool ChangeWeapon(int slotIndex, WeaponName weaponName) {
 		return weaponManager_->ChangeWeapon(slotIndex, weaponName);
 	}

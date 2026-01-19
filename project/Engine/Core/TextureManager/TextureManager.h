@@ -51,7 +51,7 @@ public:
 	const DirectX::TexMetadata& GetMetaData(uint32_t textureIndex) const;
 
 	//
-	size_t GetTextureCount() const {return textureDatas_.size();}
+	size_t GetTextureCount() const {return textureData_.size();}
 
 	//
 	size_t GetPathToIndexMapSize() const {return texturePathToIndex_.size();}
@@ -67,13 +67,13 @@ private:
 	//
 	struct TextureData {
 		std::string filePath;
-		DirectX::TexMetadata matadata;
+		DirectX::TexMetadata metadata;
 		Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
 	};
 	//
-	std::vector<TextureData> textureDatas_;
+	std::vector<TextureData> textureData_;
 	//
 	static uint32_t kSRVIndexTop_;
 	//

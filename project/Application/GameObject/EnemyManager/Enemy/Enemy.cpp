@@ -8,24 +8,22 @@ void Enemy::Initialize() {
 	transform_.scale = { 0.0f,0.0f,0.0f };
 	transform_.translate = { 0.0f,0.0f,0.0f };
 
-	//model_->Initialize("Animation/human/lowWalk.gltf");
 	model_->Initialize("enemy/enemy.obj");
 	// フラスタムカリングを有効化（画面外の敵の更新・描画をスキップ）
-	//model_->SetUpdateFrustumCulling(true);
 	model_->SetDrawFrustumCulling(true);
 	
 	// デフォルトは通常の色
 	model_->SetColor3({ 1.0f, 1.0f, 1.0f });
 
 	// moveSpeed_は使用せず、status_.moveSpeedを使用する
-	collicionRadius_ = 0.5f;
+	collisionRadius_ = 0.5f;
 
 	scaleTimer_.Start(0.5f, false);
 	
 	// AABBの初期化（プレイヤーと同様の構造）
-	mapCollosion_.center = { 0.0f, 0.0f, 0.0f };
-	mapCollosion_.min = { -0.5f, 0.0f, -0.5f };
-	mapCollosion_.max = { 0.5f, 0.25f, 0.5f };
+	mapCollision_.center = { 0.0f, 0.0f, 0.0f };
+	mapCollision_.min = { -0.5f, 0.0f, -0.5f };
+	mapCollision_.max = { 0.5f, 0.25f, 0.5f };
 	
 	// 物理パラメータの初期化
 	velocity_Y = 0.0f;
@@ -44,7 +42,7 @@ void Enemy::Update() {
 	Move();
 	
 	// AABBの中心をエネミーの位置に設定
-	mapCollosion_.center = transform_.translate;
+	mapCollision_.center = transform_.translate;
 	
 	// マップとの衝突解決を実行
 	if (map_) {
@@ -55,7 +53,7 @@ void Enemy::Update() {
 		scaleTimer_.GetProgress(), EaseType::Linear);
 
 	sphereCollision_.center = transform_.translate;
-	sphereCollision_.radius = collicionRadius_;
+	sphereCollision_.radius = collisionRadius_;
 
 	scaleTimer_.Update();
 
@@ -80,7 +78,7 @@ void Enemy::Update() {
 	// デバッグ描画はF1キーで切り替え（パフォーマンス向上のため）
 	if (MyInput::PushKey(DIK_F1)) {
 		MyDebugLine::AddShape(sphereCollision_);
-		MyDebugLine::AddShape(mapCollosion_, {0.0f, 1.0f, 0.0f, 1.0f});
+		MyDebugLine::AddShape(mapCollision_, {0.0f, 1.0f, 0.0f, 1.0f});
 	}
 #endif
 }
@@ -107,7 +105,7 @@ void Enemy::DrawImGui() {
 	if (map_) {
 		onSlope = map_->GetSlopeHeight(transform_.translate, slopeY);
 		if (onSlope) {
-			float playerBottom = transform_.translate.y + mapCollosion_.min.y;
+			float playerBottom = transform_.translate.y + mapCollision_.min.y;
 			float distanceToSlope = playerBottom - slopeY;
 			
 			ImGui::Separator();
@@ -134,9 +132,9 @@ void Enemy::Move() {
 		float slopeY;
 		if (map_->GetSlopeHeight(transform_.translate, slopeY)) {
 			// エネミーの足元の高さ
-			float playerBottom = transform_.translate.y + mapCollosion_.min.y;
+			float playerBottom = transform_.translate.y + mapCollision_.min.y;
 			// エネミーの頭頂部の高さ
-			float playerTop = transform_.translate.y + mapCollosion_.max.y;
+			float playerTop = transform_.translate.y + mapCollision_.max.y;
 			
 			// スロープの高さとの距離を計算
 			float distanceToSlope = playerBottom - slopeY;
@@ -146,7 +144,7 @@ void Enemy::Move() {
 			// プレイヤーと同じ閾値0.2fを使用
 			if (distanceToSlope <= 0.2f && velocity_Y <= 0.0f && playerTop > slopeY) {
 				// スロープに吸着
-				transform_.translate.y = slopeY - mapCollosion_.min.y;
+				transform_.translate.y = slopeY - mapCollision_.min.y;
 				velocity_Y = 0.0f;
 				isGrounded_ = true;
 				onSlope = true;
@@ -238,14 +236,14 @@ void Enemy::ResolveMapCollision() {
 	const int32_t checkRange = 1;
 	
 	// エネミーのAABBをワールド座標で取得
-	Vector3 playerMin = mapCollosion_.GetMinWorld();
-	Vector3 playerMax = mapCollosion_.GetMaxWorld();
+	Vector3 playerMin = mapCollision_.GetMinWorld();
+	Vector3 playerMax = mapCollision_.GetMaxWorld();
 
 	// スロープ上にいるかチェック（プレイヤーと同様の処理）
 	float slopeY;
 	bool isOnSlope = map_->GetSlopeHeight(transform_.translate, slopeY);
-	float playerBottom = transform_.translate.y + mapCollosion_.min.y;
-	float playerTop = transform_.translate.y + mapCollosion_.max.y;
+	float playerBottom = transform_.translate.y + mapCollision_.min.y;
+	float playerTop = transform_.translate.y + mapCollision_.max.y;
 	float distanceToSlope = playerBottom - slopeY;
 	bool standingOnSlope = false;
 	
@@ -298,7 +296,7 @@ void Enemy::ResolveMapCollision() {
 					slopeBlockAABB.max = {  7.5f,  5.0f,  7.5f };
 					
 					// スロープブロックとの衝突判定
-					if (Collision::IsHit(mapCollosion_, slopeBlockAABB)) {
+					if (Collision::IsHit(mapCollision_, slopeBlockAABB)) {
 						// スロープ表面の上にいるかチェック（プレイヤーと同じ処理）
 						float playerSlopeHeight;
 						bool playerIsOnSlopeSurface = false;
@@ -338,7 +336,7 @@ void Enemy::ResolveMapCollision() {
 				blockAABB.max = {  7.5f,  5.0f,  7.5f };
 
 				// 衝突判定
-				if (!Collision::IsHit(mapCollosion_, blockAABB)) continue;
+				if (!Collision::IsHit(mapCollision_, blockAABB)) continue;
 
 				// 衝突している場合、押し出し量を計算
 				Vector3 blockMin = blockAABB.GetMinWorld();
@@ -365,7 +363,7 @@ void Enemy::ResolveMapCollision() {
 					// Y軸方向の押し出し（下方向へ落ちないように）
 					if (overlapY > 0.0f && transform_.translate.y > blockWorldPos.y) {
 						// ブロックの上に乗せる
-						transform_.translate.y = blockTop - mapCollosion_.min.y;
+						transform_.translate.y = blockTop - mapCollision_.min.y;
 						velocity_Y = 0.0f;
 						isGrounded_ = true;
 					}
@@ -383,16 +381,16 @@ void Enemy::ResolveMapCollision() {
 		// スロープ衝突がある場合は、スロープ表面の高さを優先
 		// （スロープ表面より上には上昇しない）
 		if (hasSlopeCollision) {
-			targetY = highestSlopeTop - mapCollosion_.min.y;
+			targetY = highestSlopeTop - mapCollision_.min.y;
 			
 			// Normalブロック衝突もある場合は、より低い方を選択
 			if (hasBlockCollision) {
-				float normalTargetY = highestBlockTop - mapCollosion_.min.y + 0.01f;
+				float normalTargetY = highestBlockTop - mapCollision_.min.y + 0.01f;
 				targetY = (std::min)(targetY, normalTargetY);
 			}
 		} else {
 			// Normalブロック衝突のみの場合
-			targetY = highestBlockTop - mapCollosion_.min.y + 0.01f;
+			targetY = highestBlockTop - mapCollision_.min.y + 0.01f;
 		}
 		
 		// 現在の高さとの差
@@ -422,7 +420,7 @@ void Enemy::ResolveMapCollision() {
 		}
 		
 		// AABBの中心も更新
-		mapCollosion_.center = transform_.translate;
+		mapCollision_.center = transform_.translate;
 	}
 }
 
@@ -435,8 +433,8 @@ bool Enemy::IsGroundedOnMap() {
 	// エネミーの足元のAABBを作成（少し下に拡張）
 	AABB groundCheckAABB;
 	groundCheckAABB.center = transform_.translate;
-	groundCheckAABB.min = mapCollosion_.min;
-	groundCheckAABB.max = mapCollosion_.max;
+	groundCheckAABB.min = mapCollision_.min;
+	groundCheckAABB.max = mapCollision_.max;
 	// 足元を少し下に拡張
 	groundCheckAABB.min.y -= groundCheckDistance;
 
@@ -475,7 +473,7 @@ bool Enemy::IsGroundedOnMap() {
 					if (Collision::IsHit(groundCheckAABB, blockAABB)) {
 						// ブロックが足元にある場合、そのブロックの上面がエネミーの足元より少し下にあるかチェック
 						float blockTop = blockAABB.GetMaxWorld().y;
-						float playerBottom = mapCollosion_.GetMinWorld().y;
+						float playerBottom = mapCollision_.GetMinWorld().y;
 						
 						// ブロックの上面がエネミーの足元付近にある場合のみ地面と判定
 						float distance = playerBottom - blockTop;
@@ -493,7 +491,7 @@ bool Enemy::IsGroundedOnMap() {
 					// スロープの場合は、スロープ上のY座標を計算して判定
 					float slopeY;
 					if (map_->GetSlopeHeight(transform_.translate, slopeY)) {
-						float playerBottom = transform_.translate.y + mapCollosion_.min.y;
+						float playerBottom = transform_.translate.y + mapCollision_.min.y;
 						float distance = playerBottom - slopeY;
 						// スロープの表面付近にいる場合は地面と判定
 						if (distance >= -0.01f && distance <= groundCheckDistance) {
@@ -520,7 +518,7 @@ void Enemy::PushAway(const Vector3& otherPosition, float otherRadius) {
 	float distance = std::sqrt(direction.x * direction.x + direction.z * direction.z);
 
 	// 重なり量を計算
-	float radiusSum = collicionRadius_ + otherRadius;
+	float radiusSum = collisionRadius_ + otherRadius;
 	float overlap = radiusSum - distance;
 
 	// 重なっている場合のみ押し出す

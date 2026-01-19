@@ -61,7 +61,6 @@ void TestScene::Initialize() {
 
     testGauge_->Initialize();
 
-    //MyAudio::PlayBGM(BGM_List::TEST, 0.0f);
 }
 
 void TestScene::Update() {
@@ -72,7 +71,6 @@ void TestScene::Update() {
     MyDebugLine::AddShape(line);
 
 	// 回転を適用（orientation行列を更新）
-	//testOBB_.UpdateOrientation();
 	testOvalSphere_.UpdateOrientation();
 
 	Sphere axeSphere = {};
@@ -111,9 +109,6 @@ void TestScene::Update() {
 	Vector4 ovalSphereColor = ovalSphereHit ? Vector4 RED : Vector4 WHITE;
 	Vector4 aabbColor = aabbHit ? Vector4 RED : Vector4 WHITE;
 	Vector4 obbColor = obbHit ? Vector4 RED : Vector4 WHITE;
-
-    //testAABB_.UpdateOrientation();
-	//testOBB_.UpdateOrientation();
 
 	MyDebugLine::AddShape(testSphere_, sphereColor);
 	MyDebugLine::AddShape(testOvalSphere_, ovalSphereColor);
@@ -163,8 +158,6 @@ void TestScene::Draw() {
 
 	bitmapFont_.Draw();
 
-	//testGauge_->Draw();
-
     MyDebugLine::Draw(camera_);
 }
 
@@ -185,38 +178,6 @@ void TestScene::DrawImGui() {
 	testParticle_->DrawImGui("testParticle");
 
 	testSprite_->DrawImGui("testSprite");
-
-	/*testOBB_.DrawImGui("testOBB");
-    testAABB_.DrawImGui("testAABB");
-    testSphere_.DrawImGui("testSphere");
-    testOvalSphere_.DrawImGui("testOvalSphere");
-    testPlane_.DrawImGui("testPlane");
-    
-	cube_->DrawImGui("cubeModel");
-
-    debugCamera_.DrawImgui();
-
-	ImGui::Begin("Set Number");
-
-    ImGui::DragInt("Value", &setValue_, 1, 0, 999999);
-
-	ImGui::DragFloat("Test Float", &currentGaugeValue_, 0.1f, 0.0f, 100.0f);
-
-	ImGui::DragFloat("Max Float", &maxGaugeValue_, 0.1f, 1.0f, 1000.0f);
-
-	ImGui::End();
-
-	bitmapFont_.DrawImGui("bitmapFont");
-
-	testGauge_->DrawImGui("testGauge");*/
-
-    //testSprite_->DrawImGui("testSprite");
-
-	//MT4_01_01();
-	//MT4_01_02();
-	//MT4_01_03();
-	//MT4_01_04();
-    //MT4_01_05();
 
 #endif
 }

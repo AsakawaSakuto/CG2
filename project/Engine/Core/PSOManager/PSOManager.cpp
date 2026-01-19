@@ -34,7 +34,7 @@ void PSOManager::Finalize() {
     customPSOCache_.clear();
     
     // 事前定義済みPSOキャッシュをクリア
-    predefindedPSOs_.clear();
+    predefinedPSOs_.clear();
     
     // RootSignatureキャッシュをクリア
     rootSignatures_.clear();
@@ -47,8 +47,8 @@ void PSOManager::Finalize() {
 
 Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::GetPSO(PSOType type) {
     // キャッシュチェック
-    auto it = predefindedPSOs_.find(type);
-    if (it != predefindedPSOs_.end()) {
+    auto it = predefinedPSOs_.find(type);
+    if (it != predefinedPSOs_.end()) {
         psoCacheHits_++;
         return it->second;   // ここはそのままでOK
     }
@@ -71,7 +71,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::GetPSO(PSOType type) {
         return nullptr;
     }
 
-    predefindedPSOs_[type] = pso;
+    predefinedPSOs_[type] = pso;
 
 #ifdef _DEBUG
     auto endTime = std::chrono::high_resolution_clock::now();
@@ -438,7 +438,7 @@ void PSOManager::PrintCacheStats() const {
     sprintf_s(buffer, "Total Cached Shaders: %zu\n", shaderCache_.size());
     OutputDebugStringA(buffer);
     
-    sprintf_s(buffer, "Total Cached PSOs: %zu\n", predefindedPSOs_.size() + customPSOCache_.size());
+    sprintf_s(buffer, "Total Cached PSOs: %zu\n", predefinedPSOs_.size() + customPSOCache_.size());
     OutputDebugStringA(buffer);
     
     // 節約できた時間の推定値も表示
