@@ -268,7 +268,7 @@ void TreeManager::SetOccludersTransparent(const Vector3& cameraPos, const Vector
 	
 	direction = direction / distance; // 正規化
 	
-	const float checkRadius = 7.5f; // チェック半径
+	const float checkRadius = 10.0f; // チェック半径
 	
 	// 全ての木をチェック
 	for (auto& tree : trees_) {
