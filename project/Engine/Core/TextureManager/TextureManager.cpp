@@ -73,7 +73,7 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath) 
         [&](const TextureData& data) {
             return data.filePath == filePath;
         });
-    assert(it2 != textureDatas_.end()); // ここで見つからないなら Load に失敗している
+    assert(it2 != textureData_.end()); // ここで見つからないなら Load に失敗している
     uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureData_.begin(), it2));
     return textureIndex + kSRVIndexTop_;
 }
@@ -82,7 +82,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
     // 範囲外アクセスチェック
     assert(textureIndex >= kSRVIndexTop_);
     uint32_t index = textureIndex - kSRVIndexTop_;
-    assert(index < textureDatas_.size());
+    assert(index < textureData_.size());
 
     // テクスチャデータの参照を取得
     TextureData& textureData = textureData_[index];
@@ -126,7 +126,7 @@ Vector2 TextureManager::GetTextureSizeByIndex(uint32_t textureIndex) {
     // 範囲外アクセスチェック
     assert(textureIndex >= kSRVIndexTop_);
     uint32_t index = textureIndex - kSRVIndexTop_;
-    assert(index < textureDatas_.size());
+    assert(index < textureData_.size());
 
     // テクスチャデータの参照を取得
     const TextureData& textureData = textureData_[index];
@@ -140,7 +140,7 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureIndex) c
     // 範囲外アクセスチェック
     assert(textureIndex >= kSRVIndexTop_);
     uint32_t index = textureIndex - kSRVIndexTop_;
-    assert(index < textureDatas_.size());
+    assert(index < textureData_.size());
 
     // テクスチャデータの参照を取得
     return textureData_[index].metadata;
