@@ -170,6 +170,10 @@ void GameSceneUI::Initialize() {
 	isLastDraw_ = false;
 
 	startTimer_.Start(2.0f, false);
+
+	minMap_ = std::make_unique<Sprite>();
+	minMap_->Initialize("UI/game/minMap/minMap.png");
+	minMap_->LoadFromJson("minMap");
 }
 
 void GameSceneUI::Update() {
@@ -275,6 +279,8 @@ void GameSceneUI::Update() {
 		last_->SetPosition(MyEasing::Lerp(Vector2{ -500.0f,360.0f }, { 1780.0f,360.0f }, lastTimer_.GetProgress(), EaseType::EaseOutInSine));
 	}
 	last_->Update();
+
+	minMap_->Update();
 }
 
 void GameSceneUI::Draw() {
@@ -322,6 +328,9 @@ void GameSceneUI::Draw() {
 		weaponLvFont4_->Draw();
 	}
 
+	// ミニマップの描画
+	minMap_->Draw();
+
 	if (isPaused_) {
 		pauseBg_->Draw();
 		back_->Draw();
@@ -365,6 +374,7 @@ void GameSceneUI::Draw() {
 }
 
 void GameSceneUI::DrawImGui() {
+	minMap_->DrawImGui("minMap");
 	//lvFont_->DrawImGui("LvFont");
 	//lv_->DrawImGui("LvSprite");
 	//moneyFont_->DrawImGui("NowMoneyFont");

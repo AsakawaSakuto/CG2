@@ -144,6 +144,9 @@ public:
 
 private:
 
+	// minMap
+	std::unique_ptr<Sprite> minMap_;
+
 	GameTimer resultTimer_;
 	std::unique_ptr<Sprite> resultBg_;
 	std::unique_ptr<Sprite> resultWeaponIcon1_;
