@@ -123,6 +123,11 @@ public:
 	void SetPosition(const Vector3& position) { transform_.translate = position; }
 	
 	/// <summary>
+	/// Playerの向き（Y軸回転）を取得する
+	/// </summary>
+	float GetRotationY() const { return transform_.rotate.y; }
+	
+	/// <summary>
 	/// 新しい武器を装備する
 	/// </summary>
 	/// <param name="weaponName">装備する武器の種類</param>

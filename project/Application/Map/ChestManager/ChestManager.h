@@ -31,6 +31,9 @@ public:
 	// チェストをアクティブ状態に設定（プレイヤーが近づいたときなど）
 	void SetChestActive(const AABB& interactAABB, bool hasEnoughMoney);
 	
+	// 全ての宝箱の位置を取得（UIで使用）
+	std::vector<Vector3> GetAllChestPositions() const;
+	
 private:
 	// 最上面のNormalブロックを見つける
 	bool FindTopNormalBlock(Map3D* map, uint32_t x, uint32_t z, uint32_t& outY) const;

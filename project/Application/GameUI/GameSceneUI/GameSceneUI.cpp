@@ -172,8 +172,142 @@ void GameSceneUI::Initialize() {
 	startTimer_.Start(2.0f, false);
 
 	minMap_ = std::make_unique<Sprite>();
-	minMap_->Initialize("UI/game/minMap/minMap.png");
+	minMap_->Initialize("UI/game/minMap/Map.png");
 	minMap_->LoadFromJson("minMap");
+
+	mapPlayer_ = std::make_unique<Sprite>();
+	mapPlayer_->Initialize("UI/game/minMap/player.png");
+	mapPlayer_->SetAnchorPoint(AnchorPoint::Center);
+}
+
+void GameSceneUI::UpdateMapPlayerPosition() {
+	// ワールド座標をミニマップのスクリーン座標に変換
+	Vector2 screenPos = WorldToMapScreen(playerWorldPosition_);
+	
+	// スプライトの位置を更新
+	mapPlayer_->SetPosition(screenPos);
+	
+	// スプライトの回転を更新
+	mapPlayer_->SetRotate(playerRotationY_);
+}
+
+Vector2 GameSceneUI::WorldToMapScreen(const Vector3& worldPos) const {
+	// X軸の変換（線形補間）
+	float normalizedX = (worldPos.x - mapWorldRight_) / (mapWorldLeft_ - mapWorldRight_);
+	float screenX = mapScreenLeft_ + normalizedX * (mapScreenRight_ - mapScreenLeft_);
+	
+	// Z軸の変換（線形補間）
+	float normalizedZ = (worldPos.z - mapWorldBottom_) / (mapWorldTop_ - mapWorldBottom_);
+	float screenY = mapScreenBottom_ + normalizedZ * (mapScreenTop_ - mapScreenBottom_);
+	
+	// ミニマップの範囲内にクランプ
+	screenX = std::clamp(screenX, mapScreenLeft_, mapScreenRight_);
+	screenY = std::clamp(screenY, mapScreenTop_, mapScreenBottom_);
+	
+	return { screenX, screenY };
+}
+
+void GameSceneUI::UpdateChestIcons(const std::vector<Vector3>& chestPositions) {
+	// アイコン数が変わった場合のみ再生成
+	if (mapChestIcons_.size() != chestPositions.size()) {
+		// 既存のアイコンをクリア
+		mapChestIcons_.clear();
+		
+		// 各Chestの位置にアイコンを作成
+		for (const auto& pos : chestPositions) {
+			auto icon = std::make_unique<Sprite>();
+			icon->Initialize(chestIconPath_);
+			icon->SetAnchorPoint(AnchorPoint::Center);
+			
+			// ワールド座標をスクリーン座標に変換
+			Vector2 screenPos = WorldToMapScreen(pos);
+			icon->SetPosition(screenPos);
+			
+			mapChestIcons_.push_back(std::move(icon));
+		}
+	}
+}
+
+void GameSceneUI::UpdateJarIcons(const std::vector<Vector3>& expJarPositions, 
+                                 const std::vector<Vector3>& moneyJarPositions) {
+	// ExpJarアイコン数が変わった場合のみ再生成
+	if (mapExpJarIcons_.size() != expJarPositions.size()) {
+		mapExpJarIcons_.clear();
+		
+		// ExpJarのアイコンを作成
+		for (const auto& pos : expJarPositions) {
+			auto icon = std::make_unique<Sprite>();
+			icon->Initialize(expJarIconPath_);
+			icon->SetAnchorPoint(AnchorPoint::Center);
+			
+			// ワールド座標をスクリーン座標に変換
+			Vector2 screenPos = WorldToMapScreen(pos);
+			icon->SetPosition(screenPos);
+			
+			mapExpJarIcons_.push_back(std::move(icon));
+		}
+	}
+	
+	// MoneyJarアイコン数が変わった場合のみ再生成
+	if (mapMoneyJarIcons_.size() != moneyJarPositions.size()) {
+		mapMoneyJarIcons_.clear();
+		
+		// MoneyJarのアイコンを作成
+		for (const auto& pos : moneyJarPositions) {
+			auto icon = std::make_unique<Sprite>();
+			icon->Initialize(moneyJarIconPath_);
+			icon->SetAnchorPoint(AnchorPoint::Center);
+			
+			// ワールド座標をスクリーン座標に変換
+			Vector2 screenPos = WorldToMapScreen(pos);
+			icon->SetPosition(screenPos);
+			
+			mapMoneyJarIcons_.push_back(std::move(icon));
+		}
+	}
+}
+
+void GameSceneUI::InitializeMapObjectIcons(const std::vector<Vector3>& chestPositions,
+                                           const std::vector<Vector3>& expJarPositions, 
+                                           const std::vector<Vector3>& moneyJarPositions) {
+	// Chestアイコンの初期化
+	mapChestIcons_.clear();
+	for (const auto& pos : chestPositions) {
+		auto icon = std::make_unique<Sprite>();
+		icon->Initialize(chestIconPath_);
+		icon->SetAnchorPoint(AnchorPoint::Center);
+		
+		Vector2 screenPos = WorldToMapScreen(pos);
+		icon->SetPosition(screenPos);
+		
+		mapChestIcons_.push_back(std::move(icon));
+	}
+	
+	// ExpJarアイコンの初期化
+	mapExpJarIcons_.clear();
+	for (const auto& pos : expJarPositions) {
+		auto icon = std::make_unique<Sprite>();
+		icon->Initialize(expJarIconPath_);
+		icon->SetAnchorPoint(AnchorPoint::Center);
+		
+		Vector2 screenPos = WorldToMapScreen(pos);
+		icon->SetPosition(screenPos);
+		
+		mapExpJarIcons_.push_back(std::move(icon));
+	}
+	
+	// MoneyJarアイコンの初期化
+	mapMoneyJarIcons_.clear();
+	for (const auto& pos : moneyJarPositions) {
+		auto icon = std::make_unique<Sprite>();
+		icon->Initialize(moneyJarIconPath_);
+		icon->SetAnchorPoint(AnchorPoint::Center);
+		
+		Vector2 screenPos = WorldToMapScreen(pos);
+		icon->SetPosition(screenPos);
+		
+		mapMoneyJarIcons_.push_back(std::move(icon));
+	}
 }
 
 void GameSceneUI::Update() {
@@ -281,6 +415,18 @@ void GameSceneUI::Update() {
 	last_->Update();
 
 	minMap_->Update();
+	mapPlayer_->Update();
+	
+	// Chest/Jarアイコンの更新
+	for (auto& icon : mapChestIcons_) {
+		icon->Update();
+	}
+	for (auto& icon : mapExpJarIcons_) {
+		icon->Update();
+	}
+	for (auto& icon : mapMoneyJarIcons_) {
+		icon->Update();
+	}
 }
 
 void GameSceneUI::Draw() {
@@ -329,7 +475,22 @@ void GameSceneUI::Draw() {
 	}
 
 	// ミニマップの描画
-	minMap_->Draw();
+	if (MyInput::Push(Action::MAP_OPEN)) {
+		minMap_->Draw();
+
+		// ChestとJarのアイコンを描画
+		for (auto& icon : mapChestIcons_) {
+			icon->Draw();
+		}
+		for (auto& icon : mapExpJarIcons_) {
+			icon->Draw();
+		}
+		for (auto& icon : mapMoneyJarIcons_) {
+			icon->Draw();
+		}
+
+		mapPlayer_->Draw();
+	}
 
 	if (isPaused_) {
 		pauseBg_->Draw();
@@ -387,7 +548,7 @@ void GameSceneUI::DrawImGui() {
 	//maxHpFont_->DrawImGui("MaxHpFont");
 	//hpSlash_->DrawImGui("HpSlash");
 	//weaponIcon1_->DrawImGui("WeaponIcon1");
-	//weaponIcon2_->DrawImGui("WeaponIcon2");
+	//weaponIcon2_->DrawImGui("WeaponIcon2"];
 	//weaponIcon3_->DrawImGui("WeaponIcon3");
 	//weaponIcon4_->DrawImGui("WeaponIcon4");
 	//playTimeFont_->DrawImGui("PlayTimeFont");

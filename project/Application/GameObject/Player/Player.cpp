@@ -250,6 +250,7 @@ void Player::DrawImGui() {
 	ImGui::Text("Exp: %d / %d", status_.currentExp, status_.expToNextLevel);
 	ImGui::Text("Money: %d", status_.nowMoney);
 	ImGui::Text("Total Kills: %d", status_.killEnemyCount);
+	ImGui::Text("translate: x%.2f y%.2f z%.2f", transform_.translate.x, transform_.translate.y, transform_.translate.z);
 	
 	ImGui::Separator();
 	

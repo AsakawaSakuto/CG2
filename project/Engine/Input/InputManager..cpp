@@ -144,6 +144,10 @@ void InputManager::SetupDefaultBindings() {
 	bindings_[Action::INTERACT].push_back(InputBinding(InputSource::KEYBOARD, DIK_E));
 	bindings_[Action::INTERACT].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::X));
 
+	// マップオープン
+	bindings_[Action::MAP_OPEN].push_back(InputBinding(InputSource::KEYBOARD, DIK_F));
+	bindings_[Action::MAP_OPEN].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::BACK));
+
 	// しゃがみ
 	bindings_[Action::CROUCHING].push_back(InputBinding(InputSource::KEYBOARD, DIK_LSHIFT));
 	bindings_[Action::CROUCHING].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::L));

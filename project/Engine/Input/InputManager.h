@@ -14,6 +14,7 @@ enum class Action {
 	PAUSE,
 	INTERACT,
 	CROUCHING,
+	MAP_OPEN,
 
 	R,
 	Y,

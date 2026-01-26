@@ -278,3 +278,29 @@ std::vector<Vector3> JarManager::GetAllJarPositions() const {
 	
 	return positions;
 }
+
+std::vector<Vector3> JarManager::GetExpJarPositions() const {
+	std::vector<Vector3> positions;
+	
+	// MinJarの位置を追加 (MinJarはExp型)
+	for (const auto& jar : minJars_) {
+		if (jar->IsAlive()) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	return positions;
+}
+
+std::vector<Vector3> JarManager::GetMoneyJarPositions() const {
+	std::vector<Vector3> positions;
+	
+	// MaxJarの位置を追加 (MaxJarはMoney型)
+	for (const auto& jar : maxJars_) {
+		if (jar->IsAlive()) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	return positions;
+}

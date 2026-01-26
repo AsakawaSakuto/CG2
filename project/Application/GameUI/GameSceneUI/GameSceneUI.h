@@ -45,6 +45,50 @@ public:
 
 	void SetPlayTime(float time) { playTime_ = time; }
 
+	/// <summary>
+	/// ミニマップ上のプレイヤー位置を設定（ワールド座標から自動変換）
+	/// </summary>
+	/// <param name="worldPosition">プレイヤーのワールド座標</param>
+	void SetPlayerMapPosition(const Vector3& worldPosition) {
+		playerWorldPosition_ = worldPosition;
+		UpdateMapPlayerPosition();
+	}
+
+	/// <summary>
+	/// ミニマップ上のプレイヤー位置と向きを設定（ワールド座標から自動変換）
+	/// </summary>
+	/// <param name="worldPosition">プレイヤーのワールド座標</param>
+	/// <param name="rotationY">プレイヤーのY軸回転（ラジアン）</param>
+	void SetPlayerMapPositionAndRotation(const Vector3& worldPosition, float rotationY) {
+		playerWorldPosition_ = worldPosition;
+		playerRotationY_ = rotationY;
+		UpdateMapPlayerPosition();
+	}
+
+	/// <summary>
+	/// ミニマップ上のChestアイコンを更新
+	/// </summary>
+	/// <param name="chestPositions">Chestのワールド座標リスト</param>
+	void UpdateChestIcons(const std::vector<Vector3>& chestPositions);
+
+	/// <summary>
+	/// ミニマップ上のJarアイコンを更新
+	/// </summary>
+	/// <param name="expJarPositions">ExpJarのワールド座標リスト</param>
+	/// <param name="moneyJarPositions">MoneyJarのワールド座標リスト</param>
+	void UpdateJarIcons(const std::vector<Vector3>& expJarPositions, 
+	                    const std::vector<Vector3>& moneyJarPositions);
+
+	/// <summary>
+	/// ミニマップ上の全てのオブジェクトアイコンを更新（初期化用）
+	/// </summary>
+	/// <param name="chestPositions">Chestのワールド座標リスト</param>
+	/// <param name="expJarPositions">ExpJarのワールド座標リスト</param>
+	/// <param name="moneyJarPositions">MoneyJarのワールド座標リスト</param>
+	void InitializeMapObjectIcons(const std::vector<Vector3>& chestPositions,
+	                               const std::vector<Vector3>& expJarPositions, 
+	                               const std::vector<Vector3>& moneyJarPositions);
+
 	void SetWeaponLv(int slotIndex, int lv) {
 		if (slotIndex == 0) {
 			weaponLvFont1_->SetNumber(lv);
@@ -147,6 +191,30 @@ private:
 	// minMap
 	std::unique_ptr<Sprite> minMap_;
 
+	std::unique_ptr<Sprite> mapPlayer_;
+	Vector3 playerWorldPosition_ = { 0.0f, 0.0f, 0.0f };
+	float playerRotationY_ = 0.0f;
+
+	// ChestとJarのアイコン用のSprite（複数個表示するため、動的に生成）
+	std::vector<std::unique_ptr<Sprite>> mapChestIcons_;
+	std::vector<std::unique_ptr<Sprite>> mapExpJarIcons_;
+	std::vector<std::unique_ptr<Sprite>> mapMoneyJarIcons_;
+
+	std::string chestIconPath_ = "UI/game/minMap/chest.png";
+	std::string expJarIconPath_ = "UI/game/minMap/expJar.png";
+	std::string moneyJarIconPath_ = "UI/game/minMap/moneyJar.png";
+
+	// スクリーン座標のミニマップ範囲
+	float mapScreenTop_ =    100.0f; // Z+
+	float mapScreenBottom_ = 600.0f; // Z-
+	float mapScreenLeft_ =   20.0f;  // X+
+	float mapScreenRight_ =  520.0f; // X-
+
+	float mapWorldTop_ =   217.5f; // Z+
+	float mapWorldBottom_ = -7.5f; // Z-
+	float mapWorldLeft_ =  217.5f; // X+
+	float mapWorldRight_ =  -7.5f; // X-
+
 	GameTimer resultTimer_;
 	std::unique_ptr<Sprite> resultBg_;
 	std::unique_ptr<Sprite> resultWeaponIcon1_;
@@ -240,6 +308,16 @@ private:
 
 	// 各スロットに武器が装備されているかどうか
 	bool isWeaponEquipped_[4] = { false, false, false, false };
+
+	/// <summary>
+	/// ワールド座標をミニマップスクリーン座標に変換
+	/// </summary>
+	void UpdateMapPlayerPosition();
+
+	/// <summary>
+	/// ワールド座標をミニマップスクリーン座標に変換（汎用）
+	/// </summary>
+	Vector2 WorldToMapScreen(const Vector3& worldPos) const;
 
 	/// <summary>
 	/// 武器名からアイコンのテクスチャパスを取得

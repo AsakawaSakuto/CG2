@@ -316,3 +316,23 @@ void ChestManager::SpawnChests(Map3D* map, const std::vector<Vector3>& jarPositi
 		}
 	}
 }
+
+std::vector<Vector3> ChestManager::GetAllChestPositions() const {
+	std::vector<Vector3> positions;
+	
+	// PaidChestの位置を追加
+	for (const auto& chest : paidChests_) {
+		if (chest->IsAlive()) {
+			positions.push_back(chest->GetPosition());
+		}
+	}
+	
+	// FreeChestの位置を追加
+	for (const auto& chest : freeChests_) {
+		if (chest->IsAlive()) {
+			positions.push_back(chest->GetPosition());
+		}
+	}
+	
+	return positions;
+}
