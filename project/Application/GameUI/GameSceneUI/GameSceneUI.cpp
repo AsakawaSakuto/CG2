@@ -162,6 +162,10 @@ void GameSceneUI::Initialize() {
 	text2_ = std::make_unique<Sprite>();
 	text2_->Initialize("UI/game/Text2.png", { 640.0f,720.0f - 96.0f });
 	text2_->SetAnchorPoint(AnchorPoint::Center);
+
+	textPad_ = std::make_unique<Sprite>();
+	textPad_->Initialize("UI/game/TextPad.png", { 5.0f,415.0f });
+	
 	isTextDraw_ = true;
 	
 	last_ = make_unique<Sprite>();
@@ -417,6 +421,13 @@ void GameSceneUI::Update() {
 	minMap_->Update();
 	mapPlayer_->Update();
 	
+	if (MyInput::UseGamePad()) {
+		textPad_->SetTexture("UI/game/TextPad.png");
+	} else {
+		textPad_->SetTexture("UI/game/TextMouse.png");
+	}
+	textPad_->Update();
+
 	// Chest/Jarアイコンの更新
 	for (auto& icon : mapChestIcons_) {
 		icon->Update();
@@ -474,24 +485,6 @@ void GameSceneUI::Draw() {
 		weaponLvFont4_->Draw();
 	}
 
-	// ミニマップの描画
-	if (MyInput::Push(Action::MAP_OPEN)) {
-		minMap_->Draw();
-
-		// ChestとJarのアイコンを描画
-		for (auto& icon : mapChestIcons_) {
-			icon->Draw();
-		}
-		for (auto& icon : mapExpJarIcons_) {
-			icon->Draw();
-		}
-		for (auto& icon : mapMoneyJarIcons_) {
-			icon->Draw();
-		}
-
-		mapPlayer_->Draw();
-	}
-
 	if (isPaused_) {
 		pauseBg_->Draw();
 		back_->Draw();
@@ -526,8 +519,27 @@ void GameSceneUI::Draw() {
 	}
 	
 	if (isTextDraw_) {
-		text_->Draw();
-		text2_->Draw();
+		//text_->Draw();
+		//text2_->Draw();
+		textPad_->Draw();
+	}
+
+	// ミニマップの描画
+	if (MyInput::Push(Action::MAP_OPEN)) {
+		minMap_->Draw();
+
+		// ChestとJarのアイコンを描画
+		for (auto& icon : mapChestIcons_) {
+			icon->Draw();
+		}
+		for (auto& icon : mapExpJarIcons_) {
+			icon->Draw();
+		}
+		for (auto& icon : mapMoneyJarIcons_) {
+			icon->Draw();
+		}
+
+		mapPlayer_->Draw();
 	}
 
 	startText_->Draw();
@@ -536,6 +548,7 @@ void GameSceneUI::Draw() {
 
 void GameSceneUI::DrawImGui() {
 	minMap_->DrawImGui("minMap");
+	textPad_->DrawImGui("textPad");
 	//lvFont_->DrawImGui("LvFont");
 	//lv_->DrawImGui("LvSprite");
 	//moneyFont_->DrawImGui("NowMoneyFont");

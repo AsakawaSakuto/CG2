@@ -282,9 +282,16 @@ std::vector<Vector3> JarManager::GetAllJarPositions() const {
 std::vector<Vector3> JarManager::GetExpJarPositions() const {
 	std::vector<Vector3> positions;
 	
-	// MinJarの位置を追加 (MinJarはExp型)
+	// MinJarでExpタイプのものを追加
 	for (const auto& jar : minJars_) {
-		if (jar->IsAlive()) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Exp) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	// MaxJarでExpタイプのものを追加
+	for (const auto& jar : maxJars_) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Exp) {
 			positions.push_back(jar->GetPosition());
 		}
 	}
@@ -295,9 +302,16 @@ std::vector<Vector3> JarManager::GetExpJarPositions() const {
 std::vector<Vector3> JarManager::GetMoneyJarPositions() const {
 	std::vector<Vector3> positions;
 	
-	// MaxJarの位置を追加 (MaxJarはMoney型)
+	// MinJarでMoneyタイプのものを追加
+	for (const auto& jar : minJars_) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Money) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	// MaxJarでMoneyタイプのものを追加
 	for (const auto& jar : maxJars_) {
-		if (jar->IsAlive()) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Money) {
 			positions.push_back(jar->GetPosition());
 		}
 	}

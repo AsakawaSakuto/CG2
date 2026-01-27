@@ -300,6 +300,7 @@ private:
 
 	std::unique_ptr<Sprite> text_;
 	std::unique_ptr<Sprite> text2_;
+	std::unique_ptr<Sprite> textPad_;
 	bool isTextDraw_ = true;
 
 	std::unique_ptr<Sprite> last_;
