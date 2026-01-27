@@ -16,8 +16,8 @@ enum class Action {
 	CROUCHING,
 	MAP_OPEN,
 
-	R,
-	Y,
+	UI_CHANGE,
+	GO_SPAWN_POS,
 
 	// セレクト
 	SELECT_UP,

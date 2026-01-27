@@ -153,6 +153,12 @@ void UpgradeManager::Update() {
 	// 選択中のUIを強調表示
 	UpdateUpgradeUI();
 
+	if (MyInput::UseGamePad()) {
+		bg_->SetTexture("UI/game/selectBG.png");
+	} else {
+		bg_->SetTexture("UI/game/selectBG2.png");
+	}
+
 	bg_->Update();
 	upgradeSelectText_->Update();
 	upgradeBG1_->Update();

@@ -364,6 +364,11 @@ void GameSceneUI::Update() {
 	startText_->SetPosition(MyEasing::Lerp(startTextMin_, startTextMax_, startTimer_.GetProgress(), EaseType::EaseOutInSine));
 	startText_->Update();
 
+	if (MyInput::UseGamePad()) {
+		pauseBg_->SetTexture("UI/game/pauseBg.png");
+	} else {
+		pauseBg_->SetTexture("UI/game/pauseBg2.png");
+	}
 	pauseBg_->Update();
 	back_->Update();
 	restart_->Update();
@@ -393,7 +398,7 @@ void GameSceneUI::Update() {
 		resultRestart_->SetScale(resultMax_);
 	}
 
-	if (MyInput::Trigger(Action::R)) {
+	if (MyInput::Trigger(Action::UI_CHANGE)) {
 		if (isTextDraw_) {
 			isTextDraw_ = false;
 		} else {

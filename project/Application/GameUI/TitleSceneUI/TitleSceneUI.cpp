@@ -120,6 +120,13 @@ void TitleSceneUI::Update() {
 	scaleTimer_.Update();
 
 	play_->Update();
+
+	if (MyInput::UseGamePad()) {
+		editBG_->SetTexture("UI/title/editBG.png");
+	} else {
+		editBG_->SetTexture("UI/title/editBG2.png");
+	}
+
 	edit_->Update();
 	quit_->Update();
 	logo_->Update();

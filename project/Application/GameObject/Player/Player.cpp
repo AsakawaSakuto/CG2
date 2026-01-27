@@ -113,11 +113,11 @@ void Player::Update() {
 			transform_.translate = startPos_;
 		}
 
-		if (MyInput::Push(Action::Y)) {
+		if (MyInput::Push(Action::GO_SPAWN_POS)) {
 			comeBackTimer_ += deltaTime_;
 			MyInput::SetVibration(1.0f, 1.0f, 0.1f);
 
-			if (comeBackTimer_ >= 5.0f) {
+			if (comeBackTimer_ >= 2.0f) {
 				comeBackTimer_ = 0.0f;
 				transform_.translate = startPos_;
 			}
