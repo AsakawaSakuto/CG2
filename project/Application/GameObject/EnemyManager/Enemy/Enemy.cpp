@@ -60,14 +60,8 @@ void Enemy::Update() {
 	if (invicibilityTimer_.IsActive() && invicibilityTimer_.GetProgress() < 0.9f) {
 		// 無敵時は暗くする
 		model_->SetColor3({ 0.1f,0.1f,0.1f });
-	} else {
-		// 通常時またはハードモード時の色
-		if (isHardModeColor_) {
-			model_->SetColor3({ 1.5f, 0.5f, 0.5f });
-		} else {
-			model_->SetColor3({ 1.0f,1.0f,1.0f });
-		}
 	}
+	// ハードモード時の色は外部から設定されるため、ここでは変更しない
 
 	invicibilityTimer_.Update();
 	if (invicibilityTimer_.IsFinished()) {

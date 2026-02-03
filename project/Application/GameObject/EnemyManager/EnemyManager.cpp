@@ -20,6 +20,11 @@ void EnemyManager::Initialize() {
 	// 初期スポーン設定
 	spawnConfig_ = EnemySpawnConfig::CalculateFromPlayerLevel(1);
 	currentPlayerLevel_ = 1;
+	
+	// ハードモード関連の初期化
+	isHardMode_ = false;
+	hardModePhase_ = 0;
+	hardModeElapsedTime_ = 0.0f;
 }
 
 void EnemyManager::UpdateSpawnConfig(int playerLevel) {
@@ -27,11 +32,16 @@ void EnemyManager::UpdateSpawnConfig(int playerLevel) {
 		currentPlayerLevel_ = playerLevel;
 		spawnConfig_ = EnemySpawnConfig::CalculateFromPlayerLevel(playerLevel);
 		
-		// ハードモードの場合は追加で倍率をかける
+		// ハードモードの場合は段階に応じて倍率をかける
 		if (isHardMode_) {
-			spawnConfig_.hpMultiplier *= 1.5f;
-			spawnConfig_.powerMultiplier *= 1.25f;
-			spawnConfig_.moveSpeedMultiplier *= 1.75f;
+			// 段階ごとに強化（10秒ごとに1段階、各段階で少しずつ強化）
+			float hpBonus = CalculateHardModeMultiplier(1.2f, 0.15f);      // 初期1.5倍、段階ごとに+0.15倍
+			float powerBonus = CalculateHardModeMultiplier(1.5f, 0.1f);   // 初期1.25倍、段階ごとに+0.1倍
+			float speedBonus = CalculateHardModeMultiplier(1.1f, 0.05f);  // 初期1.75倍、段階ごとに+0.05倍
+			
+			spawnConfig_.hpMultiplier *= hpBonus;
+			spawnConfig_.powerMultiplier *= powerBonus;
+			spawnConfig_.moveSpeedMultiplier *= speedBonus;
 			spawnConfig_.spawnInterval *= 0.5f; // スポーン間隔を短く
 			spawnConfig_.enemiesPerSpawn = static_cast<int>(spawnConfig_.enemiesPerSpawn * 1.5f);
 			spawnConfig_.maxEnemyCount = static_cast<int>(spawnConfig_.maxEnemyCount * 2.0f);
@@ -52,10 +62,35 @@ void EnemyManager::Update() {
 		}
 	}
 	
-	// ハードモード時、既存の敵にも色を適用
+	// ハードモード時の処理
 	if (isHardMode_) {
+		// 経過時間を更新
+		hardModeElapsedTime_ += GetDeltaTime();
+		
+		// 10秒ごとに段階を上げる
+		int newPhase = static_cast<int>(hardModeElapsedTime_ / 10.0f);
+		if (newPhase != hardModePhase_) {
+			hardModePhase_ = newPhase;
+			
+			// 段階が上がったらスポーン設定を再計算
+			if (player_) {
+				UpdateSpawnConfig(player_->GetLevel());
+			}
+		}
+		
+		// 既存の敵の色を段階に応じて更新
+		Vector3 color = CalculateHardModeColor();
 		for (auto& enemy : enemies_) {
-			enemy->SetHardModeColor(true);
+			enemy->GetModel()->SetColor3(color);
+		}
+	} else {
+		// 通常モード時は白色
+		for (auto& enemy : enemies_) {
+			// 無敵時間以外は白色
+			if (!enemy->IsActiveInvincibleTimer() || enemy->IsActiveInvincibleTimer() && 
+			    enemy->GetInvincibilityProgress() >= 0.9f) {
+				enemy->GetModel()->SetColor3({ 1.0f, 1.0f, 1.0f });
+			}
 		}
 	}
 
@@ -75,9 +110,10 @@ void EnemyManager::Update() {
 					spawnConfig_.moveSpeedMultiplier
 				);
 				
-				// ハードモード時は敵を赤みがかった色に
+				// ハードモード時は敵を段階に応じた色に
 				if (isHardMode_) {
-					enemy->SetHardModeColor(true);
+					Vector3 color = CalculateHardModeColor();
+					enemy->GetModel()->SetColor3(color);
 				}
 				
 				// Map3Dを設定
@@ -218,6 +254,18 @@ void EnemyManager::DrawImGui() {
 	ImGui::Text("Timer Elapsed: %.2f / %.2f", spawnTimer_.GetElapsedTime(), spawnTimer_.GetDuration());
 	
 	ImGui::Separator();
+	ImGui::Text("--- Hard Mode Info ---");
+	ImGui::Text("Hard Mode: %s", isHardMode_ ? "YES" : "NO");
+	if (isHardMode_) {
+		ImGui::Text("Phase: %d", hardModePhase_);
+		ImGui::Text("Elapsed Time: %.1f sec", hardModeElapsedTime_);
+		ImGui::Text("Next Phase in: %.1f sec", 10.0f - fmod(hardModeElapsedTime_, 10.0f));
+		
+		Vector3 color = CalculateHardModeColor();
+		ImGui::ColorEdit3("Enemy Color", &color.x);
+	}
+	
+	ImGui::Separator();
 	ImGui::Text("--- Spawn Config (Level %d) ---", currentPlayerLevel_);
 	ImGui::Text("HP Multiplier: %.2f", spawnConfig_.hpMultiplier);
 	ImGui::Text("Power Multiplier: %.2f", spawnConfig_.powerMultiplier);
@@ -294,4 +342,20 @@ void EnemyManager::KillAllEnemiesForHardMode() {
 	for (auto& expItem : expItems_) {
 		expItem->StateChange();
 	}
+}
+
+float EnemyManager::CalculateHardModeMultiplier(float baseMultiplier, float phaseIncrease) const {
+	return baseMultiplier + (hardModePhase_ * phaseIncrease);
+}
+
+Vector3 EnemyManager::CalculateHardModeColor() const {
+	// 段階0: 白に近い赤 (1.5, 0.5, 0.5)
+	// 段階5以降: より濃い赤 (2.0, 0.2, 0.2)
+	float t = (std::min)(hardModePhase_ / 5.0f, 1.0f); // 0.0～1.0に正規化（最大5段階）
+	
+	float r = 1.5f + t * 0.5f;  // 1.5 → 2.0
+	float g = 0.5f - t * 0.3f;  // 0.5 → 0.2
+	float b = 0.5f - t * 0.3f;  // 0.5 → 0.2
+	
+	return { r, g, b };
 }

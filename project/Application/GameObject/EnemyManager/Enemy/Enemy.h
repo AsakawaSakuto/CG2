@@ -29,6 +29,11 @@ public:
 	/// </summary>
 	void SetHardModeColor(bool isHardMode);
 	
+	/// <summary>
+	/// モデルへのアクセス（色の設定用）
+	/// </summary>
+	Model* GetModel() { return model_.get(); }
+	
 private:
 
     void Move();

@@ -42,7 +42,14 @@ public:
 	/// <summary>
 	/// ハードモードを設定
 	/// </summary>
-	void SetHardMode(bool isHardMode) { isHardMode_ = isHardMode; }
+	void SetHardMode(bool isHardMode) { 
+		isHardMode_ = isHardMode; 
+		if (isHardMode) {
+			// ハードモード開始時にタイマーをリセット
+			hardModePhase_ = 0;
+			hardModeElapsedTime_ = 0.0f;
+		}
+	}
 	
 	/// <summary>
 	/// ハードモード中かどうか
@@ -53,6 +60,16 @@ public:
 	/// ハードモード移行時に既存の敵を全て倒してExpItemをドロップさせる
 	/// </summary>
 	void KillAllEnemiesForHardMode();
+
+	/// <summary>
+	/// ハードモードの段階（0から開始し、10秒ごとに増加）
+	/// </summary>
+	int GetHardModePhase() const { return hardModePhase_; }
+	
+	/// <summary>
+	/// ハードモードの経過時間を取得
+	/// </summary>
+	float GetHardModeElapsedTime() const { return hardModeElapsedTime_; }
 
 private:
 
@@ -82,4 +99,24 @@ private:
 	
 	// ハードモードフラグ
 	bool isHardMode_ = false;
+	
+	// ハードモードの段階（10秒ごとに1増加）
+	int hardModePhase_ = 0;
+	
+	// ハードモード開始からの経過時間
+	float hardModeElapsedTime_ = 0.0f;
+	
+	/// <summary>
+	/// ハードモードの段階に応じた倍率を計算
+	/// </summary>
+	/// <param name="baseMultiplier">基本倍率</param>
+	/// <param name="phaseIncrease">段階ごとの増加量</param>
+	/// <returns>計算された倍率</returns>
+	float CalculateHardModeMultiplier(float baseMultiplier, float phaseIncrease) const;
+	
+	/// <summary>
+	/// ハードモードの段階に応じた色を計算（白から赤へ）
+	/// </summary>
+	/// <returns>RGB色（R, G, B）各0.0-2.0</returns>
+	Vector3 CalculateHardModeColor() const;
 };

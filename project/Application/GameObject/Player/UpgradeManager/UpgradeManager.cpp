@@ -369,20 +369,21 @@ void UpgradeManager::GenerateUpgradeOptions() {
 				
 				// 武器に応じて利用可能な強化タイプを決定
 				std::vector<UpgradeType> availableUpgradeTypes;
-				availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
 				
-				// Areaはサイズのみ（発射数なし）
+				// Areaはサイズのみ（発射数とダメージなし）
 				if (option.weaponName == WeaponName::Area) {
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
 				}
-				// Axe、Boomerang、Toxicはサイズと発射数の両方
+				// Axe、Boomerang、Toxicはダメージ、サイズと発射数の両方
 				else if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Boomerang || 
 						 option.weaponName == WeaponName::Toxic) {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
 				}
-				// それ以外の武器は発射数のみ
+				// それ以外の武器はダメージと発射数のみ
 				else {
+					availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);
 					availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
 				}
 				
@@ -417,20 +418,21 @@ void UpgradeManager::GenerateUpgradeOptions() {
 			
 			// 武器に応じて利用可能な強化タイプを決定
 			std::vector<UpgradeType> availableUpgradeTypes;
-			availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);  // 全武器共通
 			
-			// Areaはサイズのみ（発射数なし）
+			// Areaはサイズのみ（発射数とダメージなし）
 			if (option.weaponName == WeaponName::Area) {
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
 			}
-			// Axe、Boomerang、Toxicはサイズと発射数の両方
+			// Axe、Boomerang、Toxicはダメージ、サイズと発射数の両方
 			else if (option.weaponName == WeaponName::Axe || option.weaponName == WeaponName::Boomerang || 
 					 option.weaponName == WeaponName::Toxic) {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeSize);
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
 			}
-			// それ以外の武器は発射数のみ
+			// それ以外の武器はダメージと発射数のみ
 			else {
+				availableUpgradeTypes.push_back(UpgradeType::UpgradeDamage);
 				availableUpgradeTypes.push_back(UpgradeType::UpgradeShotMaxCount);
 			}
 			
