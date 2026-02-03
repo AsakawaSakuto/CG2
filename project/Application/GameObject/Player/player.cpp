@@ -89,7 +89,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	// UpgradeManagerにWeaponManagerを設定
 	upgradeManager_->SetWeaponManager(weaponManager_.get());
 
-	healingTimer_.Start(6.0f, true);
+	healingTimer_.Start(2.0f, true);
 
 	isDie_ = false;
 }
