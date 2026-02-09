@@ -1,4 +1,5 @@
 #include "FreeChest.h"
+#include "Input/MyInput.h"
 
 void FreeChest::Initialize(Vector3 pos) {
 	if (isSpawn_) { return; }
@@ -31,6 +32,12 @@ void FreeChest::Initialize(Vector3 pos) {
 void FreeChest::Update() {
 	bottomTransform_.translate = transform_.translate + Vector3{ 0.0f, 2.0f, 0.0f };
 	bottomTransform_.scale = MyEasing::Lerp_GAB(textMax, textMin, timer_.GetProgress());
+
+	if (MyInput::UseGamePad()) {
+		bottom_->SetTexture("resources/model/mapObject/chest/text.png");
+	} else {
+		bottom_->SetTexture("resources/model/mapObject/chest/text2.png");
+	}
 
 	// タイマー更新
 	timer_.Update();
