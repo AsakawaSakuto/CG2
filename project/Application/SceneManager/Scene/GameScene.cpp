@@ -75,6 +75,15 @@ void GameScene::Initialize() {
 
 	gameSceneUI_ = make_unique<GameSceneUI>();
 	gameSceneUI_->Initialize();
+	
+	// ミニマップのオブジェクトアイコンを初期化
+	if (chestManager_ && jarManager_) {
+		gameSceneUI_->InitializeMapObjectIcons(
+			chestManager_->GetAllChestPositions(),
+			jarManager_->GetExpJarPositions(),
+			jarManager_->GetMoneyJarPositions()
+		);
+	}
 
 	wall_ = make_unique<Model>();
 	wall_->Initialize("MapBlock/wall.obj");
@@ -308,17 +317,6 @@ void GameScene::Update() {
 
 	auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
 	postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	/*if (useFog_) {
-		if (MyInput::TriggerKey(DIK_RETURN)) {
-			useFog_ = false;
-			postEffect->SetEnabled(false);
-		}
-	} else {
-		if (MyInput::TriggerKey(DIK_RETURN)) {
-			useFog_ = true;
-			postEffect->SetEnabled(true);
-		}
-	}*/
 
 	// フェードイン（GameSceneへ遷移時、徐々に不透明に）
 	if (fadeInTimer_.IsActive()) {
@@ -346,7 +344,6 @@ void GameScene::Draw() {
 		if (!MyInput::PushKey(DIK_P)) {
 			map3D_->Draw(camera_);
 		}
-		//map3D_->Draw(camera_);
 	}
 
 	// 壺の描画
@@ -373,17 +370,8 @@ void GameScene::Draw() {
 
 void GameScene::DrawImGui() {
 #ifdef USE_IMGUI
-	//auto postEffect = ServiceLocator::GetDXCommon()->GetPostEffectManager();
-    //postEffect->SetProjectionMatrix(camera_.GetProjectionMatrix());
-	//postEffect->DrawImGui();
-#endif // USE_IMGUI
-
-	//gameCamera_->DrawImgui();
-
 	player_->DrawImGui();
 	enemyManager_->DrawImGui();
-
-	//testParticle_->DrawImGui("TestParticle");
 
 	// マップのImGui描画
 	if (map3D_) {
@@ -391,15 +379,7 @@ void GameScene::DrawImGui() {
 	}
 	
 	gameSceneUI_->DrawImGui();
-
-	// JarManagerのImGui描画
-	//jarManager_->DrawImGui();
-
-	// ChestManagerのImGui描画
-	//chestManager_->DrawImGui();
-
-	// TreeManagerのImGui描画
-	//treeManager_->DrawImGui();
+#endif // USE_IMGUI
 }
 
 void GameScene::PostFrameCleanup() {
@@ -426,6 +406,14 @@ void GameScene::JarUpdate() {
 		}
 		// 壺を壊したときのSEを再生
 		MyAudio::Play(SE_List::Jar);
+		
+		// 壺が破壊されたので、ミニマップのJarアイコンを更新
+		if (gameSceneUI_ && jarManager_) {
+			gameSceneUI_->UpdateJarIcons(
+				jarManager_->GetExpJarPositions(),
+				jarManager_->GetMoneyJarPositions()
+			);
+		}
 	}
 
 	// JarManagerの更新
@@ -468,6 +456,11 @@ void GameScene::ChestUpdate() {
 			// 宝箱が開けられた場合、Upgradeを実行
 			if (chestOpened && player_->GetUpgradeManager()) {
 				player_->AddExp(player_->GetExpToNextLevel());
+				
+				// 宝箱が開かれたので、ミニマップのChestアイコンを更新
+				if (gameSceneUI_ && chestManager_) {
+					gameSceneUI_->UpdateChestIcons(chestManager_->GetAllChestPositions());
+				}
 			}
 		}
 	}
@@ -483,6 +476,9 @@ void GameScene::UIUpdate() {
 	gameSceneUI_->SetPauseType(pauseType_);
 	gameSceneUI_->SetIsPaused(isPause_);
 	gameSceneUI_->SetResultType(resultType_);
+	
+	// ミニマップ上のプレイヤー位置と向きを更新（毎フレーム）
+	gameSceneUI_->SetPlayerMapPositionAndRotation(player_->GetPosition(), player_->GetRotationY());
 
 	// 武器アイコンの更新
 	if (player_->GetWeaponManager()) {

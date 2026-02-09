@@ -14,9 +14,10 @@ enum class Action {
 	PAUSE,
 	INTERACT,
 	CROUCHING,
+	MAP_OPEN,
 
-	R,
-	Y,
+	UI_CHANGE,
+	GO_SPAWN_POS,
 
 	// セレクト
 	SELECT_UP,

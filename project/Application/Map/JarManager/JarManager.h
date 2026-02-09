@@ -20,6 +20,12 @@ public:
 	// 全ての壺の位置を取得（ChestManagerで使用）
 	std::vector<Vector3> GetAllJarPositions() const;
 	
+	// Exp Jarの位置を取得
+	std::vector<Vector3> GetExpJarPositions() const;
+	
+	// Money Jarの位置を取得
+	std::vector<Vector3> GetMoneyJarPositions() const;
+	
 	void SetAABBCollision(const AABB& aabb) { aabbCollision_ = aabb; }
 private:
 	// 最上面のNormalブロックを見つける

@@ -1,4 +1,5 @@
 #include "MinJar.h"
+#include "Input/MyInput.h"
 
 void MinJar::Initialize(Vector3 pos) {
 
@@ -43,6 +44,12 @@ void MinJar::Initialize(Vector3 pos) {
 
 void MinJar::Update() {
 	
+	if (MyInput::UseGamePad()) {
+		bottom_->SetTexture("resources/model/mapObject/jar/text.png");
+	} else {
+		bottom_->SetTexture("resources/model/mapObject/jar/text2.png");
+	}
+
 	bottomTransform_.translate = transform_.translate + Vector3{ 0.0f, 2.0f, 0.0f };
 	bottomTransform_.scale = MyEasing::Lerp_GAB(textMax, textMin, timer_.GetProgress());
 

@@ -144,12 +144,19 @@ void InputManager::SetupDefaultBindings() {
 	bindings_[Action::INTERACT].push_back(InputBinding(InputSource::KEYBOARD, DIK_E));
 	bindings_[Action::INTERACT].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::X));
 
+	// マップオープン
+	bindings_[Action::MAP_OPEN].push_back(InputBinding(InputSource::KEYBOARD, DIK_F));
+	bindings_[Action::MAP_OPEN].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::R));
+
 	// しゃがみ
 	bindings_[Action::CROUCHING].push_back(InputBinding(InputSource::KEYBOARD, DIK_LSHIFT));
 	bindings_[Action::CROUCHING].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::L));
 
-	bindings_[Action::Y].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::Y));
-	bindings_[Action::R].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::R));
+	bindings_[Action::UI_CHANGE].push_back(InputBinding(InputSource::KEYBOARD, DIK_C));
+	bindings_[Action::UI_CHANGE].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::BACK));
+
+	bindings_[Action::GO_SPAWN_POS].push_back(InputBinding(InputSource::KEYBOARD, DIK_R));
+	bindings_[Action::GO_SPAWN_POS].push_back(InputBinding(InputSource::GAMEPAD_BUTTON, GamePad::Y));
 
 	// セレクト
 	bindings_[Action::SELECT_UP].push_back(InputBinding(InputSource::KEYBOARD, DIK_W));

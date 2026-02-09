@@ -62,6 +62,13 @@ public:
 	float GetMoveSpeed() const { return status_.moveSpeed; }
 	
 	/// <summary>
+	/// 無敵タイマーの進行度を取得
+	/// </summary>
+	float GetInvincibilityProgress() const { 
+		return invicibilityTimer_.IsActive() ? invicibilityTimer_.GetProgress() : 1.0f; 
+	}
+	
+	/// <summary>
 	/// ノックバックを適用
 	/// </summary>
 	/// <param name="direction">ノックバックの方向（正規化されたベクトル）</param>

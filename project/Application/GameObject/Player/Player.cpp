@@ -89,7 +89,7 @@ void Player::Initialize(PlayerName playerName, WeaponName weaponName) {
 	// UpgradeManagerにWeaponManagerを設定
 	upgradeManager_->SetWeaponManager(weaponManager_.get());
 
-	healingTimer_.Start(6.0f, true);
+	healingTimer_.Start(2.0f, true);
 
 	isDie_ = false;
 }
@@ -113,11 +113,11 @@ void Player::Update() {
 			transform_.translate = startPos_;
 		}
 
-		if (MyInput::Push(Action::Y)) {
+		if (MyInput::Push(Action::GO_SPAWN_POS)) {
 			comeBackTimer_ += deltaTime_;
 			MyInput::SetVibration(1.0f, 1.0f, 0.1f);
 
-			if (comeBackTimer_ >= 5.0f) {
+			if (comeBackTimer_ >= 2.0f) {
 				comeBackTimer_ = 0.0f;
 				transform_.translate = startPos_;
 			}
@@ -250,6 +250,7 @@ void Player::DrawImGui() {
 	ImGui::Text("Exp: %d / %d", status_.currentExp, status_.expToNextLevel);
 	ImGui::Text("Money: %d", status_.nowMoney);
 	ImGui::Text("Total Kills: %d", status_.killEnemyCount);
+	ImGui::Text("translate: x%.2f y%.2f z%.2f", transform_.translate.x, transform_.translate.y, transform_.translate.z);
 	
 	ImGui::Separator();
 	

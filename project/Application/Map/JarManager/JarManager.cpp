@@ -278,3 +278,43 @@ std::vector<Vector3> JarManager::GetAllJarPositions() const {
 	
 	return positions;
 }
+
+std::vector<Vector3> JarManager::GetExpJarPositions() const {
+	std::vector<Vector3> positions;
+	
+	// MinJarでExpタイプのものを追加
+	for (const auto& jar : minJars_) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Exp) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	// MaxJarでExpタイプのものを追加
+	for (const auto& jar : maxJars_) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Exp) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	return positions;
+}
+
+std::vector<Vector3> JarManager::GetMoneyJarPositions() const {
+	std::vector<Vector3> positions;
+	
+	// MinJarでMoneyタイプのものを追加
+	for (const auto& jar : minJars_) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Money) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	// MaxJarでMoneyタイプのものを追加
+	for (const auto& jar : maxJars_) {
+		if (jar->IsAlive() && jar->GetJarType() == JarType::Money) {
+			positions.push_back(jar->GetPosition());
+		}
+	}
+	
+	return positions;
+}

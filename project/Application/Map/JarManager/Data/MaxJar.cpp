@@ -1,4 +1,5 @@
 #include "MaxJar.h"
+#include "Input/MyInput.h"
 
 void MaxJar::Initialize(Vector3 pos) {
 
@@ -7,11 +8,11 @@ void MaxJar::Initialize(Vector3 pos) {
 
 	// モデルの読み込み
 	model_ = std::make_unique<Model>();
-	model_->Initialize("MapObject/jar/maxjar.obj");
+	model_->Initialize("MapObject/jar/maxJar.obj");
 	model_->SetTexture("resources/image/white1x1.png");
 
 	bottom_ = std::make_unique<Model>();
-	bottom_->Initialize("MapObject/jar/jarisactive.obj");
+	bottom_->Initialize("MapObject/jar/jarIsActive.obj");
 	bottom_->SetBillboard(true);
 	bottom_->UseLight(false);
 
@@ -43,6 +44,13 @@ void MaxJar::Initialize(Vector3 pos) {
 }
 
 void MaxJar::Update() {
+
+	if (MyInput::UseGamePad()) {
+		bottom_->SetTexture("resources/model/mapObject/jar/text.png");
+	} else {
+		bottom_->SetTexture("resources/model/mapObject/jar/text2.png");
+	}
+
 	bottomTransform_.translate = transform_.translate + Vector3{ 0.0f, 3.0f, 0.0f };
 	bottomTransform_.scale = MyEasing::Lerp_GAB(textMax, textMin, timer_.GetProgress());
 	// タイマー更新
