@@ -90,7 +90,9 @@
       <AdditionalDependencies>DirectXTex.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)externals\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"</Command>
+      <Command>if exist "$(ProjectDir)externals\dxcompiler.dll" (
+    copy /Y "$(ProjectDir)externals\dxcompiler.dll" "$(OutDir)dxcompiler.dll"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -118,7 +120,9 @@
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)externals\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"</Command>
+      <Command>if exist "$(ProjectDir)externals\dxcompiler.dll" (
+    copy /Y "$(ProjectDir)externals\dxcompiler.dll" "$(OutDir)dxcompiler.dll"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
@@ -148,7 +152,9 @@
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)externals\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"</Command>
+      <Command>if exist "$(ProjectDir)externals\dxcompiler.dll" (
+    copy /Y "$(ProjectDir)externals\dxcompiler.dll" "$(OutDir)dxcompiler.dll"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
