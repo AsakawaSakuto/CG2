@@ -10,7 +10,9 @@
 *.exe
 *.dll
 *.pdb
-*.obj
 *.lib
 *.ilk
 *.ini
+
+*.obj
+!resources/**/*.obj
