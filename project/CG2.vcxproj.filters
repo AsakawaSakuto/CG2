@@ -110,6 +110,8 @@
     <ClCompile Include="Application\Ranking\RankingManager.cpp" />
     <ClCompile Include="Engine\3d\SkyBox\SkyBox.cpp" />
     <ClCompile Include="Engine\3d\Effect\Effect.cpp" />
+    <ClCompile Include="Engine\3d\Ring\Ring.cpp" />
+    <ClCompile Include="Engine\3d\Ring\RingRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\EngineSystem.h" />
@@ -268,6 +270,8 @@
     <ClInclude Include="Engine\3d\Effect\EffectTypes.h" />
     <ClInclude Include="Engine\3d\Effect\Effect.h" />
     <ClInclude Include="Engine\3d\Effect\EffectFactory.h" />
+    <ClInclude Include="Engine\3d\Ring\Ring.h" />
+    <ClInclude Include="Engine\3d\Ring\RingRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Model\Object3d.hlsli" />

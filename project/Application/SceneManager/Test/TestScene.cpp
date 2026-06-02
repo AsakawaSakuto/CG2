@@ -32,6 +32,12 @@ void TestScene::Initialize() {
 
 	slashEffect_ = EffectFactory::CreateSlashEffect();
 	slashEffect_->Initialize();
+
+	// --- Ring 初期化 ---
+	// テクスチャの AddressV は Sprite RootSignature で CLAMP 設定済み
+	ring_.Initialize("resources/image/white16x16.png", 32, 1.0f, 0.3f);
+	ring_.GetTransform().translate = { 0.0f, 0.0f, 0.0f };
+	ring_.GetTransform().scale     = { 1.0f, 1.0f, 1.0f };
 }
 
 void TestScene::Update() {
@@ -51,6 +57,10 @@ void TestScene::Update() {
 	hitEffect_->Update(deltaTime);
 	slashEffect_->Update(deltaTime);
 
+	// --- Ring UVスクロール更新 ---
+	uvScrollTimer_ += deltaTime * uvScrollSpeed_;
+	ring_.SetUvScrollX(uvScrollTimer_);
+
 	MyDebugLine::AddGrid(100.0f, 10, WHITE);
 }
 
@@ -59,6 +69,9 @@ void TestScene::Draw() {
 	//skyBox_.Draw(debugCamera_);
 
 	//model_.Draw(debugCamera_);
+
+	// --- Ring 描画 ---
+	ring_.Draw(debugCamera_);
 
 	// --- Effect 描画（加算合成のため不透明パスに追増） ---
 	hitEffect_->Draw(debugCamera_);
@@ -77,7 +90,11 @@ void TestScene::DrawImGui() {
 	ImGui::Separator();
 	ImGui::Text("HitEffect   : %s", hitEffect_->IsPlaying()   ? "Playing" : "Stopped");
 	ImGui::Text("SlashEffect : %s", slashEffect_->IsPlaying() ? "Playing" : "Stopped");
+	ImGui::Separator();
+	ImGui::DragFloat("UV Scroll Speed", &uvScrollSpeed_, 0.01f, 0.0f, 10.0f);
 	ImGui::End();
+
+	ring_.DrawImGui("Ring");
 
 	hitEffect_->DrawImGui("HitEffect Params");
 	slashEffect_->DrawImGui("SlashEffect Params");

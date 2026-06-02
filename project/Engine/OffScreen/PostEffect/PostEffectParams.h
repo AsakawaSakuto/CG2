@@ -68,13 +68,43 @@ struct FogParams {
     }
 };
 
+struct GaussianBlurParams {
+    float sigma = 2.0f;         // 標準偏差σ（ぼかしの広がり具合。初期値はスライド通り2.0f）
+    float padding[3];           // 定数バッファの16バイトアライメント用パディング
+};
+
+struct DissolveParams {
+    float edgeColor[3] = { 1.0f, 0.4f, 0.3f }; // エッジの色（デフォルトはスライド通りの橙/赤系）
+    float threshold = 0.0f;                    // ディゾルブの閾値（0.0: 完全表示 ～ 1.0: 完全に消滅）
+    float edgeRange = 0.03f;                   // エッジのグラデーション幅（初期値はUI例より 0.03）
+    float padding[3];                          // 16バイトアライメント（定数バッファ）用のパディング
+
+    DissolveParams() {
+        padding[0] = 0.0f;
+        padding[1] = 0.0f;
+        padding[2] = 0.0f;
+    }
+};
+
+// ランダムノイズ効果のパラメータ
+struct RandomNoiseParams {
+    float intensity = 0.15f;    // ノイズの強度（デフォルトは程よいザラザラ感の 0.15）
+    float time = 0.0f;          // 時間（毎フレーム、ゲームの累計時間などを代入して更新します）
+    float padding[2];           // 16バイトアライメント（定数バッファ）用のパディング
+
+    RandomNoiseParams() : padding{ 0.0f, 0.0f } {}
+};
+
 // 全ポストエフェクトパラメータを統合
 struct PostEffectParams {
     VignetteParams vignette;
     BlurParams blur;
+    GaussianBlurParams gaussianBlur;
     SepiaParams sepia;
     GrayscaleParams grayscale;
     RadialBlurParams radialBlur;
     OutlineParams outline;
     FogParams fog;
+    DissolveParams dissolve;
+    RandomNoiseParams randomNoise;
 };

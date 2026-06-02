@@ -7,6 +7,7 @@
 #include"3d/SkyBox/SkyBox.h"
 #include"3d/Effect/Effect.h"
 #include"3d/Effect/EffectFactory.h"
+#include"3d/Ring/RingRenderer.h"
 
 using Microsoft::WRL::ComPtr;
 using std::unique_ptr;
@@ -34,4 +35,9 @@ private:
 	std::unique_ptr<Effect> hitEffect_;
 	std::unique_ptr<Effect> slashEffect_;
 	Vector3 effectSpawnPos_ = { 0.0f, 0.0f, 0.0f };
+
+	// --- Ring ---
+	RingRenderer ring_;
+	float uvScrollSpeed_ = 0.5f;
+	float uvScrollTimer_ = 0.0f;
 };

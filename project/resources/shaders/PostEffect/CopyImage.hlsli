@@ -38,3 +38,15 @@ struct OutlineParams
     float3 edgeColor;
     float padding;
 };
+
+// ディゾルブ効果用パラメータ（32バイトアライメント）
+struct DissolveParams
+{
+    float3 edgeColor; // エッジの色 (RGB)
+    float threshold; // ディゾルブの閾値 (0.0 ～ 1.0)
+    float edgeRange; // エッジの幅 (0.0 ～ 0.1)
+    float3 padding; // C++側の padding[3] に対応するアライメント調整用
+};
+
+// ディゾルブ用定数バッファのバインド
+ConstantBuffer<DissolveParams> gDissolveParams : register(b2);
