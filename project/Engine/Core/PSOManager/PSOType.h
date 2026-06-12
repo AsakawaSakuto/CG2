@@ -37,6 +37,9 @@ enum class PSOType {
     PostEffect_Outline,
     PostEffect_Fog,
     PostEffect_BoxFilter,
+    PostEffect_GaussianFilter,
+    PostEffect_Dissolve,
+    PostEffect_RandomNoise,
 
     // Line用（デバッグ表示・可視化）
     Line_Normal,

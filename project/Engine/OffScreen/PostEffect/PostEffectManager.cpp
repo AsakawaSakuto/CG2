@@ -160,6 +160,18 @@ void PostEffectManager::UpdateParams() {
             memcpy(mappedData, &params_.fog, sizeof(FogParams));
             break;
         }
+        case PSOType::PostEffect_BoxFilter:
+            // ボックスフィルタはパラメータ不要
+            break;
+        case PSOType::PostEffect_GaussianFilter:
+            memcpy(mappedData, &params_.gaussianBlur, sizeof(GaussianBlurParams));
+            break;
+        case PSOType::PostEffect_Dissolve:
+            memcpy(mappedData, &params_.dissolve, sizeof(DissolveParams));
+            break;
+        case PSOType::PostEffect_RandomNoise:
+            memcpy(mappedData, &params_.randomNoise, sizeof(RandomNoiseParams));
+            break;
         default:
             // その他のエフェクトはパラメータ不要
             break;
@@ -191,7 +203,10 @@ void PostEffectManager::DrawImGui() {
         "Radial Blur (放射ブラー)",
         "Outline (輪郭検出)",
         "Fog (フォグ)",
-        "Box Filter 3x3 (平滑化)"
+        "Box Filter 3x3 (平滑化)",
+        "Gaussian Filter (ガウシアン)",
+        "Dissolve (ディゾルブ)",
+        "Random Noise (ランダムノイズ)"
     };
 
     int currentEffect = static_cast<int>(effectType_);
@@ -354,6 +369,57 @@ void PostEffectManager::DrawImGui() {
             break;
         }
 
+        case PSOType::PostEffect_GaussianFilter:
+        {
+            ImGui::Text("Gaussian Filter Settings");
+            ImGui::SliderFloat("Sigma", &params_.gaussianBlur.sigma, 0.5f, 10.0f);
+            if (ImGui::Button("Reset##GaussianFilter")) {
+                params_.gaussianBlur.sigma = 2.0f;
+            }
+            ImGui::TextWrapped(
+                "Sigma: ガウス関数の標準偏差を調整します。\n"
+                "小さい値ほどシャープなぼかし、大きい値ほどソフトなぼかしになります。"
+            );
+            break;
+        }
+
+        case PSOType::PostEffect_Dissolve:
+        {
+            ImGui::Text("Dissolve Settings");
+            ImGui::SliderFloat("Threshold", &params_.dissolve.threshold, 0.0f, 1.0f);
+            ImGui::SliderFloat("Edge Range", &params_.dissolve.edgeRange, 0.0f, 0.3f);
+            ImGui::ColorEdit3("Edge Color", params_.dissolve.edgeColor);
+            if (ImGui::Button("Reset##Dissolve")) {
+                params_.dissolve.threshold = 0.0f;
+                params_.dissolve.edgeRange = 0.03f;
+                params_.dissolve.edgeColor[0] = 1.0f;
+                params_.dissolve.edgeColor[1] = 0.4f;
+                params_.dissolve.edgeColor[2] = 0.3f;
+            }
+            ImGui::TextWrapped(
+                "Threshold: 消滅の進行度（0.0=全表示 ～ 1.0=全消滅）\n"
+                "Edge Range: エッジのグラデーション幅\n"
+                "Edge Color: 消滅際のエッジ色"
+            );
+            break;
+        }
+
+        case PSOType::PostEffect_RandomNoise:
+        {
+            ImGui::Text("Random Noise Settings");
+            ImGui::SliderFloat("Intensity", &params_.randomNoise.intensity, 0.0f, 1.0f);
+            ImGui::SliderFloat("Time", &params_.randomNoise.time, 0.0f, 100.0f);
+            if (ImGui::Button("Reset##RandomNoise")) {
+                params_.randomNoise.intensity = 0.15f;
+                params_.randomNoise.time = 0.0f;
+            }
+            ImGui::TextWrapped(
+                "Intensity: ノイズの強度\n"
+                "Time: 時間値（増やすとノイズパターンが変化）"
+            );
+            break;
+        }
+
         case PSOType::PostEffect_None:
         {
             ImGui::Text("No Effect Selected");
@@ -393,6 +459,14 @@ void PostEffectManager::DrawImGui() {
         params_.fog.fogStart = 5.0f;
         params_.fog.fogEnd = 50.0f;
         params_.fog.fogDensity = 1.0f;
+        params_.gaussianBlur.sigma = 2.0f;
+        params_.dissolve.threshold = 0.0f;
+        params_.dissolve.edgeRange = 0.03f;
+        params_.dissolve.edgeColor[0] = 1.0f;
+        params_.dissolve.edgeColor[1] = 0.4f;
+        params_.dissolve.edgeColor[2] = 0.3f;
+        params_.randomNoise.intensity = 0.15f;
+        params_.randomNoise.time = 0.0f;
     }
 
     ImGui::End();

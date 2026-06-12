@@ -3,6 +3,14 @@
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
+struct GaussianFilterParams
+{
+    float sigma;
+    float3 padding;
+};
+
+ConstantBuffer<GaussianFilterParams> gParams : register(b0);
+
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -31,8 +39,8 @@ PixelShaderOutput main(VertexShaderOutput input)
     float4 sum = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float weight = 0.0f;
     
-    // 標準偏差σ (スライドの実装例に合わせて 2.0f としています)
-    float sigma = 2.0f;
+    // 標準偏差σ (定数バッファから取得)
+    float sigma = gParams.sigma;
 
     // 3x3 ガウシアンフィルタ（インデックスを -1 ～ 1 でループ）
     for (int y = -1; y <= 1; y++)

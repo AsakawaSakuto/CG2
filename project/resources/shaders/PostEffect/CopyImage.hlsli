@@ -48,5 +48,10 @@ struct DissolveParams
     float3 padding; // C++側の padding[3] に対応するアライメント調整用
 };
 
-// ディゾルブ用定数バッファのバインド
-ConstantBuffer<DissolveParams> gDissolveParams : register(b2);
+// ランダムノイズ効果用パラメータ
+struct RandomNoiseParams
+{
+    float intensity; // ノイズの強度 (0.0 ～ 1.0)
+    float time;      // 時間経過（毎フレーム動かす用）
+    float2 padding;  // C++側の padding[2] に対応
+};

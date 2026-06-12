@@ -380,6 +380,42 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> PSOManager::CreatePSOOnDemand(PSOTyp
             params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
             break;
 
+        case PSOType::PostEffect_GaussianFilter:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/GaussianFilter.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+
+        case PSOType::PostEffect_Dissolve:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Dissolve.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+
+        case PSOType::PostEffect_RandomNoise:
+            params.rootSignature = GetRootSignature("Offscreen");
+            params.inputLayout.pInputElementDescs = nullptr; // 頂点バッファ無し
+            params.inputLayout.NumElements = 0;
+            params.vertexShader = GetOrCompileShader(L"resources/shaders/PostEffect/CopyImage.VS.hlsl", L"vs_6_0");
+            params.pixelShader = GetOrCompileShader(L"resources/shaders/PostEffect/Random.PS.hlsl", L"ps_6_0");
+            params.blendState = CreateBlendState("None");
+            params.rasterizerState = CreateRasterizerState("Solid_NoCull");
+            params.depthStencilState.DepthEnable = FALSE; // 深度無効
+            params.depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+            break;
+
         case PSOType::SkyBox_Normal:
             params.rootSignature = GetRootSignature("SkyBox");
             params.inputLayout = CreateInputLayout("Object3D");
